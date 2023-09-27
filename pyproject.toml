@@ -16,6 +16,7 @@ black = "^23.9.1"
 flake8 = "^6.1.0"
 flake8-print = "^5.0.0"
 gherkin-official = "^24.1.0"
+behave = "^1.2.6"
 
 [build-system]
 requires = ["poetry-core"]
