@@ -50,7 +50,6 @@ override.tf.json
 # example: *tfplan*
 
 # ide config
-.vscode
 .idea
 
 .yo-rc.json
