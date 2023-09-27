@@ -1,0 +1,4 @@
+awscli latest
+poetry 1.6.1
+python 3.11.4
+terraform 1.5.7

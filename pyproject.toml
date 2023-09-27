@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "connecting-party-manager"
+version = "0.1.0"
+description = "Repository for the Connecting Party Manager API and related services"
+authors = ["NHS England"]
+license = "LICENSE.md"
+readme = "README.md"
+packages = [{include = "connecting_party_manager"}]
+
+[tool.poetry.dependencies]
+python = "3.11.4"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.4.0"
+black = "^23.9.1"
+flake8 = "^6.1.0"
+behave = "^1.2.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
