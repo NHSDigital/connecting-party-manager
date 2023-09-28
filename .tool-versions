@@ -1,4 +1,4 @@
-awscli latest
+awscli 2.13.22
 poetry 1.6.1
 python 3.11.4
 terraform 1.5.7

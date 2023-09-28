@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Feature tests (local)",
+      "type": "python",
+      "request": "launch",
+      "module": "behave",
+      "console": "integratedTerminal",
+      "args": ["feature_tests/", "-i", "${fileBasenameNoExtension}", "--stop"]
+    },
+    {
+      "name": "Unit tests (pytest)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "console": "integratedTerminal",
+      "args": ["-m", "unit"]
+    },
+    {
+      "name": "Integration tests (pytest)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "console": "integratedTerminal",
+      "args": ["-m", "integration"]
+    },
+    {
+      "name": "Smoke tests (pytest)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "console": "integratedTerminal",
+      "args": ["-m", "smoke"]
+    }
+  ]
+}
