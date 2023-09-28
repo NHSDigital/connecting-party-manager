@@ -5,39 +5,109 @@
 ## Table of Contents
 
 1. [Setup](#setup)
-   1. [Prerequisites](#1-prerequisites)
-      1. [Utiise ASDF Tool Manager](#1-utiise-asdf-tool-manager)
-   2. [Install python dependencies](#2-install-python-dependencies)
+   1. [Prerequisites](#prerequisites)
+   2. [Project build](#project-build)
+   3. [Other helpful commands](#other-helpful-commands)
+2. [Tests](#tests)
+3. [Workflow](#workflow)
 
 ---
 
 ## Setup
 
-### 1. Prerequisites
+### Prerequisites
 
-#### 1. Utiise ASDF Tool Manager
+We use `asdf` to fetch the required versions of prerequisite libraries instead of your system's default version. To get it up and running go to https://asdf-vm.com/guide/getting-started.html. You can check it installed properly by using the command `asdf --version`.
 
-For an easy way to make sure your local system matches the requirements needed you can use `asdf tool manager`. This tool fetches the required versions of the libraries needed and sets the directory to use that version instead of your system's default version. To get it up and running,
+If you are using `pyenv` (you can check by typing `pyenv` and seeing whether it returns a nice list of commands) then you should run:
 
-- Install `asdf` using the instructions given here. https://asdf-vm.com/guide/getting-started.html. You can check it installed properly by using the command `asdf --version`
-- Install the dependencies using the `scripts/local-development/cpm-dependencies.sh` bash script. `bash scripts/local-development/cpm-dependencies.sh`
-- You should be good to go.
-
-### 2. Install python dependencies
-
-At the root of the repo, run:
-
-```shell
-poetry install
-poetry shell
-pre-commit install
+```
+pyenv install $(cat .python-version)
 ```
 
-NOTE
+Otherwise `asdf` should do the work for you.
 
-- You will know if you are correctly in the shell when you see the following before your command line prompt `(connecting-party-manager-py3.11)` (the version may change based on the version of python)
-- If it says (.venv) then you are not using the correct virtual environment
-- As mentioned above you at least need Python 3.11 installed globally to run the project, Poetry will handle the rest
-- The terraform version can be found in the .terraform-version file at the root
+### Project build
 
----
+Do `make build` every time you would like to pick up and install new local/project dependencies and artifacts. This will always detect changes to:
+
+- `.tool-versions` (project prerequisites)
+- `pyproject.toml` (python dependencies)
+- non-development files in the `src` directory
+
+The first time it will also set up your pre-commit hooks.
+
+### Other helpful commands
+
+Run `make` to get a list of helpful commands.
+
+## Tests
+
+### `pytest` tests
+
+There are three types of `pytest` in this project:
+
+- Unit: these _do not have_ any `@pytest.mark` markers;
+- Integration: these have `@pytest.mark.integration` markers;
+- Smoke: these have `@pytest.mark.smoke` markers;
+
+In order to run these you can do one of::
+
+```shell
+make test--unit
+make test--integration   # Will attempt to log you into AWS first
+make test--smoke         # Will attempt to log you into AWS first
+```
+
+If you would like to rerun all failed tests, you can append `--rerun` to the test command, e.g.:
+
+```shell
+make test--unit--rerun
+```
+
+If you would like to pass `pytest` flags you can do e.g. to \[stop after the first failure\] with \[very\] \[verbose\] feedback:
+
+```shell
+make test--unit PYTEST_FLAGS="-xvv"
+```
+
+Otherwise, feel free to run `pytest` from your `poetry` shell for more fine-grained control (see Google for more info!).
+
+The VSCode settings for "Run and Debug" are also set up to run these tests if your prefer.
+
+## Workflow
+
+In order to create new branches, use the commands listed below. Note that the commands will throw an error if
+you attempt to use them without rebasing on `origin/main`. If you need to rebase, then please do so carefully. We recommend
+that you first inspect your divergent branch with:
+
+```shell
+git log --all --decorate --oneline --graph
+```
+
+If you branch is irreparably divergent from `origin/main`, you may find it easier to recreate your base branch and to pull in relevant changes.
+
+### Create new feature branch
+
+From `main` (or a branch based from `main`) do:
+
+```shell
+make workflow--create-feature-branch JIRA_TICKET="PI-123" DESCRIPTION="this Is MY ticKET"
+```
+
+which will create a branch of the form `feature/PI-123-this_is_my_ticket`.
+
+### Create new release branch
+
+From `main` (or a branch based from `main`) do:
+
+```shell
+make workflow--create-release-branch
+```
+
+which will create a branch of the form `release/YYYY-MM-DD`. If this branch name has already been taken it will append a patch version to the branch name.
+
+This command will also:
+
+- Update the version in `pyproject.toml` with the release branch version.
+- Update the VERSION file with the release branch version number.
