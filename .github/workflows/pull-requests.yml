@@ -1,0 +1,15 @@
+name: Pull Requests
+
+on: workflow_dispatch
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+jobs:
+  say-hi:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "hi"

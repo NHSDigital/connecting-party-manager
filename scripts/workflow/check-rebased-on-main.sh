@@ -3,7 +3,12 @@
 set -e
 
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-git fetch origin main:main
+
+if [ "$current_branch" != "main" ]; then
+  git fetch origin main:main
+else
+  git pull
+fi
 
 # Iterate over the commits in the current branch
 for commit in $(git log ${current_branch}...origin/main --oneline --pretty=format:"%h"); do
