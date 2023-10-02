@@ -1,0 +1,60 @@
+name: "Make"
+description: "Run makefile commands"
+inputs:
+  command:
+    description: "Makefile command (and args) to run."
+    required: true
+  aws-role-to-assume:
+    description: "[Optional] AWS Role to assume during this operation"
+    required: false
+  cache-suffix:
+    description: "[Optional] Cache suffix (e.g. 'base')"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - name: Set "short SHA" environment variable
+      run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Synchronise the cache ("download")
+      uses: ./.github/actions/components/caching/
+      with:
+        cache-suffix: ${{ inputs.cache-suffix }}
+
+    ##### UNCOMMENT THE FOLLOWING AFTER RUNNERS SET UP ######
+    # - name: Configure AWS Credentials
+    #   id: configure-aws-credentials
+    #   if: inputs.aws-role-to-assume
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     role-to-assume: ${{ inputs.aws-role-to-assume }}
+    #     role-session-name: github-actions-ci-${{ env.GITHUB_SHA_SHORT }}
+    #     aws-region: ${{ env.AWS_DEFAULT_REGION }}
+    #     output-credentials: true
+    ######################################################
+
+    - shell: bash
+      run: |
+        make ${{ inputs.command }} \
+          CI=1 \
+          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+          AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+          AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      env:
+        ##### REMOVE THE FOLLOWING AFTER RUNNERS SET UP ######
+        AWS_ACCESS_KEY_ID: MY_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: MY_AWS_SECRET_ACCESS_KEY # pragma: allowlist secret
+        AWS_DEFAULT_REGION: MY_AWS_DEFAULT_REGION
+        AWS_SESSION_TOKEN: MY_AWS_SESSION_TOKEN
+        ##### UNCOMMENT THE FOLLOWING AFTER RUNNERS SET UP ######
+        # AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
+        # AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
+        # AWS_DEFAULT_REGION: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}
+        # AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
+        ######################################################
+
+    - name: Synchronise the cache ("upload")
+      uses: ./.github/actions/components/caching/

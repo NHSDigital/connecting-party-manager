@@ -10,7 +10,7 @@ poetry--install: $(VENV_PYTHON) ## First time installation of poetry configurati
 poetry--clean:  ## Remove .venv directory
 	[[ -d .venv ]] && rm -r .venv || :
 
-$(VENV_PYTHON): $(TOOL_TIMESTAMP)
+$(VENV_PYTHON):
 	poetry -q || (pip install --upgrade pip && pip install poetry)
 	mkdir -p .venv
 	poetry install --with dev --no-ansi

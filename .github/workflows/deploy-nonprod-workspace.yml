@@ -18,8 +18,7 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/_deploy.yml
+    uses: ./.github/workflows/templates/_deploy.yml
     with:
       workspace: ${{ inputs.workspace }}
-      branch_name: ${{ github.workflow }}--${{ github.workflow_ref }}
     secrets: inherit # pragma: allowlist secret

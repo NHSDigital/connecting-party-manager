@@ -5,10 +5,17 @@ description = "Repository for the Connecting Party Manager API and related servi
 authors = ["NHS England"]
 license = "LICENSE.md"
 readme = "README.md"
-packages = [{ include = "**/*.py", from = "src" }]
+packages = [
+    { include = "api", from = "src" },
+    { include = "domain", from = "src/layers" },
+    { include = "event", from = "src/layers" },
+    { include = "repository", from = "src/layers" },
+    { include = "builder", from = "scripts" },
+]
 
 [tool.poetry.dependencies]
 python = "3.11.4"
+pydantic = "^2.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
@@ -17,6 +24,7 @@ flake8 = "^6.1.0"
 behave = "^1.2.6"
 pytest = "^7.4.2"
 pytest-custom-exit-code = "^0.3.0"
+sh = "^2.0.6"
 
 [build-system]
 requires = ["poetry-core"]
@@ -26,8 +34,4 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-markers = [
-    "unit",
-    "integration",
-    "smoke"
-]
+markers = ["unit", "integration", "smoke"]

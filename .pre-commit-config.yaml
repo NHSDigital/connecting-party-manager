@@ -35,7 +35,7 @@ repos:
           - flake8-print
         args:
           - "--select=T201,F401,F402,F403"
-          - "--exclude=.git,__pycache__,dist,.venv,scripts,scripts/changelog/changelog.py"
+          - "--exclude=.git,__pycache__,dist,.venv,scripts,scripts/changelog/changelog_precommit.py"
 
   - repo: https://github.com/psf/black
     rev: 22.3.0
@@ -91,5 +91,5 @@ repos:
     hooks:
       - id: create_changelog
         name: Create changelog from changelog files
-        entry: scripts/changelog/changelog-pre-commit.sh
+        entry: scripts/changelog/changelog-precommit.sh
         language: python
