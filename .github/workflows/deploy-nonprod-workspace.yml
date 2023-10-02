@@ -1,0 +1,25 @@
+name: Persistent Workspace Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      workspace:
+        description: Workspace to deploy to
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - dev-sandbox
+          - ref
+          - ref-sandbox
+          - int
+          - int-sandbox
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      workspace: ${{ inputs.workspace }}
+      branch_name: ${{ github.workflow }}--${{ github.workflow_ref }}
+    secrets: inherit # pragma: allowlist secret

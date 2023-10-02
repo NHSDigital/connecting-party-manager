@@ -1,0 +1,33 @@
+name: Workspace Deploy
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        description: Workspace to deploy to
+        required: true
+        default: dev
+        type: string
+      branch_name:
+        description: Branch to deploy
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+env:
+  WORKSPACE: ${{ inputs.workspace }}
+  CACHE_NAME: ${{ inputs.workspace }}-cache
+  AWS_DEFAULT_REGION: eu-west-2
+  TF_CLI_ARGS: -no-color
+
+jobs:
+  print:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "${{ inputs.workspace }}"
+          echo "${{ inputs.branch_name }}"
