@@ -27,7 +27,9 @@ jobs:
       - id: get_branch
         run: |
           workflow_ref=${{ github.workflow_ref }}
-          echo "branch_name=${workflow_ref#*refs/heads/}" >> $GITHUB_OUTPUT
+          branch_name=${workflow_ref#*refs/heads/}
+          branch_name=${branch_name#*refs/tags/}
+          echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -72,7 +74,7 @@ jobs:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         with:
-          command: terraform--init
+          command: terraform--init TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
 
   terraform--plan:
@@ -84,7 +86,7 @@ jobs:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         with:
-          command: terraform--plan
+          command: terraform--plan TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
 
   terraform--apply:
@@ -96,7 +98,7 @@ jobs:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         with:
-          command: terraform--apply
+          command: terraform--apply TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
 
   test--smoke:

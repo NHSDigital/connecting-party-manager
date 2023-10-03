@@ -12,10 +12,10 @@ runs:
   steps:
     - uses: ./.github/actions/make/
       with:
-        command: test--${{ inputs.test-type }} --ignore-errors
+        command: test--${{ inputs.test-type }}
         aws-role-to-assume: ${{ inputs.aws-role-to-assume }}
 
     - uses: ./.github/actions/make/
       with:
-        command: test--${{ inputs.test-type }}--rerun
+        command: test--${{ inputs.test-type }}--rerun PYTEST_FLAGS="--suppress-no-test-exit-code"
         aws-role-to-assume: ${{ inputs.aws-role-to-assume }}

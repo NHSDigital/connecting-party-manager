@@ -2,7 +2,7 @@
 _CACHE_CLEAR := "--cache-clear"
 
 _pytest:
-	poetry run python -m pytest --suppress-no-test-exit-code $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
+	poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
 
 _behave:
 	poetry run python -m behave feature-tests $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS)
