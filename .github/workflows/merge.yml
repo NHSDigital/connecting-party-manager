@@ -1,0 +1,54 @@
+name: Merge to main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+jobs:
+  make-tag:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    name: Create a tag from main
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Create 'env.tag' from the latest release
+        run: |
+          TAG=$(make changelog--get-latest-release)
+          echo "tag=${TAG}" >> $GITHUB_ENV
+
+    ##### UNCOMMENT THE FOLLOWING AFTER WE HAVE RELEASES ######
+    #   - name: Create tag named from 'env.tag'
+    #     uses: actions/github-script@v6
+    #     with:
+    #       script: |
+    #         github.rest.git.createRef({
+    #           owner: context.repo.owner,
+    #           repo: context.repo.repo,
+    #           ref: 'refs/tags/${{ env.tag }}',
+    #           sha: context.sha
+    #         })
+    # outputs:
+    #   tag: ${{ env.tag }}
+  #
+  # message-slack:
+  #   name: Notify slack of merge to main
+  #   needs: [make-tag]
+  #   runs-on: [self-hosted, ci]
+  #   steps:
+  #     - name: Send merge result to slack
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v1.24.0
+  #       with:
+  #         payload: |
+  #           {
+  #             "tag": "${{ needs.make-tag.outputs.tag}}"
+  #           }
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.MAIN_MERGE_SLACK_HOOK_URL }}

@@ -1,0 +1,141 @@
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        required: true
+        default: dev
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+env:
+  WORKSPACE: ${{ inputs.workspace }}
+  CACHE_NAME: ${{ inputs.workspace }}-cache
+  AWS_DEFAULT_REGION: eu-west-2
+  TF_CLI_ARGS: -no-color
+  # SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}
+
+jobs:
+  get-branch-from-workflow-file:
+    runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ steps.get_branch.outputs.branch_name }}
+    steps:
+      - id: get_branch
+        run: |
+          workflow_ref=${{ github.workflow_ref }}
+          echo "branch_name=${workflow_ref#*refs/heads/}" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntu-latest
+    needs: get-branch-from-workflow-file
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      ##### REMOVE THE FOLLOWING AFTER RUNNERS SET UP ######
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11.4
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.6.1
+      - uses: ./.github/actions/make/
+        with:
+          command: poetry--install
+      ######################################################
+      - uses: ./.github/actions/make/
+        with:
+          command: build--python # CHANGE TO "build" once runners are set up
+
+  helpers--truststore-pull:
+    needs: [get-branch-from-workflow-file, build]
+    name: Terraform plan - ${{ inputs.workspace }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: helpers--truststore-pull WORKSPACE=${{ env.WORKSPACE }}
+
+  terraform--init:
+    needs: [get-branch-from-workflow-file, helpers--truststore-pull]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: terraform--init
+          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+
+  terraform--plan:
+    needs: [get-branch-from-workflow-file, terraform--init]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: terraform--plan
+          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+
+  terraform--apply:
+    needs: [get-branch-from-workflow-file, terraform--plan]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: terraform--apply
+          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+
+  test--smoke:
+    needs: [get-branch-from-workflow-file, terraform--apply]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: test--smoke
+          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+
+  set-success:
+    name: Set Success
+    needs: [test--smoke]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set success env var
+        run: echo "success"
+
+    outputs:
+      success: "succeeded"
+
+  # message-slack:
+  #   name: Notify slack of deployment
+  #   needs: [get-branch-from-workflow-file, set-success]
+  #   if: ${{ always() }}
+  #   runs-on: [self-hosted, ci]
+
+  #   steps:
+  #     - name: Send job result to slack
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v1.24.0
+  #       with:
+  #         payload: |
+  #           {
+  #             "environment": "${{ env.WORKSPACE }}",
+  #             "result": "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
+  #             "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}"
+  #           }

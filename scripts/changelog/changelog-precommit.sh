@@ -2,7 +2,7 @@
 
 branch=$(git symbolic-ref --short HEAD)
 if [[ "${branch}" == *"release/"* ]]; then
-    result=`python ./scripts/changelog/changelog.py $branch`
+    result=`python ./scripts/changelog/changelog_precommit.py $branch`
     if [[ "${result}" == "CHANGELOG.md updated." ]]; then
         echo "SUCCESS: CHANGELOG.md was out of date and has now been updated. Please re-commit."
         exit 1

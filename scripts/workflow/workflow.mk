@@ -10,7 +10,7 @@ workflow--create-release-branch: workflow--check--rebased-on-main ## Create a re
 workflow--check--rebased-on-main:  ## Check that the current branch is rebased on origin/main
 	@bash $(PATH_TO_HERE)/check-rebased-on-main.sh
 
-workflow--check--branch-name:  ## Check the release branch name format
+workflow--check--branch-name:  ## Check the branch name format
 	@bash $(PATH_TO_HERE)/check-branch-name.sh
 
 workflow--create-feature-branch: workflow--check--rebased-on-main  ## Create a feature branch. Must provide JIRA_TICKET and DESCRIPTION keyword arguments.
@@ -21,5 +21,5 @@ workflow--create-feature-branch: workflow--check--rebased-on-main  ## Create a f
 	@bash $(PATH_TO_HERE)/create-feature-branch.sh $(JIRA_TICKET) "$(DESCRIPTION)"
 
 
-workflow--precommit-run-all:  ## Runs all pre-commit hooks (lint, changelog, etc)
+workflow--codebase-checks:  ## Runs all codebase checks (lint, changelog, etc)
 	.venv/bin/pre-commit run --all-files

@@ -1,13 +1,16 @@
 import pytest
+from domain.placeholder import placeholder
+
+import api.status.index  # noqa: F401
 
 
 @pytest.mark.integration
 def test_dummy_integration():
-    raise Exception("delete me")
+    placeholder()
 
 
 def test_dummy_unit():
-    raise Exception("delete me")
+    placeholder()
 
 
 @pytest.mark.smoke

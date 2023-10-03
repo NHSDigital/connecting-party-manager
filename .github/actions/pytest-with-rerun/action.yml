@@ -1,0 +1,21 @@
+name: "pytest Tests"
+description: "Run pytest tests, with a rerun of failed tests"
+inputs:
+  test-type:
+    description: "Test to run (unit, integration, smoke)"
+    required: true
+  aws-role-to-assume:
+    description: "[Optional] AWS Role to assume during this operation"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - uses: ./.github/actions/make/
+      with:
+        command: test--${{ inputs.test-type }} --ignore-errors
+        aws-role-to-assume: ${{ inputs.aws-role-to-assume }}
+
+    - uses: ./.github/actions/make/
+      with:
+        command: test--${{ inputs.test-type }}--rerun
+        aws-role-to-assume: ${{ inputs.aws-role-to-assume }}
