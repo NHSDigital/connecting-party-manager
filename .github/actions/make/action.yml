@@ -35,7 +35,8 @@ runs:
     #     output-credentials: true
     ######################################################
 
-    - shell: bash
+    - name: Run "make" command
+      shell: bash
       run: |
         make ${{ inputs.command }} \
           CI=1 \

@@ -101,7 +101,7 @@ jobs:
           command: workflow--codebase-checks
 
   test--unit:
-    needs: [build-head, workflow--codebase-checks]
+    needs: [build-head]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -130,14 +130,7 @@ jobs:
           command: helpers--truststore-pull WORKSPACE=ref
 
   terraform-base-build:
-    needs:
-      [
-        create-timestamp,
-        build-base,
-        workflow--codebase-checks,
-        test--unit,
-        helpers--truststore-pull,
-      ]
+    needs: [create-timestamp, build-base, helpers--truststore-pull]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -145,7 +138,12 @@ jobs:
           ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
-          command: terraform--apply WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}"
+          command: terraform--plan WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
+          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: terraform--apply WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
           aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
 
@@ -156,6 +154,7 @@ jobs:
         build-head,
         workflow--codebase-checks,
         test--unit,
+        helpers--truststore-pull,
         terraform-base-build,
       ]
     runs-on: ubuntu-latest
@@ -165,18 +164,16 @@ jobs:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
-          command: terraform--apply WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}"
+          command: terraform--plan WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: terraform--apply WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
 
   test--integration:
     needs:
-      [
-        build-head,
-        workflow--codebase-checks,
-        test--unit,
-        terraform-head-build,
-        helpers--truststore-pull,
-      ]
+      [build-head, workflow--codebase-checks, test--unit, terraform-head-build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
