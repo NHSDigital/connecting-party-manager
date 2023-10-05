@@ -1,4 +1,3 @@
-from typing import Set
 from .error import DuplicateError
 
 from .entity import Entity
