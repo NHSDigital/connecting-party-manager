@@ -13,4 +13,4 @@ def test_dummy_unit():
 
 @pytest.mark.smoke
 def test_dummy_smoke():
-    raise Exception("delete me")
+    placeholder()
