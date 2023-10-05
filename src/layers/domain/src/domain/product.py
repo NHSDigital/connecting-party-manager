@@ -13,8 +13,8 @@ class Product(Entity, QuestionnaireEntity):
         dependency_questionnaires: Set[str] = None,
     ):
         super().__init__(id, name)
-        self._questionnaires = (
-            set(questionnaires) if questionnaires is not None else set([])
+        self._questionnaires = set(
+            questionnaires if questionnaires is not None else []
         )
         self._dependency_questionnaires = (
             set(dependency_questionnaires)
