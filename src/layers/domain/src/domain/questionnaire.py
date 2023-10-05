@@ -25,7 +25,7 @@ class Questionnaire(Entity):
         self._questions: List[Question] = []
 
     def has_question(self, name: str) -> bool:
-        return name in [q.name for q in self._questions]
+        return name in (q.name for q in self._questions)
 
     def add_question(
         self,
