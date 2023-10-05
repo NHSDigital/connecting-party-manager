@@ -7,7 +7,8 @@
 1. [Setup](#setup)
    1. [Prerequisites](#prerequisites)
    2. [Project build](#project-build)
-   3. [Other helpful commands](#other-helpful-commands)
+   3. [AWS SSO Setup](#aws-sso-setup)
+   4. [Other helpful commands](#other-helpful-commands)
 2. [Tests](#tests)
 3. [Workflow](#workflow)
 
@@ -36,6 +37,25 @@ Do `make build` every time you would like to pick up and install new local/proje
 - non-development files in the `src` directory
 
 The first time it will also set up your pre-commit hooks.
+
+### AWS SSO Setup
+
+This project uses Single Sign On (SSO) for consuming AWS services, please ensure that you have NHS SSO enabled in your browser. You should add the following lines to your `~/.aws/config` file:
+
+```
+[profile nhse-cpm-mgmt-admin]
+sso_start_url = https://***********.awsapps.com/start#
+sso_region = ***********
+sso_account_id = ***********
+sso_role_name = ***********
+region = ***********
+```
+
+You can find the above values by asking a team member, or going to the AWS SSO in your browser. To test that you've been set up ok, do:
+
+```
+make aws--login
+```
 
 ### Other helpful commands
 

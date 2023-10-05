@@ -3,6 +3,7 @@ SHELL = bash
 .DEFAULT_GOAL := help
 .PHONY: help
 
+PROJECT_PREFIX = "nhse-cpm-"
 TIMESTAMP_DIR := .timestamp
 
 include scripts/**/*.mk
