@@ -9,7 +9,7 @@ fi
 PREFIX="$1"
 VERSION="$2"
 
-version_pattern="^v(?:[0-9]|[1-9][0-9]{0,2})\.(?:[0-9]|[1-9][0-9]?)\.(?:[0-9]|[1-9][0-9]?)$"
+version_pattern="^v[0-9]+(\.[0-9]+){2}$"
 
 if [[ ! $VERSION =~ $version_pattern ]]; then
     echo "The version '$VERSION' does not conform to any of the allowed pattern."
@@ -17,10 +17,10 @@ if [[ ! $VERSION =~ $version_pattern ]]; then
 fi
 
 AWS_REGION_NAME="eu-west-2"
-MGMT_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--mgmt-account-id"
-PROD_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--prod-account-id"
-TEST_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--test-account-id"
-DEV_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--dev-account-id"
+MGMT_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--mgmt-account-id-${VERSION}"
+PROD_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--prod-account-id-${VERSION}"
+TEST_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--test-account-id-${VERSION}"
+DEV_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--dev-account-id-${VERSION}"
 
 admin_policy_arn="arn:aws:iam::aws:policy/AdministratorAccess"
 truststore_bucket_name="${PREFIX}--truststore-${VERSION}"
@@ -38,7 +38,7 @@ aws s3api delete-objects \
     --delete "${versioned_objects}" || echo "Ignore the previous warning - an empty bucket is a good thing"
 echo "Waiting for bucket contents to be deleted..." && sleep 10
 aws s3 rb "s3://${state_bucket_name}" || echo "Bucket could not be deleted at this time. You should go to the AWS Console and delete the bucket manually."
-aws secretsmanager delete-secret --secret-id "${MGMT_ACCOUNT_ID_LOCATION}"
-aws secretsmanager delete-secret --secret-id "${DEV_ACCOUNT_ID_LOCATION}"
-aws secretsmanager delete-secret --secret-id "${TEST_ACCOUNT_ID_LOCATION}"
-aws secretsmanager delete-secret --secret-id "${PROD_ACCOUNT_ID_LOCATION}"
+aws secretsmanager delete-secret --secret-id "${MGMT_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager delete-secret --secret-id "${DEV_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager delete-secret --secret-id "${TEST_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager delete-secret --secret-id "${PROD_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"

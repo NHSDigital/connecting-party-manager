@@ -9,8 +9,6 @@ fi
 PREFIX="$1"
 VERSION="$2"
 
-# version_pattern="^v(?:[0-9]|[1-9][0-9]{0,2})\.(?:[0-9]|[1-9][0-9]?)\.(?:[0-9]|[1-9][0-9]?)$"
-# version_pattern="^v(?:[0-9]|[1-9][0-9]{0,2})\.(?:[0-9]|[1-9][0-9]?)\.(?:[0-9]|[1-9][0-9]?)$"
 version_pattern="^v[0-9]+(\.[0-9]+){2}$"
 
 if [[ ! $VERSION =~ $version_pattern ]]; then
@@ -19,10 +17,10 @@ if [[ ! $VERSION =~ $version_pattern ]]; then
 fi
 
 AWS_REGION_NAME="eu-west-2"
-MGMT_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--mgmt-account-id"
-PROD_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--prod-account-id"
-TEST_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--test-account-id"
-DEV_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--dev-account-id"
+MGMT_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--mgmt-account-id-${VERSION}"
+PROD_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--prod-account-id-${VERSION}"
+TEST_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--test-account-id-${VERSION}"
+DEV_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--dev-account-id-${VERSION}"
 
 admin_policy_arn="arn:aws:iam::aws:policy/AdministratorAccess"
 truststore_bucket_name="${PREFIX}--truststore-${VERSION}"
@@ -35,7 +33,7 @@ aws s3api put-public-access-block --bucket "${state_bucket_name}" --public-acces
 aws dynamodb create-table --region "${AWS_REGION_NAME}" --table-name "${state_lock_table_name}" --attribute-definitions AttributeName=LockID,AttributeType=S \
 --key-schema AttributeName=LockID,KeyType=HASH \
 --provisioned-throughput ReadCapacityUnits=20,WriteCapacityUnits=20
-aws secretsmanager create-secret --name "${MGMT_ACCOUNT_ID_LOCATION}"
-aws secretsmanager create-secret --name "${DEV_ACCOUNT_ID_LOCATION}"
-aws secretsmanager create-secret --name "${TEST_ACCOUNT_ID_LOCATION}"
-aws secretsmanager create-secret --name "${PROD_ACCOUNT_ID_LOCATION}"
+aws secretsmanager create-secret --name "${MGMT_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager create-secret --name "${DEV_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager create-secret --name "${TEST_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager create-secret --name "${PROD_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"

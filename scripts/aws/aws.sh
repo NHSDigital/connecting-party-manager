@@ -5,7 +5,7 @@ SSO_CACHE=${HOME}/.aws/sso/cache
 # Log in, if not already logged in
 aws sts get-caller-identity --profile ${PROFILE} &> /dev/null
 if [ $? -gt 0 ]; then
-    aws sso login --profile ${PROFILE}
+    aws sso login --profile ${PROFILE} &> /dev/null
 fi
 set -e
 
