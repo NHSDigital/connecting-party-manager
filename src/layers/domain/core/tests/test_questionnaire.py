@@ -66,15 +66,15 @@ def test_has_question(name: str):
     subject = Questionnaire("id", "name")
     subject.add_question(name)
 
-    assert subject.has_question(name), "has_question"
+    assert name in subject, "has_question"
 
 
 @pytest.mark.parametrize(
     ["name", "missing"],
     [["alpha", "not_present"], ["beta", "look_elsewhere"], ["gamma", "nope"]],
 )
-def test_has_not_question(name: str, missing: str):
+def test_doesnt_have_question(name: str, missing: str):
     subject = Questionnaire("id", "name")
     subject.add_question(name)
 
-    assert not subject.has_question(missing), "not has_question()"
+    assert name not in subject, "not has_question()"

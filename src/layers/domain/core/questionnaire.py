@@ -24,8 +24,8 @@ class Questionnaire(Entity):
         super().__init__(id, name)
         self._questions: list[Question] = []
 
-    def has_question(self, name: str) -> bool:
-        return name in (q.name for q in self._questions)
+    def __contains__(self, question_name: str) -> bool:
+        return question_name in (q.name for q in self._questions)
 
     def add_question(
         self,
@@ -33,7 +33,7 @@ class Questionnaire(Entity):
         type: QuestionType = QuestionType.STRING,
         multiple: bool = False,
     ):
-        if self.has_question(name):
+        if name in self:
             raise DuplicateError(f"Question exists: {name}")
         result = Question(name, type=type, multiple=multiple)
         self._questions.append(result)
