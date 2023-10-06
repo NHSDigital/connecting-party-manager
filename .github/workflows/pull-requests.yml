@@ -119,6 +119,25 @@ jobs:
         with:
           test-type: unit
 
+  test--feature--local:
+    needs: [build-head]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      ##### REMOVE THE FOLLOWING AFTER RUNNERS SET UP ######
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11.4
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.6.1
+      ######################################################
+      - uses: ./.github/actions/make/
+        with:
+          command: test--feature--local
+
   helpers--truststore-pull:
     runs-on: ubuntu-latest
     steps:
@@ -154,6 +173,7 @@ jobs:
         build-head,
         workflow--codebase-checks,
         test--unit,
+        test--feature--local,
         helpers--truststore-pull,
         terraform-base-build,
       ]
@@ -173,7 +193,13 @@ jobs:
 
   test--integration:
     needs:
-      [build-head, workflow--codebase-checks, test--unit, terraform-head-build]
+      [
+        build-head,
+        workflow--codebase-checks,
+        test--unit,
+        test--feature--local,
+        terraform-head-build,
+      ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
