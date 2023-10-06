@@ -27,12 +27,12 @@ truststore_bucket_name="${PREFIX}--truststore-${VERSION}"
 state_bucket_name="${PREFIX}--terraform-state-${VERSION}"
 state_lock_table_name="${PREFIX}--terraform-state-lock-${VERSION}"
 
-aws dynamodb delete-table --table-name "${state_lock_table_name}" || return 1
+aws dynamodb delete-table --table-name "${state_lock_table_name}" || exit 1
 versioned_objects=NULL
 versioned_objects=$(aws s3api list-object-versions \
                     --bucket "${state_bucket_name}" \
                     --output=json \
-                    --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}') || return 1
+                    --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}') || exit 1
 aws s3api delete-objects \
     --bucket "${state_bucket_name}" \
     --delete "${versioned_objects}" || echo "Ignore the previous warning - an empty bucket is a good thing"
