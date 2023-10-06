@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 SSO_CACHE=${HOME}/.aws/sso/cache
 
@@ -8,6 +7,7 @@ aws sts get-caller-identity --profile ${PROFILE} &> /dev/null
 if [ $? -gt 0 ]; then
     aws sso login --profile ${PROFILE}
 fi
+set -e
 
 # Collect required info to get role credentials
 LATEST_SSO_JWT=${SSO_CACHE}/$(ls -t ${SSO_CACHE} | head -1)
