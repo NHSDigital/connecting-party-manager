@@ -1,0 +1,10 @@
+#!/bin/bash
+
+PROFILE_PREFIX="nhse-cpm"
+AWS_REGION_NAME="eu-west-2"
+TERRAFORM_ROLE_NAME="Terraform_Admin"
+VERSION="v1.0.0"
+MGMT_ACCOUNT_ID_LOCATION="${PROFILE_PREFIX}--mgmt--mgmt-account-id-${VERSION}"
+PROD_ACCOUNT_ID_LOCATION="${PROFILE_PREFIX}--mgmt--prod-account-id-${VERSION}"
+TEST_ACCOUNT_ID_LOCATION="${PROFILE_PREFIX}--mgmt--test-account-id-${VERSION}"
+DEV_ACCOUNT_ID_LOCATION="${PROFILE_PREFIX}--mgmt--dev-account-id-${VERSION}"

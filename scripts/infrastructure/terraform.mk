@@ -3,9 +3,13 @@
 PATH_TO_INFRASTRUCTURE := $(CURDIR)/scripts/infrastructure
 PREFIX :=
 VERSION :=
+TERRAFORM_COMMAND :=
 # UNCOMMENT THIS AFTER RUNNERS INSTALLED
 # terraform--plan: build aws--login  ## Run terraform plan
 #	@echo "terraform--plan" $(CI) $(WORKSPACE) $(AWS_ACCESS_KEY_ID) $(AWS_SECRET_ACCESS_KEY) $(AWS_DEFAULT_REGION) $(TF_CLI_ARGS)
+
+terraform--validate: aws-login ## Run terraform validate
+	@ bash -c "$(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh; _terraform validate"
 
 terraform--init: aws--login  ## Run terraform init
 	@echo "terraform--init" $(CI) $(WORKSPACE) $(AWS_ACCESS_KEY_ID) $(AWS_SECRET_ACCESS_KEY) $(AWS_DEFAULT_REGION) $(TF_CLI_ARGS)

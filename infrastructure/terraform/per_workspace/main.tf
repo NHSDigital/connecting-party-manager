@@ -1,9 +1,16 @@
 provider "aws" {
+  region = local.region
+
+  assume_role {
+    role_arn = "arn:aws:iam::${var.assume_account}:role/${var.assume_role}"
+  }
+
   default_tags {
     tags = {
       Environment = var.environment
       Timestamp   = timestamp()
       Workspace   = terraform.workspace
+      Project     = local.project
     }
   }
 }
