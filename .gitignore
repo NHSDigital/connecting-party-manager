@@ -7,6 +7,7 @@
 **/.terraform/*
 **/tfplan
 **/terraform/**/output.json
+infrastructure/localstack/.terraform.lock.hcl
 
 # key & certificate files
 *.pem
