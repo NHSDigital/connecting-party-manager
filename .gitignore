@@ -7,7 +7,7 @@
 **/.terraform/*
 **/tfplan
 **/terraform/**/output.json
-infrastructure/localstack/.terraform.lock.hcl
+*.lock.hcl
 
 # key & certificate files
 *.pem
@@ -61,6 +61,9 @@ __pycache__
 *egg-info*
 .pytest_cache
 .venv
+
+# poetry
+poetry.lock
 
 # build dirs
 build
