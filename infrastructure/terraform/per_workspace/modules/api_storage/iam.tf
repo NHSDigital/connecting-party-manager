@@ -2,9 +2,14 @@ module "iam_policy_read" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.30.0"
 
-  name        = "${var.name}-read"
+  name        = "${var.name}--iam-policy-read"
   path        = "/"
   description = "Read the ${var.name} table"
+
+  tags = {
+    Name    = "${var.name}--iam-policy-read"
+    Created = var.created
+  }
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -38,9 +43,15 @@ module "iam_policy_write" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.30.0"
 
-  name        = "${var.name}-write"
+  name        = "${var.name}--iam-policy-write"
   path        = "/"
   description = "Write to the ${var.name} table"
+
+  tags = {
+    Name    = "${var.name}--iam-policy-write"
+    Created = var.created
+  }
+
 
   policy = jsonencode({
     Version = "2012-10-17"

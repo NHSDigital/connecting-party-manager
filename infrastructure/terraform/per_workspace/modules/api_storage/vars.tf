@@ -20,3 +20,5 @@ variable "deletion_protection_enabled" {
 }
 
 variable "kms_deletion_window_in_days" {}
+
+variable "created" {}
