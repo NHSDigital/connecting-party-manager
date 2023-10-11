@@ -18,7 +18,7 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/templates/_deploy.yml
+    uses: ./.github/workflows/_deploy.yml
     with:
       workspace: ${{ inputs.workspace }}
     secrets: inherit # pragma: allowlist secret

@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   make-tag:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     permissions: write-all
     name: Create a tag from main
     steps:
