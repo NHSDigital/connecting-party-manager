@@ -20,7 +20,7 @@ env:
 
 jobs:
   get-branch-from-workflow-file:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     outputs:
       branch_name: ${{ steps.get_branch.outputs.branch_name }}
     steps:
@@ -32,31 +32,20 @@ jobs:
           echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     needs: get-branch-from-workflow-file
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      ##### REMOVE THE FOLLOWING AFTER RUNNERS SET UP ######
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.11.4
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: 1.6.1
       - uses: ./.github/actions/make/
         with:
-          command: poetry--install
-      ######################################################
-      - uses: ./.github/actions/make/
-        with:
-          command: build--python # CHANGE TO "build" once runners are set up
+          command: build
 
   helpers--truststore-pull:
     needs: [get-branch-from-workflow-file, build]
     name: Terraform plan - ${{ inputs.workspace }})
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -67,7 +56,7 @@ jobs:
 
   terraform--init:
     needs: [get-branch-from-workflow-file, helpers--truststore-pull]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -79,7 +68,7 @@ jobs:
 
   terraform--plan:
     needs: [get-branch-from-workflow-file, terraform--init]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -91,7 +80,7 @@ jobs:
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -103,7 +92,7 @@ jobs:
 
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -116,7 +105,7 @@ jobs:
   set-success:
     name: Set Success
     needs: [test--smoke]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci]
     steps:
       - name: Set success env var
         run: echo "success"
