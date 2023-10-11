@@ -84,3 +84,15 @@ function _get_expiration_date() {
     local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc) + timedelta(hours=72), '%Y-%m-%dT%H:%M:%SZ'))")
     echo "${timestamp}"
 }
+
+function _get_layer_list() {
+    local dir=$(pwd)
+    local layers=$(find "$(pwd)/src/layers" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+    echo $layers
+}
+
+function _get_lambda_list() {
+    local dir=$(pwd)
+    local lambdas=$(find "$(pwd)/src/api" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+    echo $lambdas
+}

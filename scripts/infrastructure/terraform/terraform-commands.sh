@@ -23,6 +23,8 @@ function _terraform() {
     terraform_dir=$(_get_terraform_dir "$env" "$TERRAFORM_ACCOUNT_WIDE")
     expiration_date=$(_get_expiration_date)
     current_date=$(_get_current_date)
+    layers=$(_get_layer_list)
+    lambdas=$(_get_lambda_list)
     local plan_file="./tfplan"
     # local ci_log_bucket="${PROFILE_PREFIX}--mgmt--github-ci-logging"
 
@@ -80,7 +82,6 @@ function _terraform() {
         ;;
     esac
 }
-
 function _terraform_init() {
     local env=$1
     local args=${@:2}
@@ -105,7 +106,9 @@ function _terraform_plan() {
         -var "assume_account=${aws_account_id}" \
         -var "assume_role=${TERRAFORM_ROLE_NAME}" \
         -var "updated_date=${current_date}" \
-        -var "expiration_date=${expiration_date}" || return 1
+        -var "expiration_date=${expiration_date}" \
+        -var "lambdas=${lambdas}" \
+        -var "layers=${layers}"  || return 1
 }
 
 function _terraform_apply() {
@@ -129,6 +132,8 @@ function _terraform_destroy() {
     -var-file="$var_file" \
     -var "assume_account=${aws_account_id}" \
     -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+    -var "lambdas=${lambdas}" \
+    -var "layers=${layers}" \
     $args || return 1
   if [ "$env" != "default" ]; then
     terraform workspace select default || return 1
