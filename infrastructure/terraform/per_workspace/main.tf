@@ -44,14 +44,30 @@ module "products_table" {
   kms_deletion_window_in_days = 7
 }
 
+module "layers" {
+  for_each   = toset(var.layers)
+  source     = "./modules/api_worker/api_layer"
+  name       = each.key
+  layer_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+}
+
+module "lambdas" {
+  for_each    = toset(var.lambdas)
+  source      = "./modules/api_worker/api_lambda"
+  name        = each.key
+  lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+}
+
+
 # module "api_worker_create" {
 #   source = "./modules/api_worker"
 #   name   = "${local.project}--${replace(terraform.workspace, "_", "-")}--lambdaGETReadproduct"
 # }
 
-# module "api_worker_read" {
-#   source = "./modules/api_worker"
-#   name   = "${local.project}--${replace(terraform.workspace, "_", "-")}--lambdaGETReadproduct"
+# module "api_worker_createProduct" {
+#   source      = "./modules/api_worker"
+#   name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--lambdacreateProduct"
+#   lambda_name = "createProduct"
 # }
 
 # module "api_entrypoint_owner" {

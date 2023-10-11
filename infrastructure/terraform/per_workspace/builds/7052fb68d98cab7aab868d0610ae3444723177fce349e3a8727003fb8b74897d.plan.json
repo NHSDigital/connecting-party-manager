@@ -1,0 +1,12 @@
+{
+  "filename": "builds/7052fb68d98cab7aab868d0610ae3444723177fce349e3a8727003fb8b74897d.zip",
+  "runtime": "",
+  "artifacts_dir": "builds",
+  "build_plan": [
+    [
+      "zip",
+      "modules/api_worker/api_layer/../../../../../../src/layers/third_party/dist/third_party.zip",
+      null
+    ]
+  ]
+}
