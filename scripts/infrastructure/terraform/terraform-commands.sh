@@ -14,13 +14,15 @@ function _terraform() {
     local env
     local aws_account_id
     local var_file
-    local current_timestamp
+    local current_date
     local terraform_dir
+    local expiration_time
     env=$(_get_environment_name $TERRAFORM_ENVIRONMENT)
     aws_account_id=$(_get_aws_account_id "$env")
     var_file=$(_get_environment_vars_file "$env")
     terraform_dir=$(_get_terraform_dir "$env" "$TERRAFORM_ACCOUNT_WIDE")
-    current_timestamp="$(date '+%Y_%m_%d__%H_%M_%S')"
+    expiration_date=$(_get_expiration_date)
+    current_date=$(_get_current_date)
     local plan_file="./tfplan"
     # local ci_log_bucket="${PROFILE_PREFIX}--mgmt--github-ci-logging"
 
@@ -94,13 +96,16 @@ function _terraform_plan() {
     local aws_account_id=$4
     local args=${@:5}
 
+
     terraform init || return 1
     terraform workspace select "$env" || terraform workspace new "$env" || return 1
     terraform plan \
         -out="$plan_file" \
         -var-file="$var_file" \
         -var "assume_account=${aws_account_id}" \
-        -var "assume_role=${TERRAFORM_ROLE_NAME}" || return 1
+        -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+        -var "updated_date=${current_date}" \
+        -var "expiration_date=${expiration_date}" || return 1
 }
 
 function _terraform_apply() {

@@ -7,8 +7,7 @@ module "iam_policy_read" {
   description = "Read the ${var.name} table"
 
   tags = {
-    Name    = "${var.name}--iam-policy-read"
-    Created = var.created
+    Name = "${var.name}--iam-policy-read"
   }
 
   policy = jsonencode({
@@ -48,10 +47,8 @@ module "iam_policy_write" {
   description = "Write to the ${var.name} table"
 
   tags = {
-    Name    = "${var.name}--iam-policy-write"
-    Created = var.created
+    Name = "${var.name}--iam-policy-write"
   }
-
 
   policy = jsonencode({
     Version = "2012-10-17"

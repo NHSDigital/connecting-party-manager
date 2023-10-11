@@ -8,8 +8,7 @@ module "kms" {
   aliases = [var.name]
 
   tags = {
-    Name    = "${var.name}--kms"
-    Created = var.created
+    Name = "${var.name}--kms"
   }
 
 }

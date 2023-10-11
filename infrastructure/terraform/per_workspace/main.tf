@@ -1,8 +1,12 @@
 resource "aws_resourcegroups_group" "resource_group" {
   name = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
   tags = {
-    Name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
-    Created = local.created
+    Name      = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
+    CreatedOn = local.current_time
+  }
+
+  lifecycle {
+    ignore_changes = [tags["CreatedOn"]]
   }
 
   resource_query {
@@ -38,7 +42,6 @@ module "products_table" {
   ]
   deletion_protection_enabled = var.deletion_protection_enabled
   kms_deletion_window_in_days = 7
-  created                     = local.created
 }
 
 # module "api_worker_create" {

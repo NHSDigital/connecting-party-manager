@@ -14,3 +14,11 @@ variable "deletion_protection_enabled" {
   type    = bool
   default = false
 }
+
+variable "expiration_date" {
+  default = "NEVER"
+}
+
+variable "updated_date" {
+  default = "NEVER"
+}

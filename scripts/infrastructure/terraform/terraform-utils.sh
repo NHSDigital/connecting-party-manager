@@ -72,3 +72,15 @@ function _get_terraform_dir() {
     echo "${dir}/infrastructure/terraform/per_workspace"
   fi
 }
+
+function _get_current_date() {
+    #local timestamp=$(date -d '+72 hours' -u +"%Y-%m-%dT%H:%M:%SZ")
+    local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
+    echo "${timestamp}"
+}
+
+function _get_expiration_date() {
+    #local timestamp=$(date -d '+72 hours' -u +"%Y-%m-%dT%H:%M:%SZ")
+    local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc) + timedelta(hours=72), '%Y-%m-%dT%H:%M:%SZ'))")
+    echo "${timestamp}"
+}
