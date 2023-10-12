@@ -7,14 +7,12 @@ module "lambda_function" {
   handler       = "src.api.${var.name}.index.handler"
   runtime       = var.python_version
 
-  source_path = "${path.module}/../../../../../src/api/${var.name}/dist/${var.name}.zip"
+  source_path = var.source_path
 
   tags = {
     Name = replace(var.name, "_", "-")
   }
 
-  # layers = [
-  #   module.
-  # ]
+  layers = var.layers
 
 }

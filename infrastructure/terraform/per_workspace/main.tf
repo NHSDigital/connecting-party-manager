@@ -45,10 +45,11 @@ module "products_table" {
 }
 
 module "layers" {
-  for_each   = toset(var.layers)
-  source     = "./modules/api_worker/api_layer"
-  name       = each.key
-  layer_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+  for_each    = toset(var.layers)
+  source      = "./modules/api_worker/api_layer"
+  name        = each.key
+  layer_name  = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+  source_path = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
 module "lambdas" {
@@ -56,4 +57,6 @@ module "lambdas" {
   source      = "./modules/api_worker/api_lambda"
   name        = each.key
   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+  layers      = [for instance in module.layers : instance.layer_arn]
+  source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
 }
