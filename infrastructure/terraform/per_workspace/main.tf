@@ -2,7 +2,7 @@ resource "aws_resourcegroups_group" "resource_group" {
   name = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
   tags = {
     Name      = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
-    CreatedOn = local.current_time
+    CreatedOn = var.updated_date
   }
 
   lifecycle {
@@ -57,22 +57,3 @@ module "lambdas" {
   name        = each.key
   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
 }
-
-
-# module "api_worker_create" {
-#   source = "./modules/api_worker"
-#   name   = "${local.project}--${replace(terraform.workspace, "_", "-")}--lambdaGETReadproduct"
-# }
-
-# module "api_worker_createProduct" {
-#   source      = "./modules/api_worker"
-#   name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--lambdacreateProduct"
-#   lambda_name = "createProduct"
-# }
-
-# module "api_entrypoint_owner" {
-#   source      = "./modules/api_entrypoint"
-#   name        = "${local.project}--${replace(terraform.workspace, "_", "-")}-api_entrypoint_owner"
-#   domain_name = "somedomain-name"
-#   lambda      = [module.api_worker_read.arn, module.api_worker_create.arn]
-# }
