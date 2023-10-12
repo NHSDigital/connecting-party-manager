@@ -1,6 +1,5 @@
 .PHONY: terraform--plan terraform--apply terraform--destroy initialise--mgmt
 
-TERRAFORM_COMMAND ?= "validate"
 TERRAFORM_ENVIRONMENT ?= "dev"
 TERRAFORM_ACCOUNT_WIDE ?= "non_account_wide"
 TERRAFORM_ARGS :=
@@ -8,23 +7,17 @@ TERRAFORM_ARGS :=
 PATH_TO_INFRASTRUCTURE := $(CURDIR)/scripts/infrastructure
 PREFIX :=
 VERSION :=
-# UNCOMMENT THIS AFTER RUNNERS INSTALLED
-# terraform--plan: build aws--login  ## Run terraform plan
-#	@echo "terraform--plan" $(CI) $(WORKSPACE) $(AWS_ACCESS_KEY_ID) $(AWS_SECRET_ACCESS_KEY) $(AWS_DEFAULT_REGION) $(TF_CLI_ARGS)
 
 terraform--validate: ## Run terraform validate
-	@bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh $(TERRAFORM_COMMAND) $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
-
-# terraform--%: aws--login ## Run terraform commands
-# 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh $* $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
+	@bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh validate $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
 
 terraform--init: aws--login ## Run terraform init
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh init $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
 
-terraform--plan: aws--login  ## Run terraform plan
+terraform--plan: build aws--login  ## Run terraform plan
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh plan $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
 
-terraform--apply: terraform--plan ## Run terraform apply
+terraform--apply: aws--login ## Run terraform apply
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh apply $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
 
 terraform--destroy: aws--login ## Run terraform destroy

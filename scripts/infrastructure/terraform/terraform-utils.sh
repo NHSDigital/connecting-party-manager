@@ -27,7 +27,7 @@ function _get_account_id_location() {
         echo "${PROD_ACCOUNT_ID_LOCATION}"
     elif [ "$environment" = "ref" ] || [ "$environment" = "test" ] || [ "$environment" = "ref-sandbox" ]; then
         echo "${TEST_ACCOUNT_ID_LOCATION}"
-    elif [ "$environment" = "int" ] || [ "$environment" = "uat" ] || [ "$environment" = "int-sandbox" ]; then
+    elif [ "$environment" = "int" ] || [ "$environment" = "int-sandbox" ]; then
         echo "${TEST_ACCOUNT_ID_LOCATION}"
     else
         echo "${DEV_ACCOUNT_ID_LOCATION}"
@@ -53,7 +53,7 @@ function _get_environment_vars_file() {
         vars_prefix="prod"
     elif [ "$environment" = "ref" ] || [ "$environment" = "test" ] || [ "$environment" = "ref-sandbox" ]; then
         vars_prefix="test"
-    elif [ "$environment" = "int" ] || [ "$environment" = "uat" ] || [ "$environment" = "int-sandbox" ]; then
+    elif [ "$environment" = "int" ] || [ "$environment" = "int-sandbox" ]; then
         vars_prefix="uat"
     fi
 

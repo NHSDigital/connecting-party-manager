@@ -29,7 +29,6 @@ function _terraform() {
     # local ci_log_bucket="${PROFILE_PREFIX}--mgmt--github-ci-logging"
 
     case $TERRAFORM_COMMAND in
-        # "truststore") _terraform_truststore $env ;;
         #----------------
         "validate")
             cd "$terraform_dir" || return 1
