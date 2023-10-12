@@ -78,6 +78,7 @@ repos:
         entry: json\.loads
         language: pygrep
         types: [python]
+        exclude: src/layers/event/json/__init__.py
 
   - repo: local
     hooks:
@@ -86,6 +87,7 @@ repos:
         entry: json\.load
         language: pygrep
         types: [python]
+        exclude: src/layers/event/json/__init__.py
 
   - repo: local
     hooks:
