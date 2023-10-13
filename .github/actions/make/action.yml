@@ -57,3 +57,5 @@ runs:
 
     - name: Synchronise the cache ("upload")
       uses: ./.github/actions/components/caching/
+      with:
+        cache-suffix: ${{ inputs.cache-suffix }}

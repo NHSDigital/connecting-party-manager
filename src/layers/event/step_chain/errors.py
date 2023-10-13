@@ -1,0 +1,2 @@
+class StepChainError(Exception):
+    pass
