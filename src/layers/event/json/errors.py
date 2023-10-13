@@ -1,0 +1,2 @@
+class DuplicateKeyError(Exception):
+    pass
