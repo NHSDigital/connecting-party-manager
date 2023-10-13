@@ -30,7 +30,7 @@ def create_zip_package(
 ) -> Generator[Path, None, None]:
     dist_dir = base_dir / DIST_DIR
     build_dir = dist_dir / BUILD_DIR
-    package_dir = build_dir / "python"
+    package_dir = build_dir / "python" / package_name
 
     clean_dir(dist_dir)
 

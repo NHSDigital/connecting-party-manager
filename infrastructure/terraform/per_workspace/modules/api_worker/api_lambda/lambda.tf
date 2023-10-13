@@ -4,10 +4,11 @@ module "lambda_function" {
 
   function_name = var.lambda_name
   description   = "${replace(var.name, "_", "-")} lambda function"
-  handler       = "src.api.${var.name}.index.handler"
+  handler       = "api.${var.name}.index.handler"
   runtime       = var.python_version
 
-  source_path = var.source_path
+  create_package         = false
+  local_existing_package = var.source_path
 
   tags = {
     Name = replace(var.name, "_", "-")
