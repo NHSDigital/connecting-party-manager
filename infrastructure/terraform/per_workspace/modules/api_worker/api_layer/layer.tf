@@ -8,7 +8,8 @@ module "lambda_layer" {
   description         = "${replace(var.name, "_", "-")} lambda layer"
   compatible_runtimes = [var.python_version]
 
-  source_path = var.source_path
+  create_package         = false
+  local_existing_package = var.source_path
 
   tags = {
     Name = replace(var.name, "_", "-")

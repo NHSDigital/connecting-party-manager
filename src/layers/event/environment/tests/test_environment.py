@@ -9,5 +9,5 @@ def test_base_environment():
         FOO: str
 
     with mock.patch.dict(os.environ, {"FOO": "bar"}):
-        env = Environment.model_construct()
+        env = Environment.construct()
     assert env.FOO == "bar"

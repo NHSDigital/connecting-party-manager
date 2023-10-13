@@ -10,7 +10,7 @@ class Environment(BaseEnvironment):
     SOMETHING: str
 
 
-cache = {**Environment.model_construct().model_dump()}
+cache = {**Environment.construct().dict()}
 step_decorators = [*logging_step_decorators]
 pre_steps = [*versioning_steps]
 post_steps = [*response_steps]

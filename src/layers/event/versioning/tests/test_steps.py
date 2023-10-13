@@ -28,7 +28,7 @@ PATH_TO_HERE = Path(__file__).parent
     )
 )
 def test_get_requested_version_pass(event: LambdaEventForVersioning):
-    version = get_requested_version(data=step_data(init={"event": event.model_dump()}))
+    version = get_requested_version(data=step_data(init={"event": event.dict()}))
     assert version == event.headers.version
 
 
