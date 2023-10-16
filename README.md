@@ -57,6 +57,18 @@ You can find the above values by asking a team member, or going to the AWS SSO i
 make aws--login
 ```
 
+### Build a local workspace on AWS
+
+You can build a working copy of the CPM service in your own workspace within the `dev` environment. To do this follow these steps. (You must have SSO setup on your system and have MGMT admin access)
+
+You must pass a `TERRAFORM_ENVIRONMENT` variable to each command in the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`. This variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
+
+```shell
+make terraform--init TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
+make terraform--plan TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to build the project first
+make terraform--apply TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>"
+```
+
 ### Other helpful commands
 
 Run `make` to get a list of helpful commands.
