@@ -1,4 +1,4 @@
-.PHONY: terraform--plan terraform--apply terraform--destroy initialise--mgmt
+.PHONY: terraform--plan terraform--apply terraform--destroy initialise--mgmt automated-destroy
 
 TERRAFORM_ENVIRONMENT ?= "dev"
 TERRAFORM_ACCOUNT_WIDE ?= "non_account_wide"
@@ -34,3 +34,6 @@ initialise--non-mgmt: aws--login ## Bootstrap the Non-MGMT AWS environments. Mus
 
 destroy--non-mgmt: aws--login ## Destroy the Non-MGMT AWS environments. Must provide TERRAFORM_ROLE_NAME keyword argument.
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/destroy-non-mgmt-resources.sh $(TERRAFORM_ROLE_NAME)
+
+automated--destroy: aws--login ## Destroy any workspaces that have gone past their expiration date.
+	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/destroy-expired-workspaces.sh

@@ -16,6 +16,18 @@ function _get_environment_name() {
   fi
 }
 
+function _get_workspace_type() {
+    if [ "$RUNNING_IN_CI" = 1 ]; then
+      if [ "$CI_DEPLOY_PERSISTENT_ENV" != 1]; then
+        echo "CI"
+      else
+        echo "PERSISTENT"
+      fi
+    else
+      echo "LOCAL"
+    fi
+}
+
 function _get_account_id_location() {
     local environment=$1
 

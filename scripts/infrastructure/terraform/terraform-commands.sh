@@ -21,6 +21,7 @@ function _terraform() {
     aws_account_id=$(_get_aws_account_id "$env")
     var_file=$(_get_environment_vars_file "$env")
     terraform_dir=$(_get_terraform_dir "$env" "$TERRAFORM_ACCOUNT_WIDE")
+    workspace_type=$(_get_workspace_type)
     expiration_date=$(_get_expiration_date)
     current_date=$(_get_current_date)
     layers=$(_get_layer_list)
@@ -107,6 +108,7 @@ function _terraform_plan() {
         -var "updated_date=${current_date}" \
         -var "expiration_date=${expiration_date}" \
         -var "lambdas=${lambdas}" \
+        -var "workspace_type=${workspace_type}" \
         -var "layers=${layers}"  || return 1
 }
 
@@ -131,6 +133,7 @@ function _terraform_destroy() {
     -var-file="$var_file" \
     -var "assume_account=${aws_account_id}" \
     -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+    -var "workspace_type=${workspace_type}" \
     -var "lambdas=${lambdas}" \
     -var "layers=${layers}" \
     $args || return 1
