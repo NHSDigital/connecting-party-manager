@@ -81,6 +81,16 @@ function _terraform() {
             cd "$terraform_dir" || return 1
             _terraform_destroy "$env" "$var_file" "$aws_account_id"
         ;;
+        #----------------
+        "unlock")
+            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+                echo "Please log in as the mgmt account" >&2
+                return 1
+            fi
+
+            cd "$terraform_dir" || return 1
+            _terraform_unlock "$env"
+        ;;
     esac
 }
 function _terraform_init() {
@@ -142,6 +152,10 @@ function _terraform_destroy() {
     terraform workspace select default || return 1
     terraform workspace delete "$env" || return 1
   fi
+}
+
+function _terraform_unlock() {
+    terraform force-unlock "$env"
 }
 
 _terraform $@

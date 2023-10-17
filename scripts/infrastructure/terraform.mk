@@ -23,6 +23,9 @@ terraform--apply: aws--login ## Run terraform apply
 terraform--destroy: aws--login ## Run terraform destroy
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh destroy $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
 
+terraform--force-unlock: aws--login ## Run terraform force-unlock
+	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh unlock $(TERRAFORM_ENVIRONMENT) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
+
 initialise--mgmt: aws--login ## Bootstrap the MGMT AWS environment. Must provide PREFIX and VERSION keyword arguments.
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/initialise-mgmt-resources.sh $(PREFIX) $(VERSION)
 
@@ -37,3 +40,6 @@ destroy--non-mgmt: aws--login ## Destroy the Non-MGMT AWS environments. Must pro
 
 automated--destroy: aws--login ## Destroy any workspaces that have gone past their expiration date.
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/destroy-expired-workspaces.sh
+
+corrupted--workspace-destroy: aws--login ## Destroy any workspaces that cannot be detroyed with terraform.
+	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/destroy-corrupted-workspace.sh $(TERRAFORM_ENVIRONMENT)
