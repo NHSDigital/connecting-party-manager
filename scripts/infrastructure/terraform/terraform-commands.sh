@@ -124,7 +124,7 @@ function _terraform_plan() {
         -out="$plan_file" \
         -var-file="$var_file" \
         -var "assume_account=${aws_account_id}" \
-        -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+        -var "assume_role=NHSDeploymentRole" \
         -var "updated_date=${current_date}" \
         -var "expiration_date=${expiration_date}" \
         -var "lambdas=${lambdas}" \
@@ -153,7 +153,7 @@ function _terraform_destroy() {
     terraform destroy \
         -var-file="$var_file" \
         -var "assume_account=${aws_account_id}" \
-        -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+        -var "assume_role=NHSDeploymentRole" \
         -var "workspace_type=${workspace_type}" \
         -var "lambdas=${lambdas}" \
         -var "layers=${layers}" \

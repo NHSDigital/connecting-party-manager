@@ -40,22 +40,42 @@ The first time it will also set up your pre-commit hooks.
 
 ### AWS SSO Setup
 
-This project uses Single Sign On (SSO) for consuming AWS services, please ensure that you have NHS SSO enabled in your browser. You should add the following lines to your `~/.aws/config` file:
+This project uses Single Sign On (SSO) for consuming AWS services.
+
+To configure SSO run the following command
 
 ```
-[profile nhse-cpm-mgmt-admin]
-sso_start_url = https://***********.awsapps.com/start#
-sso_region = ***********
-sso_account_id = ***********
-sso_role_name = ***********
-region = ***********
+aws configure sso
 ```
 
-You can find the above values by asking a team member, or going to the AWS SSO in your browser. To test that you've been set up ok, do:
+using the following parameters, where <REPLACE_ME> matches the URL of the SSO app you should have as a bookmark:
 
 ```
-make aws--login
+SSO session name (Recommended): NHS
+SSO start URL [None]: https://<REPLACE_ME>.awsapps.com/start#
+SSO region [None]: eu-west-2
+SSO registration scopes [sso:account:access]: sso:account:access
 ```
+
+A browser window should appear. To progress you will need to click "Confirm and continue" and then "Allow", after reading and understanding the instructions. Once complete you will be returned to the console.
+
+You can now configure your first profile, by selecting a value from the list and answering the prompts. You should setup `NHS Digital Spine Core CPM MGMT` first. Successive profiles can be added by repeating `aws configure sso` but this time the SSO session name exists and will not be recreated.
+
+Entries will now be visible in your `~/.aws/config` file.
+
+You may now login to AWS via SSO using:
+
+```
+aws sso login --sso-session NHS
+```
+
+You may now switch between profiles by using, where <profile> is taken from the entry in your `~/.aws/config` file:
+
+```
+export AWS_PROFILE=<profile>
+```
+
+This is the preferred method of switching between profiles, as it will cause the profile name to appear in your BASH prompt.
 
 ### Build a local workspace on AWS
 
