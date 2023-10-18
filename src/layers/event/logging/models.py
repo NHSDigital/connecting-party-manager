@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field, FilePath
 
@@ -19,6 +19,7 @@ class LogTemplate(BaseModel):
     action: str
     action_duration: float
     action_status: Literal["succeeded", "failed", "error"]
+    action_result: Optional[Any] = None
     log_info: LogInfoTemplate
 
 
