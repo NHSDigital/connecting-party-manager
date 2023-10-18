@@ -77,7 +77,6 @@ Destroy the local workspace and it's corresponding state file on mgmt
 make terraform--destroy TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
 ```
 
-
 ### Other helpful commands
 
 Run `make` to get a list of helpful commands.
