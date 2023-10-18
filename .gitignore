@@ -9,6 +9,7 @@
 **/terraform/**/output.json
 *.lock.hcl
 *.plan.json
+**/infrastructure/**/builds
 
 # key & certificate files
 *.pem
