@@ -37,7 +37,5 @@ def test_versioning_steps(requested_version: str, expected_steps: list[FunctionT
     step_chain = StepChain(
         step_chain=versioning_steps, step_decorators=logging_step_decorators
     )
-    step_chain.run(
-        init={"event": _event.model_dump(), "api_index_file_path": index.__file__}
-    )
+    step_chain.run(init={"event": _event.dict(), "api_index_file_path": index.__file__})
     assert step_chain.result is expected_steps

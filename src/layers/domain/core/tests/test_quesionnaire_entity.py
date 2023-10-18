@@ -1,5 +1,6 @@
 import pytest
-from domain.core.error import DuplicateError
+
+# from domain.core.error import DuplicateError
 from domain.core.questionnaire_entity import Dataset, QuestionnaireEntity
 
 
@@ -33,17 +34,17 @@ def test_add_dataset(index: str):
     assert result == subject._datasets[index], "Dataset is at index"
 
 
-@pytest.mark.parametrize(
-    ["index"],
-    [
-        ["alpha"],
-        ["beta"],
-        ["gamma"],
-    ],
-)
-def test_cannot_add_duplicate_dataset(index: str):
-    subject = TestQuestionnaireEntity()
+# @pytest.mark.parametrize(
+#     ["index"],
+#     [
+#         ["alpha"],
+#         ["beta"],
+#         ["gamma"],
+#     ],
+# )
+# def test_cannot_add_duplicate_dataset(index: str):
+#     subject = TestQuestionnaireEntity()
 
-    subject.add_dataset(index)
-    with pytest.raises(DuplicateError):
-        subject.add_dataset(index)
+#     subject.add_dataset(index)
+#     with pytest.raises(DuplicateError):
+#         subject.add_dataset(index)

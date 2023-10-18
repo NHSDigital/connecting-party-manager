@@ -3,13 +3,23 @@ import json
 from event.logging.logger import setup_logger
 from nhs_context_logging.fixtures import log_capture, log_capture_global  # noqa: F401
 from nhs_context_logging.formatters import json_serializer
-from pytest import FixtureRequest, fixture
+from pytest import Config, FixtureRequest, Item, fixture
 
 
-def pytest_collection_modifyitems(items, config):
-    # add `unit` marker to all unmarked items
+def pytest_collection_modifyitems(items: list[Item], config: Config):
+    """Add 'unit' marker to unmarked tests"""
+    custom_markers = config._getini(("markers"))
+    hypothesis_marker_idx = custom_markers.index(
+        "hypothesis: Tests which use hypothesis."
+    )
+    custom_markers = custom_markers[:hypothesis_marker_idx]
     for item in items:
-        if not any(item.iter_markers()):
+        unmarked_test = True
+        for marker in item.iter_markers():
+            if marker.name in custom_markers:
+                unmarked_test = False
+                break
+        if unmarked_test:
             item.add_marker("unit")
 
 

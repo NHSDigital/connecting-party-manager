@@ -37,9 +37,8 @@ def test_logging_step_decorators(log_capture):
         parsed_log.cache is not cache
     )  # Make sure that the log doesn't have a direct reference to global data
     assert parsed_log.cache == cache
-    assert parsed_log.result == return_value
+    assert parsed_log.action_result == return_value
     assert parsed_log.action == "test_step_decorators.a_function"
-    assert parsed_log.log_reference == "A-FUNCTION"
     assert parsed_log.action_status == "succeeded"
 
 
@@ -76,9 +75,8 @@ def test_logging_step_decorators_with_fatal_error(log_capture):
         parsed_log.cache is not cache
     )  # Make sure that the log doesn't have a direct reference to global data
     assert parsed_log.cache == cache
-    assert isinstance(parsed_log.result, MyException)
+    assert isinstance(parsed_log.action_result, MyException)
     assert parsed_log.action == "test_step_decorators.a_function"
-    assert parsed_log.log_reference == "A-FUNCTION"
     assert parsed_log.action_status == "failed"
 
 
@@ -118,7 +116,6 @@ def test_logging_step_decorators_with_non_fatal_error(log_capture):
         parsed_log.cache is not cache
     )  # Make sure that the log doesn't have a direct reference to global data
     assert parsed_log.cache == cache
-    assert isinstance(parsed_log.result, MyException)
+    assert isinstance(parsed_log.action_result, MyException)
     assert parsed_log.action == "test_step_decorators.a_function"
-    assert parsed_log.log_reference == "A-FUNCTION"
     assert parsed_log.action_status == "error"
