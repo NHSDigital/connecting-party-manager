@@ -15,4 +15,4 @@ runs:
           .venv
           .timestamp
           **/dist/*zip
-        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix }}
+        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
