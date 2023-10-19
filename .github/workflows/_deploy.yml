@@ -12,6 +12,7 @@ permissions:
   actions: write
 
 env:
+  RUNNING_IN_CI: 1
   WORKSPACE: ${{ inputs.workspace }}
   CACHE_NAME: ${{ inputs.workspace }}-cache
   AWS_DEFAULT_REGION: eu-west-2

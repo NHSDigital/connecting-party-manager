@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-constants.sh
+PERSISTENT_ENVIRONMENTS=("dev" "ref" "int" "uat" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox" "uat-sandbox")
 
 function _get_environment_name() {
   local environment=$1
@@ -17,27 +18,29 @@ function _get_environment_name() {
 }
 
 function _get_workspace_type() {
-    if [ "$RUNNING_IN_CI" = 1 ]; then
-      if [ "$CI_DEPLOY_PERSISTENT_ENV" != 1]; then
-        echo "CI"
-      else
-        echo "PERSISTENT"
-      fi
+  local env=$1
+  if [ "$RUNNING_IN_CI" = 1 ]; then
+    if [ ! " ${PERSISTENT_ENVIRONMENTS[@]} " =~ " $env " ]]; then
+      echo "CI"
     else
-      echo "LOCAL"
+      echo "PERSISTENT"
     fi
+  else
+    echo "LOCAL"
+  fi
 }
 
 function _get_workspace_expiration() {
-    if [ "$RUNNING_IN_CI" = 1 ]; then
-      if [ "$CI_DEPLOY_PERSISTENT_ENV" != 1]; then
-        echo "168"
-      else
-        echo "NEVER"
-      fi
+  local env=$1
+  if [ "$RUNNING_IN_CI" = 1 ]; then
+    if [ ! " ${PERSISTENT_ENVIRONMENTS[@]} " =~ " $env " ]]; then
+      echo "168"
     else
-      echo "72"
+      echo "NEVER"
     fi
+  else
+    echo "72"
+  fi
 }
 
 function _get_account_id_location() {
