@@ -21,5 +21,5 @@ class BaseEnvironment(BaseModel, ABC):
     """
 
     @classmethod
-    def construct(cls: Model) -> Model:
-        return super().construct(**os.environ)
+    def build(cls: Model) -> Model:
+        return cls(**os.environ)

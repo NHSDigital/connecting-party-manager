@@ -10,7 +10,7 @@ class Environment(BaseEnvironment):
     SOMETHING: str
 
 
-cache = {**Environment.construct().dict()}
+cache = {**Environment.build().dict()}
 step_decorators = [*logging_step_decorators]
 pre_steps = [*versioning_steps]
 post_steps = [*response_steps]
@@ -22,7 +22,7 @@ def handler(event: dict, context=None):
     pre_step_chain = StepChain(
         step_chain=versioning_steps, step_decorators=step_decorators
     )
-    pre_step_chain.run(init={"event": event, "__file__": __file__})
+    pre_step_chain.run(init={"event": event, "api_index_file_path": __file__})
 
     if isinstance(pre_step_chain.result, Exception):
         result = pre_step_chain.result

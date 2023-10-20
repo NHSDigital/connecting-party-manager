@@ -1,6 +1,7 @@
-import pytest
+import os
+from unittest import mock
 
-from api.createProduct.index import handler
+import pytest
 
 
 @pytest.mark.parametrize(
@@ -10,5 +11,8 @@ from api.createProduct.index import handler
     ],
 )
 def test_index(version):
-    result = handler(event={"headers": {"version": version}})
+    with mock.patch.dict(os.environ, {"SOMETHING": "hiya"}, clear=True):
+        from api.createProduct.index import handler
+
+        result = handler(event={"headers": {"version": version}})
     assert result == "OK"
