@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-constants.sh
+PERSISTENT_ENVIRONMENTS=("dev" "ref" "int" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox")
 
 function _get_environment_name() {
   local environment=$1
@@ -13,6 +14,32 @@ function _get_environment_name() {
     fi
   else
     echo "$environment"
+  fi
+}
+
+function _get_workspace_type() {
+  local env=$1
+  if [ "$RUNNING_IN_CI" = 1 ]; then
+    if [ ! " ${PERSISTENT_ENVIRONMENTS[@]} " =~ " $env " ]]; then
+      echo "CI"
+    else
+      echo "PERSISTENT"
+    fi
+  else
+    echo "LOCAL"
+  fi
+}
+
+function _get_workspace_expiration() {
+  local env=$1
+  if [ "$RUNNING_IN_CI" = 1 ]; then
+    if [ ! " ${PERSISTENT_ENVIRONMENTS[@]} " =~ " $env " ]]; then
+      echo "168"
+    else
+      echo "NEVER"
+    fi
+  else
+    echo "72"
   fi
 }
 
@@ -79,8 +106,13 @@ function _get_current_date() {
 }
 
 function _get_expiration_date() {
-    local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc) + timedelta(hours=72), '%Y-%m-%dT%H:%M:%SZ'))")
-    echo "${timestamp}"
+    local offset=$1
+    if [ "$offset" != "NEVER" ]; then
+      local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc) + timedelta(hours=${offset}), '%Y-%m-%dT%H:%M:%SZ'))")
+      echo "${timestamp}"
+    else
+      echo "${offset}"
+    fi
 }
 
 function _get_layer_list() {

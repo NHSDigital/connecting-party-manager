@@ -21,7 +21,9 @@ function _terraform() {
     aws_account_id=$(_get_aws_account_id "$env")
     var_file=$(_get_environment_vars_file "$env")
     terraform_dir=$(_get_terraform_dir "$env" "$TERRAFORM_ACCOUNT_WIDE")
-    expiration_date=$(_get_expiration_date)
+    workspace_type=$(_get_workspace_type "$env")
+    workspace_expiration=$(_get_workspace_expiration "$env")
+    expiration_date=$(_get_expiration_date "$workspace_expiration")
     current_date=$(_get_current_date)
     layers=$(_get_layer_list)
     lambdas=$(_get_lambda_list)
@@ -79,6 +81,16 @@ function _terraform() {
             cd "$terraform_dir" || return 1
             _terraform_destroy "$env" "$var_file" "$aws_account_id"
         ;;
+        #----------------
+        "unlock")
+            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+                echo "Please log in as the mgmt account" >&2
+                return 1
+            fi
+
+            cd "$terraform_dir" || return 1
+            _terraform_unlock "$env"
+        ;;
     esac
 }
 function _terraform_init() {
@@ -107,6 +119,7 @@ function _terraform_plan() {
         -var "updated_date=${current_date}" \
         -var "expiration_date=${expiration_date}" \
         -var "lambdas=${lambdas}" \
+        -var "workspace_type=${workspace_type}" \
         -var "layers=${layers}"  || return 1
 }
 
@@ -131,6 +144,7 @@ function _terraform_destroy() {
     -var-file="$var_file" \
     -var "assume_account=${aws_account_id}" \
     -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+    -var "workspace_type=${workspace_type}" \
     -var "lambdas=${lambdas}" \
     -var "layers=${layers}" \
     $args || return 1
@@ -138,6 +152,10 @@ function _terraform_destroy() {
     terraform workspace select default || return 1
     terraform workspace delete "$env" || return 1
   fi
+}
+
+function _terraform_unlock() {
+    terraform force-unlock "$env"
 }
 
 _terraform $@

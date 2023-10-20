@@ -16,6 +16,7 @@ provider "aws" {
       ProjectShortName = "CPM"
       ProjectFullname  = "Connecting Party Manager"
       ExpirationDate   = var.expiration_date
+      WorkspaceType    = var.workspace_type
     }
   }
 }

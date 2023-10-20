@@ -34,3 +34,8 @@ variable "layers" {
 variable "lambdas" {
   type = list(string)
 }
+
+variable "workspace_type" {
+  type    = string
+  default = "PERSISTENT"
+}
