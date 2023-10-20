@@ -26,11 +26,13 @@ UNNECESSARY_DIRS = [
 
 @contextmanager
 def create_zip_package(
-    package_name: str, base_dir: Path
+    package_name: str, base_dir: Path, third_party=False
 ) -> Generator[Path, None, None]:
     dist_dir = base_dir / DIST_DIR
     build_dir = dist_dir / BUILD_DIR
-    package_dir = build_dir / "python" / package_name
+    package_dir = build_dir / "python"
+    if not third_party:
+        package_dir = package_dir / package_name
 
     clean_dir(dist_dir)
 
@@ -87,7 +89,7 @@ def build_third_party(file):
     root_dir = layer_base_dir.parent.parent.parent
 
     with create_zip_package(
-        package_name=package_name, base_dir=layer_base_dir
+        package_name=package_name, base_dir=layer_base_dir, third_party=True
     ) as build_dir:
         requirements_txt_path = layer_base_dir / "requirements.txt"
         with create_temp_path(path=requirements_txt_path, is_dir=False):

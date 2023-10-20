@@ -14,7 +14,6 @@ class LogInfoTemplate(BaseModel):
 
 class LogTemplate(BaseModel):
     timestamp: float
-    log_reference: str = (Field(pattern=r"^[A-Z]+$"),)
     internal_id: str = Field(pattern=r"^[a-z0-9]{32}+$")
     action: str
     action_duration: float
@@ -26,4 +25,3 @@ class LogTemplate(BaseModel):
 class StepLog(LogTemplate):
     data: dict
     cache: dict
-    result: Any
