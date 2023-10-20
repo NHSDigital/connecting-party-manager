@@ -1,0 +1,25 @@
+name: "terraform"
+description: "Run terraform commands via the Makefile"
+inputs:
+  command:
+    description: "Terraform command to run"
+    required: true
+  workspace:
+    description: "Terraform workspace name"
+    required: true
+  account-wide:
+    description: "If account-wide then specify 'account-wide'"
+    required: false
+    default: ""
+  cache-suffix:
+    description: "[Optional] Cache suffix (e.g. 'base')"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - uses: ./.github/actions/make/
+      with:
+        command: terraform--${{ inputs.command }} TERRAFORM_WORKSPACE="${{ inputs.workspace }}" TERRAFORM_ACCOUNT_WIDE="${{ inputs.account-wide }}"
+        requires-aws: true
+        cache-suffix: ${{ inputs.cache-suffix }}

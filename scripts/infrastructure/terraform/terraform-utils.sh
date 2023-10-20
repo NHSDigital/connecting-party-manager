@@ -1,29 +1,29 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-constants.sh
-PERSISTENT_ENVIRONMENTS=("dev" "ref" "int" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox")
+PERSISTENT_WORKSPACES=("dev" "ref" "int" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox")
 
-function _get_environment_name() {
-  local environment=$1
+function _get_workspace_name() {
+  local workspace=$1
 
-  if [[ -z $environment ]]; then
+  if [[ -z $workspace ]]; then
     if [[ -z $TERRAFORM_LOCAL_WORKSPACE_OVERRIDE ]]; then
       echo "$(whoami | openssl dgst -sha1 -binary | xxd -p | cut -c1-8)"
     else
       echo "$TERRAFORM_LOCAL_WORKSPACE_OVERRIDE"
     fi
   else
-    echo "$environment"
+    echo "$workspace"
   fi
 }
 
 function _get_workspace_type() {
   local env=$1
   if [ "$RUNNING_IN_CI" = 1 ]; then
-    if [ ! " ${PERSISTENT_ENVIRONMENTS[@]} " =~ " $env " ]]; then
-      echo "CI"
-    else
+    if [[ ${PERSISTENT_WORKSPACES[@]} =~ $env ]]; then
       echo "PERSISTENT"
+    else
+      echo "CI"
     fi
   else
     echo "LOCAL"
@@ -33,7 +33,7 @@ function _get_workspace_type() {
 function _get_workspace_expiration() {
   local env=$1
   if [ "$RUNNING_IN_CI" = 1 ]; then
-    if [ ! " ${PERSISTENT_ENVIRONMENTS[@]} " =~ " $env " ]]; then
+    if [ ! " ${PERSISTENT_WORKSPACES[@]} " =~ " $env " ]]; then
       echo "168"
     else
       echo "NEVER"
@@ -44,44 +44,59 @@ function _get_workspace_expiration() {
 }
 
 function _get_account_id_location() {
-    local environment=$1
+    local workspace=$1
 
-    if [ "$RUNNING_IN_CI" = 1 ] && [ "$CI_DEPLOY_PERSISTENT_ENV" != 1 ]; then
-        echo "${TEST_ACCOUNT_ID_LOCATION}"     # CI deployments to TEST by default
-    elif [ "$environment" = "mgmt" ]; then
+    if [ "$RUNNING_IN_CI" = 1 ]; then
+        ## DELETE THIS WHEN TEST ACCOUNT ENABLED
+        echo "${DEV_ACCOUNT_ID_LOCATION}"
+        ## UNCOMMENT THIS WHEN TEST ACCOUNT ENABLED
+        # echo "${TEST_ACCOUNT_ID_LOCATION}"     # CI deployments to TEST by default
+    elif [ "$workspace" = "mgmt" ]; then
         echo "${MGMT_ACCOUNT_ID_LOCATION}"
-    elif [ "$environment" = "prod" ]; then
+    elif [ "$workspace" = "prod" ]; then
         echo "${PROD_ACCOUNT_ID_LOCATION}"
-    elif [ "$environment" = "ref" ] || [ "$environment" = "test" ] || [ "$environment" = "ref-sandbox" ]; then
+    elif [ "$workspace" = "ref" ] || [ "$workspace" = "ref-sandbox" ]; then
         echo "${TEST_ACCOUNT_ID_LOCATION}"
-    elif [ "$environment" = "int" ] || [ "$environment" = "int-sandbox" ]; then
+    elif [ "$workspace" = "int" ] || [ "$workspace" = "int-sandbox" ]; then
         echo "${TEST_ACCOUNT_ID_LOCATION}"
     else
         echo "${DEV_ACCOUNT_ID_LOCATION}"
     fi
 }
 
-function _get_aws_account_id() {
-    local account_id_location
-    account_id_location=$(_get_account_id_location "$1")
-    aws secretsmanager get-secret-value --secret-id "$account_id_location" --query SecretString --output text --profile nhse-cpm-mgmt-admin
+function _get_contact_information(){
+  echo $(aws account get-contact-information --region "${AWS_REGION_NAME}")
 }
 
-function _get_environment_vars_file() {
+function _get_aws_account_id() {
+    local account_id_location
+    local profile_info
+    account_id_location=$(_get_account_id_location "$1")
+    profile_info="--profile nhse-cpm-mgmt-admin"
+    if [ "$RUNNING_IN_CI" = 1 ]; then
+      profile_info=""
+    fi
+    aws secretsmanager get-secret-value --secret-id "$account_id_location" --query SecretString --output text ${profile_info}
+}
+
+function _get_workspace_vars_file() {
     local dir=$(pwd)
-    local environment=$1
+    local workspace=$1
     local vars_prefix="dev"
 
-    if [ "$RUNNING_IN_CI" = 1 ] && [ "$CI_DEPLOY_PERSISTENT_ENV" != 1 ]; then
-        vars_prefix="test"
-    elif [ "$environment" = "mgmt" ]; then
+    if [ "$RUNNING_IN_CI" = 1 ]; then
+        ## DELETE THIS WHEN TEST ACCOUNT ENABLED
+        vars_prefix="dev"
+        ## UNCOMMENT THIS WHEN TEST ACCOUNT ENABLED
+        #vars_prefix="test"
+    elif [ "$workspace" = "mgmt" ]; then
         vars_prefix="mgmt"
-    elif [ "$environment" = "prod" ]; then
+    elif [ "$workspace" = "prod" ]; then
         vars_prefix="prod"
-    elif [ "$environment" = "ref" ] || [ "$environment" = "test" ] || [ "$environment" = "ref-sandbox" ]; then
+    elif [ "$workspace" = "ref" ] || [ "$workspace" = "ref-sandbox" ]; then
         vars_prefix="test"
-    elif [ "$environment" = "int" ] || [ "$environment" = "int-sandbox" ]; then
-        vars_prefix="uat"
+    elif [ "$workspace" = "int" ] || [ "$workspace" = "int-sandbox" ]; then
+        vars_prefix="test"
     fi
 
     echo "${dir}/infrastructure/terraform/etc/${vars_prefix}.tfvars"
@@ -92,11 +107,14 @@ function _get_terraform_dir() {
   local account_wide=$2
   local dir=$(pwd)
   if [ "$RUNNING_IN_CI" = 1 ]; then
-    echo "$root/infrastructure/terraform/per_workspace"
-  elif [ "$account_wide" = "account_wide" ]; then
-    echo "$root/infrastructure/terraform/per_account/$env"
-  else
     echo "${dir}/infrastructure/terraform/per_workspace"
+  elif [ "$account_wide" = "account_wide" ]; then
+    echo "${dir}/infrastructure/terraform/per_account/$env"
+  elif [ "$account_wide" = "non_account_wide" ]; then
+    echo "${dir}/infrastructure/terraform/per_workspace"
+  else
+    echo "<account_wide> must either be 'non_account_wide' or 'account_wide'"
+    return 1
   fi
 }
 

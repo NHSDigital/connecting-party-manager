@@ -4,18 +4,19 @@ inputs:
   test-type:
     description: "Test to run (unit, integration, smoke)"
     required: true
-  aws-role-to-assume:
-    description: "[Optional] AWS Role to assume during this operation"
+  requires-aws:
+    description: "[Optional] Assume the CI AWS Role during this operation?"
     required: false
+    default: ""
 runs:
   using: "composite"
   steps:
     - uses: ./.github/actions/make/
       with:
         command: test--${{ inputs.test-type }}
-        aws-role-to-assume: ${{ inputs.aws-role-to-assume }}
+        requires-aws: ${{ inputs.requires-aws }}
 
     - uses: ./.github/actions/make/
       with:
         command: test--${{ inputs.test-type }}--rerun PYTEST_FLAGS="--suppress-no-test-exit-code"
-        aws-role-to-assume: ${{ inputs.aws-role-to-assume }}
+        requires-aws: ${{ inputs.requires-aws }}
