@@ -4,10 +4,10 @@ source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 source ./scripts/infrastructure/terraform/terraform-commands.sh
 
-TERRAFORM_ENVIRONMENT="$1"
+TERRAFORM_WORKSPACE="$1"
 AWS_REGION_NAME="eu-west-2"
 ENV="dev"
-persistent_list=("dev" "int" "ref" "uat" "prod")
+persistent_list=("dev" "int" "ref" "prod")
 
 function _destroy_corrupted_workspace() {
     if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
@@ -15,7 +15,7 @@ function _destroy_corrupted_workspace() {
         return 1
     fi
 
-    ter_env=$(echo "$TERRAFORM_ENVIRONMENT" | tr '[:upper:]' '[:lower:]')
+    ter_env=$(echo "$TERRAFORM_WORKSPACE" | tr '[:upper:]' '[:lower:]')
 
     if [[ " ${persistent_list[@]} " =~ "$ter_env" ]]; then
         echo "Workspace cannot be destroyed. Exiting."
@@ -44,7 +44,7 @@ function _destroy_corrupted_workspace() {
         export AWS_SESSION_TOKEN="$session_token"
 
         local workspace
-        workspace=$TERRAFORM_ENVIRONMENT
+        workspace=$TERRAFORM_WORKSPACE
         # Fetch the resources using the AWS CLI command
         aws resourcegroupstaggingapi get-resources --tag-filters Key=Workspace,Values="$workspace" | jq -c '.ResourceTagMappingList[]' |
         while IFS= read -r item; do
@@ -124,7 +124,7 @@ function _destroy_corrupted_workspace() {
         echo "Error executing aws sts assume-role command"
     fi
 
-    echo "The resources have been removed from the dev environment for the ${TERRAFORM_ENVIRONMENT} workspace. Please now remove it from the s3 and lock table manually on MGMT."
+    echo "The resources have been removed from the dev environment for the ${TERRAFORM_WORKSPACE} workspace. Please now remove it from the s3 and lock table manually on MGMT."
 
     export AWS_ACCESS_KEY_ID="$MGMT_AWS_ACCESS_KEY_ID"
     export AWS_SECRET_ACCESS_KEY="$MGMT_AWS_SECRET_ACCESS_KEY"

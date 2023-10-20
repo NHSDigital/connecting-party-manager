@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-constants.sh
-PERSISTENT_ENVIRONMENTS=("dev" "ref" "int" "uat" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox" "uat-sandbox")
+PERSISTENT_ENVIRONMENTS=("dev" "ref" "int" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox")
 
 function _get_environment_name() {
   local environment=$1
