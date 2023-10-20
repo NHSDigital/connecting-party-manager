@@ -4,9 +4,10 @@ inputs:
   command:
     description: "Makefile command (and args) to run."
     required: true
-  aws-role-to-assume:
-    description: "[Optional] AWS Role to assume during this operation"
+  requires-aws:
+    description: "[Optional] Assume the CI AWS Role during this operation?"
     required: false
+    default: ""
   cache-suffix:
     description: "[Optional] Cache suffix (e.g. 'base')"
     required: false
@@ -25,35 +26,38 @@ runs:
 
     - name: Configure AWS Credentials
       id: configure-aws-credentials
-      if: inputs.aws-role-to-assume
+      if: inputs.requires-aws
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ inputs.aws-role-to-assume }}
+        role-to-assume: ${{ env.CI_ROLE_NAME }}
         role-session-name: github-actions-ci-${{ env.GITHUB_SHA_SHORT }}
-        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+        aws-region: eu-west-2
         output-credentials: true
+        mask-aws-account-id: true
+
+    - name: Mask AWS credentials
+      if: inputs.aws-role-to-assume
+      shell: bash
+      run: |
+        echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-account-id }}" \
+        echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}" \
+        echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}" \
+        echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}" \
+        echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}"
 
     - name: Run "make" command
       shell: bash
       run: |
         make ${{ inputs.command }} \
-          CI=1 \
           AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
           AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
           AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
           AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
       env:
-        ##### REMOVE THE FOLLOWING AFTER CI-TERRAFORM SET UP ######
-        AWS_ACCESS_KEY_ID: MY_AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY: MY_AWS_SECRET_ACCESS_KEY # pragma: allowlist secret
-        AWS_DEFAULT_REGION: MY_AWS_DEFAULT_REGION
-        AWS_SESSION_TOKEN: MY_AWS_SESSION_TOKEN
-        ##### UNCOMMENT THE FOLLOWING AFTER CI-TERRAFORM SET UP ######
-        # AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
-        # AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
-        # AWS_DEFAULT_REGION: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}
-        # AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
-        ######################################################
+        AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
+        AWS_DEFAULT_REGION: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}
+        AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
 
     - name: Synchronise the cache ("upload")
       uses: ./.github/actions/components/caching/

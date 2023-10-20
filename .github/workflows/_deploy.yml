@@ -15,8 +15,6 @@ env:
   RUNNING_IN_CI: 1
   WORKSPACE: ${{ inputs.workspace }}
   CACHE_NAME: ${{ inputs.workspace }}-cache
-  AWS_DEFAULT_REGION: eu-west-2
-  TF_CLI_ARGS: -no-color
   # SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}
 
 jobs:
@@ -62,10 +60,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
+      - uses: ./.github/actions/terraform/
         with:
-          command: terraform--init TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+          command: init
+          workspace: ${{ env.WORKSPACE }}
 
   terraform--plan:
     needs: [get-branch-from-workflow-file, terraform--init]
@@ -74,10 +72,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
+      - uses: ./.github/actions/terraform/
         with:
-          command: terraform--plan TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+          command: plan
+          workspace: ${{ env.WORKSPACE }}
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
@@ -86,10 +84,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
+      - uses: ./.github/actions/terraform/
         with:
-          command: terraform--apply TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+          command: apply
+          workspace: ${{ env.WORKSPACE }}
 
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
@@ -101,7 +99,7 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: test--smoke
-          aws-role-to-assume: ${{ secrets.WORKSPACE_ROLE_NAME }}
+          requires-aws: true
 
   set-success:
     name: Set Success
@@ -110,7 +108,6 @@ jobs:
     steps:
       - name: Set success env var
         run: echo "success"
-
     outputs:
       success: "succeeded"
 

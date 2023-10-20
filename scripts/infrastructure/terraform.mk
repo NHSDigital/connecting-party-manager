@@ -1,30 +1,21 @@
-.PHONY: terraform--plan terraform--apply terraform--destroy initialise--mgmt automated-destroy corrupted--workspace-destroy terraform--force-unlock
+.PHONY: terraform--validate terraform--init terraform--plan terraform--apply terraform--destroy terraform--unlock initialise--mgmt destroy--mgmt initialise--non-mgmt automated-destroy destroy--non-mgmt corrupted--workspace-destroy corrupted--workspace-destroy
 
-TERRAFORM_WORKSPACE ?= "dev"
-TERRAFORM_ACCOUNT_WIDE ?= "non_account_wide"
-TERRAFORM_ARGS :=
+TERRAFORM_WORKSPACE =
+TERRAFORM_ACCOUNT_WIDE = "non_account_wide"
+TERRAFORM_ARGS =
 
 PATH_TO_INFRASTRUCTURE := $(CURDIR)/scripts/infrastructure
-PREFIX :=
-VERSION :=
+PREFIX =
+VERSION =
 
-terraform--validate: ## Run terraform validate
-	@bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh validate $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
-
-terraform--init: aws--login ## Run terraform init
-	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh init $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
-
-terraform--plan: build aws--login  ## Run terraform plan
-	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh plan $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
-
-terraform--apply: aws--login ## Run terraform apply
-	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh apply $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
-
-terraform--destroy: aws--login ## Run terraform destroy
-	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh destroy $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
-
-terraform--force-unlock: aws--login ## Run terraform force-unlock
-	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh unlock $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) $(TERRAFORM_ARGS)
+terraform--validate: _terraform--validate ## Run terraform validate
+terraform--init: _terraform--init ## Run terraform init
+terraform--plan: build terraform--init _terraform--plan  ## Run terraform plan
+terraform--apply: _terraform--apply ## Run terraform apply
+terraform--destroy: _terraform--destroy ## Run terraform destroy
+terraform--unlock: _terraform--unlock ## Run terraform unlock
+_terraform--%: aws--login
+	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh $* $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) "$(TERRAFORM_ARGS)"
 
 initialise--mgmt: aws--login ## Bootstrap the MGMT AWS environment. Must provide PREFIX and VERSION keyword arguments.
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/initialise-mgmt-resources.sh $(PREFIX) $(VERSION)

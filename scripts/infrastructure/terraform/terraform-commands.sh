@@ -1,34 +1,37 @@
 #!/bin/bash
 
+set -x
+
 source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 
 TERRAFORM_COMMAND="$1"
-TERRAFORM_ENVIRONMENT="$2"
+TERRAFORM_WORKSPACE="$2"
 TERRAFORM_ACCOUNT_WIDE="$3"
 TERRAFORM_ARGS="$4"
 AWS_REGION_NAME="eu-west-2"
 
 function _terraform() {
     local account_wide=$3
-    local env
+    local workspace
     local aws_account_id
     local var_file
     local current_date
     local terraform_dir
     local expiration_time
-    env=$(_get_environment_name $TERRAFORM_ENVIRONMENT)
-    aws_account_id=$(_get_aws_account_id "$env")
-    var_file=$(_get_environment_vars_file "$env")
-    terraform_dir=$(_get_terraform_dir "$env" "$TERRAFORM_ACCOUNT_WIDE")
-    workspace_type=$(_get_workspace_type "$env")
-    workspace_expiration=$(_get_workspace_expiration "$env")
-    expiration_date=$(_get_expiration_date "$workspace_expiration")
-    current_date=$(_get_current_date)
-    layers=$(_get_layer_list)
-    lambdas=$(_get_lambda_list)
+    workspace=$(_get_workspace_name $TERRAFORM_WORKSPACE) || return 1
+    aws_account_id=$(_get_aws_account_id "$workspace") || return 1
+    var_file=$(_get_workspace_vars_file "$workspace") || return 1
+    terraform_dir=$(_get_terraform_dir "$workspace" "$TERRAFORM_ACCOUNT_WIDE")
+    if [ $? -gt 0 ]; then
+        echo ${terraform_dir}
+        return 1
+    fi
+    current_date=$(_get_current_date) || return 1
+    layers=$(_get_layer_list) || return 1
+    lambdas=$(_get_lambda_list) || return 1
+    contact_info=$(_get_contact_information) || return 1
     local plan_file="./tfplan"
-    # local ci_log_bucket="${PROFILE_PREFIX}--mgmt--github-ci-logging"
 
     case $TERRAFORM_COMMAND in
         #----------------
@@ -38,71 +41,71 @@ function _terraform() {
         ;;
         #----------------
         "init")
-            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+            if [[ "${contact_info}" != *MGMT* ]]; then
                 echo "Please log in as the mgmt account" >&2
                 return 1
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_init "$env" "$TERRAFORM_ARGS"
+            _terraform_init "$workspace" "$TERRAFORM_ARGS"
         ;;
         #----------------
         "plan")
-            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+            if [[ "${contact_info}" != *MGMT* ]]; then
                 echo "Please log in as the mgmt account" >&2
                 return 1
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_plan "$env" "$var_file" "$plan_file" "$aws_account_id"
+            _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id"
         ;;
         #----------------
         "apply")
-            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+            if [[ "${contact_info}" != *MGMT* ]]; then
                 echo "Please log in as the mgmt account" >&2
                 return 1
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_apply "$env" "$plan_file"
+            _terraform_apply "$workspace" "$plan_file"
         ;;
         #----------------
         "destroy")
-            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+            if [[ "${contact_info}" != *MGMT* ]]; then
                 echo "Please log in as the mgmt account" >&2
                 return 1
             fi
 
-            if [[ -z ${env} ]]; then
+            if [[ -z ${workspace} ]]; then
                 echo "Non-mgmt parameter required" >&2
                 return 1
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_destroy "$env" "$var_file" "$aws_account_id"
+            _terraform_destroy "$workspace" "$var_file" "$aws_account_id"
         ;;
         #----------------
         "unlock")
-            if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
+            if [[ "${contact_info}" != *MGMT* ]]; then
                 echo "Please log in as the mgmt account" >&2
                 return 1
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_unlock "$env"
+            _terraform_unlock "$workspace"
         ;;
     esac
 }
 function _terraform_init() {
-    local env=$1
+    local workspace=$1
     local args=${@:2}
 
     terraform init $args || return 1
-    terraform workspace select "$env" || terraform workspace new "$env" || return 1
+    terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 }
 
 function _terraform_plan() {
-    local env=$1
+    local workspace=$1
     local var_file=$2
     local plan_file=$3
     local aws_account_id=$4
@@ -110,7 +113,7 @@ function _terraform_plan() {
 
 
     terraform init || return 1
-    terraform workspace select "$env" || terraform workspace new "$env" || return 1
+    terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
     terraform plan \
         -out="$plan_file" \
         -var-file="$var_file" \
@@ -124,22 +127,22 @@ function _terraform_plan() {
 }
 
 function _terraform_apply() {
-    local env=$1
+    local workspace=$1
     local plan_file=$2
     local args=${@:4}
 
-    terraform workspace select "$env" || terraform workspace new "$env" || return 1
+    terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
     terraform apply $args "$plan_file" || return 1
     terraform output -json > output.json || return 1
 }
 
 function _terraform_destroy() {
-  local env=$1
+  local workspace=$1
   local var_file=$2
   local aws_account_id=$3
   local args=${@:4}
 
-  terraform workspace select "$env" || terraform workspace new "$env" || return 1
+  terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
   terraform destroy \
     -var-file="$var_file" \
     -var "assume_account=${aws_account_id}" \
@@ -148,14 +151,14 @@ function _terraform_destroy() {
     -var "lambdas=${lambdas}" \
     -var "layers=${layers}" \
     $args || return 1
-  if [ "$env" != "default" ]; then
+  if [ "$workspace" != "default" ]; then
     terraform workspace select default || return 1
-    terraform workspace delete "$env" || return 1
+    terraform workspace delete "$workspace" || return 1
   fi
 }
 
 function _terraform_unlock() {
-    terraform force-unlock "$env"
+    terraform force-unlock "$workspace"
 }
 
 _terraform $@

@@ -9,20 +9,28 @@ permissions:
 
 env:
   BASE_CACHE_SUFFIX: base
-  AWS_DEFAULT_REGION: eu-west-2
   BASE_BRANCH_NAME: ${{ github.event.pull_request.base.ref }}
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
-  TF_CLI_ARGS: -no-color
+  CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
+  RUNNING_IN_CI: "1"
 
 jobs:
-  create-timestamp:
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+          echo "CI_ROLE_NAME=${{ secrets.CI_ROLE_NAME }}" >> $GITHUB_ENV
+
+  create-workspace-name:
     runs-on: [self-hosted, ci]
     outputs:
-      timestamp: ${{ steps.create_timestamp.outputs.timestamp }}
+      workspace: ${{ steps.create_workspace_name.outputs.workspace }}
     steps:
-      - id: create_timestamp
+      - id: create_workspace_name
         run: |
-          echo "timestamp=$(date -d "+3 days" "+%Y.%m.%d.%H.%M.%S")" >> $GITHUB_OUTPUT
+          echo "workspace=CI-$(date "+%Y-%m-%d-%H-%M-%S")" >> $GITHUB_OUTPUT
 
   workflow--check--branch-name:
     runs-on: [self-hosted, ci]
@@ -98,48 +106,48 @@ jobs:
         with:
           command: helpers--truststore-pull WORKSPACE=ref
 
-  terraform-base-build:
-    needs: [create-timestamp, build-base, helpers--truststore-pull]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ env.BASE_BRANCH_NAME }}
-      - uses: ./.github/actions/make/
-        with:
-          command: terraform--plan WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
-          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
-      - uses: ./.github/actions/make/
-        with:
-          command: terraform--apply WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
-          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
+  # terraform-base-build:
+  #   needs: [create-workspace-name, build-base, helpers--truststore-pull]
+  #   runs-on: [self-hosted, ci]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ env.BASE_BRANCH_NAME }}
+  #     - uses: ./.github/actions/terraform/
+  #       with:
+  #         command: plan
+  #         workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+  #         cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
+  #     - uses: ./.github/actions/terraform/
+  #       with:
+  #         command: apply
+  #         workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+  #         cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   terraform-head-build:
     needs:
       [
-        create-timestamp,
+        create-workspace-name,
         build-head,
         workflow--codebase-checks,
         test--unit,
         test--feature--local,
         helpers--truststore-pull,
-        terraform-base-build,
       ]
+      #terraform-base-build,
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ env.BRANCH_NAME }}
-      - uses: ./.github/actions/make/
+      - uses: ./.github/actions/terraform/
         with:
-          command: terraform--plan WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
-      - uses: ./.github/actions/make/
+          command: plan
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+      - uses: ./.github/actions/terraform/
         with:
-          command: terraform--apply WORKSPACE="ci-${{ needs.create-timestamp.outputs.timestamp }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
+          command: apply
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
 
   test--integration:
     needs:
@@ -158,4 +166,4 @@ jobs:
       - uses: ./.github/actions/pytest-with-rerun/
         with:
           test-type: integration
-          aws-role-to-assume: ${{ secrets.CI_ROLE_NAME }}
+          requires-aws: true
