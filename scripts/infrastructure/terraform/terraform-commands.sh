@@ -145,7 +145,7 @@ function _terraform_destroy() {
     local aws_account_id=$3
     local args=${@:4}
 
-    terraform init || return 1
+    terraform init -reconfigure || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
     terraform destroy \
         -var-file="$var_file" \
