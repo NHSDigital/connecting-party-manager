@@ -61,12 +61,12 @@ make aws--login
 
 You can build a working copy of the CPM service in your own workspace within the `dev` environment. To do this follow these steps. (You must have SSO setup on your system and have MGMT admin access)
 
-You must pass a `TERRAFORM_ENVIRONMENT` variable to each command in the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`. This variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
+You must pass a `TERRAFORM_WORKSPACE` variable to each command in the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`. This variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
 
 ```shell
-make terraform--init TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
-make terraform--plan TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to build the project first
-make terraform--apply TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>"
+make terraform--init TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
+make terraform--plan TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to build the project first
+make terraform--apply TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>"
 ```
 
 ### Destroy a local workspace on AWS
@@ -74,7 +74,7 @@ make terraform--apply TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>"
 Destroy the local workspace and it's corresponding state file on mgmt
 
 ```shell
-make terraform--destroy TERRAFORM_ENVIRONMENT="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
+make terraform--destroy TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
 ```
 
 ### Other helpful commands
