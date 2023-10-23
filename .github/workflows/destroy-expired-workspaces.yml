@@ -3,6 +3,7 @@ name: Scheduled Workspace Destroy
 on:
   schedule:
     - cron: "0 0 * * *" # Runs every day at midnight (UTC).
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -17,6 +18,9 @@ jobs:
   destroy_expired_workspace:
     runs-on: [self-hosted, ci]
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
       - uses: ./.github/actions/make/
         with:
           command: automated--destroy TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
