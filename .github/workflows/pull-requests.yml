@@ -12,7 +12,7 @@ env:
   BASE_BRANCH_NAME: ${{ github.event.pull_request.base.ref }}
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
-  RUNNING_IN_CI: "1"
+  RUNNING_IN_CI: 1
 
 jobs:
   parse-secrets:
