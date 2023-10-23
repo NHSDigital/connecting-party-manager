@@ -139,8 +139,8 @@ jobs:
         test--feature--local,
         helpers--truststore-pull,
         parse-secrets,
+        terraform-base-build,
       ]
-      #terraform-base-build,
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
