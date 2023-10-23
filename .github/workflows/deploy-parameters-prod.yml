@@ -1,0 +1,11 @@
+name: Production Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      workspace: prod
+    secrets: inherit # pragma: allowlist secret
