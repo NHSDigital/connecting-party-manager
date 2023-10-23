@@ -21,7 +21,6 @@ jobs:
       - id: parse-secrets
         run: |
           echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
-          echo "CI_ROLE_NAME=${{ secrets.CI_ROLE_NAME }}" >> $GITHUB_ENV
 
   create-workspace-name:
     runs-on: [self-hosted, ci]
@@ -106,23 +105,29 @@ jobs:
         with:
           command: helpers--truststore-pull WORKSPACE=ref
 
-  # terraform-base-build:
-  #   needs: [create-workspace-name, build-base, helpers--truststore-pull]
-  #   runs-on: [self-hosted, ci]
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         ref: ${{ env.BASE_BRANCH_NAME }}
-  #     - uses: ./.github/actions/terraform/
-  #       with:
-  #         command: plan
-  #         workspace: ${{ needs.create-workspace-name.outputs.workspace }}
-  #         cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
-  #     - uses: ./.github/actions/terraform/
-  #       with:
-  #         command: apply
-  #         workspace: ${{ needs.create-workspace-name.outputs.workspace }}
-  #         cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
+  terraform-base-build:
+    needs:
+      [
+        create-workspace-name,
+        build-base,
+        helpers--truststore-pull,
+        parse-secrets,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BASE_BRANCH_NAME }}
+      - uses: ./.github/actions/terraform/
+        with:
+          command: plan
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+          cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
+      - uses: ./.github/actions/terraform/
+        with:
+          command: apply
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+          cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   terraform-head-build:
     needs:
@@ -133,6 +138,7 @@ jobs:
         test--unit,
         test--feature--local,
         helpers--truststore-pull,
+        parse-secrets,
       ]
       #terraform-base-build,
     runs-on: [self-hosted, ci]
