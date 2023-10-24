@@ -106,7 +106,7 @@ function _terraform_init() {
     local workspace=$1
     local args=${@:2}
 
-    terraform init $args || return 1
+    terraform init "$args" || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 }
 
@@ -152,7 +152,7 @@ function _terraform_apply() {
 
     terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-    terraform apply $args "$plan_file" || return 1
+    terraform apply "$args" "$plan_file" || return 1
     terraform output -json > output.json || return 1
 }
 
