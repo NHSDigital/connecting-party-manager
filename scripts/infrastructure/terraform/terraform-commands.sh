@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 
@@ -21,6 +19,11 @@ function _terraform() {
     local expiration_time
     workspace=$(_get_workspace_name $TERRAFORM_WORKSPACE) || return 1
     aws_account_id=$(_get_aws_account_id "$workspace") || return 1
+    if [ "$RUNNING_IN_CI" = 1 ]; then
+        # Ask Github Actions to mask the Account ID in the logs
+        echo "::add-mask:: ${aws_account_id}"
+    fi
+
     var_file=$(_get_workspace_vars_file "$workspace") || return 1
     terraform_dir=$(_get_terraform_dir "$workspace" "$TERRAFORM_ACCOUNT_WIDE")
     if [ $? -gt 0 ]; then
