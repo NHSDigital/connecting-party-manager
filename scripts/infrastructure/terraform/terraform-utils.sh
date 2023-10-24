@@ -33,7 +33,7 @@ function _get_workspace_type() {
 function _get_workspace_expiration() {
   local env=$1
   if [ "$RUNNING_IN_CI" = 1 ]; then
-    if [ ${PERSISTENT_WORKSPACES[@]} =~ $env ]]; then
+    if [[ ${PERSISTENT_WORKSPACES[@]} =~ $env ]]; then
       echo "NEVER"
     else
       echo "168"
