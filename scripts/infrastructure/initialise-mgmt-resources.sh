@@ -64,8 +64,6 @@ if [ $? != 0 ]; then
     || exit 1
 fi
 
-exit 99
-
 #
 # Create the Trust Store bucket
 #
