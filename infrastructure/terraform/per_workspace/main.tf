@@ -2,8 +2,10 @@ resource "aws_resourcegroups_group" "resource_group" {
   name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
   description = "${var.workspace_type} workspace resource group."
   tags = {
-    Name      = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
-    CreatedOn = var.updated_date
+    Name           = "${local.project}--${replace(terraform.workspace, "_", "-")}--resource-group"
+    CreatedOn      = var.updated_date
+    LastUpdated    = var.updated_date
+    ExpirationDate = var.expiration_date
   }
 
   lifecycle {
