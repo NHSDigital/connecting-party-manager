@@ -1,14 +1,19 @@
-from abc import ABC
+from typing import Generic, TypeVar
+
+from .reference import Reference
+
+T = TypeVar("T")
 
 
-class Entity(ABC):
+class Entity(Generic[T]):
     """
     Abstract Base Class for handling equality and hashing
     """
 
-    def __init__(self, id: str, name: str):
+    def __init__(self, id: T, name: str):
+        assert name.strip() != "", "Invalid name"
         self.id = id
-        self.name = name
+        self.name = name.strip()
 
     def __hash__(self):
         return hash(self.id)
@@ -18,3 +23,6 @@ class Entity(ABC):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def as_reference(self) -> Reference:
+        return Reference(type(self).__name__, self.id, self.name)

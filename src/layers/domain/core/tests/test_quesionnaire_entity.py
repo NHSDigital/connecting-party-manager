@@ -1,6 +1,4 @@
 import pytest
-
-# from domain.core.error import DuplicateError
 from domain.core.questionnaire_entity import Dataset, QuestionnaireEntity
 
 
@@ -22,7 +20,7 @@ def test_constructor():
         ["gamma"],
     ],
 )
-def test_add_dataset(index: str):
+def test__add_dataset(index: str):
     subject = TestQuestionnaireEntity()
 
     result = subject.add_dataset(index)
