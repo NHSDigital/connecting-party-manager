@@ -124,7 +124,7 @@ function _terraform_plan() {
         -out="$plan_file" \
         -var-file="$var_file" \
         -var "assume_account=${aws_account_id}" \
-        -var "assume_role=Terraform_Admin" \
+        -var "assume_role=NHSDeploymentRole" \
         -var "updated_date=${current_date}" \
         -var "expiration_date=${expiration_date}" \
         -var "lambdas=${lambdas}" \
