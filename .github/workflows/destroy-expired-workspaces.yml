@@ -13,10 +13,20 @@ permissions:
 env:
   AWS_DEFAULT_REGION: eu-west-2
   TF_CLI_ARGS: -no-color
+  CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
+  RUNNING_IN_CI: 1
 
 jobs:
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+
   destroy_expired_workspace:
     runs-on: [self-hosted, ci]
+    needs: [parse-secrets]
     steps:
       - uses: actions/checkout@v3
         with:

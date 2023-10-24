@@ -36,7 +36,7 @@ runs:
         mask-aws-account-id: true
 
     - name: Mask AWS credentials
-      if: inputs.aws-role-to-assume
+      if: inputs.requires-aws
       shell: bash
       run: |
         echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-account-id }}" \

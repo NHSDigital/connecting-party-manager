@@ -30,6 +30,9 @@ function _terraform() {
         echo ${terraform_dir}
         return 1
     fi
+    workspace_type=$(_get_workspace_type "$workspace")
+    workspace_expiration=$(_get_workspace_expiration "$workspace")
+    expiration_date=$(_get_expiration_date "$workspace_expiration")
     current_date=$(_get_current_date) || return 1
     layers=$(_get_layer_list) || return 1
     lambdas=$(_get_lambda_list) || return 1
@@ -140,24 +143,25 @@ function _terraform_apply() {
 }
 
 function _terraform_destroy() {
-  local workspace=$1
-  local var_file=$2
-  local aws_account_id=$3
-  local args=${@:4}
+    local workspace=$1
+    local var_file=$2
+    local aws_account_id=$3
+    local args=${@:4}
 
-  terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-  terraform destroy \
-    -var-file="$var_file" \
-    -var "assume_account=${aws_account_id}" \
-    -var "assume_role=${TERRAFORM_ROLE_NAME}" \
-    -var "workspace_type=${workspace_type}" \
-    -var "lambdas=${lambdas}" \
-    -var "layers=${layers}" \
-    $args || return 1
-  if [ "$workspace" != "default" ]; then
-    terraform workspace select default || return 1
-    terraform workspace delete "$workspace" || return 1
-  fi
+    terraform init -reconfigure || return 1
+    terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
+    terraform destroy \
+        -var-file="$var_file" \
+        -var "assume_account=${aws_account_id}" \
+        -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+        -var "workspace_type=${workspace_type}" \
+        -var "lambdas=${lambdas}" \
+        -var "layers=${layers}" \
+        $args || return 1
+    if [ "$workspace" != "default" ]; then
+        terraform workspace select default || return 1
+        terraform workspace delete "$workspace" || return 1
+    fi
 }
 
 function _terraform_unlock() {
