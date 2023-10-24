@@ -35,6 +35,21 @@ state_bucket_name="${PREFIX}--terraform-state-${VERSION}"
 state_lock_table_name="${PREFIX}--terraform-state-lock-${VERSION}"
 
 #
+# Create the NHSDeploymentRole that will be used for deployment and CI/CD
+#
+
+aws iam get-role --role-name "NHSDeploymentRole" &> /dev/null
+if [ $? != 0 ]; then
+  tf_assume_role_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/mgmt-role-trust-policy.json)
+
+  aws iam create-role \
+    --role-name "NHSDeploymentRole" \
+    --assume-role-policy-document "${tf_assume_role_policy}" \
+    --region "${AWS_REGION_NAME}" \
+    || exit 1
+fi
+
+#
 # Create the NHSDeploymentPolicy that will be used for Developer access and CI/CD
 #
 
@@ -48,6 +63,12 @@ if [ $? != 0 ]; then
     --region "${AWS_REGION_NAME}" \
     || exit 1
 fi
+
+aws iam attach-role-policy \
+  --role-name "NHSDeploymentRole" \
+  --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/NHSDeploymentPolicy" \
+  --region "${AWS_REGION_NAME}" \
+  || exit 1
 
 #
 # Create the NHSSupportPolicy that will be used for Support access
