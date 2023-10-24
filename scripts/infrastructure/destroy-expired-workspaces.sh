@@ -37,11 +37,13 @@ function _destroy_expired_workspaces() {
                 tagsResult=$(aws resource-groups get-tags --arn "$arn" --region "${AWS_REGION_NAME}")
                 if [ $? -eq 0 ]; then
                     expirationDate=$(echo "$tagsResult" | jq -r '.Tags.ExpirationDate')
-                    workspace=$(echo "$tagsResult" | jq -r '.Tags.Workspace')
-                    local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
-                    local expired=$(python -c "from datetime import datetime, timezone; import sys; print(1) if datetime.strptime('$timestamp', '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime('$expirationDate', '%Y-%m-%dT%H:%M:%SZ') else print(0)")
-                    if [ -n "$expirationDate" ] && [ "$expired" = 1 ]; then
-                        workspaces+=("$workspace")
+                    if [ "$expirationDate" != "NEVER" ]; then
+                        workspace=$(echo "$tagsResult" | jq -r '.Tags.Workspace')
+                        local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
+                        local expired=$(python -c "from datetime import datetime, timezone; import sys; print(1) if datetime.strptime('$timestamp', '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime('$expirationDate', '%Y-%m-%dT%H:%M:%SZ') else print(0)")
+                        if [ -n "$expirationDate" ] && [ "$expired" = 1 ]; then
+                            workspaces+=("$workspace")
+                        fi
                     fi
                 else
                     echo "Error executing get-tags command for $arn"

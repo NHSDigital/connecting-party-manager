@@ -63,11 +63,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-<<<<<<< HEAD
             _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id" "$ACCOUNT_WIDE" "$TERRAFORM_ARGS"
-=======
-            _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id" "$TERRAFORM_ARGS"
->>>>>>> 452e4ba (Allow args into terraform commands)
         ;;
         #----------------
         "apply")
@@ -77,11 +73,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-<<<<<<< HEAD
             _terraform_apply "$workspace" "$plan_file" "$ACCOUNT_WIDE" "$TERRAFORM_ARGS"
-=======
-            _terraform_apply "$workspace" "$plan_file" "$TERRAFORM_ARGS"
->>>>>>> 452e4ba (Allow args into terraform commands)
         ;;
         #----------------
         "destroy")
@@ -96,11 +88,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-<<<<<<< HEAD
             _terraform_destroy "$workspace" "$var_file" "$aws_account_id" "$ACCOUNT_WIDE" "$TERRAFORM_ARGS"
-=======
-            _terraform_destroy "$workspace" "$var_file" "$aws_account_id" "$TERRAFORM_ARGS"
->>>>>>> 452e4ba (Allow args into terraform commands)
         ;;
         #----------------
         "unlock")
