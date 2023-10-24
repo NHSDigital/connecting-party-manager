@@ -30,6 +30,9 @@ function _terraform() {
         echo ${terraform_dir}
         return 1
     fi
+    workspace_type=$(_get_workspace_type "$workspace")
+    workspace_expiration=$(_get_workspace_expiration "$workspace")
+    expiration_date=$(_get_expiration_date "$workspace_expiration")
     current_date=$(_get_current_date) || return 1
     layers=$(_get_layer_list) || return 1
     lambdas=$(_get_lambda_list) || return 1
