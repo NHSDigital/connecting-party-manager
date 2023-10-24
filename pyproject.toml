@@ -30,6 +30,7 @@ sh = "^2.0.6"
 hypothesis = "^6.87.3"
 aws-lambda-powertools = { extras = ["aws-sdk"], version = "^2.25.1" }
 openapi3 = { git = "https://github.com/jaklinger/openapi3.git", rev = "bug/request_bodies_fix" }
+parse = "^1.19.1"
 
 [build-system]
 requires = ["poetry-core"]

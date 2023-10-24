@@ -10,7 +10,7 @@ from domain.core.product import Product
         ["meep", "Meep", [], []],
     ],
 )
-def test_can_create_product(
+def test__can_create_product(
     id: str, name: str, questionnaires: set[str], dependency_questionnaires: set[str]
 ):
     result = Product(

@@ -1,16 +1,20 @@
-from typing import Iterable, TypeVar
+from typing import TypeVar
+from uuid import UUID
 
+from .common import default_set
 from .entity import Entity
 from .questionnaire_entity import QuestionnaireEntity
 
 T = TypeVar("T")
 
 
-def default_set(iterable: Iterable[T]) -> set[T]:
-    return set(iterable if iterable is not None else [])
+class Product(Entity[UUID], QuestionnaireEntity):
+    """
+    A Product represents logical and physical software products.  A Product may
+    be referenced by multiple keys, such as internal GUID, Product Id, ASID,
+    etc.
+    """
 
-
-class Product(Entity, QuestionnaireEntity):
     def __init__(
         self,
         id: str,

@@ -5,7 +5,7 @@ _pytest:
 	poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
 
 _behave:
-	poetry run python -m behave feature-tests $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS)
+	poetry run python -m behave feature_tests $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS)
 
 test--unit: ## Run unit (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'unit' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR)
