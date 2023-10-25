@@ -8,14 +8,12 @@ provider "aws" {
   default_tags {
     tags = {
       Environment      = var.environment
-      LastUpdated      = var.updated_date
       Workspace        = replace(terraform.workspace, "_", "-")
       Project          = local.project
       Name             = "${local.project}--${replace(terraform.workspace, "_", "-")}-secrets"
       Owner            = "NHSE"
       ProjectShortName = "CPM"
       ProjectFullname  = "Connecting Party Manager"
-      ExpirationDate   = var.expiration_date
       WorkspaceType    = var.workspace_type
     }
   }

@@ -167,20 +167,18 @@ function _terraform_destroy() {
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 
     if [[ "${account_wide}" = "account_wide" ]]; then
-        terraform destroy \
+        terraform apply -destroy $args \
             -var-file="$var_file" \
             -var "assume_account=${aws_account_id}" \
-            -var "assume_role=${terraform_role_name}" \
-            $args || return 1
+            -var "assume_role=${terraform_role_name}" || return 1
     else
-        terraform destroy \
+        terraform apply -destroy $args \
             -var-file="$var_file" \
             -var "assume_account=${aws_account_id}" \
             -var "assume_role=${terraform_role_name}" \
             -var "workspace_type=${workspace_type}" \
             -var "lambdas=${lambdas}" \
-            -var "layers=${layers}" \
-            $args || return 1
+            -var "layers=${layers}" || return 1
     fi
 
     if [ "$workspace" != "default" ]; then

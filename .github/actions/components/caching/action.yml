@@ -19,8 +19,7 @@ runs:
           .venv
           .timestamp
           **/dist/*zip
-          infrastructure/terraform/per_account/*/parameters/tfplan
-          infrastructure/terraform/per_account/*/tfplan
+          **/tfplan
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.date.outputs.date }}
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
