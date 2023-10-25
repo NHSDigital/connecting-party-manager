@@ -30,6 +30,7 @@ jobs:
     steps:
       - id: create_workspace_name
         run: |
+          # will create a workspace in the format ci-PI-70-b25lkjd
           echo "workspace=ci-$(echo ${{ env.BRANCH_NAME }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
 
   workflow--check--branch-name:
