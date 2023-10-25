@@ -1,4 +1,4 @@
-name: Scheduled Workspace Destroy
+name: "Schedule: Workspace Destroy"
 
 on:
   schedule:

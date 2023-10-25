@@ -19,7 +19,7 @@ runs:
       run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
       shell: bash
 
-    - name: Synchronise the cache ("download")
+    - name: Synchronise the cache
       uses: ./.github/actions/components/caching/
       with:
         cache-suffix: ${{ inputs.cache-suffix }}
@@ -48,6 +48,11 @@ runs:
     - name: Run "make" command
       shell: bash
       run: |
+        ls .venv && echo yes || echo no
+
+    - name: Run "make" command
+      shell: bash
+      run: |
         make ${{ inputs.command }} \
           AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
           AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
@@ -58,8 +63,3 @@ runs:
         AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
         AWS_DEFAULT_REGION: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}
         AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
-
-    - name: Synchronise the cache ("upload")
-      uses: ./.github/actions/components/caching/
-      with:
-        cache-suffix: ${{ inputs.cache-suffix }}

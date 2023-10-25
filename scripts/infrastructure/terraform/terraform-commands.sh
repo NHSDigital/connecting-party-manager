@@ -1,16 +1,15 @@
 #!/bin/bash
 
-source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 
 TERRAFORM_COMMAND="$1"
 TERRAFORM_WORKSPACE="$2"
-TERRAFORM_ACCOUNT_WIDE="$3"
-TERRAFORM_ARGS="$4"
+ACCOUNT_WIDE="$3"
+PARAMETER_DEPLOY="$4"
+TERRAFORM_ARGS="$5"
 AWS_REGION_NAME="eu-west-2"
 
 function _terraform() {
-    local account_wide=$3
     local workspace
     local aws_account_id
     local var_file
@@ -25,7 +24,7 @@ function _terraform() {
     fi
 
     var_file=$(_get_workspace_vars_file "$workspace") || return 1
-    terraform_dir=$(_get_terraform_dir "$workspace" "$TERRAFORM_ACCOUNT_WIDE")
+    terraform_dir=$(_get_terraform_dir "$workspace" "$ACCOUNT_WIDE" "$PARAMETER_DEPLOY")
     if [ $? -gt 0 ]; then
         echo ${terraform_dir}
         return 1
@@ -63,7 +62,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id"
+            _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id" "$ACCOUNT_WIDE"
         ;;
         #----------------
         "apply")
@@ -73,7 +72,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_apply "$workspace" "$plan_file"
+            _terraform_apply "$workspace" "$plan_file" "$ACCOUNT_WIDE"
         ;;
         #----------------
         "destroy")
@@ -88,7 +87,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_destroy "$workspace" "$var_file" "$aws_account_id"
+            _terraform_destroy "$workspace" "$var_file" "$aws_account_id" "$ACCOUNT_WIDE"
         ;;
         #----------------
         "unlock")
@@ -115,28 +114,42 @@ function _terraform_plan() {
     local var_file=$2
     local plan_file=$3
     local aws_account_id=$4
-    local args=${@:5}
+    local account_wide=$5
+    local args=${@:6}
 
 
     terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-    terraform plan \
-        -out="$plan_file" \
-        -var-file="$var_file" \
-        -var "assume_account=${aws_account_id}" \
-        -var "assume_role=${TERRAFORM_ROLE_NAME}" \
-        -var "updated_date=${current_date}" \
-        -var "expiration_date=${expiration_date}" \
-        -var "lambdas=${lambdas}" \
-        -var "workspace_type=${workspace_type}" \
-        -var "layers=${layers}"  || return 1
+
+    if [[ "${account_wide}" = "account_wide" ]]; then
+        terraform plan \
+            -out="$plan_file" \
+            -var-file="$var_file" \
+            -var "assume_account=${aws_account_id}" \
+            -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+            -var "updated_date=${current_date}" \
+            -var "expiration_date=${expiration_date}" || return 1
+    else
+        terraform plan \
+            -out="$plan_file" \
+            -var-file="$var_file" \
+            -var "assume_account=${aws_account_id}" \
+            -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+            -var "updated_date=${current_date}" \
+            -var "expiration_date=${expiration_date}" \
+            -var "lambdas=${lambdas}" \
+            -var "workspace_type=${workspace_type}" \
+            -var "layers=${layers}"  || return 1
+    fi
 }
 
 function _terraform_apply() {
     local workspace=$1
     local plan_file=$2
+    local account_wide=$3
     local args=${@:4}
 
+    terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
     terraform apply $args "$plan_file" || return 1
     terraform output -json > output.json || return 1
@@ -146,18 +159,29 @@ function _terraform_destroy() {
     local workspace=$1
     local var_file=$2
     local aws_account_id=$3
-    local args=${@:4}
+    local account_wide=$4
+    local args=${@:5}
 
     terraform init -reconfigure || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-    terraform destroy \
-        -var-file="$var_file" \
-        -var "assume_account=${aws_account_id}" \
-        -var "assume_role=${TERRAFORM_ROLE_NAME}" \
-        -var "workspace_type=${workspace_type}" \
-        -var "lambdas=${lambdas}" \
-        -var "layers=${layers}" \
-        $args || return 1
+
+    if [[ "${account_wide}" = "account_wide" ]]; then
+        terraform destroy \
+            -var-file="$var_file" \
+            -var "assume_account=${aws_account_id}" \
+            -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+            $args || return 1
+    else
+        terraform destroy \
+            -var-file="$var_file" \
+            -var "assume_account=${aws_account_id}" \
+            -var "assume_role=${TERRAFORM_ROLE_NAME}" \
+            -var "workspace_type=${workspace_type}" \
+            -var "lambdas=${lambdas}" \
+            -var "layers=${layers}" \
+            $args || return 1
+    fi
+
     if [ "$workspace" != "default" ]; then
         terraform workspace select default || return 1
         terraform workspace delete "$workspace" || return 1
