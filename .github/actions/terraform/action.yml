@@ -8,11 +8,15 @@ inputs:
     description: "Terraform workspace name"
     required: true
   account-wide:
-    description: "If account-wide then specify 'account-wide'"
+    description: "If account-wide then specify 'account_wide'"
     required: false
-    default: ""
+    default: "non_account_wide"
   cache-suffix:
     description: "[Optional] Cache suffix (e.g. 'base')"
+    required: false
+    default: ""
+  parameter-deploy:
+    description: "If account wide parameter deploy then specify 'parameter_deploy'"
     required: false
     default: ""
 runs:
@@ -20,6 +24,6 @@ runs:
   steps:
     - uses: ./.github/actions/make/
       with:
-        command: terraform--${{ inputs.command }} TERRAFORM_WORKSPACE="${{ inputs.workspace }}" TERRAFORM_ACCOUNT_WIDE="${{ inputs.account-wide }}"
+        command: terraform--${{ inputs.command }} TERRAFORM_WORKSPACE="${{ inputs.workspace }}" ACCOUNT_WIDE="${{ inputs.account-wide }}" PARAMETER_DEPLOY="${{ inputs.parameter-deploy }}"
         requires-aws: true
         cache-suffix: ${{ inputs.cache-suffix }}

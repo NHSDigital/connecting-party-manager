@@ -1,4 +1,4 @@
-name: Persistent Workspace Deploy
+name: "Deploy - parameters: Persistent Workspace"
 
 on:
   workflow_dispatch:
@@ -18,4 +18,6 @@ jobs:
     uses: ./.github/workflows/_deploy.yml
     with:
       workspace: ${{ inputs.workspace }}
+      parameter-deploy: "parameter_deploy"
+      account-wide: "account_wide"
     secrets: inherit # pragma: allowlist secret

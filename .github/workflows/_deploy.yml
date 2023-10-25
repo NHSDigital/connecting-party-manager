@@ -5,6 +5,14 @@ on:
         required: true
         default: dev
         type: string
+      parameter-deploy:
+        required: false
+        type: string
+        default: ""
+      account-wide:
+        required: false
+        type: string
+        default: ""
 
 permissions:
   id-token: write
@@ -15,11 +23,22 @@ env:
   RUNNING_IN_CI: 1
   WORKSPACE: ${{ inputs.workspace }}
   CACHE_NAME: ${{ inputs.workspace }}-cache
+  PARAMETER_DEPLOY: ${{ inputs.parameter-deploy }}
+  ACCOUNT_WIDE: ${{ inputs.account-wide }}
   # SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}
+  CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
 
 jobs:
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+
   get-branch-from-workflow-file:
     runs-on: [self-hosted, ci]
+    needs: [parse-secrets]
     outputs:
       branch_name: ${{ steps.get_branch.outputs.branch_name }}
     steps:
@@ -43,7 +62,6 @@ jobs:
 
   helpers--truststore-pull:
     needs: [get-branch-from-workflow-file, build]
-    name: Terraform plan - ${{ inputs.workspace }})
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v3
@@ -64,6 +82,8 @@ jobs:
         with:
           command: init
           workspace: ${{ env.WORKSPACE }}
+          account-wide: ${{ env.ACCOUNT_WIDE }}
+          parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
 
   terraform--plan:
     needs: [get-branch-from-workflow-file, terraform--init]
@@ -76,6 +96,8 @@ jobs:
         with:
           command: plan
           workspace: ${{ env.WORKSPACE }}
+          account-wide: ${{ env.ACCOUNT_WIDE }}
+          parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
@@ -88,6 +110,8 @@ jobs:
         with:
           command: apply
           workspace: ${{ env.WORKSPACE }}
+          account-wide: ${{ env.ACCOUNT_WIDE }}
+          parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
 
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
