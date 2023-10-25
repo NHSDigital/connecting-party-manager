@@ -105,9 +105,10 @@ function _get_workspace_vars_file() {
 function _get_terraform_dir() {
   local env=$1
   local account_wide=$2
+  local parameter_deploy=$3
   local dir=$(pwd)
-  if [ "$RUNNING_IN_CI" = 1 ]; then
-    echo "${dir}/infrastructure/terraform/per_workspace"
+  if [ "$parameter_deploy" = "parameter_deploy" ] && [ "$account_wide" = "account_wide" ]; then
+    echo "${dir}/infrastructure/terraform/per_account/$env/parameters"
   elif [ "$account_wide" = "account_wide" ]; then
     echo "${dir}/infrastructure/terraform/per_account/$env"
   elif [ "$account_wide" = "non_account_wide" ]; then

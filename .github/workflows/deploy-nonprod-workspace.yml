@@ -1,4 +1,4 @@
-name: Persistent Workspace Deploy
+name: "Deploy: Persistent Workspace"
 
 on:
   workflow_dispatch:

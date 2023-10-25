@@ -1,4 +1,4 @@
-name: Production Deploy
+name: "Deploy - parameters: Production"
 
 on:
   workflow_dispatch:
@@ -8,4 +8,6 @@ jobs:
     uses: ./.github/workflows/_deploy.yml
     with:
       workspace: prod
+      parameter-deploy: "parameter_deploy"
+      account-wide: "account_wide"
     secrets: inherit # pragma: allowlist secret

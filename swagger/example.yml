@@ -1,0 +1,58 @@
+openapi: 3.0.3 # MUST be 3.0.3
+info:
+  version: 1.0.0
+  title: Hello Platform As A Service
+  description: |
+    Integration tests for the proxygen service
+  contact:
+    name: API Management Support
+    email: api.management@nhs.net
+servers: # MUST have maximum length 1
+  - url: "https://internal-dev-sandbox.api.service.nhs.uk/{{ base_path }}"
+components:
+  securitySchemes: # MAY only contain these exact values
+    nhs-login-p5:
+      $ref: https://proxygen.ptl.api.platform.nhs.uk/components/securitySchemes/nhs-login-p5
+    app-level0:
+      $ref: https://proxygen.ptl.api.platform.nhs.uk/components/securitySchemes/app-level0
+paths:
+  /hello/user:
+    get:
+      security: # Use security tag to define APIM security pattern on endpoint.
+        - nhs-login-p5: []
+      responses:
+        200:
+          description: "Request was successful"
+  /hello/application:
+    get:
+      security:
+        - app-level0: []
+      responses:
+        200:
+          description: "Request was successful"
+  /hello/world: # Leave empty for open endpoint (obviously not recommended in most cases).
+    get:
+      security: []
+      responses:
+        200:
+          description: "Request was successful"
+
+################################
+# Custom extension for NHSD APIM
+################################
+x-nhsd-apim:
+  access:
+    - title: User Restricted
+      grants:
+        nhs-login-p5: []
+    - title: Application Restricted
+      grants:
+        app-level0: []
+  target: # Only one target (omit for NO backend)
+    type: external
+    healthcheck: /_status
+    url: https://example.external.apikey.secured.backend.com
+    security:
+      type: apikey
+      header: X-API-Key
+      secret: example-apikey-secret-name

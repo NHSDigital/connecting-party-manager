@@ -1,7 +1,7 @@
 .PHONY: terraform--validate terraform--init terraform--plan terraform--apply terraform--destroy terraform--unlock initialise--mgmt destroy--mgmt initialise--non-mgmt automated-destroy destroy--non-mgmt corrupted--workspace-destroy corrupted--workspace-destroy
 
 TERRAFORM_WORKSPACE =
-TERRAFORM_ACCOUNT_WIDE = "non_account_wide"
+ACCOUNT_WIDE = "non_account_wide"
 TERRAFORM_ARGS =
 
 PATH_TO_INFRASTRUCTURE := $(CURDIR)/scripts/infrastructure
@@ -15,7 +15,7 @@ terraform--apply: _terraform--apply ## Run terraform apply
 terraform--destroy: _terraform--destroy ## Run terraform destroy
 terraform--unlock: _terraform--unlock ## Run terraform unlock
 _terraform--%: aws--login
-	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh $* $(TERRAFORM_WORKSPACE) $(TERRAFORM_ACCOUNT_WIDE) "$(TERRAFORM_ARGS)"
+	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh $* "$(TERRAFORM_WORKSPACE)" "$(ACCOUNT_WIDE)" "$(PARAMETER_DEPLOY)" "$(TERRAFORM_ARGS)"
 
 initialise--mgmt: aws--login ## Bootstrap the MGMT AWS environment. Must provide PREFIX and VERSION keyword arguments.
 	@ AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/initialise-mgmt-resources.sh $(PREFIX) $(VERSION)
