@@ -8,7 +8,7 @@ provider "aws" {
   default_tags {
     tags = {
       Environment      = var.environment
-      Workspace        = replace(terraform.workspace, "_", "-")
+      Workspace        = "${replace(terraform.workspace, "_", "-")}-parameters"
       Project          = local.project
       Name             = "${local.project}--${replace(terraform.workspace, "_", "-")}-secrets"
       Owner            = "NHSE"
