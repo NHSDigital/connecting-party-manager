@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: main
+          ref: feature/PI-70-destroy_workspace_fixes
       - uses: ./.github/actions/make/
         with:
           command: automated--destroy TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
