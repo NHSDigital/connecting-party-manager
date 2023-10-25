@@ -8,15 +8,11 @@ AWS_REGION_NAME="eu-west-2"
 ENV="dev"
 
 function _destroy_expired_workspaces() {
-    echo "Destroy script"
     dev_acct=$(_get_aws_account_id "$ENV")
-    echo "$dev_acct"
     role_arn="arn:aws:iam::${dev_acct}:role/NHSDeploymentRole"
-    echo "$role_arn"
     session_name="resource-search-session"
     duration_seconds=900
     assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
-    echo "$assume_role_output"
 
     # Check if the assume-role command was successful
     if [ $? -eq 0 ]; then
