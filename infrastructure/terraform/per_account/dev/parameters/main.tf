@@ -1,10 +1,10 @@
 resource "aws_resourcegroups_group" "resource_group" {
   name = "${local.project}--${replace(terraform.workspace, "_", "-")}--parameter-resource-group"
   tags = {
-    Name      = "${local.project}--${replace(terraform.workspace, "_", "-")}--parameter-resource-group"
-    CreatedOn = var.updated_date
-LastUpdated    = var.updated_date
-}
+    Name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--parameter-resource-group"
+    CreatedOn   = var.updated_date
+    LastUpdated = var.updated_date
+  }
 
   lifecycle {
     ignore_changes = [tags["CreatedOn"]]
