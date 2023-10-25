@@ -6,6 +6,7 @@ source ./scripts/infrastructure/terraform/terraform-commands.sh
 
 AWS_REGION_NAME="eu-west-2"
 ENV="dev"
+TERRAFORM_ROLE_NAME="Terraform_Admin"
 
 function _destroy_expired_workspaces() {
     dev_acct=$(_get_aws_account_id "$ENV")
