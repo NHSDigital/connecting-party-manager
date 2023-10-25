@@ -13,6 +13,7 @@ env:
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
   RUNNING_IN_CI: 1
+  GITHUB_SHA_SHORT: ${{ github.event.pull_request.head.sha }}
 
 jobs:
   parse-secrets:
