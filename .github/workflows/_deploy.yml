@@ -53,7 +53,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: get-branch-from-workflow-file
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
@@ -64,7 +64,7 @@ jobs:
     needs: [get-branch-from-workflow-file, build]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
@@ -75,7 +75,7 @@ jobs:
     needs: [get-branch-from-workflow-file, helpers--truststore-pull]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
@@ -89,7 +89,7 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--init]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
@@ -103,7 +103,7 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--plan]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
@@ -117,7 +117,7 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--apply]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
