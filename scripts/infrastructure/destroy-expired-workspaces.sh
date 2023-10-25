@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 source ./scripts/infrastructure/terraform/terraform-commands.sh
@@ -12,9 +10,7 @@ TERRAFORM_ROLE_NAME="NHSDeploymentRole"
 
 function _destroy_expired_workspaces() {
     dev_acct=$(_get_aws_account_id "$ENV")
-    echo "${dev_acct}"
-    role_arn="arn:aws:iam::${dev_acct}:role/${TERRAFORM_ROLE_NAME}"
-    echo "${role_arn}"
+    role_arn="arn:aws:iam::${dev_acct}:role/$TERRAFORM_ROLE_NAME"
     session_name="resource-search-session"
     duration_seconds=900
     assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
