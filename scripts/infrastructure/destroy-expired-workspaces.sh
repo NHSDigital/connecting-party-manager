@@ -10,7 +10,7 @@ TERRAFORM_ROLE_NAME="NHSDeploymentRole"
 
 function _destroy_expired_workspaces() {
     dev_acct=$(_get_aws_account_id "$ENV")
-    role_arn="arn:aws:iam::${dev_acct}:role/$TERRAFORM_ROLE_NAME"
+    role_arn="arn:aws:iam::${dev_acct}:role/NHSDeploymentRole"
     session_name="resource-search-session"
     duration_seconds=900
     assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
