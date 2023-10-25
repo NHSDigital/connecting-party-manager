@@ -69,7 +69,7 @@ function _destroy_expired_workspaces() {
 
     for workspace in "${workspaces[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
-        bash ./scripts/infrastructure/terraform/terraform-commands.sh destroy $workspace "non_account_wide" "-input=false -auto-approve"
+        bash ./scripts/infrastructure/terraform/terraform-commands.sh destroy $workspace "non_account_wide" "-input=false -auto-approve -no-color"
         # Add your additional logic here
     done
 }
