@@ -13,6 +13,7 @@ env:
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
   RUNNING_IN_CI: 1
+  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
 
 jobs:
   parse-secrets:
@@ -28,8 +29,9 @@ jobs:
       workspace: ${{ steps.create_workspace_name.outputs.workspace }}
     steps:
       - id: create_workspace_name
+        # will create a workspace in the format ci-PI-70-b25lkjd
         run: |
-          echo "workspace=CI-$(date "+%Y-%m-%d-%H-%M-%S")" >> $GITHUB_OUTPUT
+          echo "workspace=ci-$(echo ${{ env.BRANCH_NAME }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
 
   workflow--check--branch-name:
     runs-on: [self-hosted, ci]

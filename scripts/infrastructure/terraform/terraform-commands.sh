@@ -98,7 +98,7 @@ function _terraform() {
             fi
 
             cd "$terraform_dir" || return 1
-            _terraform_unlock "$workspace"
+            _terraform_unlock "$workspace" "$TERRAFORM_ARGS"
         ;;
     esac
 }
@@ -123,7 +123,7 @@ function _terraform_plan() {
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 
     if [[ "${account_wide}" = "account_wide" ]]; then
-        terraform plan \
+        terraform plan $args \
             -out="$plan_file" \
             -var-file="$var_file" \
             -var "assume_account=${aws_account_id}" \
@@ -131,7 +131,7 @@ function _terraform_plan() {
             -var "updated_date=${current_date}" \
             -var "expiration_date=${expiration_date}" || return 1
     else
-        terraform plan \
+        terraform plan $args \
             -out="$plan_file" \
             -var-file="$var_file" \
             -var "assume_account=${aws_account_id}" \
@@ -140,7 +140,7 @@ function _terraform_plan() {
             -var "expiration_date=${expiration_date}" \
             -var "lambdas=${lambdas}" \
             -var "workspace_type=${workspace_type}" \
-            -var "layers=${layers}"  || return 1
+            -var "layers=${layers}" || return 1
     fi
 }
 

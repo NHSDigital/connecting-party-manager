@@ -9,7 +9,7 @@ ENV="dev"
 
 function _destroy_expired_workspaces() {
     dev_acct=$(_get_aws_account_id "$ENV")
-    role_arn="arn:aws:iam::${dev_acct}:role/${TERRAFORM_ROLE_NAME}"
+    role_arn="arn:aws:iam::${dev_acct}:role/NHSDeploymentRole"
     session_name="resource-search-session"
     duration_seconds=900
     assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
@@ -37,11 +37,13 @@ function _destroy_expired_workspaces() {
                 tagsResult=$(aws resource-groups get-tags --arn "$arn" --region "${AWS_REGION_NAME}")
                 if [ $? -eq 0 ]; then
                     expirationDate=$(echo "$tagsResult" | jq -r '.Tags.ExpirationDate')
-                    workspace=$(echo "$tagsResult" | jq -r '.Tags.Workspace')
-                    local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
-                    local expired=$(python -c "from datetime import datetime, timezone; import sys; print(1) if datetime.strptime('$timestamp', '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime('$expirationDate', '%Y-%m-%dT%H:%M:%SZ') else print(0)")
-                    if [ -n "$expirationDate" ] && [ "$expired" = 1 ]; then
-                        workspaces+=("$workspace")
+                    if [ "$expirationDate" != "NEVER" ]; then
+                        workspace=$(echo "$tagsResult" | jq -r '.Tags.Workspace')
+                        local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
+                        local expired=$(python -c "from datetime import datetime, timezone; import sys; print(1) if datetime.strptime('$timestamp', '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime('$expirationDate', '%Y-%m-%dT%H:%M:%SZ') else print(0)")
+                        if [ -n "$expirationDate" ] && [ "$expired" = 1 ]; then
+                            workspaces+=("$workspace")
+                        fi
                     fi
                 else
                     echo "Error executing get-tags command for $arn"
@@ -66,7 +68,7 @@ function _destroy_expired_workspaces() {
 
     for workspace in "${workspaces[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
-        bash ./scripts/infrastructure/terraform/terraform-commands.sh destroy $workspace "non_account_wide"
+        bash ./scripts/infrastructure/terraform/terraform-commands.sh destroy $workspace "non_account_wide" "-input=false -auto-approve -no-color"
         # Add your additional logic here
     done
 }
