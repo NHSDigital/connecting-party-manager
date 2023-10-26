@@ -15,4 +15,8 @@ def test_index(version):
         from api.createProduct.index import handler
 
         result = handler(event={"headers": {"version": version}})
-    assert result == "OK"
+    assert result == {
+        "statusCode": 200,
+        "body": "OK",
+        "headers": {"Content-Length": 123, "Content-Type": "application/json"},
+    }

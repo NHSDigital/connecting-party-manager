@@ -6,6 +6,7 @@ module "lambda_function" {
   description   = "${replace(var.name, "_", "-")} lambda function"
   handler       = "api.${var.name}.index.handler"
   runtime       = var.python_version
+
   environment_variables = {
     SOMETHING = "hiya"
   }
@@ -18,4 +19,16 @@ module "lambda_function" {
 
   layers = var.layers
 
+}
+
+resource "aws_lambda_permission" "lambda_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway-${module.lambda_function.lambda_function_name}"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_function.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${var.apigateway_execution_arn}/*/*/*"
+
+  depends_on = [
+    module.lambda_function.lambda_function_arn
+  ]
 }

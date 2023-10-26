@@ -1,0 +1,6 @@
+---
+components:
+  schemas:
+    placeholder:
+      # DELETE ME when you've got something to replace placeholder
+      type: object

@@ -55,11 +55,39 @@ module "layers" {
   source_path = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
-# module "lambdas" {
-#   for_each    = toset(var.lambdas)
-#   source      = "./modules/api_worker/api_lambda"
-#   name        = each.key
-#   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
-#   layers      = [for instance in module.layers : instance.layer_arn]
-#   source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
-# }
+module "lambdas" {
+  for_each                 = setsubtract(var.lambdas, ["authoriser"])
+  source                   = "./modules/api_worker/api_lambda"
+  name                     = each.key
+  lambda_name              = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+  layers                   = [for instance in module.layers : instance.layer_arn]
+  source_path              = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
+  apigateway_execution_arn = module.api_entrypoint.execution_arn
+}
+
+module "authoriser" {
+  source      = "./modules/api_worker/api_authoriser"
+  lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+  source_path = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
+  layers      = [for instance in module.layers : instance.layer_arn]
+}
+
+module "kms__cloudwatch" {
+  source         = "./modules/kms"
+  name           = "${local.project}--${replace(terraform.workspace, "_", "-")}--cloudwatch"
+  assume_account = var.assume_account
+  prefix         = local.project
+}
+
+
+
+module "api_entrypoint" {
+  source         = "./modules/api_entrypoint"
+  assume_account = var.assume_account
+  project        = local.project
+
+  name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
+  kms_key_id          = module.kms__cloudwatch.kms_arn
+  lambdas             = setsubtract(var.lambdas, ["authoriser"])
+  authoriser_metadata = module.authoriser.metadata
+}

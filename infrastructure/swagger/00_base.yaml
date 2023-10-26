@@ -1,0 +1,15 @@
+# This is an OpenAPI Specification (https://swagger.io/specification/)
+# for the National Record Locator Producer FHIR API
+# owned by NHS Digital (https://digital.nhs.uk/)
+openapi: 3.0.0
+servers:
+info:
+  version:
+  contact:
+  title:
+  description:
+components:
+  schemas:
+  parameters:
+  requestBodies:
+  responses:
