@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 source ./scripts/infrastructure/terraform/terraform-commands.sh
 
