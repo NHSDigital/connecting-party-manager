@@ -1,0 +1,25 @@
+---
+components:
+  responses:
+    Success:
+      description: Success Response
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+    Error:
+      description: Error Response
+      headers:
+        X-Correlation-Id:
+          $ref: "#/components/headers/CorrelationId"
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"

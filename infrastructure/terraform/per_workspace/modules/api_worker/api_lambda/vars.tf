@@ -11,3 +11,7 @@ variable "layers" {
 }
 
 variable "source_path" {}
+
+variable "apigateway_execution_arn" {
+  type = string
+}

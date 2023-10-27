@@ -1,0 +1,10 @@
+---
+# Request body content and parameter definition
+components:
+  requestBodies:
+    Device:
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/Device"
+      required: true

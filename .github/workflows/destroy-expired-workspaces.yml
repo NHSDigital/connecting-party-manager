@@ -33,5 +33,5 @@ jobs:
           ref: main
       - uses: ./.github/actions/make/
         with:
-          command: automated--destroy TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          command: destroy--expired TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           requires-aws: true

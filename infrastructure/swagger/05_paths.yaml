@@ -1,0 +1,72 @@
+---
+x-definitions:
+  # "x-" before "definitions" prevents it from being parsed as an OpenAPI Schema object
+  ApiGatewayIntegration:
+    type: object
+    x-amazon-apigateway-integration: &ApiGatewayIntegration
+      type: aws_proxy
+      httpMethod: POST
+      responses:
+        default:
+          statusCode: "200"
+      passthroughBehavior: when_no_match
+      contentHandling: CONVERT_TO_TEXT
+
+paths:
+  /_status:
+    get:
+      summary: _status endpoint for APIGEE integration
+      operationId: status
+      responses:
+        "200":
+          description: Producer API is operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    enum: ["OK"]
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_status}
+
+  /Device:
+    get:
+      tags:
+        - Device
+      summary: Read a Product (FHIR Device) resource
+      operationId: readProduct
+      responses:
+        "201":
+          description: Successful read of product
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Device"
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+            X-Request-Id:
+              $ref: "#/components/headers/RequestId"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProduct}
+    post:
+      tags:
+        - Device
+      summary: Create a Product (FHIR Device) resource
+      operationId: createProduct
+      responses:
+        "201":
+          description: Create Product operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+      requestBody:
+        $ref: "#/components/schemas/Device"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createProduct}

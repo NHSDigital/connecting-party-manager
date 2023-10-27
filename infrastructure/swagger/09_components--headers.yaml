@@ -1,0 +1,51 @@
+---
+components:
+  parameters:
+    requestId:
+      name: X-Request-ID
+      description: |
+        A globally unique identifier (GUID) for the request, which can be used to trace the request if you contact our helpdesk.
+
+        Must be a universally unique identifier (UUID) (ideally version 4).
+
+        Mirrored back in a response header.
+      in: header
+      required: false
+      schema:
+        $ref: "#/components/schemas/RequestHeaderRequestId"
+    correlationId:
+      name: X-Correlation-ID
+      description: |
+        An optional ID which you can use to track transactions across multiple systems, and we use to de-duplicate repeated requests and to trace the request if you contact our helpdesk.
+
+        If you re-send a failed request please re-send this ID in the header.
+
+        It can take any value, but we recommend avoiding `.` characters.
+
+        Mirrored back in a response header.
+      in: header
+      required: false
+      schema:
+        $ref: "#/components/schemas/RequestHeaderCorrelationId"
+  schemas:
+    RequestHeaderRequestId:
+      type: string
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+      example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
+    RequestHeaderCorrelationId:
+      type: string
+      example: 11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA
+  headers:
+    CorrelationId:
+      schema:
+        type: string
+        example: 11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA
+        description: |
+          The X-Correlation-ID from the request header, if supplied, mirrored back.
+    RequestId:
+      schema:
+        type: string
+        pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
+        description: |
+          The X-Request-ID from the request header, if supplied, mirrored back.

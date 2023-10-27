@@ -3,3 +3,4 @@ poetry 1.6.1
 python 3.11.4
 terraform 1.5.7
 jq 1.7
+yq 4.34.2

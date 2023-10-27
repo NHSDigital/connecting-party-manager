@@ -20,6 +20,7 @@ runs:
           .timestamp
           **/dist/*zip
           **/tfplan
+          **/swagger.yaml
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.date.outputs.date }}
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
