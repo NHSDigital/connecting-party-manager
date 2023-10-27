@@ -13,6 +13,13 @@ module "lambda_function" {
   create_package         = false
   local_existing_package = var.source_path
 
+  # allowed_triggers = {
+  #   APIGatewayAny = {
+  #     service    = "apigateway"
+  #     source_arn = "arn:aws:execute-api:eu-west-1:135367859851:aqnku8akd0/*/*/*"
+  #   }
+  # }
+
   tags = {
     Name = replace(var.name, "_", "-")
   }

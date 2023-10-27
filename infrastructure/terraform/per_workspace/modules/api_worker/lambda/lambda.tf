@@ -17,5 +17,7 @@ module "lambda_function" {
   layers = var.layers
 
   assume_role_policy_statements = var.assume_role_policy_statements
+  attach_policy_statements      = var.attach_policy_statements
+  policy_statements             = var.policy_statements
 
 }
