@@ -13,6 +13,9 @@ workflow--check--rebased-on-main:  ## Check that the current branch is rebased o
 workflow--check--branch-name:  ## Check the branch name format
 	@bash $(PATH_TO_WORKFLOW)/check-branch-name.sh
 
+workflow--check--release-branch-name:  ## Check the release branch name format
+	@bash $(PATH_TO_WORKFLOW)/check-release-branch-name.sh
+
 workflow--create-feature-branch: workflow--check--rebased-on-main  ## Create a feature branch. Must provide JIRA_TICKET and DESCRIPTION keyword arguments.
 	@if [ -z "$(JIRA_TICKET)" ] || [ -z "$(DESCRIPTION)" ]; then \
 		echo "Error: Both JIRA_TICKET and DESCRIPTION must be provided."; \
