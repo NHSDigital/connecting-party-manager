@@ -135,20 +135,20 @@ jobs:
     outputs:
       success: "succeeded"
 
-  # message-slack:
-  #   name: Notify slack of deployment
-  #   needs: [get-branch-from-workflow-file, set-success]
-  #   if: ${{ always() }}
-  #   runs-on: [self-hosted, ci]
+  message-slack:
+    name: Notify slack of deployment
+    needs: [get-branch-from-workflow-file, set-success]
+    if: ${{ always() }}
+    runs-on: [self-hosted, ci]
 
-  #   steps:
-  #     - name: Send job result to slack
-  #       id: slack
-  #       uses: slackapi/slack-github-action@v1.24.0
-  #       with:
-  #         payload: |
-  #           {
-  #             "environment": "${{ env.WORKSPACE }}",
-  #             "result": "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
-  #             "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}"
-  #           }
+    steps:
+      - name: Send job result to slack
+        id: slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "environment": "${{ env.WORKSPACE }}",
+              "result": "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
+              "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}"
+            }
