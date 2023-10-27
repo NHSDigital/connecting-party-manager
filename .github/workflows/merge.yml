@@ -17,7 +17,7 @@ jobs:
     name: Create a tag from main
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Create 'env.tag' from the latest release
         run: |
           TAG=$(make changelog--get-latest-release)
