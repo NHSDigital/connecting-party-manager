@@ -79,13 +79,16 @@ jobs:
   test--unit:
     needs: [build-head]
     runs-on: [self-hosted, ci]
+    strategy:
+      matrix:
+        test-type: [unit, slow]
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/pytest-with-rerun/
         with:
-          test-type: unit
+          test-type: ${{ matrix.test-type }}
 
   test--feature--local:
     needs: [build-head]

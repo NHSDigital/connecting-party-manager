@@ -17,6 +17,7 @@ packages = [
 python = "3.11.4"
 pydantic = "1.10"
 nhs-context-logging = { git = "https://github.com/jaklinger/nhs-context-logging.git", rev = "jk-pi-49-enhancements" }
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
@@ -38,5 +39,5 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-markers = ["unit", "integration", "smoke"]
+markers = ["unit", "integration", "smoke", "slow"]
 addopts = "--import-mode=importlib"
