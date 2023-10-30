@@ -18,6 +18,7 @@ function _terraform() {
     local expiration_time
     local terraform_role_name="NHSDeploymentRole"
     workspace=$(_get_workspace_name $TERRAFORM_WORKSPACE) || return 1
+
     aws_account_id=$(_get_aws_account_id "$workspace") || return 1
     if [ "$RUNNING_IN_CI" = 1 ]; then
         # Ask Github Actions to mask the Account ID in the logs
@@ -105,9 +106,8 @@ function _terraform() {
 function _terraform_init() {
     local workspace=$1
     local args=${@:2}
-
-    terraform init $args || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
+    terraform init $args || return 1
 }
 
 function _terraform_plan() {
@@ -118,9 +118,8 @@ function _terraform_plan() {
     local account_wide=$5
     local args=${@:6}
 
-
-    terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
+    terraform init || return 1
 
     if [[ "${account_wide}" = "account_wide" ]]; then
         terraform plan $args \
@@ -150,8 +149,8 @@ function _terraform_apply() {
     local account_wide=$3
     local args=${@:4}
 
-    terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
+    terraform init || return 1
     terraform apply $args "$plan_file" || return 1
     terraform output -json > output.json || return 1
 }
@@ -163,8 +162,8 @@ function _terraform_destroy() {
     local account_wide=$4
     local args=${@:5}
 
-    terraform init -reconfigure || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
+    terraform init -reconfigure || return 1
 
     if [[ "${account_wide}" = "account_wide" ]]; then
         terraform apply -destroy $args \

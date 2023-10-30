@@ -19,7 +19,7 @@ paths:
       operationId: status
       responses:
         "200":
-          description: Producer API is operational
+          description: API is operational
           content:
             application/json:
               schema:
