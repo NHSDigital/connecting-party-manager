@@ -6,7 +6,7 @@ CURRENT_DATE=$(date +"%Y-%m-%d")
 RELEASE_PREFIX="release/"
 
 # Check if the branch already exists
-BRANCH_EXISTS=$(git rev-parse --verify "release/${CURRENT_DATE}" 2> /dev/null) || echo "ok"
+BRANCH_EXISTS=$(git rev-parse --verify "release/${CURRENT_DATE}" 2> /dev/null) || :
 
 # If the branch doesn't exist, create it with the current date
 VERSION=${CURRENT_DATE}
