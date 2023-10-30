@@ -1,4 +1,4 @@
-.PHONY: _pytest _behave test--unit test--integration test--smoke test--feature--integration test--feature--local
+.PHONY: _pytest _behave test--unit test--integration test--slow test--smoke test--feature--integration test--feature--local
 _CACHE_CLEAR := "--cache-clear"
 
 _pytest:
@@ -12,6 +12,9 @@ test--unit: ## Run unit (pytest) tests
 
 test--integration: aws--login ## Run integration (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'integration' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR)
+
+test--slow:  ## Run slow (pytest) tests
+	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'slow'" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
 test--smoke:  ## Run end-to-end smoke tests (pytest)
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'smoke'" _CACHE_CLEAR=$(_CACHE_CLEAR)
