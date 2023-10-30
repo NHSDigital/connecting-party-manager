@@ -179,3 +179,23 @@ jobs:
         with:
           test-type: integration
           requires-aws: true
+
+  destroy-redundant-commits:
+    runs-on: [self-hosted, ci]
+    needs:
+      [
+        build-head,
+        workflow--codebase-checks,
+        test--unit,
+        test--feature--local,
+        terraform-head-build,
+        test--integration,
+      ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - uses: ./.github/actions/make/
+        with:
+          command: destroy--redundant-commits BRANCH_NAME=${{ env.BRANCH_NAME }} DESTROY_ALL=false  CURRENT_COMMIT=${{ env.BRANCH_GITHUB_SHA_SHORT }} TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          requires-aws: true
