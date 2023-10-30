@@ -170,4 +170,4 @@ which will create a branch of the form `release/YYYY-MM-DD`. If this branch name
 This command will also:
 
 - Update the version in `pyproject.toml` with the release branch version.
-- Update the VERSION file with the release branch version number.
+- Update the VERSION file with the release branch version number
