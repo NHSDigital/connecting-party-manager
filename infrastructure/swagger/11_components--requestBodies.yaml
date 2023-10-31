@@ -6,5 +6,5 @@ components:
       content:
         application/fhir+json:
           schema:
-            $ref: "#/components/schemas/Device"
+            $ref: "#/components/requestBodies/Device"
       required: true
