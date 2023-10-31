@@ -29,9 +29,13 @@ jobs:
       workspace: ${{ steps.create_workspace_name.outputs.workspace }}
     steps:
       - id: create_workspace_name
-        # will create a workspace in the format ci-PI-70-b25lkjd
+        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdld
         run: |
-          echo "workspace=ci-$(echo ${{ env.BRANCH_NAME }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
+          if [[ ${{ env.BRANCH_NAME }} == *"release/"* ]]; then
+            echo "workspace=rel-$(echo ${{ env.BRANCH_NAME }} | sed 's/release\///')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
+          else
+            echo "workspace=ci-$(echo ${{ env.BRANCH_NAME }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
+          fi
 
   workflow--check--branch-name:
     runs-on: [self-hosted, ci]
@@ -197,5 +201,5 @@ jobs:
           ref: main
       - uses: ./.github/actions/make/
         with:
-          command: destroy--redundant-workspaces BRANCH_NAME=${{ env.BRANCH_NAME }} DESTROY_ALL=false CURRENT_COMMIT=${{ env.BRANCH_GITHUB_SHA_SHORT }} TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          command: destroy--redundant-workspaces BRANCH_NAME=${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT=${{ env.BRANCH_GITHUB_SHA_SHORT }} TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           requires-aws: true

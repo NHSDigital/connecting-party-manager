@@ -4,8 +4,9 @@ source ./scripts/infrastructure/terraform/terraform-utils.sh
 source ./scripts/infrastructure/terraform/terraform-commands.sh
 
 BRANCH_NAME="$1"
-DESTROY_ALL="$2"
-CURRENT_COMMIT="$3"
+DESTROY_ALL_COMMITS_ON_BRANCH="$2"
+KILL_ALL="$3"
+CURRENT_COMMIT="$4"
 AWS_REGION_NAME="eu-west-2"
 ENV="dev"
 
@@ -21,7 +22,6 @@ function _get_valid_workspaces_to_destroy() {
             return
         fi
     else
-        echo "Commit $extract_commit does not exist."
         # Commit was squashed
         echo "$object_name"
     fi
@@ -33,21 +33,23 @@ function _destroy_redundant_workspaces() {
 
     # get JIRA ID from branch name
     if [[ $BRANCH_NAME =~ feature\/(PI-[0-9]+)[-_] ]]; then
-        jira_id="${BASH_REMATCH[1]}"
+        workspace_id="${BASH_REMATCH[1]}"
+    elif [[ $BRANCH_NAME == *release/* ]]; then
+        workspace_id="${BRANCH_NAME##*release/}"
     fi
 
     # get current short commit from branch
     if [ -z "$CURRENT_COMMIT" ]; then
         CURRENT_COMMIT=$(git rev-parse --short "$BRANCH_NAME")
     fi
-
+    echo "$workspace_id"
     matching_objects=()
 
     # Loop through each line in the workspaces list
     while IFS= read -r object_name; do
         # Check if the object name contains the specified Jira ID
-        if [[ -z "$DESTROY_ALL" || "$DESTROY_ALL" != "true" ]]; then
-            if [[ $object_name == *"$jira_id"* ]]; then
+        if [[ -z "$DESTROY_ALL_COMMITS_ON_BRANCH" || "$DESTROY_ALL_COMMITS_ON_BRANCH" != "true" ]]; then
+            if [[ $object_name == "ci-$workspace_id"* || $object_name == "rel-$workspace_id"* ]]; then
                 if [[ ! $object_name == *"$CURRENT_COMMIT"* ]]; then
                     matching_object=$(_get_valid_workspaces_to_destroy "$object_name")
                     if [[ $matching_object ]]; then
@@ -57,10 +59,14 @@ function _destroy_redundant_workspaces() {
             fi
         else
             # Destroy everything!
-            if [[ $object_name == *"$jira_id"* ]]; then
-                matching_object=$(_get_valid_workspaces_to_destroy "$object_name")
-                if [[ $matching_object ]]; then
-                    matching_objects+=("$matching_object")
+            if [[ $object_name == "ci-$workspace_id"* || $object_name == "rel-$workspace_id"* ]]; then
+                if [[ -z "$KILL_ALL" || "$KILL_ALL" != "true" ]]; then
+                    matching_object=$(_get_valid_workspaces_to_destroy "$object_name")
+                    if [[ $matching_object ]]; then
+                        matching_objects+=("$matching_object")
+                    fi
+                else
+                    matching_objects+=("$object_name")
                 fi
             fi
         fi
