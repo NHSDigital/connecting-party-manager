@@ -12,7 +12,6 @@ swagger--clean:  ## Removes swagger builds.
 
 
 $(SWAGGER_TIMESTAMP): $(TIMESTAMP_DIR) $(SWAGGER_AWS) $(SWAGGER_PUBLIC)
-	@bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 	touch $(SWAGGER_TIMESTAMP)
 
 $(CURDIR)/infrastructure/swagger/dist/%/swagger.yaml: $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )

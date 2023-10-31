@@ -51,7 +51,7 @@ cat ${_CLEANED_SWAGGER_FILE} |
     yq 'del(.paths./_status)' |
     yq 'del(.components.securitySchemes."${authoriser_name}")' \
         > ${PUBLIC_SWAGGER_FILE}
-
+echo "Generated ${PUBLIC_SWAGGER_FILE}"
 
 # Remove fields not valid on AWS but otherwise required in public docs
 # * 4XX codes
@@ -60,5 +60,6 @@ cat ${_CLEANED_SWAGGER_FILE} |
     yq 'del(.. | select(has("4XX")).4XX)' |
     yq 'explode(.)' |
     yq 'del(.x-*)' > ${AWS_SWAGGER_FILE}
+echo "Generated ${AWS_SWAGGER_FILE}"
 
 rm -r ${PATH_TO_SWAGGER_BUILD}
