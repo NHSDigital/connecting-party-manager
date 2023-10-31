@@ -19,5 +19,6 @@ module "lambda_function" {
   assume_role_policy_statements = var.assume_role_policy_statements
   attach_policy_statements      = var.attach_policy_statements
   policy_statements             = var.policy_statements
+  trusted_entities              = var.trusted_entities
 
 }

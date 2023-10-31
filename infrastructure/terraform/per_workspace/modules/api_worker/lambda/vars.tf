@@ -23,3 +23,23 @@ variable "attach_policy_statements" {
 variable "policy_statements" {
   default = {}
 }
+
+variable "attach_policy_json" {
+  default = false
+}
+
+variable "policy_json" {
+  default = {}
+}
+
+variable "trusted_entities" {
+  default = []
+}
+
+variable "attach_policy" {
+  default = false
+}
+
+variable "policy" {
+  default = ""
+}

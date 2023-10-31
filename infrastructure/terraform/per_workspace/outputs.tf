@@ -29,3 +29,11 @@ output "layer_arns_array" {
 #     for instance in module.lambdas : instance.lambda_arn
 #   ]
 # }
+
+output "auth_lambda_arn" {
+  value = module.authoriser.lambda_arn
+}
+
+output "auth_lambda_role_arn" {
+  value = module.authoriser.lambda_role_arn
+}
