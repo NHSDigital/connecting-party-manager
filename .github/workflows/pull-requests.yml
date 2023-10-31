@@ -36,7 +36,7 @@ jobs:
   workflow--check--branch-name:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -47,7 +47,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [parse-secrets]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -57,7 +57,7 @@ jobs:
   build-base:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -69,7 +69,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [workflow--check--branch-name, build-head]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -83,7 +83,7 @@ jobs:
       matrix:
         test-type: [unit, slow]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/pytest-with-rerun/
@@ -94,7 +94,7 @@ jobs:
     needs: [build-head]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -104,7 +104,7 @@ jobs:
   helpers--truststore-pull:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -121,7 +121,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
@@ -149,7 +149,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
@@ -172,7 +172,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/pytest-with-rerun/
