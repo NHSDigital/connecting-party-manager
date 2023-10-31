@@ -12,6 +12,14 @@ variable "layers" {
 
 variable "source_path" {}
 
-variable "assume_role_policy_statements" {
+variable "attach_policy_json" {
+  default = false
+}
+
+variable "policy_json" {
   default = {}
+}
+
+variable "trusted_entities" {
+  default = []
 }

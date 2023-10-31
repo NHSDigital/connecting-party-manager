@@ -67,7 +67,7 @@ module "lambdas" {
 
 module "authoriser" {
   name        = "authoriser"
-  source      = "./modules/api_worker/lambda"
+  source      = "./modules/api_worker/api_authoriser"
   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
   layers      = [for instance in module.layers : instance.layer_arn]
@@ -79,28 +79,20 @@ module "authoriser" {
       ]
     }
   ]
-  # attach_policy = true
-  # policy        = "lambda:InvokeFunction"
-  # assume_role_policy_statements = {
-  #   authoriser = {
-  #     effect  = "Allow",
-  #     actions = ["sts:AssumeRole"],
-  #     principals = {
-  #       account_principal = {
-  #         type        = "AWS",
-  #         identifiers = ["apigateway.amazonaws.com"]
-  #         Service
-  #       }
-  #     }
-  #   }
-  # }
-  # attach_policy_statements = true
-  # policy_statements = {
-  #   lambdaInvoke = {
-  #     effect    = "Allow",
-  #     actions   = ["lambda:InvokeFunction"]
-  #   }
-  # }
+
+  attach_policy_json = true
+  policy_json        = <<-EOT
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": "arn:aws:lambda:eu-west-2:${var.assume_account}:function:${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+          }
+      ]
+    }
+  EOT
 }
 
 module "kms__cloudwatch" {

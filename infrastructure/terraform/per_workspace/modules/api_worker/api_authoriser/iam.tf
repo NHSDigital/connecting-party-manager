@@ -32,3 +32,4 @@ resource "aws_iam_role_policy" "invoke_function" {
     ]
   })
 }
+
