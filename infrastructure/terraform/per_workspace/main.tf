@@ -56,18 +56,24 @@ module "layers" {
 }
 
 module "lambdas" {
-  for_each                 = setsubtract(var.lambdas, ["authoriser"])
-  source                   = "./modules/api_worker/api_lambda"
-  name                     = each.key
-  lambda_name              = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
-  layers                   = [for instance in module.layers : instance.layer_arn]
-  source_path              = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
-  apigateway_execution_arn = module.api_entrypoint.execution_arn
+  for_each    = setsubtract(var.lambdas, ["authoriser"])
+  source      = "./modules/api_worker/api_lambda"
+  name        = each.key
+  lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+  layers      = [for instance in module.layers : instance.layer_arn]
+  source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
+  #apigateway_execution_arn = module.api_entrypoint.execution_arn
+  allowed_triggers = {
+    "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
+      service    = "apigateway"
+      source_arn = "${module.api_entrypoint.execution_arn}/*/*/*"
+    }
+  }
 }
 
 module "authoriser" {
   name        = "authoriser"
-  source      = "./modules/api_worker/api_authoriser"
+  source      = "./modules/api_worker/api_lambda"
   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
   layers      = [for instance in module.layers : instance.layer_arn]

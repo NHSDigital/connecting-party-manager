@@ -38,6 +38,6 @@
 #   value = module.authoriser.lambda_role_arn
 # }
 
-output "apigateway_execution_arn" {
-  value = module.api_entrypoint.execution_arn
-}
+# output "apigateway_execution_arn" {
+#   value = module.api_entrypoint.execution_arn
+# }
