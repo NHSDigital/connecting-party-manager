@@ -127,7 +127,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
         with:
           command: plan
