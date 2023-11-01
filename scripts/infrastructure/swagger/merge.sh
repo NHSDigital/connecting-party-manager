@@ -46,6 +46,7 @@ cat ${_CLEANED_SWAGGER_FILE} |
     yq 'del(.paths.*.*.x-amazon-apigateway-integration)' |
     yq 'del(.x-*)' |
     yq 'del(.paths.*.*.security)' |
+    yq 'del(.security)' |
     yq 'del(.tags)' |
     yq 'del(.paths.*.*.tags)' |
     yq 'del(.paths./_status)' |
