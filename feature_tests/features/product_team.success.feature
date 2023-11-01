@@ -8,28 +8,26 @@ Feature: Product Teams Success Scenarios
       | user_id   | name      |
       | <user_id> | Test User |
     When User "<user_id>" creates Product Team <id> called "<name>" for supplier <ods_code>
-    Then the operation was successful
+    Then the operation is successful
     And the result is a ProductTeam with:
       | property | value  |
       | id       | <id>   |
       | name     | <name> |
-    And the result organisation is a Reference with:
-      | property | value           |
-      | system   | OdsOrganisation |
-      | value    | <ods_code>      |
-    And the result owner is a Reference with:
+    And the result organisation is an OdsOrganisation with:
+      | property | value      |
+      | id       | <ods_code> |
+    And the result owner is a User with:
       | property | value     |
-      | system   | User      |
-      | value    | <user_id> |
+      | id       | <user_id> |
     And the following events were raised:
       | event                   |
       | ProductTeamCreatedEvent |
     And event #1 is ProductTeamCreatedEvent with:
-      | property           | value      |
-      | id                 | <id>       |
-      | name               | <name>     |
-      | organisation.value | <ods_code> |
-      | owner.value        | <user_id>  |
+      | property                     | value      |
+      | product_team.id              | <id>       |
+      | product_team.name            | <name>     |
+      | product_team.organisation.id | <ods_code> |
+      | product_team.owner.id        | <user_id>  |
 
     Examples:
       | id                                     | name            | ods_code | ods_name           | user_id          |

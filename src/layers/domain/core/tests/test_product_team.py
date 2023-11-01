@@ -1,11 +1,12 @@
+from unittest import mock
 from uuid import UUID
 
 import pytest
-from domain.core.product_team import ProductTeam
+from domain.core.product import ProductTeam, ProductTeamCreatedEvent
 from domain.core.root import Root
-from domain.events.product_team_created_event import ProductTeamCreatedEvent
 
 
+@mock.patch("domain.core.product.validate_ods_code")
 @pytest.mark.parametrize(
     "id,name",
     [
@@ -14,21 +15,20 @@ from domain.events.product_team_created_event import ProductTeamCreatedEvent
         [UUID("f9518c12-6c83-4544-97db-d9dd1d64da97"), "Third"],
     ],
 )
-def test__create_product_team(id: str, name: str):
-    subject = Root.create_ods_organisation("AB123", "Test")
+def test__create_product_team(_mocked_validate_ods_code, id: str, name: str):
+    org = Root.create_ods_organisation("AB123", "Test")
     user = Root.create_user("test@example.org", "Test User")
 
-    (result, event) = subject.create_product_team(id, name, user)
+    (result, event) = org.create_product_team(id, name, user)
 
     assert isinstance(result, ProductTeam), "Created ProductTeam"
     assert result.id == id, "id mismatch"
     assert result.name == name, "name mismatch"
-    assert result.organisation == subject.as_reference(), "organisation mismatch"
-    assert result.owner == user.as_reference(), "owner mismatch"
+    assert result.organisation is org, "organisation mismatch"
+    assert result.owner is user, "owner mismatch"
 
     assert isinstance(event, ProductTeamCreatedEvent), "Event type mismatch"
-    assert event.id == id, "event id mismatch"
-    assert event.id == id, "event id mismatch"
-    assert event.name == name, "event name mismatch"
-    assert event.organisation == subject.as_reference(), "event organisation mismatch"
-    assert event.owner == user.as_reference(), "event owner mismatch"
+    assert event.product_team.id == id, "event id mismatch"
+    assert event.product_team.name == name, "event name mismatch"
+    assert event.product_team.organisation is org, "event organisation mismatch"
+    assert event.product_team.owner is user, "event owner mismatch"

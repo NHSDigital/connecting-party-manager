@@ -34,7 +34,7 @@ class Questionnaire(Entity[UUID]):
     """
 
     def __init__(self, id: str, name: str):
-        super().__init__(id, name)
+        super().__init__(id=id, name=name)
         self._questions: list[Question] = []
 
     def __contains__(self, question_name: str) -> bool:
@@ -71,4 +71,4 @@ class Questionnaire(Entity[UUID]):
         Creates an exact duplicate of the questionnaire, which is the only way
         to edit questionnaires once they become locked.
         """
-        raise NotImplemented()
+        raise NotImplementedError()

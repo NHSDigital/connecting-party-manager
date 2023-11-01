@@ -1,31 +1,31 @@
 from behave import then
-from domain.core.reference import Reference
 
 from feature_tests.steps.common import parse_value, read_value_from_path
+from feature_tests.steps.context import Context
 
 
 @then("the result is of type {type_name}")
-def step_impl(context, type_name):
+def step_impl(context: Context, type_name):
     t = type(context.result).__name__
     assert t == type_name, f"Expected '{type_name}' got '{t}'"
 
 
 @then("the result {field} equals {value:Number}")
-def step_impl(context, field, value):
+def step_impl(context: Context, field, value):
     assert context.result is not None, "result"
     v = context.result.__dict__[field]
     assert v == value, f"Expected {value} but found {v}"
 
 
 @then('the result {field:String} equals "{value:String}"')
-def step_impl(context, field, value):
+def step_impl(context: Context, field, value):
     assert context.result is not None, "result"
     v = context.result.__dict__[field]
     assert v == value, f"Expected {value} but found {v}"
 
 
 @then("the result {field:String} equals {value:UUID}")
-def step_impl(context, field, value):
+def step_impl(context: Context, field, value):
     assert context.result is not None, "result"
     v = context.result.__dict__[field]
     assert v == value, f"Expected {value} but found {v}"

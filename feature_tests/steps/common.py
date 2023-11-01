@@ -2,6 +2,10 @@ from uuid import UUID
 
 import parse
 from behave import register_type
+from domain.core.error import BadEntityNameError, InvalidOdsCodeError, InvalidTypeError
+from domain.core.product import ProductTeamCreatedEvent
+
+from feature_tests.steps.context import Context
 
 
 @parse.with_pattern(
@@ -51,41 +55,75 @@ def catch_errors(func):
     Decorator that will catch an exception and record it on the context
     """
 
-    def inner(context, *args, **kwargs):
+    def inner(context: Context, *args, **kwargs):
         try:
-            func(context, *args, **kwargs)
+            func(context=context, *args, **kwargs)
         except Exception as e:
             context.error = e
 
     return inner
 
 
-def assert_type_matches(obj, expected):
-    actual = type(obj).__name__
-    assert actual == expected, "Type mismatch: expected {expected} got {actual}"
+EXPECTED_TYPES = {
+    "BadEntityNameError": BadEntityNameError,
+    "InvalidTypeError": InvalidTypeError,
+    "ProductTeamCreatedEvent": ProductTeamCreatedEvent,
+    "InvalidOdsCodeError": InvalidOdsCodeError,
+}
+
+
+def assert_type_matches(obj, expected_type_name: str):
+    expected_type = EXPECTED_TYPES.get(expected_type_name)
+    if expected_type is None:
+        raise ValueError(
+            f"Type '{expected_type_name}' not registered in feature_tests.steps.common.EXPECTED_TYPES. "
+            f"The actual type is '{type(obj).__name__}' - did you mean to register this?"
+        )
+
+    if type(obj) is not expected_type and isinstance(obj, Exception):
+        raise obj
+
+    assert (
+        type(obj) is expected_type
+    ), f"Type mismatch: expected {expected_type} got {type(obj)}"
 
 
 def parse_value(v):
     """
     Use the parsing methods above to turn a value into a proper type.
     """
+    _parsing_functions = (parse_uuid, parse_number, parse_ods_code, parse_string)
 
-    def __parse_value(v, *funcs):
-        [head, *tail] = funcs
+    def __parse_value(v, *functions):
+        if len(functions) == 0:
+            raise ValueError(
+                f"Could not parse '{v}' with any of {(f.__name__ for f in _parsing_functions)}"
+            )
+
+        head, *tail = functions
         try:
             return head(v)
         except:
             return __parse_value(v, *tail)
 
-    return __parse_value(v, parse_uuid, parse_number, parse_ods_code, parse_string)
+    return __parse_value(v, *_parsing_functions)
 
 
-def read_value_from_path(obj, path) -> any:
-    def _read_value(obj, path) -> any:
-        [head, *tail] = path
-        obj = obj.__dict__[head]
-        if len(tail) > 0:
+def read_value_from_path(obj, full_path: str) -> any:
+    """
+    Uses a json-like path to read a nested object attributes.
+    """
+
+    def _read_value(obj, path: list[str]) -> any:
+        if not path:
+            raise ValueError(
+                f"Could not read a value at path {full_path} from object {obj}"
+            )
+
+        head, *tail = path
+        obj = getattr(obj, head)
+        if tail:
             return _read_value(obj, tail)
         return obj
 
-    return _read_value(obj, path.split("."))
+    return _read_value(obj, full_path.split("."))

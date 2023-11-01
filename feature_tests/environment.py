@@ -1,3 +1,5 @@
+from feature_tests.steps.context import Context
+
 # def before_all(context):
 #     pass
 
@@ -12,14 +14,14 @@
 #     pass
 
 
-def before_scenario(context, scenario):
+def before_scenario(context: Context, scenario):
     context.questionnaires = {}
     context.users = {}
     context.ods_organisations = {}
+    context.events = []
     context.error = None
     context.result = None
     context.subject = None
-    context.events = []
 
 
 # def after_scenario(context, scenario):

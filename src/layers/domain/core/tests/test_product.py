@@ -1,7 +1,10 @@
+from unittest import mock
+
 import pytest
 from domain.core.product import Product
 
 
+@mock.patch("domain.core.product.validate_product_id_or_asid")
 @pytest.mark.parametrize(
     ["id", "name", "questionnaires", "dependency_questionnaires"],
     [
@@ -11,7 +14,11 @@ from domain.core.product import Product
     ],
 )
 def test__can_create_product(
-    id: str, name: str, questionnaires: set[str], dependency_questionnaires: set[str]
+    mocked_validate_product_id_or_asid,
+    id: str,
+    name: str,
+    questionnaires: set[str],
+    dependency_questionnaires: set[str],
 ):
     result = Product(
         id,
