@@ -29,3 +29,7 @@ variable "trusted_entities" {
 variable "allowed_triggers" {
   default = {}
 }
+
+variable "environment_variables" {
+  default = {}
+}

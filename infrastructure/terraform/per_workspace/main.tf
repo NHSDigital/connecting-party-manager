@@ -69,6 +69,9 @@ module "lambdas" {
       source_arn = "${module.api_entrypoint.execution_arn}/*/*/*"
     }
   }
+  environment_variables = {
+    SOMETHING = "hiya"
+  }
 }
 
 module "authoriser" {

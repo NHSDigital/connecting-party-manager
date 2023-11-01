@@ -7,8 +7,9 @@ module "lambda_function" {
   handler       = "api.${var.name}.index.handler"
   runtime       = var.python_version
 
-  publish          = true
-  allowed_triggers = var.allowed_triggers
+  publish               = true
+  allowed_triggers      = var.allowed_triggers
+  environment_variables = var.environment_variables
 
   create_package         = false
   local_existing_package = var.source_path
