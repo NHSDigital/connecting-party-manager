@@ -19,7 +19,7 @@ paths:
       operationId: status
       responses:
         "200":
-          description: Producer API is operational
+          description: API is operational
           content:
             application/json:
               schema:
@@ -66,7 +66,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
       requestBody:
-        $ref: "#/components/schemas/Device"
+        $ref: "#/components/requestBodies/Device"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createProduct}

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2023.10.27.a"
+version = "2023.10.30"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -17,6 +17,7 @@ packages = [
 python = "3.11.4"
 pydantic = "1.10"
 nhs-context-logging = { git = "https://github.com/jaklinger/nhs-context-logging.git", rev = "jk-pi-49-enhancements" }
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
@@ -28,7 +29,7 @@ pytest-custom-exit-code = "^0.3.0"
 sh = "^2.0.6"
 hypothesis = "^6.87.3"
 aws-lambda-powertools = { extras = ["aws-sdk"], version = "^2.25.1" }
-openapi3 = "^1.8.2"
+openapi3 = { git = "https://github.com/jaklinger/openapi3.git", rev = "bug/request_bodies_fix" }
 
 [build-system]
 requires = ["poetry-core"]
@@ -38,5 +39,5 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-markers = ["unit", "integration", "smoke"]
+markers = ["unit", "integration", "smoke", "slow"]
 addopts = "--import-mode=importlib"

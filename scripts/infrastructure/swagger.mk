@@ -7,12 +7,11 @@ SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 
 swagger--merge: $(SWAGGER_TIMESTAMP) ## Updates swagger builds from the components in the infrastructure/swagger/ directory.
 swagger--clean:  ## Removes swagger builds.
-	rm $(SWAGGER_TIMESTAMP)
-	rm -r $(SWAGGER_DIST)
+	[[ -f $(SWAGGER_TIMESTAMP) ]] && rm $(SWAGGER_TIMESTAMP) || :
+	[[ -d $(SWAGGER_DIST) ]] && rm -r $(SWAGGER_DIST) || :
 
 
 $(SWAGGER_TIMESTAMP): $(TIMESTAMP_DIR) $(SWAGGER_AWS) $(SWAGGER_PUBLIC)
-	@bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 	touch $(SWAGGER_TIMESTAMP)
 
 $(CURDIR)/infrastructure/swagger/dist/%/swagger.yaml: $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
