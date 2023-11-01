@@ -1,5 +1,5 @@
 resource "aws_iam_role" "assume_role" {
-  name = var.lambda_name
+  name = "${var.lambda_name}-apig"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
