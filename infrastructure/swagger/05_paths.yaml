@@ -31,20 +31,19 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
-
-  /Device:
+  /Organization:
     get:
       tags:
-        - Device
-      summary: Read a Product (FHIR Device) resource
-      operationId: readProduct
+        - Organization
+      summary: Read a ProductTeam (FHIR Organization) resource
+      operationId: readProductTeam
       responses:
         "201":
-          description: Successful read of product
+          description: Successful read of ProductTeam
           content:
             application/fhir+json:
               schema:
-                $ref: "#/components/schemas/Device"
+                $ref: "#/components/schemas/Organization"
           headers:
             X-Correlation-Id:
               $ref: "#/components/headers/CorrelationId"
@@ -52,21 +51,21 @@ paths:
               $ref: "#/components/headers/RequestId"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_readProduct}
+        uri: ${method_readProductTeam}
     post:
       tags:
-        - Device
-      summary: Create a Product (FHIR Device) resource
-      operationId: createProduct
+        - Organization
+      summary: Create a ProductTeam (FHIR Organization) resource
+      operationId: createProductTeam
       responses:
         "201":
-          description: Create Product operation successful
+          description: Create ProductTeam operation successful
           content:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
       requestBody:
-        $ref: "#/components/requestBodies/Device"
+        $ref: "#/components/requestBodies/Organization"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_createProduct}
+        uri: ${method_createProductTeam}

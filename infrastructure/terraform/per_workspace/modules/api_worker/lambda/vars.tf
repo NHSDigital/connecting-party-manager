@@ -4,7 +4,9 @@ variable "python_version" {
   default = "python3.11"
 }
 
-variable "lambda_name" {}
+variable "lambda_name" {
+  default = ""
+}
 
 variable "layers" {
   type = list(string)
@@ -26,4 +28,8 @@ variable "trusted_entities" {
 
 variable "create_layer" {
   default = false
+}
+
+variable "layer_name" {
+  default = ""
 }

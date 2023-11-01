@@ -1,7 +1,7 @@
 ---
 components:
   schemas:
-    Device:
+    Organization:
       type: object
       discriminator:
         propertyName: resourceType

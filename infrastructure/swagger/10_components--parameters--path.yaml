@@ -2,8 +2,8 @@
 # Path parameter definitions
 components:
   parameters:
-    DeviceId:
-      name: device-id
+    OrganizationId:
+      name: organization-id
       in: query
       schema:
-        $ref: "#/components/schemas/Device/properties/id"
+        $ref: "#/components/schemas/Organization/properties/id"

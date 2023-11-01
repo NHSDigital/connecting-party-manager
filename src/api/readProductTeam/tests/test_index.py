@@ -12,7 +12,7 @@ import pytest
 )
 def test_index(version):
     with mock.patch.dict(os.environ, {"SOMETHING": "hiya"}, clear=True):
-        from api.readProduct.index import handler
+        from api.readProductTeam.index import handler
 
         result = handler(event={"headers": {"version": version}})
     assert result == {
