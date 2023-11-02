@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-02
+
+- PI-52: ProductTeam Domain logic
+
 ## 2023-11-01
 
 - [PI-107] Destroy workspaces
