@@ -28,17 +28,16 @@ function _get_valid_workspaces_to_destroy() {
 }
 
 function _destroy_redundant_workspaces() {
-    echo "$CURRENT_COMMIT"
     local bucket="s3://nhse-cpm--terraform-state-${VERSION}/${PROFILE_PREFIX}/"
     workspaces=$(aws s3 ls "$bucket" --no-paginate | awk '{print $NF}' | sed 's:/$::')
-    echo "$workspaces"
+
     # get JIRA ID from branch name
     if [[ $BRANCH_NAME =~ feature\/(PI-[0-9]+)[-_] ]]; then
         workspace_id="${BASH_REMATCH[1]}"
     elif [[ $BRANCH_NAME == *release/* ]]; then
         workspace_id="${BRANCH_NAME##*release/}"
     fi
-
+    echo "$workspace_id"
     # get current short commit from branch
     if [ -z "$CURRENT_COMMIT" ]; then
         CURRENT_COMMIT=$(git rev-parse --short "$BRANCH_NAME")
@@ -51,6 +50,7 @@ function _destroy_redundant_workspaces() {
         if [[ -z "$DESTROY_ALL_COMMITS_ON_BRANCH" || "$DESTROY_ALL_COMMITS_ON_BRANCH" != "true" ]]; then
             if [[ $object_name == "ci-$workspace_id"* || $object_name == "rel-$workspace_id"* ]]; then
                 if [[ ! $object_name == *"$CURRENT_COMMIT"* ]]; then
+                    echo "$object_name"
                     matching_object=$(_get_valid_workspaces_to_destroy "$object_name")
                     if [[ $matching_object ]]; then
                         matching_objects+=("$matching_object")
