@@ -42,7 +42,6 @@ function _destroy_redundant_workspaces() {
     if [ -z "$CURRENT_COMMIT" ]; then
         CURRENT_COMMIT=$(git rev-parse --short "$BRANCH_NAME")
     fi
-    echo "$workspace_id"
     matching_objects=()
 
     # Loop through each line in the workspaces list
