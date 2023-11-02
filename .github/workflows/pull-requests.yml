@@ -200,6 +200,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
+          fetch-depth: 0
       - uses: ./.github/actions/make/
         with:
           command: destroy--redundant-workspaces BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}

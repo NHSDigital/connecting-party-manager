@@ -50,7 +50,6 @@ function _destroy_redundant_workspaces() {
             if [[ $object_name == "ci-$workspace_id"* || $object_name == "rel-$workspace_id"* ]]; then
                 if [[ ! $object_name == *"$CURRENT_COMMIT"* ]]; then
                     matching_object=$(_get_valid_workspaces_to_destroy "$object_name")
-                    echo "$matching_object"
                     if [[ $matching_object ]]; then
                         matching_objects+=("$matching_object")
                     fi
