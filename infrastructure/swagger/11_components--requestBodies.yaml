@@ -2,9 +2,9 @@
 # Request body content and parameter definition
 components:
   requestBodies:
-    Organisation:
+    Organization:
       content:
         application/fhir+json:
           schema:
-            $ref: "#/components/schemas/Organisation"
+            $ref: "#/components/schemas/Organization"
       required: true
