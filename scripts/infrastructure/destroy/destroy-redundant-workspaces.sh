@@ -28,6 +28,7 @@ function _get_valid_workspaces_to_destroy() {
 }
 
 function _destroy_redundant_workspaces() {
+    echo "$CURRENT_COMMIT"
     local bucket="s3://nhse-cpm--terraform-state-${VERSION}/${PROFILE_PREFIX}/"
     workspaces=$(aws s3 ls "$bucket" --no-paginate | awk '{print $NF}' | sed 's:/$::')
 
