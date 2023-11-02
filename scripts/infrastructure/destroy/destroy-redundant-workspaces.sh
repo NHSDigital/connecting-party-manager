@@ -31,7 +31,7 @@ function _destroy_redundant_workspaces() {
     echo "$CURRENT_COMMIT"
     local bucket="s3://nhse-cpm--terraform-state-${VERSION}/${PROFILE_PREFIX}/"
     workspaces=$(aws s3 ls "$bucket" --no-paginate | awk '{print $NF}' | sed 's:/$::')
-
+    echo "$workspaces"
     # get JIRA ID from branch name
     if [[ $BRANCH_NAME =~ feature\/(PI-[0-9]+)[-_] ]]; then
         workspace_id="${BASH_REMATCH[1]}"
