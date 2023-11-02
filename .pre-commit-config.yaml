@@ -37,6 +37,15 @@ repos:
           - "--select=T201,F401,F402,F403"
           - "--exclude=.git,__pycache__,dist,.venv,scripts,scripts/changelog/changelog_precommit.py"
 
+  # Flake8 for asserts (error code S101)
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args:
+          - "--select=S101"
+          - "--exclude=.git,__pycache__,dist,.venv,tests"
+
   - repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:
