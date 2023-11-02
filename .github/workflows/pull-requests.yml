@@ -14,6 +14,7 @@ env:
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
   RUNNING_IN_CI: 1
   BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
+  TF_CLI_ARGS: -no-color
 
 jobs:
   parse-secrets:
