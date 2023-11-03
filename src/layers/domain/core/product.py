@@ -12,7 +12,12 @@ from domain.events.event import Event
 from .entity import Entity
 from .questionnaire_entity import QuestionnaireEntity
 from .user import User
-from .validation import validate_ods_code, validate_product_id_or_asid, validate_type
+from .validation import (
+    validate_ods_code,
+    validate_product_id_or_asid,
+    validate_type,
+    validate_uuid,
+)
 
 SetType = TypeVar("SetType")
 
@@ -50,6 +55,7 @@ class ProductTeam(Entity[UUID]):
     """
 
     def __init__(self, id: UUID, name: str, organisation: OdsOrganisation, owner: User):
+        validate_uuid(uuid=id)
         validate_type(obj=organisation, expected_type=OdsOrganisation)
         validate_type(obj=owner, expected_type=User)
 

@@ -1,4 +1,5 @@
 import re
+from uuid import UUID
 
 from domain.core.error import (
     BadAsidError,
@@ -23,9 +24,11 @@ def _validate_with_regex(value: str, regex: re.Pattern, exception: Exception):
         raise exception
 
 
-def validate_uuid(uuid: str):
+def validate_uuid(uuid: UUID | str):
     _validate_with_regex(
-        value=uuid, regex=UUID_REGEX, exception=BadUuidError(f"UUID required: {uuid}")
+        value=str(uuid),
+        regex=UUID_REGEX,
+        exception=BadUuidError(f"UUID required: {uuid}"),
     )
 
 

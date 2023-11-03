@@ -2,6 +2,7 @@ from unittest import mock
 from uuid import UUID
 
 import pytest
+from domain.core.error import BadEntityNameError, BadUuidError
 from domain.core.product import ProductTeam, ProductTeamCreatedEvent
 from domain.core.root import Root
 
@@ -32,3 +33,34 @@ def test__create_product_team(_mocked_validate_ods_code, id: str, name: str):
     assert event.product_team.name == name, "event name mismatch"
     assert event.product_team.organisation is org, "event organisation mismatch"
     assert event.product_team.owner is user, "event owner mismatch"
+
+
+@mock.patch("domain.core.product.validate_ods_code")
+@pytest.mark.parametrize(
+    "id,name",
+    [
+        ["123", "First"],
+        ["  ", "Second"],
+    ],
+)
+def test__create_product_team_bad_id(_mocked_validate_ods_code, id: str, name: str):
+    org = Root.create_ods_organisation("AB123", "Test")
+    user = Root.create_user("test@example.org", "Test User")
+
+    with pytest.raises(BadUuidError):
+        org.create_product_team(id=id, name=name, owner=user)
+
+
+@mock.patch("domain.core.product.validate_ods_code")
+@pytest.mark.parametrize(
+    "id,name",
+    [
+        ["ae28e872-843d-4e2e-9f0b-b5d3c42d441f", " "],
+    ],
+)
+def test__create_product_team_bad_name(_mocked_validate_ods_code, id: str, name: str):
+    org = Root.create_ods_organisation("AB123", "Test")
+    user = Root.create_user("test@example.org", "Test User")
+
+    with pytest.raises(BadEntityNameError):
+        org.create_product_team(id=id, name=name, owner=user)
