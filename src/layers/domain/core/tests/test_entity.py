@@ -2,11 +2,11 @@ import pytest
 from domain.core.entity import Entity
 
 
-class TestEntityRed(Entity):
+class TestEntityRed(Entity[str]):
     __test__ = False
 
 
-class TestEntityBlue(Entity):
+class TestEntityBlue(Entity[str]):
     __test__ = False
 
 

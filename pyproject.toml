@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2023.11.01"
+version = "2023.11.02"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -30,6 +30,7 @@ sh = "^2.0.6"
 hypothesis = "^6.87.3"
 aws-lambda-powertools = { extras = ["aws-sdk"], version = "^2.25.1" }
 openapi3 = { git = "https://github.com/jaklinger/openapi3.git", rev = "bug/request_bodies_fix" }
+parse = "^1.19.1"
 
 [build-system]
 requires = ["poetry-core"]

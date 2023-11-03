@@ -1,3 +1,4 @@
+import re
 import time
 from functools import wraps
 from http import HTTPStatus
@@ -10,6 +11,7 @@ ODS_API_ENDPOINT = (
     "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/{ods_code}"
 )
 BACKOFF_BASE_SECONDS = 2
+WHITESPACE = re.compile(r"^(\s+)$")
 
 
 class UnexpectedStatusCode(Exception):
@@ -32,6 +34,10 @@ class OdsApiOfflineError(ExceptionGroup):
 
 def _construct_ods_url(ods_code: str) -> str:
     return ODS_API_ENDPOINT.format(ods_code=ods_code)
+
+
+def _is_whitespace(item: str) -> bool:
+    return WHITESPACE.match(item) is not None
 
 
 T = TypeVar("T")
@@ -62,6 +68,9 @@ def retry(max_attempts: int) -> Callable[[Callable[P, RT]], Callable[P, RT]]:
 
 @retry(max_attempts=3)
 def is_valid_ods_code(ods_code: str) -> bool:
+    if _is_whitespace(ods_code):
+        return False
+
     url = _construct_ods_url(ods_code=ods_code)
     response = requests.get(url=url)
     status_code = HTTPStatus(response.status_code)
