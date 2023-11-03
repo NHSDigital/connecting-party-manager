@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
 from event.logging.step_decorators import logging_step_decorators
@@ -15,8 +17,7 @@ post_steps = [*response_steps]
 
 
 def _status_check(data, cache):
-    # REPLACE WITH A PROPER STATUS CHECK
-    return True
+    return HTTPStatus.OK
 
 
 def handler(event: dict, context=None):

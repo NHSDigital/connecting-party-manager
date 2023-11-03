@@ -1,25 +1,45 @@
 ---
+x-definitions:
+  ResponseHeaders:
+    type: object
+    headers: &ResponseHeaders
+      X-Correlation-Id:
+        $ref: "#/components/headers/CorrelationId"
+      X-Request-Id:
+        $ref: "#/components/headers/RequestId"
+
+  OperationOutcome:
+    type: object
+    context: &OperationOutcome
+      application/json:
+        schema:
+          $ref: "#/components/schemas/OperationOutcome"
+
 components:
   responses:
-    Success:
-      description: Success Response
-      headers:
-        X-Correlation-Id:
-          $ref: "#/components/headers/CorrelationId"
-        X-Request-Id:
-          $ref: "#/components/headers/RequestId"
+    CreatedSuccessfully:
+      description: Created successfully
       content:
-        application/fhir+json:
-          schema:
-            $ref: "#/components/schemas/OperationOutcome"
-    Error:
-      description: Error Response
+        <<: *OperationOutcome
       headers:
-        X-Correlation-Id:
-          $ref: "#/components/headers/CorrelationId"
-        X-Request-Id:
-          $ref: "#/components/headers/RequestId"
+        <<: *ResponseHeaders
+    BadRequest:
+      description: Bad request
       content:
-        application/fhir+json:
+        <<: *OperationOutcome
+      headers:
+        <<: *ResponseHeaders
+    ProductTeam:
+      description: Successfully read a Product Team
+      content:
+        application/json:
           schema:
-            $ref: "#/components/schemas/OperationOutcome"
+            $ref: "#/components/schemas/ProductTeam"
+      headers:
+        <<: *ResponseHeaders
+    NotFound:
+      description: Cannot find a Product Team
+      content:
+        <<: *OperationOutcome
+      headers:
+        <<: *ResponseHeaders

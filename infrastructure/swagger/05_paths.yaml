@@ -1,6 +1,5 @@
 ---
 x-definitions:
-  # "x-" before "definitions" prevents it from being parsed as an OpenAPI Schema object
   ApiGatewayIntegration:
     type: object
     x-amazon-apigateway-integration: &ApiGatewayIntegration
@@ -11,6 +10,23 @@ x-definitions:
           statusCode: "200"
       passthroughBehavior: when_no_match
       contentHandling: CONVERT_TO_TEXT
+
+  RequestHeaders:
+    type: object
+    headers: &RequestHeaders
+      parameters:
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
 
 paths:
   /_status:
@@ -28,45 +44,36 @@ paths:
                   message:
                     type: string
                     enum: ["OK"]
+      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
 
-  /Device:
-    get:
-      tags:
-        - Device
-      summary: Read a Product (FHIR Device) resource
-      operationId: readProduct
-      responses:
-        "201":
-          description: Successful read of product
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Device"
-          headers:
-            X-Correlation-Id:
-              $ref: "#/components/headers/CorrelationId"
-            X-Request-Id:
-              $ref: "#/components/headers/RequestId"
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_readProduct}
+  /product-team:
     post:
-      tags:
-        - Device
-      summary: Create a Product (FHIR Device) resource
-      operationId: createProduct
+      summary: Create a new Product Team
+      requestBody:
+        $ref: "#/components/requestBodies/ProductTeam"
       responses:
         "201":
-          description: Create Product operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/OperationOutcome"
-      requestBody:
-        $ref: "#/components/requestBodies/Device"
+          $ref: "#/components/responses/CreatedSuccessfully"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_createProduct}
+        uri: ${method_createProductTeam}
+
+  /product-team/{id}:
+    get:
+      summary: Get a Product Team by ID
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductTeam"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProductTeam}

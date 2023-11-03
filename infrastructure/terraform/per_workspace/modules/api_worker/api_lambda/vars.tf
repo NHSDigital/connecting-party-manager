@@ -4,7 +4,9 @@ variable "python_version" {
   default = "python3.11"
 }
 
-variable "lambda_name" {}
+variable "lambda_name" {
+  default = ""
+}
 
 variable "layers" {
   type = list(string)
@@ -12,6 +14,22 @@ variable "layers" {
 
 variable "source_path" {}
 
-variable "apigateway_execution_arn" {
-  type = string
+variable "attach_policy_json" {
+  default = false
+}
+
+variable "policy_json" {
+  default = ""
+}
+
+variable "trusted_entities" {
+  default = []
+}
+
+variable "allowed_triggers" {
+  default = {}
+}
+
+variable "environment_variables" {
+  default = {}
 }

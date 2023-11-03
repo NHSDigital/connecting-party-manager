@@ -1,5 +1,11 @@
 set -e
 
+function validate_yaml {
+    # Initial validation to exit early if invalid YAML
+    # as per https://mikefarah.gitbook.io/yq/usage/tips-and-tricks#validating-yaml-files
+    yq --exit-status 'tag == "!!map" or tag== "!!seq"' ${1} > /dev/null || return 1
+}
+
 PATH_TO_SWAGGER_INFRA=${PWD}/infrastructure/swagger
 PATH_TO_SWAGGER_DIST=${PATH_TO_SWAGGER_INFRA}/dist
 PATH_TO_SWAGGER_BUILD=${PATH_TO_SWAGGER_DIST}/build
@@ -19,6 +25,7 @@ _CLEANED_SWAGGER_FILE=${PATH_TO_SWAGGER_BUILD}/_02_clean.yaml
 swagger_files=$(find ${PATH_TO_SWAGGER_INFRA}/*yaml | sort -g)
 
 yq eval-all '. as $item ireduce ({}; . * $item)' ${_BASE_SWAGGER_FILE} ${swagger_files} > ${_INITIAL_MERGE_SWAGGER_FILE}
+validate_yaml ${_INITIAL_MERGE_SWAGGER_FILE}
 
 cat ${_INITIAL_MERGE_SWAGGER_FILE} |
     # Remove commented lines
@@ -30,9 +37,11 @@ cat ${_INITIAL_MERGE_SWAGGER_FILE} |
     yq 'del(.paths.*.post.requestBody.content."application/x-www-form-urlencoded")' |
     yq 'del(.x-ibm-configuration)' |
     yq 'del(.components.schemas.*.discriminator)' |
+    yq 'explode(.)' |
+    yq 'del(.x-*)' |
     yq '(.. | select(style == "single")) style |= "double"' \
         > ${_CLEANED_SWAGGER_FILE}
-
+validate_yaml ${_CLEANED_SWAGGER_FILE}
 
 # Remove fields not required for public docs
 # * AWS specific stuff, including security & lambdas
@@ -40,9 +49,9 @@ cat ${_INITIAL_MERGE_SWAGGER_FILE} |
 # * API catalogue dislikes tags
 # * /_status not public
 cat ${_CLEANED_SWAGGER_FILE} |
-    yq 'with(.paths.*.*.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
-    yq 'with(.components.requestBodies.*.content; with_entries(.key |= . + ";version=1" ))' |
-    yq 'with(.components.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
+    # yq 'with(.paths.*.*.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
+    # yq 'with(.components.requestBodies.*.content; with_entries(.key |= . + ";version=1" ))' |
+    # yq 'with(.components.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
     yq 'del(.paths.*.*.x-amazon-apigateway-integration)' |
     yq 'del(.x-*)' |
     yq 'del(.paths.*.*.security)' |
@@ -53,14 +62,13 @@ cat ${_CLEANED_SWAGGER_FILE} |
     yq 'del(.components.securitySchemes."${authoriser_name}")' \
         > ${PUBLIC_SWAGGER_FILE}
 echo "Generated ${PUBLIC_SWAGGER_FILE}"
+validate_yaml ${PUBLIC_SWAGGER_FILE}
 
 # Remove fields not valid on AWS but otherwise required in public docs
 # * 4XX codes
-# * Expand anchors and remove corresponding x-definitions
 cat ${_CLEANED_SWAGGER_FILE} |
-    yq 'del(.. | select(has("4XX")).4XX)' |
-    yq 'explode(.)' |
-    yq 'del(.x-*)' > ${AWS_SWAGGER_FILE}
+    yq 'del(.. | select(has("4XX")).4XX)' > ${AWS_SWAGGER_FILE}
 echo "Generated ${AWS_SWAGGER_FILE}"
+validate_yaml ${PUBLIC_SWAGGER_FILE}
 
 rm -r ${PATH_TO_SWAGGER_BUILD}
