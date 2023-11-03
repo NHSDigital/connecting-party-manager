@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-03
+
+- PI-53: Swagger models and a REST API that calls domain logic
+
 ## 2023-11-02
 
 - PI-52: ProductTeam Domain logic
