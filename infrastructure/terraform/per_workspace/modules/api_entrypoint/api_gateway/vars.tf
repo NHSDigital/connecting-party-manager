@@ -15,11 +15,3 @@ variable "project" {
 
 variable "authoriser_metadata" {
 }
-
-variable "lambda_authoriser_arn" {
-
-}
-
-variable "lambda_authoriser_id" {
-
-}

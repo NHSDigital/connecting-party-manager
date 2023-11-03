@@ -104,24 +104,12 @@ module "authoriser" {
   EOT
 }
 
-module "kms__cloudwatch" {
-  source         = "./modules/kms"
-  name           = "${local.project}--${replace(terraform.workspace, "_", "-")}--cloudwatch"
-  assume_account = var.assume_account
-  prefix         = local.project
-}
-
-
-
 module "api_entrypoint" {
   source         = "./modules/api_entrypoint"
   assume_account = var.assume_account
   project        = local.project
 
-  name                  = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
-  kms_key_id            = module.kms__cloudwatch.kms_arn
-  lambdas               = setsubtract(var.lambdas, ["authoriser"])
-  authoriser_metadata   = module.authoriser.metadata
-  lambda_authoriser_arn = module.authoriser.lambda_arn
-  lambda_authoriser_id  = module.authoriser.lambda_role_name
+  name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
+  lambdas             = setsubtract(var.lambdas, ["authoriser"])
+  authoriser_metadata = module.authoriser.metadata
 }
