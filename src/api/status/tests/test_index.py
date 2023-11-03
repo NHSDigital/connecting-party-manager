@@ -10,5 +10,5 @@ def test_index():
     assert result == {
         "statusCode": 200,
         "body": "OK",
-        "headers": {"Content-Length": 123, "Content-Type": "application/json"},
+        "headers": {"Content-Length": 2, "Content-Type": "application/json"},
     }

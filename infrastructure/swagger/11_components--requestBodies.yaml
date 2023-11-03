@@ -2,9 +2,9 @@
 # Request body content and parameter definition
 components:
   requestBodies:
-    Device:
+    ProductTeam:
       content:
-        application/fhir+json:
+        application/json:
           schema:
-            $ref: "#/components/schemas/Device"
+            $ref: "#/components/schemas/ProductTeam"
       required: true

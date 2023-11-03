@@ -56,20 +56,52 @@ module "layers" {
 }
 
 module "lambdas" {
-  for_each                 = setsubtract(var.lambdas, ["authoriser"])
-  source                   = "./modules/api_worker/api_lambda"
-  name                     = each.key
-  lambda_name              = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
-  layers                   = [for instance in module.layers : instance.layer_arn]
-  source_path              = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
-  apigateway_execution_arn = module.api_entrypoint.execution_arn
+  for_each    = setsubtract(var.lambdas, ["authoriser"])
+  source      = "./modules/api_worker/api_lambda"
+  name        = each.key
+  lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+  layers      = [for instance in module.layers : instance.layer_arn]
+  source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
+  #apigateway_execution_arn = module.api_entrypoint.execution_arn
+  allowed_triggers = {
+    "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
+      service    = "apigateway"
+      source_arn = "${module.api_entrypoint.execution_arn}/*/*/*"
+    }
+  }
+  environment_variables = {
+    SOMETHING = "hiya"
+  }
 }
 
 module "authoriser" {
-  source      = "./modules/api_worker/api_authoriser"
+  name        = "authoriser"
+  source      = "./modules/api_worker/api_lambda"
   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
   layers      = [for instance in module.layers : instance.layer_arn]
+  trusted_entities = [
+    {
+      type = "Service",
+      identifiers = [
+        "apigateway.amazonaws.com"
+      ]
+    }
+  ]
+
+  attach_policy_json = true
+  policy_json        = <<-EOT
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": "arn:aws:lambda:eu-west-2:${var.assume_account}:function:${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+          }
+      ]
+    }
+  EOT
 }
 
 module "kms__cloudwatch" {
@@ -86,8 +118,10 @@ module "api_entrypoint" {
   assume_account = var.assume_account
   project        = local.project
 
-  name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
-  kms_key_id          = module.kms__cloudwatch.kms_arn
-  lambdas             = setsubtract(var.lambdas, ["authoriser"])
-  authoriser_metadata = module.authoriser.metadata
+  name                  = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
+  kms_key_id            = module.kms__cloudwatch.kms_arn
+  lambdas               = setsubtract(var.lambdas, ["authoriser"])
+  authoriser_metadata   = module.authoriser.metadata
+  lambda_authoriser_arn = module.authoriser.lambda_arn
+  lambda_authoriser_id  = module.authoriser.lambda_role_name
 }

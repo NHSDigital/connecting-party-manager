@@ -1,4 +1,5 @@
 from event.environment import BaseEnvironment
+from event.event_processing.steps import event_processing_steps
 from event.logging.logger import setup_logger
 from event.logging.step_decorators import logging_step_decorators
 from event.response.steps import response_steps
@@ -12,7 +13,7 @@ class Environment(BaseEnvironment):
 
 cache = {**Environment.build().dict()}
 step_decorators = [*logging_step_decorators]
-pre_steps = [*versioning_steps]
+pre_steps = [*versioning_steps, *event_processing_steps]
 post_steps = [*response_steps]
 
 

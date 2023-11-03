@@ -8,6 +8,8 @@ info:
   contact:
   title:
   description:
+x-nhsd-apim:
+x-definitions:
 components:
   schemas:
   parameters:
