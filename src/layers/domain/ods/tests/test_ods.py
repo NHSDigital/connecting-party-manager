@@ -30,6 +30,9 @@ def test_is_valid_ods_code_returns_true(ods_code):
         "AAA111",
         "BBB111",
         "CCC111",
+        "   ",
+        " AAA ",
+        "😊😊😊",
     ],
 )
 def test_is_valid_ods_code_returns_false(ods_code):
