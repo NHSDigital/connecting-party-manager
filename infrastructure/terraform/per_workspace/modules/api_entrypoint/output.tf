@@ -1,3 +1,3 @@
-output "execution_arnv1" {
-  value = module.api_gatewayv1.execution_arn
+output "execution_arn" {
+  value = module.api_gateway.execution_arn
 }
