@@ -69,7 +69,6 @@ function _destroy_redundant_workspaces() {
             fi
         fi
     done <<< "$workspaces"
-    echo "$matching_objects"
     # Print the matching object names
     for workspace in "${matching_objects[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
