@@ -7,7 +7,7 @@ from feature_tests.steps.context import Context
 
 def _add_ods_org_to_context(context: Context, ods_code: str, name: str):
     context.ods_organisations[ods_code] = Root.create_ods_organisation(
-        ods_code=ods_code, name=name
+        id=ods_code, name=name
     )
 
 

@@ -2,8 +2,9 @@
 # Path parameter definitions
 components:
   parameters:
-    DeviceId:
-      name: device-id
-      in: query
+    ProductTeamId:
+      in: path
+      name: id
+      required: true
       schema:
-        $ref: "#/components/schemas/Device/properties/id"
+        type: string

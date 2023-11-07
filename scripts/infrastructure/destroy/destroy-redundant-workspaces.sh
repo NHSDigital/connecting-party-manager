@@ -37,12 +37,10 @@ function _destroy_redundant_workspaces() {
     elif [[ $BRANCH_NAME == *release/* ]]; then
         workspace_id="${BRANCH_NAME##*release/}"
     fi
-
     # get current short commit from branch
     if [ -z "$CURRENT_COMMIT" ]; then
         CURRENT_COMMIT=$(git rev-parse --short "$BRANCH_NAME")
     fi
-    echo "$workspace_id"
     matching_objects=()
 
     # Loop through each line in the workspaces list
@@ -71,7 +69,7 @@ function _destroy_redundant_workspaces() {
             fi
         fi
     done <<< "$workspaces"
-
+    echo "$matching_objects"
     # Print the matching object names
     for workspace in "${matching_objects[@]}"; do
         echo "Attempting to destroy workspace: $workspace"

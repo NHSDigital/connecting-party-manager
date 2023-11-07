@@ -11,8 +11,8 @@ class Root:
     """
 
     @staticmethod
-    def create_ods_organisation(ods_code: str, name: str) -> OdsOrganisation:
-        return OdsOrganisation(id=ods_code, name=name)
+    def create_ods_organisation(id: str, name: str) -> OdsOrganisation:
+        return OdsOrganisation(id=id, name=name)
 
     @staticmethod
     def create_user(id: str, name: str) -> User:
