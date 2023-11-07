@@ -62,7 +62,6 @@ module "lambdas" {
   lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
   layers      = [for instance in module.layers : instance.layer_arn]
   source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
-  #apigateway_execution_arn = module.api_entrypoint.execution_arn
   allowed_triggers = {
     "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
       service    = "apigateway"
