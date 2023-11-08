@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-07
+
+- PI-112: Refactor API Gateway Terraform
+
 ## 2023-11-03
 
 - PI-53: Swagger models and a REST API that calls domain logic
