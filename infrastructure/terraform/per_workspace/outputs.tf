@@ -1,3 +1,11 @@
+output "dynamodb_table_name" {
+  value = module.table.dynamodb_table_name
+}
+
+output "environment" {
+  value = var.environment
+}
+
 # output "layers_list" {
 #   value = var.layers
 # }
@@ -38,6 +46,6 @@
 #   value = module.authoriser.lambda_role_arn
 # }
 
-# output "apigateway_execution_arn" {
-#   value = module.api_entrypoint.execution_arn
+# output "invoke_url" {
+#   value = module.api_entrypoint.invoke_url
 # }

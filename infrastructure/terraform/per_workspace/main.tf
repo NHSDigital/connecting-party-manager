@@ -27,24 +27,38 @@ JSON
   }
 }
 
-module "products_table" {
-  source      = "./modules/api_storage"
-  name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--products-table"
-  environment = var.environment
-  hash_key    = "pk"
-  range_key   = "sk"
-  attributes = [
-    {
-      name = "pk"
-      type = "S"
-    },
-    {
-      name = "sk"
-      type = "S"
-    }
-  ]
+module "table" {
+  source                      = "./modules/api_storage"
+  name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--table"
+  environment                 = var.environment
   deletion_protection_enabled = var.deletion_protection_enabled
   kms_deletion_window_in_days = 7
+  range_key                   = "sk"
+  hash_key                    = "pk"
+
+  attributes = [
+    { name = "pk", type = "S" },
+    { name = "sk", type = "S" },
+    { name = "pk_1", type = "S" },
+    { name = "sk_1", type = "S" },
+    { name = "pk_2", type = "S" },
+    { name = "sk_2", type = "S" }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "idx_gsi_1"
+      hash_key        = "pk_1"
+      range_key       = "sk_1"
+      projection_type = "ALL"
+    },
+    {
+      name            = "idx_gsi_2"
+      hash_key        = "pk_2"
+      range_key       = "sk_2"
+      projection_type = "ALL"
+    }
+  ]
 }
 
 module "layers" {
@@ -69,7 +83,7 @@ module "lambdas" {
     }
   }
   environment_variables = {
-    SOMETHING = "hiya"
+    DYNAMODB_TABLE = module.table.dynamodb_table_name
   }
 }
 

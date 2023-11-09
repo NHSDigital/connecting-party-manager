@@ -42,7 +42,6 @@ runs:
         echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-account-id }}" \
         echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}" \
         echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}" \
-        echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}" \
         echo "::add-mask:: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}"
 
     - name: Run "make" command
@@ -51,10 +50,8 @@ runs:
         make ${{ inputs.command }} \
           AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
           AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
-          AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
           AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
       env:
         AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
-        AWS_DEFAULT_REGION: ${{ steps.configure-aws-credentials.outputs.aws-default-region }}
         AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
