@@ -1,9 +1,12 @@
 import json
+import os
 
 from event.logging.logger import setup_logger
 from nhs_context_logging.fixtures import log_capture, log_capture_global  # noqa: F401
 from nhs_context_logging.formatters import json_serializer
 from pytest import Config, FixtureRequest, Item, fixture
+
+from test_helpers.aws_session import aws_session_env_vars
 
 
 def pytest_collection_modifyitems(items: list[Item], config: Config):
@@ -39,3 +42,13 @@ def log_on_failure(request: FixtureRequest, log_capture):
 
     if isinstance(exception, Exception):
         raise exception
+
+
+@fixture(autouse=True)
+def aws_session(request: FixtureRequest):
+    original_env = dict(os.environ)
+    if request.node.get_closest_marker("integration") is not None:
+        env_vars = aws_session_env_vars()
+        os.environ.update(env_vars)
+    yield
+    os.environ = original_env

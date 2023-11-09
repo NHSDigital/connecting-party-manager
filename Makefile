@@ -5,6 +5,7 @@ SHELL = bash
 
 PROJECT_PREFIX = "nhse-cpm-"
 TIMESTAMP_DIR := .timestamp
+AWS_DEFAULT_REGION ?= "eu-west-2"
 
 include scripts/**/*.mk
 
