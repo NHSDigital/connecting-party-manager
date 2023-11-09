@@ -16,7 +16,7 @@ from .model import ReadProductTeamEvent
 )
 @given(read_event=builds(ReadProductTeamEvent))
 def test_index(read_event: ReadProductTeamEvent, version):
-    with mock.patch.dict(os.environ, {"SOMETHING": "hiya"}, clear=True):
+    with mock.patch.dict(os.environ, {"DYNAMODB_TABLE": "hiya"}, clear=True):
         from api.readProductTeam.index import handler
 
         result = handler(
