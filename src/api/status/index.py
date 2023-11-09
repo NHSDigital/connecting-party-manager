@@ -8,7 +8,7 @@ from event.step_chain import StepChain
 
 
 class Environment(BaseEnvironment):
-    SOMETHING: str
+    DYNAMODB_TABLE: str
 
 
 cache = {**Environment.build().dict()}
