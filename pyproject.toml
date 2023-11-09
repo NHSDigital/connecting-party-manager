@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2023.11.07"
+version = "2023.11.09.a"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"

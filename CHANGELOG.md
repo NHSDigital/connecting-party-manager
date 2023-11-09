@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-09-a
+
+- [PI-75] Create general table and repository interface
+
 ## 2023-11-07
 
 - PI-112: Refactor API Gateway Terraform
