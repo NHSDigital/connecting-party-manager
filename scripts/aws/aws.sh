@@ -1,13 +1,10 @@
 #!/bin/bash
-
 SSO_CACHE=${HOME}/.aws/sso/cache
 
 # Log in, if not already logged in
 aws sts get-caller-identity --profile ${PROFILE} &> /dev/null
 if [ $? -gt 0 ]; then
-    echo -n "Signing you in via SSO: please check your browser"
     aws sso login --profile ${PROFILE} &> /dev/null
-    echo "... authorised as ${PROFILE}"
 fi
 set -e
 

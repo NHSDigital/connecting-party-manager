@@ -2,7 +2,7 @@
 _CACHE_CLEAR := "--cache-clear"
 
 _pytest:
-	poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
+	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
 
 _behave:
 	poetry run python -m behave feature_tests $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS)
@@ -11,7 +11,7 @@ test--unit: ## Run unit (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'unit' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
 test--integration: aws--login ## Run integration (pytest) tests
-	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'integration' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR)
+	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'integration' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
 
 test--slow:  ## Run slow (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'slow'" _CACHE_CLEAR=$(_CACHE_CLEAR)

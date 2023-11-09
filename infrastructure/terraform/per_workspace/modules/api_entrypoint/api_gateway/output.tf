@@ -9,3 +9,7 @@ output "execution_arn" {
 output "kms_key" {
   value = module.kms.key_id
 }
+
+output "invoke_url" {
+  value = aws_api_gateway_stage.api_gateway_stage.invoke_url
+}
