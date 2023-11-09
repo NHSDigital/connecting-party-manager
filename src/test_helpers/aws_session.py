@@ -1,5 +1,8 @@
+import os
+from contextlib import contextmanager
 from datetime import datetime
 from functools import cache
+from typing import Generator
 
 import boto3
 
@@ -43,15 +46,21 @@ def aws_session_env_vars() -> boto3.Session:
     }
 
 
-@cache
-def aws_session() -> boto3.Session:
-    env = read_terraform_output("environment.value")
-    account_id = _aws_account_id_from_secret(env=env)
-    access_key_id, secret_access_key, session_token = _get_access_token(
-        account_id=account_id
-    )
-    return boto3.Session(
-        aws_access_key_id=access_key_id,
-        aws_secret_access_key=secret_access_key,
-        aws_session_token=session_token,
-    )
+@contextmanager
+def aws_session() -> Generator[None, None, None]:
+    original_env = dict(os.environ)
+    env_vars = aws_session_env_vars()
+
+    exception = None
+    try:
+        boto3.DEFAULT_SESSION = None
+        os.environ.update(env_vars)
+        yield
+    except Exception as _exception:
+        exception = _exception
+    finally:
+        boto3.DEFAULT_SESSION = None
+        os.environ = original_env
+
+    if exception:
+        raise exception

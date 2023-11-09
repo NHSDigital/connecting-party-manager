@@ -1,12 +1,18 @@
 import json
-import os
 
+import boto3
 from event.logging.logger import setup_logger
 from nhs_context_logging.fixtures import log_capture, log_capture_global  # noqa: F401
 from nhs_context_logging.formatters import json_serializer
 from pytest import Config, FixtureRequest, Item, fixture
 
-from test_helpers.aws_session import aws_session_env_vars
+from test_helpers.aws_session import aws_session
+from test_helpers.dynamodb import clear_dynamodb_table
+from test_helpers.terraform import read_terraform_output
+
+
+def is_integration(request: FixtureRequest) -> bool:
+    return request.node.get_closest_marker("integration") is not None
 
 
 def pytest_collection_modifyitems(items: list[Item], config: Config):
@@ -45,10 +51,22 @@ def log_on_failure(request: FixtureRequest, log_capture):
 
 
 @fixture(autouse=True)
-def aws_session(request: FixtureRequest):
-    original_env = dict(os.environ)
-    if request.node.get_closest_marker("integration") is not None:
-        env_vars = aws_session_env_vars()
-        os.environ.update(env_vars)
-    yield
-    os.environ = original_env
+def aws_session_(request: FixtureRequest):
+    if is_integration(request):
+        with aws_session():
+            yield
+    else:
+        yield
+
+
+@fixture(autouse=True)
+def clear_dynamodb_table_(request: FixtureRequest):
+    client, table_name = None, None
+    if is_integration(request):
+        client = boto3.client("dynamodb")
+        table_name = read_terraform_output("dynamodb_table_name.value")
+        clear_dynamodb_table(client=client, table_name=table_name)
+        yield
+        clear_dynamodb_table(client=client, table_name=table_name)
+    else:
+        yield
