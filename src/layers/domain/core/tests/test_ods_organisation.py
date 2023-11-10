@@ -1,34 +1,34 @@
 import pytest
-from domain.core.error import InvalidOdsCodeError
-from domain.core.product import OdsOrganisation
+from domain.core.ods_organisation import OdsOrganisation
 from domain.core.root import Root
+from pydantic import ValidationError
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    "id,name",
+    "ods_code,name",
     [
         ["F5H1R", "ROYAL DERBY HOSPITAL UTC"],
         ["RTG09", "QUEENS MEDICAL CENTRE"],
         ["NLF02", "THE ROYAL OLDHAM HOSPITAL - PHYSIOTHERAPY DEPARTMENT"],
     ],
 )
-def test__can_instantiate_ods_organisation(id: str, name: str):
-    result = Root.create_ods_organisation(id, name)
+def test__can_instantiate_ods_organisation(ods_code: str, name: str):
+    result = Root.create_ods_organisation(ods_code=ods_code, name=name)
 
     assert isinstance(result, OdsOrganisation)
-    assert result.id == id
+    assert result.ods_code == ods_code
     assert result.name == name
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    "id,name",
+    "ods_code",
     [
-        ["ABCDEFGHIJ", "Blah"],
-        ["!@£$%", "Blah"],
+        "ABCDEFGHIJ",
+        "!@£$%",
     ],
 )
-def test__id_must_be_ods_code(id: str, name: str):
-    with pytest.raises(InvalidOdsCodeError):
-        Root.create_ods_organisation(id, name)
+def test__id_must_be_ods_code(ods_code: str):
+    with pytest.raises(ValidationError):
+        Root.create_ods_organisation(ods_code=ods_code, name="Valid Name")

@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from domain.core.product import ProductTeam
+from domain.core.product_team import ProductTeam
 from domain.core.root import Root
 from domain.fhir.r4 import Organization, StrictOrganization, cpm_model
 from pydantic import BaseModel
@@ -17,13 +17,10 @@ def create_product_team_from_fhir_org_json(
         our_model=cpm_model.Organization,
     )
     org = Root.create_ods_organisation(
-        id=fhir_org.partOf.identifier.id,
+        ods_code=fhir_org.partOf.identifier.id,
         name=fhir_org.partOf.identifier.value,
     )
-    user = Root.create_user(
-        id=fhir_org.contact[0].telecom[0].value, name=fhir_org.contact[0].name.text
-    )
-    (product_team, event) = org.create_product_team(fhir_org.id, fhir_org.name, user)
+    product_team = org.create_product_team(id=fhir_org.id, name=fhir_org.name)
     return product_team
 
 
@@ -34,18 +31,10 @@ def create_fhir_model_from_product_team(product_team: ProductTeam, **kwargs) -> 
         name=product_team.name,
         partOf=cpm_model.Reference(
             identifier=cpm_model.Identifier(
-                id=product_team.organisation.id,
-                value=product_team.organisation.name,
+                id=product_team.ods_code,
+                value=product_team.ods_code,
             )
         ),
-        contact=[
-            cpm_model.OrganizationContact(
-                name=cpm_model.HumanName(text=product_team.owner.name),
-                telecom=[
-                    cpm_model.ContactPoint(system="email", value=product_team.owner.id)
-                ],
-            )
-        ],
     )
     return org
 

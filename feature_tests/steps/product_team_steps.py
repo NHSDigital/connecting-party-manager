@@ -9,10 +9,6 @@ from feature_tests.steps.context import Context
 )
 @catch_errors
 def step_impl(context: Context, user_id, id, name, ods_code):
-    owner = context.users[user_id]
     context.subject = context.ods_organisations[ods_code]
-    (product_team, event) = context.subject.create_product_team(
-        id=id, name=name, owner=owner
-    )
+    product_team = context.subject.create_product_team(id=id, name=name)
     context.result = product_team
-    context.events.append(event)

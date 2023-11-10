@@ -2,9 +2,8 @@ from dataclasses import dataclass
 
 from behave.model import Table
 from behave.runner import Context as BehaveContext
-from domain.core.product import OdsOrganisation
+from domain.core.ods_organisation import OdsOrganisation
 from domain.core.questionnaire import Questionnaire
-from domain.core.user import User
 from domain.events.event import Event
 
 
@@ -12,7 +11,6 @@ from domain.events.event import Event
 class Context(BehaveContext):
     # Extra domain specific fields
     questionnaires: dict[str, Questionnaire]
-    users: dict[str, User]
     ods_organisations: dict[str, OdsOrganisation]
     events: list[Event]
     error: list

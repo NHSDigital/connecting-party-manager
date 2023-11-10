@@ -1,4 +1,3 @@
-from unittest import mock
 from uuid import UUID
 
 import pytest
@@ -7,17 +6,14 @@ from domain.core.fhir_transform import (
     create_fhir_model_from_product_team,
     create_product_team_from_fhir_org_json,
 )
-from domain.core.product import OdsOrganisation, ProductTeam
+from domain.core.product_team import ProductTeam
 from domain.core.root import Root
 from domain.core.tests.utils import read_test_data
-from domain.core.user import User
 from domain.fhir.r4.cpm_model import Organization
 from domain.fhir.r4.strict_models import Organization as StrictOrganization
 from pydantic import ValidationError
 
-REQUIRED_CREATE_FIELDS = {
-    "Organization": ["resourceType", "id", "name", "partOf", "contact"]
-}
+REQUIRED_CREATE_FIELDS = {"Organization": ["resourceType", "id", "name", "partOf"]}
 
 
 @pytest.mark.parametrize(
@@ -70,18 +66,11 @@ def test_validate_required_create_fields(fhir_type, fhir_name, model_type, json_
         create_fhir_model_from_fhir_json(fhir_json, [fhir_type], model_type)
 
 
-def test_email_validates_organization():
-    fhir_json = read_test_data("organization-fhir-example-required.json")
-    fhir_json["contact"][0]["telecom"][0]["value"] = "foobar"
-    with pytest.raises(ValidationError):
-        create_fhir_model_from_fhir_json(fhir_json, [StrictOrganization], Organization)
-
-
 @pytest.mark.parametrize(
     "expected_fields, expected_values, json_file",
     [
         (
-            ["id", "name", "organisation", "owner"],
+            ["id", "name"],
             ["f9518c12-6c83-4544-97db-d9dd1d64da97", "Test-Organization"],
             "organization-fhir-example-required.json",
         )
@@ -95,16 +84,12 @@ def test_create_product_team_from_fhir_organization(
 
     assert isinstance(core_model, ProductTeam)
     for key, field in enumerate(expected_fields):
-        assert hasattr(core_model, field)
-        if field == "organisation":
-            assert isinstance(core_model.organisation, OdsOrganisation)
-        elif field == "owner":
-            assert isinstance(core_model.owner, User)
-        else:
-            assert getattr(core_model, field) == expected_values[key]
+        assert hasattr(
+            core_model, field
+        ), f"{field} missing from {core_model.__class__.__name__}"
+        assert str(getattr(core_model, field)) == str(expected_values[key])
 
 
-@mock.patch("domain.core.product.validate_ods_code")
 @pytest.mark.parametrize(
     "id,name",
     [
@@ -113,12 +98,9 @@ def test_create_product_team_from_fhir_organization(
         [UUID("f9518c12-6c83-4544-97db-d9dd1d64da97"), "Third"],
     ],
 )
-def test_product_team_to_fhir_organization(
-    _mocked_validate_ods_code, id: str, name: str
-):
-    org = Root.create_ods_organisation("AB123", "Test")
-    user = Root.create_user("test@example.org", "Test User")
+def test_product_team_to_fhir_organization(id: str, name: str):
+    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
 
-    (result, event) = org.create_product_team(id, name, user)
+    result = org.create_product_team(id=id, name=name)
     fhir_model = create_fhir_model_from_product_team(result)
     assert isinstance(fhir_model, Organization)
