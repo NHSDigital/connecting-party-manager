@@ -1,16 +1,20 @@
 # Changelog
 
+## 2023-11-09-a
+
+- [PI-75] Create general table and repository interface
+
 ## 2023-11-07
 
 - PI-112: Refactor API Gateway Terraform
 
 ## 2023-11-03
 
-- PI-53: Swagger models and a REST API that calls domain logic
+- [PI-53] Swagger models and a REST API that calls domain logic
 
 ## 2023-11-02
 
-- PI-52: ProductTeam Domain logic
+- [PI-52] ProductTeam Domain logic
 
 ## 2023-11-01
 

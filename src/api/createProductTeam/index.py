@@ -8,7 +8,7 @@ from event.versioning.steps import get_steps_for_requested_version, versioning_s
 
 
 class Environment(BaseEnvironment):
-    SOMETHING: str
+    DYNAMODB_TABLE: str
 
 
 cache = {**Environment.build().dict()}

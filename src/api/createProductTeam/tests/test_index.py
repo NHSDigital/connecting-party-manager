@@ -14,7 +14,7 @@ from .data import product_team
     ],
 )
 def test_index(version):
-    with mock.patch.dict(os.environ, {"SOMETHING": "hiya"}, clear=True):
+    with mock.patch.dict(os.environ, {"DYNAMODB_TABLE": "hiya"}, clear=True):
         from api.createProductTeam.index import handler
 
         result = handler(

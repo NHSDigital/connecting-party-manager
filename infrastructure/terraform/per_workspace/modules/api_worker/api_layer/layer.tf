@@ -10,6 +10,7 @@ module "lambda_layer" {
 
   create_package         = false
   local_existing_package = var.source_path
+  environment_variables  = var.environment_variables
 
   tags = {
     Name = replace(var.name, "_", "-")

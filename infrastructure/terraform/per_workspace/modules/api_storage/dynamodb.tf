@@ -7,10 +7,8 @@ module "dynamodb_table" {
   hash_key                    = var.hash_key
   range_key                   = var.range_key
   deletion_protection_enabled = var.deletion_protection_enabled
-  stream_enabled              = true
-  stream_view_type            = "NEW_AND_OLD_IMAGES"
-
-  attributes = var.attributes
+  attributes                  = var.attributes
+  global_secondary_indexes    = var.global_secondary_indexes
 
   server_side_encryption_enabled     = true
   server_side_encryption_kms_key_arn = module.kms.key_arn

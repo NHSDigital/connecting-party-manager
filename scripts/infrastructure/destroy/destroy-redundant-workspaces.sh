@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
-source ./scripts/infrastructure/terraform/terraform-commands.sh
 
 BRANCH_NAME="$1"
 DESTROY_ALL_COMMITS_ON_BRANCH="$2"
@@ -19,7 +18,11 @@ function _get_valid_workspaces_to_destroy() {
         if echo "$commits_in_branch" | grep -q "$extract_commit"; then
             echo "$object_name"
         else
-            return
+            if branches=$(git branch --contains "$commit_hash" 2>&1); then
+                return
+            else
+                echo "$object_name"
+            fi
         fi
     else
         # Commit was squashed

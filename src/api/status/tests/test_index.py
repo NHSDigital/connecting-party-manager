@@ -3,7 +3,7 @@ from unittest import mock
 
 
 def test_index():
-    with mock.patch.dict(os.environ, {"SOMETHING": "hiya"}, clear=True):
+    with mock.patch.dict(os.environ, {"DYNAMODB_TABLE": "hiya"}, clear=True):
         from api.status.index import handler
 
         result = handler(event={})
