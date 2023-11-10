@@ -187,7 +187,7 @@ jobs:
 
   destroy-redundant-workspaces:
     runs-on: [self-hosted, ci]
-    needs: [workflow--check--branch-name, build-head]
+    needs: [build-head]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -202,6 +202,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs:
       [
+        workflow--check--branch-name,
         test--unit,
         test--feature--local,
         workflow--codebase-checks,
