@@ -50,7 +50,7 @@ jobs:
 
   build-head:
     runs-on: [self-hosted, ci]
-    needs: [parse-secrets]
+    needs: [parse-secrets, workflow--check--branch-name]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +61,7 @@ jobs:
 
   build-base:
     runs-on: [self-hosted, ci]
+    needs: [workflow--check--branch-name]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -209,7 +210,7 @@ jobs:
         terraform-head-build,
         test--integration,
       ]
-    if: ${{ needs.test--unit.result == 'failure' || needs.test--feature--local.result == 'failure' || needs.workflow--codebase-checks.result == 'failure' || needs.terraform-head-build.result == 'failure' || needs.test--integration.result == 'failure' }}
+    if: ${{ needs.workflow--check--branch-name.result == 'failure' || needs.test--unit.result == 'failure' || needs.test--feature--local.result == 'failure' || needs.workflow--codebase-checks.result == 'failure' || needs.terraform-head-build.result == 'failure' || needs.test--integration.result == 'failure' }}
     steps:
       - uses: actions/checkout@v4
         with:
