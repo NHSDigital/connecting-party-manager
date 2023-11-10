@@ -50,7 +50,7 @@ jobs:
 
   build-head:
     runs-on: [self-hosted, ci]
-    needs: [parse-secrets, workflow--check--branch-name]
+    needs: [parse-secrets]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,7 +61,6 @@ jobs:
 
   build-base:
     runs-on: [self-hosted, ci]
-    needs: [workflow--check--branch-name]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -120,6 +119,7 @@ jobs:
   terraform-base-build:
     needs:
       [
+        workflow--check--branch-name,
         create-workspace-name,
         build-base,
         helpers--truststore-pull,
