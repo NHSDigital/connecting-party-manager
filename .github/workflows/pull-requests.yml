@@ -204,16 +204,8 @@ jobs:
 
   destroy-failed-workspace:
     runs-on: [self-hosted, ci]
-    needs:
-      [
-        workflow--check--branch-name,
-        test--unit,
-        test--feature--local,
-        workflow--codebase-checks,
-        terraform-head-build,
-        test--integration,
-      ]
-    if: ${{ needs.workflow--check--branch-name.result == 'failure' || needs.test--unit.result == 'failure' || needs.test--feature--local.result == 'failure' || needs.workflow--codebase-checks.result == 'failure' || needs.terraform-head-build.result == 'failure' || needs.test--integration.result == 'failure' }}
+    needs: [test--integration]
+    if: ${{ failure() }}
     steps:
       - uses: actions/checkout@v4
         with:
