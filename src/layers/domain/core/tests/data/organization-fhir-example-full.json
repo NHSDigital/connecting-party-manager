@@ -24,24 +24,5 @@
     {
       "value": "test@example.org"
     }
-  ],
-  "contact": [
-    {
-      "name": {
-        "text": "MrFooBar"
-      },
-      "telecom": [
-        {
-          "system": "email",
-          "value": "test@example.org",
-          "use": "work",
-          "rank": 1,
-          "period": {
-            "start": "2015-02-07T13:28:17-05:00",
-            "end": "2025-02-07T13:28:17-05:00"
-          }
-        }
-      ]
-    }
   ]
 }

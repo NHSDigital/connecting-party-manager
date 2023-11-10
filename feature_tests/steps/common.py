@@ -2,8 +2,8 @@ from uuid import UUID
 
 import parse
 from behave import register_type
-from domain.core.error import BadEntityNameError, InvalidOdsCodeError, InvalidTypeError
-from domain.core.product import ProductTeamCreatedEvent
+from domain.core.product_team import ProductTeamCreatedEvent
+from pydantic import ValidationError
 
 from feature_tests.steps.context import Context
 
@@ -65,10 +65,8 @@ def catch_errors(func):
 
 
 EXPECTED_TYPES = {
-    "BadEntityNameError": BadEntityNameError,
-    "InvalidTypeError": InvalidTypeError,
     "ProductTeamCreatedEvent": ProductTeamCreatedEvent,
-    "InvalidOdsCodeError": InvalidOdsCodeError,
+    "ValidationError": ValidationError,
 }
 
 

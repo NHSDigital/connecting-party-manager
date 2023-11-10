@@ -1,29 +1,31 @@
 from typing import Generic, TypeVar
 
-from .errors import ItemNotFound
-from .model import BaseModel
+import boto3
+from pydantic import BaseModel
 
-TableItemType = TypeVar("TableItemType", bound=BaseModel)
+ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
-class Repository(Generic[TableItemType]):
-    def __init__(self, model: type[TableItemType]):
+class Repository(Generic[ModelType]):
+    def __init__(self, table_name, model: type[ModelType]):
+        self.table_name = table_name
         self.model = model
+        self.client = boto3.client("dynamodb")
 
-    def create(self, data: dict):
-        instance = self.model(**data)
-        condition = self.model.pk.does_not_exist() & self.model.sk.does_not_exist()
-        return instance.save(condition=condition)
+    def write(self, entity):
+        def get_handler_name(event):
+            handler_name = f"handle_{type(event).__name__}"
+            handler = getattr(self, handler_name)
+            return handler(event, entity)
 
-    def read(self, pk, sk=None) -> TableItemType:
-        range_key_condition = (self.model.sk == sk) if sk else None
-        response = self.model.query(
-            hash_key=pk, range_key_condition=range_key_condition
-        )
+        commands = [get_handler_name(e) for e in entity.events]
+        args = {
+            "TransactItems": commands,
+            "ReturnConsumedCapacity": "NONE",
+            "ReturnItemCollectionMetrics": "NONE",
+        }
+        response = self.client.transact_write_items(**args)
+        return response
 
-        try:
-            (item,) = response
-        except ValueError:
-            raise ItemNotFound() from None
-
-        return item
+    def register(self, event: type, handler):
+        self.handlers[event.__name__] = handler

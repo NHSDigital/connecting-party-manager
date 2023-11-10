@@ -1,0 +1,107 @@
+import pytest
+from repository.utils import marshall_value, to_dict, unmarshall_value
+
+
+class Nested:
+    def __init__(self, depth=0):
+        if depth > 0:
+            self.child = Nested(depth - 1)
+        self.depth = depth
+
+
+@pytest.mark.parametrize(
+    ["subject", "expected"],
+    [
+        [0, 0],
+        [1.0, 1.0],
+        [True, True],
+        ["", ""],
+        [{"foo": 1}, {"foo": 1}],
+        [Nested(), {"depth": 0}],
+        [Nested(1), {"depth": 1, "child": {"depth": 0}}],
+        [Nested(2), {"depth": 2, "child": {"depth": 1, "child": {"depth": 0}}}],
+    ],
+)
+def test__to_dict(subject, expected):
+    actual = to_dict(subject)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        [None, {"Null": True}],
+        ["foo", {"S": "foo"}],
+        [123, {"N": 123}],
+        [True, {"B": True}],
+        [[], {"L": []}],
+        [
+            [
+                None,
+                1,
+                2.0,
+                "3",
+                False,
+                [],
+                {},
+            ],
+            {
+                "L": [
+                    {"Null": True},
+                    {"N": 1},
+                    {"N": 2.0},
+                    {"S": "3"},
+                    {"B": False},
+                    {"L": []},
+                    {"M": {}},
+                ]
+            },
+        ],
+        [
+            {
+                "none": None,
+                "bool": False,
+                "int": 1,
+                "float": 2,
+                "string": "str",
+                "list": [],
+                "map": {},
+            },
+            {
+                "M": {
+                    "none": {"Null": True},
+                    "bool": {"B": False},
+                    "int": {"N": 1},
+                    "float": {"N": 2},
+                    "string": {"S": "str"},
+                    "list": {"L": []},
+                    "map": {"M": {}},
+                }
+            },
+        ],
+    ],
+)
+def test__marshall(value, expected):
+    actual = marshall_value(value)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        [{"Null": True}, None],
+        [{"B": False}, False],
+        [{"B": True}, True],
+        [{"N": 0}, 0.0],
+        [{"N": 1}, 1.0],
+        [{"N": "1.2"}, 1.2],
+        [{"S": "x"}, "x"],
+        [{"L": []}, []],
+        [{"L": [{"Null": True}]}, [None]],
+        [{"M": {}}, {}],
+        [{"M": {"foo": {"B": False}, "bar": {"N": 1}}}, {"foo": False, "bar": 1}],
+    ],
+)
+def test__unmarshall(value, expected):
+    actual = unmarshall_value(value)
+    assert actual == expected

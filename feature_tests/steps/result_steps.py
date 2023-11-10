@@ -1,4 +1,5 @@
 from behave import then
+from domain.core.reference import Reference
 
 from feature_tests.steps.common import parse_value, read_value_from_path
 from feature_tests.steps.context import Context

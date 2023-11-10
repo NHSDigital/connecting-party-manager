@@ -1,98 +1,244 @@
-"""
-The collection of models required to create Products:
-
-OdsOrganisation -creates-> ProductTeam -creates-> Product
-                ∟ emits -> ProductTeamCreatedEvent
-"""
-from typing import Iterable, TypeVar
+from enum import StrEnum, auto
 from uuid import UUID
 
-from domain.events.event import Event
-
-from .entity import Entity
-from .questionnaire_entity import QuestionnaireEntity
-from .user import User
-from .validation import (
-    validate_ods_code,
-    validate_product_id_or_asid,
-    validate_type,
-    validate_uuid,
-)
-
-SetType = TypeVar("SetType")
+from domain.core.aggregate_root import AggregateRoot
+from domain.core.error import DuplicateError, NotFoundError
+from domain.core.event import Event
+from pydantic import BaseModel, Field
 
 
-def default_set(iterable: Iterable[SetType]) -> set[SetType]:
-    return set(iterable if iterable is not None else [])
-
-
-class OdsOrganisation(Entity[str]):
+class ProductCreatedEvent(Event):
     """
-    Represents the bare minimum properties that we need to take from the
-    ODS definition of an organisation.
+    Raised when a new Product is created
     """
 
-    def __init__(self, id: str, name: str):
-        validate_ods_code(ods_code=id)
+    def __init__(self, id, name, type, product_team_id, ods_code, status):
+        self.id = id
+        self.name = name
+        self.type = type
+        self.product_team_id = product_team_id
+        self.ods_code = ods_code
+        self.status = status
 
-        super().__init__(id=id, name=name)
 
-    def create_product_team(
-        self, id: str, name: str, owner: User
-    ) -> tuple["ProductTeam", "ProductTeamCreatedEvent"]:
+class ProductUpdatedEvent(Event):
+    """
+    Raised when a Product name or type is amended
+    """
+
+    def __init__(self, id, name, type):
+        self.id = id
+        self.name = name
+        self.type = type
+
+
+class ProductDeletedEvent(Event):
+    """
+    Raised when a Product has been deleted
+    """
+
+    def __init__(self, id):
+        self.id = id
+
+
+class RelationshipAddedEvent(Event):
+    """
+    Raised when a relationship has been created between two Products.
+    """
+
+    def __init__(self, id, target, type):
+        self.id = id
+        self.target = target
+        self.type = type
+
+
+class RelationshipRemovedEvent(Event):
+    """
+    Raised when a relationship has been removed from two Products.
+    """
+
+    def __init__(self, id, target):
+        self.id = id
+        self.target = target
+
+
+class ProductKeyAddedEvent(Event):
+    """
+    Raised when a new Key (Product Id/ASID/SNow) has been added to a Product.
+    """
+
+    def __init__(self, id, key, type):
+        self.id = id
+        self.key = key
+        self.type = type
+
+
+class ProductKeyRemovedEvent(Event):
+    """
+    Raised when an existing Key is removed from a Product.
+    """
+
+    def __init__(self, id, key):
+        self.id = id
+        self.key = key
+
+
+class RelationshipType(StrEnum):
+    """
+    How we classify the relationships between two products.
+    """
+
+    DEPENDENCY = auto()
+    # Product is dependent upon / consumes another Product
+    # https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Domain+Model#CPMDomainModel-Dependencies
+    COMPONENT = auto()
+    # Product is a sub-component of an existing Product
+    # https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Domain+Model#CPMDomainModel-Ranges
+    REVISION = auto()
+    # Product is a revision of an existing Product
+    # https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Domain+Model#CPMDomainModel-Versioning
+
+
+class Relationship(BaseModel):
+    """
+    A relationship indicates that two Products are linked.  One product is the "Source" and the other is the "Destination"
+    """
+
+    type: RelationshipType
+
+
+class ProductKeyType(StrEnum):
+    PRODUCT_ID = auto()
+    # XXX-XXX-XXX
+    ACCREDITED_SYSTEM_ID = auto()
+    # \d{1,12}
+    SERVICE_NOW_ID = auto()
+    # TBD
+
+
+class ProductKey(BaseModel):
+    """
+    A Product Key is a secondary way of indexing / retrieving Products.  These are expected to be:
+      Product Id                    - e.g. XXX-XXX-XXX
+      Accredited System Id (ASID)   - e.g. 123456789012
+      Service Now Id                - e.g. TBD
+    """
+
+    type: ProductKeyType
+
+
+class ProductType(StrEnum):
+    """
+    A Product is to be classified as being one of the following.  These terms
+    were provided by Aubyn Crawford in collaboration with Service Now.
+
+    NOTE:
+        A 'SERVICE' and 'API' is NOT what a developer would expect them to be.
+        These are terms from the problem domain and relate to how Assurance
+        is performed.
+    """
+
+    PRODUCT = auto()
+    SERVICE = auto()
+    API = auto()
+
+
+class ProductStatus(StrEnum):
+    """
+    Indicates whether a record is active or has been deleted
+    """
+
+    ACTIVE = auto()
+    INACTIVE = auto()
+
+
+class Product(AggregateRoot):
+    """
+    An entity in the database.  It could model all sorts of different logical or
+    physical entities:
+    e.g.
+        NRL (SERVICE)
+        +-- NRL.v2 (API)
+        |   +-- nrl (???)
+        +-- NRL.v3 (API)
+            +-- nrl-consumer-api (???)
+            +-- nrl-producer-api (???)
+    """
+
+    id: UUID
+    name: str = Field(pattern="^[a-z][a-z0-9_]+$")
+    type: ProductType
+    status: ProductStatus = Field(default=ProductStatus.ACTIVE)
+    product_team_id: UUID
+    ods_code: str
+    relationships: dict[UUID, Relationship] = (lambda: {})()
+    keys: dict[str, ProductKey] = (lambda: {})()
+
+    def rename(self, name: str):
         """
-        Creates an instance of a ProductTeam
+        Demonstrating that `renaming` is a specific operation and not just a
+        CRUD update.
         """
-        product_team = ProductTeam(id=id, name=name, organisation=self, owner=owner)
-        event = ProductTeamCreatedEvent(product_team=product_team)
-        return (product_team, event)
+        raise NotImplementedError()
 
-
-class ProductTeam(Entity[UUID]):
-    """
-    A ProductTeam is created from a Supplier OdsOrganisation, and is the entity
-    that creates and owns Products.
-    """
-
-    def __init__(self, id: UUID, name: str, organisation: OdsOrganisation, owner: User):
-        validate_uuid(uuid=id)
-        validate_type(obj=organisation, expected_type=OdsOrganisation)
-        validate_type(obj=owner, expected_type=User)
-
-        super().__init__(id=id, name=name)
-        self.organisation = organisation
-        self.owner = owner
-
-    def create_product(self) -> "Product":
+    def add_relationship(
+        self, target: "Product", type: RelationshipType
+    ) -> RelationshipAddedEvent:
         """
-        Creates an instance of a new Product
+        Adds a relationship between two Products
         """
-        pass
+        if target.id in self.relationships:
+            raise DuplicateError(f"Relationship {target.id} exists")
+        self.relationships[target.id] = Relationship(type=type)
+        event = RelationshipAddedEvent(id=self.id, target=target.id, type=type)
+        return self.add_event(event=event)
 
+    def remove_relationship(self, target: str) -> RelationshipRemovedEvent:
+        """
+        Removes an existing relationship between two Products
+        TODO: Do we delete them or mark them inactive?
+        """
+        target_id = target.id if isinstance(target, Product) else target
+        if target_id not in self.relationships:
+            raise NotFoundError(f"Relationship {target_id} is unknown")
+        del self.relationships[target_id]
+        event = RelationshipRemovedEvent(id=self.id, target=target_id)
+        return self.add_event(event=event)
 
-class Product(Entity[UUID], QuestionnaireEntity):
-    """
-    A Product represents logical and physical software products.  A Product may
-    be referenced by multiple keys, such as internal GUID, Product Id, ASID,
-    etc.
-    """
+    def add_key(self, key, type: ProductKeyType) -> ProductKeyAddedEvent:
+        """
+        Adds a new Key to a Product
+        """
+        if key in self.keys:
+            raise DuplicateError(f"Key {key} exists")
+        self.keys[key] = ProductKey(type=type)
+        event = ProductKeyAddedEvent(id=self.id, key=key, type=type)
+        return self.add_event(event=event)
 
-    def __init__(
-        self,
-        id: str,
-        name: str,
-        questionnaires: set[str] = None,
-        dependency_questionnaires: set[str] = None,
-    ):
-        validate_product_id_or_asid(id=id)
+    def remove_key(self, key: str) -> ProductKeyRemovedEvent:
+        """
+        Remove an existing key from a Product
+        TODO: Do we delete them or mark inactive?
+        """
+        if key not in self.keys:
+            raise NotFoundError(f"Key {key} is unknown")
+        del self.keys[key]
+        event = ProductKeyRemovedEvent(id=self.id, key=key)
+        return self.add_event(event=event)
 
-        super().__init__(id=id, name=name)
-        self._questionnaires = default_set(questionnaires)
-        self._dependency_questionnaires = default_set(dependency_questionnaires)
-
-
-class ProductTeamCreatedEvent(Event):
-    def __init__(self, product_team: ProductTeam):
-        validate_type(obj=product_team, expected_type=ProductTeam)
-
-        self.product_team = product_team
+    def delete(self) -> list[Event]:
+        """
+        Delete the entire Product and all sub-entities.
+        This method will generate all the events required to ensure that all
+        associated records are removed.
+        """
+        events = (
+            [
+                self.remove_relationship(target)
+                for target in list(self.relationships.keys())
+            ]
+            + [self.remove_key(key) for key in list(self.keys.keys())]
+            + [ProductDeletedEvent(id=self.id)]
+        )
+        self.events = self.events + events
+        return self.events

@@ -19,7 +19,6 @@ pydantic = "1.10"
 nhs-context-logging = { git = "https://github.com/jaklinger/nhs-context-logging.git", rev = "jk-pi-49-enhancements" }
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
-pynamodb = "^5.5.0"
 email-validator = "^2.1.0.post1"
 
 [tool.poetry.group.dev.dependencies]
@@ -34,10 +33,10 @@ hypothesis = "^6.87.3"
 aws-lambda-powertools = { extras = ["aws-sdk"], version = "^2.26.0" }
 parse = "^1.19.1"
 pytest-mock = "^3.12.0"
-moto = "^4.2.7"
 datamodel-code-generator = "^0.23.0"
 pyyaml = "^6.0.1"
 proxygen-cli = "^2.0.15"
+moto = "^4.2.9"
 
 [build-system]
 requires = ["poetry-core"]
@@ -47,5 +46,5 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-markers = ["unit", "integration", "smoke", "slow"]
+markers = ["unit", "integration", "smoke", "slow", "wip"]
 addopts = "--import-mode=importlib"

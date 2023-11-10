@@ -1,3 +1,5 @@
+import uuid
+
 from behave import given, then, when
 from domain.core.questionnaire import Questionnaire, QuestionType
 
@@ -6,7 +8,7 @@ from feature_tests.steps.context import Context
 
 @given("Questionnaire {id}")
 def given__questionnaire(context: Context, id: str):
-    q = Questionnaire(id, id)
+    q = Questionnaire(id=uuid.uuid4(), name=id)
     context.questionnaires[id] = q
 
 
