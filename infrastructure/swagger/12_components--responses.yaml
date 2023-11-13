@@ -4,42 +4,23 @@ x-definitions:
     type: object
     headers: &ResponseHeaders
       X-Correlation-Id:
-        $ref: "#/components/headers/CorrelationId"
-      X-Request-Id:
-        $ref: "#/components/headers/RequestId"
-
-  OperationOutcome:
-    type: object
-    context: &OperationOutcome
-      application/json:
         schema:
-          $ref: "#/components/schemas/OperationOutcome"
+          $ref: "#/components/schemas/CorrelationId"
+      X-Request-Id:
+        schema:
+          $ref: "#/components/schemas/RequestId"
 
 components:
   responses:
-    CreatedSuccessfully:
-      description: Created successfully
-      content:
-        <<: *OperationOutcome
-      headers:
-        <<: *ResponseHeaders
-    BadRequest:
-      description: Bad request
-      content:
-        <<: *OperationOutcome
-      headers:
-        <<: *ResponseHeaders
-    ProductTeam:
-      description: Successfully read a Product Team
+    StatusOK:
+      description: API is operational
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProductTeam"
-      headers:
-        <<: *ResponseHeaders
-    NotFound:
-      description: Cannot find a Product Team
-      content:
-        <<: *OperationOutcome
+            type: object
+            properties:
+              message:
+                type: string
+                enum: ["OK"]
       headers:
         <<: *ResponseHeaders

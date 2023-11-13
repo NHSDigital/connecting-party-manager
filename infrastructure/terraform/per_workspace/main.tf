@@ -118,10 +118,9 @@ module "authoriser" {
 }
 
 module "api_entrypoint" {
-  source         = "./modules/api_entrypoint"
-  assume_account = var.assume_account
-  project        = local.project
-
+  source              = "./modules/api_entrypoint"
+  assume_account      = var.assume_account
+  project             = local.project
   name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
   lambdas             = setsubtract(var.lambdas, ["authoriser"])
   authoriser_metadata = module.authoriser.metadata
