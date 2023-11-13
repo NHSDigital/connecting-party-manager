@@ -15,7 +15,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "3.11.4"
-pydantic = "1.10"
+pydantic = "2.5.0"
 nhs-context-logging = { git = "https://github.com/jaklinger/nhs-context-logging.git", rev = "jk-pi-49-enhancements" }
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
