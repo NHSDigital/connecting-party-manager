@@ -105,7 +105,7 @@ function _terraform() {
 function _terraform_init() {
     local workspace=$1
     local args=${@:2}
-
+    terraform workspace select default
     terraform init $args || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 }
@@ -118,7 +118,7 @@ function _terraform_plan() {
     local account_wide=$5
     local args=${@:6}
 
-
+    terraform workspace select default
     terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 
