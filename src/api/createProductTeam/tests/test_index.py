@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from .data import product_team
+from .data import organisation
 
 
 @pytest.mark.parametrize(
@@ -18,7 +18,7 @@ def test_index(version):
         from api.createProductTeam.index import handler
 
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(product_team)}
+            event={"headers": {"version": version}, "body": json.dumps(organisation)}
         )
     assert result == {
         "statusCode": 201,

@@ -22,6 +22,8 @@ runs:
           **/tfplan
           **/swagger.yaml
           **/infrastructure/terraform/**/output.json
+          .downloads
+          **/fhir/r4/*models.py
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.date.outputs.date }}
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}

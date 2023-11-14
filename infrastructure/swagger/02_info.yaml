@@ -6,6 +6,9 @@ info:
     name: NHS Digital API Management
     url: "https://digital.nhs.uk/developer/help-and-support"
     email: api.management@nhs.net
+  license:
+    name: MIT
+    url: https://github.com/NHSDigital/connecting-party-manager/blob/main/LICENCE.md
   description: |
     ## Overview
 
