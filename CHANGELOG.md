@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-14
+
+- [PI-125] FHIR / Swagger / Pydantic generation
+
 ## 2023-11-09-a
 
 - [PI-75] Create general table and repository interface
