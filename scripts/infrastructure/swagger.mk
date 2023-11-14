@@ -37,10 +37,10 @@ $(SWAGGER_FHIR_BASE): $(PATH_TO_SWAGGER_GENERATOR_JAR) $(FHIR_DEFINITION)
 $(SWAGGER_DIST)/%/swagger.yaml: $(SWAGGER_TIMESTAMP) $(SWAGGER_FHIR_BASE) $(REDOCLY) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
 	@bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 
-	npx @redocly/cli lint $(SWAGGER_AWS) --skip-rule operation-4xx-response --skip-rule spec-components-invalid-map-name || ([[ -f $(SWAGGER_TIMESTAMP) ]] && rm $(SWAGGER_TIMESTAMP) || :; exit 1)
+	npx --yes @redocly/cli lint $(SWAGGER_AWS) --skip-rule operation-4xx-response --skip-rule spec-components-invalid-map-name || ([[ -f $(SWAGGER_TIMESTAMP) ]] && rm $(SWAGGER_TIMESTAMP) || :; exit 1)
 	touch $(SWAGGER_AWS)
 
-	npx @redocly/cli lint $(SWAGGER_PUBLIC) --skip-rule security-defined || ([[ -f $(SWAGGER_TIMESTAMP) ]] && rm $(SWAGGER_TIMESTAMP) || :; exit 1)
+	npx --yes @redocly/cli lint $(SWAGGER_PUBLIC) --skip-rule security-defined || ([[ -f $(SWAGGER_TIMESTAMP) ]] && rm $(SWAGGER_TIMESTAMP) || :; exit 1)
 	touch $(SWAGGER_PUBLIC)
 
 
