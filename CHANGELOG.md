@@ -3,6 +3,7 @@
 ## 2023-11-14
 
 - [PI-125] FHIR / Swagger / Pydantic generation
+- [PI-000] Dependabot
 
 ## 2023-11-09-a
 
