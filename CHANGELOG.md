@@ -4,6 +4,7 @@
 
 - [PI-125] FHIR / Swagger / Pydantic generation
 - [PI-000] Dependabot
+- [PI-000] Mask template file
 
 ## 2023-11-09-a
 
