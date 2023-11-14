@@ -27,6 +27,9 @@ If you are using `pyenv` (you can check by typing `pyenv` and seeing whether it 
 pyenv install $(cat .python-version)
 ```
 
+Additionally you will need `wget`: this is straightforward, but the instructions are dependant on your operating system.
+Please Google "how to install wget on my operating system", if you don't already have this installed (doing `which wget` will return blank if not installed).
+
 Otherwise `asdf` should do the work for you.
 
 ### Project build
