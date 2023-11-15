@@ -58,7 +58,7 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: build
-          cache-save-or-restore: save
+          cache-save: save
 
   build-base:
     runs-on: [self-hosted, ci]
@@ -69,7 +69,7 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: build
-          cache-save-or-restore: save
+          cache-save: save
           cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   workflow--codebase-checks:

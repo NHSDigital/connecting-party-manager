@@ -8,11 +8,10 @@ inputs:
     description: "[Optional] Assume the CI AWS Role during this operation?"
     required: false
     default: ""
-  cache-save-or-restore:
-    description: "[Optional] Save or restore from cache"
+  cache-save:
+    description: "[Optional] 'save' instead of 'restore' from cache"
     required: false
     default: "restore"
-
   cache-suffix:
     description: "[Optional] Cache suffix (e.g. 'base')"
     required: false
@@ -24,8 +23,24 @@ runs:
       run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
       shell: bash
 
-    - name: Cache action (save or restore)
-      uses: actions/cache/${{ inputs.cache-save-or-restore }}@v3
+    - name: Save cache
+      uses: actions/cache/save@v3
+      if: ${{ inputs.cache-save == 'save' }}
+      with:
+        path: |
+          .venv
+          .timestamp
+          **/dist/*zip
+          **/tfplan
+          **/swagger.yaml
+          **/infrastructure/terraform/**/output.json
+          .downloads
+          **/fhir/r4/*models.py
+        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }} #-${{ steps.date.outputs.date }}
+
+    - name: Restore cache
+      uses: actions/cache/save@v3
+      if: ${{ inputs.cache-save == 'restore' }}
       with:
         path: |
           .venv
