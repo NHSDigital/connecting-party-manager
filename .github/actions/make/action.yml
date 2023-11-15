@@ -24,12 +24,6 @@ runs:
       with:
         cache-suffix: ${{ inputs.cache-suffix }}
 
-    - name: Print stuff
-      shell: bash
-      run: |
-        apt-get install tree
-        tree
-
     - name: Configure AWS Credentials
       id: configure-aws-credentials
       if: inputs.requires-aws
