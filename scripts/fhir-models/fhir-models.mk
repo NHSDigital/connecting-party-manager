@@ -1,7 +1,7 @@
 .PHONY: fhir--models fhir--models--clean _datamodel-codegen
 
-FHIR_MODELS_SCRIPTS_DIR = scripts/fhir-models
-FHIR_MODEL_PATH = src/layers/domain/fhir/r4
+FHIR_MODELS_SCRIPTS_DIR = $(CURDIR)/scripts/fhir-models
+FHIR_MODEL_PATH = $(CURDIR)/src/layers/domain/fhir/r4
 NORMAL_MODEL_PATH := $(FHIR_MODEL_PATH)/models.py
 STRICT_MODEL_PATH := $(FHIR_MODEL_PATH)/strict_models.py
 

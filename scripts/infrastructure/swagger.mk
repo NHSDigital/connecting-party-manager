@@ -8,7 +8,7 @@ FHIR_DEFINITION = $(CURDIR)/infrastructure/swagger/swagger-fhir-generator-defini
 
 SWAGGER_TIMESTAMP = $(TIMESTAMP_DIR)/.swagger.stamp
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
-SWAGGER_FHIR_BASE = $(SWAGGER_DIST)/fhir-base
+SWAGGER_FHIR_BASE = $(SWAGGER_DIST)/fhir-base/swagger.yaml
 SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 
