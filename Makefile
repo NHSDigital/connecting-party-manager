@@ -4,9 +4,9 @@ SHELL = bash
 .PHONY: help
 
 PROJECT_PREFIX = "nhse-cpm-"
-TIMESTAMP_DIR := .timestamp
+TIMESTAMP_DIR := $(CURDIR)/.timestamp
 AWS_DEFAULT_REGION ?= "eu-west-2"
-DOWNLOADS_DIR := .downloads
+DOWNLOADS_DIR := $(CURDIR)/.downloads
 PATH_TO_INFRASTRUCTURE := $(CURDIR)/scripts/infrastructure
 
 include scripts/**/*.mk
