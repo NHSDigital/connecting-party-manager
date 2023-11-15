@@ -24,7 +24,7 @@ runs:
       shell: bash
 
     - name: Restore cache
-      uses: actions/cache/save@v3
+      uses: actions/cache/restore@v3
       if: ${{ inputs.cache-save == 'restore' }}
       with:
         path: |
