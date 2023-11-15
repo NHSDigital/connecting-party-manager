@@ -55,26 +55,30 @@ validate_yaml ${_CLEANED_SWAGGER_FILE}
 # * security tags
 # * API catalogue dislikes tags
 # * /_status not public (and so also don't need StatusOK)
-cat ${_CLEANED_SWAGGER_FILE} |
-    # yq 'with(.paths.*.*.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
-    # yq 'with(.components.requestBodies.*.content; with_entries(.key |= . + ";version=1" ))' |
-    # yq 'with(.components.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
-    yq 'del(.paths.*.*.x-amazon-apigateway-integration)' |
-    yq 'del(.x-*)' |
-    yq 'del(.paths.*.*.security)' |
-    yq 'del(.security)' |
-    yq 'del(.tags)' |
-    yq 'del(.paths.*.*.tags)' |
-    yq 'del(.paths./_status)' |
-    yq 'del(.. | select(has("StatusOK")).StatusOK)' |
-    yq 'del(.components.securitySchemes."${authoriser_name}")' \
-        > ${PUBLIC_SWAGGER_FILE}
-echo "Generated ${PUBLIC_SWAGGER_FILE}"
-validate_yaml ${PUBLIC_SWAGGER_FILE}
+if [[ ${MERGE_PUBLIC} == "1" ]]; then
+    cat ${_CLEANED_SWAGGER_FILE} |
+        # yq 'with(.paths.*.*.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
+        # yq 'with(.components.requestBodies.*.content; with_entries(.key |= . + ";version=1" ))' |
+        # yq 'with(.components.responses.*.content; with_entries(.key |= . + ";version=1" ))' |
+        yq 'del(.paths.*.*.x-amazon-apigateway-integration)' |
+        yq 'del(.x-*)' |
+        yq 'del(.paths.*.*.security)' |
+        yq 'del(.security)' |
+        yq 'del(.tags)' |
+        yq 'del(.paths.*.*.tags)' |
+        yq 'del(.paths./_status)' |
+        yq 'del(.. | select(has("StatusOK")).StatusOK)' |
+        yq 'del(.components.securitySchemes."${authoriser_name}")' \
+            > ${PUBLIC_SWAGGER_FILE}
+    echo "Generated ${PUBLIC_SWAGGER_FILE}"
+    validate_yaml ${PUBLIC_SWAGGER_FILE}
+fi
 
 # Remove fields not valid on AWS but otherwise required in public docs
 # * 4XX codes
-cat ${_CLEANED_SWAGGER_FILE} |
-    yq 'del(.. | select(has("4XX")).4XX)' > ${AWS_SWAGGER_FILE}
-echo "Generated ${AWS_SWAGGER_FILE}"
-validate_yaml ${PUBLIC_SWAGGER_FILE}
+if [[ ${MERGE_AWS} == "1" ]]; then
+    cat ${_CLEANED_SWAGGER_FILE} |
+        yq 'del(.. | select(has("4XX")).4XX)' > ${AWS_SWAGGER_FILE}
+    echo "Generated ${AWS_SWAGGER_FILE}"
+    validate_yaml ${AWS_SWAGGER_FILE}
+fi

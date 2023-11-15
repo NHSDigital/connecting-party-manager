@@ -1,10 +1,10 @@
 .PHONY: poetry--update poetry--install poetry--clean
 
-VENV_PYTHON = .venv/bin/python
+VENV_PYTHON = $(CURDIR)/.venv/bin/python
 VENV_TIMESTAMP = $(TIMESTAMP_DIR)/.venv.stamp
+PYPROJECT_TOML = $(CURDIR)/pyproject.toml
 
 poetry--update: $(VENV_TIMESTAMP) ## Updates installed dependencies as specified in pyproject.toml
-
 poetry--install: $(VENV_PYTHON) ## First time installation of poetry configuration
 
 poetry--clean:  ## Remove .venv directory
@@ -17,6 +17,6 @@ $(VENV_PYTHON):
 	.venv/bin/pre-commit install
 	touch $(VENV_PYTHON)
 
-$(VENV_TIMESTAMP): $(TIMESTAMP_DIR) $(VENV_PYTHON) pyproject.toml
+$(VENV_TIMESTAMP): $(TIMESTAMP_DIR) $(VENV_PYTHON) $(PYPROJECT_TOML)
 	poetry update
 	touch $(VENV_TIMESTAMP)

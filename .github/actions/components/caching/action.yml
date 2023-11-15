@@ -24,6 +24,11 @@ runs:
           **/infrastructure/terraform/**/output.json
           .downloads
           **/fhir/r4/*models.py
+          .tool-versions
+          pyproject.toml
+          **/make.py
+          **/infrastructure/swagger/*.yaml
+          **/infrastructure/swagger/**/*.yaml
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.date.outputs.date }}
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
