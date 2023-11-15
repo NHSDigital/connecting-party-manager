@@ -27,7 +27,7 @@ runs:
     - name: Print stuff
       shell: bash
       run: |
-        apt-get install tree
+        sudo apt-get install tree -y
         tree
 
     - name: Configure AWS Credentials
