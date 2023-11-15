@@ -8,10 +8,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Get current date
-      shell: bash
-      id: date
-      run: echo "date=$(date +'%Y-%m-%d-%M:%S')" >> $GITHUB_OUTPUT
+    # - name: Get current date
+    #   shell: bash
+    #   id: date
+    #   run: echo "date=$(date +'%Y-%m-%d-%M:%S')" >> $GITHUB_OUTPUT
     - name: Create cache
       uses: actions/cache@v3
       with:
@@ -24,6 +24,6 @@ runs:
           **/infrastructure/terraform/**/output.json
           .downloads
           **/fhir/r4/*models.py
-        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.date.outputs.date }}
-        restore-keys: |
-          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
+        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }} #-${{ steps.date.outputs.date }}
+        # restore-keys: |
+        #   ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
