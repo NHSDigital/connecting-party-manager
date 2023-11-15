@@ -1,0 +1,47 @@
+{
+  "resourceType": "Organization",
+  "id": "f9518c12-6c83-4544-97db-d9dd1d64da97",
+  "identifier": [
+    {
+      "id": "f9518c12-6c83-4544-97db-d9dd1d64da97",
+      "use": "official",
+      "value": "f9518c12-6c83-4544-97db-d9dd1d64da97"
+    }
+  ],
+  "name": "Test-Organization",
+  "partOf": {
+    "id": "F5H1R",
+    "identifier": {
+      "id": "F5H1R",
+      "use": "official",
+      "value": "ROYAL DERBY HOSPITAL UTC"
+    },
+    "type": "uri",
+    "reference": "internal",
+    "display": "other"
+  },
+  "telecom": [
+    {
+      "value": "test@example.org"
+    }
+  ],
+  "contact": [
+    {
+      "name": {
+        "text": "MrFooBar"
+      },
+      "telecom": [
+        {
+          "system": "email",
+          "value": "test@example.org",
+          "use": "work",
+          "rank": 1,
+          "period": {
+            "start": "2015-02-07T13:28:17-05:00",
+            "end": "2025-02-07T13:28:17-05:00"
+          }
+        }
+      ]
+    }
+  ]
+}
