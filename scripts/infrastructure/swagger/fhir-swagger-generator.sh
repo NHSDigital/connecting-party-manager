@@ -3,8 +3,6 @@ set -e
 # Parse the FHIR objects and interactions
 ARGS=$(poetry run python -c "import yaml, sys; print(\";\".join(f\"{k}({','.join(v)})\" for k, v in yaml.safe_load(open(\"${PATH_TO_FHIR_DEFINITIONS}\")).items()))")
 
-ls -l ${PATH_TO_SWAGGER_GENERATOR_JAR}
-
 # Generate the swagger
 java -jar ${PATH_TO_SWAGGER_GENERATOR_JAR} "${ARGS}" &> /dev/null
 

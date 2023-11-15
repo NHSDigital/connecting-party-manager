@@ -15,6 +15,6 @@ build--python: fhir--models $(BUILD_TIMESTAMP)  ## Builds local python packages 
 
 build--python--force: clean--build $(BUILD_TIMESTAMP)  ## Force a rebuild of local python packages into .zip files
 
-$(BUILD_TIMESTAMP): $(TIMESTAMP_DIR) $(shell find src -type f -name "*.py" -not -path "*/test_*" ) $(FHIR_MODEL)
+$(BUILD_TIMESTAMP): $(TIMESTAMP_DIR) $(shell find src -type f -name "*.py" -not -path "*/test_*" )
 	@find $(CURDIR) -name make.py | xargs -I % bash -c 'poetry run python %'
 	touch $(BUILD_TIMESTAMP)

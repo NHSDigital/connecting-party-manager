@@ -16,6 +16,8 @@ help:  ## This help message
 
 $(TIMESTAMP_DIR):
 	@mkdir -p $(TIMESTAMP_DIR)
+	touch $(TIMESTAMP_DIR)
 
 $(DOWNLOADS_DIR):
 	@mkdir -p $(DOWNLOADS_DIR)
+	touch $(DOWNLOADS_DIR)
