@@ -1,8 +1,8 @@
 .PHONY: development--install
 
 PATH_TO_DEPS = $(CURDIR)/scripts/local-development
-TOOL_VERSIONS = .tool-versions
-TOOL_TIMESTAMP = $(TIMESTAMP_DIR)/$(TOOL_VERSIONS).stamp
+TOOL_VERSIONS = $(CURDIR)/.tool-versions
+TOOL_TIMESTAMP = $(TIMESTAMP_DIR)/tool-versions.stamp
 
 development--install: $(TOOL_TIMESTAMP) ## Install local development tools
 

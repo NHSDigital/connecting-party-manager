@@ -1,5 +1,5 @@
 data "template_file" "swagger" {
-  template = file("${path.root}/../../swagger/dist/aws/swagger.yaml")
+  template = sensitive(file("${path.root}/../../swagger/dist/aws/swagger.yaml"))
   vars = merge(
     { environment = terraform.workspace },
     var.authoriser_metadata,

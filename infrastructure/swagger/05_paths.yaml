@@ -12,21 +12,34 @@ x-definitions:
       contentHandling: CONVERT_TO_TEXT
 
   RequestHeaders:
-    type: object
-    headers: &RequestHeaders
-      parameters:
-        - in: header
-          name: version
+    - &RequestHeaderVersion
+      in: header
+      name: version
+      schema:
+        $ref: "#/components/schemas/Version"
+    - &RequestHeaderRequestId
+      in: header
+      name: x-request-id
+      schema:
+        $ref: "#/components/schemas/RequestId"
+    - &RequestHeaderCorrelationId
+      in: header
+      name: x-correlation-id
+      schema:
+        $ref: "#/components/schemas/CorrelationId"
+    - headers: &RequestHeaders
+        parameters:
+          - *RequestHeaderVersion
+          - *RequestHeaderRequestId
+          - *RequestHeaderCorrelationId
+
+  ErrorResponses:
+    "4XX": &Response4XX
+      description: "Client Error"
+      content:
+        application/fhir+json:
           schema:
-            $ref: "#/components/schemas/Version"
-        - in: header
-          name: x-request-id
-          schema:
-            $ref: "#/components/schemas/RequestId"
-        - in: header
-          name: x-correlation-id
-          schema:
-            $ref: "#/components/schemas/CorrelationId"
+            $ref: "#/components/schemas/OperationOutcome"
 
 paths:
   /_status:
@@ -35,45 +48,39 @@ paths:
       operationId: status
       responses:
         "200":
-          description: API is operational
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    enum: ["OK"]
+          $ref: "#/components/responses/StatusOK"
+        "4XX":
+          <<: *Response4XX
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
 
-  /product-team:
+  /Organization:
     post:
-      summary: Create a new Product Team
-      requestBody:
-        $ref: "#/components/requestBodies/ProductTeam"
       responses:
-        "201":
-          $ref: "#/components/responses/CreatedSuccessfully"
-        "400":
-          $ref: "#/components/responses/BadRequest"
+        "4XX":
+          <<: *Response4XX
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createProductTeam}
 
-  /product-team/{id}:
+  /Organization/{id}:
     get:
-      summary: Get a Product Team by ID
       parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
+        - name: id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
       responses:
-        "200":
-          $ref: "#/components/responses/ProductTeam"
-        "404":
-          $ref: "#/components/responses/NotFound"
+        "4XX":
+          <<: *Response4XX
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}

@@ -4,7 +4,6 @@ TERRAFORM_WORKSPACE =
 ACCOUNT_WIDE = "non_account_wide"
 TERRAFORM_ARGS =
 
-PATH_TO_INFRASTRUCTURE := $(CURDIR)/scripts/infrastructure
 PREFIX =
 VERSION =
 

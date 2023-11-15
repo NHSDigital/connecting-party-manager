@@ -74,3 +74,7 @@ dist
 .hypothesis
 .firehose
 .timestamp
+.downloads
+openapi
+
+src/layers/domain/fhir/r4/*models.py

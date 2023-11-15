@@ -1,48 +1,54 @@
 import sys
-from os import listdir
-from os.path import getsize, isfile, join
+from enum import StrEnum, auto
+from os.path import getsize
+from pathlib import Path
+
+PATH_TO_HERE = Path(__file__).parent
+PATH_TO_ROOT = PATH_TO_HERE.parent.parent
+PATH_TO_CHANGELOG_DIR = PATH_TO_ROOT / "changelog"
+PATH_TO_ROOT_CHANGELOG_FILE = PATH_TO_ROOT / "CHANGELOG.md"
 
 
-def main(argv):
-    if "release/" in argv[0]:
-        file_list = sorted(
-            [f for f in listdir("./changelog") if isfile(join("./changelog", f))]
-        )
-        file_list.reverse()
-        latest_file = file_list[0].replace(".md", "")
-        release_date = argv[0].replace("release/", "")
-        if latest_file != release_date:
-            print("No matching changelog for release branch.")
-            sys.exit(0)
-        else:
-            data = "# Changelog\n\n"
+class Result(StrEnum):
+    UPDATED = auto()
+    FILE_NOT_FOUND = auto()
+    NOTHING_TO_DO = auto()
 
-            for i, v in enumerate(file_list):
-                data = data + "## " + v.replace(".md", "") + "\n\n"
-                with open(f"./changelog/{v}", "r") as f:
-                    data = data + f.read()
-                    if i != (len(file_list) - 1):
-                        data = data + "\n"
 
-            try:
-                original_size = getsize("./CHANGELOG.md")
-            except OSError:
-                original_size = 0
+def main(branch: str) -> Result:
+    PATH_TO_ROOT_CHANGELOG_FILE.touch()
+    release_date = branch.replace("release/", "")
 
-            with open("./CHANGELOG.md", "w") as f:
-                f.write(data)
-            new_size = getsize("./CHANGELOG.md")
+    file_list = sorted(
+        filter(
+            Path.is_file,
+            PATH_TO_CHANGELOG_DIR.iterdir(),
+        ),
+        reverse=True,
+    )
 
-            if new_size != original_size:
-                print("CHANGELOG.md updated.")
-                sys.exit(0)
+    if release_date not in (f.stem for f in file_list):
+        return Result.FILE_NOT_FOUND
 
-            print("CHANGELOG.md, No changes.")
-            sys.exit(0)
+    changelog_content = ["# Changelog\n"]
+    for file_path in file_list:
+        changelog_content.append(f"## {file_path.stem}")
+        with open(file_path, "r") as f:
+            changelog_content.append(f.read())
+    changelog_data = "\n".join(changelog_content)
 
-    print("Not a release branch")
-    sys.exit(0)
+    with open(PATH_TO_ROOT_CHANGELOG_FILE, "r") as f:
+        original_changelog_data = f.read()
+
+    with open(PATH_TO_ROOT_CHANGELOG_FILE, "w") as f:
+        f.write(changelog_data)
+
+    if original_changelog_data != changelog_data:
+        return Result.UPDATED
+    return Result.NOTHING_TO_DO
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    (branch,) = sys.argv[1:]
+    result = main(branch)
+    print(result.value)

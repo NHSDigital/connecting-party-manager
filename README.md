@@ -11,6 +11,7 @@
    4. [Other helpful commands](#other-helpful-commands)
 2. [Tests](#tests)
 3. [Workflow](#workflow)
+4. [FHIR, Swagger and FHIR Pydantic models](#fhir-swagger-and-fhir-pydantic-models)
 
 ---
 
@@ -25,6 +26,8 @@ If you are using `pyenv` (you can check by typing `pyenv` and seeing whether it 
 ```
 pyenv install $(cat .python-version)
 ```
+
+Additionally you will need `wget` (doing `which wget` will return blank if not installed). Please Google "how to install wget on my operating system", if you don't already have this installed.
 
 Otherwise `asdf` should do the work for you.
 
@@ -171,3 +174,7 @@ This command will also:
 
 - Update the version in `pyproject.toml` with the release branch version.
 - Update the VERSION file with the release branch version number.
+
+## FHIR, Swagger and FHIR Pydantic models
+
+This is all done by `make build`. For more details on how to update the Swagger and FHIR Pydantic models, please see [the swagger README](infrastructure/swagger/README.md).
