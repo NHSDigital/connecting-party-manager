@@ -8,7 +8,7 @@ FHIR_DEFINITION = $(CURDIR)/infrastructure/swagger/swagger-fhir-generator-defini
 
 SWAGGER_TIMESTAMP = $(TIMESTAMP_DIR)/.swagger.stamp
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
-SWAGGER_FHIR_BASE = $(SWAGGER_DIST)/fhir-base/swagger.yaml
+SWAGGER_FHIR_BASE = $(SWAGGER_DIST)/fhir-base
 SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 
@@ -25,14 +25,14 @@ $(PATH_TO_SWAGGER_GENERATOR_JAR): $(DOWNLOADS_DIR)
 	@wget -q https://github.com/IBM/FHIR/releases/download/$(SWAGGER_GENERATOR_VERSION)/$(SWAGGER_GENERATOR_JAR) -P $(DOWNLOADS_DIR)
 	touch $(PATH_TO_SWAGGER_GENERATOR_JAR)
 
-$(SWAGGER_FHIR_BASE): $(PATH_TO_SWAGGER_GENERATOR_JAR) $(FHIR_DEFINITION)
+$(SWAGGER_FHIR_BASE)/%.json: $(PATH_TO_SWAGGER_GENERATOR_JAR) $(FHIR_DEFINITION)
 	mkdir -p $(SWAGGER_FHIR_BASE)
 	@env \
 		PATH_TO_FHIR_DEFINITIONS=$(FHIR_DEFINITION) \
 		PATH_TO_SWAGGER_GENERATOR_JAR=$(PATH_TO_SWAGGER_GENERATOR_JAR) \
 		SWAGGER_FHIR_BASE=$(SWAGGER_FHIR_BASE) \
 		bash $(PATH_TO_INFRASTRUCTURE)/swagger/fhir-swagger-generator.sh
-	touch $(SWAGGER_FHIR_BASE)
+	find $(SWAGGER_FHIR_BASE) -type f -exec touch {} +
 
 $(SWAGGER_DIST)/%/swagger.yaml: $(SWAGGER_TIMESTAMP) $(SWAGGER_FHIR_BASE) $(REDOCLY) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
 	@bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
