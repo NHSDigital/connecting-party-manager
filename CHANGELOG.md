@@ -1,6 +1,6 @@
 # Changelog
 
-## 2023-11-14
+## 2023-11-14-bugfix
 - [PI-125] FHIR / Swagger / Pydantic generation
 - [PI-000] Dependabot
 - [PI-000] debug
