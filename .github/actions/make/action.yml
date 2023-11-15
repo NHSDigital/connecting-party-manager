@@ -27,7 +27,21 @@ runs:
       uses: actions/cache/restore@v3
       if: ${{ inputs.cache-save == 'restore' }}
       with:
-        path: "*"
+        path: |
+          .venv
+          .timestamp
+          **/dist/*zip
+          **/tfplan
+          **/swagger.yaml
+          **/infrastructure/terraform/**/output.json
+          .downloads
+          **/fhir/r4/*models.py
+          .tool-versions
+          pyproject.toml
+          **/make.py
+          **/infrastructure/swagger/*.yaml
+          **/infrastructure/swagger/**/*.yaml
+
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }} #-${{ steps.date.outputs.date }}
 
     - name: Print stuff
@@ -72,5 +86,18 @@ runs:
       uses: actions/cache/save@v3
       if: ${{ inputs.cache-save == 'save' }}
       with:
-        path: "*"
+        path: |
+          .venv
+          .timestamp
+          **/dist/*zip
+          **/tfplan
+          **/swagger.yaml
+          **/infrastructure/terraform/**/output.json
+          .downloads
+          **/fhir/r4/*models.py
+          .tool-versions
+          pyproject.toml
+          **/make.py
+          **/infrastructure/swagger/*.yaml
+          **/infrastructure/swagger/**/*.yaml
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }} #-${{ steps.date.outputs.date }}

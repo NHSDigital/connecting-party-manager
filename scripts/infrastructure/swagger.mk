@@ -4,7 +4,7 @@ SWAGGER_GENERATOR_VERSION = 4.6.1
 SWAGGER_GENERATOR_JAR = fhir-swagger-generator-$(SWAGGER_GENERATOR_VERSION)-cli.jar
 PATH_TO_SWAGGER_GENERATOR_JAR := $(DOWNLOADS_DIR)/$(SWAGGER_GENERATOR_JAR)
 
-FHIR_DEFINITION = $(CURDIR)/infrastructure/swagger/swagger-fhir-generator-definitions/config.yaml
+FHIR_DEFINITION = $(CURDIR)/infrastructure/swagger/swagger-fhir-generator-definitions/endpoints.yaml
 
 FHIR_BASE_TIMESTAMP =  $(TIMESTAMP_DIR)/.fhir-base.stamp
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
