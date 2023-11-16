@@ -1,5 +1,5 @@
 import re
-from typing import Type, TypeVar, Union
+from typing import TypeVar, Union
 
 from domain.core.error import (
     BadEmailFieldError,
@@ -8,8 +8,10 @@ from domain.core.error import (
 )
 from domain.core.product import ProductTeam
 from domain.core.root import Root
+from domain.fhir.r4 import cpm_model
 from domain.fhir.r4.models import Organization
 from domain.fhir.r4.strict_models import Organization as StrictOrganization
+from pydantic import BaseModel
 
 from .constants import EMPTY_VALUES, JSON_TYPES, REQUIRED_CREATE_FIELDS
 
@@ -89,48 +91,71 @@ def create_product_team_from_fhir_json(fhir_json: dict, **kwargs) -> ProductTeam
 
 
 def create_fhir_model_from_product_team(product_team: ProductTeam, **kwargs) -> dict:
-    product_team_dict = product_team.__dict__
-    product_team_dict["resourceType"] = "Organization"
-    product_team_dict["id"] = str(product_team_dict["id"])
-    product_team_dict["organisation"] = product_team_dict["organisation"].__dict__
-    product_team_dict["owner"] = product_team_dict["owner"].__dict__
-    org = StrictOrganization(
-        id=product_team_dict["id"],
-        resourceType=product_team_dict["resourceType"],
-        name=product_team_dict["name"],
-        partOf={
-            "id": product_team_dict["organisation"]["id"],
-            "identifier": {
-                "id": product_team_dict["organisation"]["id"],
-                "value": product_team_dict["organisation"]["name"],
-            },
-        },
+    org = cpm_model.Organization(
+        resourceType="Organization",
+        id=product_team.id,
+        name=product_team.name,
+        partOf=cpm_model.Reference(
+            identifier=cpm_model.Identifier(
+                id=product_team.organisation.id,
+                value=product_team.organisation.name,
+            )
+        ),
         contact=[
-            {
-                "name": {"text": product_team_dict["owner"]["name"]},
-                "telecom": [
-                    {"system": "email", "value": product_team_dict["owner"]["id"]}
+            cpm_model.OrganizationContact(
+                name=cpm_model.HumanName(text=product_team.owner.name),
+                telecom=[
+                    cpm_model.ContactPoint(system="email", value=product_team.owner.id)
                 ],
-            }
+            )
         ],
     )
+    return org.dict()
 
-    return org
+    # product_team_dict = product_team.__dict__
+    # product_team_dict["resourceType"] = "Organization"
+    # product_team_dict["id"] = str(product_team_dict["id"])
+    # product_team_dict["organisation"] = product_team_dict["organisation"].__dict__
+    # product_team_dict["owner"] = product_team_dict["owner"].__dict__
+    # org = StrictOrganization(
+    #     id=product_team_dict["id"],
+    #     resourceType=product_team_dict["resourceType"],
+    #     name=product_team_dict["name"],
+    #     partOf={
+    #         "id": product_team_dict["organisation"]["id"],
+    #         "identifier": {
+    #             "id": product_team_dict["organisation"]["id"],
+    #             "value": product_team_dict["organisation"]["name"],
+    #         },
+    #     },
+    #     contact=[
+    #         {
+    #             "name": {"text": product_team_dict["owner"]["name"]},
+    #             "telecom": [
+    #                 {"system": "email", "value": product_team_dict["owner"]["id"]}
+    #             ],
+    #         }
+    #     ],
+    # )
+
+    # return org
 
 
 def create_fhir_model_from_fhir_json(
-    fhir_json: dict,
-    model: Type[fhir_type],
-    strict_model: Type[fhir_type],
-    model_type: str,
+    fhir_json: dict, fhir_models: list[BaseModel], our_model: BaseModel
 ) -> fhir_type:
-    model(**fhir_json)
-    fhir_strict_model = strict_model(**fhir_json)
-    validate_required_create_fields(fhir_json, model_type)
-    validate_no_extra_fields(
-        input_fhir_json=fhir_json,
-        output_fhir_json=fhir_strict_model.dict(exclude_none=True),
-    )
-    validate_contact_details(input_fhir_json=fhir_json)
-    strip_empty_json_paths(json=fhir_json)
-    return fhir_strict_model
+    for fhir_model in fhir_models:
+        fhir_model(**fhir_json)
+
+    # fhir_strict_model = strict_model(**fhir_json)
+    # cpm_model.Organization(**fhir_json)
+
+    # validate_required_create_fields(fhir_json, model_type)
+    # validate_no_extra_fields(
+    #     input_fhir_json=fhir_json,
+    #     output_fhir_json=fhir_strict_model.dict(exclude_none=True),
+    # )
+    # validate_contact_details(input_fhir_json=fhir_json)
+    # strip_empty_json_paths(json=fhir_json)
+
+    return our_model(**fhir_json)
