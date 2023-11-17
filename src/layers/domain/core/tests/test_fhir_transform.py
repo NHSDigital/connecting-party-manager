@@ -2,11 +2,10 @@ from unittest import mock
 from uuid import UUID
 
 import pytest
-from domain.core.constants import REQUIRED_CREATE_FIELDS
 from domain.core.fhir_transform import (
     create_fhir_model_from_fhir_json,
     create_fhir_model_from_product_team,
-    create_product_team_from_fhir_json,
+    create_product_team_from_fhir_org_json,
 )
 from domain.core.product import OdsOrganisation, ProductTeam
 from domain.core.root import Root
@@ -15,6 +14,8 @@ from domain.core.user import User
 from domain.fhir.r4.cpm_model import Organization
 from domain.fhir.r4.strict_models import Organization as StrictOrganization
 from pydantic import ValidationError
+
+REQUIRED_CREATE_FIELDS = {"Organization": ["id", "name", "partOf", "contact"]}
 
 
 @pytest.mark.parametrize(
@@ -31,14 +32,8 @@ from pydantic import ValidationError
 def test_null_values_raise_error(fhir_type, fhir_name, model_type, json_file):
     fhir_json = read_test_data(json_file)
     for key in REQUIRED_CREATE_FIELDS[fhir_name]:
-        if isinstance(fhir_json[key], list):
-            pass
-            fhir_json[key] = []
-        elif isinstance(fhir_json[key], dict):
-            pass
-            fhir_json[key] = {}
-        else:
-            fhir_json[key] = ""
+        item_type = type(fhir_json[key])
+        fhir_json[key] = item_type()
     with pytest.raises(ValidationError):
         create_fhir_model_from_fhir_json(fhir_json, [fhir_type], model_type)
 
@@ -94,7 +89,7 @@ def test_create_product_team_from_fhir_organization(
     expected_fields, expected_values, json_file
 ):
     fhir_json = read_test_data(json_file)
-    core_model = create_product_team_from_fhir_json(fhir_json=fhir_json)
+    core_model = create_product_team_from_fhir_org_json(fhir_org_json=fhir_json)
 
     assert isinstance(core_model, ProductTeam)
     for key, field in enumerate(expected_fields):
