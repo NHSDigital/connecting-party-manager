@@ -100,7 +100,7 @@ def test_logging_step_decorators_with_non_fatal_error(log_capture):
 
     # Run the step, with logging
     with mock.patch(
-        "event.logging.step_decorators.NonFatalErrorCollection", (MyException,)
+        "event.logging.step_decorators.EXPECTED_EXCEPTIONS", (MyException,)
     ):
         step_chain = StepChain(
             step_chain=[a_function], step_decorators=logging_step_decorators

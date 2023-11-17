@@ -1,3 +1,4 @@
+import json
 import os
 from unittest import mock
 
@@ -26,10 +27,13 @@ def test_index(read_event: ReadProductTeamEvent, version):
             }
         )
 
-    expected_result = f"ProductTeam({read_event.pathParameters.id})"
+    expected_result = json.dumps(f"ProductTeam({read_event.pathParameters.id})")
 
     assert result == {
         "statusCode": 200,
         "body": expected_result,
-        "headers": {"Content-Length": 49, "Content-Type": "application/json"},
+        "headers": {
+            "Content-Length": len(expected_result),
+            "Content-Type": "application/json",
+        },
     }
