@@ -44,20 +44,3 @@ class BadEntityNameError(Exception):
 
 class InvalidTypeError(Exception):
     pass
-
-
-class MissingRequiredFieldForCreate(Exception):
-    def __init__(self, field):
-        super().__init__(f"The required field {field} is missing")
-        self.field = field
-
-
-class FhirValidationError(Exception):
-    def __init__(self, error_message):
-        super().__init__(error_message)
-        self.error_message = error_message
-
-
-class BadEmailFieldError(Exception):
-    def __init__(self):
-        super().__init__("Contact value must be an email address")

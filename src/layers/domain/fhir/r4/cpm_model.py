@@ -9,7 +9,7 @@ class BaseModel(_BaseModel, extra=Extra.forbid):
 
 
 class HumanName(BaseModel):
-    text: str
+    text: str = Field(min_length=1)
 
 
 class ContactPoint(BaseModel):
@@ -18,13 +18,13 @@ class ContactPoint(BaseModel):
 
 
 class OrganizationContact(BaseModel):
-    name: str
+    name: HumanName
     telecom: list[ContactPoint] = Field(min_items=1, max_items=1)
 
 
 class Identifier(BaseModel):
-    id: str
-    value: str
+    id: str = Field(min_length=1)
+    value: str = Field(min_length=1)
 
 
 class Reference(BaseModel):
@@ -33,7 +33,7 @@ class Reference(BaseModel):
 
 class Organization(BaseModel):
     resourceType: Literal["Organization"]
-    id: str
-    name: str
+    id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
     partOf: Reference
     contact: list[OrganizationContact] = Field(min_items=1, max_items=1)

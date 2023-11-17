@@ -1,134 +1,99 @@
-import json
 from unittest import mock
 from uuid import UUID
 
 import pytest
-from domain.core.constants import EMPTY_VALUES, REQUIRED_CREATE_FIELDS
-from domain.core.error import (
-    BadEmailFieldError,
-    FhirValidationError,
-    MissingRequiredFieldForCreate,
-)
+from domain.core.constants import REQUIRED_CREATE_FIELDS
 from domain.core.fhir_transform import (
+    create_fhir_model_from_fhir_json,
     create_fhir_model_from_product_team,
     create_product_team_from_fhir_json,
-    strip_empty_json_paths,
-    validate_contact_details,
-    validate_no_extra_fields,
-    validate_required_create_fields,
 )
 from domain.core.product import OdsOrganisation, ProductTeam
 from domain.core.root import Root
 from domain.core.tests.utils import read_test_data
 from domain.core.user import User
+from domain.fhir.r4.cpm_model import Organization
 from domain.fhir.r4.strict_models import Organization as StrictOrganization
-from pydantic import BaseModel
-
-NULLISH_VALUES = ["null", "[]", "{}", '""']
-
-
-def test_nullish_fields_consistent_with_empty_values():
-    assert sorted(NULLISH_VALUES) == sorted(map(json.dumps, EMPTY_VALUES))
+from pydantic import ValidationError
 
 
 @pytest.mark.parametrize(
-    "bad_json",
-    (
-        {"foo": {"bar": [None]}, "oof": "rab"},
-        {"foo": {"bar": []}, "oof": "rab"},
-        {"foo": {}, "oof": "rab"},
-    ),
-)
-def test_strip_empty_json_paths(bad_json):
-    # Confirm bad fields are present
-    bad_json_str = json.dumps(bad_json)
-    assert any(nullish_field in bad_json_str for nullish_field in NULLISH_VALUES)
-
-    stripped_bad_json = strip_empty_json_paths(bad_json)
-    assert stripped_bad_json == {"oof": "rab"}
-
-    # Confirm bad fields are gone
-    stripped_bad_json_str = json.dumps(stripped_bad_json)
-    assert not any(
-        nullish_field in stripped_bad_json_str for nullish_field in NULLISH_VALUES
-    )
-
-
-@pytest.mark.parametrize(
-    "bad_json",
-    (
-        {"foo": {"bar": [None]}, "oof": "rab"},
-        {"foo": {"bar": []}, "oof": "rab"},
-        {"foo": {}, "oof": "rab"},
-    ),
-)
-def test_strip_empty_json_paths(bad_json):
-    with pytest.raises(FhirValidationError):
-        strip_empty_json_paths(bad_json, True)
-
-
-def test_strip_empty_json_paths_throws_error_when_field_missing():
-    assert REQUIRED_CREATE_FIELDS["Organization"] == [
-        "identifier",
-        "name",
-        "partOf",
-        "contact",
-    ]
-
-
-class Foo(BaseModel):
-    spam: str
-    eggs: int
-
-
-def test_validate_no_extra_fields_success():
-    json_without_extra_fields = {"spam": "SPAM", "eggs": 123}
-    json_as_model = Foo(**json_without_extra_fields)
-    validate_no_extra_fields(
-        json_as_model.dict(exclude_none=True), json_without_extra_fields
-    )
-
-
-def test_validate_no_extra_fields_failure():
-    json_with_extra_fields = {"spam": "SPAM", "eggs": 123, "bar": "BAR"}
-    json_as_model = Foo(**json_with_extra_fields)
-    with pytest.raises(FhirValidationError):
-        validate_no_extra_fields(
-            json_as_model.dict(exclude_none=True), json_with_extra_fields
+    "fhir_type, fhir_name, model_type, json_file",
+    [
+        (
+            StrictOrganization,
+            "Organization",
+            Organization,
+            "organization-fhir-example-required.json",
         )
+    ],
+)
+def test_null_values_raise_error(fhir_type, fhir_name, model_type, json_file):
+    fhir_json = read_test_data(json_file)
+    for key in REQUIRED_CREATE_FIELDS[fhir_name]:
+        if isinstance(fhir_json[key], list):
+            pass
+            fhir_json[key] = []
+        elif isinstance(fhir_json[key], dict):
+            pass
+            fhir_json[key] = {}
+        else:
+            fhir_json[key] = ""
+    with pytest.raises(ValidationError):
+        create_fhir_model_from_fhir_json(fhir_json, [fhir_type], model_type)
 
 
 @pytest.mark.parametrize(
-    "model_type, json_file", [("Organization", "organization-fhir-example.json")]
+    "fhir_type, model_type, json_file",
+    [(StrictOrganization, Organization, "organization-fhir-example-full.json")],
 )
-def test_validate_required_create_fields(model_type, json_file):
+def test_validate_no_extra_fields(fhir_type, model_type, json_file):
     fhir_json = read_test_data(json_file)
-    for key in REQUIRED_CREATE_FIELDS[model_type]:
+    with pytest.raises(ValidationError):
+        create_fhir_model_from_fhir_json(fhir_json, [fhir_type], model_type)
+
+
+@pytest.mark.parametrize(
+    "fhir_type, fhir_name, model_type, json_file",
+    [
+        (
+            StrictOrganization,
+            "Organization",
+            Organization,
+            "organization-fhir-example-required.json",
+        )
+    ],
+)
+def test_validate_required_create_fields(fhir_type, fhir_name, model_type, json_file):
+    fhir_json = read_test_data(json_file)
+    for key in REQUIRED_CREATE_FIELDS[fhir_name]:
         fhir_json.pop(key)
 
-    with pytest.raises(MissingRequiredFieldForCreate):
-        validate_required_create_fields(fhir_json, model_type)
+    with pytest.raises(ValidationError):
+        create_fhir_model_from_fhir_json(fhir_json, [fhir_type], model_type)
+
+
+def test_email_validates_organization():
+    fhir_json = read_test_data("organization-fhir-example-required.json")
+    fhir_json["contact"][0]["telecom"][0]["value"] = "foobar"
+    with pytest.raises(ValidationError):
+        create_fhir_model_from_fhir_json(fhir_json, [StrictOrganization], Organization)
 
 
 @pytest.mark.parametrize(
-    "json_file", [{"contact": [{"telecom": [{"value": "foobar"}]}]}]
-)
-def test_email_validates(json_file):
-    with pytest.raises(BadEmailFieldError):
-        validate_contact_details(json_file)
-
-
-@pytest.mark.parametrize(
-    "expected_fields, expected_values",
+    "expected_fields, expected_values, json_file",
     [
         (
             ["id", "name", "organisation", "owner"],
             ["f9518c12-6c83-4544-97db-d9dd1d64da97", "Test-Organization"],
+            "organization-fhir-example-required.json",
         )
     ],
 )
-def test_create_product_team_from_fhir_organization(expected_fields, expected_values):
-    fhir_json = read_test_data("organization-fhir-example.json")
+def test_create_product_team_from_fhir_organization(
+    expected_fields, expected_values, json_file
+):
+    fhir_json = read_test_data(json_file)
     core_model = create_product_team_from_fhir_json(fhir_json=fhir_json)
 
     assert isinstance(core_model, ProductTeam)
@@ -159,4 +124,4 @@ def test_product_team_to_fhir_organization(
 
     (result, event) = org.create_product_team(id, name, user)
     fhir_model = create_fhir_model_from_product_team(result)
-    assert isinstance(fhir_model, StrictOrganization)
+    assert isinstance(fhir_model, Organization)
