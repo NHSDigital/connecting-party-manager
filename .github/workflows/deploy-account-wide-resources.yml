@@ -1,25 +1,21 @@
-name: "Deploy: Workspace - Nonprod"
+name: "Deploy: Account Wide Resources - Nonprod"
 
 on:
   workflow_dispatch:
     inputs:
       workspace:
-        description: Workspace to deploy to
+        description: Account to deploy to
         required: true
         default: dev
         type: choice
         options:
           - dev
-          - dev-sandbox
           - ref
-          - ref-sandbox
           - int
-          - int-sandbox
-
 jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
       workspace: ${{ inputs.workspace }}
-      account-wide: non_account_wide
+      account-wide: account_wide
     secrets: inherit # pragma: allowlist secret

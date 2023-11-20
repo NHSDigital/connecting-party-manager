@@ -27,6 +27,6 @@ JSON
   }
 }
 
-resource "aws_secretsmanager_secret" "rowans-test-secret-account" {
-  name = "${terraform.workspace}-rowans-test-secret-account"
+resource "aws_secretsmanager_secret" "dev-apigee-credentials" {
+  name = "${terraform.workspace}-apigee-credentials"
 }
