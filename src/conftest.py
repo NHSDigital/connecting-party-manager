@@ -2,7 +2,12 @@ import json
 
 import boto3
 from event.logging.logger import setup_logger
-from nhs_context_logging.fixtures import log_capture, log_capture_global  # noqa: F401
+from nhs_context_logging.fixtures import (  # noqa: F401
+    log_capture_fixture as log_capture,
+)
+from nhs_context_logging.fixtures import (  # noqa: F401
+    log_capture_global_fixture as log_capture_global,
+)
 from nhs_context_logging.formatters import json_serializer
 from pytest import Config, FixtureRequest, Item, fixture
 

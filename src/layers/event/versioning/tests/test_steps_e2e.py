@@ -7,7 +7,12 @@ from event.logging.step_decorators import logging_step_decorators
 from event.step_chain import StepChain
 from event.versioning.models import LambdaEventForVersioning, VersionHeader
 from event.versioning.steps import versioning_steps
-from nhs_context_logging.fixtures import log_capture, log_capture_global  # noqa: F401
+from nhs_context_logging.fixtures import (  # noqa: F401
+    log_capture_fixture as log_capture,
+)
+from nhs_context_logging.fixtures import (  # noqa: F401
+    log_capture_global_fixture as log_capture_global,
+)
 
 from .example_api import index
 from .example_api.src.v0.steps import steps as v0_steps
