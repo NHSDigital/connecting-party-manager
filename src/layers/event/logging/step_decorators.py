@@ -9,7 +9,6 @@ def log_action(function):
         log_args=["data", "cache"],
         expected_errors=EXPECTED_EXCEPTIONS,
         log_result=True,
-        # prepend_module_name=True,
     )(function)
 
 
