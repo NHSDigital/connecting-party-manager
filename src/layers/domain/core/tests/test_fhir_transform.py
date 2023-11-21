@@ -15,7 +15,9 @@ from domain.fhir.r4.cpm_model import Organization
 from domain.fhir.r4.strict_models import Organization as StrictOrganization
 from pydantic import ValidationError
 
-REQUIRED_CREATE_FIELDS = {"Organization": ["id", "name", "partOf", "contact"]}
+REQUIRED_CREATE_FIELDS = {
+    "Organization": ["resourceType", "id", "name", "partOf", "contact"]
+}
 
 
 @pytest.mark.parametrize(
