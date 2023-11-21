@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, validator
 
 
-class ResponseHeaders(BaseModel):
+class AwsLambdaResponseHeaders(BaseModel):
     content_type: Literal["application/json"] = Field(
         default="application/json", alias="Content-Type"
     )
@@ -17,13 +17,19 @@ class ResponseHeaders(BaseModel):
         return super().dict(*args, by_alias=True, **kwargs)
 
 
-class Response(BaseModel):
+class AwsLambdaResponse(BaseModel):
     statusCode: HTTPStatus
     body: str
-    headers: ResponseHeaders = None
+    headers: AwsLambdaResponseHeaders = None
 
     @validator("headers", always=True)
     def generate_response_headers(headers, values):
         body: str = values["body"]
-        headers = ResponseHeaders(content_length=len(body))
+        headers = AwsLambdaResponseHeaders(content_length=len(body))
         return headers
+
+    def dict(self):
+        """Convert statusCode to native python integer"""
+        data = super().dict()
+        data["statusCode"] = data["statusCode"].value
+        return data

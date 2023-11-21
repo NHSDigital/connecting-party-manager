@@ -3,8 +3,10 @@
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
   },
-  "python.formatting.provider": "none",
-  "cSpell.words": ["Pynamo", "pynamodb"]
+  "cSpell.words": ["Pynamo", "pynamodb"],
+  "editor.formatOnSave": true,
+  "black-formatter.args": ["--line-length=88"]
 }

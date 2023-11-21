@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-17
+- [PI-77] Translation layer for FHIR Organization to ProductTeam
+- [PI-73] Error Handling
+
 ## 2023-11-14
 - [PI-125] FHIR / Swagger / Pydantic generation
 - [PI-000] Dependabot
