@@ -1,14 +1,38 @@
 from functools import wraps
 from typing import Callable, ParamSpec, TypeVar
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 T = TypeVar("T")
 RT = TypeVar("RT")
 P = ParamSpec("P")
 
 
+class ValidationErrorItem(BaseModel):
+    model_name: str
+    is_inbound: bool
+    loc: tuple[str, ...]
+    msg: str
+    type: str
+
+    @property
+    def exception_type(self) -> type[Exception]:
+        if self.is_inbound and self.type == "value_error.missing":
+            return InboundMissingValue
+        elif self.is_inbound:
+            return InboundValidationError
+        return ValidationError
+
+    @property
+    def path(self):
+        return ".".join((self.model_name, *map(str, self.loc)))
+
+
 class InboundValidationError(ValidationError):
+    pass
+
+
+class InboundMissingValue(ValidationError):
     pass
 
 
@@ -26,14 +50,14 @@ def mark_validation_errors_as_inbound(function: Callable[P, RT]):
     return decorator
 
 
-def _path_to_error(model_name: str, error: dict) -> str:
-    return ".".join((model_name, *map(str, error["loc"])))
-
-
-def get_path_error_mapping(validation_error: ValidationError) -> dict[str, str]:
-    """Returns {path.to.field --> error_msg} mapping"""
-    model_name = validation_error.model.__name__
-    return {
-        _path_to_error(model_name=model_name, error=error): error["msg"]
-        for error in validation_error.errors()
-    }
+def parse_validation_error(
+    validation_error: ValidationError,
+) -> list[ValidationErrorItem]:
+    return [
+        ValidationErrorItem(
+            model_name=validation_error.model.__name__,
+            is_inbound=isinstance(validation_error, InboundValidationError),
+            **error_item
+        )
+        for error_item in validation_error.errors()
+    ]

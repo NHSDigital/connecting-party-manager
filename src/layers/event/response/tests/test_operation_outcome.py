@@ -1,13 +1,12 @@
-from string import ascii_letters
-
 from event.response.coding import IssueSeverity, IssueType
 from event.response.operation_outcome import (
     _operation_outcome,
     _operation_outcome_from_validation_error,
 )
 from event.response.response_matrix import CpmCoding, FhirCoding
+from event.response.validation_errors import ValidationErrorItem
 from hypothesis import given
-from hypothesis.strategies import builds, dictionaries, just, text
+from hypothesis.strategies import builds, just, lists, sampled_from
 
 
 @given(
@@ -41,9 +40,19 @@ def test__operation_outcome(operation_outcome: dict):
     operation_outcome=builds(
         _operation_outcome_from_validation_error,
         id=just("id_123"),
-        path_error_mapping=dictionaries(
-            keys=text(min_size=1, alphabet=ascii_letters),
-            values=text(min_size=1, alphabet=ascii_letters),
+        error_items=lists(
+            builds(
+                ValidationErrorItem,
+                type=sampled_from(
+                    (
+                        "value_error.missing",
+                        "other",
+                    )
+                ),
+                msg=just("all_good"),
+                model_name=just("my_model"),
+                loc=just(("path",)),
+            )
         ),
     )
 )
@@ -57,7 +66,7 @@ def test__operation_outcome_from_validation_error(operation_outcome: dict):
     }
 
     for issue in operation_outcome["issue"]:
-        assert type(issue["diagnostics"]) is str
+        assert issue["diagnostics"] == "all_good"
         assert issue["severity"] == IssueSeverity.ERROR
         assert issue["code"] == IssueType.PROCESSING
 

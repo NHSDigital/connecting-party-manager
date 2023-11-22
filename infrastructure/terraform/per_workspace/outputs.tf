@@ -6,6 +6,9 @@ output "environment" {
   value = var.environment
 }
 
+output "invoke_url" {
+  value = module.api_entrypoint.invoke_url
+}
 # output "layers_list" {
 #   value = var.layers
 # }
@@ -44,8 +47,4 @@ output "environment" {
 
 # output "auth_lambda_role_arn" {
 #   value = module.authoriser.lambda_role_arn
-# }
-
-# output "invoke_url" {
-#   value = module.api_entrypoint.invoke_url
 # }

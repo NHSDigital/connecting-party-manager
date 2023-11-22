@@ -1,7 +1,7 @@
 from behave import then
 
-from feature_tests.steps.common import assert_type_matches
-from feature_tests.steps.context import Context
+from feature_tests.domain.steps.common import assert_type_matches
+from feature_tests.domain.steps.context import Context
 
 
 @then("the error is {err:String}")

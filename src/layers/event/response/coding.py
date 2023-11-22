@@ -51,6 +51,11 @@ class FhirCoding(PydanticModelEnum):
         display="Service error",
         system=CODE_SYSTEM,
     )
+    RESOURCE_NOT_FOUND = Coding(
+        code="RESOURCE_NOT_FOUND",
+        display="Resource not found",
+        system=CODE_SYSTEM,
+    )
 
 
 class CpmCoding(PydanticModelEnum):

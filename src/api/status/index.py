@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import boto3
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
 from event.logging.step_decorators import logging_step_decorators
@@ -11,12 +12,21 @@ class Environment(BaseEnvironment):
     DYNAMODB_TABLE: str
 
 
-cache = {**Environment.build().dict()}
+cache = {
+    **Environment.build().dict(),
+    "DYNAMODB_CLIENT": boto3.client("dynamodb"),
+}
 step_decorators = [*logging_step_decorators]
 post_steps = [*response_steps]
 
 
-def _status_check(data, cache):
+class StatusNotOk(Exception):
+    pass
+
+
+def _status_check(data, cache) -> HTTPStatus:
+    if cache["DYNAMODB_TABLE"] not in cache["DYNAMODB_CLIENT"].list_tables():
+        raise StatusNotOk
     return HTTPStatus.OK
 
 
