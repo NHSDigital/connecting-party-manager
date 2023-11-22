@@ -23,9 +23,9 @@ def _status_check(data, cache):
 def handler(event: dict, context=None):
     setup_logger(service_name=__file__)
 
-    step_chain = StepChain(step_chain=[_status_check], step_decorators=step_decorators)
-    step_chain.run(cache=cache, init=event)
+    api_chain = StepChain(step_chain=[_status_check], step_decorators=step_decorators)
+    api_chain.run(cache=cache, init=event)
 
-    post_step_chain = StepChain(step_chain=post_steps, step_decorators=step_decorators)
-    post_step_chain.run(init=step_chain.result)
-    return post_step_chain.result
+    response_chain = StepChain(step_chain=post_steps, step_decorators=step_decorators)
+    response_chain.run(init=api_chain.result)
+    return response_chain.result

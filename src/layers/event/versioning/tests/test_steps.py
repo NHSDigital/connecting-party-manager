@@ -1,16 +1,12 @@
 from pathlib import Path
-from unittest import mock
 
 import pytest
+from event.step_chain import StepChain
 from event.step_chain.tests.utils import step_data
-from event.versioning.constants import VERSION_HEADER_PATTERN
+from event.versioning.constants import VERSION_HEADER_PATTERN, VERSIONING_STEP_ARGS
 from event.versioning.errors import VersionException
 from event.versioning.models import LambdaEventForVersioning, VersionHeader
-from event.versioning.steps import (
-    get_largest_possible_version,
-    get_requested_version,
-    get_steps_by_version,
-)
+from event.versioning.steps import get_largest_possible_version, get_requested_version
 from hypothesis import given
 from hypothesis.strategies import builds, dictionaries, from_regex, none, text
 from pydantic import ValidationError
@@ -62,7 +58,9 @@ def test_largest_possible_version(requested_version: str, expected_version: str)
         data=step_data(
             kwargs={
                 get_requested_version: requested_version,
-                get_steps_by_version: handler_versions,
+                StepChain.INIT: {
+                    VERSIONING_STEP_ARGS.VERSIONED_STEPS: handler_versions
+                },
             }
         )
     )
@@ -78,21 +76,10 @@ def test_largest_possible_version_error(requested_version: str):
             data=step_data(
                 kwargs={
                     get_requested_version: requested_version,
-                    get_steps_by_version: handler_versions,
+                    StepChain.INIT: {
+                        VERSIONING_STEP_ARGS.VERSIONED_STEPS: handler_versions
+                    },
                 }
             )
         )
     assert str(e.value) == "Version not supported"
-
-
-@mock.patch("event.versioning.steps.API_ROOT_DIRNAME", "event/versioning/tests")
-def test_get_versioned_steps():
-    from .example_api import index
-
-    assert get_steps_by_version(
-        data=step_data(init={"api_index_file_path": index.__file__})
-    ) == {
-        "0": "v0_steps",
-        "1": "v1_steps",
-        "3": "v3_steps",
-    }

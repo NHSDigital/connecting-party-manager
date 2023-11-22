@@ -2,5 +2,8 @@ import re
 
 VERSION_HEADER_PATTERN = r"^(\d+)$"
 VERSION_RE = re.compile(r"^v(\d+)$")
-API_ROOT_DIRNAME = "api"
-VERSIONED_HANDLER_GLOB = "src/v*/steps.py"
+
+
+class VERSIONING_STEP_ARGS:
+    VERSIONED_STEPS = "versioned_steps"
+    EVENT = "event"
