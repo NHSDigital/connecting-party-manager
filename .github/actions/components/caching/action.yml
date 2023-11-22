@@ -26,6 +26,7 @@ runs:
           **/fhir/r4/*models.py
           .tool-versions
           pyproject.toml
+          poetry.lock
           **/make.py
           **/infrastructure/swagger/*.yaml
           **/infrastructure/swagger/**/*.yaml
