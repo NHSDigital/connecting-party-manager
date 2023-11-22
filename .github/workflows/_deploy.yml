@@ -12,7 +12,7 @@ on:
       account-wide:
         required: false
         type: string
-        default: ""
+        default: "non_account_wide"
 
 permissions:
   id-token: write

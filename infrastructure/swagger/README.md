@@ -31,3 +31,13 @@ make swagger--merge
 ```
 
 however since this is a dependency of the terraform plan, it is sufficient to run `make terraform--plan` and the OpenAPI 3 specs will be updated accordingly.
+
+## If you have swagger generation issues
+
+If you delete your dist folder when doing work on the swagger you can end up with some odd behaviour, if this is the case then you should do
+
+```
+make swagger--clean
+```
+
+You should try to do this instead of deleting the dist folder to ensure that everything works correctly

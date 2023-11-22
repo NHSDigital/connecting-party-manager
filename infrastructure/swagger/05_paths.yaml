@@ -55,6 +55,8 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
+      security: #This should be removed in the future if its problematic, helps proxygen be happy
+        - app-level0: []
 
   /Organization:
     post:
@@ -65,6 +67,8 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createProductTeam}
+      security:
+        - app-level0: []
 
   /Organization/{id}:
     get:
@@ -84,3 +88,5 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}
+      security:
+        - app-level0: []

@@ -1,4 +1,4 @@
-name: "Deploy - parameters: Persistent Workspace"
+name: "Deploy: Parameters - Nonprod"
 
 on:
   workflow_dispatch:
