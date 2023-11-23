@@ -1,5 +1,10 @@
 # Changelog
 
+## 2023-11-23
+- [PI-110] Step chain refactor
+- [PI-100] NHS Context logging
+- Dependabot: pydantic, datamodel-codegen
+
 ## 2023-11-22
 - [PI-120] Initial Apigee instance
 
