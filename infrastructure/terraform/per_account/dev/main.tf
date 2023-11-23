@@ -1,8 +1,8 @@
 resource "aws_resourcegroups_group" "resource_group" {
-  name        = "${local.project}--${replace(terraform.workspace, "", "-")}--account-wide-resource-group"
+  name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--account-wide-resource-group"
   description = "${terraform.workspace} account-wide resource group."
   tags = {
-    Name           = "${local.project}--${replace(terraform.workspace, "", "-")}--account-wide-resource-group"
+    Name           = "${local.project}--${replace(terraform.workspace, "_", "-")}--account-wide-resource-group"
     CreatedOn      = var.updated_date
     LastUpdated    = var.updated_date
     ExpirationDate = var.expiration_date

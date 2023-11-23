@@ -11,8 +11,9 @@ SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
 SWAGGER_FHIR_BASE = $(SWAGGER_DIST)/fhir-base
 SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
+SWAGGER_APIGEE = $(SWAGGER_DIST)/apigee/swagger.yaml
 
-swagger--merge: $(SWAGGER_AWS) $(SWAGGER_PUBLIC) ## Updates swagger builds from the components in the infrastructure/swagger/ directory.
+swagger--merge: $(SWAGGER_AWS) $(SWAGGER_PUBLIC) $(SWAGGER_APIGEE) ## Updates swagger builds from the components in the infrastructure/swagger/ directory.
 swagger--clean:  ## Removes swagger builds.
 	[[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :
 	[[ -d $(SWAGGER_DIST) ]] && rm -r $(SWAGGER_DIST) || :
@@ -45,3 +46,8 @@ $(SWAGGER_PUBLIC): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -t
 	@env MERGE_PUBLIC=1 bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 	npx --yes @redocly/cli lint $(SWAGGER_PUBLIC) --skip-rule security-defined || ([[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :; exit 1)
 	touch $(SWAGGER_PUBLIC)
+
+$(SWAGGER_APIGEE): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
+	@env MERGE_APIGEE=1 bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
+	npx --yes @redocly/cli lint $(SWAGGER_APIGEE) --skip-rule security-defined || ([[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :; exit 1)
+	touch $(SWAGGER_APIGEE)

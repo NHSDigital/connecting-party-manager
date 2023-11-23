@@ -41,6 +41,14 @@ Do `make build` every time you would like to pick up and install new local/proje
 
 The first time it will also set up your pre-commit hooks.
 
+### Proxygen - WIP
+
+If you wish to deploy proxies to Apigee then we use the proxygen-cli which is installed as part of the project
+
+There is also some credential setup that is required, at this stage we do not have a standard set of "dev" credentials but when we do then this section will be completed - for now here is the link to the README for the cli
+
+https://github.com/NHSDigital/proxygen-cli
+
 ### AWS SSO Setup
 
 This project uses Single Sign On (SSO) for consuming AWS services.

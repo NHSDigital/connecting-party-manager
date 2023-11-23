@@ -12,13 +12,16 @@ PATH_TO_SWAGGER_BUILD=${PATH_TO_SWAGGER_DIST}/build
 PATH_TO_SWAGGER_AWS=${PATH_TO_SWAGGER_DIST}/aws
 PATH_TO_SWAGGER_PUBLIC=${PATH_TO_SWAGGER_DIST}/public
 PATH_TO_SWAGGER_FHIR_BASE=${PATH_TO_SWAGGER_DIST}/fhir-base
+PATH_TO_SWAGGER_APIGEE=${PATH_TO_SWAGGER_DIST}/apigee
 
 mkdir -p ${PATH_TO_SWAGGER_AWS}
 mkdir -p ${PATH_TO_SWAGGER_PUBLIC}
 mkdir -p ${PATH_TO_SWAGGER_BUILD}
+mkdir -p ${PATH_TO_SWAGGER_APIGEE}
 
 AWS_SWAGGER_FILE=${PATH_TO_SWAGGER_AWS}/swagger.yaml
 PUBLIC_SWAGGER_FILE=${PATH_TO_SWAGGER_PUBLIC}/swagger.yaml
+APIGEE_SWAGGER_FILE=${PATH_TO_SWAGGER_APIGEE}/swagger.yaml
 _BASE_SWAGGER_FILE=${PATH_TO_SWAGGER_BUILD}/_00_fhir_merge.yaml
 _INITIAL_MERGE_SWAGGER_FILE=${PATH_TO_SWAGGER_BUILD}/_01_initial_merge.yaml
 _CLEANED_SWAGGER_FILE=${PATH_TO_SWAGGER_BUILD}/_02_clean.yaml
@@ -43,12 +46,25 @@ cat ${_INITIAL_MERGE_SWAGGER_FILE} |
     yq 'del(.x-ibm-configuration)' |
     yq 'del(.components.schemas.*.discriminator)' |
     yq 'explode(.)' |
-    yq 'del(.x-*)' |
     yq '(.. | select(style == "single")) style |= "double"' |
     # Remove null dead-ends
     yq 'del(.. | select(. == null))' \
         > ${_CLEANED_SWAGGER_FILE}
 validate_yaml ${_CLEANED_SWAGGER_FILE}
+
+# Remove fields not required for apigee
+if [[ ${MERGE_APIGEE} == "1" ]]; then
+    cat ${_CLEANED_SWAGGER_FILE} |
+        yq 'del(.paths.*.*.x-amazon-apigateway-integration)' |
+        yq 'del(.x-definitions)' |
+        yq 'del(.security)' |
+        yq 'del(.tags)' |
+        yq 'del(.paths.*.*.tags)' |
+        yq 'del(.components.securitySchemes."${authoriser_name}")' \
+            > ${APIGEE_SWAGGER_FILE}
+    echo "Generated ${APIGEE_SWAGGER_FILE}"
+    validate_yaml ${APIGEE_SWAGGER_FILE}
+fi
 
 # Remove fields not required for public docs
 # * AWS specific stuff, including security & lambdas
@@ -78,7 +94,9 @@ fi
 # * 4XX codes
 if [[ ${MERGE_AWS} == "1" ]]; then
     cat ${_CLEANED_SWAGGER_FILE} |
-        yq 'del(.. | select(has("4XX")).4XX)' > ${AWS_SWAGGER_FILE}
+        yq 'del(.x-*)' |
+        yq 'del(.. | select(has("4XX")).4XX)' \
+            > ${AWS_SWAGGER_FILE}
     echo "Generated ${AWS_SWAGGER_FILE}"
     validate_yaml ${AWS_SWAGGER_FILE}
 fi

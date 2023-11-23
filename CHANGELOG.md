@@ -1,5 +1,8 @@
 # Changelog
 
+## 2023-11-22
+- [PI-120] Initial Apigee instance
+
 ## 2023-11-17
 - [PI-77] Translation layer for FHIR Organization to ProductTeam
 - [PI-73] Error Handling

@@ -1,4 +1,4 @@
-name: "Deploy - parameters: Production"
+name: "Deploy: Parameters - Production"
 
 on:
   workflow_dispatch:
