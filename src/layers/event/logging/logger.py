@@ -9,4 +9,7 @@ def setup_logger(service_name: str, uuid: str = None):
     if uuid is None:
         uuid = str(uuid4())
     app_logger._is_setup = False
-    app_logger.setup(service_name="-".join((service_name, uuid)))
+    app_logger.setup(
+        service_name="-".join((service_name, uuid)),
+        config_kwargs={"prepend_module_name": True},
+    )
