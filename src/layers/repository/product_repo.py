@@ -12,7 +12,8 @@ from domain.core.product import (
 )
 from repository.keys import ods_pk, product_key_sk, product_pk, product_relationship_sk
 
-from .errors import NotFoundException, Repository
+from .errors import NotFoundException
+from .repository import Repository
 from .utils import marshall, unmarshall
 
 

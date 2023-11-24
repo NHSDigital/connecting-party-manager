@@ -1,5 +1,5 @@
 import pytest
-from repository.utils import marshall_value, to_dict, unmarshall_value
+from repository.utils import marshall_value, unmarshall_value
 
 
 class Nested:
@@ -7,24 +7,6 @@ class Nested:
         if depth > 0:
             self.child = Nested(depth - 1)
         self.depth = depth
-
-
-@pytest.mark.parametrize(
-    ["subject", "expected"],
-    [
-        [0, 0],
-        [1.0, 1.0],
-        [True, True],
-        ["", ""],
-        [{"foo": 1}, {"foo": 1}],
-        [Nested(), {"depth": 0}],
-        [Nested(1), {"depth": 1, "child": {"depth": 0}}],
-        [Nested(2), {"depth": 2, "child": {"depth": 1, "child": {"depth": 0}}}],
-    ],
-)
-def test__to_dict(subject, expected):
-    actual = to_dict(subject)
-    assert actual == expected
 
 
 @pytest.mark.parametrize(
