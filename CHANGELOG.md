@@ -1,5 +1,8 @@
 # Changelog
 
+## 2023-11-24
+- [PI-124] Revert Domain to AR model
+
 ## 2023-11-23
 - [PI-110] Step chain refactor
 - [PI-100] NHS Context logging
