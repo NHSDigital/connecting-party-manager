@@ -4,7 +4,12 @@ from event.logging.models import StepLog
 from event.logging.step_decorators import logging_step_decorators
 from event.step_chain import StepChain
 from event.step_chain.tests.utils import step_data
-from nhs_context_logging.fixtures import log_capture, log_capture_global  # noqa: F401
+from nhs_context_logging.fixtures import (  # noqa: F401
+    log_capture_fixture as log_capture,
+)
+from nhs_context_logging.fixtures import (  # noqa: F401
+    log_capture_global_fixture as log_capture_global,
+)
 
 
 def test_logging_step_decorators(log_capture):
@@ -78,7 +83,7 @@ def test_logging_step_decorators_with_fatal_error(log_capture):
         parsed_log.cache is not cache
     )  # Make sure that the log doesn't have a direct reference to global data
     assert parsed_log.cache == cache
-    assert isinstance(parsed_log.action_result, MyException)
+    assert parsed_log.action_result == None
     assert (
         parsed_log.action
         == "src.layers.event.logging.tests.test_step_decorators.a_function"
@@ -122,7 +127,7 @@ def test_logging_step_decorators_with_non_fatal_error(log_capture):
         parsed_log.cache is not cache
     )  # Make sure that the log doesn't have a direct reference to global data
     assert parsed_log.cache == cache
-    assert isinstance(parsed_log.action_result, MyException)
+    assert parsed_log.action_result == None
     assert (
         parsed_log.action
         == "src.layers.event.logging.tests.test_step_decorators.a_function"
