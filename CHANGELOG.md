@@ -2,6 +2,7 @@
 
 ## 2023-11-24
 - [PI-124] Revert Domain to AR model
+- [PI-130] Move Check Branch to the beginning of CI Pipeline
 
 ## 2023-11-23
 - [PI-110] Step chain refactor
