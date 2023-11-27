@@ -36,4 +36,3 @@ class Organization(BaseModel):
     id: str = Field(min_length=1)
     name: str = Field(min_length=1)
     partOf: Reference
-    contact: list[OrganizationContact] = Field(min_items=1, max_items=1)

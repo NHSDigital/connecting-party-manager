@@ -1,13 +1,11 @@
-from unittest import mock
 from uuid import UUID
 
 import pytest
-from domain.core.error import BadEntityNameError, BadUuidError
-from domain.core.product import ProductTeam, ProductTeamCreatedEvent
+from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
 from domain.core.root import Root
+from pydantic import ValidationError
 
 
-@mock.patch("domain.core.product.validate_ods_code")
 @pytest.mark.parametrize(
     "id,name",
     [
@@ -16,26 +14,25 @@ from domain.core.root import Root
         [UUID("f9518c12-6c83-4544-97db-d9dd1d64da97"), "Third"],
     ],
 )
-def test__create_product_team(_mocked_validate_ods_code, id: str, name: str):
-    org = Root.create_ods_organisation("AB123", "Test")
-    user = Root.create_user("test@example.org", "Test User")
+def test__create_product_team(id: str, name: str):
+    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
 
-    (result, event) = org.create_product_team(id, name, user)
+    result = org.create_product_team(id=id, name=name)
+    event = result.events[0]
 
     assert isinstance(result, ProductTeam), "Created ProductTeam"
     assert result.id == id, "id mismatch"
     assert result.name == name, "name mismatch"
-    assert result.organisation is org, "organisation mismatch"
-    assert result.owner is user, "owner mismatch"
+    assert result.ods_code == org.ods_code, "ods_code"
 
+    assert len(result.events) == 1
+    event = result.events[0]
     assert isinstance(event, ProductTeamCreatedEvent), "Event type mismatch"
-    assert event.product_team.id == id, "event id mismatch"
-    assert event.product_team.name == name, "event name mismatch"
-    assert event.product_team.organisation is org, "event organisation mismatch"
-    assert event.product_team.owner is user, "event owner mismatch"
+    assert event.id == id, "id mismatch"
+    assert event.name == name, "name mismatch"
+    assert result.ods_code == org.ods_code, "organisation.id mismatch"
 
 
-@mock.patch("domain.core.product.validate_ods_code")
 @pytest.mark.parametrize(
     "id,name",
     [
@@ -43,24 +40,21 @@ def test__create_product_team(_mocked_validate_ods_code, id: str, name: str):
         ["  ", "Second"],
     ],
 )
-def test__create_product_team_bad_id(_mocked_validate_ods_code, id: str, name: str):
-    org = Root.create_ods_organisation("AB123", "Test")
-    user = Root.create_user("test@example.org", "Test User")
+def test__create_product_team_bad_id(id: str, name: str):
+    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
 
-    with pytest.raises(BadUuidError):
-        org.create_product_team(id=id, name=name, owner=user)
+    with pytest.raises(ValidationError):
+        org.create_product_team(id=id, name=name)
 
 
-@mock.patch("domain.core.product.validate_ods_code")
 @pytest.mark.parametrize(
     "id,name",
     [
         ["ae28e872-843d-4e2e-9f0b-b5d3c42d441f", " "],
     ],
 )
-def test__create_product_team_bad_name(_mocked_validate_ods_code, id: str, name: str):
-    org = Root.create_ods_organisation("AB123", "Test")
-    user = Root.create_user("test@example.org", "Test User")
+def test__create_product_team_bad_name(id: str, name: str):
+    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
 
-    with pytest.raises(BadEntityNameError):
-        org.create_product_team(id=id, name=name, owner=user)
+    with pytest.raises(ValidationError):
+        org.create_product_team(id=id, name=name)

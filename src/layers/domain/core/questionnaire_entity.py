@@ -1,20 +1,22 @@
-from abc import ABC
+from uuid import UUID
+
+from pydantic import BaseModel, Field
 
 from .error import DuplicateError, NotFoundError
 from .questionnaire import Question, Questionnaire
+from .validation import ENTITY_NAME_REGEX
 
 GLOBAL = "GLOBAL"
 
 
-class Dataset:
+class Dataset(BaseModel):
     """
     The data collected by Questionnaires is held in a consolidated bag of
     properties, called a dataset.  Questionnaires may overlap and share the same
     underlying properties, should they wish, or can be completely isolated.
     """
 
-    def __init__(self):
-        self._values = []
+    _values: dict[str, any] = (lambda: {})()
 
     def set_values(self, questionnaire: Questionnaire, values: dict[str, any]):
         """
@@ -33,7 +35,7 @@ class Dataset:
         raise NotImplementedError()
 
 
-class QuestionnaireEntity(ABC):
+class QuestionnaireEntity(BaseModel):
     """
     A QuestionnaireEntity represents an entity that can store and process
     questionnaire data.  It maintains one ore more DataSet where answers are
@@ -45,8 +47,10 @@ class QuestionnaireEntity(ABC):
     why this logic is shared here.
     """
 
-    def __init__(self):
-        self._datasets = {}
+    id: UUID
+    name: str = Field(regex=ENTITY_NAME_REGEX)
+    _questionnaires: list[str] = (lambda: [])()
+    _datasets: dict[str, Dataset] = (lambda: {})()
 
     def add_dataset(self, index: str = GLOBAL) -> Dataset:
         """

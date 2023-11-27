@@ -72,6 +72,5 @@ def clear_dynamodb_table_(request: FixtureRequest):
         table_name = read_terraform_output("dynamodb_table_name.value")
         clear_dynamodb_table(client=client, table_name=table_name)
         yield
-        clear_dynamodb_table(client=client, table_name=table_name)
     else:
         yield

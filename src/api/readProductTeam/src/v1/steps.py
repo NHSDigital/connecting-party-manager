@@ -1,5 +1,5 @@
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.product import ProductTeam
+from domain.core.product_team import ProductTeam
 from event.step_chain import StepChain
 
 

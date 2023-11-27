@@ -2,8 +2,10 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID
 
-from .entity import Entity
+from pydantic import BaseModel, Field
+
 from .error import DuplicateError
+from .validation import ENTITY_NAME_REGEX
 
 
 class QuestionType(Enum):
@@ -17,25 +19,24 @@ class QuestionType(Enum):
     DATE_TIME = datetime
 
 
-class Question:
+class Question(BaseModel):
     """
     A single Questionnaire Question
     """
 
-    def __init__(self, name: str, type: QuestionType, multiple: bool):
-        self.name = name
-        self.type = type
-        self.multiple = multiple
+    name: str
+    type: QuestionType
+    multiple: bool
 
 
-class Questionnaire(Entity[UUID]):
+class Questionnaire(BaseModel):
     """
     A Questionnaire represents a collection of Questions, in a specific order.
     """
 
-    def __init__(self, id: str, name: str):
-        super().__init__(id=id, name=name)
-        self._questions: list[Question] = []
+    id: UUID
+    name: str = Field(regex=ENTITY_NAME_REGEX)
+    _questions: list[Question] = (lambda: [])()
 
     def __contains__(self, question_name: str) -> bool:
         """
@@ -55,7 +56,7 @@ class Questionnaire(Entity[UUID]):
         """
         if name in self:
             raise DuplicateError(f"Question exists: {name}")
-        result = Question(name, type=type, multiple=multiple)
+        result = Question(name=name, type=type, multiple=multiple)
         self._questions.append(result)
         return result
 

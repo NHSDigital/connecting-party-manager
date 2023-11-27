@@ -1,6 +1,5 @@
 from http import HTTPStatus
 
-from domain.core.error import InvalidOdsCodeError
 from event.versioning.errors import VersionException
 
 from .coding import CpmCoding, FhirCoding
@@ -28,7 +27,6 @@ FHIR_CODING_TO_HTTP_STATUS = {
 EXCEPTIONS_TO_FHIR_CODING = {
     # Part 2 of the error matrix here
     InboundValidationError: FhirCoding.VALIDATION_ERROR,
-    InvalidOdsCodeError: FhirCoding.VALIDATION_ERROR,
     VersionException: FhirCoding.ACCESS_DENIED,
 }
 
