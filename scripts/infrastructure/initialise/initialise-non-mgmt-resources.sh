@@ -12,7 +12,7 @@ AWS_REGION_NAME="eu-west-2"
 # Check we're not running this against MGMT
 #
 . "./scripts/aws/helpers.sh"
-if ! _validate_current_account "MGMT"; then
+if _validate_current_account "MGMT"; then
   echo "Please login to non-mgmt profile before running this script"
   exit 1
 fi

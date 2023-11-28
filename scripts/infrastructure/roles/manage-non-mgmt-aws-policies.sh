@@ -14,7 +14,7 @@ ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
 # Check we're not running this against MGMT
 #
 . "./scripts/aws/helpers.sh"
-if ! _validate_current_account "MGMT"; then
+if _validate_current_account "MGMT"; then
   echo "Please login to non-mgmt profile before running this script"
   exit 1
 fi
@@ -35,7 +35,6 @@ function _update_policy() {
     for role in "${role_names[@]}"; do
       if [ "${role}" == "NHSDevelopmentRole" ]; then
         if ! _validate_current_account "PROD"; then
-          echo "Non-prod"
           aws iam attach-role-policy \
             --role-name "${role}" \
             --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
@@ -56,7 +55,6 @@ function _update_policy() {
       if [[ ! $attached_policies == *"\"PolicyName\": \"${policy_name}\""* ]]; then
         if [ "${role}" == "NHSDevelopmentRole" ]; then
           if ! _validate_current_account "PROD"; then
-            echo "Non-prod"
             aws iam attach-role-policy \
               --role-name "${role}" \
               --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
@@ -110,3 +108,8 @@ _update_policy "NHSDeploymentPolicy" "deployment" "NHSDeploymentRole" "NHSDevelo
 # used in SSO
 #
 _update_policy "NHSSupportPolicy" "support" "NHSDevelopmentRole"
+
+#
+# Create the NHSIntegrationPolicy that will be used for CI Test access
+#
+_update_policy "NHSIntegrationPolicy" "integration-test" "NHSIntegrationRole"
