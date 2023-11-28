@@ -16,10 +16,11 @@ function _terraform() {
     local current_date
     local terraform_dir
     local expiration_time
-    local terraform_role_name="NHSDeploymentRole"
+    local terraform_role_name="NHSDevelopmentRole"
     workspace=$(_get_workspace_name $TERRAFORM_WORKSPACE) || return 1
     aws_account_id=$(_get_aws_account_id "$workspace") || return 1
     if [ "$RUNNING_IN_CI" = 1 ]; then
+        terraform_role_name="NHSDeploymentRole"
         # Ask Github Actions to mask the Account ID in the logs
         echo "::add-mask:: ${aws_account_id}"
     fi
