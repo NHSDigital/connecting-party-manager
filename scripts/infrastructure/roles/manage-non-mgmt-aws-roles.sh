@@ -10,7 +10,7 @@ AWS_REGION_NAME="eu-west-2"
 ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
 
 
-SECRET_MGMT="nhse-cpm--dev--mgmt-account-id-v1.0.0"
+MGMT_ID_PARAMETER_STORE="nhse-cpm--dev--mgmt-account-id-v1.0.0"
 
 
 #
@@ -22,9 +22,9 @@ if _validate_current_account "MGMT"; then
   exit 1
 fi
 
-if aws secretsmanager describe-secret --secret-id "$SECRET_MGMT" --region "$AWS_REGION_NAME" &> /dev/null; then
+if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" &> /dev/null; then
   # Secret exists, retrieve its value
-  MGMT_ACCOUNT_ID=$(aws secretsmanager get-secret-value --secret-id "$SECRET_MGMT" --region "$AWS_REGION_NAME" --query 'SecretString' --output text)
+  MGMT_ACCOUNT_ID=$(aws secretsmanager get-secret-value --secret-id "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" --query 'SecretString' --output text)
 
   #
   # Create the NHSDeploymentRole that will be used for deployment and CI/CD
@@ -67,8 +67,8 @@ if aws secretsmanager describe-secret --secret-id "$SECRET_MGMT" --region "$AWS_
   fi
 else
   # Secret doesn't exist, create it with an empty string value
-  echo "Secret ${SECRET_MGMT} doesn't exist. Creating..."
-  aws secretsmanager create-secret --name "$SECRET_MGMT" --region "$AWS_REGION_NAME" --secret-string "TEMP_VALUE"
+  echo "Secret ${MGMT_ID_PARAMETER_STORE} doesn't exist. Creating..."
+  aws secretsmanager create-secret --name "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" --secret-string "TEMP_VALUE"
   echo "Secret created with an empty string value. Please update it's value and run this script again."
   exit 1
 fi
