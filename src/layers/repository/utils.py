@@ -1,4 +1,5 @@
-from enum import Enum
+from enum import StrEnum
+from typing import Any
 
 from repository.errors import UnableToUnmarshall
 
@@ -6,8 +7,8 @@ from repository.errors import UnableToUnmarshall
 def marshall_value(value):
     if value is None:
         return {"Null": True}
-    if isinstance(value, Enum):
-        return {"S": str(value._value_)}
+    if isinstance(value, StrEnum):
+        return {"S": str(value)}
     if isinstance(value, bool):  # isinstance(True,int) == True
         return {"B": value}
     if isinstance(value, int) or isinstance(value, float):
@@ -23,7 +24,11 @@ def marshall(d):
     return marshall_value(d)["M"]
 
 
-def unmarshall_value(record: dict[str, any]):
+def _unmarshall_mapping(mapping: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    return {k: unmarshall_value(v) for (k, v) in mapping["M"].items()}
+
+
+def unmarshall_value(record: dict[str, Any]):
     if "Null" in record:
         return None
     if "S" in record:
@@ -37,9 +42,9 @@ def unmarshall_value(record: dict[str, any]):
     if "L" in record:
         return [unmarshall_value(v) for v in record["L"]]
     if "M" in record:
-        return {k: unmarshall_value(v) for (k, v) in record["M"].items()}
+        return _unmarshall_mapping(mapping=record)
     raise UnableToUnmarshall(f"Unhandled record {record}")
 
 
-def unmarshall(record):
-    return unmarshall_value({"M": record})
+def unmarshall(record) -> dict[str, Any]:
+    return _unmarshall_mapping({"M": record})

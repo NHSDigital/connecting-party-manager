@@ -24,13 +24,15 @@ def test__create_product_team(id: str, name: str):
     assert result.id == id, "id mismatch"
     assert result.name == name, "name mismatch"
     assert result.ods_code == org.ods_code, "ods_code"
+    assert result.ods_name == org.name, "ods_code"
 
     assert len(result.events) == 1
     event = result.events[0]
     assert isinstance(event, ProductTeamCreatedEvent), "Event type mismatch"
     assert event.id == id, "id mismatch"
     assert event.name == name, "name mismatch"
-    assert result.ods_code == org.ods_code, "organisation.id mismatch"
+    assert event.ods_code == org.ods_code, "organisation.id mismatch"
+    assert event.ods_name == org.name, "ods_code"
 
 
 @pytest.mark.parametrize(

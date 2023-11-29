@@ -12,12 +12,13 @@ class ProductCreatedEvent(Event):
     Raised when a new Product is created
     """
 
-    def __init__(self, id, name, type, product_team_id, ods_code, status):
+    def __init__(self, id, name, type, product_team_id, ods_code, ods_name, status):
         self.id = id
         self.name = name
         self.type = type
         self.product_team_id = product_team_id
         self.ods_code = ods_code
+        self.ods_name = ods_name
         self.status = status
 
 
@@ -171,6 +172,7 @@ class Product(AggregateRoot):
     status: ProductStatus = Field(default=ProductStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
+    ods_name: str
     relationships: dict[UUID, Relationship] = (lambda: {})()
     keys: dict[str, ProductKey] = (lambda: {})()
 

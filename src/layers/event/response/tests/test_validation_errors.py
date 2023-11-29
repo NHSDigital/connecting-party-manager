@@ -1,8 +1,8 @@
 import pytest
 from event.response.validation_errors import (
     InboundValidationError,
-    get_path_error_mapping,
     mark_validation_errors_as_inbound,
+    parse_validation_error,
 )
 from pydantic import BaseModel, ValidationError
 
@@ -65,9 +65,10 @@ def _get_validation_error(model_params: dict) -> ValidationError:
         ),
     ],
 )
-def test_get_path_error_mapping(model_params, expected_path_error_mapping):
+def test_parse_validation_error(model_params, expected_path_error_mapping: dict):
     validation_error = _get_validation_error(model_params=model_params)
-    path_error_mapping = get_path_error_mapping(validation_error=validation_error)
+    error_items = parse_validation_error(validation_error=validation_error)
+    path_error_mapping = {error_item.path: error_item.msg for error_item in error_items}
     assert path_error_mapping == expected_path_error_mapping
 
 

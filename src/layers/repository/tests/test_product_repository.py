@@ -1,5 +1,6 @@
 from uuid import UUID
 
+import boto3
 import pytest
 from domain.core.product import (
     ProductKeyType,
@@ -39,7 +40,9 @@ def test__product_repository():
     subject.add_key("XXX-YYY-ZZZ", ProductKeyType.PRODUCT_ID)
     subject.add_key("1234567890", ProductKeyType.ACCREDITED_SYSTEM_ID)
 
-    product_repo = ProductRepository(table_name=table_name)
+    product_repo = ProductRepository(
+        table_name=table_name, dynamodb_client=boto3.client("dynamodb")
+    )
 
     product_repo.write(subject)
 

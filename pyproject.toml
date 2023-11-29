@@ -39,6 +39,10 @@ proxygen-cli = "^2.0.15"
 moto = "^4.2.9"
 urllib3 = "<2"
 
+
+[tool.poetry.group.local.dependencies]
+ipython = "^8.17.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

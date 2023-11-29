@@ -5,7 +5,7 @@ from behave import register_type
 from domain.core.product_team import ProductTeamCreatedEvent
 from pydantic import ValidationError
 
-from feature_tests.steps.context import Context
+from feature_tests.domain.steps.context import Context
 
 
 @parse.with_pattern(

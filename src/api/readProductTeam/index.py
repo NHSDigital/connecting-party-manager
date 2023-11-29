@@ -1,3 +1,4 @@
+import boto3
 from event.api_step_chain import execute_step_chain
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
@@ -9,8 +10,11 @@ class Environment(BaseEnvironment):
     DYNAMODB_TABLE: str
 
 
-cache = {**Environment.build().dict()}
 versioned_steps = {"1": v1_steps}
+cache = {
+    **Environment.build().dict(),
+    "DYNAMODB_CLIENT": boto3.client("dynamodb"),
+}
 
 
 def handler(event: dict, context=None):

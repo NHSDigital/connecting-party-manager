@@ -39,7 +39,14 @@ def get_steps_by_version(
     return versioned_steps
 
 
-@mock.patch.dict("os.environ", {"DYNAMODB_TABLE": "hiya"}, clear=True)
+@mock.patch.dict(
+    "os.environ",
+    {
+        "DYNAMODB_TABLE": "hiya",
+        "AWS_DEFAULT_REGION": "eu-west-2",
+    },
+    clear=True,
+)
 @pytest.mark.parametrize("api", API_LAMBDAS)
 def test_no_zombie_versions(api: Path):
     index_file_path = api / "index.py"
