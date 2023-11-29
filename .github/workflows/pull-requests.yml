@@ -60,6 +60,8 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
 
   build-base:
     runs-on: [self-hosted, ci]
@@ -67,10 +69,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BRANCH_NAME }} # ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
           command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
           cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   workflow--codebase-checks:
@@ -132,7 +136,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BRANCH_NAME }} # ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
         with:
           command: plan
@@ -142,6 +146,8 @@ jobs:
         with:
           command: apply
           workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+          save-to-cache: "true"
+          restore-from-cache: "false"
           cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   terraform-head-build:
@@ -168,6 +174,8 @@ jobs:
       - uses: ./.github/actions/terraform/
         with:
           command: apply
+          save-to-cache: "true"
+          restore-from-cache: "false"
           workspace: ${{ needs.create-workspace-name.outputs.workspace }}
 
   test--integration:

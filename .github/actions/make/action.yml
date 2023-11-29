@@ -12,6 +12,14 @@ inputs:
     description: "[Optional] Cache suffix (e.g. 'base')"
     required: false
     default: ""
+  restore-from-cache:
+    description: "[Optional] restore from cache?"
+    required: false
+    default: "true"
+  save-to-cache:
+    description: "[Optional] save to cache?"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -19,9 +27,11 @@ runs:
       run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
       shell: bash
 
-    - name: Synchronise the cache
+    - name: Restore from the cache
+      if: ${{ inputs.restore-from-cache == 'true' }}
       uses: ./.github/actions/components/caching/
       with:
+        save-or-restore: "restore"
         cache-suffix: ${{ inputs.cache-suffix }}
 
     - name: Configure AWS Credentials
@@ -55,3 +65,10 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
         AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
+
+    - name: Save to the cache
+      if: ${{ inputs.save-to-cache == 'true' }}
+      uses: ./.github/actions/components/caching/
+      with:
+        save-or-restore: "save"
+        cache-suffix: ${{ inputs.cache-suffix }}

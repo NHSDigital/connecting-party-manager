@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DynamoDbIntegrationPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:UpdateItem",
+        "dynamodb:GetItem",
+        "dynamodb:ListTables"
+      ],
+      "Resource": ["arn:aws:dynamodb:*:${ACCOUNT_ID}:table/*"]
+    },
+    {
+      "Sid": "KMSIntegrationPermissions",
+      "Effect": "Allow",
+      "Action": ["kms:Decrypt"],
+      "Resource": ["*"]
+    }
+  ]
+}

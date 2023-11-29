@@ -59,6 +59,8 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
 
   helpers--truststore-pull:
     needs: [get-branch-from-workflow-file, build]
@@ -84,6 +86,8 @@ jobs:
           workspace: ${{ env.WORKSPACE }}
           account-wide: ${{ env.ACCOUNT_WIDE }}
           parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
+          restore-from-cache: "true"
+          save-to-cache: "true"
 
   terraform--plan:
     needs: [get-branch-from-workflow-file, terraform--init]
@@ -98,6 +102,8 @@ jobs:
           workspace: ${{ env.WORKSPACE }}
           account-wide: ${{ env.ACCOUNT_WIDE }}
           parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
+          restore-from-cache: "true"
+          save-to-cache: "true"
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
@@ -112,6 +118,8 @@ jobs:
           workspace: ${{ env.WORKSPACE }}
           account-wide: ${{ env.ACCOUNT_WIDE }}
           parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
+          restore-from-cache: "true"
+          save-to-cache: "true"
 
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
