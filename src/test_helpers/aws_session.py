@@ -22,7 +22,7 @@ def _get_access_token(account_id: str = None):
     sts_client = boto3.client("sts")
     current_time = datetime.utcnow().timestamp()
     response = sts_client.assume_role(
-        RoleArn=f"arn:aws:iam::{account_id}:role/NHSIntegrationRole",
+        RoleArn=f"arn:aws:iam::{account_id}:role/NHSTestCIRole",
         RoleSessionName=f"role--{current_time}",
     )
 

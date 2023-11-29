@@ -25,6 +25,7 @@ else
     ENV="int"
   elif _validate_current_account "TEST"; then
     ENV="test"
+  fi
 fi
 MGMT_ID_PARAMETER_STORE="nhse-cpm--${ENV}--mgmt-account-id-v1.0.0"
 
@@ -60,12 +61,12 @@ if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --r
         || exit 1
     fi
 
-    aws iam get-role --role-name "NHSIntegrationRole" &> /dev/null
+    aws iam get-role --role-name "NHSTestCIRole" &> /dev/null
     if [ $? != 0 ]; then
       tf_assume_role_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/role-trust-policy.json)
 
       aws iam create-role \
-        --role-name "NHSIntegrationRole" \
+        --role-name "NHSTestCIRole" \
         --assume-role-policy-document "${tf_assume_role_policy}" \
         --region "${AWS_REGION_NAME}" \
         || exit 1

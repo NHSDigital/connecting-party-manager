@@ -113,4 +113,4 @@ _update_policy "NHSSupportPolicy" "support" "NHSDevelopmentRole"
 #
 # Create the NHSIntegrationPolicy that will be used for CI Test access
 #
-_update_policy "NHSIntegrationPolicy" "integration-test" "NHSIntegrationRole"
+_update_policy "NHSIntegrationPolicy" "integration-test" "NHSTestCIRole"
