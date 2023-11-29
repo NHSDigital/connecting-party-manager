@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-11-29
+- [PI-128] Less Zealous Caching
+- [PI-134] Developer Role
+
 ## 2023-11-24
 - [PI-124] Revert Domain to AR model
 - [PI-130] Move Check Branch to the beginning of CI Pipeline
