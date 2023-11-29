@@ -9,9 +9,7 @@ EOF"
 AWS_REGION_NAME="eu-west-2"
 ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
 
-
-MGMT_ID_PARAMETER_STORE="nhse-cpm--dev--mgmt-account-id-v1.0.0"
-
+ENV="dev"
 
 #
 # Check we're not running this against MGMT
@@ -20,7 +18,15 @@ MGMT_ID_PARAMETER_STORE="nhse-cpm--dev--mgmt-account-id-v1.0.0"
 if _validate_current_account "MGMT"; then
   echo "Please login to non-mgmt profile before running this script"
   exit 1
+else
+  if _validate_current_account "PROD"; then
+    ENV="prod"
+  elif _validate_current_account "INT"; then
+    ENV="int"
+  elif _validate_current_account "TEST"; then
+    ENV="test"
 fi
+MGMT_ID_PARAMETER_STORE="nhse-cpm--${ENV}--mgmt-account-id-v1.0.0"
 
 if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" &> /dev/null; then
   # Secret exists, retrieve its value

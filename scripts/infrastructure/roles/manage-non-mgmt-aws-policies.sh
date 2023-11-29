@@ -73,6 +73,7 @@ function _update_policy() {
 
     tf_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/${policy_type}-policy.json)
 
+    # We update the version because this updates all roles and we don't have to detach and delete.
     versions=$(aws iam list-policy-versions --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" --region "${AWS_REGION_NAME}")
     num_versions=$(echo "$versions" | jq -r '.Versions | length')
     # There has got to be at least 2 versions.
