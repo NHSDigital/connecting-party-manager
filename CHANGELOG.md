@@ -6,6 +6,7 @@
 
 ## 2023-11-29-a
 - [PI-118] End-to-end product team endpoints
+- Dependabot: datamodel-code-generator
 
 ## 2023-11-24
 - [PI-124] Revert Domain to AR model
