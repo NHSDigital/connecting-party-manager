@@ -1,19 +1,16 @@
 from typing import Iterable, TypeVar
 
-SetType = TypeVar("SetType")
+T = TypeVar("T")
 
 
-def default_set(iterable: Iterable[SetType]) -> set[SetType]:
+def default_set(iterable: Iterable[T]) -> set[T]:
     """
     Solve the problem of default parameters being shared references in Python
     """
     return set(iterable if iterable is not None else [])
 
 
-ListType = TypeVar("ListType")
-
-
-def default_list(iterable) -> list[ListType]:
+def default_list(iterable: Iterable[T]) -> list[T]:
     """
     Solve the problem of default parameters being shared references in Python
     """

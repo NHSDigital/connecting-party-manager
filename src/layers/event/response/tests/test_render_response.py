@@ -346,8 +346,8 @@ def test_render_response_of_internal_validation_error():
                         "coding": [
                             {
                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "VALIDATION_ERROR",
-                                "display": "Validation error",
+                                "code": "MISSING_VALUE",
+                                "display": "Missing value",
                             }
                         ]
                     },
@@ -361,8 +361,8 @@ def test_render_response_of_internal_validation_error():
                         "coding": [
                             {
                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "VALIDATION_ERROR",
-                                "display": "Validation error",
+                                "code": "MISSING_VALUE",
+                                "display": "Missing value",
                             }
                         ]
                     },

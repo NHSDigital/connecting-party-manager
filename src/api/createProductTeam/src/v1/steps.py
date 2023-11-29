@@ -1,38 +1,30 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
-from domain.core.root import Root
-from domain.fhir.r4 import Organization  # StrictOrganization
+from domain.core.fhir_transform import create_product_team_from_fhir_org_json
+from domain.core.product_team import ProductTeam
+from domain.ods import validate_ods_code
 from event.step_chain import StepChain
+from repository.product_team_repo import ProductTeamRepository
 
 
-def _parse_fhir_organisation(organisation: dict) -> Organization:
-    org = Organization(**organisation)
-
-    # TODO: Also need to validate against StrictOrganization here
-    # strict_org = StrictOrganization(**organisation)
-    return org
-
-
-def _create_product_team(
-    event: APIGatewayProxyEvent,
-) -> tuple[ProductTeam, ProductTeamCreatedEvent]:
-    _product_team: dict = event.json_body
-
-    organisation = Root.create_ods_organisation(
-        ods_code=_product_team["ods_code"], name="Test"
-    )
-    product_team = organisation.create_product_team(
-        id=_product_team["id"],
-        name=_product_team["name"],
-    )
+def create_product_team(data, cache) -> ProductTeam:
+    event = APIGatewayProxyEvent(data[StepChain.INIT])
+    product_team = create_product_team_from_fhir_org_json(fhir_org_json=event.json_body)
     return product_team
 
 
-def parse_fhir_organisation(data, cache) -> Organization:
-    event = APIGatewayProxyEvent(data[StepChain.INIT])
-    return _parse_fhir_organisation(organisation=event.json_body)
+def validate_product_team_ods_code(data, cache) -> None:
+    product_team: ProductTeam = data[create_product_team]
+    validate_ods_code(ods_code=product_team.ods_code)
+
+
+def save_product_team(data, cache) -> dict:
+    product_team = data[create_product_team]
+    product_team_repo = ProductTeamRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+    )
+    return product_team_repo.write(entity=product_team)
 
 
 def set_http_status(data, cache) -> HTTPStatus:
@@ -40,6 +32,8 @@ def set_http_status(data, cache) -> HTTPStatus:
 
 
 steps = [
-    parse_fhir_organisation,
+    create_product_team,
+    validate_product_team_ods_code,
+    save_product_team,
     set_http_status,
 ]

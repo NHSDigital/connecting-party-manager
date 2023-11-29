@@ -3,4 +3,5 @@ class UnableToUnmarshall(Exception):
 
 
 class NotFoundException(Exception):
-    pass
+    def __init__(self, key):
+        super().__init__(f"Could not find object with key '{key}'")

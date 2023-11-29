@@ -7,5 +7,6 @@
     "editor.formatOnSave": true
   },
   "editor.formatOnSave": true,
-  "black-formatter.args": ["--line-length=88"]
+  "black-formatter.args": ["--line-length=88"],
+  "cSpell.words": ["unmarshall"]
 }

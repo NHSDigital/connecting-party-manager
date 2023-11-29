@@ -18,6 +18,18 @@ class OdsOrganisation(AggregateRoot):
     name: str
 
     def create_product_team(self, id: UUID, name: str) -> ProductTeam:
-        event = ProductTeamCreatedEvent(id=id, name=name, ods_code=self.ods_code)
-        result = ProductTeam(id=id, name=name, ods_code=self.ods_code, events=[event])
-        return result
+        event = ProductTeamCreatedEvent(
+            id=id,
+            name=name,
+            ods_code=self.ods_code,
+            ods_name=self.name,
+        )
+        product_team = ProductTeam(
+            id=id,
+            name=name,
+            ods_code=self.ods_code,
+            ods_name=self.name,
+            events=[event],
+        )
+        self.add_event(event=event)
+        return product_team

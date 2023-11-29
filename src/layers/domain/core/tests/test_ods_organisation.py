@@ -4,7 +4,6 @@ from domain.core.root import Root
 from pydantic import ValidationError
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ods_code,name",
     [
@@ -21,7 +20,6 @@ def test__can_instantiate_ods_organisation(ods_code: str, name: str):
     assert result.name == name
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(
     "ods_code",
     [

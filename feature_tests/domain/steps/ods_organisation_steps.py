@@ -1,8 +1,8 @@
 from behave import given, then, when
 from domain.core.root import Root
 
-from feature_tests.steps.common import catch_errors
-from feature_tests.steps.context import Context
+from feature_tests.domain.steps.common import catch_errors
+from feature_tests.domain.steps.context import Context
 
 
 def _add_ods_org_to_context(context: Context, ods_code: str, name: str):

@@ -1,24 +1,24 @@
 from typing import Generic, TypeVar
 
-import boto3
+from domain.core.aggregate_root import AggregateRoot
 from pydantic import BaseModel
 
 ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
 class Repository(Generic[ModelType]):
-    def __init__(self, table_name, model: type[ModelType]):
+    def __init__(self, table_name, model: type[ModelType], dynamodb_client):
         self.table_name = table_name
         self.model = model
-        self.client = boto3.client("dynamodb")
+        self.client = dynamodb_client
 
-    def write(self, entity):
-        def get_handler_name(event):
+    def write(self, entity: AggregateRoot):
+        def execute_event_handler(event):
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
             return handler(event, entity)
 
-        commands = [get_handler_name(e) for e in entity.events]
+        commands = [execute_event_handler(e) for e in entity.events]
         args = {
             "TransactItems": commands,
             "ReturnConsumedCapacity": "NONE",
@@ -26,6 +26,3 @@ class Repository(Generic[ModelType]):
         }
         response = self.client.transact_write_items(**args)
         return response
-
-    def register(self, event: type, handler):
-        self.handlers[event.__name__] = handler

@@ -3,7 +3,7 @@ import uuid
 from behave import given, then, when
 from domain.core.questionnaire import Questionnaire, QuestionType
 
-from feature_tests.steps.context import Context
+from feature_tests.domain.steps.context import Context
 
 
 @given("Questionnaire {id}")
