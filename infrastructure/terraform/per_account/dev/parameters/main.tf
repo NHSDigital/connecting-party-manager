@@ -1,6 +1,6 @@
 resource "aws_resourcegroups_group" "resource_group" {
   name        = "${local.project}--${replace(terraform.workspace, "_", "-")}--parameter-resource-group"
-  description = "${var.workspace_type} parameter resource group."
+  description = "${var.workspace_type} ${upper(terraform.workspace)} parameter resource group."
   tags = {
     Name           = "${local.project}--${replace(terraform.workspace, "_", "-")}--parameter-resource-group"
     CreatedOn      = var.updated_date

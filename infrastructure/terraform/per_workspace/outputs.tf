@@ -2,6 +2,10 @@ output "dynamodb_table_name" {
   value = module.table.dynamodb_table_name
 }
 
+# output "assumed_role" {
+#   value = var.assume_role
+# }
+
 output "environment" {
   value = var.environment
 }
