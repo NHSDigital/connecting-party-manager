@@ -15,6 +15,14 @@ inputs:
     description: "[Optional] Cache suffix (e.g. 'base')"
     required: false
     default: ""
+  restore-from-cache:
+    description: "[Optional] restore from cache?"
+    required: false
+    default: "true"
+  save-to-cache:
+    description: "[Optional] save to cache?"
+    required: false
+    default: "false"
   parameter-deploy:
     description: "If account wide parameter deploy then specify 'parameter_deploy'"
     required: false
@@ -26,4 +34,6 @@ runs:
       with:
         command: terraform--${{ inputs.command }} TERRAFORM_WORKSPACE="${{ inputs.workspace }}" ACCOUNT_WIDE="${{ inputs.account-wide }}" PARAMETER_DEPLOY="${{ inputs.parameter-deploy }}"
         requires-aws: true
+        restore-from-cache: ${{ inputs.restore-from-cache }}
+        save-to-cache: ${{ inputs.save-to-cache }}
         cache-suffix: ${{ inputs.cache-suffix }}

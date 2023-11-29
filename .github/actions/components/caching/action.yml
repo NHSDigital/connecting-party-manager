@@ -1,35 +1,56 @@
 name: "Synchronise cache"
 description: "Synchronise cache"
 inputs:
+  save-or-restore:
+    description: "'save' or 'restore' to/from cache"
+    required: true
   cache-suffix:
     description: "[Optional] Cache prefix (e.g. 'base')"
     required: false
     default: ""
+  paths-to-cache:
+    description: |
+      [Optional] Path to the items to be saved/restored.
+      These should generally include all:
+        * Makefile "targets" (e.g. .venv); and
+        * Makefile "prerequisites" (e.g. pyproject.toml)
+    required: false
+    default: |
+      .venv
+      .timestamp
+      **/.terraform
+      **/dist/*zip
+      **/tfplan
+      **/swagger.yaml
+      **/infrastructure/terraform/**/output.json
+      .downloads
+      **/fhir/r4/*models.py
+      .tool-versions
+      pyproject.toml
+      poetry.lock
+      **/make.py
+      **/infrastructure/swagger/*.yaml
+      **/infrastructure/swagger/**/*.yaml
+
 runs:
   using: "composite"
   steps:
-    - name: Get current date
+    - id: set-date
       shell: bash
-      id: date
       run: echo "date=$(date +'%Y-%m-%d-%M:%S')" >> $GITHUB_OUTPUT
-    - name: Create cache
-      uses: actions/cache@v3
+
+    - if: ${{ inputs.save-or-restore == 'restore' }}
+      id: restore-cache
+      uses: actions/cache/restore@v3
       with:
-        path: |
-          .venv
-          .timestamp
-          **/dist/*zip
-          **/tfplan
-          **/swagger.yaml
-          **/infrastructure/terraform/**/output.json
-          .downloads
-          **/fhir/r4/*models.py
-          .tool-versions
-          pyproject.toml
-          poetry.lock
-          **/make.py
-          **/infrastructure/swagger/*.yaml
-          **/infrastructure/swagger/**/*.yaml
-        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.date.outputs.date }}
+        path: ${{ inputs.paths-to-cache }}
+        key: "dummy"
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
+
+    - if: ${{ inputs.save-or-restore == 'save' }}
+      id: save-cache
+      uses: actions/cache/save@v3
+      with:
+        path: ${{ inputs.paths-to-cache }}
+        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
