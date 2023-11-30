@@ -8,6 +8,7 @@ module "lambda_function" {
   runtime       = var.python_version
   timeout       = 10
 
+  # I'll test this.
   publish               = true
   allowed_triggers      = var.allowed_triggers
   environment_variables = var.environment_variables
