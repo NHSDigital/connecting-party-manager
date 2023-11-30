@@ -6,6 +6,7 @@
 
 ## 2023-11-29-a
 - [PI-118] End-to-end product team endpoints
+- [PI-146] Fix: Lambda timeouts during deployment
 - Dependabot: datamodel-code-generator
 
 ## 2023-11-24
