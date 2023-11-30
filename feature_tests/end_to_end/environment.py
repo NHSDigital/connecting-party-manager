@@ -1,5 +1,5 @@
 import boto3
-from behave.model import Feature, Scenario
+from behave.model import Feature, Scenario, Step
 
 from feature_tests.end_to_end.steps.context import Context
 from feature_tests.feature_test_helpers import TestMode
@@ -23,3 +23,7 @@ def before_scenario(context: Context, scenario: Scenario):
     with aws_session():
         client = boto3.client("dynamodb")
         clear_dynamodb_table(client=client, table_name=table_name)
+
+
+def after_step(context: Context, step: Step):
+    context.table = None

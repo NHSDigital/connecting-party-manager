@@ -12,7 +12,11 @@ def make_request(
     raise_for_status=False,
 ) -> Response:
     url = base_url + "/".join(map(quote_plus, endpoint.split("/")))
-    response = request(method=http_method, url=url, json=body, headers=headers)
+    json = body if type(body) is dict else None
+    data = None if type(body) is dict else body
+    response = request(
+        method=http_method, url=url, headers=headers, json=json, data=data
+    )
     if raise_for_status:
         try:
             response.raise_for_status()

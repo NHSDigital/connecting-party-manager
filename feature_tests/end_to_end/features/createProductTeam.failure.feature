@@ -164,3 +164,24 @@ Feature: Create Product Team - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 567              |
+
+  Scenario: Cannot create a ProductTeam with corrupt body
+    When I make a "POST" request with "default" headers to "Organization" with body:
+      """
+      {"invalid_array": [}
+      """
+    Then I receive a status code "400" with body
+      | path                             | value                                                               |
+      | resourceType                     | OperationOutcome                                                    |
+      | id                               | << ignore >>                                                        |
+      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
+      | issue.0.severity                 | error                                                               |
+      | issue.0.code                     | processing                                                          |
+      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
+      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
+      | issue.0.details.coding.0.display | Validation error                                                    |
+      | issue.0.diagnostics              | Invalid JSON body was provided: line 1 column 20 (char 19)          |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 494              |

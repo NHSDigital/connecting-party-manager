@@ -55,7 +55,7 @@ def given_made_request(
 def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    body = parse_table(table=context.table)
+    body = parse_table(table=context.table) if context.table else context.text
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -87,7 +87,7 @@ def then_response(context: Context, status_code: str):
 
     assert_many(
         assertions=(
-            assert_same_type,
+            assert_equal,
             assert_same_type,
             assert_equal,
             assert_is_subset,
