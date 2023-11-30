@@ -1,6 +1,6 @@
 from behave import then
 
-from feature_tests.steps.context import Context
+from feature_tests.domain.steps.context import Context
 
 
 @then("the operation is successful")

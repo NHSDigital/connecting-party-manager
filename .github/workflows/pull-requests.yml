@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH_NAME }} # ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
           command: build
@@ -136,7 +136,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH_NAME }} # ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
         with:
           command: plan
@@ -195,6 +195,26 @@ jobs:
       - uses: ./.github/actions/pytest-with-rerun/
         with:
           test-type: integration
+          requires-aws: true
+
+  test--feature--integration:
+    needs:
+      [
+        build-head,
+        workflow--codebase-checks,
+        test--unit,
+        test--feature--local,
+        terraform-head-build,
+        test--integration,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: test--feature--integration
           requires-aws: true
 
   destroy-redundant-workspaces:

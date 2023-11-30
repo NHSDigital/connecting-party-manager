@@ -18,8 +18,10 @@ from .utils import marshall, unmarshall
 
 
 class ProductRepository(Repository[Product]):
-    def __init__(self, table_name):
-        super().__init__(table_name=table_name, model=Product)
+    def __init__(self, table_name: str, dynamodb_client):
+        super().__init__(
+            table_name=table_name, model=Product, dynamodb_client=dynamodb_client
+        )
 
     def handle_ProductCreatedEvent(self, event: ProductCreatedEvent, entity: Product):
         return {
@@ -34,6 +36,7 @@ class ProductRepository(Repository[Product]):
                         "name": event.name,
                         "type": event.type,
                         "ods_code": event.ods_code,
+                        "ods_name": event.ods_name,
                         "product_team_id": event.product_team_id,
                         "status": event.status,
                     }
@@ -146,7 +149,7 @@ class ProductRepository(Repository[Product]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise NotFoundException()
+            raise NotFoundException(key=key)
 
         (item,) = items
 

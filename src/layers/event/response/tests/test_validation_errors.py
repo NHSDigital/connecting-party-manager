@@ -1,8 +1,13 @@
+import json
+
 import pytest
+from event.json import json_loads
 from event.response.validation_errors import (
+    InboundJSONDecodeError,
     InboundValidationError,
-    get_path_error_mapping,
+    mark_json_decode_errors_as_inbound,
     mark_validation_errors_as_inbound,
+    parse_validation_error,
 )
 from pydantic import BaseModel, ValidationError
 
@@ -65,9 +70,10 @@ def _get_validation_error(model_params: dict) -> ValidationError:
         ),
     ],
 )
-def test_get_path_error_mapping(model_params, expected_path_error_mapping):
+def test_parse_validation_error(model_params, expected_path_error_mapping: dict):
     validation_error = _get_validation_error(model_params=model_params)
-    path_error_mapping = get_path_error_mapping(validation_error=validation_error)
+    error_items = parse_validation_error(validation_error=validation_error)
+    path_error_mapping = {error_item.path: error_item.msg for error_item in error_items}
     assert path_error_mapping == expected_path_error_mapping
 
 
@@ -90,3 +96,28 @@ def test_mark_validation_errors_as_inbound():
     validation_error = _get_inbound_validation_error()
 
     assert type(validation_error) is InboundValidationError
+
+
+def _get_inbound_json_decode_error():
+    @mark_json_decode_errors_as_inbound
+    def my_function():
+        json_loads("{")
+
+    json_decode_error = None
+    try:
+        my_function()
+    except json.JSONDecodeError as _json_decode_error:
+        json_decode_error = _json_decode_error
+    else:
+        raise ValueError("This json str should have failed!")
+    return json_decode_error
+
+
+def test_mark_json_decode_errors_as_inbound():
+    json_decode_error = _get_inbound_json_decode_error()
+
+    assert type(json_decode_error) is InboundJSONDecodeError
+    assert (
+        str(json_decode_error)
+        == "Invalid JSON body was provided: line 1 column 2 (char 1)"
+    )

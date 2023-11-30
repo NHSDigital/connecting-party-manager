@@ -7,7 +7,7 @@ from domain.fhir.r4 import (
     OperationOutcomeIssue,
     ProfileItem,
 )
-from event.response.validation_errors import get_path_error_mapping
+from event.response.validation_errors import ValidationErrorItem, parse_validation_error
 from pydantic import ValidationError
 
 from .coding import CODE_SYSTEM, CpmCoding, FhirCoding, IssueSeverity, IssueType
@@ -42,18 +42,19 @@ def _operation_outcome(
 
 
 def _operation_outcome_from_validation_error(
-    id: str, coding: FhirCoding, path_error_mapping: dict[str, str]
+    id: str, error_items: list[ValidationErrorItem]
 ) -> OperationOutcome:
-    issue_details = CodeableConcept(coding=[coding.value])
     issue = [
         OperationOutcomeIssue(
             code=IssueType.PROCESSING.value,
             severity=IssueSeverity.ERROR.value,
-            diagnostics=error_message,
-            details=issue_details,
-            expression=[path_to_error],
+            diagnostics=error_item.msg,
+            details=CodeableConcept(
+                coding=[_fhir_coding_from_exception(error_item.exception_type).value]
+            ),
+            expression=[error_item.path],
         )
-        for path_to_error, error_message in path_error_mapping.items()
+        for error_item in error_items
     ]
     return OperationOutcome(
         resourceType=OperationOutcome.__name__, id=id, meta=META, issue=issue
@@ -61,9 +62,12 @@ def _operation_outcome_from_validation_error(
 
 
 def _fhir_coding_from_exception(
-    exception: Exception,
+    exception: Exception | type[Exception],
 ) -> FhirCoding:
-    return EXCEPTIONS_TO_FHIR_CODING.get(exception.__class__, FhirCoding.SERVICE_ERROR)
+    exception_type = (
+        exception.__class__ if isinstance(exception, Exception) else exception
+    )
+    return EXCEPTIONS_TO_FHIR_CODING.get(exception_type, FhirCoding.SERVICE_ERROR)
 
 
 def _http_status_from_coding(coding: FhirCoding) -> HTTPStatus:
@@ -79,9 +83,9 @@ def operation_outcome_not_ok(id: str, exception: Exception) -> tuple[int, dict]:
     http_status = _http_status_from_coding(coding=coding)
 
     if isinstance(exception, ValidationError):
-        path_error_mapping = get_path_error_mapping(validation_error=exception)
+        error_items = parse_validation_error(validation_error=exception)
         operation_outcome = _operation_outcome_from_validation_error(
-            id=id, coding=coding, path_error_mapping=path_error_mapping
+            id=id, error_items=error_items
         )
     else:
         operation_outcome = _operation_outcome(

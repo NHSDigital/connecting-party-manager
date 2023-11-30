@@ -3,14 +3,18 @@ from domain.core.product_team import (
     ProductTeamCreatedEvent,
     ProductTeamDeletedEvent,
 )
+from repository.errors import NotFoundException
+from repository.keys import ods_pk, product_team_pk
 
 from .repository import Repository
-from .utils import marshall, unmarshall
+from .utils import marshall, marshall_value, unmarshall
 
 
 class ProductTeamRepository(Repository[ProductTeam]):
-    def __init__(self, table_name):
-        super().__init__(table_name=table_name, model=ProductTeam)
+    def __init__(self, table_name: str, dynamodb_client):
+        super().__init__(
+            table_name=table_name, model=ProductTeam, dynamodb_client=dynamodb_client
+        )
 
     def handle_ProductTeamCreatedEvent(
         self, event: ProductTeamCreatedEvent, entity: ProductTeam
@@ -20,12 +24,13 @@ class ProductTeamRepository(Repository[ProductTeam]):
                 "TableName": self.table_name,
                 "Item": marshall(
                     {
-                        "pk": f"T#{event.id}",
-                        "sk": f"T#{event.id}",
-                        "pk_1": f"O#{event.ods_code}",
-                        "sk_1": f"T#{event.id}",
+                        "pk": product_team_pk(event.id),
+                        "sk": product_team_pk(event.id),
+                        "pk_1": ods_pk(event.ods_code),
+                        "sk_1": product_team_pk(event.id),
                         "name": event.name,
                         "ods_code": event.ods_code,
+                        "ods_name": event.ods_name,
                     }
                 ),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
@@ -40,8 +45,8 @@ class ProductTeamRepository(Repository[ProductTeam]):
                 "TableName": self.table_name,
                 "Key": marshall(
                     {
-                        "pk": f"T#{event.id}",
-                        "sk": f"T#{event.id}",
+                        "pk": product_team_pk(event.id),
+                        "sk": product_team_pk(event.id),
                     }
                 ),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
@@ -49,17 +54,19 @@ class ProductTeamRepository(Repository[ProductTeam]):
         }
 
     def read(self, id) -> ProductTeam:
-        pk = f"T#{id}"
+        pk = product_team_pk(id)
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk AND sk = :sk",
             "ExpressionAttributeValues": {
-                ":pk": {"S": pk},
-                ":sk": {"S": pk},
+                ":pk": marshall_value(pk),
+                ":sk": marshall_value(pk),
             },
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
+        if len(items) == 0:
+            raise NotFoundException(key=id)
         (item,) = items
 
         return ProductTeam(id=id, **item)
