@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH_NAME }} # ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
           command: build
@@ -136,7 +136,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH_NAME }} # ${{ env.BASE_BRANCH_NAME }}
+          ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
         with:
           command: plan
