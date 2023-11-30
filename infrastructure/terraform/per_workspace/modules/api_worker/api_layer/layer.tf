@@ -2,6 +2,12 @@ module "lambda_layer" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
+  timeouts = {
+    create = "5m"
+    update = "5m"
+    delete = "5m"
+  }
+
   create_layer = true
 
   layer_name          = var.layer_name

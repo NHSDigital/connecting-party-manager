@@ -8,9 +8,15 @@ module "lambda_function" {
   runtime       = var.python_version
   timeout       = 10
 
-  publish               = true
-  allowed_triggers      = var.allowed_triggers
-  environment_variables = var.environment_variables
+  timeouts = {
+    create = "5m"
+    update = "5m"
+    delete = "5m"
+  }
+
+  create_current_version_allowed_triggers = false
+  allowed_triggers                        = var.allowed_triggers
+  environment_variables                   = var.environment_variables
 
   create_package         = false
   local_existing_package = var.source_path
