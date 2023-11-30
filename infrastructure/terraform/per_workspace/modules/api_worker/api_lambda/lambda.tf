@@ -9,12 +9,12 @@ module "lambda_function" {
   timeout       = 10
 
   timeouts = {
-    create = "20m"
-    update = "20m"
-    delete = "20m"
+    create = "2m"
+    update = "2m"
+    delete = "2m"
   }
 
-  publish               = true
+  publish               = false
   allowed_triggers      = var.allowed_triggers
   environment_variables = var.environment_variables
 

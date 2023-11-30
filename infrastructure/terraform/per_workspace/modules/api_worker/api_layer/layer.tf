@@ -3,12 +3,12 @@ module "lambda_layer" {
   version = "6.0.0"
 
   timeouts = {
-    create = "20m"
-    update = "20m"
-    delete = "20m"
+    create = "2m"
+    update = "2m"
+    delete = "2m"
   }
 
-  publish      = true
+  publish      = false
   create_layer = true
 
   layer_name          = var.layer_name
