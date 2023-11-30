@@ -6,7 +6,11 @@ from event.versioning.errors import VersionException
 from repository.errors import NotFoundException
 
 from .coding import CpmCoding, FhirCoding
-from .validation_errors import InboundMissingValue, InboundValidationError
+from .validation_errors import (
+    InboundJSONDecodeError,
+    InboundMissingValue,
+    InboundValidationError,
+)
 
 HTTP_STATUS_TO_CPM_CODING = {
     # Success matrix here
@@ -35,6 +39,7 @@ EXCEPTIONS_TO_FHIR_CODING = {
     # Part 2 of the error matrix here
     InboundValidationError: FhirCoding.VALIDATION_ERROR,
     InboundMissingValue: FhirCoding.MISSING_VALUE,
+    InboundJSONDecodeError: FhirCoding.VALIDATION_ERROR,
     InvalidOdsCodeError: FhirCoding.UNPROCESSABLE_ENTITY,
     VersionException: FhirCoding.ACCESS_DENIED,
     NotFoundException: FhirCoding.RESOURCE_NOT_FOUND,

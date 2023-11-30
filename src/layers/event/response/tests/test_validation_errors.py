@@ -1,6 +1,11 @@
+import json
+
 import pytest
+from event.json import json_loads
 from event.response.validation_errors import (
+    InboundJSONDecodeError,
     InboundValidationError,
+    mark_json_decode_errors_as_inbound,
     mark_validation_errors_as_inbound,
     parse_validation_error,
 )
@@ -91,3 +96,28 @@ def test_mark_validation_errors_as_inbound():
     validation_error = _get_inbound_validation_error()
 
     assert type(validation_error) is InboundValidationError
+
+
+def _get_inbound_json_decode_error():
+    @mark_json_decode_errors_as_inbound
+    def my_function():
+        json_loads("{")
+
+    json_decode_error = None
+    try:
+        my_function()
+    except json.JSONDecodeError as _json_decode_error:
+        json_decode_error = _json_decode_error
+    else:
+        raise ValueError("This json str should have failed!")
+    return json_decode_error
+
+
+def test_mark_json_decode_errors_as_inbound():
+    json_decode_error = _get_inbound_json_decode_error()
+
+    assert type(json_decode_error) is InboundJSONDecodeError
+    assert (
+        str(json_decode_error)
+        == "Invalid JSON body was provided: line 1 column 2 (char 1)"
+    )
