@@ -4,3 +4,11 @@ class DuplicateError(Exception):
 
 class NotFoundError(Exception):
     pass
+
+
+class InvalidDeviceKeyError(Exception):
+    pass
+
+
+class InvalidKeyError(Exception):
+    pass

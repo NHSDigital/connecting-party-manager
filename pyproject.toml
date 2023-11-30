@@ -53,3 +53,6 @@ profile = "black"
 [tool.pytest.ini_options]
 markers = ["unit", "integration", "smoke", "slow", "wip"]
 addopts = "--import-mode=importlib"
+
+[tool.black]
+line-length = 88
