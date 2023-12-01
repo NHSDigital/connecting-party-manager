@@ -1,11 +1,6 @@
 import pytest
-from domain.fhir.r4.cpm_model import ContactPoint, Organization
+from domain.fhir.r4.cpm_model import Organization
 from pydantic import ValidationError
-
-
-def test_contactpoint_email_validates_failure():
-    with pytest.raises(ValidationError):
-        result = ContactPoint(system="email", value="foobar")
 
 
 @pytest.mark.parametrize(

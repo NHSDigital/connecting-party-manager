@@ -78,3 +78,4 @@ dist
 openapi
 
 src/layers/domain/fhir/r4/*models.py
+postman-collection.json

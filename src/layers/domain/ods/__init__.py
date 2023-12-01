@@ -14,6 +14,13 @@ BACKOFF_BASE_SECONDS = 2
 WHITESPACE = re.compile(r"^(\s+)$")
 
 
+class InvalidOdsCodeError(Exception):
+    def __init__(self, ods_code):
+        super().__init__(
+            f"Invalid ODS Code: could not resolve '{ODS_API_ENDPOINT.format(ods_code=ods_code)}'"
+        )
+
+
 class UnexpectedStatusCode(Exception):
     pass
 
@@ -86,3 +93,8 @@ def is_valid_ods_code(ods_code: str) -> bool:
         f"from {ODS_API_ENDPOINT} "
         f"for ODS code '{ods_code}'"
     )
+
+
+def validate_ods_code(ods_code: str):
+    if not is_valid_ods_code(ods_code=ods_code):
+        raise InvalidOdsCodeError(ods_code=ods_code)

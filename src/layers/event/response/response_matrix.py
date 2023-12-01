@@ -1,9 +1,16 @@
 from http import HTTPStatus
 
+from domain.ods import InvalidOdsCodeError
+from event.status.steps import StatusNotOk
 from event.versioning.errors import VersionException
+from repository.errors import NotFoundException
 
 from .coding import CpmCoding, FhirCoding
-from .validation_errors import InboundValidationError
+from .validation_errors import (
+    InboundJSONDecodeError,
+    InboundMissingValue,
+    InboundValidationError,
+)
 
 HTTP_STATUS_TO_CPM_CODING = {
     # Success matrix here
@@ -18,16 +25,25 @@ FHIR_CODING_TO_HTTP_STATUS = {
     FhirCoding.VALIDATION_ERROR: HTTPStatus.BAD_REQUEST,
     # 403
     FhirCoding.ACCESS_DENIED: HTTPStatus.FORBIDDEN,
+    # 404
+    FhirCoding.RESOURCE_NOT_FOUND: HTTPStatus.NOT_FOUND,
     # 422
     FhirCoding.UNPROCESSABLE_ENTITY: HTTPStatus.UNPROCESSABLE_ENTITY,
     # 500
     FhirCoding.SERVICE_ERROR: HTTPStatus.INTERNAL_SERVER_ERROR,
+    # 503
+    FhirCoding.SERVICE_UNAVAILABLE: HTTPStatus.SERVICE_UNAVAILABLE,
 }
 
 EXCEPTIONS_TO_FHIR_CODING = {
     # Part 2 of the error matrix here
     InboundValidationError: FhirCoding.VALIDATION_ERROR,
+    InboundMissingValue: FhirCoding.MISSING_VALUE,
+    InboundJSONDecodeError: FhirCoding.VALIDATION_ERROR,
+    InvalidOdsCodeError: FhirCoding.UNPROCESSABLE_ENTITY,
     VersionException: FhirCoding.ACCESS_DENIED,
+    NotFoundException: FhirCoding.RESOURCE_NOT_FOUND,
+    StatusNotOk: FhirCoding.SERVICE_UNAVAILABLE,
 }
 
 SUCCESS_STATUSES = set(HTTP_STATUS_TO_CPM_CODING)

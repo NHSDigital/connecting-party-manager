@@ -1,7 +1,7 @@
 from behave import when
 
-from feature_tests.steps.common import catch_errors
-from feature_tests.steps.context import Context
+from feature_tests.domain.steps.common import catch_errors
+from feature_tests.domain.steps.context import Context
 
 
 @when(

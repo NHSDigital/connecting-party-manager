@@ -1,6 +1,7 @@
 import math
 from types import FunctionType
 
+from event.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
 from .constants import VERSIONING_STEP_ARGS
@@ -8,6 +9,7 @@ from .errors import VersionException
 from .models import LambdaEventForVersioning
 
 
+@mark_validation_errors_as_inbound
 def get_requested_version(data, cache=None):
     event = LambdaEventForVersioning(**data[StepChain.INIT][VERSIONING_STEP_ARGS.EVENT])
     return event.headers.version
@@ -24,7 +26,7 @@ def get_largest_possible_version(data, cache=None) -> str:
     ]
     largest_possible_version = max(possible_versions, default=math.inf)
     if not math.isfinite(largest_possible_version):
-        raise VersionException("Version not supported")
+        raise VersionException(f"Version not supported: {requested_version}")
     return str(largest_possible_version)
 
 

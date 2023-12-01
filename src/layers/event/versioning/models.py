@@ -1,10 +1,8 @@
-from pydantic import BaseModel, Field
-
-from .constants import VERSION_HEADER_PATTERN
+from pydantic import BaseModel
 
 
 class VersionHeader(BaseModel):
-    version: str = Field(pattern=VERSION_HEADER_PATTERN)
+    version: int
 
 
 class LambdaEventForVersioning(BaseModel):

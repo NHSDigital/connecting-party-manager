@@ -3,26 +3,18 @@ from pathlib import Path
 import pytest
 from event.step_chain import StepChain
 from event.step_chain.tests.utils import step_data
-from event.versioning.constants import VERSION_HEADER_PATTERN, VERSIONING_STEP_ARGS
+from event.versioning.constants import VERSIONING_STEP_ARGS
 from event.versioning.errors import VersionException
-from event.versioning.models import LambdaEventForVersioning, VersionHeader
+from event.versioning.models import LambdaEventForVersioning
 from event.versioning.steps import get_largest_possible_version, get_requested_version
 from hypothesis import given
-from hypothesis.strategies import builds, dictionaries, from_regex, none, text
+from hypothesis.strategies import builds, dictionaries, none, text
 from pydantic import ValidationError
 
 PATH_TO_HERE = Path(__file__).parent
 
 
-@given(
-    event=builds(
-        LambdaEventForVersioning,
-        headers=builds(
-            VersionHeader,
-            version=from_regex(VERSION_HEADER_PATTERN, fullmatch=True),
-        ),
-    )
-)
+@given(event=builds(LambdaEventForVersioning))
 def test_get_requested_version_pass(event: LambdaEventForVersioning):
     version = get_requested_version(data=step_data(init={"event": event.dict()}))
     assert version == event.headers.version
@@ -82,4 +74,4 @@ def test_largest_possible_version_error(requested_version: str):
                 }
             )
         )
-    assert str(e.value) == "Version not supported"
+    assert str(e.value) == f"Version not supported: {requested_version}"
