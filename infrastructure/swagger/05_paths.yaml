@@ -55,7 +55,8 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
-      security: #This should be removed in the future if its problematic, helps proxygen be happy
+      security:
+        - ${authoriser_name}: []
         - app-level0: []
 
   /Organization:
@@ -68,6 +69,7 @@ paths:
         <<: *ApiGatewayIntegration
         uri: ${method_createProductTeam}
       security:
+        - ${authoriser_name}: []
         - app-level0: []
 
   /Organization/{id}:
@@ -89,4 +91,5 @@ paths:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}
       security:
+        - ${authoriser_name}: []
         - app-level0: []

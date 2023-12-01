@@ -2,7 +2,8 @@ Feature: Headers - failure scenarios
 
   Scenario: Version is missing
     Given "bad" request headers:
-      | name | value |
+      | name          | value   |
+      | Authorization | letmein |
     When I make a "GET" request with "bad" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then I receive a status code "400" with body
       | path                             | value                                                               |
@@ -23,8 +24,9 @@ Feature: Headers - failure scenarios
 
   Scenario Outline: Version is invalid
     Given "bad" request headers:
-      | name    | value     |
-      | version | <version> |
+      | name          | value     |
+      | version       | <version> |
+      | Authorization | letmein   |
     When I make a "GET" request with "bad" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then I receive a status code "400" with body
       | path                             | value                                                               |
@@ -51,8 +53,9 @@ Feature: Headers - failure scenarios
 
   Scenario: Version does not exist
     Given "bad" request headers:
-      | name    | value |
-      | version | 0     |
+      | name          | value   |
+      | version       | 0       |
+      | Authorization | letmein |
     When I make a "GET" request with "bad" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then I receive a status code "403" with body
       | path                             | value                                                               |

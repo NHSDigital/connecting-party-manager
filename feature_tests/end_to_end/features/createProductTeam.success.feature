@@ -2,8 +2,9 @@ Feature: Create Product Team - success scenarios
 
   Background:
     Given "default" request headers:
-      | name    | value |
-      | version | 1     |
+      | name          | value   |
+      | version       | 1       |
+      | Authorization | letmein |
 
   Scenario: Successfully create a ProductTeam
     When I make a "POST" request with "default" headers to "Organization" with body:

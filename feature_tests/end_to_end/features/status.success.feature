@@ -2,7 +2,8 @@ Feature: Status
 
   Background:
     Given "default" request headers:
-      | name | value |
+      | name          | value   |
+      | Authorization | letmein |
 
   Scenario: Confirm Status endpoint is active
     When I make a "GET" request with "default" headers to "_status"

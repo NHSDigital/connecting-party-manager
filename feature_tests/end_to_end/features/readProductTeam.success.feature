@@ -2,8 +2,9 @@ Feature: Read Product Team - success scenarios
 
   Background:
     Given "default" request headers:
-      | name    | value |
-      | version | 1     |
+      | name          | value   |
+      | version       | 1       |
+      | Authorization | letmein |
 
   Scenario: Read an existing ProductTeam
     Given I have already made a "POST" request with "default" headers to "Organization" with body:

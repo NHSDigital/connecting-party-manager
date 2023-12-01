@@ -2,8 +2,9 @@ Feature: Read Product Team - failure scenarios
 
   Background:
     Given "default" request headers:
-      | name    | value |
-      | version | 1     |
+      | name          | value   |
+      | version       | 1       |
+      | Authorization | letmein |
 
   Scenario: Unknown Product Team
     When I make a "GET" request with "default" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
