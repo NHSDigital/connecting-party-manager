@@ -3,9 +3,10 @@ from enum import StrEnum
 
 class TableKeys(StrEnum):
     PRODUCT_TEAM = "T"
-    PRODUCT = "P"
-    PRODUCT_KEY = "PK"
-    PRODUCT_RELATIONSHIP = "PR"
+    DEVICE = "D"
+    DEVICE_KEY = "DK"
+    DEVICE_PAGE = "DP"
+    DEVICE_RELATIONSHIP = "DR"
     ODS_ORGANISATION = "O"
 
 
@@ -13,16 +14,20 @@ def product_team_pk(id):
     return f"{TableKeys.PRODUCT_TEAM._value_}#{id}"
 
 
-def product_pk(id):
-    return f"{TableKeys.PRODUCT._value_}#{id}"
+def device_pk(id):
+    return f"{TableKeys.DEVICE._value_}#{id}"
 
 
-def product_key_sk(key):
-    return f"{TableKeys.PRODUCT_KEY._value_}#{key}"
+def device_key_sk(key):
+    return f"{TableKeys.DEVICE_KEY._value_}#{key}"
 
 
-def product_relationship_sk(target_id):
-    return f"{TableKeys.PRODUCT_RELATIONSHIP._value_}#{target_id}"
+def device_page_sk(page):
+    return f"{TableKeys.DEVICE_PAGE._value_}#{page}"
+
+
+def device_relationship_sk(target_id):
+    return f"{TableKeys.DEVICE_RELATIONSHIP._value_}#{target_id}"
 
 
 def ods_pk(ods_code):

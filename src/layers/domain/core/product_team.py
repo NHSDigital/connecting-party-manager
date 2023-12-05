@@ -1,8 +1,8 @@
 from uuid import UUID
 
 from domain.core.aggregate_root import AggregateRoot
+from domain.core.device import Device, DeviceCreatedEvent, DeviceStatus, DeviceType
 from domain.core.event import Event
-from domain.core.product import Product, ProductCreatedEvent, ProductStatus, ProductType
 from domain.core.validation import ENTITY_NAME_REGEX
 from pydantic import Field
 
@@ -40,14 +40,14 @@ class ProductTeam(AggregateRoot):
     ods_code: str
     ods_name: str
 
-    def create_product(
+    def create_device(
         self,
         id: UUID,
         name: str,
-        type: ProductType,
-        status: ProductStatus = ProductStatus.ACTIVE,
-    ) -> Product:
-        event = ProductCreatedEvent(
+        type: DeviceType,
+        status: DeviceStatus = DeviceStatus.ACTIVE,
+    ) -> Device:
+        event = DeviceCreatedEvent(
             id=id,
             name=name,
             type=type,
@@ -56,7 +56,7 @@ class ProductTeam(AggregateRoot):
             ods_name=self.ods_name,
             status=status,
         )
-        result = Product(
+        result = Device(
             id=id,
             name=name,
             type=type,

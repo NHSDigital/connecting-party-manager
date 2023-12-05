@@ -1,4 +1,3 @@
-from enum import StrEnum
 from typing import Any
 
 from repository.errors import UnableToUnmarshall
@@ -7,12 +6,10 @@ from repository.errors import UnableToUnmarshall
 def marshall_value(value):
     if value is None:
         return {"Null": True}
-    if isinstance(value, StrEnum):
-        return {"S": str(value)}
-    if isinstance(value, bool):  # isinstance(True,int) == True
+    if type(value) is bool:  # isinstance(True,int) == True
         return {"B": value}
-    if isinstance(value, int) or isinstance(value, float):
-        return {"N": value}
+    if type(value) is int or isinstance(value, float):
+        return {"N": str(value)}
     if isinstance(value, list):
         return {"L": [marshall_value(item) for item in value]}
     if isinstance(value, dict):
