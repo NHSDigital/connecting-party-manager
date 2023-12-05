@@ -319,7 +319,7 @@ class Device(AggregateRoot):
                 "key must be ProductId() or AccreditedSystemId()"
             )
         self.keys[key] = DeviceKey(type=type)
-        event = DeviceKeyAddedEvent(id=self.id, **self.keys[key].dict())
+        event = DeviceKeyAddedEvent(id=self.id, key=key, type=type)
         return self.add_event(event=event)
 
     def remove_key(self, key: str) -> DeviceKeyRemovedEvent:
