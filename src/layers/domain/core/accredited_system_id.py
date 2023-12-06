@@ -1,6 +1,6 @@
 import re
 
-ACCREDITED_SYSTEM_ID = "^[0-9]{1,12}$"
+ACCREDITED_SYSTEM_ID = r"^[0-9]{1,12}$"
 
 
 class InvalidAccreditedSystemIdError(Exception):

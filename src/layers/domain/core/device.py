@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 from enum import StrEnum, auto
 from uuid import UUID
 
@@ -15,80 +16,52 @@ from domain.core.product_id import ProductId
 from pydantic import BaseModel, Field
 
 
+@dataclass(kw_only=True, slots=True)
 class DeviceCreatedEvent(Event):
-    """
-    Raised when a new Device is created
-    """
-
-    def __init__(self, id, name, type, product_team_id, ods_code, status):
-        self.id = id
-        self.name = name
-        self.type = type
-        self.product_team_id = product_team_id
-        self.ods_code = ods_code
-        self.status = status
+    id: UUID
+    name: str
+    type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: "DeviceStatus"
 
 
+@dataclass(kw_only=True, slots=True)
 class DeviceUpdatedEvent(Event):
-    """
-    Raised when a Device name or type is amended
-    """
-
-    def __init__(self, id, name, type):
-        self.id = id
-        self.name = name
-        self.type = type
+    id: UUID
+    name: str
+    type: "DeviceType"
 
 
+@dataclass(kw_only=True, slots=True)
 class DeviceDeletedEvent(Event):
-    """
-    Raised when a Device has been deleted
-    """
-
-    def __init__(self, id):
-        self.id = id
+    id: UUID
 
 
+@dataclass(kw_only=True, slots=True)
 class RelationshipAddedEvent(Event):
-    """
-    Raised when a relationship has been created between two Devices.
-    """
-
-    def __init__(self, id, target, type):
-        self.id = id
-        self.target = target
-        self.type = type
+    id: UUID
+    target: UUID
+    type: "RelationshipType"
 
 
+@dataclass(kw_only=True, slots=True)
 class RelationshipRemovedEvent(Event):
-    """
-    Raised when a relationship has been removed from two Devices.
-    """
-
-    def __init__(self, id, target):
-        self.id = id
-        self.target = target
+    id: UUID
+    target: UUID
 
 
+@dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
-    """
-    Raised when a new Key (Product Id/ASID/SNow) has been added to a Device.
-    """
-
-    def __init__(self, id, key, type):
-        self.id = id
-        self.key = key
-        self.type = type
+    id: UUID
+    key: ProductId | AccreditedSystemId
+    type: "DeviceKeyType"
 
 
+@dataclass(kw_only=True, slots=True)
 class DeviceKeyRemovedEvent(Event):
-    """
-    Raised when an existing Key is removed from a Device.
-    """
-
-    def __init__(self, id, key):
-        self.id = id
-        self.key = key
+    id: UUID
+    key: ProductId | AccreditedSystemId
 
 
 class RelationshipType(StrEnum):
@@ -160,22 +133,22 @@ class DeviceStatus(StrEnum):
     INACTIVE = auto()
 
 
+@dataclass(kw_only=True, slots=True)
 class DevicePageAddedEvent(Event):
-    def __init__(self, id, page):
-        self.id = id
-        self.page = page
+    id: UUID
+    page: str
 
 
+@dataclass(kw_only=True, slots=True)
 class DevicePageUpdatedEvent(Event):
-    def __init__(self, id, page):
-        self.id = id
-        self.page = page
+    id: UUID
+    page: str
 
 
+@dataclass(kw_only=True, slots=True)
 class DevicePageRemovedEvent(Event):
-    def __init__(self, id, page):
-        self.id = id
-        self.page = page
+    id: UUID
+    page: str
 
 
 PAGE_NAME_REGEX = r"^([A-z0-9]+(_[A-z0-9]+)*)(\:[A-z0-9]+(_[A-z0-9]+)*)?$"
@@ -228,9 +201,9 @@ class Device(AggregateRoot):
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
-    relationships: dict[UUID, Relationship] = Field(default_factory=dict)
-    keys: dict[str, DeviceKey] = Field(default_factory=dict)
-    pages: dict[str, DevicePage] = Field(default_factory=dict)
+    relationships: dict[UUID, Relationship] = Field(default_factory=dict, exclude=True)
+    keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
+    pages: dict[str, DevicePage] = Field(default_factory=dict, exclude=True)
 
     def rename(self, name: str):
         """
@@ -248,7 +221,7 @@ class Device(AggregateRoot):
         if not re.match(PAGE_NAME_REGEX, index):
             raise InvalidKeyError(f"Invalid page index: {index}")
         if index in self.pages:
-            raise DuplicateError(f"Page exists: {index}")
+            raise DuplicateError(f"It is forbidden to supply duplicate pages: {index}")
         page = DevicePage(values=values or {})
         self.add_event(DevicePageAddedEvent(id=self.id, page=index))
         self.pages[index] = page
@@ -275,8 +248,8 @@ class Device(AggregateRoot):
         """
         Update the values on a page
         """
-        page = self.get_page(page or "")
-        page.values = {**page.values, **values}
+        device_page = self.get_page(page or "")
+        device_page.values = {**device_page.values, **values}
         self.add_event(DevicePageUpdatedEvent(id=self.id, page=page))
 
     def add_relationship(
@@ -286,9 +259,14 @@ class Device(AggregateRoot):
         Adds a relationship between two Devices
         """
         if target.id in self.relationships:
-            raise DuplicateError(f"Relationship {target.id} exists")
-        self.relationships[target.id] = Relationship(type=type)
-        event = RelationshipAddedEvent(id=self.id, target=target.id, type=type)
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate relationships: '{target.id}'"
+            )
+        relationship = Relationship(type=type)
+        event = RelationshipAddedEvent(
+            id=self.id, target=target.id, **relationship.dict()
+        )
+        self.relationships[target.id] = relationship
         return self.add_event(event=event)
 
     def remove_relationship(self, target: str) -> RelationshipRemovedEvent:
@@ -308,7 +286,7 @@ class Device(AggregateRoot):
         Adds a new Key to a Device
         """
         if key in self.keys:
-            raise DuplicateError(f"Key '{key}' has been provided multiple times.")
+            raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
         if isinstance(key, ProductId):
             type = DeviceKeyType.PRODUCT_ID
         elif isinstance(key, AccreditedSystemId):
@@ -317,8 +295,9 @@ class Device(AggregateRoot):
             raise InvalidDeviceKeyError(
                 "key must be ProductId() or AccreditedSystemId()"
             )
-        self.keys[key] = DeviceKey(type=type)
-        event = DeviceKeyAddedEvent(id=self.id, key=key, type=type)
+        device_key = DeviceKey(type=type)
+        event = DeviceKeyAddedEvent(id=self.id, **device_key.dict())
+        self.keys[key] = device_key
         return self.add_event(event=event)
 
     def remove_key(self, key: str) -> DeviceKeyRemovedEvent:

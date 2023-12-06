@@ -1,34 +1,67 @@
 from enum import StrEnum
+from typing import Generator
+
+KEY_SEPARATOR = "#"
 
 
 class TableKeys(StrEnum):
-    PRODUCT_TEAM = "T"
     DEVICE = "D"
     DEVICE_KEY = "DK"
-    DEVICE_PAGE = "DP"
     DEVICE_RELATIONSHIP = "DR"
+    DEVICE_PAGE = "DP"
+    PRODUCT_TEAM = "PT"
     ODS_ORGANISATION = "O"
 
+    def key(self, *args) -> str:
+        return KEY_SEPARATOR.join(map(str, (self, *args)))
 
-def product_team_pk(id):
-    return f"{TableKeys.PRODUCT_TEAM._value_}#{id}"
+    def filter(
+        self, iterable: list[dict[str, str]], key: str
+    ) -> Generator[dict[str, str], None, None]:
+        return (
+            item for item in iterable if item[key].startswith(f"{self}{KEY_SEPARATOR}")
+        )
 
-
-def device_pk(id):
-    return f"{TableKeys.DEVICE._value_}#{id}"
-
-
-def device_key_sk(key):
-    return f"{TableKeys.DEVICE_KEY._value_}#{key}"
-
-
-def device_page_sk(page):
-    return f"{TableKeys.DEVICE_PAGE._value_}#{page}"
-
-
-def device_relationship_sk(target_id):
-    return f"{TableKeys.DEVICE_RELATIONSHIP._value_}#{target_id}"
+    def filter_and_group(
+        self, iterable: list[dict[str, str]], key: str
+    ) -> Generator[tuple[str, dict[str, str]], None, None]:
+        return group_by_key(
+            iterable=self.filter(iterable=iterable, key=key),
+            key=key,
+        )
 
 
-def ods_pk(ods_code):
-    return f"{TableKeys.ODS_ORGANISATION._value_}#{ods_code}"
+def group_by_key(
+    iterable: list[dict[str, str]], key: str
+) -> Generator[tuple[str, dict[str, str]], None, None]:
+    """
+    Groups data by the stripped key, and removes keys from the data, e.g. for key = "pk":
+
+        >> iterable = [{"pk": "A#123", "sk": "B#345", "other_data": "567"}]
+        >> group_by_key(iterable, key="pk")
+        << [("123", {"other_data": "567"})]
+    """
+    return ((strip_key_prefix(item[key]), remove_keys(**item)) for item in iterable)
+
+
+def strip_key_prefix(key: str):
+    _, tail = key.split(KEY_SEPARATOR, 1)
+    return tail
+
+
+def remove_keys(
+    pk=None,
+    sk=None,
+    pk_1=None,
+    sk_1=None,
+    pk_2=None,
+    sk_2=None,
+    pk_3=None,
+    sk_3=None,
+    pk_4=None,
+    sk_4=None,
+    pk_5=None,
+    sk_5=None,
+    **values,
+):
+    return values

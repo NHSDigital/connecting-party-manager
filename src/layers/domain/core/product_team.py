@@ -1,30 +1,24 @@
+from dataclasses import dataclass
 from uuid import UUID
 
-from domain.core.aggregate_root import AggregateRoot
-from domain.core.device import Device, DeviceCreatedEvent, DeviceStatus, DeviceType
-from domain.core.event import Event
-from domain.core.validation import ENTITY_NAME_REGEX
 from pydantic import Field
 
+from .aggregate_root import AggregateRoot
+from .device import Device, DeviceCreatedEvent, DeviceStatus, DeviceType
+from .event import Event
+from .validation import ENTITY_NAME_REGEX
 
+
+@dataclass(kw_only=True, slots=True)
 class ProductTeamCreatedEvent(Event):
-    """
-    Raised when a new ProductTeam has been created within the domain.
-    """
-
-    def __init__(self, id, name, ods_code):
-        self.id = id
-        self.name = name
-        self.ods_code = ods_code
+    id: UUID
+    name: str
+    ods_code: str
 
 
+@dataclass(kw_only=True, slots=True)
 class ProductTeamDeletedEvent(Event):
-    """
-    Raised when an existing ProductTeam has been deleted.
-    """
-
-    def __init__(self, id):
-        self.id = id
+    id: UUID
 
 
 class ProductTeam(AggregateRoot):
@@ -45,25 +39,18 @@ class ProductTeam(AggregateRoot):
         type: DeviceType,
         status: DeviceStatus = DeviceStatus.ACTIVE,
     ) -> Device:
-        event = DeviceCreatedEvent(
-            id=id,
-            name=name,
-            type=type,
-            product_team_id=self.id,
-            ods_code=self.ods_code,
-            status=status,
-        )
-        result = Device(
+        device = Device(
             id=id,
             name=name,
             type=type,
             status=status,
             product_team_id=self.id,
             ods_code=self.ods_code,
-            events=[event],
         )
+        event = DeviceCreatedEvent(**device.dict())
+        device.add_event(event)
         self.add_event(event)
-        return result
+        return device
 
     def delete(self) -> list[Event]:
         return [ProductTeamDeletedEvent(id=self.id)]

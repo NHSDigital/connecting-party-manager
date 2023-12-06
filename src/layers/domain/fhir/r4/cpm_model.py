@@ -31,10 +31,8 @@ class ProductTeamIdentifier(Identifier):
     value: UUID
 
     def dict(self, *args, **kwargs):
-        """Additionally serializes UUID to string"""
-        _dict = super().dict(*args, **kwargs)
-        (_, _dict["value"]) = self.value.urn.split("urn:uuid:")
-        return _dict
+        """Additionally converts UUID to string"""
+        return {"system": self.system, "value": str(self.value)}
 
 
 class OdsIdentifier(Identifier):

@@ -17,7 +17,7 @@ from pydantic import ValidationError
 def test__create_product_team(id: str, name: str):
     org = Root.create_ods_organisation(ods_code="AB123")
 
-    result = org.create_product_team(id=id, name=name)
+    result = org.create_product_team(id=str(id), name=name)
     event = result.events[0]
 
     assert isinstance(result, ProductTeam), "Created ProductTeam"

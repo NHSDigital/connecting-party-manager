@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from domain.core.device import (
     Device,
     DeviceCreatedEvent,
@@ -16,13 +18,7 @@ from domain.core.device import (
 )
 
 from .errors import NotFoundException
-from .keys import (
-    device_key_sk,
-    device_page_sk,
-    device_pk,
-    device_relationship_sk,
-    ods_pk,
-)
+from .keys import TableKeys, strip_key_prefix
 from .marshall import marshall, unmarshall
 from .repository import Repository
 
@@ -34,52 +30,34 @@ class DeviceRepository(Repository[Device]):
         )
 
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent, entity: Device):
+        pk = TableKeys.DEVICE.key(event.id)
+        pk_1 = TableKeys.ODS_ORGANISATION.key(event.ods_code)
         return {
             "Put": {
                 "TableName": self.table_name,
                 "Item": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_pk(event.id),
-                        "pk_1": ods_pk(event.ods_code),
-                        "sk_1": device_pk(event.id),
-                        "name": event.name,
-                        "type": event.type,
-                        "ods_code": event.ods_code,
-                        "product_team_id": event.product_team_id,
-                        "status": event.status,
-                    }
+                    {"pk": pk, "sk": pk, "pk_1": pk_1, "sk_1": pk, **asdict(event)}
                 ),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
             }
         }
 
     def handle_DeviceUpdatedEvent(self, event: DeviceUpdatedEvent, entity: Device):
+        pk = TableKeys.DEVICE.key(event.id)
         return {
             "Put": {
                 "TableName": self.table_name,
-                "Item": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_pk(event.id),
-                        "name": event.name,
-                        "type": event.type,
-                    }
-                ),
+                "Item": marshall({"pk": pk, "sk": pk, **asdict(event)}),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
 
     def handle_DeviceDeletedEvent(self, event: DeviceDeletedEvent, entity: Device):
+        pk = TableKeys.DEVICE.key(event.id)
         return {
             "Delete": {
                 "TableName": self.table_name,
-                "Key": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_pk(event.id),
-                    }
-                ),
+                "Key": marshall({"pk": pk, "sk": pk}),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
@@ -87,17 +65,13 @@ class DeviceRepository(Repository[Device]):
     def handle_RelationshipAddedEvent(
         self, event: RelationshipAddedEvent, entity: Device
     ):
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_RELATIONSHIP.key(event.target)
         return {
             "Put": {
                 "TableName": self.table_name,
                 "Item": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_relationship_sk(event.target),
-                        "pk_1": device_relationship_sk(event.target),
-                        "sk_1": device_pk(event.id),
-                        "type": event.type,
-                    }
+                    {"pk": pk, "sk": sk, "pk_1": sk, "sk_1": pk, **asdict(event)}
                 ),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
             }
@@ -106,31 +80,24 @@ class DeviceRepository(Repository[Device]):
     def handle_RelationshipRemovedEvent(
         self, event: RelationshipRemovedEvent, entity: Device
     ):
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_RELATIONSHIP.key(event.target)
         return {
             "Delete": {
                 "TableName": self.table_name,
-                "Key": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_relationship_sk(event.target),
-                    }
-                ),
+                "Key": marshall({"pk": pk, "sk": sk}),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
 
     def handle_DeviceKeyAddedEvent(self, event: DeviceKeyAddedEvent, entity: Device):
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_KEY.key(event.key)
         return {
             "Put": {
                 "TableName": self.table_name,
                 "Item": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_key_sk(event.key),
-                        "pk_1": device_key_sk(event.key),
-                        "sk_1": device_key_sk(event.key),
-                        "type": event.type,
-                    }
+                    {"pk": pk, "sk": sk, "pk_1": sk, "sk_1": pk, **asdict(event)}
                 ),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
             }
@@ -139,32 +106,26 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceKeyRemovedEvent(
         self, event: DeviceKeyRemovedEvent, entity: Device
     ):
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_KEY.key(event.key)
         return {
             "Delete": {
                 "TableName": self.table_name,
-                "Key": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_key_sk(event.key),
-                    }
-                ),
+                "Key": marshall({"pk": pk, "sk": sk}),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
 
     def handle_DevicePageAddedEvent(self, event: DevicePageAddedEvent, entity: Device):
         page = entity.get_page(event.page)
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_PAGE.key(event.page)
+
         return {
             "Put": {
                 "TableName": self.table_name,
                 "Item": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_page_sk(event.page),
-                        "pk_1": device_pk(event.id),
-                        "sk_1": device_page_sk(event.page),
-                        **page.values,
-                    }
+                    {"pk": pk, "sk": sk, "pk_1": pk, "sk_1": sk, **page.values}
                 ),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
             }
@@ -173,15 +134,12 @@ class DeviceRepository(Repository[Device]):
     def handle_DevicePageRemovedEvent(
         self, event: DevicePageRemovedEvent, entity: Device
     ):
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_PAGE.key(event.page)
         return {
             "Delete": {
                 "TableName": self.table_name,
-                "Key": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_page_sk(event.page),
-                    }
-                ),
+                "Key": marshall({"pk": pk, "sk": sk}),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
@@ -190,24 +148,20 @@ class DeviceRepository(Repository[Device]):
         self, event: DevicePageUpdatedEvent, entity: Device
     ):
         page = entity.get_page(event.page)
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_PAGE.key(event.page)
         return {
             "Put": {
                 "TableName": self.table_name,
                 "Item": marshall(
-                    {
-                        "pk": device_pk(event.id),
-                        "sk": device_page_sk(event.page),
-                        "pk_1": device_pk(event.id),
-                        "sk_1": device_page_sk(event.page),
-                        **page.values,
-                    }
+                    {"pk": pk, "sk": sk, "pk_1": pk, "sk_1": sk, **page.values}
                 ),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
 
     def read_by_key(self, key) -> Device:
-        pk_1 = device_key_sk(key)
+        pk_1 = TableKeys.DEVICE_KEY.key(key)
         args = {
             "TableName": self.table_name,
             "IndexName": "idx_gsi_1",
@@ -221,10 +175,10 @@ class DeviceRepository(Repository[Device]):
 
         (item,) = items
 
-        return self.read(item["pk"].split("#", 1)[1])
+        return self.read(strip_key_prefix(item["pk"]))
 
     def read(self, id) -> Device:
-        pk = device_pk(id)
+        pk = TableKeys.DEVICE.key(id)
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk",
@@ -233,23 +187,14 @@ class DeviceRepository(Repository[Device]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
 
-        pages = [v for v in items if v["sk"].startswith("DP#")]
-        keys = [v for v in items if v["sk"].startswith("DK#")]
-        relationships = [v for v in items if v["sk"].startswith("DR#")]
-        device = [v for v in items if v["sk"].startswith("D#")][0]
-
-        def extract_sk(record):
-            return record["sk"].split("#", 1)[1]
-
-        def remove_keys(pk=None, sk=None, pk_1=None, sk_1=None, **values):  # NOSONAR
-            return values
+        pages = TableKeys.DEVICE_PAGE.filter_and_group(items, key="sk")
+        keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
+        relationships = TableKeys.DEVICE_RELATIONSHIP.filter_and_group(items, key="sk")
+        (device,) = TableKeys.DEVICE.filter(items, key="sk")
 
         return Device(
-            id=id,
-            relationships={
-                extract_sk(r): Relationship(**remove_keys(**r)) for r in relationships
-            },
-            keys={extract_sk(k): DeviceKey(**remove_keys(**k)) for k in keys},
-            pages={extract_sk(p): DevicePage(values=remove_keys(**p)) for p in pages},
+            relationships={id_: Relationship(**data) for id_, data in relationships},
+            keys={id_: DeviceKey(**data) for id_, data in keys},
+            pages={id_: DevicePage(values=data) for id_, data in pages},
             **device,
         )
