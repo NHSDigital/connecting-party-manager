@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Generic, Literal, TypeVar
 from uuid import UUID
 
 from domain.core.validation import ENTITY_NAME_REGEX, ODS_CODE_REGEX
@@ -13,12 +13,20 @@ class BaseModel(_BaseModel, extra=Extra.forbid):
     pass
 
 
+class Identifier(BaseModel):
+    system: str
+    value: str
+
+
+IdentifierType = TypeVar("IdentifierType", bound=Identifier)
+
+
 def ConstStrField(value):
     """Field that can only take the given value, and defaults to it"""
     return Field(default=value, regex=rf"^{value}$")
 
 
-class Identifier(BaseModel):
+class ProductTeamIdentifier(Identifier):
     system: str = ConstStrField(SYSTEM)
     value: UUID
 
@@ -29,17 +37,17 @@ class Identifier(BaseModel):
         return _dict
 
 
-class OdsIdentifier(BaseModel):
+class OdsIdentifier(Identifier):
     system: str = ConstStrField(ODS_API_BASE)
     value: str = Field(regex=ODS_CODE_REGEX)
 
 
-class Reference(BaseModel):
-    identifier: OdsIdentifier
+class Reference(BaseModel, Generic[IdentifierType]):
+    identifier: IdentifierType
 
 
 class Organization(BaseModel):
     resourceType: Literal["Organization"]
-    identifier: list[Identifier] = Field(min_items=1, max_items=1)
+    identifier: list[ProductTeamIdentifier] = Field(min_items=1, max_items=1)
     name: str = Field(regex=ENTITY_NAME_REGEX)
-    partOf: Reference
+    partOf: Reference[str]

@@ -1,9 +1,9 @@
 from domain.core.product_team import ProductTeam
 from domain.core.root import Root
 from domain.fhir.r4 import Organization, StrictOrganization
-from domain.fhir.r4.cpm_model import Identifier, OdsIdentifier
+from domain.fhir.r4.cpm_model import OdsIdentifier
 from domain.fhir.r4.cpm_model import Organization as ProductTeamOrganization
-from domain.fhir.r4.cpm_model import Reference
+from domain.fhir.r4.cpm_model import ProductTeamIdentifier, Reference
 from event.response.validation_errors import mark_validation_errors_as_inbound
 
 from .parse import create_fhir_model_from_fhir_json
@@ -29,7 +29,7 @@ def create_fhir_model_from_product_team(
 ) -> ProductTeamOrganization:
     return ProductTeamOrganization(
         resourceType=ProductTeamOrganization.__name__,
-        identifier=[Identifier(value=product_team.id)],
+        identifier=[ProductTeamIdentifier(value=product_team.id)],
         name=product_team.name,
         partOf=Reference(identifier=OdsIdentifier(value=product_team.ods_code)),
     )
