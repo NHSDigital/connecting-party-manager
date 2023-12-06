@@ -20,13 +20,12 @@ class DeviceCreatedEvent(Event):
     Raised when a new Device is created
     """
 
-    def __init__(self, id, name, type, product_team_id, ods_code, ods_name, status):
+    def __init__(self, id, name, type, product_team_id, ods_code, status):
         self.id = id
         self.name = name
         self.type = type
         self.product_team_id = product_team_id
         self.ods_code = ods_code
-        self.ods_name = ods_name
         self.status = status
 
 
@@ -138,7 +137,7 @@ class DeviceKey(BaseModel):
 
 class DeviceType(StrEnum):
     """
-    A Product is to be classified as being one of the following.  These terms
+    A Device is to be classified as being one of the following.  These terms
     were provided by Aubyn Crawford in collaboration with Service Now.
 
     NOTE:

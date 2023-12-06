@@ -14,17 +14,17 @@ from domain.core.device import (
     RelationshipAddedEvent,
     RelationshipRemovedEvent,
 )
-from repository.keys import (
+
+from .errors import NotFoundException
+from .keys import (
     device_key_sk,
     device_page_sk,
     device_pk,
     device_relationship_sk,
     ods_pk,
 )
-
-from .errors import NotFoundException
+from .marshall import marshall, unmarshall
 from .repository import Repository
-from .utils import marshall, unmarshall
 
 
 class DeviceRepository(Repository[Device]):

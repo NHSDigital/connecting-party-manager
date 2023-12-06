@@ -61,7 +61,7 @@ def test__can_create_device(
 
 @pytest.mark.parametrize("index", ["PROD", "env:PROD"])
 def test__can_add_page(index: str):
-    org = Root.create_ods_organisation(ods_code="AB123", name="Supplier")
+    org = Root.create_ods_organisation(ods_code="AB123")
     team = org.create_product_team(
         id=UUID("f363c58b-1b6c-4fa6-a9b6-0c390808319b"), name="Team"
     )
@@ -81,7 +81,7 @@ def test__can_add_page(index: str):
 
 @pytest.mark.parametrize("index", ["!!", "env:PROD:X"])
 def test__cannot_add_page(index: str):
-    org = Root.create_ods_organisation(ods_code="AB123", name="Supplier")
+    org = Root.create_ods_organisation(ods_code="AB123")
     team = org.create_product_team(
         id=UUID("f363c58b-1b6c-4fa6-a9b6-0c390808319b"), name="Team"
     )
@@ -98,7 +98,7 @@ def test__cannot_add_page(index: str):
 
 @pytest.mark.parametrize("index", ["PROD", "env:PROD"])
 def test__can_remove_page(index: str):
-    org = Root.create_ods_organisation(ods_code="AB123", name="Supplier")
+    org = Root.create_ods_organisation(ods_code="AB123")
     team = org.create_product_team(
         id=UUID("f363c58b-1b6c-4fa6-a9b6-0c390808319b"), name="Team"
     )

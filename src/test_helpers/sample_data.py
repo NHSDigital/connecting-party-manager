@@ -2,7 +2,7 @@ from event.json import json_load
 
 from .constants import PROJECT_ROOT
 
-PATH_TO_CORE_TEST_DATA = PROJECT_ROOT / "src/layers/domain/core/tests/data"
+PATH_TO_CORE_TEST_DATA = PROJECT_ROOT / "src/layers/domain/fhir_translation/tests/data"
 
 
 def _read_core_test_data(file_name: str) -> dict | list:

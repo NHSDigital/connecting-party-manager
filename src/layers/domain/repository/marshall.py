@@ -1,6 +1,6 @@
 from typing import Any
 
-from repository.errors import UnableToUnmarshall
+from .errors import UnableToUnmarshall
 
 
 def marshall_value(value):

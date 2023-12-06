@@ -1,5 +1,5 @@
 import pytest
-from repository.utils import marshall, marshall_value, unmarshall_value
+from domain.repository.marshall import marshall, marshall_value, unmarshall_value
 
 
 class Nested:

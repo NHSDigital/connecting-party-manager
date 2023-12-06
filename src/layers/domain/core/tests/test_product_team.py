@@ -15,7 +15,7 @@ from pydantic import ValidationError
     ],
 )
 def test__create_product_team(id: str, name: str):
-    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
+    org = Root.create_ods_organisation(ods_code="AB123")
 
     result = org.create_product_team(id=id, name=name)
     event = result.events[0]
@@ -24,7 +24,6 @@ def test__create_product_team(id: str, name: str):
     assert result.id == id, "id mismatch"
     assert result.name == name, "name mismatch"
     assert result.ods_code == org.ods_code, "ods_code"
-    assert result.ods_name == org.name, "ods_code"
 
     assert len(result.events) == 1
     event = result.events[0]
@@ -32,7 +31,6 @@ def test__create_product_team(id: str, name: str):
     assert event.id == id, "id mismatch"
     assert event.name == name, "name mismatch"
     assert event.ods_code == org.ods_code, "organisation.id mismatch"
-    assert event.ods_name == org.name, "ods_code"
 
 
 @pytest.mark.parametrize(
@@ -43,7 +41,7 @@ def test__create_product_team(id: str, name: str):
     ],
 )
 def test__create_product_team_bad_id(id: str, name: str):
-    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
+    org = Root.create_ods_organisation(ods_code="AB123")
 
     with pytest.raises(ValidationError):
         org.create_product_team(id=id, name=name)
@@ -56,7 +54,7 @@ def test__create_product_team_bad_id(id: str, name: str):
     ],
 )
 def test__create_product_team_bad_name(id: str, name: str):
-    org = Root.create_ods_organisation(ods_code="AB123", name="Test")
+    org = Root.create_ods_organisation(ods_code="AB123")
 
     with pytest.raises(ValidationError):
         org.create_product_team(id=id, name=name)

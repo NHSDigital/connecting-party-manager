@@ -12,11 +12,10 @@ class ProductTeamCreatedEvent(Event):
     Raised when a new ProductTeam has been created within the domain.
     """
 
-    def __init__(self, id, name, ods_code, ods_name):
+    def __init__(self, id, name, ods_code):
         self.id = id
         self.name = name
         self.ods_code = ods_code
-        self.ods_name = ods_name
 
 
 class ProductTeamDeletedEvent(Event):
@@ -38,7 +37,6 @@ class ProductTeam(AggregateRoot):
     id: UUID
     name: str = Field(regex=ENTITY_NAME_REGEX)
     ods_code: str
-    ods_name: str
 
     def create_device(
         self,
@@ -53,7 +51,6 @@ class ProductTeam(AggregateRoot):
             type=type,
             product_team_id=self.id,
             ods_code=self.ods_code,
-            ods_name=self.ods_name,
             status=status,
         )
         result = Device(
@@ -63,7 +60,6 @@ class ProductTeam(AggregateRoot):
             status=status,
             product_team_id=self.id,
             ods_code=self.ods_code,
-            ods_name=self.ods_name,
             events=[event],
         )
         self.add_event(event)

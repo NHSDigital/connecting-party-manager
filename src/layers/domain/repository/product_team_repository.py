@@ -3,11 +3,11 @@ from domain.core.product_team import (
     ProductTeamCreatedEvent,
     ProductTeamDeletedEvent,
 )
-from repository.errors import NotFoundException
-from repository.keys import ods_pk, product_team_pk
 
+from .errors import NotFoundException
+from .keys import ods_pk, product_team_pk
+from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
-from .utils import marshall, marshall_value, unmarshall
 
 
 class ProductTeamRepository(Repository[ProductTeam]):
@@ -30,7 +30,6 @@ class ProductTeamRepository(Repository[ProductTeam]):
                         "sk_1": product_team_pk(event.id),
                         "name": event.name,
                         "ods_code": event.ods_code,
-                        "ods_name": event.ods_name,
                     }
                 ),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",

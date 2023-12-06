@@ -3,7 +3,7 @@ from uuid import UUID
 import boto3
 import pytest
 from domain.core.root import Root
-from repository.product_team_repo import ProductTeamRepository
+from domain.repository.product_team_repository import ProductTeamRepository
 
 from test_helpers.terraform import read_terraform_output
 
@@ -13,7 +13,7 @@ def test__product_team_repository():
     team_id = UUID("359e28eb-6e2c-409c-a3ab-a4868ab5c2df")
     table_name = read_terraform_output("dynamodb_table_name.value")
 
-    org = Root.create_ods_organisation(ods_code="AB123", name="Test Organisation")
+    org = Root.create_ods_organisation(ods_code="AB123")
     team = org.create_product_team(id=team_id, name="Test Team")
 
     repo = ProductTeamRepository(

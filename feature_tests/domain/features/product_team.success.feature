@@ -2,8 +2,8 @@ Feature: Product Teams Success Scenarios
 
   Scenario Outline: Successfully create a Product Team
     Given ODS Organisations:
-      | ods_code   | name       |
-      | <ods_code> | <ods_name> |
+      | ods_code   |
+      | <ods_code> |
     When User "<user_id>" creates Product Team <id> called "<name>" for supplier <ods_code>
     Then the operation is successful
     And the result is a ProductTeam with:
