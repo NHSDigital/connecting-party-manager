@@ -2,20 +2,18 @@ from uuid import UUID
 
 import boto3
 import pytest
-from domain.core.product import (
-    ProductKeyType,
-    ProductStatus,
-    ProductType,
-    RelationshipType,
-)
+from domain.core.accredited_system_id import AccreditedSystemId
+from domain.core.device import DeviceStatus, DeviceType, RelationshipType
+from domain.core.product_id import ProductId
 from domain.core.root import Root
-from repository.product_repo import ProductRepository
+from repository.device_repo import DeviceRepository
 
 from test_helpers.terraform import read_terraform_output
 
 
+@pytest.mark.wip
 @pytest.mark.integration
-def test__product_repository():
+def test__device_repository():
     subject_id = UUID("774c8c06-0d15-4b7d-9c7e-4a358681b78b")
     target_id = UUID("07bca737-1022-494c-8df0-5e7dd152ba59")
     table_name = read_terraform_output("dynamodb_table_name.value")
@@ -24,29 +22,30 @@ def test__product_repository():
     team = org.create_product_team(
         id=UUID("6f8c285e-04a2-4194-a84e-dabeba474ff7"), name="Team"
     )
-    target = team.create_product(
+    target = team.create_device(
         id=target_id,
         name="Target",
-        type=ProductType.SERVICE,
-        status=ProductStatus.ACTIVE,
+        type=DeviceType.SERVICE,
+        status=DeviceStatus.ACTIVE,
     )
-    subject = team.create_product(
+    subject = team.create_device(
         id=subject_id,
         name="Subject",
-        type=ProductType.SERVICE,
-        status=ProductStatus.ACTIVE,
+        type=DeviceType.SERVICE,
+        status=DeviceStatus.ACTIVE,
     )
     subject.add_relationship(target, RelationshipType.DEPENDENCY)
-    subject.add_key("XXX-YYY-ZZZ", ProductKeyType.PRODUCT_ID)
-    subject.add_key("1234567890", ProductKeyType.ACCREDITED_SYSTEM_ID)
+    subject.add_key(ProductId("WWW-XXX-YYY"))
+    subject.add_key(AccreditedSystemId("1234567890"))
+    subject.add_page(index="TEST", values={"one": 1, "two": 2, "three": 3})
 
-    product_repo = ProductRepository(
+    device_repo = DeviceRepository(
         table_name=table_name, dynamodb_client=boto3.client("dynamodb")
     )
 
-    product_repo.write(subject)
+    device_repo.write(subject)
 
-    result = product_repo.read(subject_id)
+    result = device_repo.read(subject_id)
 
     assert result is not None, "result"
     assert result.id == subject.id, "id"
@@ -55,3 +54,4 @@ def test__product_repository():
     assert result.product_team_id == subject.product_team_id, "product_team_id"
     assert result.keys == subject.keys, "keys"
     assert result.relationships == subject.relationships, "relationships"
+    assert result.pages == subject.pages, "pages"

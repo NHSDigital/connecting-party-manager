@@ -9,7 +9,6 @@ from test_helpers.terraform import read_terraform_output
 
 
 @pytest.mark.integration
-@pytest.mark.wip
 def test__product_team_repository():
     team_id = UUID("359e28eb-6e2c-409c-a3ab-a4868ab5c2df")
     table_name = read_terraform_output("dynamodb_table_name.value")
@@ -22,7 +21,7 @@ def test__product_team_repository():
         dynamodb_client=boto3.client("dynamodb"),
     )
 
-    repo.write(team)
+    response = repo.write(team)
 
     result = repo.read(team_id)
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2023-12-05
+- PI-127 Rename Product to Device
+
 ## 2023-11-30
 - [PI-118] End-to-end product team endpoints
 - dependabot (datamodel-codegen)
