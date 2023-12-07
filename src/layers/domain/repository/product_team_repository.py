@@ -22,13 +22,10 @@ class ProductTeamRepository(Repository[ProductTeam]):
         self, event: ProductTeamCreatedEvent, entity: ProductTeam
     ):
         pk = TableKeys.PRODUCT_TEAM.key(event.id)
-        pk_1 = TableKeys.ODS_ORGANISATION.key(event.ods_code)
         return {
             "Put": {
                 "TableName": self.table_name,
-                "Item": marshall(
-                    {"pk": pk, "sk": pk, "pk_1": pk_1, "sk_1": pk, **asdict(event)}
-                ),
+                "Item": marshall(pk=pk, sk=pk, **asdict(event)),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
             }
         }
@@ -40,7 +37,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         return {
             "Delete": {
                 "TableName": self.table_name,
-                "Key": marshall({"pk": pk, "sk": pk}),
+                "Key": marshall(pk=pk, sk=pk),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }

@@ -1,5 +1,10 @@
 import pytest
-from domain.repository.marshall import marshall, marshall_value, unmarshall_value
+from domain.repository.marshall import (
+    _marshall,
+    marshall,
+    marshall_value,
+    unmarshall_value,
+)
 
 
 class Nested:
@@ -91,6 +96,20 @@ def test__unmarshall_value(value, expected):
 
 def test__marshall():
     input = {"one": 1, "two": 2, "three": 3}
-    actual = marshall(input)
+    actual = _marshall(input)
     expected = {"one": {"N": "1"}, "two": {"N": "2"}, "three": {"N": "3"}}
+    assert actual == expected
+
+
+def test_marshall():
+    input = {"one": 1, "two": 2, "three": 3}
+    actual = marshall(pk="_pk_", pk_1="_pk_1_", sk_5="_sk_5_", **input)
+    expected = {
+        "pk": {"S": "_pk_"},
+        "pk_1": {"S": "_pk_1_"},
+        "sk_5": {"S": "_sk_5_"},
+        "one": {"N": "1"},
+        "two": {"N": "2"},
+        "three": {"N": "3"},
+    }
     assert actual == expected

@@ -6,7 +6,7 @@ from .errors import UnableToUnmarshall
 def marshall_value(value):
     if value is None:
         return {"Null": True}
-    if type(value) is bool:  # isinstance(True,int) == True
+    if type(value) is bool:
         return {"B": value}
     if type(value) is int or isinstance(value, float):
         return {"N": str(value)}
@@ -17,7 +17,40 @@ def marshall_value(value):
     return {"S": str(value)}
 
 
-def marshall(d):
+def marshall(
+    pk,
+    sk=None,
+    pk_1=None,
+    sk_1=None,
+    pk_2=None,
+    sk_2=None,
+    pk_3=None,
+    sk_3=None,
+    pk_4=None,
+    sk_4=None,
+    pk_5=None,
+    sk_5=None,
+    **data,
+):
+    keys = {
+        "pk": pk,
+        "sk": sk,
+        "pk_1": pk_1,
+        "sk_1": sk_1,
+        "pk_2": pk_2,
+        "sk_2": sk_2,
+        "pk_3": pk_3,
+        "sk_3": sk_3,
+        "pk_4": pk_4,
+        "sk_4": sk_4,
+        "pk_5": pk_5,
+        "sk_5": sk_5,
+    }
+    non_null_keys = {k: v for k, v in keys.items() if v is not None}
+    return _marshall({**non_null_keys, **data})
+
+
+def _marshall(d):
     return marshall_value(d)["M"]
 
 
