@@ -47,9 +47,9 @@ class ProductTeam(AggregateRoot):
             product_team_id=self.id,
             ods_code=self.ods_code,
         )
-        event = DeviceCreatedEvent(**device.dict())
-        device.add_event(event)
-        self.add_event(event)
+        device_created_event = DeviceCreatedEvent(**device.dict())
+        device.add_event(device_created_event)
+        self.add_event(device_created_event)
         return device
 
     def delete(self) -> list[Event]:

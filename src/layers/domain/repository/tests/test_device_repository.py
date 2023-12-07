@@ -2,9 +2,7 @@ from uuid import UUID
 
 import boto3
 import pytest
-from domain.core.accredited_system_id import AccreditedSystemId
-from domain.core.device import DeviceStatus, DeviceType
-from domain.core.product_id import ProductId
+from domain.core.device import DeviceKeyType, DeviceStatus, DeviceType
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
 
@@ -35,8 +33,8 @@ def test__device_repository():
         status=DeviceStatus.ACTIVE,
     )
     # subject.add_relationship(target, RelationshipType.DEPENDENCY)
-    subject.add_key(ProductId("WWW-XXX-YYY"))
-    subject.add_key(AccreditedSystemId("1234567890"))
+    subject.add_key("WWW-XXX-YYY", type=DeviceKeyType.PRODUCT_ID)
+    subject.add_key("1234567890", type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     # subject.add_page(index="TEST", values={"one": 1, "two": 2, "three": 3})
 
     device_repo = DeviceRepository(

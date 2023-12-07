@@ -14,27 +14,14 @@ import random
 import re
 
 PRODUCT_ID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"
-PRODUCT_ID_REGEX = (
-    f"^[{PRODUCT_ID_CHARS}]{{3}}-[f{PRODUCT_ID_CHARS}]{{3}}-[{PRODUCT_ID_CHARS}]{{3}}$"
-)
+PRODUCT_ID_REGEX = re.compile(rf"^[{PRODUCT_ID_CHARS}]{{3}}-[{PRODUCT_ID_CHARS}]{{3}}$")
+
+PART_LENGTH = 3
+N_PARTS = 2
 
 
-class InvalidProductIdError(Exception):
-    pass
-
-
-class ProductId(str):
-    """
-    ProductId has been derived from `str` to allow for string comparisons and
-    hashing without having to make any specific changes.
-    """
-
-    def __new__(cls, content):
-        if not re.match(PRODUCT_ID_REGEX, content):
-            raise InvalidProductIdError(f"Invalid Product Id: {content}")
-        return str.__new__(cls, content)
-
-    @staticmethod
-    def generate(seed: int | None = None) -> "ProductId":
-        rng = random.Random(seed)
-        return "-".join("".join(rng.choices(PRODUCT_ID_CHARS, k=3)) for _ in range(3))
+def generate_product_id(seed: int | None = None) -> str:
+    rng = random.Random(seed)
+    return "-".join(
+        "".join(rng.choices(PRODUCT_ID_CHARS, k=PART_LENGTH)) for _ in range(N_PARTS)
+    )
