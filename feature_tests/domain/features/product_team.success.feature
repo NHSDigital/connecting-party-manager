@@ -21,6 +21,6 @@ Feature: Product Teams Success Scenarios
       | ods_code | <ods_code> |
 
     Examples:
-      | id                                     | name            | ods_code | ods_name           | user_id          |
-      | {00702d39-e65f-49f5-b9ef-6570245bfe17} | My organisation | H8S7A    | BURENDO            | test@example.org |
-      | {d3424f20-e9bd-40d3-a7c1-5c401c5b9a1d} | Another Org     | 8JK09    | AIRE LOGIC LIMITED | test@example.org |
+      | id                                   | name            | ods_code | user_id          |
+      | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My organisation | H8S7A    | test@example.org |
+      | d3424f20-e9bd-40d3-a7c1-5c401c5b9a1d | Another Org     | 8JK09    | test@example.org |

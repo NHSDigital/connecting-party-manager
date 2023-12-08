@@ -2,9 +2,7 @@ from uuid import UUID
 
 import boto3
 import pytest
-from domain.core.accredited_system_id import AccreditedSystemId
-from domain.core.device import DeviceStatus, DeviceType
-from domain.core.product_id import ProductId
+from domain.core.device import DeviceKeyType, DeviceStatus, DeviceType
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
 
@@ -22,12 +20,12 @@ def test__device_repository():
     team = org.create_product_team(
         id=UUID("6f8c285e-04a2-4194-a84e-dabeba474ff7"), name="Team"
     )
-    target = team.create_device(
-        id=target_id,
-        name="Target",
-        type=DeviceType.SERVICE,
-        status=DeviceStatus.ACTIVE,
-    )
+    # target = team.create_device(
+    #     id=target_id,
+    #     name="Target",
+    #     type=DeviceType.SERVICE,
+    #     status=DeviceStatus.ACTIVE,
+    # )
     subject = team.create_device(
         id=subject_id,
         name="Subject",
@@ -35,8 +33,8 @@ def test__device_repository():
         status=DeviceStatus.ACTIVE,
     )
     # subject.add_relationship(target, RelationshipType.DEPENDENCY)
-    subject.add_key(ProductId("WWW-XXX-YYY"))
-    subject.add_key(AccreditedSystemId("1234567890"))
+    subject.add_key(key="WWW-XXX", type=DeviceKeyType.PRODUCT_ID)
+    subject.add_key(key="1234567890", type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     # subject.add_page(index="TEST", values={"one": 1, "two": 2, "three": 3})
 
     device_repo = DeviceRepository(
@@ -44,14 +42,5 @@ def test__device_repository():
     )
 
     device_repo.write(subject)
-
     result = device_repo.read(subject_id)
-
-    assert result is not None, "result"
-    assert result.id == subject.id, "id"
-    assert result.name == subject.name, "name"
-    assert result.ods_code == subject.ods_code, "ods_code"
-    assert result.product_team_id == subject.product_team_id, "product_team_id"
-    assert result.keys == subject.keys, "keys"
-    # assert result.relationships == subject.relationships, "relationships"
-    # assert result.pages == subject.pages, "pages"
+    assert result == subject

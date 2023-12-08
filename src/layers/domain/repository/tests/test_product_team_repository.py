@@ -21,11 +21,6 @@ def test__product_team_repository():
         dynamodb_client=boto3.client("dynamodb"),
     )
 
-    response = repo.write(team)
-
+    repo.write(team)
     result = repo.read(team_id)
-
-    assert result is not None, "failed to load"
-    assert result.id == team.id, "id"
-    assert result.name == team.name, "name"
-    assert result.ods_code == team.ods_code, "ods_code"
+    assert result == team

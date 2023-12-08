@@ -1,18 +1,11 @@
-from uuid import UUID
-
 import parse
 from behave import register_type
+from domain.core.device import DeviceCreatedEvent, DeviceKeyAddedEvent
+from domain.core.error import DuplicateError
 from domain.core.product_team import ProductTeamCreatedEvent
 from pydantic import ValidationError
 
 from feature_tests.domain.steps.context import Context
-
-
-@parse.with_pattern(
-    r"\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}"
-)
-def parse_uuid(value):
-    return UUID(value)
 
 
 def parse_string(value):
@@ -41,7 +34,6 @@ def parse_path(value):
 
 # Register the different datatypes used in the step definitions.
 register_type(
-    UUID=parse_uuid,
     String=parse_string,
     Number=parse_number,
     OdsCode=parse_ods_code,
@@ -66,7 +58,10 @@ def catch_errors(func):
 
 EXPECTED_TYPES = {
     "ProductTeamCreatedEvent": ProductTeamCreatedEvent,
+    "DeviceCreatedEvent": DeviceCreatedEvent,
+    "DeviceKeyAddedEvent": DeviceKeyAddedEvent,
     "ValidationError": ValidationError,
+    "DuplicateError": DuplicateError,
 }
 
 
@@ -90,7 +85,7 @@ def parse_value(v):
     """
     Use the parsing methods above to turn a value into a proper type.
     """
-    _parsing_functions = (parse_uuid, parse_number, parse_ods_code, parse_string)
+    _parsing_functions = (parse_number, parse_ods_code, parse_string)
 
     def __parse_value(v, *functions):
         if len(functions) == 0:
@@ -119,7 +114,10 @@ def read_value_from_path(obj, full_path: str) -> any:
             )
 
         head, *tail = path
-        obj = getattr(obj, head)
+        if isinstance(obj, dict):
+            obj = obj[head]
+        else:
+            obj = getattr(obj, head)
         if tail:
             return _read_value(obj, tail)
         return obj

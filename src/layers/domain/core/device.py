@@ -1,13 +1,16 @@
+import re
 from dataclasses import dataclass
 from enum import StrEnum, auto
+from typing import TypedDict
 from uuid import UUID
 
-from domain.core.accredited_system_id import AccreditedSystemId
-from domain.core.aggregate_root import AggregateRoot
-from domain.core.error import DuplicateError, InvalidDeviceKeyError
-from domain.core.event import Event
-from domain.core.product_id import ProductId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
+
+from .aggregate_root import AggregateRoot
+from .error import DuplicateError
+from .event import Event
+from .product_id import PRODUCT_ID_REGEX
+from .validation import ACCREDITED_SYSTEM_ID_REGEX, DEVICE_NAME_REGEX
 
 
 @dataclass(kw_only=True, slots=True)
@@ -23,33 +26,54 @@ class DeviceCreatedEvent(Event):
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
     id: UUID
-    key: ProductId | AccreditedSystemId
+    key: str
     type: "DeviceKeyType"
 
 
 class DeviceKeyType(StrEnum):
     PRODUCT_ID = auto()
-    # XXX-XXX-XXX
     ACCREDITED_SYSTEM_ID = auto()
-    # \d{1,12}
-    SERVICE_NOW_ID = auto()
-    # TBD
+    # SERVICE_NOW_ID = auto()
+
+    @property
+    def pattern(self) -> re.Pattern:
+        match self:
+            case DeviceKeyType.PRODUCT_ID:
+                return PRODUCT_ID_REGEX
+            case DeviceKeyType.ACCREDITED_SYSTEM_ID:
+                return ACCREDITED_SYSTEM_ID_REGEX
+            case _:
+                raise NotImplementedError(f"No ID validation configured for '{self}'")
 
 
 class DeviceKey(BaseModel):
     """
-    A Device Key is a secondary way of indexing / retrieving Devices.  These are expected to be:
-      Product Id                    - e.g. XXX-XXX-XXX
-      Accredited System Id (ASID)   - e.g. 123456789012
-      Service Now Id                - e.g. TBD
+    A Device Key is a secondary way of indexing / retrieving Devices
     """
 
     type: DeviceKeyType
+    key: str
+
+    @validator("key", check_fields=True)
+    def validate_key(key: str, values: dict):
+        type: DeviceKeyType = values.get("type")
+        if type and type.pattern.match(key) is None:
+            raise ValueError(
+                f"Key '{key}' does not match the expected "
+                f"pattern '{type.pattern.pattern}' associated with "
+                f"key type '{type}'"
+            )
+        return key
+
+
+class DeviceKeyDict(TypedDict):
+    type: str
+    key: str
 
 
 class DeviceType(StrEnum):
     """
-    A Device is to be classified as being one of the following.  These terms
+    A Product is to be classified as being one of the following.  These terms
     were provided by Aubyn Crawford in collaboration with Service Now.
 
     NOTE:
@@ -82,7 +106,7 @@ class Device(AggregateRoot):
     """
 
     id: UUID
-    name: str = Field(pattern="^[a-z][a-z0-9_]+$")
+    name: str = Field(regex=DEVICE_NAME_REGEX)
     type: DeviceType
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
@@ -98,22 +122,14 @@ class Device(AggregateRoot):
         """
         raise NotImplementedError()
 
-    def add_key(self, key: ProductId | AccreditedSystemId) -> DeviceKeyAddedEvent:
+    def add_key(self, type: str, key: str) -> DeviceKeyAddedEvent:
         """
         Adds a new Key to a Device
         """
         if key in self.keys:
             raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        if isinstance(key, ProductId):
-            type = DeviceKeyType.PRODUCT_ID
-        elif isinstance(key, AccreditedSystemId):
-            type = DeviceKeyType.ACCREDITED_SYSTEM_ID
-        else:
-            raise InvalidDeviceKeyError(
-                "key must be ProductId() or AccreditedSystemId()"
-            )
-        device_key = DeviceKey(type=type)
-        event = DeviceKeyAddedEvent(id=self.id, key=key, **device_key.dict())
+        device_key = DeviceKey(key=key, type=type)
+        event = DeviceKeyAddedEvent(id=self.id, **device_key.dict())
         self.keys[key] = device_key
         return self.add_event(event=event)
 
