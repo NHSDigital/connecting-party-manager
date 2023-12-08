@@ -26,7 +26,7 @@ class AggregateRoot(BaseModel):
 
         arbitrary_types_allowed = True
 
-    events: list[Event] = Field(default_factory=list)
+    events: list[Event] = Field(default_factory=list, exclude=True)
 
     def add_event(self, event: Event) -> Event:
         """

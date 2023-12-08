@@ -5,6 +5,7 @@
     {
       "id": "f9518c12-6c83-4544-97db-d9dd1d64da97",
       "use": "official",
+      "system": "connecting-party-manager",
       "value": "f9518c12-6c83-4544-97db-d9dd1d64da97"
     }
   ],
@@ -12,9 +13,9 @@
   "partOf": {
     "id": "F5H1R",
     "identifier": {
-      "id": "F5H1R",
+      "system": "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations",
       "use": "official",
-      "value": "ROYAL DERBY HOSPITAL UTC"
+      "value": "F5H1R"
     },
     "type": "uri",
     "reference": "internal",

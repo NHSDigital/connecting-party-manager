@@ -9,7 +9,6 @@ packages = [
     { include = "api", from = "src" },
     { include = "domain", from = "src/layers" },
     { include = "event", from = "src/layers" },
-    { include = "repository", from = "src/layers" },
     { include = "builder", from = "scripts" },
 ]
 

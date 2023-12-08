@@ -1,12 +1,12 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.fhir_transform import create_product_team_from_fhir_org_json
 from domain.core.product_team import ProductTeam
+from domain.fhir_translation.product_team import create_product_team_from_fhir_org_json
 from domain.ods import validate_ods_code
+from domain.repository.product_team_repository import ProductTeamRepository
 from event.response.validation_errors import mark_json_decode_errors_as_inbound
 from event.step_chain import StepChain
-from repository.product_team_repo import ProductTeamRepository
 
 
 @mark_json_decode_errors_as_inbound

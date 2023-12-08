@@ -1,13 +1,15 @@
+from dataclasses import asdict
+
 from domain.core.product_team import (
     ProductTeam,
     ProductTeamCreatedEvent,
     ProductTeamDeletedEvent,
 )
-from repository.errors import NotFoundException
-from repository.keys import ods_pk, product_team_pk
 
+from .errors import NotFoundException
+from .keys import TableKeys
+from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
-from .utils import marshall, marshall_value, unmarshall
 
 
 class ProductTeamRepository(Repository[ProductTeam]):
@@ -19,20 +21,11 @@ class ProductTeamRepository(Repository[ProductTeam]):
     def handle_ProductTeamCreatedEvent(
         self, event: ProductTeamCreatedEvent, entity: ProductTeam
     ):
+        pk = TableKeys.PRODUCT_TEAM.key(event.id)
         return {
             "Put": {
                 "TableName": self.table_name,
-                "Item": marshall(
-                    {
-                        "pk": product_team_pk(event.id),
-                        "sk": product_team_pk(event.id),
-                        "pk_1": ods_pk(event.ods_code),
-                        "sk_1": product_team_pk(event.id),
-                        "name": event.name,
-                        "ods_code": event.ods_code,
-                        "ods_name": event.ods_name,
-                    }
-                ),
+                "Item": marshall(pk=pk, sk=pk, **asdict(event)),
                 "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
             }
         }
@@ -40,21 +33,17 @@ class ProductTeamRepository(Repository[ProductTeam]):
     def handle_ProductTeamDeletedEvent(
         self, event: ProductTeamDeletedEvent, entity: ProductTeam
     ):
+        pk = TableKeys.PRODUCT_TEAM.key(event.id)
         return {
             "Delete": {
                 "TableName": self.table_name,
-                "Key": marshall(
-                    {
-                        "pk": product_team_pk(event.id),
-                        "sk": product_team_pk(event.id),
-                    }
-                ),
+                "Key": marshall(pk=pk, sk=pk),
                 "ConditionExpression": "attribute_exists(pk) AND attribute_exists(sk)",
             }
         }
 
     def read(self, id) -> ProductTeam:
-        pk = product_team_pk(id)
+        pk = TableKeys.PRODUCT_TEAM.key(id)
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk AND sk = :sk",
@@ -69,4 +58,4 @@ class ProductTeamRepository(Repository[ProductTeam]):
             raise NotFoundException(key=id)
         (item,) = items
 
-        return ProductTeam(id=id, **item)
+        return ProductTeam(**item)

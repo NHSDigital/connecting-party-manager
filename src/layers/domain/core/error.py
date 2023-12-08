@@ -12,3 +12,11 @@ class InvalidDeviceKeyError(Exception):
 
 class InvalidKeyError(Exception):
     pass
+
+
+class InvalidProductIdError(Exception):
+    pass
+
+
+class InvalidAccreditedSystemIdError(Exception):
+    pass

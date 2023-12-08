@@ -10,8 +10,8 @@ class Root:
     """
 
     @staticmethod
-    def create_ods_organisation(ods_code: str, name: str) -> OdsOrganisation:
-        return OdsOrganisation(ods_code=ods_code, name=name)
+    def create_ods_organisation(ods_code: str) -> OdsOrganisation:
+        return OdsOrganisation(ods_code=ods_code)
 
     @staticmethod
     def create_questionnaire(id: str, name: str) -> Questionnaire:

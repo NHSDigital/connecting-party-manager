@@ -2,31 +2,42 @@ from typing import Literal
 from uuid import UUID
 
 from domain.core.validation import ENTITY_NAME_REGEX, ODS_CODE_REGEX
+from domain.ods import ODS_API_BASE
 from pydantic import BaseModel as _BaseModel
 from pydantic import Extra, Field
+
+SYSTEM = "connecting-party-manager"
 
 
 class BaseModel(_BaseModel, extra=Extra.forbid):
     pass
 
 
-class Identifier(BaseModel):
-    id: str = Field(regex=ODS_CODE_REGEX)
-    value: str = Field(min_length=1)
+def ConstStrField(value):
+    """Field that can only take the given value, and defaults to it"""
+    return Field(default=value, regex=rf"^{value}$")
 
 
-class Reference(BaseModel):
-    identifier: Identifier
+class ProductTeamIdentifier(BaseModel):
+    system: str = ConstStrField(SYSTEM)
+    value: UUID
+
+    def dict(self, *args, **kwargs):
+        """Additionally converts UUID to string"""
+        return {"system": self.system, "value": str(self.value)}
+
+
+class OdsIdentifier(BaseModel):
+    system: str = ConstStrField(ODS_API_BASE)
+    value: str = Field(regex=ODS_CODE_REGEX)
+
+
+class OdsReference(BaseModel):
+    identifier: OdsIdentifier
 
 
 class Organization(BaseModel):
     resourceType: Literal["Organization"]
-    id: UUID
+    identifier: list[ProductTeamIdentifier] = Field(min_items=1, max_items=1)
     name: str = Field(regex=ENTITY_NAME_REGEX)
-    partOf: Reference
-
-    def dict(self, *args, **kwargs):
-        """Additionally serializes UUID to string"""
-        _dict = super().dict(*args, **kwargs)
-        (_, _dict["id"]) = self.id.urn.split("urn:uuid:")
-        return _dict
+    partOf: OdsReference
