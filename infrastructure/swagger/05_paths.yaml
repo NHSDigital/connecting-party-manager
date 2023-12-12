@@ -33,6 +33,13 @@ x-definitions:
           - *RequestHeaderRequestId
           - *RequestHeaderCorrelationId
 
+  SuccessResponses:
+    "201": &Response201
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
   ErrorResponses:
     "4XX": &Response4XX
       description: "Client Error"
@@ -62,6 +69,8 @@ paths:
   /Organization:
     post:
       responses:
+        "201":
+          <<: *Response201
         "4XX":
           <<: *Response4XX
       <<: *RequestHeaders
@@ -90,6 +99,43 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /Device:
+    post:
+      responses:
+        "201":
+          <<: *Response201
+        "4XX":
+          <<: *Response4XX
+      <<: *RequestHeaders
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProductTeam} # CHANGE ME
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /Device/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProductTeam} # CHANGE ME
       security:
         - ${authoriser_name}: []
         - app-level0: []

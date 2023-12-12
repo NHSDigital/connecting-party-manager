@@ -2,7 +2,7 @@
   "resourceType": "Organization",
   "identifier": [
     {
-      "system": "connecting-party-manager",
+      "system": "connecting-party-manager/product-team-id",
       "value": "f9518c12-6c83-4544-97db-d9dd1d64da97"
     }
   ],

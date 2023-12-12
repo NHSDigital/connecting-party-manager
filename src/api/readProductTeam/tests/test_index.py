@@ -51,7 +51,7 @@ def test_index(version):
             "resourceType": "Organization",
             "identifier": [
                 {
-                    "system": "connecting-party-manager",
+                    "system": "connecting-party-manager/product-team-id",
                     "value": product_team_id,
                 }
             ],

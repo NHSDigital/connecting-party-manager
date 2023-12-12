@@ -10,9 +10,7 @@ from .parse import create_fhir_model_from_fhir_json
 
 
 @mark_validation_errors_as_inbound
-def create_product_team_from_fhir_org_json(
-    fhir_org_json: dict, **kwargs
-) -> ProductTeam:
+def create_product_team_from_fhir_org_json(fhir_org_json: dict) -> ProductTeam:
     fhir_org = create_fhir_model_from_fhir_json(
         fhir_json=fhir_org_json,
         fhir_models=[Organization, StrictOrganization],
@@ -25,7 +23,7 @@ def create_product_team_from_fhir_org_json(
 
 
 def create_fhir_model_from_product_team(
-    product_team: ProductTeam, **kwargs
+    product_team: ProductTeam,
 ) -> ProductTeamOrganization:
     return ProductTeamOrganization(
         resourceType=ProductTeamOrganization.__name__,
