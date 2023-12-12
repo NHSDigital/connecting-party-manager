@@ -5,29 +5,27 @@ from feature_tests.domain.steps.common import catch_errors
 from feature_tests.domain.steps.context import Context
 
 
-def _add_ods_org_to_context(context: Context, ods_code: str, name: str):
+def _add_ods_org_to_context(context: Context, ods_code: str):
     context.ods_organisations[ods_code] = Root.create_ods_organisation(
-        ods_code=ods_code, name=name
+        ods_code=ods_code
     )
 
 
 @given('ODS Organisation {ods_code:OdsCode} called "{name:String}"')
 def step_impl(context: Context, ods_code: str, name: str):
-    _add_ods_org_to_context(context=context, ods_code=ods_code, name=name)
+    _add_ods_org_to_context(context=context, ods_code=ods_code)
 
 
 @given("ODS Organisations")
 def step_impl(context: Context):
     for row in context.table:
-        _add_ods_org_to_context(
-            context=context, ods_code=row["ods_code"], name=row["name"]
-        )
+        _add_ods_org_to_context(context=context, ods_code=row["ods_code"])
 
 
 @when('ODS Organisation {ods_code} called "{name:String}" is created')
 def step_impl(context: Context, ods_code: str, name: str):
     __add_ods_org_to_context = catch_errors(_add_ods_org_to_context)
-    __add_ods_org_to_context(context=context, ods_code=ods_code, name=name)
+    __add_ods_org_to_context(context=context, ods_code=ods_code)
 
 
 @then("ODS Organisation {ods_code} exists")

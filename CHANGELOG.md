@@ -1,5 +1,10 @@
 # Changelog
 
+## 2023-12-08
+- [PI-145] Switch id to identifier
+- [PI-80] Domain logic for Device
+- [PI-127] PR feedback
+
 ## 2023-12-05
 - PI-127 Rename Product to Device
 

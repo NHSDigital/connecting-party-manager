@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
 from domain.ods import InvalidOdsCodeError
+from domain.repository.errors import NotFoundException
 from event.status.steps import StatusNotOk
 from event.versioning.errors import VersionException
-from repository.errors import NotFoundException
 
 from .coding import CpmCoding, FhirCoding
 from .validation_errors import (

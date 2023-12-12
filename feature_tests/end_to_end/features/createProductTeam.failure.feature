@@ -8,19 +8,21 @@ Feature: Create Product Team - failure scenarios
 
   Scenario: Cannot create a ProductTeam that already exists
     Given I have already made a "POST" request with "default" headers to "Organization" with body:
-      | path                    | value                    |
-      | resourceType            | Organization             |
-      | id                      | ${guid: 2}               |
-      | name                    | My Great Product Team    |
-      | partOf.identifier.id    | F5H1R                    |
-      | partOf.identifier.value | ROYAL DERBY HOSPITAL UTC |
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.value       | ${guid: 2}                                                     |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | F5H1R                                                          |
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path                    | value                    |
-      | resourceType            | Organization             |
-      | id                      | ${guid: 2}               |
-      | name                    | My Great Product Team    |
-      | partOf.identifier.id    | F5H1R                    |
-      | partOf.identifier.value | ROYAL DERBY HOSPITAL UTC |
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.value       | ${guid: 2}                                                     |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | F5H1R                                                          |
     Then I receive a status code "500" with body
       | path                             | value                                                                                                                                                                                                  |
       | resourceType                     | OperationOutcome                                                                                                                                                                                       |
@@ -37,13 +39,14 @@ Feature: Create Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 628              |
 
-  Scenario: Cannot create a ProductTeam with an Organization that is missing fields (no partOf.identifier.id)
+  Scenario: Cannot create a ProductTeam with an Organization that is missing fields (no partOf.identifier.value)
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path                    | value                    |
-      | resourceType            | Organization             |
-      | id                      | ${guid: 2}               |
-      | name                    | My Great Product Team    |
-      | partOf.identifier.value | ROYAL DERBY HOSPITAL UTC |
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.value       | ${guid: 2}                                                     |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |
@@ -55,19 +58,20 @@ Feature: Create Product Team - failure scenarios
       | issue.0.details.coding.0.code    | MISSING_VALUE                                                       |
       | issue.0.details.coding.0.display | Missing value                                                       |
       | issue.0.diagnostics              | field required                                                      |
-      | issue.0.expression.0             | Organization.partOf.identifier.id                                   |
+      | issue.0.expression.0             | Organization.partOf.identifier.value                                |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 497              |
+      | Content-Length | 500              |
 
   Scenario: Cannot create a ProductTeam with invalid FHIR
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path              | value                 |
-      | resourceType      | invalid_type          |
-      | id                | ${guid: 2}            |
-      | name              | My Great Product Team |
-      | partOf.identifier | invalid_identifier    |
+      | path                | value                    |
+      | resourceType        | invalid_type             |
+      | identifier.0.system | connecting-party-manager |
+      | identifier.0.value  | ${guid: 2}               |
+      | name                | My Great Product Team    |
+      | partOf.identifier   | invalid_identifier       |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |
@@ -94,12 +98,13 @@ Feature: Create Product Team - failure scenarios
 
   Scenario: Cannot create a ProductTeam with an invalid ID
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path                    | value                    |
-      | resourceType            | Organization             |
-      | id                      | invalid_id               |
-      | name                    | My Great Product Team    |
-      | partOf.identifier.id    | F5H1R                    |
-      | partOf.identifier.value | ROYAL DERBY HOSPITAL UTC |
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.value       | invalid_id                                                     |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | F5H1R                                                          |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |
@@ -111,20 +116,21 @@ Feature: Create Product Team - failure scenarios
       | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
       | issue.0.details.coding.0.display | Validation error                                                    |
       | issue.0.diagnostics              | value is not a valid uuid                                           |
-      | issue.0.expression.0             | Organization.id                                                     |
+      | issue.0.expression.0             | Organization.identifier.0.value                                     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 496              |
+      | Content-Length | 512              |
 
   Scenario: Cannot create a ProductTeam with a syntactically invalid ODS Code
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path                    | value                    |
-      | resourceType            | Organization             |
-      | id                      | ${guid: 2}               |
-      | name                    | My Great Product Team    |
-      | partOf.identifier.id    | invalid_ods_code         |
-      | partOf.identifier.value | ROYAL DERBY HOSPITAL UTC |
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.value       | ${guid: 2}                                                     |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | invalid_ods_code                                               |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |
@@ -136,20 +142,21 @@ Feature: Create Product Team - failure scenarios
       | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
       | issue.0.details.coding.0.display | Validation error                                                    |
       | issue.0.diagnostics              | string does not match regex "^[a-zA-Z0-9]{1,5}$"                    |
-      | issue.0.expression.0             | Organization.partOf.identifier.id                                   |
+      | issue.0.expression.0             | Organization.partOf.identifier.value                                |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 539              |
+      | Content-Length | 542              |
 
   Scenario: Cannot create a ProductTeam with an ODS code that is syntatically correct but doesn't exist
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path                    | value                                |
-      | resourceType            | Organization                         |
-      | id                      | f9518c12-6c83-4544-97db-d9dd1d64da97 |
-      | name                    | My Great Product Team                |
-      | partOf.identifier.id    | F5H11                                |
-      | partOf.identifier.value | ROYAL DERBY HOSPITAL UTC             |
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.value       | ${guid: 2}                                                     |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | F5H11                                                          |
     Then I receive a status code "422" with body
       | path                             | value                                                                                                      |
       | resourceType                     | OperationOutcome                                                                                           |

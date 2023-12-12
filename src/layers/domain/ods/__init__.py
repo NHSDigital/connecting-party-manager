@@ -7,9 +7,8 @@ from typing import Callable, ParamSpec, TypeVar
 import requests
 from requests.exceptions import RequestException
 
-ODS_API_ENDPOINT = (
-    "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/{ods_code}"
-)
+ODS_API_BASE = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
+ODS_API_ENDPOINT = f"{ODS_API_BASE}/" "{ods_code}"
 BACKOFF_BASE_SECONDS = 2
 WHITESPACE = re.compile(r"^(\s+)$")
 

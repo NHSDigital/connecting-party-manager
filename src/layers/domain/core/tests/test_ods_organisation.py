@@ -13,11 +13,10 @@ from pydantic import ValidationError
     ],
 )
 def test__can_instantiate_ods_organisation(ods_code: str, name: str):
-    result = Root.create_ods_organisation(ods_code=ods_code, name=name)
+    result = Root.create_ods_organisation(ods_code=ods_code)
 
     assert isinstance(result, OdsOrganisation)
     assert result.ods_code == ods_code
-    assert result.name == name
 
 
 @pytest.mark.parametrize(
@@ -29,4 +28,4 @@ def test__can_instantiate_ods_organisation(ods_code: str, name: str):
 )
 def test__id_must_be_ods_code(ods_code: str):
     with pytest.raises(ValidationError):
-        Root.create_ods_organisation(ods_code=ods_code, name="Valid Name")
+        Root.create_ods_organisation(ods_code=ods_code)

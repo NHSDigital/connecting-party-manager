@@ -14,6 +14,7 @@ def before_feature(context: Context, feature: Feature):
 def before_scenario(context: Context, scenario: Scenario):
     context.questionnaires = {}
     context.ods_organisations = {}
+    context.product_teams = {}
     context.events = []
     context.error = None
     context.result = None

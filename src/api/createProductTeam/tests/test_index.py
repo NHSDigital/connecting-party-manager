@@ -128,7 +128,7 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Organization.id"],
+                    "expression": ["Organization.identifier"],
                 },
                 {
                     "severity": "error",

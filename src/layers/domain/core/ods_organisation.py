@@ -15,21 +15,10 @@ class OdsOrganisation(AggregateRoot):
     """
 
     ods_code: str = Field(regex=ODS_CODE_REGEX)
-    name: str
 
     def create_product_team(self, id: UUID, name: str) -> ProductTeam:
-        event = ProductTeamCreatedEvent(
-            id=id,
-            name=name,
-            ods_code=self.ods_code,
-            ods_name=self.name,
-        )
-        product_team = ProductTeam(
-            id=id,
-            name=name,
-            ods_code=self.ods_code,
-            ods_name=self.name,
-            events=[event],
-        )
+        product_team = ProductTeam(id=id, name=name, ods_code=self.ods_code)
+        event = ProductTeamCreatedEvent(**product_team.dict())
+        product_team.add_event(event)
         self.add_event(event=event)
         return product_team
