@@ -1,5 +1,8 @@
 # Changelog
 
+## 2023-12-13
+- [PI-81] Translation layer (FHIR Device)
+
 ## 2023-12-08
 - [PI-145] Switch id to identifier
 - [PI-80] Domain logic for Device
