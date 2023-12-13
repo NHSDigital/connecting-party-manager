@@ -1,12 +1,21 @@
+import re
 from typing import Literal
 from uuid import UUID
 
+from domain.core.device import DeviceKeyType, DeviceType
+from domain.core.device_key import validate_key
 from domain.core.validation import ENTITY_NAME_REGEX, ODS_CODE_REGEX
 from domain.ods import ODS_API_BASE
 from pydantic import BaseModel as _BaseModel
-from pydantic import Extra, Field
+from pydantic import Extra, Field, validator
 
 SYSTEM = "connecting-party-manager"
+DEVICE_KEY_TYPE_SYSTEM_RE = (
+    rf"^{SYSTEM}/({'|'.join(DeviceKeyType._value2member_map_)})$"
+)
+PRODUCT_TEAM_ID_SYSTEM = f"{SYSTEM}/product-team-id"
+DEVICE_TYPE_SYSTEM = f"{SYSTEM}/device-type"
+DEVICE_TYPE_VALUE_RE = rf"^{'|'.join(DeviceType._value2member_map_)}$"
 
 
 class BaseModel(_BaseModel, extra=Extra.forbid):
@@ -19,7 +28,7 @@ def ConstStrField(value):
 
 
 class ProductTeamIdentifier(BaseModel):
-    system: str = ConstStrField(SYSTEM)
+    system: str = ConstStrField(PRODUCT_TEAM_ID_SYSTEM)
     value: UUID
 
     def dict(self, *args, **kwargs):
@@ -36,8 +45,60 @@ class OdsReference(BaseModel):
     identifier: OdsIdentifier
 
 
+class DeviceName(BaseModel):
+    name: str
+    type: str = ConstStrField("user-friendly-name")
+
+
+class DeviceDefinitionIdentifier(BaseModel):
+    system: str = ConstStrField(DEVICE_TYPE_SYSTEM)
+    value: str = Field(regex=DEVICE_TYPE_VALUE_RE)
+
+
+class DeviceDefinitionReference(BaseModel):
+    identifier: DeviceDefinitionIdentifier
+
+
+class DeviceIdentifier(BaseModel):
+    system: str = Field(regex=DEVICE_KEY_TYPE_SYSTEM_RE)
+    value: str
+
+    @property
+    def key_type(self) -> DeviceKeyType:
+        (_key_type,) = re.findall(DEVICE_KEY_TYPE_SYSTEM_RE, self.system)
+        return DeviceKeyType(_key_type)
+
+
+class DeviceOwnerReference(BaseModel):
+    identifier: ProductTeamIdentifier
+
+
 class Organization(BaseModel):
     resourceType: Literal["Organization"]
     identifier: list[ProductTeamIdentifier] = Field(min_items=1, max_items=1)
     name: str = Field(regex=ENTITY_NAME_REGEX)
     partOf: OdsReference
+
+
+class Device(BaseModel):
+    resourceType: Literal["Device"]
+    deviceName: list[DeviceName] = Field(min_items=1, max_items=1)
+    definition: DeviceDefinitionReference
+    identifier: list[DeviceIdentifier] = Field(min_items=1)
+    owner: DeviceOwnerReference
+
+    @validator("identifier")
+    def validate_identifier(identifier: list[DeviceIdentifier]):
+        if (
+            identifier
+            and isinstance(identifier, list)
+            and identifier[0].key_type is not DeviceKeyType.PRODUCT_ID
+        ):
+            raise ValueError("First identifier must be a 'product_id'")
+        return identifier
+
+    @validator("identifier", each_item=True)
+    def validate_key(identifier: DeviceIdentifier):
+        if identifier and isinstance(identifier, DeviceIdentifier):
+            validate_key(key=identifier.value, type=identifier.key_type)
+        return identifier

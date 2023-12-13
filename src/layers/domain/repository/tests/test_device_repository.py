@@ -12,8 +12,7 @@ from test_helpers.terraform import read_terraform_output
 @pytest.mark.wip
 @pytest.mark.integration
 def test__device_repository():
-    subject_id = UUID("774c8c06-0d15-4b7d-9c7e-4a358681b78b")
-    target_id = UUID("07bca737-1022-494c-8df0-5e7dd152ba59")
+    subject_id = "XXX-YYY"
     table_name = read_terraform_output("dynamodb_table_name.value")
 
     org = Root.create_ods_organisation(ods_code="AB123")
@@ -23,7 +22,7 @@ def test__device_repository():
     subject = team.create_device(
         id=subject_id,
         name="Subject",
-        type=DeviceType.SERVICE,
+        type=DeviceType.PRODUCT,
         status=DeviceStatus.ACTIVE,
     )
     subject.add_key(key="WWW-XXX", type=DeviceKeyType.PRODUCT_ID)

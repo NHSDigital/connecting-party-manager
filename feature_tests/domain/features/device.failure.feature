@@ -18,10 +18,10 @@ Feature: Device Failure Scenarios
       | id                                   | name            | ods_code |
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-      | property | value                                  |
-      | id       | {00702d39-e65f-49f5-b9ef-6570245bfe17} |
-      | name     | My Device 🚀                           |
-      | type     | product                                |
+      | property | value        |
+      | id       | XXX-YYY      |
+      | name     | My Device 🚀 |
+      | type     | product      |
     Then the operation is not successful
     And the error is ValidationError on fields
       | Device.name |
@@ -31,10 +31,10 @@ Feature: Device Failure Scenarios
       | id                                   | name            | ods_code |
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-      | property | value                                  |
-      | id       | {00702d39-e65f-49f5-b9ef-6570245bfe17} |
-      | name     | My Device                              |
-      | type     | not_a_type                             |
+      | property | value      |
+      | id       | XXX-YYY    |
+      | name     | My Device  |
+      | type     | not_a_type |
     Then the operation is not successful
     And the error is ValidationError on fields
       | Device.type |
@@ -57,12 +57,12 @@ Feature: Device Failure Scenarios
       | id                                   | name            | ods_code |
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-      | property    | value                                  |
-      | id          | {00702d39-e65f-49f5-b9ef-6570245bfe17} |
-      | name        | My Product                             |
-      | type        | product                                |
-      | keys.0.key  | AAA-CCC-DDD                            |
-      | keys.0.type | not_a_key_type                         |
+      | property    | value          |
+      | id          | XXX-YYY        |
+      | name        | My Product     |
+      | type        | product        |
+      | keys.0.key  | AAA-CCC-DDD    |
+      | keys.0.type | not_a_key_type |
     Then the operation is not successful
     And the error is ValidationError on fields
       | DeviceKey.type |
@@ -72,12 +72,12 @@ Feature: Device Failure Scenarios
       | id                                   | name            | ods_code |
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-      | property    | value                                  |
-      | id          | {00702d39-e65f-49f5-b9ef-6570245bfe17} |
-      | name        | My Product                             |
-      | type        | product                                |
-      | keys.0.key  | not_a_valid_product_id                 |
-      | keys.0.type | product_id                             |
+      | property    | value                  |
+      | id          | XXX-YYY                |
+      | name        | My Product             |
+      | type        | product                |
+      | keys.0.key  | not_a_valid_product_id |
+      | keys.0.type | product_id             |
     Then the operation is not successful
     And the error is ValidationError on fields
       | DeviceKey.key |
@@ -87,13 +87,13 @@ Feature: Device Failure Scenarios
       | id                                   | name            | ods_code |
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-      | property    | value                                  |
-      | id          | {00702d39-e65f-49f5-b9ef-6570245bfe17} |
-      | name        | My Product                             |
-      | type        | product                                |
-      | keys.0.key  | AAA-CCC                                |
-      | keys.0.type | product_id                             |
-      | keys.1.key  | AAA-CCC                                |
-      | keys.1.type | product_id                             |
+      | property    | value      |
+      | id          | XXX-YYY    |
+      | name        | My Product |
+      | type        | product    |
+      | keys.0.key  | AAA-CCC    |
+      | keys.0.type | product_id |
+      | keys.1.key  | AAA-CCC    |
+      | keys.1.type | product_id |
     Then the operation is not successful
     And the error is DuplicateError

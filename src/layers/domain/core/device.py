@@ -1,21 +1,20 @@
-import re
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import TypedDict
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field
 
 from .aggregate_root import AggregateRoot
+from .device_key import DeviceKey, DeviceKeyType
 from .error import DuplicateError
 from .event import Event
 from .product_id import PRODUCT_ID_REGEX
-from .validation import ACCREDITED_SYSTEM_ID_REGEX, DEVICE_NAME_REGEX
+from .validation import DEVICE_NAME_REGEX
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceCreatedEvent(Event):
-    id: UUID
+    id: str
     name: str
     type: "DeviceType"
     product_team_id: UUID
@@ -25,50 +24,9 @@ class DeviceCreatedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
-    id: UUID
+    id: str
     key: str
-    type: "DeviceKeyType"
-
-
-class DeviceKeyType(StrEnum):
-    PRODUCT_ID = auto()
-    ACCREDITED_SYSTEM_ID = auto()
-    # SERVICE_NOW_ID = auto()
-
-    @property
-    def pattern(self) -> re.Pattern:
-        match self:
-            case DeviceKeyType.PRODUCT_ID:
-                return PRODUCT_ID_REGEX
-            case DeviceKeyType.ACCREDITED_SYSTEM_ID:
-                return ACCREDITED_SYSTEM_ID_REGEX
-            case _:
-                raise NotImplementedError(f"No ID validation configured for '{self}'")
-
-
-class DeviceKey(BaseModel):
-    """
-    A Device Key is a secondary way of indexing / retrieving Devices
-    """
-
     type: DeviceKeyType
-    key: str
-
-    @validator("key", check_fields=True)
-    def validate_key(key: str, values: dict):
-        type: DeviceKeyType = values.get("type")
-        if type and type.pattern.match(key) is None:
-            raise ValueError(
-                f"Key '{key}' does not match the expected "
-                f"pattern '{type.pattern.pattern}' associated with "
-                f"key type '{type}'"
-            )
-        return key
-
-
-class DeviceKeyDict(TypedDict):
-    type: str
-    key: str
 
 
 class DeviceType(StrEnum):
@@ -83,8 +41,8 @@ class DeviceType(StrEnum):
     """
 
     PRODUCT = auto()
-    SERVICE = auto()
-    API = auto()
+    # SERVICE = auto()
+    # API = auto()
 
 
 class DeviceStatus(StrEnum):
@@ -105,7 +63,7 @@ class Device(AggregateRoot):
             +-- nrl-producer-api (???)
     """
 
-    id: UUID
+    id: str = Field(regex=PRODUCT_ID_REGEX.pattern)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     type: DeviceType
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
