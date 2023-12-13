@@ -4,7 +4,8 @@ from domain.fhir_translation.product_team import (
     create_fhir_model_from_product_team,
     create_product_team_from_fhir_org_json,
 )
-from domain.fhir_translation.tests.utils import read_test_data
+
+from test_helpers.sample_data import ORGANISATION
 
 
 def test_product_team_translation():
@@ -13,7 +14,7 @@ def test_product_team_translation():
     is the compliment of 'create_fhir_model_from_product_team'
     """
 
-    fhir_json = read_test_data("organization-fhir-example-required.json")
+    fhir_json = ORGANISATION
     product_team = create_product_team_from_fhir_org_json(fhir_org_json=fhir_json)
     assert isinstance(product_team, ProductTeam)
 

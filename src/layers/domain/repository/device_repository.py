@@ -7,7 +7,7 @@ from domain.core.device import (
     DeviceKeyAddedEvent,
 )
 
-from .errors import NotFoundException
+from .errors import ItemNotFound
 from .keys import TableKeys, strip_key_prefix
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
@@ -50,7 +50,7 @@ class DeviceRepository(Repository[Device]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise NotFoundException()
+            raise ItemNotFound(key)
 
         (item,) = items
 
@@ -65,6 +65,8 @@ class DeviceRepository(Repository[Device]):
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
+        if len(items) == 0:
+            raise ItemNotFound(id)
 
         keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
         # pages = TableKeys.DEVICE_PAGE.filter_and_group(items, key="sk")

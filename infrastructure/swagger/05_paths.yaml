@@ -113,7 +113,7 @@ paths:
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_readProductTeam} # CHANGE ME
+        uri: ${method_createDevice}
       security:
         - ${authoriser_name}: []
         - app-level0: []
@@ -135,7 +135,7 @@ paths:
           <<: *Response4XX
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_readProductTeam} # CHANGE ME
+        uri: ${method_readDevice}
       security:
         - ${authoriser_name}: []
         - app-level0: []

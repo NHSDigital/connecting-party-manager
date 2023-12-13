@@ -18,12 +18,12 @@ from event.response.validation_errors import mark_validation_errors_as_inbound
 
 @mark_validation_errors_as_inbound
 def parse_fhir_device_json(fhir_device_json: dict) -> CpmFhirDevice:
-    fhir_device_json = create_fhir_model_from_fhir_json(
+    fhir_device = create_fhir_model_from_fhir_json(
         fhir_json=fhir_device_json,
         fhir_models=[FhirDevice, StrictFhirDevice],
         our_model=CpmFhirDevice,
     )
-    return fhir_device_json
+    return fhir_device
 
 
 def create_domain_device_from_fhir_device(

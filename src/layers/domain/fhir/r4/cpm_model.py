@@ -4,7 +4,7 @@ from uuid import UUID
 
 from domain.core.device import DeviceKeyType, DeviceType
 from domain.core.device_key import validate_key
-from domain.core.validation import ENTITY_NAME_REGEX, ODS_CODE_REGEX
+from domain.core.validation import DEVICE_NAME_REGEX, ENTITY_NAME_REGEX, ODS_CODE_REGEX
 from domain.ods import ODS_API_BASE
 from pydantic import BaseModel as _BaseModel
 from pydantic import Extra, Field, validator
@@ -46,7 +46,7 @@ class OdsReference(BaseModel):
 
 
 class DeviceName(BaseModel):
-    name: str
+    name: str = Field(regex=DEVICE_NAME_REGEX)
     type: str = ConstStrField("user-friendly-name")
 
 
@@ -67,6 +67,9 @@ class DeviceIdentifier(BaseModel):
     def key_type(self) -> DeviceKeyType:
         (_key_type,) = re.findall(DEVICE_KEY_TYPE_SYSTEM_RE, self.system)
         return DeviceKeyType(_key_type)
+
+    def as_tuple(self) -> tuple[str, str]:
+        return (self.system, self.value)
 
 
 class DeviceOwnerReference(BaseModel):
@@ -101,4 +104,15 @@ class Device(BaseModel):
     def validate_key(identifier: DeviceIdentifier):
         if identifier and isinstance(identifier, DeviceIdentifier):
             validate_key(key=identifier.value, type=identifier.key_type)
+        return identifier
+
+    @validator("identifier")
+    def no_duplicate_keys(identifier: list[DeviceIdentifier]):
+        if identifier and isinstance(identifier, list):
+            unique_identifiers = set(map(DeviceIdentifier.as_tuple, identifier))
+            if len(unique_identifiers) != len(identifier):
+                raise ValueError(
+                    "It is forbidden to supply the same key multiple times"
+                )
+
         return identifier
