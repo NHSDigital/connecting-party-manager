@@ -1,9 +1,10 @@
 from typing import Generic, TypeVar
 
 from domain.core.aggregate_root import AggregateRoot
-from pydantic import BaseModel
 
-ModelType = TypeVar("ModelType", bound=BaseModel)
+from .transaction import Transaction, TransactionItem, handle_client_errors
+
+ModelType = TypeVar("ModelType", bound=AggregateRoot)
 
 
 class Repository(Generic[ModelType]):
@@ -12,17 +13,16 @@ class Repository(Generic[ModelType]):
         self.model = model
         self.client = dynamodb_client
 
-    def write(self, entity: AggregateRoot):
-        def execute_event_handler(event):
+    def write(self, entity: ModelType):
+        def generate_transaction_statements(event) -> TransactionItem:
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
-            return handler(event, entity)
+            return handler(event=event, entity=entity)
 
-        commands = [execute_event_handler(e) for e in entity.events]
-        args = {
-            "TransactItems": commands,
-            "ReturnConsumedCapacity": "NONE",
-            "ReturnItemCollectionMetrics": "NONE",
-        }
-        response = self.client.transact_write_items(**args)
+        transact_items = list(map(generate_transaction_statements, entity.events))
+        transaction = Transaction(TransactItems=transact_items)
+        with handle_client_errors(commands=transaction.TransactItems):
+            response = self.client.transact_write_items(
+                **transaction.dict(exclude_none=True)
+            )
         return response
