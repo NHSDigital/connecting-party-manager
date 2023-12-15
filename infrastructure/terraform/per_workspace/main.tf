@@ -85,24 +85,14 @@ module "lambdas" {
   environment_variables = {
     DYNAMODB_TABLE = module.table.dynamodb_table_name
   }
-  attach_policy_json = true
-  policy_json        = <<-EOT
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-              "Action": ["dynamodb:PutItem", "dynamodb:Query"],
-              "Effect": "Allow",
-              "Resource": "arn:aws:dynamodb:eu-west-2:${var.assume_account}:table/${local.project}--${replace(terraform.workspace, "_", "-")}--table"
-          },
-          {
-              "Action": ["kms:Decrypt"],
-              "Effect": "Allow",
-              "Resource": "*"
-          }
-      ]
+  attach_policy_statements = true
+  policy_statements = {
+    for file in fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json") : replace(file, ".json", "") => {
+      effect    = "Allow"
+      actions   = jsondecode(file("${path.module}/../../../src/api/${each.key}/policies/${file}"))
+      resources = [local.permission_resource_map["${replace(file, ".json", "")}"]]
     }
-  EOT
+  }
 }
 
 module "authoriser" {

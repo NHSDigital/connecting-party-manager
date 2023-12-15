@@ -33,3 +33,11 @@ variable "allowed_triggers" {
 variable "environment_variables" {
   default = {}
 }
+
+variable "attach_policy_statements" {
+  default = false
+}
+
+variable "policy_statements" {
+  default = {}
+}
