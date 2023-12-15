@@ -82,7 +82,6 @@ def test__device_repository__device_does_not_exist():
 
 def test__device_repository_local():
     subject_id = "XXX-YYY"
-    table_name = read_terraform_output("dynamodb_table_name.value")
 
     org = Root.create_ods_organisation(ods_code="AB123")
     team = org.create_product_team(
@@ -98,9 +97,9 @@ def test__device_repository_local():
     subject.add_key(key="WWW-XXX", type=DeviceKeyType.PRODUCT_ID)
     subject.add_key(key="1234567890", type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
 
-    with mock_table(table_name) as client:
+    with mock_table("my_table") as client:
         device_repo = DeviceRepository(
-            table_name=table_name,
+            table_name="my_table",
             dynamodb_client=client,
         )
 
@@ -111,11 +110,10 @@ def test__device_repository_local():
 
 def test__device_repository__device_does_not_exist_local():
     subject_id = "XXX-YYY"
-    table_name = read_terraform_output("dynamodb_table_name.value")
 
-    with mock_table(table_name) as client:
+    with mock_table("my_table") as client:
         device_repo = DeviceRepository(
-            table_name=table_name,
+            table_name="my_table",
             dynamodb_client=client,
         )
 

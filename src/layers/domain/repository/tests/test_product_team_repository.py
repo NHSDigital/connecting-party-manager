@@ -56,14 +56,13 @@ def test__product_team_repository__device_does_not_exist():
 
 def test__product_team_repository_local():
     team_id = "359e28eb-6e2c-409c-a3ab-a4868ab5c2df"
-    table_name = read_terraform_output("dynamodb_table_name.value")
 
     org = Root.create_ods_organisation(ods_code="AB123")
     team = org.create_product_team(id=team_id, name="Test Team")
 
-    with mock_table(table_name) as client:
+    with mock_table("my_table") as client:
         repo = ProductTeamRepository(
-            table_name=table_name,
+            table_name="my_table",
             dynamodb_client=client,
         )
 
@@ -74,11 +73,10 @@ def test__product_team_repository_local():
 
 def test__product_team_repository__device_does_not_exist_local():
     team_id = "359e28eb-6e2c-409c-a3ab-a4868ab5c2df"
-    table_name = read_terraform_output("dynamodb_table_name.value")
 
-    with mock_table(table_name) as client:
+    with mock_table("my_table") as client:
         repo = ProductTeamRepository(
-            table_name=table_name,
+            table_name="my_table",
             dynamodb_client=client,
         )
         with pytest.raises(ItemNotFound):
