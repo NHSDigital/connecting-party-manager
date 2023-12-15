@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from domain.ods import InvalidOdsCodeError
-from domain.repository.errors import NotFoundException
+from domain.repository.errors import AlreadyExistsError, NotFoundException
 from event.status.steps import StatusNotOk
 from event.versioning.errors import VersionException
 
@@ -43,6 +43,7 @@ EXCEPTIONS_TO_FHIR_CODING = {
     InvalidOdsCodeError: FhirCoding.UNPROCESSABLE_ENTITY,
     VersionException: FhirCoding.ACCESS_DENIED,
     NotFoundException: FhirCoding.RESOURCE_NOT_FOUND,
+    AlreadyExistsError: FhirCoding.VALIDATION_ERROR,
     StatusNotOk: FhirCoding.SERVICE_UNAVAILABLE,
 }
 
