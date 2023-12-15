@@ -1,5 +1,9 @@
 # Changelog
 
+## 2023-12-15
+- [PI-82] Device e2e
+- [PI-143] DynamoDb errors
+
 ## 2023-12-13
 - [PI-81] Translation layer (FHIR Device)
 
