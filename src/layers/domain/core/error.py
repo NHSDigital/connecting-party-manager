@@ -6,7 +6,7 @@ class NotFoundError(Exception):
     pass
 
 
-class InvalidDeviceKeyError(Exception):
+class InvalidDeviceKeyError(ValueError):
     pass
 
 

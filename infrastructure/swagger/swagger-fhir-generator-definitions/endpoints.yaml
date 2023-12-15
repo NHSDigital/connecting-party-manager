@@ -10,4 +10,4 @@
 # described in https://hl7.org/fhir/r4b/http.html
 
 Organization: [create, read]
-# Questionnaire: [create, read, search, delete, update]
+Device: [create, read]

@@ -10,7 +10,7 @@ Feature: Create Product Team - failure scenarios
     Given I have already made a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
       | identifier.0.value       | ${guid: 2}                                                     |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
@@ -18,7 +18,7 @@ Feature: Create Product Team - failure scenarios
     When I make a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
       | identifier.0.value       | ${guid: 2}                                                     |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
@@ -43,7 +43,7 @@ Feature: Create Product Team - failure scenarios
     When I make a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
       | identifier.0.value       | ${guid: 2}                                                     |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
@@ -66,12 +66,12 @@ Feature: Create Product Team - failure scenarios
 
   Scenario: Cannot create a ProductTeam with invalid FHIR
     When I make a "POST" request with "default" headers to "Organization" with body:
-      | path                | value                    |
-      | resourceType        | invalid_type             |
-      | identifier.0.system | connecting-party-manager |
-      | identifier.0.value  | ${guid: 2}               |
-      | name                | My Great Product Team    |
-      | partOf.identifier   | invalid_identifier       |
+      | path                | value                                    |
+      | resourceType        | invalid_type                             |
+      | identifier.0.system | connecting-party-manager/product-team-id |
+      | identifier.0.value  | ${guid: 2}                               |
+      | name                | My Great Product Team                    |
+      | partOf.identifier   | invalid_identifier                       |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |
@@ -100,7 +100,7 @@ Feature: Create Product Team - failure scenarios
     When I make a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
       | identifier.0.value       | invalid_id                                                     |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
@@ -126,7 +126,7 @@ Feature: Create Product Team - failure scenarios
     When I make a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
       | identifier.0.value       | ${guid: 2}                                                     |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
@@ -152,7 +152,7 @@ Feature: Create Product Team - failure scenarios
     When I make a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager                                       |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
       | identifier.0.value       | ${guid: 2}                                                     |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
