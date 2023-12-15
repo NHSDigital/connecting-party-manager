@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
 
-from .errors import NotFoundException
+from .errors import ItemNotFound
 from .keys import TableKeys
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
@@ -40,7 +40,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise NotFoundException(key=id)
+            raise ItemNotFound(key=id)
         (item,) = items
 
         return ProductTeam(**item)

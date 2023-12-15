@@ -1,6 +1,5 @@
 from dataclasses import asdict, dataclass
 
-import boto3
 import pytest
 from domain.repository.errors import AlreadyExistsError, UnhandledTransaction
 from domain.repository.marshall import marshall, marshall_value, unmarshall
@@ -12,6 +11,7 @@ from domain.repository.transaction import (
 )
 from pydantic import BaseModel, Field
 
+from test_helpers.dynamodb import dynamodb_client
 from test_helpers.terraform import read_terraform_output
 
 
@@ -68,7 +68,7 @@ def test_repository():
     repo = MyRepository(
         table_name=table_name,
         model=MyModel,
-        dynamodb_client=boto3.client("dynamodb"),
+        dynamodb_client=dynamodb_client(),
     )
 
     value = "123"
@@ -83,7 +83,7 @@ def test_repository_raise_already_exists():
     repo = MyRepository(
         table_name=table_name,
         model=MyModel,
-        dynamodb_client=boto3.client("dynamodb"),
+        dynamodb_client=dynamodb_client(),
     )
 
     my_item = MyModel(field="123", events=[MyEvent(field="123")])
@@ -98,7 +98,7 @@ def test_repository_raise_already_exists_multiple_events():
     repo = MyRepository(
         table_name=table_name,
         model=MyModel,
-        dynamodb_client=boto3.client("dynamodb"),
+        dynamodb_client=dynamodb_client(),
     )
 
     my_item = MyModel(
@@ -120,7 +120,7 @@ def test_repository_raise_already_exists_from_single_transaction():
     repo = MyRepository(
         table_name=table_name,
         model=MyModel,
-        dynamodb_client=boto3.client("dynamodb"),
+        dynamodb_client=dynamodb_client(),
     )
 
     my_item = MyModel(

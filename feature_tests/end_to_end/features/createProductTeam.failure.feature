@@ -11,7 +11,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
@@ -19,7 +19,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
@@ -44,7 +44,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
     Then I receive a status code "400" with body
@@ -69,7 +69,7 @@ Feature: Create Product Team - failure scenarios
       | path                | value                                    |
       | resourceType        | invalid_type                             |
       | identifier.0.system | connecting-party-manager/product-team-id |
-      | identifier.0.value  | ${guid: 2}                               |
+      | identifier.0.value  | ${ uuid(1) }                             |
       | name                | My Great Product Team                    |
       | partOf.identifier   | invalid_identifier                       |
     Then I receive a status code "400" with body
@@ -127,7 +127,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | invalid_ods_code                                               |
@@ -153,7 +153,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H11                                                          |
