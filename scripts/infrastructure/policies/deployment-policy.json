@@ -2,6 +2,12 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "TagPermissions",
+      "Effect": "Allow",
+      "Action": ["tag:TagResources"],
+      "Resource": ["*"]
+    },
+    {
       "Sid": "ResourceGroupPermissions",
       "Effect": "Allow",
       "Action": [
@@ -13,12 +19,13 @@
         "resource-groups:GetGroupConfiguration",
         "resource-groups:GetTags",
         "resource-groups:SearchResources",
+        "tag:TagResources",
         "resource-groups:Tag",
         "resource-groups:UnTag"
       ],
       "Resource": [
         "arn:aws:resource-groups:*:${ACCOUNT_ID}:group/*",
-        "arn:aws:resource-groups:*:${ACCOUNT_ID}:resources/search"
+        "arn:aws:resource-groups:*:${ACCOUNT_ID}:resources/*"
       ]
     },
     {
@@ -165,6 +172,12 @@
         "logs:UntagResource"
       ],
       "Resource": ["arn:aws:logs:*:${ACCOUNT_ID}:log-group:*"]
+    },
+    {
+      "Sid": "CloudFormationPermissions",
+      "Effect": "Allow",
+      "Action": ["cloudformation:DescribeStacks", "cloudformation:ListStacks"],
+      "Resource": ["arn:aws:cloudformation:*:${ACCOUNT_ID}:stack/*/*"]
     }
   ]
 }
