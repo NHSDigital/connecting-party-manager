@@ -12,10 +12,14 @@
         "resource-groups:GetGroupQuery",
         "resource-groups:GetGroupConfiguration",
         "resource-groups:GetTags",
+        "resource-groups:SearchResources",
         "resource-groups:Tag",
         "resource-groups:UnTag"
       ],
-      "Resource": ["arn:aws:resource-groups:*:${ACCOUNT_ID}:group/*"]
+      "Resource": [
+        "arn:aws:resource-groups:*:${ACCOUNT_ID}:group/*",
+        "arn:aws:resource-groups:*:${ACCOUNT_ID}:resources/search"
+      ]
     },
     {
       "Sid": "ParameterPermissions",
