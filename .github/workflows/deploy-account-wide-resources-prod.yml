@@ -1,4 +1,4 @@
-name: "Deploy: Account Wide Resources - Production"
+name: "Deploy: Account Wide - Production"
 
 on:
   workflow_dispatch:
@@ -7,6 +7,8 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
+      account: prod
       workspace: prod
-      account-wide: account_wide
+      scope: per_account/prod
+      run_smoke_tests: false
     secrets: inherit # pragma: allowlist secret

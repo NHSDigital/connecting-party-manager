@@ -4,13 +4,16 @@ inputs:
   command:
     description: "Terraform command to run"
     required: true
+  account:
+    description: "AWS account name"
+    required: true
   workspace:
     description: "Terraform workspace name"
     required: true
-  account-wide:
-    description: "If account-wide then specify 'account_wide'"
-    required: false
-    default: "non_account_wide"
+  scope:
+    description: "Terraform scope"
+    required: true
+    default: "per_workspace"
   cache-suffix:
     description: "[Optional] Cache suffix (e.g. 'base')"
     required: false
@@ -32,7 +35,7 @@ runs:
   steps:
     - uses: ./.github/actions/make/
       with:
-        command: terraform--${{ inputs.command }} TERRAFORM_WORKSPACE="${{ inputs.workspace }}" ACCOUNT_WIDE="${{ inputs.account-wide }}" PARAMETER_DEPLOY="${{ inputs.parameter-deploy }}"
+        command: terraform--${{ inputs.command }} AWS_ACCOUNT="${{ inputs.account }}" TERRAFORM_WORKSPACE="${{ inputs.workspace }}" TERRAFORM_SCOPE="${{ inputs.scope }}"
         requires-aws: true
         restore-from-cache: ${{ inputs.restore-from-cache }}
         save-to-cache: ${{ inputs.save-to-cache }}

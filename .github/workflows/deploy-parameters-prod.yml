@@ -7,7 +7,8 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
+      account: prod
       workspace: prod
-      parameter-deploy: "parameter_deploy"
-      account-wide: "account_wide"
+      scope: per_account/prod/parameters
+      run_smoke_tests: false
     secrets: inherit # pragma: allowlist secret

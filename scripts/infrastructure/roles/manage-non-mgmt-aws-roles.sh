@@ -23,8 +23,12 @@ else
     ENV="prod"
   elif _validate_current_account "INT"; then
     ENV="int"
-  elif _validate_current_account "TEST"; then
-    ENV="test"
+  elif _validate_current_account "QA"; then
+    ENV="qa"
+  elif _validate_current_account "INT"; then
+    ENV="int"
+  elif _validate_current_account "REF"; then
+    ENV="ref"
   fi
 fi
 MGMT_ID_PARAMETER_STORE="nhse-cpm--${ENV}--mgmt-account-id-v1.0.0"

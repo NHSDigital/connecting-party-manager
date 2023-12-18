@@ -3,23 +3,26 @@ name: "Deploy: Workspace - Nonprod"
 on:
   workflow_dispatch:
     inputs:
-      workspace:
-        description: Workspace to deploy to
+      account:
+        description: Account to deploy
         required: true
         default: dev
         type: choice
         options:
           - dev
-          - dev-sandbox
-          - ref
-          - ref-sandbox
+          - qa
           - int
-          - int-sandbox
+          - ref
+      sandbox:
+        description: Do you want to deploy the sandbox version?
+        type: boolean
+        default: false
 
 jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
-      workspace: ${{ inputs.workspace }}
-      account-wide: non_account_wide
+      account: ${{ inputs.account }}
+      workspace: ${{ inputs.account }}${{ inputs.sandbox == 'true' && '-sandbox' || '' }}
+      scope: "per_workspace"
     secrets: inherit # pragma: allowlist secret
