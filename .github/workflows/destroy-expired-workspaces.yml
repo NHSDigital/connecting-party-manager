@@ -15,7 +15,7 @@ env:
   TF_CLI_ARGS: -no-color
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
   RUNNING_IN_CI: 1
-  BASE_CACHE_SUFFIX: base
+  BRANCH_NAME: ${{ github.ref_name }}
 
 jobs:
   parse-secrets:
@@ -31,13 +31,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
           command: build
           save-to-cache: "true"
           restore-from-cache: "false"
-          cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   destroy_expired_workspace:
     runs-on: [self-hosted, ci]
