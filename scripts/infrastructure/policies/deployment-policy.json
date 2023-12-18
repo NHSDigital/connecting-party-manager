@@ -4,7 +4,7 @@
     {
       "Sid": "TagPermissions",
       "Effect": "Allow",
-      "Action": ["tag:TagResources"],
+      "Action": ["tag:TagResources", "tag:GetResources"],
       "Resource": ["*"]
     },
     {
@@ -19,9 +19,8 @@
         "resource-groups:GetGroupConfiguration",
         "resource-groups:GetTags",
         "resource-groups:SearchResources",
-        "tag:TagResources",
         "resource-groups:Tag",
-        "resource-groups:UnTag"
+        "resource-groups:Untag"
       ],
       "Resource": [
         "arn:aws:resource-groups:*:${ACCOUNT_ID}:group/*",
@@ -95,6 +94,7 @@
       "Action": [
         "iam:AttachRolePolicy",
         "iam:CreateRole",
+        "iam:CreateServiceLinkedRole",
         "iam:UpdateRole",
         "iam:DeleteRole",
         "iam:CreatePolicy",
@@ -111,7 +111,7 @@
         "iam:ListPolicyVersions",
         "iam:PassRole",
         "iam:TagRole",
-        "iam:UnTagRole",
+        "iam:UntagRole",
         "iam:TagPolicy",
         "iam:UntagPolicy"
       ],
@@ -176,7 +176,11 @@
     {
       "Sid": "CloudFormationPermissions",
       "Effect": "Allow",
-      "Action": ["cloudformation:DescribeStacks", "cloudformation:ListStacks"],
+      "Action": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:ListStacks",
+        "cloudformation:ListStackResources"
+      ],
       "Resource": ["arn:aws:cloudformation:*:${ACCOUNT_ID}:stack/*/*"]
     }
   ]
