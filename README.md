@@ -186,3 +186,12 @@ This command will also:
 ## FHIR, Swagger and FHIR Pydantic models
 
 This is all done by `make build`. For more details on how to update the Swagger and FHIR Pydantic models, please see [the swagger README](infrastructure/swagger/README.md).
+
+## Setting Lambda permissions
+
+Lambda permissions are able to be set individually, To do this,
+
+- Inside the lambda src code. e.g. `src/api/createProductTeam` there is a subfolder called `policies`
+- In here create a `json` file named after the aws resource type that you wish to create permissions for. For example if you wanted to add permissions to acces s3 buckets then you would add a file called `s3.json`
+- In this file add a list of permissions for s3 access. e.g. `["s3:ListBucket", "s3:GetObject"]`
+- Finally in `infrastructure/terraform/per_workspace/locals.tf` there is a mapping `permission_resource_map`. Add the mapping to the resources that these permissions need access to. e.g.`s3 = "${module.s3.s3_arn}"`
