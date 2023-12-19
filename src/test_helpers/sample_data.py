@@ -10,4 +10,5 @@ def _read_core_test_data(file_name: str) -> dict | list:
         return json_load(f)
 
 
-organisation = _read_core_test_data("organization-fhir-example-required.json")
+ORGANISATION = _read_core_test_data("organization-fhir-example-required.json")
+DEVICE = _read_core_test_data("device-fhir-example-required.json")

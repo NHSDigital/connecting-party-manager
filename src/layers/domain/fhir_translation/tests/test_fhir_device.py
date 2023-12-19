@@ -6,7 +6,8 @@ from domain.fhir_translation.device import (
     create_fhir_model_from_device,
     parse_fhir_device_json,
 )
-from domain.fhir_translation.tests.utils import read_test_data
+
+from test_helpers.sample_data import DEVICE
 
 
 def test_device_translation():
@@ -14,7 +15,7 @@ def test_device_translation():
     Tests that 'create_domain_device_from_fhir_device'
     is the compliment of 'create_fhir_model_from_device'
     """
-    fhir_json = read_test_data("device-fhir-example-required.json")
+    fhir_json = DEVICE
     fhir_device = parse_fhir_device_json(fhir_device_json=fhir_json)
     assert isinstance(fhir_device, CpmDevice)
 

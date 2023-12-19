@@ -3,10 +3,12 @@ import os
 from unittest import mock
 
 import pytest
+from domain.core.root import Root
+from domain.repository.product_team_repository import ProductTeamRepository
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
-from test_helpers.sample_data import ORGANISATION
+from test_helpers.sample_data import DEVICE
 
 TABLE_NAME = "hiya"
 
@@ -18,7 +20,14 @@ TABLE_NAME = "hiya"
     ],
 )
 def test_index(version):
-    with mock_table(table_name=TABLE_NAME), mock.patch.dict(
+    org = Root.create_ods_organisation(ods_code="ABC")
+
+    # Note 'f9518c12-6c83-4544-97db-d9dd1d64da97' is consistent with DEVICE
+    product_team = org.create_product_team(
+        id="f9518c12-6c83-4544-97db-d9dd1d64da97", name="product-team-name"
+    )
+
+    with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -26,10 +35,15 @@ def test_index(version):
         },
         clear=True,
     ):
-        from api.createProductTeam.index import handler
+        from api.createDevice.index import handler
+
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
 
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(ORGANISATION)}
+            event={"headers": {"version": version}, "body": json.dumps(DEVICE)}
         )
 
     expected_body = json.dumps(
@@ -84,7 +98,7 @@ def test_index_bad_payload(version):
         },
         clear=True,
     ):
-        from api.createProductTeam.index import handler
+        from api.createDevice.index import handler
 
         result = handler(
             event={"headers": {"version": version}, "body": json.dumps({})}
@@ -113,7 +127,7 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Organization.resourceType"],
+                    "expression": ["Device.resourceType"],
                 },
                 {
                     "severity": "error",
@@ -128,7 +142,7 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Organization.identifier"],
+                    "expression": ["Device.deviceName"],
                 },
                 {
                     "severity": "error",
@@ -143,7 +157,7 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Organization.name"],
+                    "expression": ["Device.definition"],
                 },
                 {
                     "severity": "error",
@@ -158,7 +172,22 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Organization.partOf"],
+                    "expression": ["Device.identifier"],
+                },
+                {
+                    "severity": "error",
+                    "code": "processing",
+                    "details": {
+                        "coding": [
+                            {
+                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
+                                "code": "MISSING_VALUE",
+                                "display": "Missing value",
+                            }
+                        ]
+                    },
+                    "diagnostics": "field required",
+                    "expression": ["Device.owner"],
                 },
             ],
         }

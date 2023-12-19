@@ -11,7 +11,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
@@ -19,32 +19,32 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
-    Then I receive a status code "500" with body
-      | path                             | value                                                                                                                                                                                                  |
-      | resourceType                     | OperationOutcome                                                                                                                                                                                       |
-      | id                               | << ignore >>                                                                                                                                                                                           |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome                                                                                                                                    |
-      | issue.0.severity                 | error                                                                                                                                                                                                  |
-      | issue.0.code                     | processing                                                                                                                                                                                             |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome                                                                                                                                    |
-      | issue.0.details.coding.0.code    | SERVICE_ERROR                                                                                                                                                                                          |
-      | issue.0.details.coding.0.display | Service error                                                                                                                                                                                          |
-      | issue.0.diagnostics              | An error occurred (TransactionCanceledException) when calling the TransactWriteItems operation: Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed] |
+    Then I receive a status code "400" with body
+      | path                             | value                                                               |
+      | resourceType                     | OperationOutcome                                                    |
+      | id                               | << ignore >>                                                        |
+      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
+      | issue.0.severity                 | error                                                               |
+      | issue.0.code                     | processing                                                          |
+      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
+      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
+      | issue.0.details.coding.0.display | Validation error                                                    |
+      | issue.0.diagnostics              | Item already exists                                                 |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 628              |
+      | Content-Length | 455              |
 
   Scenario: Cannot create a ProductTeam with an Organization that is missing fields (no partOf.identifier.value)
     When I make a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
     Then I receive a status code "400" with body
@@ -69,7 +69,7 @@ Feature: Create Product Team - failure scenarios
       | path                | value                                    |
       | resourceType        | invalid_type                             |
       | identifier.0.system | connecting-party-manager/product-team-id |
-      | identifier.0.value  | ${guid: 2}                               |
+      | identifier.0.value  | ${ uuid(1) }                             |
       | name                | My Great Product Team                    |
       | partOf.identifier   | invalid_identifier                       |
     Then I receive a status code "400" with body
@@ -127,7 +127,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | invalid_ods_code                                               |
@@ -153,7 +153,7 @@ Feature: Create Product Team - failure scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${guid: 2}                                                     |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H11                                                          |

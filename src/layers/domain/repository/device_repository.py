@@ -7,10 +7,11 @@ from domain.core.device import (
     DeviceKeyAddedEvent,
 )
 
-from .errors import NotFoundException
+from .errors import ItemNotFound
 from .keys import TableKeys, strip_key_prefix
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
+from .transaction import ConditionExpression, TransactionItem, TransactionStatement
 
 
 class DeviceRepository(Repository[Device]):
@@ -19,25 +20,28 @@ class DeviceRepository(Repository[Device]):
             table_name=table_name, model=Device, dynamodb_client=dynamodb_client
         )
 
-    def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent, entity: Device):
+    def handle_DeviceCreatedEvent(
+        self, event: DeviceCreatedEvent, entity: Device
+    ) -> TransactionItem:
         pk = TableKeys.DEVICE.key(event.id)
-        return {
-            "Put": {
-                "TableName": self.table_name,
-                "Item": marshall(pk=pk, sk=pk, **asdict(event)),
-            }
-        }
+        return TransactionItem(
+            Put=TransactionStatement(
+                TableName=self.table_name,
+                Item=marshall(pk=pk, sk=pk, **asdict(event)),
+                ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
+            )
+        )
 
     def handle_DeviceKeyAddedEvent(self, event: DeviceKeyAddedEvent, entity: Device):
         pk = TableKeys.DEVICE.key(event.id)
         sk = TableKeys.DEVICE_KEY.key(event.key)
-        return {
-            "Put": {
-                "TableName": self.table_name,
-                "Item": marshall(pk=pk, sk=sk, **asdict(event)),
-                "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk)",
-            }
-        }
+        return TransactionItem(
+            Put=TransactionStatement(
+                TableName=self.table_name,
+                Item=marshall(pk=pk, sk=sk, **asdict(event)),
+                ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
+            )
+        )
 
     def read_by_key(self, key) -> Device:
         pk_1 = TableKeys.DEVICE_KEY.key(key)
@@ -50,7 +54,7 @@ class DeviceRepository(Repository[Device]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise NotFoundException()
+            raise ItemNotFound(key)
 
         (item,) = items
 
@@ -65,6 +69,8 @@ class DeviceRepository(Repository[Device]):
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
+        if len(items) == 0:
+            raise ItemNotFound(id)
 
         keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
         # pages = TableKeys.DEVICE_PAGE.filter_and_group(items, key="sk")

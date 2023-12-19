@@ -1,10 +1,16 @@
 from contextlib import contextmanager
+from functools import cache
 from typing import Generator
 
 import boto3
 from moto import mock_dynamodb
 
 CHUNK_SIZE = 25
+
+
+@cache
+def dynamodb_client():
+    return boto3.client("dynamodb")
 
 
 def _chunk_list(list_a, chunk_size=CHUNK_SIZE):

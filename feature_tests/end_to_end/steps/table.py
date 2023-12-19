@@ -5,9 +5,12 @@ from behave.model import Table
 
 from test_helpers.uuid import consistent_uuid
 
-FN_REGEX = re.compile(r"^\${(\w+): (.+)}$")
+FN_REGEX = re.compile(r"\${\s([a-zA-Z_]\w*)\(([^)]*)\)\s}")
 EXPAND_FUNCTIONS = {
-    "guid": consistent_uuid,
+    "uuid": consistent_uuid,
+    # behave formatter workarounds here:
+    "dollar": lambda: "$",
+    "pipe": lambda: "|",
 }
 
 
@@ -18,11 +21,13 @@ def parse_table(table: Table) -> dict:
 
 
 def _expand(value: str):
-    _match = FN_REGEX.match(value)
+    _match: list[str] = FN_REGEX.findall(value)
     if not _match:
         return value
-    fn_name, *args = _match.groups()
-    return EXPAND_FUNCTIONS[fn_name](*args)
+    ((fn_name, _args),) = _match
+    args = filter(bool, map(str.strip, _args.split(",")))
+    expanded_value = EXPAND_FUNCTIONS[fn_name](*args)
+    return FN_REGEX.sub(expanded_value, value)
 
 
 T = TypeVar("T")
@@ -52,7 +57,7 @@ def _merge_nested_dicts(d1, d2):
 def _unpack_nested_lists(obj: Any | dict[str, any]):
     """Recursively convert any dict to a list where all keys are integer-like"""
     if not isinstance(obj, dict) or not obj:
-        return obj
+        return _expand(obj)
     if all(key.isdigit() for key in obj):
         unpacked_list = [None] * (int(max(obj)) + 1)
         for key, value in obj.items():
@@ -64,10 +69,8 @@ def _unpack_nested_lists(obj: Any | dict[str, any]):
 def _unflatten_dict(flat_dict: dict[str, any]):
     nested_dict = {}
     for key, value in flat_dict.items():
-        expanded_value = _expand(value)
-
         head, *tail = key.split(".")
-        _nested_dict = _make_nested_dict(path=tail, value=expanded_value)
+        _nested_dict = _make_nested_dict(path=tail, value=value)
 
         if head not in nested_dict:
             nested_dict[head] = _nested_dict
