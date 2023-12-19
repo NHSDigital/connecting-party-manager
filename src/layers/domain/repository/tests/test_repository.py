@@ -9,9 +9,9 @@ from domain.repository.transaction import (
     TransactionItem,
     TransactionStatement,
 )
+from event.aws.client import dynamodb_client
 from pydantic import BaseModel, Field
 
-from test_helpers.dynamodb import dynamodb_client
 from test_helpers.terraform import read_terraform_output
 
 

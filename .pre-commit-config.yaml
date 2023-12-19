@@ -84,17 +84,17 @@ repos:
 
   - repo: local
     hooks:
-      - id: forbid_json_loads
-        name: Don't use json.loads - use json_loads instead
-        entry: json\.loads
+      - id: forbid_client_dynamodb
+        name: Don't use boto3.client("dynamodb") - use dynamodb_client() instead
+        entry: boto3\.client\(\"dynamodb\"\)
         language: pygrep
         types: [python]
-        exclude: src/layers/event/json/__init__.py
+        exclude: src/layers/event/aws/client.py
 
   - repo: local
     hooks:
       - id: forbid_json_load
-        name: Don't use json.load - use json_load instead
+        name: Don't use json.load(s) - use json_load(s) instead
         entry: json\.load
         language: pygrep
         types: [python]

@@ -19,7 +19,7 @@ def test_render_response_of_json_serialisable():
         "body": '{"dict": "of things"}',
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": 21,
+            "Content-Length": "21",
         },
     }
 
@@ -60,7 +60,7 @@ def test_render_response_of_success_http_status_created():
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -101,7 +101,7 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -141,7 +141,7 @@ def test_render_response_of_non_json_serialisable():
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -162,7 +162,7 @@ def test_render_response_of_json_serialisable(response, expected_body):
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -201,7 +201,7 @@ def test_render_response_of_blank_exception():
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -240,7 +240,7 @@ def test_render_response_of_general_exception():
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -321,7 +321,7 @@ def test_render_response_of_general_validation_error():
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }
 
@@ -377,6 +377,6 @@ def test_render_response_of_internal_validation_error():
         "body": expected_body,
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
         },
     }

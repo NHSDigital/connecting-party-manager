@@ -1,4 +1,4 @@
-import boto3
+from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
 from event.logging.step_decorators import logging_step_decorators
@@ -13,7 +13,7 @@ class Environment(BaseEnvironment):
 
 cache = {
     **Environment.build().dict(),
-    "DYNAMODB_CLIENT": boto3.client("dynamodb"),
+    "DYNAMODB_CLIENT": dynamodb_client(),
 }
 step_decorators = [*logging_step_decorators]
 post_steps = [*response_steps]

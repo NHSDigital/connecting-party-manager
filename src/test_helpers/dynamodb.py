@@ -1,16 +1,34 @@
 from contextlib import contextmanager
-from functools import cache
 from typing import Generator
 
-import boto3
+from event.aws.client import dynamodb_client
 from moto import mock_dynamodb
 
 CHUNK_SIZE = 25
 
-
-@cache
-def dynamodb_client():
-    return boto3.client("dynamodb")
+KEY_SCHEMAS = [
+    {"AttributeName": "pk", "KeyType": "HASH"},
+    {"AttributeName": "sk", "KeyType": "HASH"},
+]
+GLOBAL_SECONDARY_INDEXES = [
+    {
+        "IndexName": f"idx_gsi_{i}",
+        "KeySchema": [
+            {"AttributeName": f"pk_{i}", "KeyType": "HASH"},
+            {"AttributeName": f"sk_{i}", "KeyType": "RANGE"},
+        ],
+        "Projection": {"ProjectionType": "ALL"},
+    }
+    for i in range(5)
+]
+ATTRIBUTE_DEFINITIONS = (
+    [
+        {"AttributeName": "pk", "AttributeType": "S"},
+        {"AttributeName": "sk", "AttributeType": "S"},
+    ]
+    + [{"AttributeName": f"pk_{i}", "AttributeType": "S"} for i in range(5)]
+    + [{"AttributeName": f"sk_{i}", "AttributeType": "S"} for i in range(5)]
+)
 
 
 def _chunk_list(list_a, chunk_size=CHUNK_SIZE):
@@ -45,38 +63,39 @@ def clear_dynamodb_table(client, table_name: str):
 
 
 @contextmanager
-def mock_table(table_name: str):
-    key_schemas = [
-        {"AttributeName": "pk", "KeyType": "HASH"},
-        {"AttributeName": "sk", "KeyType": "HASH"},
-    ]
-    global_secondary_indexes = [
-        {
-            "IndexName": f"idx_gsi_{i}",
-            "KeySchema": [
-                {"AttributeName": f"pk_{i}", "KeyType": "HASH"},
-                {"AttributeName": f"sk_{i}", "KeyType": "RANGE"},
-            ],
-            "Projection": {"ProjectionType": "ALL"},
-        }
-        for i in range(5)
-    ]
-    attribute_definitions = (
-        [
-            {"AttributeName": "pk", "AttributeType": "S"},
-            {"AttributeName": "sk", "AttributeType": "S"},
-        ]
-        + [{"AttributeName": f"pk_{i}", "AttributeType": "S"} for i in range(5)]
-        + [{"AttributeName": f"sk_{i}", "AttributeType": "S"} for i in range(5)]
-    )
+def patch_dynamodb_client():
+    """
+    Patch dynamodb 'query' operations that hit just a 'pk' because moto
+    has a bug that doesn't return all results if there are multiple matches
+    to the pk (i.e. with different values 'sk'). The alternative for
+    testing purposes is to patch the 'query' into a 'scan' with filter
+    """
+    client = dynamodb_client()
+    bare_query = client.query
 
+    def _mocked_query(TableName, KeyConditionExpression=None, **kwargs):
+        operation = bare_query
+        if KeyConditionExpression == "pk = :pk":
+            operation = client.scan
+            kwargs["FilterExpression"] = KeyConditionExpression
+        elif KeyConditionExpression:
+            kwargs["KeyConditionExpression"] = KeyConditionExpression
+        return operation(TableName=TableName, **kwargs)
+
+    client.query = _mocked_query
+    yield client
+    client.query = bare_query
+
+
+@contextmanager
+def mock_table(table_name: str):
     with mock_dynamodb():
-        client = boto3.client("dynamodb")
-        client.create_table(
-            TableName=table_name,
-            AttributeDefinitions=attribute_definitions,
-            KeySchema=key_schemas,
-            GlobalSecondaryIndexes=global_secondary_indexes,
-            BillingMode="PAY_PER_REQUEST",
-        )
-        yield client
+        with patch_dynamodb_client() as client:
+            client.create_table(
+                TableName=table_name,
+                AttributeDefinitions=ATTRIBUTE_DEFINITIONS,
+                KeySchema=KEY_SCHEMAS,
+                GlobalSecondaryIndexes=GLOBAL_SECONDARY_INDEXES,
+                BillingMode="PAY_PER_REQUEST",
+            )
+            yield client

@@ -52,6 +52,7 @@ profile = "black"
 [tool.pytest.ini_options]
 markers = ["unit", "integration", "smoke", "slow", "wip"]
 addopts = "--import-mode=importlib"
+filterwarnings = ["ignore:from_type:"]                    # Ignores an annoying hypothesis warning
 
 [tool.black]
 line-length = 88
