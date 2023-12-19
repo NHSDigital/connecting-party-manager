@@ -1,5 +1,10 @@
 # Changelog
 
+## 2023-12-19
+- [PI-162] Missing destroy permissions
+- [PI-139] Fine-grained lambda permissions
+- [PI-138] End-to-end feature tests run locally
+
 ## 2023-12-15
 - [PI-82] Device e2e
 - [PI-143] DynamoDb errors
