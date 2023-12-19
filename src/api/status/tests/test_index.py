@@ -68,7 +68,7 @@ def test_index():
         "statusCode": 200,
         "body": expected_body,
         "headers": {
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
         },
     }
@@ -109,7 +109,7 @@ def test_index_not_ok():
                             }
                         ]
                     },
-                    "diagnostics": "An error occurred (ResourceNotFoundException) when calling the Query operation: Requested resource not found",
+                    "diagnostics": "An error occurred (ResourceNotFoundException) when calling the Scan operation: Requested resource not found",
                 }
             ],
         }
@@ -119,7 +119,7 @@ def test_index_not_ok():
         "statusCode": 503,
         "body": expected_body,
         "headers": {
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
         },
     }

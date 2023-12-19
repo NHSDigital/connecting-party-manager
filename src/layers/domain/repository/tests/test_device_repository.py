@@ -5,8 +5,9 @@ from domain.core.device import DeviceKeyType, DeviceStatus, DeviceType
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
+from event.aws.client import dynamodb_client
 
-from test_helpers.dynamodb import dynamodb_client, mock_table
+from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 
 

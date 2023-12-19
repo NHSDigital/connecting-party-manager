@@ -8,7 +8,7 @@ class AwsLambdaResponseHeaders(BaseModel):
     content_type: Literal["application/json"] = Field(
         default="application/json", alias="Content-Type"
     )
-    content_length: int = Field(alias="Content-Length")
+    content_length: str = Field(alias="Content-Length", regex=r"^[1-9][0-9]*$")
 
     class Config:
         allow_population_by_field_name = True
@@ -19,7 +19,7 @@ class AwsLambdaResponseHeaders(BaseModel):
 
 class AwsLambdaResponse(BaseModel):
     statusCode: HTTPStatus
-    body: str
+    body: str = Field(min_length=1)
     headers: AwsLambdaResponseHeaders = None
 
     @validator("headers", always=True)

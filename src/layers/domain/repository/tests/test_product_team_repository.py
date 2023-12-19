@@ -2,8 +2,9 @@ import pytest
 from domain.core.root import Root
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 from domain.repository.product_team_repository import ProductTeamRepository
+from event.aws.client import dynamodb_client
 
-from test_helpers.dynamodb import dynamodb_client, mock_table
+from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 
 

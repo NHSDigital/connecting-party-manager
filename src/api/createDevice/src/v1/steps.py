@@ -10,6 +10,7 @@ from domain.fhir_translation.device import (
 )
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.product_team_repository import ProductTeamRepository
+from event.aws.client import dynamodb_client
 from event.response.validation_errors import mark_json_decode_errors_as_inbound
 from event.step_chain import StepChain
 
@@ -29,7 +30,7 @@ def parse_fhir_device(data, cache) -> FhirDevice:
 def read_product_team(data, cache) -> ProductTeam:
     fhir_device: FhirDevice = data[parse_fhir_device]
     product_team_repo = ProductTeamRepository(
-        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=dynamodb_client()
     )
     return product_team_repo.read(id=fhir_device.owner.identifier.value)
 
