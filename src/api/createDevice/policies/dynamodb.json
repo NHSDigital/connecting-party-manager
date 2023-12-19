@@ -1,1 +1,1 @@
-["dynamodb:PutItem"]
+["dynamodb:Query", "dynamodb:PutItem"]
