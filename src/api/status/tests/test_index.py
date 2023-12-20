@@ -70,6 +70,7 @@ def test_index():
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
+            "Version": "null",
         },
     }
 
@@ -121,5 +122,6 @@ def test_index_not_ok():
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
+            "Version": "null",
         },
     }

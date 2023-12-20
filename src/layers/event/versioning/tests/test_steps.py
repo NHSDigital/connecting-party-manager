@@ -5,7 +5,7 @@ from event.step_chain import StepChain
 from event.step_chain.tests.utils import step_data
 from event.versioning.constants import VERSIONING_STEP_ARGS
 from event.versioning.errors import VersionException
-from event.versioning.models import LambdaEventForVersioning
+from event.versioning.models import Event
 from event.versioning.steps import get_largest_possible_version, get_requested_version
 from hypothesis import given
 from hypothesis.strategies import builds, dictionaries, none, text
@@ -14,8 +14,8 @@ from pydantic import ValidationError
 PATH_TO_HERE = Path(__file__).parent
 
 
-@given(event=builds(LambdaEventForVersioning))
-def test_get_requested_version_pass(event: LambdaEventForVersioning):
+@given(event=builds(Event))
+def test_get_requested_version_pass(event: Event):
     version = get_requested_version(data=step_data(init={"event": event.dict()}))
     assert version == event.headers.version
 

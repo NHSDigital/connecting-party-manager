@@ -71,6 +71,7 @@ def test_index(version):
         "headers": {
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
+            "Version": version,
         },
     }
 
@@ -143,5 +144,6 @@ def test_index_no_such_product_team(version):
         "headers": {
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
+            "Version": version,
         },
     }

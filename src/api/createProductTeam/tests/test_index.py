@@ -65,6 +65,7 @@ def test_index(version):
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
+            "Version": version,
         },
     }
 
@@ -169,5 +170,6 @@ def test_index_bad_payload(version):
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
+            "Version": version,
         },
     }

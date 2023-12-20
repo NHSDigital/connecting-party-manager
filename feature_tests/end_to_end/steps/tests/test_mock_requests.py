@@ -14,7 +14,7 @@ def test__mock_requests():
             "GET": {
                 "my_url/{id}/{something}": lambda event: {
                     "statusCode": 200,
-                    "headers": {"Content-Length": "123"},
+                    "headers": {"Content-Length": len(response_body), "Version": "1"},
                     "body": response_body,
                 }
             }
@@ -32,6 +32,7 @@ def test__mock_requests():
         "headers": {
             "Content-Length": str(len(response_body)),
             "Content-Type": "application/json",
+            "Version": "1",
         },
         "status_code": 200,
         "reason": "OK",
