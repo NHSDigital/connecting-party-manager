@@ -5,7 +5,7 @@ from event.logging.logger import setup_logger
 from event.logging.step_decorators import logging_step_decorators
 from event.step_chain import StepChain
 from event.versioning.constants import VERSIONING_STEP_ARGS
-from event.versioning.models import LambdaEventForVersioning, VersionHeader
+from event.versioning.models import Event, VersionHeader
 from event.versioning.steps import versioning_steps
 from nhs_context_logging.fixtures import (  # noqa: F401
     log_capture_fixture as log_capture,
@@ -37,7 +37,7 @@ versioned_steps = {
 def test_versioning_steps(requested_version: str, expected_steps: list[FunctionType]):
     setup_logger(service_name=f"test_versioning_steps-{requested_version}")
 
-    _event = LambdaEventForVersioning(
+    _event = Event(
         headers=VersionHeader(
             version=requested_version,
         ),

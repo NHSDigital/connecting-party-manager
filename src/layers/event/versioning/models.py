@@ -5,5 +5,5 @@ class VersionHeader(BaseModel):
     version: int
 
 
-class LambdaEventForVersioning(BaseModel):
+class Event(BaseModel):
     headers: VersionHeader

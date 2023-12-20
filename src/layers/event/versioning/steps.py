@@ -6,12 +6,12 @@ from event.step_chain import StepChain
 
 from .constants import VERSIONING_STEP_ARGS
 from .errors import VersionException
-from .models import LambdaEventForVersioning
+from .models import Event
 
 
 @mark_validation_errors_as_inbound
 def get_requested_version(data, cache=None):
-    event = LambdaEventForVersioning(**data[StepChain.INIT][VERSIONING_STEP_ARGS.EVENT])
+    event = Event(**data[StepChain.INIT][VERSIONING_STEP_ARGS.EVENT])
     return event.headers.version
 
 

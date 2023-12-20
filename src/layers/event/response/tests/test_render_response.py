@@ -20,6 +20,7 @@ def test_render_response_of_json_serialisable():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": "21",
+            "Version": "null",
         },
     }
 
@@ -61,6 +62,7 @@ def test_render_response_of_success_http_status_created():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -102,6 +104,7 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -142,6 +145,7 @@ def test_render_response_of_non_json_serialisable():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -163,6 +167,7 @@ def test_render_response_of_json_serialisable(response, expected_body):
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -202,6 +207,7 @@ def test_render_response_of_blank_exception():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -241,6 +247,7 @@ def test_render_response_of_general_exception():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -322,6 +329,7 @@ def test_render_response_of_general_validation_error():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }
 
@@ -378,5 +386,6 @@ def test_render_response_of_internal_validation_error():
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": str(len(expected_body)),
+            "Version": "null",
         },
     }

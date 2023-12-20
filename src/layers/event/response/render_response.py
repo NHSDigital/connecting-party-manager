@@ -16,7 +16,9 @@ JsonSerialisable = TypeVar("JsonSerialisable")
 
 
 def render_response(
-    response: JsonSerialisable | HTTPStatus | Exception, id=None
+    response: JsonSerialisable | HTTPStatus | Exception,
+    id: str = None,
+    version: str = None,
 ) -> AwsLambdaResponse:
     if id is None:
         id = app_logger.service_name
@@ -44,4 +46,4 @@ def render_response(
         outcome = response
 
     body = json.dumps(outcome)
-    return AwsLambdaResponse(statusCode=http_status, body=body)
+    return AwsLambdaResponse(statusCode=http_status, body=body, version=version)
