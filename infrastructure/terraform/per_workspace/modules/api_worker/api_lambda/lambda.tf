@@ -30,4 +30,7 @@ module "lambda_function" {
   trusted_entities   = var.trusted_entities
   attach_policy_json = var.attach_policy_json
   policy_json        = var.policy_json
+
+  attach_policy_statements = var.attach_policy_statements
+  policy_statements        = var.policy_statements
 }

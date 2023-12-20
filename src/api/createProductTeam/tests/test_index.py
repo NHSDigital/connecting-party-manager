@@ -63,7 +63,7 @@ def test_index(version):
         "statusCode": 201,
         "body": expected_body,
         "headers": {
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
         },
     }
@@ -167,7 +167,7 @@ def test_index_bad_payload(version):
         "statusCode": 400,
         "body": expected_body,
         "headers": {
-            "Content-Length": len(expected_body),
+            "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
         },
     }

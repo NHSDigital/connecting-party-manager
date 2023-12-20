@@ -1,5 +1,5 @@
-import boto3
 from event.api_step_chain import execute_step_chain
+from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
 
@@ -11,10 +11,7 @@ class Environment(BaseEnvironment):
 
 
 versioned_steps = {"1": v1_steps}
-cache = {
-    **Environment.build().dict(),
-    "DYNAMODB_CLIENT": boto3.client("dynamodb"),
-}
+cache = {**Environment.build().dict(), "DYNAMODB_CLIENT": dynamodb_client()}
 
 
 def handler(event: dict, context=None):

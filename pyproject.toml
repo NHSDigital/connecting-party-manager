@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2023.12.15"
+version = "2023.12.19"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -52,6 +52,7 @@ profile = "black"
 [tool.pytest.ini_options]
 markers = ["unit", "integration", "smoke", "slow", "wip"]
 addopts = "--import-mode=importlib"
+filterwarnings = ["ignore:from_type:"]                    # Ignores an annoying hypothesis warning
 
 [tool.black]
 line-length = 88

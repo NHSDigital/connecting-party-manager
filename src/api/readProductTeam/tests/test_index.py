@@ -69,7 +69,7 @@ def test_index(version):
         "statusCode": 200,
         "body": expected_result,
         "headers": {
-            "Content-Length": len(expected_result),
+            "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
         },
     }
@@ -141,7 +141,7 @@ def test_index_no_such_product_team(version):
         "statusCode": 404,
         "body": expected_result,
         "headers": {
-            "Content-Length": len(expected_result),
+            "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
         },
     }

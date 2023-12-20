@@ -2,6 +2,12 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "TagPermissions",
+      "Effect": "Allow",
+      "Action": ["tag:TagResources", "tag:GetResources"],
+      "Resource": ["*"]
+    },
+    {
       "Sid": "ResourceGroupPermissions",
       "Effect": "Allow",
       "Action": [
@@ -13,9 +19,15 @@
         "resource-groups:GetGroupConfiguration",
         "resource-groups:GetTags",
         "resource-groups:Tag",
-        "resource-groups:UnTag"
+        "resource-groups:Untag"
       ],
       "Resource": ["arn:aws:resource-groups:*:${ACCOUNT_ID}:group/*"]
+    },
+    {
+      "Sid": "ResourceGroupSearchPermissions",
+      "Effect": "Allow",
+      "Action": ["resource-groups:SearchResources"],
+      "Resource": ["*"]
     },
     {
       "Sid": "ParameterPermissions",
@@ -84,11 +96,13 @@
       "Action": [
         "iam:AttachRolePolicy",
         "iam:CreateRole",
+        "iam:CreateServiceLinkedRole",
         "iam:UpdateRole",
         "iam:DeleteRole",
         "iam:CreatePolicy",
         "iam:CreatePolicyVersion",
         "iam:DeletePolicy",
+        "iam:DeletePolicyVersion",
         "iam:DetachRolePolicy",
         "iam:GetPolicy",
         "iam:GetPolicyVersion",
@@ -100,7 +114,7 @@
         "iam:ListPolicyVersions",
         "iam:PassRole",
         "iam:TagRole",
-        "iam:UnTagRole",
+        "iam:UntagRole",
         "iam:TagPolicy",
         "iam:UntagPolicy"
       ],
@@ -161,6 +175,16 @@
         "logs:UntagResource"
       ],
       "Resource": ["arn:aws:logs:*:${ACCOUNT_ID}:log-group:*"]
+    },
+    {
+      "Sid": "CloudFormationPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:ListStacks",
+        "cloudformation:ListStackResources"
+      ],
+      "Resource": ["arn:aws:cloudformation:*:${ACCOUNT_ID}:stack/*/*"]
     }
   ]
 }

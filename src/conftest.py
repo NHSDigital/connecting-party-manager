@@ -1,5 +1,6 @@
 import json
 
+from event.aws.client import dynamodb_client
 from event.logging.logger import setup_logger
 from nhs_context_logging.fixtures import (  # noqa: F401
     log_capture_fixture as log_capture,
@@ -11,7 +12,7 @@ from nhs_context_logging.formatters import json_serializer
 from pytest import Config, FixtureRequest, Item, fixture
 
 from test_helpers.aws_session import aws_session
-from test_helpers.dynamodb import clear_dynamodb_table, dynamodb_client
+from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.terraform import read_terraform_output
 
 
