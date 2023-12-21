@@ -12,4 +12,17 @@ x-nhsd-apim:
     security:
       type: apikey
       header: apikey
-      secret: rowan-cpm-test-5
+      secret: rowan-cpm-test-8
+  target-attributes:
+    - name: nrl-ods-RJ11
+      required: true
+    - name: nrlf-ods-object.cpm.code
+      required: false
+    - name: nrlf-ods-object.cpm
+      required: true
+    - name: nrlf-ods-object
+      required: true
+    - name: nrlf-ods-array
+      required: true
+    - name: missing
+      required: false
