@@ -60,6 +60,7 @@ if [[ ${MERGE_APIGEE} == "1" ]]; then
         yq 'del(.security)' |
         yq 'del(.tags)' |
         yq 'del(.paths.*.*.tags)' |
+        yq 'del(.paths.*.*.security[] | select(has("${authoriser_name}")))' |
         yq 'del(.components.securitySchemes."${authoriser_name}")' \
             > ${APIGEE_SWAGGER_FILE}
     echo "Generated ${APIGEE_SWAGGER_FILE}"
