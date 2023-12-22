@@ -78,6 +78,7 @@ def test_index(version):
         "headers": {
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
+            "Version": version,
         },
     }
 
@@ -140,5 +141,6 @@ def test_index_no_such_device(version):
         "headers": {
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
+            "Version": version,
         },
     }

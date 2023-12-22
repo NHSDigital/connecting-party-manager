@@ -5,7 +5,8 @@ from event.step_chain import StepChain
 
 
 def render_response(data, cache) -> dict:
-    response = _render_response(response=data[StepChain.INIT])
+    result, version = data[StepChain.INIT]
+    response = _render_response(response=result, version=version)
     return response.dict()
 
 

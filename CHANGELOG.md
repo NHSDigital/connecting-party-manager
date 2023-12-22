@@ -1,5 +1,8 @@
 # Changelog
 
+## 2023-12-20
+- [PI-166] Versioning
+
 ## 2023-12-19
 - [PI-162] Missing destroy permissions
 - [PI-139] Fine-grained lambda permissions
