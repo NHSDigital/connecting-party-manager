@@ -127,12 +127,13 @@ jobs:
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
     runs-on: [self-hosted, ci]
-    if: inputs.run_smoke_tests == 'true'
+    if: always()
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
+      - if: inputs.run_smoke_tests == 'true'
+        uses: ./.github/actions/make/
         with:
           command: test--smoke
           requires-aws: true
