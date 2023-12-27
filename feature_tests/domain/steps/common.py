@@ -114,7 +114,7 @@ def read_value_from_path(obj, full_path: str) -> any:
             )
 
         head, *tail = path
-        head = head.replace("DOT", ".")
+        head = head.replace("#DOT#", ".")
         if isinstance(obj, dict):
             obj = obj[head]
         else:
@@ -123,5 +123,5 @@ def read_value_from_path(obj, full_path: str) -> any:
             return _read_value(obj, tail)
         return obj
 
-    path = full_path.replace("\\.", "DOT")
+    # path = full_path.replace("#.", "DOT")
     return _read_value(obj, path.split("."))

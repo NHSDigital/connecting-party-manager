@@ -45,15 +45,15 @@ Feature: Device Success Scenarios
       | keys.1.type | accredited_system_id |
     Then the operation is successful
     And the result is a Device with
-      | property              | value                |
-      | name                  | My Product           |
-      | type                  | product              |
-      | status                | active               |
-      | ods_code              | H8S7A                |
-      | keys.P\\.AAA-CCC.key  | P.AAA-CCC            |
-      | keys.P\\.AAA-CCC.type | product_id           |
-      | keys.12345.key        | 12345                |
-      | keys.12345.type       | accredited_system_id |
+      | property                | value                |
+      | name                    | My Product           |
+      | type                    | product              |
+      | status                  | active               |
+      | ods_code                | H8S7A                |
+      | keys.P#DOT#AAA-CCC.key  | P.AAA-CCC            |
+      | keys.P#DOT#AAA-CCC.type | product_id           |
+      | keys.12345.key          | 12345                |
+      | keys.12345.type         | accredited_system_id |
     And the following events were raised for the result
       | event                 |
       | DeviceCreatedEvent    |
