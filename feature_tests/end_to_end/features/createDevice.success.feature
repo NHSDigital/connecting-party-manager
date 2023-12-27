@@ -24,7 +24,7 @@ Feature: Create Device - success scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | <type>                                   |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "201" with body
@@ -42,7 +42,7 @@ Feature: Create Device - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 456              |
-    When I make a "GET" request with "default" headers to "Device/XXX-YYY"
+    When I make a "GET" request with "default" headers to "Device/P.XXX-YYY"
     Then I receive a status code "200" with body
       | path                         | value                                    |
       | resourceType                 | Device                                   |
@@ -51,7 +51,7 @@ Feature: Create Device - success scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | <type>                                   |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
 

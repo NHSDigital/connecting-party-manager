@@ -2,6 +2,8 @@ from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.device import Device
+from domain.core.device_id import generate_device_key
+from domain.core.device_key import DeviceKeyType
 from domain.core.product_team import ProductTeam
 from domain.fhir.r4.cpm_model import Device as FhirDevice
 from domain.fhir_translation.device import (
@@ -44,8 +46,16 @@ def create_device(data, cache) -> Device:
     return device
 
 
+def create_device_key(data, cache) -> dict:
+    device: Device = data[create_device]
+    device = device.add_key(
+        DeviceKeyType.PRODUCT_ID, generate_device_key(DeviceKeyType.PRODUCT_ID)
+    )
+    return device
+
+
 def save_device(data, cache) -> dict:
-    device = data[create_device]
+    device = data[create_device_key]
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
@@ -61,6 +71,7 @@ steps = [
     parse_fhir_device,
     read_product_team,
     create_device,
+    create_device_key,
     save_device,
     set_http_status,
 ]

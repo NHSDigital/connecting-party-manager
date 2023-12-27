@@ -1,25 +1,23 @@
 Feature: Device Failure Scenarios
 
-  Scenario: Device ID is not valid
-    Given Product Teams
-      | id                                   | name            | ods_code |
-      | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
-    When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-      | property | value          |
-      | id       | not_a_valid_id |
-      | name     | My Device      |
-      | type     | product        |
-    Then the operation is not successful
-    And the error is ValidationError on fields
-      | Device.id |
-
+  # Scenario: Device ID is not valid
+  # Given Product Teams
+  # | id                                   | name            | ods_code |
+  # | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
+  # When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
+  # | property | value          |
+  # | id       | not_a_valid_id |
+  # | name     | My Device      |
+  # | type     | product        |
+  # Then the operation is not successful
+  # And the error is ValidationError on fields
+  # | Device.id |
   Scenario: Device name is not valid
     Given Product Teams
       | id                                   | name            | ods_code |
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
       | property | value        |
-      | id       | XXX-YYY      |
       | name     | My Device 🚀 |
       | type     | product      |
     Then the operation is not successful
@@ -32,7 +30,6 @@ Feature: Device Failure Scenarios
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
       | property | value      |
-      | id       | XXX-YYY    |
       | name     | My Device  |
       | type     | not_a_type |
     Then the operation is not successful
@@ -45,12 +42,11 @@ Feature: Device Failure Scenarios
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
       | property | value        |
-      | id       | not_an_id    |
       | name     | My Device 🚀 |
       | type     | not_a_type   |
     Then the operation is not successful
     And the error is ValidationError on fields
-      | Device.id | Device.name | Device.type |
+      | Device.name | Device.type |
 
   Scenario: Invalid product key types
     Given Product Teams
@@ -58,7 +54,6 @@ Feature: Device Failure Scenarios
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
       | property    | value          |
-      | id          | XXX-YYY        |
       | name        | My Product     |
       | type        | product        |
       | keys.0.key  | AAA-CCC-DDD    |
@@ -73,7 +68,6 @@ Feature: Device Failure Scenarios
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
       | property    | value                  |
-      | id          | XXX-YYY                |
       | name        | My Product             |
       | type        | product                |
       | keys.0.key  | not_a_valid_product_id |
@@ -88,12 +82,11 @@ Feature: Device Failure Scenarios
       | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
     When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
       | property    | value      |
-      | id          | XXX-YYY    |
       | name        | My Product |
       | type        | product    |
-      | keys.0.key  | AAA-CCC    |
+      | keys.0.key  | P.AAA-CCC  |
       | keys.0.type | product_id |
-      | keys.1.key  | AAA-CCC    |
+      | keys.1.key  | P.AAA-CCC  |
       | keys.1.type | product_id |
     Then the operation is not successful
     And the error is DuplicateError

@@ -24,7 +24,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     When I make a "POST" request with "default" headers to "Device" with body:
@@ -35,7 +35,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
@@ -67,7 +67,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
@@ -103,7 +103,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier             | connecting-party-manager/product-team-id |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
@@ -183,7 +183,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
@@ -220,7 +220,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
@@ -257,7 +257,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | not_a_type                               |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
@@ -294,7 +294,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | not_a_key_type                           |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
@@ -368,9 +368,9 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | identifier.1.system          | connecting-party-manager/product_id      |
-      | identifier.1.value           | XXX-YYY                                  |
+      | identifier.1.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
@@ -428,7 +428,7 @@ Feature: Create Device - failure scenarios
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | XXX-YYY                                  |
+      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "404" with body
