@@ -46,9 +46,9 @@ def create_device(data, cache) -> Device:
     return device
 
 
-def create_device_key(data, cache) -> dict:
+def create_device_key(data, cache) -> Device:
     device: Device = data[create_device]
-    device = device.add_key(
+    device.add_key(
         DeviceKeyType.PRODUCT_ID, generate_device_key(DeviceKeyType.PRODUCT_ID)
     )
     return device

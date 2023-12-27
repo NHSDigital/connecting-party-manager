@@ -28,7 +28,6 @@ def test_index(version):
     )
     device = product_team.create_device(name="device-name", type="product")
     device.add_key(DeviceKeyType.PRODUCT_ID, device_key)
-    device_id = device.id
 
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
@@ -46,7 +45,7 @@ def test_index(version):
         result = handler(
             event={
                 "headers": {"version": version},
-                "pathParameters": {"id": device_id},
+                "pathParameters": {"id": str(device.id)},
             }
         )
 

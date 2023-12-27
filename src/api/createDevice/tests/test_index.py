@@ -73,6 +73,7 @@ def test_index(version):
             ],
         }
     )
+
     assert result == {
         "statusCode": 201,
         "body": expected_body,
