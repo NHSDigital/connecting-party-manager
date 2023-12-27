@@ -1,4 +1,5 @@
 Feature: Status
+  These scenarios demonstrate the expected behaviour of the status endpoint
 
   Background:
     Given "default" request headers:

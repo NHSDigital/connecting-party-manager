@@ -1,4 +1,5 @@
 Feature: Read Product Team - success scenarios
+  These scenarios demonstrate successful reads from the GET Organization (i.e. Product Team) endpoint
 
   Background:
     Given "default" request headers:
