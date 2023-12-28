@@ -22,6 +22,13 @@ def _pop_ignore(expected: dict, received: dict):
                 _pop_ignore(expected=expected_value, received=received_value)
 
 
+def _fix_backslashes(json_data: dict):
+    if "issue" in json_data and isinstance(json_data["issue"], list):
+        for issue in json_data["issue"]:
+            if "diagnostics" in issue and isinstance(issue["diagnostics"], str):
+                issue["diagnostics"] = issue["diagnostics"].replace("\\\\", "\\")
+
+
 def stringify(item) -> str:
     if isinstance(item, (list, dict)):
         return json.dumps(item)
@@ -39,6 +46,7 @@ def assert_same_type(expected, received, label=""):
 
 def assert_equal(expected, received, label=""):
     if isinstance(expected, dict):
+        _fix_backslashes(json_data=expected)
         _pop_ignore(expected=expected, received=received)
     assert expected == received, error_message(
         expected, "does not equal", received, label=label
