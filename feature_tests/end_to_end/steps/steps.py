@@ -15,6 +15,13 @@ from feature_tests.end_to_end.steps.requests import make_request
 from feature_tests.end_to_end.steps.table import parse_table
 
 
+def fix_backslashes(json_data):
+    if "issue" in json_data and isinstance(json_data["issue"], list):
+        for issue in json_data["issue"]:
+            if "diagnostics" in issue and isinstance(issue["diagnostics"], str):
+                issue["diagnostics"] = issue["diagnostics"].replace("\\\\", "\\")
+
+
 def remove_ignore_keys(data1, data2):
     if isinstance(data1, dict) and isinstance(data2, dict):
         for key in list(data1.keys()):
@@ -138,6 +145,7 @@ def then_response(context: Context, status_code: str):
         response_body = context.response.json()
     except JSONDecodeError:
         response_body = context.response.text
+    fix_backslashes(expected_body)
     remove_ignore_keys(expected_body, response_body)
     assert_many(
         assertions=(
