@@ -4,7 +4,7 @@ source ./scripts/infrastructure/terraform/terraform-utils.sh
 
 TERRAFORM_COMMAND="$1"
 TERRAFORM_WORKSPACE="$2"
-ACCOUNT_WIDE="$3"
+TERRAFORM_SCOPE="$3"
 PARAMETER_DEPLOY="$4"
 TERRAFORM_ARGS="$5"
 AWS_REGION_NAME="eu-west-2"

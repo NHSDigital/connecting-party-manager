@@ -21,5 +21,4 @@ jobs:
       account: ${{ inputs.account }}
       workspace: ${{ inputs.account }}
       scope: "per_account/${{ inputs.account }}"
-      run_smoke_tests: false
     secrets: inherit # pragma: allowlist secret

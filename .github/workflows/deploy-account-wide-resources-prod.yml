@@ -10,5 +10,4 @@ jobs:
       account: prod
       workspace: prod
       scope: per_account/prod
-      run_smoke_tests: false
     secrets: inherit # pragma: allowlist secret

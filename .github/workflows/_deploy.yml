@@ -13,10 +13,6 @@ on:
         description: The Terraform scope being deployed
         type: string
         required: true
-      run_smoke_tests:
-        description: Run smoke tests?
-        type: boolean
-        default: true
 
 permissions:
   id-token: write
@@ -132,8 +128,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - if: inputs.run_smoke_tests == 'true'
-        uses: ./.github/actions/make/
+      - uses: ./.github/actions/make/
         with:
           command: test--smoke
           requires-aws: true

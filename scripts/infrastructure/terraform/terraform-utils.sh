@@ -93,10 +93,11 @@ function _get_workspace_vars_file() {
 }
 
 function _get_terraform_scope() {
-  if [[ -z "$TERRAFORM_SCOPE" ]]; then
+  local scope=$1
+  if [[ -z "$scope" ]]; then
     echo "per_workspace"
   else
-    echo "$TERRAFORM_SCOPE"
+    echo "$scope"
   fi
 }
 
