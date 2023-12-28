@@ -15,6 +15,19 @@ from feature_tests.end_to_end.steps.requests import make_request
 from feature_tests.end_to_end.steps.table import parse_table
 
 
+def remove_ignore_keys(data1, data2):
+    if isinstance(data1, dict) and isinstance(data2, dict):
+        for key in list(data1.keys()):
+            if data1[key] == "<< ignore >>":
+                del data1[key]
+                del data2[key]  # Synchronize removal in both dictionaries
+            else:
+                remove_ignore_keys(data1[key], data2[key])
+    elif isinstance(data1, list) and isinstance(data2, list):
+        for item1, item2 in zip(data1, data2):
+            remove_ignore_keys(item1, item2)
+
+
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
     context.headers[header_name] = parse_table(table=context.table)
@@ -125,7 +138,7 @@ def then_response(context: Context, status_code: str):
         response_body = context.response.json()
     except JSONDecodeError:
         response_body = context.response.text
-
+    remove_ignore_keys(expected_body, response_body)
     assert_many(
         assertions=(
             assert_equal,
