@@ -3,10 +3,11 @@
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 
 TERRAFORM_COMMAND="$1"
-TERRAFORM_WORKSPACE="$2"
-TERRAFORM_SCOPE="$3"
-PARAMETER_DEPLOY="$4"
-TERRAFORM_ARGS="$5"
+AWS_ACCOUNT="$2"
+TERRAFORM_WORKSPACE="$3"
+TERRAFORM_SCOPE="$4"
+PARAMETER_DEPLOY="$5"
+TERRAFORM_ARGS="$6"
 AWS_REGION_NAME="eu-west-2"
 
 function _terraform() {
@@ -40,7 +41,6 @@ function _terraform() {
     login_account        ${login_account}
     scope                ${scope}
     account              ${account}
-    account_id           ${aws_account_id}
     workspace            ${workspace}
     workspace_type       ${workspace_type}
     workspace_expiration ${workspace_expiration}
