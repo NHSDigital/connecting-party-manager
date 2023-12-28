@@ -27,6 +27,6 @@ JSON
   }
 }
 
-resource "aws_secretsmanager_secret" "dev-apigee-credentials" {
+resource "aws_secretsmanager_secret" "apigee-credentials" {
   name = "${terraform.workspace}-apigee-credentials"
 }

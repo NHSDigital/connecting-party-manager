@@ -22,7 +22,7 @@ function _destroy_corrupted_workspace() {
         return 1
     fi
 
-    dev_acct=$(_get_aws_account_id "$ENV") # TODO Broken by PI-165
+    dev_acct=$(_get_aws_account_id "$ENV" "$PROFILE_PREFIX" "$VERSION")
     role_arn="arn:aws:iam::${dev_acct}:role/${TERRAFORM_ROLE_NAME}"
     session_name="resource-search-session"
     duration_seconds=900
