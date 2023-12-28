@@ -18,8 +18,6 @@ variable "updated_date" {
   default = "NEVER"
 }
 
-variable "lambdas" {}
-
-variable "layers" {}
-
-variable "workspace_type" {}
+variable "workspace_type" {
+  default = "PERSISTENT"
+}

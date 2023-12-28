@@ -65,7 +65,7 @@ function _terraform() {
         ;;
         #----------------
         "plan")
-            _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id" "$TERRAFORM_ARGS"
+            _terraform_plan "$workspace" "$var_file" "$plan_file" "$aws_account_id" "$scope" "$TERRAFORM_ARGS"
         ;;
         #----------------
         "apply")
@@ -99,23 +99,34 @@ function _terraform_plan() {
     local var_file=$2
     local plan_file=$3
     local aws_account_id=$4
-    local args=${@:5}
+    local scope=$5
+
+    local args=${@:6}
 
     terraform workspace select default
     terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
 
-    terraform plan $args \
-        -out="$plan_file" \
-        -var-file="$var_file" \
-        -var "assume_account=${aws_account_id}" \
-        -var "assume_role=${terraform_role_name}" \
-        -var "updated_date=${current_date}" \
-        -var "expiration_date=${expiration_date}" \
-        -var "workspace_type=${workspace_type}" \
-        -var "lambdas=${lambdas}" \
-        -var "layers=${layers}" \
-    || return 1
+    if [[ "${scope}" = "per_workspace" ]]; then
+        terraform plan $args \
+            -out="$plan_file" \
+            -var-file="$var_file" \
+            -var "assume_account=${aws_account_id}" \
+            -var "assume_role=${terraform_role_name}" \
+            -var "updated_date=${current_date}" \
+            -var "expiration_date=${expiration_date}" \
+            -var "lambdas=${lambdas}" \
+            -var "workspace_type=${workspace_type}" \
+            -var "layers=${layers}" || return 1
+    else
+        terraform plan $args \
+            -out="$plan_file" \
+            -var-file="$var_file" \
+            -var "assume_account=${aws_account_id}" \
+            -var "assume_role=${terraform_role_name}" \
+            -var "updated_date=${current_date}" \
+            -var "expiration_date=${expiration_date}" || return 1
+    fi
 }
 
 function _terraform_apply() {
