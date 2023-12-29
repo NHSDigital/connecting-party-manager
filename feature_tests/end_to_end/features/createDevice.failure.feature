@@ -7,6 +7,7 @@ Feature: Create Device - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
+  # No longer necessary. Multiple devices can be created that are identical but the ID will always be different.
   # Scenario: Cannot create a Device that already exists
   # Given I have already made a "POST" request with "default" headers to "Organization" with body:
   # | path                     | value                                                          |

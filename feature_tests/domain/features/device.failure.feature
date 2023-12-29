@@ -1,17 +1,5 @@
 Feature: Device Failure Scenarios
 
-  # Scenario: Device ID is not valid
-  # Given Product Teams
-  # | id                                   | name            | ods_code |
-  # | 00702d39-e65f-49f5-b9ef-6570245bfe17 | My Product Team | H8S7A    |
-  # When Product Team "00702d39-e65f-49f5-b9ef-6570245bfe17" creates a Device with
-  # | property | value          |
-  # | id       | not_a_valid_id |
-  # | name     | My Device      |
-  # | type     | product        |
-  # Then the operation is not successful
-  # And the error is ValidationError on fields
-  # | Device.id |
   Scenario: Device name is not valid
     Given Product Teams
       | id                                   | name            | ods_code |
