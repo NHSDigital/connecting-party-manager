@@ -22,7 +22,7 @@ permissions:
 env:
   ACCOUNT: ${{ inputs.account }}
   WORKSPACE: ${{ inputs.workspace }}
-  CACHE_NAME: ${{ inputs.workspace }}-cache
+  CACHE_NAME: ${{ inputs.workspace }}-${{ inputs.account }}-${{ inputs.scope }}
   SCOPE: ${{ inputs.scope }}
   # SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
@@ -60,6 +60,7 @@ jobs:
           command: build
           save-to-cache: "true"
           restore-from-cache: "false"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   helpers--truststore-pull:
     needs: [get-branch-from-workflow-file, build]
@@ -87,6 +88,7 @@ jobs:
           scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
           save-to-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   terraform--plan:
     needs: [get-branch-from-workflow-file, terraform--init]
@@ -103,6 +105,7 @@ jobs:
           scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
           save-to-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
@@ -119,6 +122,7 @@ jobs:
           scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
           save-to-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
