@@ -23,20 +23,19 @@ Feature: Read Device - success scenarios
       | deviceName.0.type            | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
-      | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | P.XXX-YYY                                |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
-    When I make a "GET" request with "default" headers to "Device/P.XXX-YYY"
+    When I make a "GET" request with "default" headers to the id in the location response header to the Device endpoint
     Then I receive a status code "200" with body
       | path                         | value                                    |
       | resourceType                 | Device                                   |
+      | id                           | << ignore >>                             |
       | deviceName.0.name            | My Device of type "product"              |
       | deviceName.0.type            | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | P.XXX-YYY                                |
+      | identifier.0.value           | << ignore >>                             |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     And the response headers contain:

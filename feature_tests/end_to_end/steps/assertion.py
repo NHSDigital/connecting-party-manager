@@ -20,6 +20,11 @@ def _pop_ignore(expected: dict, received: dict):
             received_value = received.get(key)
             if isinstance(expected_value, dict) and isinstance(received_value, dict):
                 _pop_ignore(expected=expected_value, received=received_value)
+            if isinstance(received_value, list) and isinstance(expected_value, list):
+                for a, b in zip(received_value, expected_value):
+                    if not isinstance(a, dict) and not isinstance(b, dict):
+                        continue
+                    _pop_ignore(expected=b, received=a)
 
 
 def _fix_backslashes(json_data: dict):

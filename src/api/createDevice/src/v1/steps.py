@@ -5,6 +5,7 @@ from domain.core.device import Device
 from domain.core.device_id import generate_device_key
 from domain.core.device_key import DeviceKeyType
 from domain.core.product_team import ProductTeam
+from domain.fhir.r4.cpm_model import SYSTEM
 from domain.fhir.r4.cpm_model import Device as FhirDevice
 from domain.fhir_translation.device import (
     create_domain_device_from_fhir_device,
@@ -25,6 +26,14 @@ def parse_event_body(data, cache) -> dict:
 
 def parse_fhir_device(data, cache) -> FhirDevice:
     json_body = data[parse_event_body]
+    identifier = json_body.get("identifier", [])
+    identifier.append(
+        dict(
+            system=f"{SYSTEM}/{DeviceKeyType.PRODUCT_ID}",
+            value=generate_device_key(DeviceKeyType.PRODUCT_ID),
+        )
+    )
+    json_body["identifier"] = identifier
     fhir_device = parse_fhir_device_json(fhir_device_json=json_body)
     return fhir_device
 
@@ -46,16 +55,8 @@ def create_device(data, cache) -> Device:
     return device
 
 
-def create_device_key(data, cache) -> Device:
-    device: Device = data[create_device]
-    device.add_key(
-        DeviceKeyType.PRODUCT_ID, generate_device_key(DeviceKeyType.PRODUCT_ID)
-    )
-    return device
-
-
 def save_device(data, cache) -> dict:
-    device = data[create_device_key]
+    device = data[create_device]
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
@@ -63,7 +64,8 @@ def save_device(data, cache) -> dict:
 
 
 def set_http_status(data, cache) -> HTTPStatus:
-    return HTTPStatus.CREATED
+    device: Device = data[create_device]
+    return HTTPStatus.CREATED, str(device.id)
 
 
 steps = [
@@ -71,7 +73,6 @@ steps = [
     parse_fhir_device,
     read_product_team,
     create_device,
-    create_device_key,
     save_device,
     set_http_status,
 ]

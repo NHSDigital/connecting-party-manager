@@ -90,7 +90,6 @@ def _parse_params_from_url(
     path_pattern = _template_to_regex(path_template)
     path_match = re.match(path_pattern, path)
     path_params = path_match.groupdict() if path_match else {}
-
     result = result & bool(path_match)
     return path_params, query_params, result
 
