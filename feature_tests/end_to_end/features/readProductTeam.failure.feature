@@ -1,4 +1,5 @@
 Feature: Read Product Team - failure scenarios
+  These scenarios demonstrate failures from the GET Organization (i.e. Product Team) endpoint
 
   Background:
     Given "default" request headers:

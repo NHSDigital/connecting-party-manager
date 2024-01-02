@@ -67,9 +67,10 @@ def _mocked_request(
 ):
     """Implement the desired mocked behaviour of the 'request' function"""
     endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+    _, path = url.split(sep="/", maxsplit=1)
     path_params, query_params, handler = parse_api_path(
         method=method,
-        path=url,
+        path=path,
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     )
 

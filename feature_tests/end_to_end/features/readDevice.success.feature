@@ -1,4 +1,5 @@
 Feature: Read Device - success scenarios
+  These scenarios demonstrate successful reads from the GET Device endpoint
 
   Background:
     Given "default" request headers:

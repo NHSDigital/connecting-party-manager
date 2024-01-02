@@ -1,4 +1,5 @@
 Feature: Headers - failure scenarios
+  These scenarios demonstrate invalid header values
 
   Scenario: Version is missing
     Given "bad" request headers:
