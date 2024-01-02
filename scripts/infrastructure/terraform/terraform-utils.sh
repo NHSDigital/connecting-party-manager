@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-constants.sh
-PERSISTENT_WORKSPACES=("dev" "qa" "ref" "int" "prod" "dev-sandbox" "int-sandbox" "ref-sandbox")
 
 
 function _get_account_name() {

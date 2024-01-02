@@ -23,6 +23,6 @@ jobs:
     uses: ./.github/workflows/_deploy.yml
     with:
       account: ${{ inputs.account }}
-      workspace: ${{ inputs.account }}${{ inputs.sandbox == 'true' && '-sandbox' || '' }}
+      workspace: ${{ inputs.account }}${{ inputs.sandbox == true && '-sandbox' || '' }}
       scope: "per_workspace"
     secrets: inherit # pragma: allowlist secret
