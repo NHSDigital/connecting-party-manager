@@ -7,7 +7,7 @@ source ./scripts/infrastructure/terraform/terraform-commands.sh
 TERRAFORM_WORKSPACE="$1"
 AWS_REGION_NAME="eu-west-2"
 ENV="dev"
-persistent_list=("dev" "int" "ref" "prod")
+persistent_list=("dev" "qa" "int" "ref" "prod")
 
 function _destroy_corrupted_workspace() {
     if [[ "$(aws account get-contact-information --region "${AWS_REGION_NAME}")" != *MGMT* ]]; then
@@ -22,7 +22,7 @@ function _destroy_corrupted_workspace() {
         return 1
     fi
 
-    dev_acct=$(_get_aws_account_id "$ENV")
+    dev_acct=$(_get_aws_account_id "$ENV" "$PROFILE_PREFIX" "$VERSION")
     role_arn="arn:aws:iam::${dev_acct}:role/${TERRAFORM_ROLE_NAME}"
     session_name="resource-search-session"
     duration_seconds=900

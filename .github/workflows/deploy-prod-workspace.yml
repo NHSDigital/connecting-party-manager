@@ -7,6 +7,7 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
+      account: prod
       workspace: prod
-      account-wide: non_account_wide
+      scope: per_workspace
     secrets: inherit # pragma: allowlist secret
