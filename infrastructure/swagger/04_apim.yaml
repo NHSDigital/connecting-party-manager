@@ -15,4 +15,4 @@ x-nhsd-apim:
       secret: rowan-cpm-test-8
   target-attributes:
     - name: testing-purpose-value
-      required: true
+      required: false
