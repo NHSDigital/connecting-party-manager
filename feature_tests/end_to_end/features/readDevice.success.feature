@@ -41,4 +41,4 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 434              |
+      | Content-Length | 436              |

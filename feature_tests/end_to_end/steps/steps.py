@@ -27,7 +27,7 @@ def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
     body = parse_table(table=context.table)
-    response = make_request(
+    context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
         endpoint=endpoint,
@@ -36,7 +36,11 @@ def given_made_request(
         raise_for_status=True,
     )
     context.postman_step.request = PostmanRequest(
-        url=Url(raw=response.url, host=[context.base_url.rstrip("/")], path=[endpoint]),
+        url=Url(
+            raw=context.response.url,
+            host=[context.base_url.rstrip("/")],
+            path=[endpoint],
+        ),
         method=http_method,
         header=[
             HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
@@ -51,7 +55,7 @@ def given_made_request(
 def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    response = make_request(
+    context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
         endpoint=endpoint,
@@ -59,7 +63,11 @@ def given_made_request(
         raise_for_status=True,
     )
     context.postman_step.request = PostmanRequest(
-        url=Url(raw=response.url, host=[context.base_url.rstrip("/")], path=[endpoint]),
+        url=Url(
+            raw=context.response.url,
+            host=[context.base_url.rstrip("/")],
+            path=[endpoint],
+        ),
         method=http_method,
         header=[
             HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
