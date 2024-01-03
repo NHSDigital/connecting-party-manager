@@ -11,6 +11,24 @@ from test_helpers.sample_data import ORGANISATION
 TABLE_NAME = "hiya"
 
 
+def _response_assertion(result, expected):
+    assert "statusCode" in result
+    assert result["statusCode"] == expected["statusCode"]
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Type" in header_response
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert "Content-Length" in header_response
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+    assert "Version" in header_response
+    assert header_response["Version"] == expected["headers"]["Version"]
+    assert "Location" in header_response
+    assert header_response["Location"] == expected["headers"]["Location"]
+    assert result["body"] == expected["body"]
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+
+
 @pytest.mark.parametrize(
     "version",
     [
@@ -59,15 +77,17 @@ def test_index(version):
             ],
         }
     )
-    assert result == {
+    expected = {
         "statusCode": 201,
         "body": expected_body,
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
+            "Location": None,
         },
     }
+    _response_assertion(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -164,12 +184,14 @@ def test_index_bad_payload(version):
             ],
         }
     )
-    assert result == {
+    expected = {
         "statusCode": 400,
         "body": expected_body,
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
+            "Location": None,
         },
     }
+    _response_assertion(result, expected)

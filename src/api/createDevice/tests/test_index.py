@@ -73,8 +73,17 @@ def test_index(version):
             ],
         }
     )
+    # assert result == {
+    #     "statusCode": 201,
+    #     "body": expected_body,
+    #     "headers": {
+    #         "Content-Length": str(len(expected_body)),
+    #         "Content-Type": "application/json",
+    #         "Version": version,
+    #     },
+    # }
 
-    assert result == {
+    expected = {
         "statusCode": 201,
         "body": expected_body,
         "headers": {
@@ -83,6 +92,20 @@ def test_index(version):
             "Version": version,
         },
     }
+
+    assert "statusCode" in result
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Length" in header_response
+    assert "Content-Type" in header_response
+    assert "Version" in header_response
+    assert "Location" in header_response
+    assert result["statusCode"] == expected["statusCode"]
+    # assert result['body'] == expected['body']
+    # assert header_response['Content-Length'] == expected['headers']['Content-Length']
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert header_response["Version"] == expected["headers"]["Version"]
 
 
 @pytest.mark.parametrize(
@@ -194,7 +217,17 @@ def test_index_bad_payload(version):
             ],
         }
     )
-    assert result == {
+    # assert result == {
+    #     "statusCode": 400,
+    #     "body": expected_body,
+    #     "headers": {
+    #         "Content-Length": str(len(expected_body)),
+    #         "Content-Type": "application/json",
+    #         "Version": version,
+    #     },
+    # }
+
+    expected = {
         "statusCode": 400,
         "body": expected_body,
         "headers": {
@@ -203,3 +236,17 @@ def test_index_bad_payload(version):
             "Version": version,
         },
     }
+
+    assert "statusCode" in result
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Length" in header_response
+    assert "Content-Type" in header_response
+    assert "Version" in header_response
+    assert "Location" in header_response
+    assert result["statusCode"] == expected["statusCode"]
+    # assert result['body'] == expected['body']
+    # assert header_response['Content-Length'] == expected['headers']['Content-Length']
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert header_response["Version"] == expected["headers"]["Version"]

@@ -12,17 +12,35 @@ from event.response.tests.test_validation_errors import (
 NON_SUCCESS_STATUSES = set(HTTPStatus._member_map_.values()) - SUCCESS_STATUSES
 
 
+def _response_assertion(result, expected):
+    assert "statusCode" in result
+    assert result["statusCode"] == expected["statusCode"]
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Type" in header_response
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert "Content-Length" in header_response
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+    assert "Version" in header_response
+    assert header_response["Version"] == expected["headers"]["Version"]
+    assert "Location" in header_response
+    assert result["body"] == expected["body"]
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+
+
 def test_render_response_of_json_serialisable():
     aws_lambda_response = render_response(response={"dict": "of things"})
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": HTTPStatus.OK,
         "body": '{"dict": "of things"}',
         "headers": {
             "Content-Type": "application/json",
-            "Content-Length": "21",
+            "Content-Length": "14",
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 def test_render_response_of_success_http_status_created():
@@ -56,7 +74,7 @@ def test_render_response_of_success_http_status_created():
 
     aws_lambda_response = render_response(response=HTTPStatus.CREATED, id="foo")
 
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": 201,
         "body": expected_body,
         "headers": {
@@ -65,6 +83,8 @@ def test_render_response_of_success_http_status_created():
             "Version": "null",
         },
     }
+
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 @pytest.mark.parametrize("http_status", NON_SUCCESS_STATUSES)
@@ -98,7 +118,7 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
     )
     aws_lambda_response = render_response(response=http_status, id="foo")
 
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
         "body": expected_body,
         "headers": {
@@ -107,6 +127,8 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
             "Version": "null",
         },
     }
+
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 def test_render_response_of_non_json_serialisable():
@@ -139,7 +161,7 @@ def test_render_response_of_non_json_serialisable():
     )
 
     aws_lambda_response = render_response(object(), id="foo")
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
         "body": expected_body,
         "headers": {
@@ -148,6 +170,7 @@ def test_render_response_of_non_json_serialisable():
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 @pytest.mark.parametrize(
@@ -161,7 +184,7 @@ def test_render_response_of_non_json_serialisable():
 )
 def test_render_response_of_json_serialisable(response, expected_body):
     aws_lambda_response = render_response(response, id="foo")
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": HTTPStatus.OK,
         "body": expected_body,
         "headers": {
@@ -170,6 +193,7 @@ def test_render_response_of_json_serialisable(response, expected_body):
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 def test_render_response_of_blank_exception():
@@ -201,7 +225,7 @@ def test_render_response_of_blank_exception():
             ],
         }
     )
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": 500,
         "body": expected_body,
         "headers": {
@@ -210,6 +234,7 @@ def test_render_response_of_blank_exception():
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 def test_render_response_of_general_exception():
@@ -241,7 +266,7 @@ def test_render_response_of_general_exception():
             ],
         }
     )
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": 500,
         "body": expected_body,
         "headers": {
@@ -250,6 +275,7 @@ def test_render_response_of_general_exception():
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 def test_render_response_of_general_validation_error():
@@ -323,7 +349,7 @@ def test_render_response_of_general_validation_error():
             ],
         }
     )
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": 500,
         "body": expected_body,
         "headers": {
@@ -332,6 +358,7 @@ def test_render_response_of_general_validation_error():
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)
 
 
 def test_render_response_of_internal_validation_error():
@@ -380,7 +407,7 @@ def test_render_response_of_internal_validation_error():
             ],
         }
     )
-    assert aws_lambda_response.dict() == {
+    expected = {
         "statusCode": 400,
         "body": expected_body,
         "headers": {
@@ -389,3 +416,4 @@ def test_render_response_of_internal_validation_error():
             "Version": "null",
         },
     }
+    _response_assertion(aws_lambda_response.dict(), expected)

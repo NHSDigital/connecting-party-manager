@@ -12,6 +12,23 @@ from test_helpers.dynamodb import mock_table
 TABLE_NAME = "hiya"
 
 
+def _response_assertion(result, expected):
+    assert "statusCode" in result
+    assert result["statusCode"] == expected["statusCode"]
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Type" in header_response
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert "Content-Length" in header_response
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+    assert "Version" in header_response
+    assert header_response["Version"] == expected["headers"]["Version"]
+    assert "Location" in header_response
+    assert result["body"] == expected["body"]
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+
+
 def test__status_check():
     with mock_table(table_name=TABLE_NAME) as client:
         result = _status_check(client=client, table_name=TABLE_NAME)
@@ -64,15 +81,17 @@ def test_index():
         }
     )
 
-    assert result == {
+    expected = {
         "statusCode": 200,
         "body": expected_body,
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": "null",
+            "Location": None,
         },
     }
+    _response_assertion(result, expected)
 
 
 def test_index_not_ok():
@@ -116,12 +135,14 @@ def test_index_not_ok():
         }
     )
 
-    assert result == {
+    expected = {
         "statusCode": 503,
         "body": expected_body,
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": "null",
+            "Location": None,
         },
     }
+    _response_assertion(result, expected)

@@ -14,6 +14,23 @@ from test_helpers.uuid import consistent_uuid
 TABLE_NAME = "hiya"
 
 
+def _response_assertion(result, expected):
+    assert "statusCode" in result
+    assert result["statusCode"] == expected["statusCode"]
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Type" in header_response
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert "Content-Length" in header_response
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+    assert "Version" in header_response
+    assert header_response["Version"] == expected["headers"]["Version"]
+    assert "Location" in header_response
+    assert result["body"] == expected["body"]
+    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+
+
 @pytest.mark.parametrize(
     "version",
     [
@@ -71,7 +88,7 @@ def test_index(version):
         }
     )
 
-    assert result == {
+    expected = {
         "statusCode": 200,
         "body": expected_result,
         "headers": {
@@ -80,6 +97,7 @@ def test_index(version):
             "Version": version,
         },
     }
+    _response_assertion(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -134,7 +152,7 @@ def test_index_no_such_device(version):
         }
     )
 
-    assert result == {
+    expected = {
         "statusCode": 404,
         "body": expected_result,
         "headers": {
@@ -143,3 +161,4 @@ def test_index_no_such_device(version):
             "Version": version,
         },
     }
+    _response_assertion(result, expected)
