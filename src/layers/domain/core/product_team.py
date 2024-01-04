@@ -34,13 +34,11 @@ class ProductTeam(AggregateRoot):
 
     def create_device(
         self,
-        id: UUID,
         name: str,
         type: DeviceType,
         status: DeviceStatus = DeviceStatus.ACTIVE,
     ) -> Device:
         device = Device(
-            id=id,
             name=name,
             type=type,
             status=status,

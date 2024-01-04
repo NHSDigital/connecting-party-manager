@@ -8,6 +8,7 @@ from domain.repository.product_team_repository import ProductTeamRepository
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.response_assertions import _response_assertions
 from test_helpers.uuid import consistent_uuid
 
 TABLE_NAME = "hiya"
@@ -65,15 +66,19 @@ def test_index(version):
         }
     )
 
-    assert result == {
+    expected = {
         "statusCode": 200,
         "body": expected_result,
         "headers": {
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
+            "Location": None,
         },
     }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
 @pytest.mark.parametrize(
@@ -138,12 +143,16 @@ def test_index_no_such_product_team(version):
         }
     )
 
-    assert result == {
+    expected = {
         "statusCode": 404,
         "body": expected_result,
         "headers": {
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
+            "Location": None,
         },
     }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )

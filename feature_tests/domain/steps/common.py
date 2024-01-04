@@ -114,6 +114,7 @@ def read_value_from_path(obj, full_path: str) -> any:
             )
 
         head, *tail = path
+        head = head.replace("#DOT#", ".")
         if isinstance(obj, dict):
             obj = obj[head]
         else:

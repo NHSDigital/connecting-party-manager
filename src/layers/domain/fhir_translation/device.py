@@ -31,7 +31,6 @@ def create_domain_device_from_fhir_device(
 ) -> DomainDevice:
     (device_name,) = fhir_device.deviceName
     device = product_team.create_device(
-        id=fhir_device.identifier[0].value,
         name=device_name.name,
         type=fhir_device.definition.identifier.value,
     )
