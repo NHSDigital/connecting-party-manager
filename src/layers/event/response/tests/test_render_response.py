@@ -14,23 +14,6 @@ from test_helpers.response_assertions import _response_assertions
 NON_SUCCESS_STATUSES = set(HTTPStatus._member_map_.values()) - SUCCESS_STATUSES
 
 
-# def _response_assertion(result, expected):
-#     assert "statusCode" in result
-#     assert result["statusCode"] == expected["statusCode"]
-#     assert "body" in result
-#     assert "headers" in result
-#     header_response = result.get("headers", {})
-#     assert "Content-Type" in header_response
-#     assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
-#     assert "Content-Length" in header_response
-#     assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
-#     assert "Version" in header_response
-#     assert header_response["Version"] == expected["headers"]["Version"]
-#     assert "Location" in header_response
-#     assert result["body"] == expected["body"]
-#     assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
-
-
 def test_render_response_of_json_serialisable():
     aws_lambda_response = render_response(response={"dict": "of things"})
     expected = {
