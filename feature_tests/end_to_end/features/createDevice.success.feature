@@ -1,4 +1,5 @@
 Feature: Create Device - success scenarios
+  These scenarios demonstrate successful Device creation
 
   Background:
     Given "default" request headers:
