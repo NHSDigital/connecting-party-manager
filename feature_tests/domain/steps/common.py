@@ -123,5 +123,4 @@ def read_value_from_path(obj, full_path: str) -> any:
             return _read_value(obj, tail)
         return obj
 
-    # path = full_path.replace("#.", "DOT")
     return _read_value(obj, full_path.split("."))
