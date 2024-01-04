@@ -1,18 +1,18 @@
 on:
   workflow_call:
     inputs:
-      workspace:
+      account:
+        description: The AWS account being deployed
+        type: string
         required: true
-        default: dev
+      workspace:
+        description: The Terraform workspace being deployed
         type: string
-      parameter-deploy:
-        required: false
+        required: true
+      scope:
+        description: The Terraform scope being deployed
         type: string
-        default: ""
-      account-wide:
-        required: false
-        type: string
-        default: "non_account_wide"
+        required: true
 
 permissions:
   id-token: write
@@ -20,11 +20,10 @@ permissions:
   actions: write
 
 env:
-  RUNNING_IN_CI: 1
+  ACCOUNT: ${{ inputs.account }}
   WORKSPACE: ${{ inputs.workspace }}
-  CACHE_NAME: ${{ inputs.workspace }}-cache
-  PARAMETER_DEPLOY: ${{ inputs.parameter-deploy }}
-  ACCOUNT_WIDE: ${{ inputs.account-wide }}
+  CACHE_NAME: ${{ inputs.workspace }}-${{ inputs.account }}-${{ inputs.scope }}
+  SCOPE: ${{ inputs.scope }}
   # SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
 
@@ -61,6 +60,7 @@ jobs:
           command: build
           save-to-cache: "true"
           restore-from-cache: "false"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   helpers--truststore-pull:
     needs: [get-branch-from-workflow-file, build]
@@ -83,11 +83,12 @@ jobs:
       - uses: ./.github/actions/terraform/
         with:
           command: init
+          account: ${{ env.ACCOUNT }}
           workspace: ${{ env.WORKSPACE }}
-          account-wide: ${{ env.ACCOUNT_WIDE }}
-          parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
+          scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
           save-to-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   terraform--plan:
     needs: [get-branch-from-workflow-file, terraform--init]
@@ -99,11 +100,12 @@ jobs:
       - uses: ./.github/actions/terraform/
         with:
           command: plan
+          account: ${{ env.ACCOUNT }}
           workspace: ${{ env.WORKSPACE }}
-          account-wide: ${{ env.ACCOUNT_WIDE }}
-          parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
+          scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
           save-to-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
@@ -115,11 +117,12 @@ jobs:
       - uses: ./.github/actions/terraform/
         with:
           command: apply
+          account: ${{ env.ACCOUNT }}
           workspace: ${{ env.WORKSPACE }}
-          account-wide: ${{ env.ACCOUNT_WIDE }}
-          parameter-deploy: ${{ env.PARAMETER_DEPLOY }}
+          scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
           save-to-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   test--smoke:
     needs: [get-branch-from-workflow-file, terraform--apply]
@@ -146,7 +149,7 @@ jobs:
   message-slack:
     name: Notify slack of deployment
     needs: [get-branch-from-workflow-file, set-success]
-    if: ${{ always() }}
+    if: always()
     runs-on: [self-hosted, ci]
 
     steps:
@@ -156,7 +159,10 @@ jobs:
         with:
           payload: |
             {
+              "account": "${{ env.ACCOUNT }}",
               "environment": "${{ env.WORKSPACE }}",
               "result": "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
               "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}"
             }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}

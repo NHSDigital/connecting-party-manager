@@ -1,4 +1,5 @@
 Feature: Headers - success scenarios
+  These scenarios demonstrate valid header values, and associated behaviour
 
   Scenario Outline: Headers are case insensitive
     Given "default" request headers:

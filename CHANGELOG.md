@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-01-02
+- [PI-129] Postman collection from local tests
+- [PI-165] AWS environments
+
 ## 2023-12-20
 - [PI-166] Versioning
 

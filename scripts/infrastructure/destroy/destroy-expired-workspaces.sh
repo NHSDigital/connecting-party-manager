@@ -7,7 +7,7 @@ AWS_REGION_NAME="eu-west-2"
 ENV="dev"
 
 function _destroy_expired_workspaces() {
-    dev_acct=$(_get_aws_account_id "$ENV")
+    dev_acct=$(_get_aws_account_id "$ENV" "$PROFILE_PREFIX" "$VERSION")
     role_arn="arn:aws:iam::${dev_acct}:role/NHSDeploymentRole"
     session_name="resource-search-session"
     duration_seconds=900

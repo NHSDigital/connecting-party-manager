@@ -1,4 +1,5 @@
 Feature: Create Product Team - success scenarios
+  These scenarios demonstrate successful Product Team (FHIR "Organization") creation
 
   Background:
     Given "default" request headers:

@@ -25,9 +25,11 @@ fi
 ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
 AWS_REGION_NAME="eu-west-2"
 MGMT_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--mgmt-account-id-${VERSION}"
-PROD_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--prod-account-id-${VERSION}"
-TEST_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--test-account-id-${VERSION}"
 DEV_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--dev-account-id-${VERSION}"
+PROD_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--prod-account-id-${VERSION}"
+QA_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--qa-account-id-${VERSION}"
+INT_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--int-account-id-${VERSION}"
+REF_ACCOUNT_ID_LOCATION="${PREFIX}--mgmt--ref-account-id-${VERSION}"
 
 admin_policy_arn="arn:aws:iam::aws:policy/AdministratorAccess"
 truststore_bucket_name="${PREFIX}--truststore-${VERSION}"
@@ -125,5 +127,7 @@ aws dynamodb create-table \
 
 aws secretsmanager create-secret --name "${MGMT_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
 aws secretsmanager create-secret --name "${DEV_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
-aws secretsmanager create-secret --name "${TEST_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager create-secret --name "${QA_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager create-secret --name "${INT_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
+aws secretsmanager create-secret --name "${REF_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"
 aws secretsmanager create-secret --name "${PROD_ACCOUNT_ID_LOCATION}" --region "${AWS_REGION_NAME}"

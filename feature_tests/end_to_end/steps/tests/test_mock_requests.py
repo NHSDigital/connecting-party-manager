@@ -21,7 +21,7 @@ def test__mock_requests():
         },
     ):
         response = make_request(
-            base_url="my_url/my_id/my_something",
+            base_url="BASE_URL/my_url/my_id/my_something",
             http_method="GET",
             endpoint="/the_endpoint",
             body={"key": "value"},
@@ -36,5 +36,5 @@ def test__mock_requests():
         },
         "status_code": 200,
         "reason": "OK",
-        "url": "my_url/my_id/my_something/the_endpoint",
+        "url": "BASE_URL/my_url/my_id/my_something/the_endpoint",
     }
