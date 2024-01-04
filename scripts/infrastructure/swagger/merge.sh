@@ -36,7 +36,7 @@ validate_yaml ${_INITIAL_MERGE_SWAGGER_FILE}
 
 cat ${_INITIAL_MERGE_SWAGGER_FILE} |
     # Remove commented lines
-    grep -v "^\s*#" |
+    yq '... comments=""' |
     # Replace snake case terms, which are invalid in ApiGateway
     yq 'with(.components.schemas; with_entries(.key |= sub("_","")))' |
     yq 'with(.components.parameters; with_entries(.key |= sub("_","")))' |
