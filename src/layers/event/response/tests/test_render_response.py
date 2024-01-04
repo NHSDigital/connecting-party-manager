@@ -9,24 +9,26 @@ from event.response.tests.test_validation_errors import (
     _get_validation_error,
 )
 
+from test_helpers.response_assertions import _response_assertions
+
 NON_SUCCESS_STATUSES = set(HTTPStatus._member_map_.values()) - SUCCESS_STATUSES
 
 
-def _response_assertion(result, expected):
-    assert "statusCode" in result
-    assert result["statusCode"] == expected["statusCode"]
-    assert "body" in result
-    assert "headers" in result
-    header_response = result.get("headers", {})
-    assert "Content-Type" in header_response
-    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
-    assert "Content-Length" in header_response
-    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
-    assert "Version" in header_response
-    assert header_response["Version"] == expected["headers"]["Version"]
-    assert "Location" in header_response
-    assert result["body"] == expected["body"]
-    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+# def _response_assertion(result, expected):
+#     assert "statusCode" in result
+#     assert result["statusCode"] == expected["statusCode"]
+#     assert "body" in result
+#     assert "headers" in result
+#     header_response = result.get("headers", {})
+#     assert "Content-Type" in header_response
+#     assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+#     assert "Content-Length" in header_response
+#     assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
+#     assert "Version" in header_response
+#     assert header_response["Version"] == expected["headers"]["Version"]
+#     assert "Location" in header_response
+#     assert result["body"] == expected["body"]
+#     assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
 
 
 def test_render_response_of_json_serialisable():
@@ -40,7 +42,12 @@ def test_render_response_of_json_serialisable():
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 def test_render_response_of_success_http_status_created():
@@ -84,7 +91,12 @@ def test_render_response_of_success_http_status_created():
         },
     }
 
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 @pytest.mark.parametrize("http_status", NON_SUCCESS_STATUSES)
@@ -128,7 +140,12 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
         },
     }
 
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 def test_render_response_of_non_json_serialisable():
@@ -170,7 +187,12 @@ def test_render_response_of_non_json_serialisable():
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 @pytest.mark.parametrize(
@@ -193,7 +215,12 @@ def test_render_response_of_json_serialisable(response, expected_body):
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 def test_render_response_of_blank_exception():
@@ -234,7 +261,12 @@ def test_render_response_of_blank_exception():
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 def test_render_response_of_general_exception():
@@ -275,7 +307,12 @@ def test_render_response_of_general_exception():
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 def test_render_response_of_general_validation_error():
@@ -358,7 +395,12 @@ def test_render_response_of_general_validation_error():
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
 
 
 def test_render_response_of_internal_validation_error():
@@ -416,4 +458,9 @@ def test_render_response_of_internal_validation_error():
             "Version": "null",
         },
     }
-    _response_assertion(aws_lambda_response.dict(), expected)
+    _response_assertions(
+        result=aws_lambda_response.dict(),
+        expected=expected,
+        check_body=True,
+        check_content_length=True,
+    )
