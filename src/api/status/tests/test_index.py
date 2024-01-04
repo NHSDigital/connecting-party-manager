@@ -13,23 +13,6 @@ from test_helpers.response_assertions import _response_assertions
 TABLE_NAME = "hiya"
 
 
-def _response_assertion(result, expected):
-    assert "statusCode" in result
-    assert result["statusCode"] == expected["statusCode"]
-    assert "body" in result
-    assert "headers" in result
-    header_response = result.get("headers", {})
-    assert "Content-Type" in header_response
-    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
-    assert "Content-Length" in header_response
-    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
-    assert "Version" in header_response
-    assert header_response["Version"] == expected["headers"]["Version"]
-    assert "Location" in header_response
-    assert result["body"] == expected["body"]
-    assert header_response["Content-Length"] == expected["headers"]["Content-Length"]
-
-
 def test__status_check():
     with mock_table(table_name=TABLE_NAME) as client:
         result = _status_check(client=client, table_name=TABLE_NAME)
