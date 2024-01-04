@@ -73,16 +73,6 @@ def test_index(version):
             ],
         }
     )
-    # assert result == {
-    #     "statusCode": 201,
-    #     "body": expected_body,
-    #     "headers": {
-    #         "Content-Length": str(len(expected_body)),
-    #         "Content-Type": "application/json",
-    #         "Version": version,
-    #     },
-    # }
-
     expected = {
         "statusCode": 201,
         "body": expected_body,
@@ -102,8 +92,6 @@ def test_index(version):
     assert "Version" in header_response
     assert "Location" in header_response
     assert result["statusCode"] == expected["statusCode"]
-    # assert result['body'] == expected['body']
-    # assert header_response['Content-Length'] == expected['headers']['Content-Length']
     assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
     assert header_response["Version"] == expected["headers"]["Version"]
 
@@ -217,16 +205,6 @@ def test_index_bad_payload(version):
             ],
         }
     )
-    # assert result == {
-    #     "statusCode": 400,
-    #     "body": expected_body,
-    #     "headers": {
-    #         "Content-Length": str(len(expected_body)),
-    #         "Content-Type": "application/json",
-    #         "Version": version,
-    #     },
-    # }
-
     expected = {
         "statusCode": 400,
         "body": expected_body,
@@ -246,7 +224,5 @@ def test_index_bad_payload(version):
     assert "Version" in header_response
     assert "Location" in header_response
     assert result["statusCode"] == expected["statusCode"]
-    # assert result['body'] == expected['body']
-    # assert header_response['Content-Length'] == expected['headers']['Content-Length']
     assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
     assert header_response["Version"] == expected["headers"]["Version"]
