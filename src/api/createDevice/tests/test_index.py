@@ -13,6 +13,20 @@ from test_helpers.sample_data import DEVICE
 TABLE_NAME = "hiya"
 
 
+def _response_assertion(result, expected):
+    assert "statusCode" in result
+    assert result["statusCode"] == expected["statusCode"]
+    assert "body" in result
+    assert "headers" in result
+    header_response = result.get("headers", {})
+    assert "Content-Type" in header_response
+    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
+    assert "Content-Length" in header_response
+    assert "Version" in header_response
+    assert header_response["Version"] == expected["headers"]["Version"]
+    assert "Location" in header_response
+
+
 @pytest.mark.parametrize(
     "version",
     [
@@ -82,18 +96,7 @@ def test_index(version):
             "Version": version,
         },
     }
-
-    assert "statusCode" in result
-    assert "body" in result
-    assert "headers" in result
-    header_response = result.get("headers", {})
-    assert "Content-Length" in header_response
-    assert "Content-Type" in header_response
-    assert "Version" in header_response
-    assert "Location" in header_response
-    assert result["statusCode"] == expected["statusCode"]
-    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
-    assert header_response["Version"] == expected["headers"]["Version"]
+    _response_assertion(result=result, expected=expected)
 
 
 @pytest.mark.parametrize(
@@ -214,15 +217,4 @@ def test_index_bad_payload(version):
             "Version": version,
         },
     }
-
-    assert "statusCode" in result
-    assert "body" in result
-    assert "headers" in result
-    header_response = result.get("headers", {})
-    assert "Content-Length" in header_response
-    assert "Content-Type" in header_response
-    assert "Version" in header_response
-    assert "Location" in header_response
-    assert result["statusCode"] == expected["statusCode"]
-    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
-    assert header_response["Version"] == expected["headers"]["Version"]
+    _response_assertion(result=result, expected=expected)

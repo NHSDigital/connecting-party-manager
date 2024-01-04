@@ -157,6 +157,7 @@ def then_response(context: Context, status_code: str):
         response_body = context.response.json()
     except JSONDecodeError:
         response_body = context.response.text
+
     assert_many(
         assertions=(
             assert_equal,
