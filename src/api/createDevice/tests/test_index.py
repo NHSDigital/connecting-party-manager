@@ -8,23 +8,10 @@ from domain.repository.product_team_repository import ProductTeamRepository
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import DEVICE
 
 TABLE_NAME = "hiya"
-
-
-def _response_assertion(result, expected):
-    assert "statusCode" in result
-    assert result["statusCode"] == expected["statusCode"]
-    assert "body" in result
-    assert "headers" in result
-    header_response = result.get("headers", {})
-    assert "Content-Type" in header_response
-    assert header_response["Content-Type"] == expected["headers"]["Content-Type"]
-    assert "Content-Length" in header_response
-    assert "Version" in header_response
-    assert header_response["Version"] == expected["headers"]["Version"]
-    assert "Location" in header_response
 
 
 @pytest.mark.parametrize(
@@ -94,9 +81,12 @@ def test_index(version):
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
+            "Location": "FOO",
         },
     }
-    _response_assertion(result=result, expected=expected)
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
 @pytest.mark.parametrize(
@@ -188,21 +178,6 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Device.identifier"],
-                },
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
                     "expression": ["Device.owner"],
                 },
             ],
@@ -217,4 +192,6 @@ def test_index_bad_payload(version):
             "Version": version,
         },
     }
-    _response_assertion(result=result, expected=expected)
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )

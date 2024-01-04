@@ -8,6 +8,7 @@ from event.status.steps import StatusNotOk, _status_check
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.response_assertions import _response_assertions
 
 TABLE_NAME = "hiya"
 
@@ -91,7 +92,9 @@ def test_index():
             "Location": None,
         },
     }
-    _response_assertion(result, expected)
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
 def test_index_not_ok():
@@ -145,4 +148,6 @@ def test_index_not_ok():
             "Location": None,
         },
     }
-    _response_assertion(result, expected)
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
