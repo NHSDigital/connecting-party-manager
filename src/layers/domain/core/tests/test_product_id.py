@@ -10,3 +10,8 @@ def test__deterministic_generate():
     assert a != b
     assert PRODUCT_ID_REGEX.match(a) is not None
     assert PRODUCT_ID_REGEX.match(b) is not None
+
+
+def test__deterministic_generate_failure():
+    a = "FOO"
+    assert PRODUCT_ID_REGEX.match(a) is None
