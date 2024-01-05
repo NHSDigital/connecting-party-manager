@@ -33,6 +33,7 @@ def test__mock_requests():
             "Content-Length": str(len(response_body)),
             "Content-Type": "application/json",
             "Version": "1",
+            "Location": None,
         },
         "status_code": 200,
         "reason": "OK",

@@ -1,3 +1,4 @@
+import pytest
 from domain.core.device import Device
 from domain.core.root import Root
 from domain.fhir.r4.cpm_model import Device as CpmDevice
@@ -7,7 +8,7 @@ from domain.fhir_translation.device import (
     parse_fhir_device_json,
 )
 
-from test_helpers.sample_data import DEVICE
+from test_helpers.sample_data import DEVICE, FAILED_DEVICE
 
 
 def test_device_translation():
@@ -33,3 +34,13 @@ def test_device_translation():
     assert isinstance(fhir_model, CpmDevice)
     assert fhir_model == fhir_device
     assert fhir_model.dict() == fhir_json
+
+
+def test_device_translation_failure():
+    """
+    Tests that 'create_domain_device_from_fhir_device'
+    is the compliment of 'create_fhir_model_from_device'
+    """
+    fhir_json = FAILED_DEVICE
+    with pytest.raises(ValueError):
+        parse_fhir_device_json(fhir_device_json=fhir_json)

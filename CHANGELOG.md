@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-01-05
+- [PI-158] Generate Product ID
+
 ## 2024-01-02
 - [PI-129] Postman collection from local tests
 - [PI-165] AWS environments

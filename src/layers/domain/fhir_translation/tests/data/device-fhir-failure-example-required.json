@@ -2,6 +2,14 @@
   "resourceType": "Device",
   "identifier": [
     {
+      "system": "connecting-party-manager/product_id",
+      "value": "P.XXX-YYY"
+    },
+    {
+      "system": "connecting-party-manager/product_id",
+      "value": "P.AAA-DDD"
+    },
+    {
       "system": "connecting-party-manager/accredited_system_id",
       "value": "12345"
     }
