@@ -12,4 +12,7 @@ x-nhsd-apim:
     security:
       type: apikey
       header: apikey
-      secret: rowan-cpm-test-5
+      secret: rowan-cpm-test-8
+  target-attributes:
+    - name: testing-purpose-value
+      required: false
