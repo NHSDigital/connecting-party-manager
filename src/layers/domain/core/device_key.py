@@ -4,8 +4,7 @@ from enum import StrEnum, auto
 from domain.core.error import InvalidDeviceKeyError
 from pydantic import BaseModel, validator
 
-from .product_id import PRODUCT_ID_REGEX
-from .validation import ACCREDITED_SYSTEM_ID_REGEX
+from .validation import ACCREDITED_SYSTEM_ID_REGEX, PRODUCT_ID_REGEX
 
 
 class DeviceKeyType(StrEnum):

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from pydantic import Field
 
@@ -8,7 +8,6 @@ from .aggregate_root import AggregateRoot
 from .device_key import DeviceKey, DeviceKeyType
 from .error import DuplicateError
 from .event import Event
-from .product_id import PRODUCT_ID_REGEX
 from .validation import DEVICE_NAME_REGEX
 
 
@@ -63,7 +62,7 @@ class Device(AggregateRoot):
             +-- nrl-producer-api (???)
     """
 
-    id: str = Field(regex=PRODUCT_ID_REGEX.pattern)
+    id: UUID = Field(default_factory=uuid4)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     type: DeviceType
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)

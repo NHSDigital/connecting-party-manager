@@ -9,3 +9,7 @@ ACCREDITED_SYSTEM_ID_REGEX = re.compile(r"^[0-9]{1,12}$")
 DEVICE_NAME_REGEX = (
     r"^[a-zA-Z]{1}[ -~]+$"  # starts with any letter, followed by any sequence of ascii
 )
+PRODUCT_ID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"
+PRODUCT_ID_REGEX = re.compile(
+    rf"^P\.[{PRODUCT_ID_CHARS}]{{3}}-[{PRODUCT_ID_CHARS}]{{3}}$"
+)

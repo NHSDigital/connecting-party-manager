@@ -6,7 +6,7 @@ from domain.core.error import InvalidDeviceKeyError
 @pytest.mark.parametrize(
     ["type", "key"],
     (
-        ("product_id", "XXX-YYY"),
+        ("product_id", "P.XXX-YYY"),
         ("accredited_system_id", "12345"),
     ),
 )
