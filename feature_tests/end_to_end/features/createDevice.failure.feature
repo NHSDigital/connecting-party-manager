@@ -271,18 +271,18 @@ Feature: Create Device - failure scenarios
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
     When I make a "POST" request with "default" headers to "Device" with body:
-      | path                         | value                                    |
-      | resourceType                 | Device                                   |
-      | deviceName.0.name            | My Device of type "product"              |
-      | deviceName.0.type            | user-friendly-name                       |
-      | definition.identifier.system | connecting-party-manager/device-type     |
-      | definition.identifier.value  | product                                  |
-      | identifier.0.system          | connecting-party-manager/product_id      |
-      | identifier.0.value           | P.XXX-YYY                                |
-      | identifier.1.system          | connecting-party-manager/product_id      |
-      | identifier.1.value           | P.XXX-YYY                                |
-      | owner.identifier.system      | connecting-party-manager/product-team-id |
-      | owner.identifier.value       | ${ uuid(1) }                             |
+      | path                         | value                                         |
+      | resourceType                 | Device                                        |
+      | deviceName.0.name            | My Device of type "product"                   |
+      | deviceName.0.type            | user-friendly-name                            |
+      | definition.identifier.system | connecting-party-manager/device-type          |
+      | definition.identifier.value  | product                                       |
+      | identifier.0.system          | connecting-party-manager/accredited_system_id |
+      | identifier.0.value           | 12345                                         |
+      | identifier.1.system          | connecting-party-manager/accredited_system_id |
+      | identifier.1.value           | 12345                                         |
+      | owner.identifier.system      | connecting-party-manager/product-team-id      |
+      | owner.identifier.value       | ${ uuid(1) }                                  |
     Then I receive a status code "400" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |
@@ -299,6 +299,43 @@ Feature: Create Device - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 521              |
+
+  Scenario: Cannot create a Device with a product_id
+    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | F5H1R                                                          |
+    When I make a "POST" request with "default" headers to "Device" with body:
+      | path                         | value                                    |
+      | resourceType                 | Device                                   |
+      | deviceName.0.name            | My Device of type "product"              |
+      | deviceName.0.type            | user-friendly-name                       |
+      | definition.identifier.system | connecting-party-manager/device-type     |
+      | definition.identifier.value  | product                                  |
+      | identifier.0.system          | connecting-party-manager/product_id      |
+      | identifier.0.value           | P.XXX-YYY                                |
+      | owner.identifier.system      | connecting-party-manager/product-team-id |
+      | owner.identifier.value       | ${ uuid(1) }                             |
+    Then I receive a status code "400" with body
+      | path                             | value                                                               |
+      | resourceType                     | OperationOutcome                                                    |
+      | id                               | << ignore >>                                                        |
+      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
+      | issue.0.severity                 | error                                                               |
+      | issue.0.code                     | processing                                                          |
+      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
+      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
+      | issue.0.details.coding.0.display | Validation error                                                    |
+      | issue.0.diagnostics              | It is forbidden to supply a product_id                              |
+      | issue.0.expression.0             | Device.identifier                                                   |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 506              |
 
   Scenario: Cannot create a Device with corrupt body
     Given I have already made a "POST" request with "default" headers to "Organization" with body:

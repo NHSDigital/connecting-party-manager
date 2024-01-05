@@ -12,3 +12,4 @@ def _read_core_test_data(file_name: str) -> dict | list:
 
 ORGANISATION = _read_core_test_data("organization-fhir-example-required.json")
 DEVICE = _read_core_test_data("device-fhir-example-required.json")
+FAILED_DEVICE = _read_core_test_data("device-fhir-failure-example-required.json")

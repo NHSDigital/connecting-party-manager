@@ -90,16 +90,6 @@ class Device(BaseModel):
     identifier: list[DeviceIdentifier] = Field(min_items=1)
     owner: DeviceOwnerReference
 
-    @validator("identifier")
-    def validate_identifier(identifier: list[DeviceIdentifier]):
-        if (
-            identifier
-            and isinstance(identifier, list)
-            and identifier[0].key_type is not DeviceKeyType.PRODUCT_ID
-        ):
-            raise ValueError("First identifier must be a 'product_id'")
-        return identifier
-
     @validator("identifier", each_item=True)
     def validate_key(identifier: DeviceIdentifier):
         if identifier and isinstance(identifier, DeviceIdentifier):
@@ -115,4 +105,15 @@ class Device(BaseModel):
                     "It is forbidden to supply the same key multiple times"
                 )
 
+        return identifier
+
+    @validator("identifier")
+    def no_duplicate_product_keys(identifier: list[DeviceIdentifier]):
+        if identifier and isinstance(identifier, list):
+            count = sum(
+                ident.system == "connecting-party-manager/product_id"
+                for ident in identifier
+            )
+            if count > 1:
+                raise ValueError("It is forbidden to supply a product_id")
         return identifier
