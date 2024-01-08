@@ -1,16 +1,17 @@
-import pytest
-from domain.core.product_id import PRODUCT_ID_REGEX, generate_product_id
+from domain.core.device_id import generate_device_key
+from domain.core.device_key import DeviceKeyType
+from domain.core.validation import PRODUCT_ID_REGEX
 
 
-@pytest.mark.parametrize("seed", [1, 2, 3])
-def test__deterministic_generate(seed: int):
-    a = generate_product_id(seed)
-    b = generate_product_id(seed)
+def test__deterministic_generate():
+    a = generate_device_key(DeviceKeyType.PRODUCT_ID)
+    b = generate_device_key(DeviceKeyType.PRODUCT_ID)
 
-    assert a == b
+    assert a != b
     assert PRODUCT_ID_REGEX.match(a) is not None
+    assert PRODUCT_ID_REGEX.match(b) is not None
 
 
-def test__deterministic_generate_without_seed():
-    a = generate_product_id()
-    assert PRODUCT_ID_REGEX.match(a) is not None
+def test__deterministic_generate_failure():
+    a = "FOO"
+    assert PRODUCT_ID_REGEX.match(a) is None

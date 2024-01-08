@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.01.02"
+version = "2024.01.05"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -22,7 +22,7 @@ email-validator = "^2.1.0.post1"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
-black = "^23.9.1"
+black = "^23.12.1"
 flake8 = "^6.1.0"
 behave = "^1.2.6"
 pytest = "^7.4.2"

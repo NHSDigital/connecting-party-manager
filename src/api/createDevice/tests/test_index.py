@@ -8,6 +8,7 @@ from domain.repository.product_team_repository import ProductTeamRepository
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import DEVICE
 
 TABLE_NAME = "hiya"
@@ -73,15 +74,19 @@ def test_index(version):
             ],
         }
     )
-    assert result == {
+    expected = {
         "statusCode": 201,
         "body": expected_body,
         "headers": {
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
+            "Location": "FOO",
         },
     }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
 @pytest.mark.parametrize(
@@ -173,27 +178,12 @@ def test_index_bad_payload(version):
                         ]
                     },
                     "diagnostics": "field required",
-                    "expression": ["Device.identifier"],
-                },
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
                     "expression": ["Device.owner"],
                 },
             ],
         }
     )
-    assert result == {
+    expected = {
         "statusCode": 400,
         "body": expected_body,
         "headers": {
@@ -202,3 +192,6 @@ def test_index_bad_payload(version):
             "Version": version,
         },
     }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )

@@ -19,6 +19,7 @@ def render_response(
     response: JsonSerialisable | HTTPStatus | Exception,
     id: str = None,
     version: str = None,
+    location: str = None,
 ) -> AwsLambdaResponse:
     if id is None:
         id = app_logger.service_name
@@ -46,4 +47,6 @@ def render_response(
         outcome = response
 
     body = json.dumps(outcome)
-    return AwsLambdaResponse(statusCode=http_status, body=body, version=version)
+    return AwsLambdaResponse(
+        statusCode=http_status, body=body, version=version, location=location
+    )
