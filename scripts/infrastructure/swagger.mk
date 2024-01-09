@@ -37,17 +37,17 @@ $(FHIR_BASE_TIMESTAMP): $(PATH_TO_SWAGGER_GENERATOR_JAR) $(FHIR_DEFINITION) ## G
 		bash $(PATH_TO_INFRASTRUCTURE)/swagger/fhir-swagger-generator.sh
 	touch $(FHIR_BASE_TIMESTAMP)
 
-$(SWAGGER_AWS): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
+$(SWAGGER_AWS): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" ) $(shell find scripts/infrastructure/swagger -type f -name "*.sh")
 	@env MERGE_AWS=1 bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 	npx --yes @redocly/cli lint $(SWAGGER_AWS) --skip-rule operation-4xx-response --skip-rule spec-components-invalid-map-name || ([[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :; exit 1)
 	touch $(SWAGGER_AWS)
 
-$(SWAGGER_PUBLIC): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
+$(SWAGGER_PUBLIC): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" ) $(shell find scripts/infrastructure/swagger -type f -name "*.sh")
 	@env MERGE_PUBLIC=1 bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 	npx --yes @redocly/cli lint $(SWAGGER_PUBLIC) --skip-rule security-defined || ([[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :; exit 1)
 	touch $(SWAGGER_PUBLIC)
 
-$(SWAGGER_APIGEE): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" )
+$(SWAGGER_APIGEE): $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" ) $(shell find scripts/infrastructure/swagger -type f -name "*.sh")
 	@env MERGE_APIGEE=1 bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh
 	npx --yes @redocly/cli lint $(SWAGGER_APIGEE) --skip-rule security-defined || ([[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :; exit 1)
 	touch $(SWAGGER_APIGEE)

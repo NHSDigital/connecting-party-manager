@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-01-09
+- [PI-131] Swagger narrative
+
 ## 2024-01-05
 - [PI-158] Generate Product ID
 
