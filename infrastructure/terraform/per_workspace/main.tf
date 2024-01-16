@@ -62,20 +62,22 @@ module "table" {
 }
 
 module "layers" {
-  for_each    = toset(var.layers)
-  source      = "./modules/api_worker/api_layer"
-  name        = each.key
-  layer_name  = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
-  source_path = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
+  for_each       = toset(var.layers)
+  source         = "./modules/api_worker/api_layer"
+  name           = each.key
+  python_version = var.python_version
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+  source_path    = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
 module "lambdas" {
-  for_each    = setsubtract(var.lambdas, ["authoriser"])
-  source      = "./modules/api_worker/api_lambda"
-  name        = each.key
-  lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
-  layers      = [for instance in module.layers : instance.layer_arn]
-  source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
+  for_each       = setsubtract(var.lambdas, ["authoriser"])
+  source         = "./modules/api_worker/api_lambda"
+  python_version = var.python_version
+  name           = each.key
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+  layers         = [for instance in module.layers : instance.layer_arn]
+  source_path    = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
   allowed_triggers = {
     "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
       service    = "apigateway"
@@ -96,11 +98,12 @@ module "lambdas" {
 }
 
 module "authoriser" {
-  name        = "authoriser"
-  source      = "./modules/api_worker/api_lambda"
-  lambda_name = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
-  source_path = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
-  layers      = [for instance in module.layers : instance.layer_arn]
+  name           = "authoriser"
+  source         = "./modules/api_worker/api_lambda"
+  python_version = var.python_version
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+  source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
+  layers         = [for instance in module.layers : instance.layer_arn]
   trusted_entities = [
     {
       type = "Service",
@@ -132,4 +135,13 @@ module "api_entrypoint" {
   name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
   lambdas             = setsubtract(var.lambdas, ["authoriser"])
   authoriser_metadata = module.authoriser.metadata
+}
+
+module "sds_etl" {
+  source                = "./modules/etl/sds"
+  workspace_prefix      = "${local.project}--${replace(terraform.workspace, "_", "-")}"
+  assume_account        = var.assume_account
+  python_version        = var.python_version
+  event_layer_arn       = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
+  third_party_layer_arn = element([for instance in module.layers : instance if instance.name == "third_party"], 0).layer_arn
 }

@@ -1,10 +1,9 @@
 resource "aws_cloudwatch_log_group" "api_gateway_access_logs" {
-  name = "/aws/api-gateway/access-logs/${aws_api_gateway_rest_api.api_gateway_rest_api.name}"
+  name = "/aws/api-gateway/access-logs/${var.name}"
 
   kms_key_id = module.kms.key_arn
 
   depends_on = [
-    aws_api_gateway_rest_api.api_gateway_rest_api,
     module.kms
   ]
 

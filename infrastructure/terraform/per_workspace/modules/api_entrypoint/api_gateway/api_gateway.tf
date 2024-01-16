@@ -4,6 +4,11 @@ resource "aws_api_gateway_rest_api" "api_gateway_rest_api" {
   # UNCOMMENT THIS WHEN ENABLING CUSTOM DOMAINS
   # disable_execute_api_endpoint = true
   body = sensitive(local.swagger_file)
+
+  depends_on = [
+    aws_cloudwatch_log_group.api_gateway_access_logs
+  ]
+
 }
 
 resource "aws_api_gateway_deployment" "api_gateway_deployment" {
@@ -20,6 +25,8 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
 
   depends_on = [
     aws_api_gateway_rest_api.api_gateway_rest_api,
+    aws_cloudwatch_log_group.api_gateway_access_logs,
+    aws_cloudwatch_log_group.api_gateway_execution_logs
   ]
 }
 
@@ -49,7 +56,8 @@ resource "aws_api_gateway_stage" "api_gateway_stage" {
   depends_on = [
     aws_api_gateway_deployment.api_gateway_deployment,
     aws_api_gateway_rest_api.api_gateway_rest_api,
-    aws_cloudwatch_log_group.api_gateway_access_logs
+    aws_cloudwatch_log_group.api_gateway_access_logs,
+    aws_cloudwatch_log_group.api_gateway_execution_logs
   ]
 }
 
@@ -58,7 +66,7 @@ resource "aws_api_gateway_method_settings" "api_gateway_method_settings" {
   stage_name  = aws_api_gateway_stage.api_gateway_stage.stage_name
   method_path = "*/*"
   settings {
-    logging_level      = "ERROR"
+    logging_level      = "INFO"
     data_trace_enabled = true
   }
 
