@@ -20,3 +20,7 @@ class InvalidProductIdError(Exception):
 
 class InvalidAccreditedSystemIdError(Exception):
     pass
+
+
+class InvalidResponseError(Exception):
+    pass
