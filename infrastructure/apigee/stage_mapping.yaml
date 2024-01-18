@@ -1,0 +1,10 @@
+# This file maps standard NHS environments on to APIM/Apigee stages
+# see https://nhsd-confluence.digital.nhs.uk/display/APM/Environments
+dev: ptl
+dev-sandbox: ptl
+qa: ptl
+qa-sandbox: ptl
+ref: ptl
+int: prod
+int-sandbox: prod
+prod: prod

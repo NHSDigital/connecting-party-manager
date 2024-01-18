@@ -1,6 +1,7 @@
 ---
 openapi: 3.0.3
 x-nhsd-apim:
+  temporary: ${ terraform_output("workspace_type.value") != "PERSISTENT" }
   access:
     - title: Application Restricted
       grants:
@@ -8,8 +9,8 @@ x-nhsd-apim:
   target: # Only one target (omit for NO backend)
     type: external
     healthcheck: /_status
-    url: https://i38bu8egci.execute-api.eu-west-2.amazonaws.com/production #for now this is the dev gateway
+    url: ${ terraform_output("invoke_url.value") } # pull out 'invoke_url.value' from tf output
     security:
       type: apikey
       header: apikey
-      secret: rowan-cpm-test-5
+      secret: cpm-1 # NB: this is the *name* of the secret, not the value

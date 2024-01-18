@@ -31,6 +31,8 @@ inputs:
       **/make.py
       **/infrastructure/swagger/*.yaml
       **/infrastructure/swagger/**/*.yaml
+      **/fhir-base/*json
+      **/.proxygen/*
 
 runs:
   using: "composite"

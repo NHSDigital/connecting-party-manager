@@ -2,6 +2,14 @@ output "dynamodb_table_name" {
   value = module.table.dynamodb_table_name
 }
 
+output "workspace" {
+  value = terraform.workspace
+}
+
+output "workspace_type" {
+  value = local.workspace_type
+}
+
 # output "assumed_role" {
 #   value = var.assume_role
 # }
