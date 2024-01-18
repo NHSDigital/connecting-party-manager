@@ -35,10 +35,9 @@ class Questionnaire(BaseModel):
     A Questionnaire represents a collection of Questions, in a specific order.
     """
 
-    id: UUID
     name: str = Field(regex=ENTITY_NAME_REGEX)
     version: int
-    _questions: list[Question] = [] 
+    _questions: list[Question] = [] #dict of question name mapping onto question
 
     def __contains__(self, question_name: str) -> bool:
         """
@@ -50,7 +49,7 @@ class Questionnaire(BaseModel):
         self,
         name: str,
         type: QuestionType = QuestionType.STRING,
-        multiple: bool = False,
+        multiple: bool = False, #only add multiple if true, defaults to false
         validation_rules: list[str] = [],
     ):
         """
@@ -79,10 +78,16 @@ class Questionnaire(BaseModel):
     
 # Needs to check type first then check validation rules? Put type as a validation rule?
     # How to check multiple answers given or not?
+
+#create class for questionnaire response that maps question to response, then use pydantic models to validate answers
+    
 class questionnaire_response_validator:
     def __init__(self, questionnaire):
         self.questionnaire = questionnaire
-    
+
+    #validate answered right questionnaire
+    #Validate question type
+        
     def validate_question_response(self, question_name, response):
         # Add your specific criteria for response format validation based on the question
         question = next((q for q in self.questionnaire if q["name"] == question_name), {})
@@ -130,7 +135,8 @@ class questionnaire_response_validator:
 
 # Define your questionnaire with validation rules and questions
 questionnaire1 = [
-    {"name": "What is your favorite color?", "validation_rules": ["text"]},
+    {"questionnaire name":"", "questionnaire version":""},
+    {"name": "What is your favorite color?", "type": "text", "multiple": True, "validation_rules": ["text"]},
     {"name": "How many years of experience do you have in programming?", "validation_rules": ["text", "numeric"]},
     # Add more questions as needed with different types
 ]
@@ -147,4 +153,3 @@ validator1 = questionnaire_response_validator(questionnaire1)
 
 # Validate and get invalid responses for the questionnaire
 invalid_responses1 = validator1.validate_and_get_invalid_responses(user_responses1)
-
