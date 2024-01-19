@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-01-19
+- [PI-196] SDS ETL step function
+
 ## 2024-01-09
 - [PI-131] Swagger narrative
 
