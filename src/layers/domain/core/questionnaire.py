@@ -91,9 +91,9 @@ class QuestionnaireResponse(BaseModel):
     responses: dict
 
 
-class QuestionnaireResponseValidator:
-    def __init__(self, questionnaire):
-        self.questionnaire = questionnaire
+class QuestionnaireResponseValidator(BaseModel):
+    questionnaire: Questionnaire
+    responses: dict
 
     def validate_response_type(self, question_name, response):
         question = next(
@@ -106,9 +106,9 @@ class QuestionnaireResponseValidator:
 
         return True, None
 
-    def validate_questionnaire_responses_type(self, questionnaire_responses):
+    def validate_questionnaire_responses_type(self):
         invalid_response_types = []
-        for question_name, response in questionnaire_responses.items():
+        for question_name, response in self.responses.items():
             is_valid, failed_type = self.validate_response_type(question_name, response)
 
             if not is_valid:
@@ -134,9 +134,9 @@ class QuestionnaireResponseValidator:
 
         return True, None  # All validation rules passed
 
-    def validate_questionnaire_responses(self, questionnaire_responses):
+    def validate_questionnaire_responses(self):
         invalid_responses = []
-        for question_name, response in questionnaire_responses.items():
+        for question_name, response in self.responses.items():
             is_valid, failed_rule = self.validate_question_response(
                 question_name, response
             )
@@ -146,31 +146,27 @@ class QuestionnaireResponseValidator:
 
         return invalid_responses
 
-    def validate_and_get_invalid_responses(self, questionnaire_responses):
+    def validate_and_get_invalid_responses(self):
         # Use Pydantic to validate the overall structure of the responses
         try:
             questionnaire_response = QuestionnaireResponse.parse_obj(
-                {"responses": questionnaire_responses}
+                {"responses": self.responses}
             )
         except ValidationError as e:
             raise InvalidResponseError(f"Invalid response structure: {e.errors()}")
 
         # Check if questionnaire responses correspond to the questions in the questionnaire
-        for question_name in questionnaire_responses:
+        for question_name in self.responses:
             if question_name not in [q.name for q in self.questionnaire._questions]:
                 raise InvalidResponseError(
                     f"Invalid response: {question_name} is not a valid question in the questionnaire: {self.questionnaire.name}."
                 )  # should this message be different? Wrong questionnaire answered?
 
-        invalid_response_types = self.validate_questionnaire_responses_type(
-            questionnaire_responses
-        )
-        invalid_responses = self.validate_questionnaire_responses(
-            questionnaire_responses
-        )
+        invalid_response_types = self.validate_questionnaire_responses_type()
+        invalid_responses = self.validate_questionnaire_responses()
 
         if not invalid_response_types and not invalid_responses:
-            # print("\nAll responses are valid.")
+            # print("\nAll responses are valid.") -- doesn't indicate that all valid, that needed?
             return invalid_response_types, invalid_responses
 
         else:
@@ -221,14 +217,16 @@ questionnaire.add_question(
 
 # _questions = [Question(name='What is your favorite color?', type=<QuestionType.STRING: <class 'str'>>, multiple=False, validation_rules=['text']), Question(name='How many years of experience do you have in programming?', type=<QuestionType.INT: <class 'int'>>, multiple=False, validation_rules=['numeric'])]
 
-# Create instance of the QuestionnaireResponseValidator
-validator = QuestionnaireResponseValidator(questionnaire)
-
 # Set responses
-user_responses = {
-    "How many years of experience do you have in programming?": 2,
-    "What is your favorite color?": "pink",
+responses = {
+    "How many years of experience do you have in programming?": "2",
+    "What is your favorite color?": 2,
 }
 
+# Create instance of the QuestionnaireResponseValidator
+validator = QuestionnaireResponseValidator(
+    questionnaire=questionnaire, responses=responses
+)
+
 # Validate and get invalid responses for the questionnaire
-invalid_responses = validator.validate_and_get_invalid_responses(user_responses)
+invalid_responses = validator.validate_and_get_invalid_responses()
