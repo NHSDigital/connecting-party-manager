@@ -52,6 +52,9 @@ module "notify" {
   python_version   = var.python_version
 }
 
+resource "aws_cloudwatch_log_group" "step_function" {
+  name = "${var.workspace_prefix}--${local.etl_name}--step-function"
+}
 
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
@@ -109,6 +112,11 @@ module "step_function" {
     }
   EOT
 
+  logging_configuration = {
+    log_destination        = "${aws_cloudwatch_log_group.step_function.arn}:*"
+    include_execution_data = true
+    level                  = "ALL"
+  }
 
   tags = {
     Name = "${var.workspace_prefix}--${local.etl_name}"

@@ -238,6 +238,7 @@
         "states:ListStateMachineVersions",
         "states:ListTagsForResource",
         "states:CreateStateMachine",
+        "states:UpdateStateMachine",
         "states:DeleteStateMachine",
         "states:TagResource"
       ],
