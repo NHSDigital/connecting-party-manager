@@ -116,7 +116,8 @@
         "iam:TagRole",
         "iam:UntagRole",
         "iam:TagPolicy",
-        "iam:UntagPolicy"
+        "iam:UntagPolicy",
+        "iam:ListEntitiesForPolicy"
       ],
       "Resource": [
         "arn:aws:iam::${ACCOUNT_ID}:policy/*",
@@ -185,6 +186,63 @@
         "cloudformation:ListStackResources"
       ],
       "Resource": ["arn:aws:cloudformation:*:${ACCOUNT_ID}:stack/*/*"]
+    },
+    {
+      "Sid": "S3GlobalPermissions",
+      "Effect": "Allow",
+      "Action": ["s3:ListAllMyBuckets"],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "S3BucketPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:ListBucket",
+        "s3:GetBucketPolicy",
+        "s3:GetBucketAcl",
+        "s3:GetBucketCORS",
+        "s3:GetBucketWebsite",
+        "s3:GetBucketVersioning",
+        "s3:GetAccelerateConfiguration",
+        "s3:GetBucketRequestPayment",
+        "s3:GetBucketLogging",
+        "s3:GetLifecycleConfiguration",
+        "s3:GetReplicationConfiguration",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetBucketObjectLockConfiguration",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:GetBucketTagging",
+        "s3:GetBucketOwnershipControls",
+        "s3:PutBucketVersioning",
+        "s3:PutBucketOwnershipControls",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:PutBucketAcl",
+        "s3:DeleteBucket",
+        "s3:ListBucketVersions",
+        "s3:PutBucketTagging"
+      ],
+      "Resource": ["arn:aws:s3:::*"]
+    },
+    {
+      "Sid": "S3ObjectPermissions",
+      "Effect": "Allow",
+      "Action": ["s3:DeleteObject", "s3:DeleteObjectVersion"],
+      "Resource": ["arn:aws:s3:::*--etl/*"]
+    },
+    {
+      "Sid": "StepFunctionPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "states:DescribeStateMachine",
+        "states:ListStateMachineVersions",
+        "states:ListTagsForResource",
+        "states:CreateStateMachine",
+        "states:UpdateStateMachine",
+        "states:DeleteStateMachine",
+        "states:TagResource"
+      ],
+      "Resource": ["arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*"]
     }
   ]
 }

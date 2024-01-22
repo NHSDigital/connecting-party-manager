@@ -20,6 +20,18 @@
       "Effect": "Allow",
       "Action": ["kms:Decrypt"],
       "Resource": ["*"]
+    },
+    {
+      "Sid": "S3IntegrationPermissions",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": ["arn:aws:s3:::*/*"]
+    },
+    {
+      "Sid": "StepFunctionIntegrationPermissions",
+      "Effect": "Allow",
+      "Action": ["states:StartSyncExecution"],
+      "Resource": ["arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*"]
     }
   ]
 }
