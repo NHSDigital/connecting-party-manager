@@ -1,9 +1,11 @@
-from datetime import datetime
+from datetime import date, datetime, time
 from enum import Enum
 
 from domain.core.error import DuplicateError, InvalidResponseError
 from domain.core.validation import ENTITY_NAME_REGEX
 from pydantic import BaseModel, Field, ValidationError
+
+# import validators
 
 
 class QuestionType(Enum):
@@ -15,7 +17,9 @@ class QuestionType(Enum):
     INT = int
     BOOL = bool
     DATE_TIME = datetime
-    # ADD OTHER TYPES
+    DECIMAL = float
+    DATE = date
+    TIME = time
 
 
 class Question(BaseModel):
@@ -27,6 +31,7 @@ class Question(BaseModel):
     type: QuestionType
     multiple: bool
     validation_rules: list[str] = []
+    choices: list[str] = []
 
 
 class Questionnaire(BaseModel):
@@ -36,14 +41,13 @@ class Questionnaire(BaseModel):
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
     version: int
-    _questions: list[
-        Question
-    ] = []  # Change to dict of question name mapping onto question?
+    _questions: list[Question] = []
 
     def __contains__(self, question_name: str) -> bool:
         """
         Returns true if the question specified exists within the questionnaire
         """
+
         return question_name in (q.name for q in self._questions)
 
     def add_question(
@@ -52,35 +56,24 @@ class Questionnaire(BaseModel):
         type: QuestionType = QuestionType.STRING,
         multiple: bool = False,
         validation_rules: list[str] = [],
+        choices: list[str] = [],
     ):
         """
         Adds a new question to the questionnaire.  Once a questionnaire is
         locked this method will throw an error.
         """
+
         if name in self:
             raise DuplicateError(f"Question exists: {name}")
         result = Question(
-            name=name, type=type, multiple=multiple, validation_rules=validation_rules
+            name=name,
+            type=type,
+            multiple=multiple,
+            validation_rules=validation_rules,
+            choices=choices,
         )
         self._questions.append(result)
         return result
-
-    # def remove_question(self, name: str):
-    #     """
-    #     Removes a question from the questionnaire.  Once a questionnaire is
-    #     locked this method will throw an error.
-    #     """
-    #     raise NotImplementedError()
-
-    # def revise(self) -> "Questionnaire":
-    #     """
-    #     Creates an exact duplicate of the questionnaire, which is the only way
-    #     to edit questionnaires once they become locked.
-    #     """
-    #     raise NotImplementedError()
-
-
-# How to check multiple answers given or not?
 
 
 class QuestionnaireResponse(BaseModel):
@@ -92,59 +85,117 @@ class QuestionnaireResponse(BaseModel):
 
 
 class QuestionnaireResponseValidator(BaseModel):
+    """
+    Validates questionnaire responses against questionnaire questions are of the correct type, meet any validation criteria and .
+    """
+
     questionnaire: Questionnaire
     responses: dict
 
-    def validate_response_type(self, question_name, response):
+    def validate_question_response_type(self, question_name, response):
         question = next(
             (q for q in self.questionnaire._questions if q.name == question_name), {}
         )
         question_type = question.type
-        # Check if the response is of the correct type
-        if not isinstance(response, question.type.value):
-            return False, question_type
+        if question.multiple:
+            if not isinstance(response, list):
+                response = [response]
+            for item in response:
+                if not isinstance(item, question.type.value):
+                    return False, question_type
+        else:
+            if not isinstance(response, question.type.value):
+                return False, question_type
 
         return True, None
 
-    def validate_questionnaire_responses_type(self):
-        invalid_response_types = []
+    def validate_questionnaire_responses_types(self):
+        invalid_responses_types = []
         for question_name, response in self.responses.items():
-            is_valid, failed_type = self.validate_response_type(question_name, response)
+            is_valid, failed_type = self.validate_question_response_type(
+                question_name, response
+            )
 
             if not is_valid:
-                invalid_response_types.append((question_name, response, failed_type))
+                invalid_responses_types.append((question_name, response, failed_type))
 
-        return invalid_response_types
+        return invalid_responses_types
 
-    def validate_question_response(self, question_name, response):
+    def validate_question_response_rules(self, question_name, response):
         question = next(
             (q for q in self.questionnaire._questions if q.name == question_name), {}
         )
 
         validation_rules = question.validation_rules
 
-        for validation_rule in validation_rules:
-            if validation_rule == "text":
-                if not (isinstance(response, str) and len(response) > 0):
-                    return (
-                        False,
-                        validation_rule,
-                    )  # Returns at first failed rule only - not showing all failed criteria
-            # Add more validation criteria for different question types as needed
+        if question.multiple:
+            if not isinstance(response, list):
+                response = [response]
+            for item in response:
+                for validation_rule in validation_rules:
+                    if validation_rule == "text":
+                        if not (isinstance(item, str) and len(item) > 0):
+                            return (
+                                False,
+                                validation_rule,
+                            )
+        else:
+            for validation_rule in validation_rules:
+                if validation_rule == "text":
+                    if not (isinstance(response, str) and len(response) > 0):
+                        return (
+                            False,
+                            validation_rule,
+                        )  # Returns at first failed rule only - not showing all failed criteria
+                # if validation_rule == "url":
+                #     if not validators.url(response):
+                #         return (False, validation_rule)
+                # Add more validation criteria for different question types as needed
 
         return True, None  # All validation rules passed
 
-    def validate_questionnaire_responses(self):
-        invalid_responses = []
+    def validate_questionnaire_responses_rules(self):
+        invalid_responses_rules = []
         for question_name, response in self.responses.items():
-            is_valid, failed_rule = self.validate_question_response(
+            is_valid, failed_rule = self.validate_question_response_rules(
                 question_name, response
             )
 
             if not is_valid:
-                invalid_responses.append((question_name, response, failed_rule))
+                invalid_responses_rules.append((question_name, response, failed_rule))
 
-        return invalid_responses
+        return invalid_responses_rules
+
+    def validate_question_response_choices(self, question_name, response):
+        question = next(
+            (q for q in self.questionnaire._questions if q.name == question_name), {}
+        )
+        valid_choices = question.choices
+        if question.multiple:
+            if not isinstance(response, list):
+                response = [response]
+            for item in response:
+                # Check if the question has choices and if each response is one of the valid choices
+                if valid_choices and item not in valid_choices:
+                    return False, valid_choices
+
+        elif valid_choices and response not in valid_choices:
+            return False, valid_choices
+        return True, None
+
+    def validate_questionnaire_responses_choices(self):
+        invalid_responses_choices = []
+        for question_name, response in self.responses.items():
+            is_valid, valid_choices = self.validate_question_response_choices(
+                question_name, response
+            )
+
+            if not is_valid:
+                invalid_responses_choices.append(
+                    (question_name, response, valid_choices)
+                )
+
+        return invalid_responses_choices
 
     def validate_and_get_invalid_responses(self):
         # Use Pydantic to validate the overall structure of the responses
@@ -159,41 +210,39 @@ class QuestionnaireResponseValidator(BaseModel):
         for question_name in self.responses:
             if question_name not in [q.name for q in self.questionnaire._questions]:
                 raise InvalidResponseError(
-                    f"Invalid response: {question_name} is not a valid question in the questionnaire: {self.questionnaire.name}."
+                    f"Unexpected answer for the question '{question_name}'. The questionnaire '{self.questionnaire.name}' does not contain this question."
                 )  # should this message be different? Wrong questionnaire answered?
 
-        invalid_response_types = self.validate_questionnaire_responses_type()
-        invalid_responses = self.validate_questionnaire_responses()
+        invalid_responses_types = self.validate_questionnaire_responses_types()
+        invalid_responses_rules = self.validate_questionnaire_responses_rules()
+        invalid_responses_choices = self.validate_questionnaire_responses_choices()
 
-        if not invalid_response_types and not invalid_responses:
-            # print("\nAll responses are valid.") -- doesn't indicate that all valid, that needed?
-            return invalid_response_types, invalid_responses
+        if (
+            not invalid_responses_types
+            and not invalid_responses_rules
+            and not invalid_responses_choices
+        ):
+            return "All responses are valid."
 
         else:
             failed_validation_types_explained = []
-            failed_validation_explained = []
-            for question_name, response, failed_type in invalid_response_types:
+            failed_validation_rules_explained = []
+            failed_validation_choices_explained = []
+            for question_name, response, failed_type in invalid_responses_types:
                 failed_validation_type = f"Question '{question_name}': {response} (Failed validation type: {failed_type})"
                 failed_validation_types_explained.append(failed_validation_type)
 
-            for question_name, response, validation_rule in invalid_responses:
+            for question_name, response, validation_rule in invalid_responses_rules:
                 failed_validation = f"Question '{question_name}': {response} (Failed validation for rule: {validation_rule})"
-                failed_validation_explained.append(failed_validation)
+                failed_validation_rules_explained.append(failed_validation)
 
-            if failed_validation_explained == []:
-                raise InvalidResponseError(
-                    f"Invalid response types: {failed_validation_types_explained}"
-                )
-
-            if failed_validation_types_explained == []:
-                raise InvalidResponseError(
-                    f"Invalid responses given: {failed_validation_explained}"
-                )
+            for question_name, response, valid_choices in invalid_responses_choices:
+                failed_validation = f"Question '{question_name}': {response} (Failed validation as not in choices: {valid_choices})"
+                failed_validation_choices_explained.append(failed_validation)
 
             raise InvalidResponseError(
-                f"Invalid response types: {failed_validation_types_explained}. Invalid responses given: {failed_validation_explained}"
+                f"Invalid response types: {failed_validation_types_explained}. Invalid validation rules: {failed_validation_rules_explained}. Invalid response choices: {failed_validation_choices_explained}"
             )
-        return invalid_response_types, invalid_responses
 
 
 # Example Usage:
@@ -205,13 +254,14 @@ questionnaire = Questionnaire(name="SampleQuestionnaire", version=1)
 questionnaire.add_question(
     name="What is your favorite color?",
     type=QuestionType.STRING,
-    multiple=False,
+    multiple=True,
     validation_rules=["text"],
+    choices=["red", "pink", "blue"],
 )
 questionnaire.add_question(
     name="How many years of experience do you have in programming?",
     type=QuestionType.INT,
-    multiple=False,
+    multiple=True,
     validation_rules=["numeric"],
 )
 
@@ -219,8 +269,9 @@ questionnaire.add_question(
 
 # Set responses
 responses = {
-    "How many years of experience do you have in programming?": "2",
-    "What is your favorite color?": 2,
+    "How many years of experience do you have in programming?": [2, 3],
+    "What is your favorite color?": ["pink", "green"],
+    # "interactionID": ["xxx", "yyy"]
 }
 
 # Create instance of the QuestionnaireResponseValidator
