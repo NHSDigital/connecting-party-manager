@@ -8,5 +8,14 @@
   },
   "editor.formatOnSave": true,
   "black-formatter.args": ["--line-length=88"],
-  "cSpell.words": ["stepfunctions", "unmarshall"]
+  "cSpell.words": [
+    "changetype",
+    "getbuffer",
+    "ldif",
+    "nhsexternalchangelogentry",
+    "objectclass",
+    "popleft",
+    "stepfunctions",
+    "unmarshall"
+  ]
 }
