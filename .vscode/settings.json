@@ -13,6 +13,7 @@
     "getbuffer",
     "ldif",
     "nhsexternalchangelogentry",
+    "NOSONAR",
     "objectclass",
     "popleft",
     "stepfunctions",

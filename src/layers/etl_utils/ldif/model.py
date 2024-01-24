@@ -8,7 +8,7 @@ class BadDistinguishedName(Exception):
     pass
 
 
-DISTINGUISHED_NAME_RE = re.compile(r"([^,]+)=([^,]+)")
+DISTINGUISHED_NAME_RE = re.compile(r"([^,]+)=([^,]+)")  # NOSONAR
 
 
 class DistinguishedName(BaseModel):
