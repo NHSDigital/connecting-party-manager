@@ -38,7 +38,7 @@ class SyncReplyModel(CaseInsensitiveEnum):
 
 
 class MhsActor(CaseInsensitiveEnum):
-    TOPARTHMSH = "urn:oasis:names:tc:ebxml-msg:actor:topartymsh"
+    TOPARTYMSH = "urn:oasis:names:tc:ebxml-msg:actor:topartymsh"
     NEXTMSH = "urn:oasis:names:tc:ebxml-msg:actor:nextmsh"
 
 

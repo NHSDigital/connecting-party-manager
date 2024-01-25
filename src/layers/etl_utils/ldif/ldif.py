@@ -15,9 +15,11 @@ def _decode_record(record: dict[str, list[bytes]]) -> dict[str, set[str]]:
     decoded_record = {}
     for field_name, field_items in record.items():
         non_empty_items = filter(bool, field_items)
-        decoded_items = set(map(bytes.decode, non_empty_items))
+        decoded_items = set(
+            map(bytes.decode, non_empty_items)
+        )  # duplicate values (values, not keys) are removed here
         if decoded_items:
-            decoded_record[field_name.lower()] = decoded_items
+            decoded_record[field_name] = decoded_items
     return decoded_record
 
 

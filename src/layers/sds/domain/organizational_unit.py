@@ -3,7 +3,7 @@ from typing import ClassVar, Literal, Optional
 from pydantic import BaseModel, Field
 from sds.domain.constants import OrganizationalUnitNhs, OrganizationalUnitServices
 
-from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel  # , _lowercase_values
+from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
 
 
 class OrganizationalUnitDistinguishedName(BaseModel):
