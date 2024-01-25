@@ -5,7 +5,7 @@ from domain.core.error import DuplicateError, InvalidResponseError
 from domain.core.questionnaire import (
     Question,
     Questionnaire,
-    QuestionnaireResponseValidator,
+    QuestionnaireResponse,
     QuestionType,
 )
 
@@ -17,9 +17,9 @@ from domain.core.questionnaire import (
 def test_questionnaire_constructor(name: str, version: int):
     subject = Questionnaire(name=name, version=version)
 
-    assert subject.name == name, "name"
-    assert subject.version == version, "version"
-    assert subject.questions is not None, "questions"
+    assert subject.name == name
+    assert subject.version == version
+    assert subject.questions is not None
 
 
 @pytest.mark.parametrize(
@@ -46,11 +46,11 @@ def test_question_constructor(
         choices=choices,
     )
 
-    assert subject.name == name, "name"
-    assert subject.type == type, "type"
-    assert subject.multiple == multiple, "multiple"
-    assert subject.validation_rules == validation_rules, "validation_rules"
-    assert subject.choices == choices, "choices"
+    assert subject.name == name
+    assert subject.type == type
+    assert subject.multiple == multiple
+    assert subject.validation_rules == validation_rules
+    assert subject.choices == choices
 
 
 @pytest.mark.parametrize(
@@ -77,8 +77,8 @@ def test_add_question(
         choices=choices,
     )
 
-    assert result is not None, "result"
-    assert name in [q.name for q in subject.questions], "name in questions"
+    assert result is not None
+    assert name in [q.name for q in subject.questions]
 
 
 @pytest.mark.parametrize("name", ["alpha", "beta", "gamma"])
@@ -97,17 +97,7 @@ def test_has_question(name: str):
 
     result = subject.__contains__(name)
 
-    assert result == True, "has_question"
-
-
-@pytest.mark.parametrize(
-    ["name", "missing"],
-    [["alpha", "not_present"], ["beta", "look_elsewhere"], ["gamma", "nope"]],
-)
-def test_doesnt_have_question(name: str, missing: str):
-    subject = Questionnaire(name="questionnaire", version=1)
-
-    assert name not in subject, "not has_question"
+    assert result == True
 
 
 @pytest.mark.parametrize(
@@ -129,11 +119,11 @@ def test_correct_questionnaire_answered(response: dict):
     questionnaire.add_question(name="What is your favorite color?")
     questionnaire.add_question(name="interactionID")
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_responses_correspond_to_questionnaire()
 
-    assert result == True, "correct questionnaire answered"
+    assert result == True
 
 
 @pytest.mark.parametrize(
@@ -166,7 +156,7 @@ def test_incorrect_questionnaire_answered(response: dict):
     questionnaire.add_question(name="What is your favourite food?")
 
     with pytest.raises(InvalidResponseError):
-        result = QuestionnaireResponseValidator(
+        result = QuestionnaireResponse(
             questionnaire=questionnaire, responses=response
         ).validate_responses_correspond_to_questionnaire()
 
@@ -198,7 +188,7 @@ def test_multiple_responses_allowed(response: dict):
         multiple=True,
     )
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_multiple_responses_allowed()
 
@@ -230,7 +220,7 @@ def test_multiple_responses_not_allowed(response: dict):
     )
 
     with pytest.raises(InvalidResponseError):
-        result2 = QuestionnaireResponseValidator(
+        result2 = QuestionnaireResponse(
             questionnaire=questionnaire, responses=response
         ).validate_multiple_responses_allowed()
 
@@ -259,10 +249,10 @@ def test_valid_questionnaire_response_types(response: dict):
     questionnaire.add_question(name="Date response", type=QuestionType.DATE)
     questionnaire.add_question(name="Time response", type=QuestionType.TIME)
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_questionnaire_responses_types()
-    result2 = QuestionnaireResponseValidator(
+    result2 = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_and_get_invalid_responses()
 
@@ -294,22 +284,16 @@ def test_invalid_questionnaire_response_types(response: dict):
     questionnaire.add_question(name="Date response", type=QuestionType.DATE)
     questionnaire.add_question(name="Time response", type=QuestionType.TIME)
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_questionnaire_responses_types()
 
     assert len(result) == 7
 
     with pytest.raises(InvalidResponseError):
-        result2 = QuestionnaireResponseValidator(
+        result2 = QuestionnaireResponse(
             questionnaire=questionnaire, responses=response
         ).validate_and_get_invalid_responses()
-
-
-# def test_valid_questionnaire_response_rules():
-# not got any rules yet?
-
-# def test_invalid_questionnaire_response_rules():
 
 
 @pytest.mark.parametrize(
@@ -335,10 +319,10 @@ def test_valid_questionnaire_response_choices(response: dict):
         name="What is your favourite food?", choices=["chicken", "pasta", "rice"]
     )
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_questionnaire_responses_choices()
-    result2 = QuestionnaireResponseValidator(
+    result2 = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_and_get_invalid_responses()
 
@@ -369,14 +353,14 @@ def test_invalid_questionnaire_response_choices(response: dict):
         name="What is your favourite food?", choices=["chicken", "pasta", "rice"]
     )
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_questionnaire_responses_choices()
 
     assert len(result) == 2
 
     with pytest.raises(InvalidResponseError):
-        result2 = QuestionnaireResponseValidator(
+        result2 = QuestionnaireResponse(
             questionnaire=questionnaire, responses=response
         ).validate_and_get_invalid_responses()
 
@@ -406,15 +390,55 @@ def test_multiple_invalid_questionnaire_response_choices(response: dict):
         name="What is your favourite food?", choices=["chicken", "pasta", "rice"]
     )
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_questionnaire_responses_choices()
 
     assert len(result) == 2
     with pytest.raises(InvalidResponseError):
-        result2 = QuestionnaireResponseValidator(
+        result2 = QuestionnaireResponse(
             questionnaire=questionnaire, responses=response
         ).validate_and_get_invalid_responses()
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        {
+            "How many years of experience do you have in programming?": 2,
+            "What is your favorite animal?": ["cat", "dog"],
+            "What is your favourite food?": "pasta",
+        }
+    ],
+)
+def test_valid_questionnaire_response_rules(response: dict):
+    questionnaire = Questionnaire(name="sample_questionaire", version=1)
+    questionnaire.add_question(
+        name="How many years of experience do you have in programming?",
+        type=QuestionType.INT,
+        validation_rules=["number2"],
+    )
+    questionnaire.add_question(
+        name="What is your favorite animal?",
+        choices=["dog", "cat", "pig"],
+        multiple=True,
+        validation_rules=["text"],
+    )
+    questionnaire.add_question(
+        name="What is your favourite food?",
+        choices=["chicken", "pasta", "rice"],
+        validation_rules=["text"],
+    )
+
+    result = QuestionnaireResponse(
+        questionnaire=questionnaire, responses=response
+    ).validate_questionnaire_responses_rules()
+    result2 = QuestionnaireResponse(
+        questionnaire=questionnaire, responses=response
+    ).validate_and_get_invalid_responses()
+
+    assert result == []
+    assert result2[1] == "invalid response rules: []"
 
 
 @pytest.mark.parametrize(
@@ -445,11 +469,11 @@ def test_multiple_invalid_questionnaire_response_rules(response: dict):
         validation_rules=["number2"],
     )
 
-    result = QuestionnaireResponseValidator(
+    result = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
     ).validate_questionnaire_responses_rules()
     assert len(result) == 2
     with pytest.raises(InvalidResponseError):
-        result2 = QuestionnaireResponseValidator(
+        result2 = QuestionnaireResponse(
             questionnaire=questionnaire, responses=response
         ).validate_and_get_invalid_responses()

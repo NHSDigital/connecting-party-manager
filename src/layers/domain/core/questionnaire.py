@@ -78,19 +78,11 @@ class Questionnaire(BaseModel):
 
 class QuestionnaireResponse(BaseModel):
     """
-    Represents a Questionnaire response mapping Questions to Responses.
+    Validates questionnaire responses against questionnaire questions
     """
 
     responses: dict
-
-
-class QuestionnaireResponseValidator(BaseModel):
-    """
-    Validates questionnaire responses against questionnaire questions are of the correct type, meet any validation criteria and .
-    """
-
     questionnaire: Questionnaire
-    responses: dict
 
     def validate_question_response_type(self, question_name, response):
         question = next(
@@ -138,6 +130,10 @@ class QuestionnaireResponseValidator(BaseModel):
                     if validation_rule == "number2":
                         if not item == 2:
                             failed_rules.append(validation_rule)
+
+                    # if validation_rule == "url":
+                    #     if not validators.url(item):
+                    #         failed_rules.append(validation_rule)
         else:
             for validation_rule in validation_rules:
                 if validation_rule == "text":
@@ -153,6 +149,7 @@ class QuestionnaireResponseValidator(BaseModel):
                 #         failed_rules.append(validation_rule)
 
                 # Add more validation criteria for different question types as needed
+
         if len(failed_rules) == 0:
             return True, None  # All validation rules passed
         else:
