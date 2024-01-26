@@ -124,8 +124,21 @@ jobs:
           save-to-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}
 
-  test--smoke:
+  apigee--deploy:
     needs: [get-branch-from-workflow-file, terraform--apply]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--deploy
+          requires-aws: true
+          cache-suffix: ${{ env.CACHE_NAME }}
+
+  test--smoke:
+    needs: [get-branch-from-workflow-file, apigee--deploy]
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v4

@@ -177,6 +177,18 @@ jobs:
           restore-from-cache: "false"
           workspace: ${{ needs.create-workspace-name.outputs.workspace }}
 
+  apigee--deploy:
+    needs: [build-head, terraform-head-build]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--deploy
+          requires-aws: true
+
   test--integration:
     needs:
       [
