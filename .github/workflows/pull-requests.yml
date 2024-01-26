@@ -187,13 +187,16 @@ jobs:
         terraform-head-build,
       ]
     runs-on: [self-hosted, ci]
+    strategy:
+      matrix:
+        test-type: [integration, s3]
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/pytest-with-rerun/
         with:
-          test-type: integration
+          test-type: ${{ matrix.test-type }}
           requires-aws: true
 
   test--feature--integration:

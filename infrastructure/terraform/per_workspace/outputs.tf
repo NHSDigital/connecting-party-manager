@@ -14,6 +14,10 @@ output "sds_etl" {
   value = module.sds_etl
 }
 
+output "test_data_bucket" {
+  value = "${local.project}--${replace(var.account_name, "_", "-")}--test-data"
+}
+
 # output "assumed_role" {
 #   value = var.assume_role
 # }
