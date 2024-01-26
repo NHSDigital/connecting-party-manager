@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-01-26
+- [PI-200] Parsing LDIF files
+- [PI-122] Proxygen in the CI
+
 ## 2024-01-19
 - [PI-196] SDS ETL step function
 
