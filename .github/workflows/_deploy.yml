@@ -132,6 +132,7 @@ jobs:
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
+        if: ${{ env.SCOPE == 'per_workspace'}}
         with:
           command: apigee--deploy
           requires-aws: true
