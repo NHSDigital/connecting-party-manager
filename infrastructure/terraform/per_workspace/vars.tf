@@ -31,6 +31,16 @@ variable "layers" {
   type = list(string)
 }
 
+variable "api_lambda_layers" {
+  type = list(string)
+  default = [
+    "domain",
+    "event",
+    "respository",
+    "third_party"
+  ]
+}
+
 variable "lambdas" {
   type = list(string)
 }

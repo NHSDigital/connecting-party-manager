@@ -76,8 +76,9 @@ module "lambdas" {
   python_version = var.python_version
   name           = each.key
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
-  layers         = [for instance in module.layers : instance.layer_arn]
-  source_path    = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
+  //Compact will remove all nulls from the list and create a new one - this is because TF throws an error if there is a null item in the list.
+  layers      = compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null])
+  source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
   allowed_triggers = {
     "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
       service    = "apigateway"
@@ -103,7 +104,7 @@ module "authoriser" {
   python_version = var.python_version
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
-  layers         = [for instance in module.layers : instance.layer_arn]
+  layers         = compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null])
   trusted_entities = [
     {
       type = "Service",
