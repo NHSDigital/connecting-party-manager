@@ -36,7 +36,6 @@ variable "api_lambda_layers" {
   default = [
     "domain",
     "event",
-    "respository",
     "third_party"
   ]
 }
