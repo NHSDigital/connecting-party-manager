@@ -13,10 +13,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.20.0"
     }
-    #This isnt needed, kept in for build reasons after removing template_file
-    template = {
-      source = "hashicorp/template"
-    }
   }
   # required_version = ">= 1.1.0"
 }

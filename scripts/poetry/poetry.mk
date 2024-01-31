@@ -3,6 +3,7 @@
 VENV_PYTHON = $(CURDIR)/.venv/bin/python
 PYPROJECT_TOML = $(CURDIR)/pyproject.toml
 POETRY_LOCK = $(CURDIR)/poetry.lock
+TOOL_VERSIONS_COPY = $(TIMESTAMP_DIR)/tool-versions.copy
 
 poetry--update: $(POETRY_LOCK) ## Updates installed dependencies as specified in pyproject.toml
 poetry--install: $(VENV_PYTHON) ## First time installation of poetry configuration
@@ -16,8 +17,7 @@ $(VENV_PYTHON):
 	mkdir -p .venv
 	poetry install --with dev --no-ansi
 	.venv/bin/pre-commit install
-	touch $(VENV_PYTHON)
 
-$(POETRY_LOCK): $(TIMESTAMP_DIR) $(VENV_PYTHON) $(PYPROJECT_TOML)
+$(POETRY_LOCK): $(TOOL_VERSIONS_COPY) $(VENV_PYTHON) $(PYPROJECT_TOML)
 	poetry update
 	touch $(POETRY_LOCK)

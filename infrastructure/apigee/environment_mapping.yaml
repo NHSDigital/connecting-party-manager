@@ -1,0 +1,10 @@
+# This file maps standard NHS environments on to APIM/Apigee environments
+# see https://nhsd-confluence.digital.nhs.uk/display/APM/Environments
+dev: internal-dev
+dev-sandbox: internal-dev-sandbox
+qa: internal-qa
+qa-sandbox: internal-qa-sandbox
+ref: ref
+int: int
+int-sandbox: sandbox
+prod: prod

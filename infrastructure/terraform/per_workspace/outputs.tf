@@ -2,6 +2,14 @@ output "dynamodb_table_name" {
   value = module.table.dynamodb_table_name
 }
 
+output "workspace" {
+  value = terraform.workspace
+}
+
+output "workspace_type" {
+  value = local.workspace_type
+}
+
 output "environment" {
   value = var.environment
 }
@@ -12,6 +20,10 @@ output "invoke_url" {
 
 output "sds_etl" {
   value = module.sds_etl
+}
+
+output "test_data_bucket" {
+  value = "${local.project}--${replace(var.account_name, "_", "-")}--test-data"
 }
 
 # output "assumed_role" {

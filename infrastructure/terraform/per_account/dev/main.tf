@@ -31,3 +31,16 @@ module "iam__api-gateway-to-cloudwatch" {
   source  = "../modules/iam__api-gateway-to-cloudwatch"
   project = local.project
 }
+
+module "bucket" {
+  source        = "terraform-aws-modules/s3-bucket/aws"
+  version       = "3.15.2"
+  bucket        = "${local.project}--${replace(terraform.workspace, "_", "-")}--test-data"
+  force_destroy = true
+  versioning = {
+    enabled = true
+  }
+  tags = {
+    Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--test-data"
+  }
+}

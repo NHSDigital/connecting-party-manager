@@ -108,6 +108,22 @@ Destroy the local workspace and it's corresponding state file on mgmt
 make terraform--destroy TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
 ```
 
+## Updating Roles
+
+To update any of the roles used for SSO then you need to do the following command which should prompt you to log in via SSO:
+
+`make manage--non-mgmt-policies MGMT_ACCOUNT_ID=<ID> SSO_PROFILE="dev-admin"`
+
+Where:
+
+- MGMT ACCOUNT ID = The account id for mgmt so that it can be substituted into the role trust policy
+- SSO_PROFILE = This is the profile in you .aws/config file where you will specify the details for each environment
+  - dev-admin
+  - qa-admin
+  - ref-admin
+  - int-admin
+  - prod-admin
+
 ### Other helpful commands
 
 Run `make` to get a list of helpful commands.

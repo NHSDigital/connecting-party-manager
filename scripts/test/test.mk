@@ -17,6 +17,9 @@ test--integration: aws--login ## Run integration (pytest) tests
 test--slow:  ## Run slow (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'slow'" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
+test--s3: aws--login ## Run (pytest) tests that require s3 downloads
+	$(MAKE) _pytest _INTERNAL_FLAGS="-m 's3'" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
+
 test--smoke:  ## Run end-to-end smoke tests (pytest)
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'smoke'" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
