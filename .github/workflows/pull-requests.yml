@@ -187,6 +187,8 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: apigee--deploy
+          save-to-cache: "false"
+          restore-from-cache: "true"
           requires-aws: true
 
   test--integration:
