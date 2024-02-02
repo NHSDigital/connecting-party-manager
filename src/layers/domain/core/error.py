@@ -22,5 +22,5 @@ class InvalidAccreditedSystemIdError(Exception):
     pass
 
 
-class InvalidResponseError(Exception):
+class InvalidResponseError(ValueError):
     pass
