@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, validator
 # from domain.core.questionnaire_validation_custom_rules import url
 
 T = TypeVar("T")
-A = {str, int, bool, datetime, float, date, time}  # allowed question types
+ALLOWED_QUESTION_TYPES = {str, int, bool, datetime, float, date, time}
 
 
 class Question(BaseModel, Generic[T]):
@@ -25,16 +25,16 @@ class Question(BaseModel, Generic[T]):
         arbitrary_types_allowed = True
 
     name: str
-    type: T
+    answer_type: T
     multiple: bool
     validation_rules: set[FunctionType] = None
     choices: set[T] = None
 
-    @validator("type")
-    def validate_question_type(cls, type):
-        if type not in A:
+    @validator("answer_type")
+    def validate_question_type(cls, answer_type):
+        if answer_type not in ALLOWED_QUESTION_TYPES:
             raise ValueError
-        return type
+        return answer_type
 
 
 class Questionnaire(BaseModel):
@@ -56,7 +56,7 @@ class Questionnaire(BaseModel):
     def add_question(
         self,
         name: str,
-        type: Type = str,
+        answer_type: Type = str,
         multiple: bool = False,
         validation_rules: set[FunctionType] = None,
         choices: set[T] = None,
@@ -69,15 +69,15 @@ class Questionnaire(BaseModel):
 
         # Validate choices are of the same type as the question type
         if choices is not None and not all(
-            isinstance(choice, type) for choice in choices
+            isinstance(choice, answer_type) for choice in choices
         ):
             raise ValueError(
-                f"Choices must be of the same type as the question type: {type}"
+                f"Choices must be of the same type as the question type: {answer_type}"
             )
 
-        question = Question[type](
+        question = Question(
             name=name,
-            type=type,
+            answer_type=answer_type,
             multiple=multiple,
             validation_rules=validation_rules,
             choices=choices,
@@ -100,7 +100,7 @@ class QuestionnaireResponse(BaseModel):
         response: tuple[str, list], values: dict[str, Questionnaire]
     ):
         questionnaire = values.get("questionnaire")
-        question_name = response[0]
+        question_name, answers = response
         if questionnaire is not None:
             questionnaire_name = questionnaire.name
             question = questionnaire.questions.get(question_name)
@@ -108,13 +108,11 @@ class QuestionnaireResponse(BaseModel):
                 raise InvalidResponseError(
                     f"Unexpected answer for the question '{question_name}'. The questionnaire '{questionnaire_name}' does not contain this question."
                 )
-            validate_response_against_question(response=response, question=question)
+            validate_response_against_question(question=question, answers=answers)
         return response
 
 
-def validate_response_against_question(response: tuple[str, list], question: Question):
-    answers = response[1]
-
+def validate_response_against_question(answers: list, question: Question):
     if not question.multiple and len(answers) > 1:
         raise InvalidResponseError(
             f"Question '{question.name}' does not allow multiple responses. Response given: {answers}."
@@ -124,9 +122,9 @@ def validate_response_against_question(response: tuple[str, list], question: Que
         []
     )  # accumulate errors here for multianswer question and raise under a single ValueError
     for answer in answers:
-        if not isinstance(answer, question.type):
+        if not isinstance(answer, question.answer_type):
             errors.append(
-                f"Question '{question.name}' expects type {question.type}. Response given: {answer}."
+                f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
             )
 
         if question.validation_rules is not None:
@@ -135,7 +133,7 @@ def validate_response_against_question(response: tuple[str, list], question: Que
                     validation_rule(answer)
                 except ValueError as e:
                     errors.append(
-                        f"Question '{question.name}' validation failed for response: {answer}. Error: {str(e)}"
+                        f"Question '{question.name}' rule '{validation_rule.__name__}' failed validation for response '{answer}' with error: {e}."
                     )
 
         if question.choices and answer not in question.choices:
@@ -146,4 +144,4 @@ def validate_response_against_question(response: tuple[str, list], question: Que
     if errors:
         raise InvalidResponseError("\n".join(errors))
 
-    return response
+    return answers
