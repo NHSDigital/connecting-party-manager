@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, validator
 from .error import DuplicateError, InvalidResponseError
 from .validation import ENTITY_NAME_REGEX
 
-# from domain.core.questionnaire_validation_custom_rules import url
+# from .questionnaire_validation_custom_rules import url
 
 T = TypeVar("T")
 ALLOWED_QUESTION_TYPES = {str, int, bool, datetime, float, date, time}

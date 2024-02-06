@@ -579,7 +579,7 @@ def test_invalid_question_response_type_time(response: list):
         ],
     ],
 )
-def test_valid_questionnaire_responses_choices(response: dict):
+def test_valid_questionnaire_responses_choices(response: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(
         name="question1", multiple=True, choices={"answer_a", "answer_b", "answer_c"}
@@ -629,7 +629,7 @@ def test_valid_question_response_choice(response: list):
         ],
     ],
 )
-def test_invalid_questionnaire_responses_choices(response: dict):
+def test_invalid_questionnaire_responses_choices(response: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(
         name="question1", multiple=True, choices={"a1", "a2", "answer3", "a4"}
@@ -670,9 +670,9 @@ def test_invalid_question_response_choice(response: list):
         ],
     ],
 )
-def test_valid_questionnaire_responses_rules(response: dict):
+def test_valid_questionnaire_responses_rules(response: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
-    questionnaire.add_question(name="url", multiple=True, validation_rules={url})
+    questionnaire.add_question(name="url", validation_rules={url})
 
     questionnaire_response = QuestionnaireResponse(
         questionnaire=questionnaire, responses=response
@@ -701,9 +701,9 @@ def test_valid_question_response_rule(response: list):
         ("url", ["not_a_url"]),
     ],
 )
-def test_invalid_questionnaire_response_rules(responses: tuple[str, list]):
+def test_invalid_questionnaire_response_rules(responses: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
-    questionnaire.add_question(name="url", multiple=True, validation_rules={url})
+    questionnaire.add_question(name="url", validation_rules={url})
 
     with pytest.raises(ValidationError) as error:
         questionnaire_response = QuestionnaireResponse(
