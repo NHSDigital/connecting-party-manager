@@ -2,9 +2,10 @@ from datetime import date, datetime, time
 from types import FunctionType
 from typing import Generic, Type, TypeVar
 
-from domain.core.error import DuplicateError, InvalidResponseError
-from domain.core.validation import ENTITY_NAME_REGEX
 from pydantic import BaseModel, Field, validator
+
+from .error import DuplicateError, InvalidResponseError
+from .validation import ENTITY_NAME_REGEX
 
 # from domain.core.questionnaire_validation_custom_rules import url
 
