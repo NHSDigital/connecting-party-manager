@@ -1,40 +1,59 @@
-import uuid
+from datetime import date, datetime, time
 
 from behave import given, then, when
-from domain.core.questionnaire import Questionnaire, QuestionType
+from domain.core.questionnaire import Questionnaire
 
 from feature_tests.domain.steps.context import Context
 
+TYPE_MAPPING = {
+    "str": str,
+    "int": int,
+    "bool": bool,
+    "datetime": datetime,
+    "float": float,
+    "date": date,
+    "time": time,
+}
 
-@given("Questionnaire {id}")
-def given__questionnaire(context: Context, id: str):
-    q = Questionnaire(id=uuid.uuid4(), name=id)
-    context.questionnaires[id] = q
+
+@given("Questionnaire {name} version {version}")
+def given__questionnaire(context: Context, name: str, version: int):
+    q = Questionnaire(name=name, version=version)
+    context.questionnaires[(name, version)] = q
 
 
-@when("I add the following questions to {id}")
-def step_impl(context: Context, id):
-    subject = context.questionnaires[id]
+@when("I add the following questions to {name} version {version}")
+def step_impl(context: Context, name, version):
+    subject = context.questionnaires[(name, version)]
     for row in context.table:
-        name = row["name"]
-        qtype = QuestionType[row["type"]]
+        question_name = row["name"]
+        answer_type_str = row["type"]
         multiple = row["multiple"].lower() == "true"
 
-        subject.add_question(name, type=qtype, multiple=multiple)
+        # Convert the string to the corresponding Python type
+        answer_type = TYPE_MAPPING.get(answer_type_str.lower())
+
+        subject.add_question(
+            name=question_name, answer_type=answer_type, multiple=multiple
+        )
 
 
-@then("Questionnaire {id} has the questions")
-def step_impl(context: Context, id):
-    subject = context.questionnaires[id]
+@then("Questionnaire {name} version {version} has the questions")
+def step_impl(context: Context, name, version):
+    subject = context.questionnaires[(name, version)]
     ix = 0
     for row in context.table:
-        question_type = QuestionType[row["type"]]
+        question_name = row["name"]
+        answer_type_str = row["type"]
         multiple = row["multiple"].lower() == "true"
 
-        q = subject._questions[ix]
+        # Convert the string to the corresponding Python type
+        answer_type = TYPE_MAPPING.get(answer_type_str.lower())
+
+        q = subject.questions[question_name]
         assert q is not None, "question exists"
-        assert q.type == question_type, "question type"
+        assert q.answer_type == answer_type, "question answer_type"
         assert q.multiple == multiple, "question multiple"
 
         ix = ix + 1
-    assert len(subject._questions) == ix, "count"
+    assert len(subject.questions) == ix, "count"
