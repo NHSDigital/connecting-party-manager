@@ -23,7 +23,7 @@ smart-open = "^6.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
-black = "^23.12.1"
+black = "^24.1.1"
 flake8 = "^7.0.0"
 behave = "^1.2.6"
 pytest = "^7.4.2"
