@@ -7,12 +7,12 @@ from feature_tests.domain.steps.context import Context
 @given("Questionnaire {name} version {version}")
 def given__questionnaire(context: Context, name: str, version: int):
     q = Questionnaire(name=name, version=version)
-    context.questionnaires[name] = q
+    context.questionnaires[(name, version)] = q
 
 
-@when("I add the following questions to {name}")
-def step_impl(context: Context, name):
-    subject = context.questionnaires[name]
+@when("I add the following questions to {name} version {version}")
+def step_impl(context: Context, name, version):
+    subject = context.questionnaires[(name, version)]
     for row in context.table:
         question_name = row["name"]
         answer_type = row["type"]
@@ -23,7 +23,7 @@ def step_impl(context: Context, name):
 
 @then("Questionnaire {name} version {version} has the questions")
 def step_impl(context: Context, name, version):
-    subject = context.questionnaires[name]
+    subject = context.questionnaires[(name, version)]
     ix = 0
     for row in context.table:
         question_name = row["name"]
