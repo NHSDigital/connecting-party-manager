@@ -1,6 +1,6 @@
 from datetime import date, datetime, time
 from types import FunctionType
-from typing import Type, TypeVar
+from typing import Type
 
 import pytest
 from domain.core.error import DuplicateError, InvalidResponseError
@@ -8,12 +8,11 @@ from domain.core.questionnaire import (
     Question,
     Questionnaire,
     QuestionnaireResponse,
+    T,
     validate_response_against_question,
 )
 from domain.core.questionnaire_validation_custom_rules import url
 from pydantic import ValidationError
-
-T = TypeVar("T")
 
 
 @pytest.mark.parametrize(
