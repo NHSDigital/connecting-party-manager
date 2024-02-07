@@ -2,9 +2,9 @@ import json
 from http import HTTPStatus
 
 import pytest
-from event.response.render_response import render_response
-from event.response.response_matrix import SUCCESS_STATUSES
-from event.response.tests.test_validation_errors import (
+from domain.response.render_response import render_response
+from domain.response.response_matrix import SUCCESS_STATUSES
+from domain.response.tests.test_validation_errors import (
     _get_inbound_validation_error,
     _get_validation_error,
 )

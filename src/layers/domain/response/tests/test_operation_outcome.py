@@ -1,10 +1,10 @@
-from event.response.coding import IssueSeverity, IssueType
-from event.response.operation_outcome import (
+from domain.response.coding import IssueSeverity, IssueType
+from domain.response.operation_outcome import (
     _operation_outcome,
     _operation_outcome_from_validation_error,
 )
-from event.response.response_matrix import CpmCoding, FhirCoding
-from event.response.validation_errors import ValidationErrorItem
+from domain.response.response_matrix import CpmCoding, FhirCoding
+from domain.response.validation_errors import ValidationErrorItem
 from hypothesis import given
 from hypothesis.strategies import builds, just, lists, sampled_from
 

@@ -1,7 +1,7 @@
 from unittest import mock
 
+from domain.logging.step_decorators import logging_step_decorators
 from event.logging.models import StepLog
-from event.logging.step_decorators import logging_step_decorators
 from event.step_chain import StepChain
 from event.step_chain.tests.utils import step_data
 from nhs_context_logging.fixtures import (  # noqa: F401
@@ -45,7 +45,7 @@ def test_logging_step_decorators(log_capture):
     assert parsed_log.action_result == return_value
     assert (
         parsed_log.action
-        == "src.layers.event.logging.tests.test_step_decorators.a_function"
+        == "src.layers.domain.logging.tests.test_step_decorators.a_function"
     )
     assert parsed_log.action_status == "succeeded"
 
@@ -86,7 +86,7 @@ def test_logging_step_decorators_with_fatal_error(log_capture):
     assert parsed_log.action_result == None
     assert (
         parsed_log.action
-        == "src.layers.event.logging.tests.test_step_decorators.a_function"
+        == "src.layers.domain.logging.tests.test_step_decorators.a_function"
     )
     assert parsed_log.action_status == "failed"
 
@@ -105,7 +105,7 @@ def test_logging_step_decorators_with_non_fatal_error(log_capture):
 
     # Run the step, with logging
     with mock.patch(
-        "event.logging.step_decorators.EXPECTED_EXCEPTIONS", (MyException,)
+        "domain.logging.step_decorators.EXPECTED_EXCEPTIONS", (MyException,)
     ):
         step_chain = StepChain(
             step_chain=[a_function], step_decorators=logging_step_decorators
@@ -130,6 +130,6 @@ def test_logging_step_decorators_with_non_fatal_error(log_capture):
     assert parsed_log.action_result == None
     assert (
         parsed_log.action
-        == "src.layers.event.logging.tests.test_step_decorators.a_function"
+        == "src.layers.domain.logging.tests.test_step_decorators.a_function"
     )
     assert parsed_log.action_status == "error"

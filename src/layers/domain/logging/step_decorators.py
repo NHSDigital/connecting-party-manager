@@ -1,6 +1,6 @@
 from types import FunctionType
 
-from event.response.response_matrix import EXPECTED_EXCEPTIONS
+from domain.response.response_matrix import EXPECTED_EXCEPTIONS
 from nhs_context_logging import log_action as _log_action
 
 

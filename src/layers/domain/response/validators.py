@@ -6,7 +6,7 @@ from .response_matrix import SUCCESS_STATUSES
 
 class UnexpectedHttpStatus(Exception):
     def __init__(self, http_status):
-        return super().__init__(
+        super().__init__(
             f"HTTP Status '{http_status}' should not be "
             "explicitly returned from the API. For non-2XX "
             "statuses we should raise exceptions for "
@@ -21,7 +21,7 @@ class NotJsonSerialisable(Exception):
 
 class InvalidExceptionRaised(Exception):
     def __init__(self, exception):
-        return super().__init__(
+        super().__init__(
             f"An exception of type '{exception.__class__.__name__}' was raised with no message"
         )
 

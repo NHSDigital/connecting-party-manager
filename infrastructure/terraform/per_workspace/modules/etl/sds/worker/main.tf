@@ -6,7 +6,8 @@ module "lambda_function" {
   description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.etl_stage}) lambda function"
   handler       = "etl.sds.worker.${var.etl_stage}.${var.etl_stage}.handler"
   runtime       = var.python_version
-  timeout       = 10
+  timeout       = 600
+  memory_size   = 10240
 
   timeouts = {
     create = "5m"
@@ -32,7 +33,7 @@ module "lambda_function" {
     Name = "${var.workspace_prefix}--${var.etl_name}--${var.etl_stage}"
   }
 
-  layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
+  layers = [var.sds_layer_arn, var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
 
   trusted_entities = [
     {

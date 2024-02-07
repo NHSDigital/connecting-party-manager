@@ -1,7 +1,7 @@
 import math
 from types import FunctionType
 
-from event.response.validation_errors import mark_validation_errors_as_inbound
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
 from .constants import VERSIONING_STEP_ARGS

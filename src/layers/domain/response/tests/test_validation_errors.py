@@ -1,14 +1,14 @@
 import json
 
 import pytest
-from event.json import json_loads
-from event.response.validation_errors import (
+from domain.response.validation_errors import (
     InboundJSONDecodeError,
     InboundValidationError,
     mark_json_decode_errors_as_inbound,
     mark_validation_errors_as_inbound,
     parse_validation_error,
 )
+from event.json import json_loads
 from pydantic import BaseModel, ValidationError
 
 

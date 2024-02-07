@@ -1,7 +1,8 @@
 from types import FunctionType
 
-from event.response.render_response import render_response as _render_response
 from event.step_chain import StepChain
+
+from .render_response import render_response as _render_response
 
 
 def render_response(data, cache) -> dict:

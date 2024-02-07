@@ -11,7 +11,7 @@ module "bucket" {
   }
 }
 
-module "layer" {
+module "etl_layer" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
@@ -28,6 +28,22 @@ module "layer" {
 }
 
 
+module "sds_layer" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "6.0.0"
+
+  layer_name             = "${var.workspace_prefix}--${local.etl_name}--sds"
+  description            = "SDS domain lambda layer"
+  create_layer           = true
+  compatible_runtimes    = [var.python_version]
+  create_package         = false
+  local_existing_package = "${path.root}/../../../src/layers/sds/dist/sds.zip"
+
+  tags = {
+    Name = "${var.workspace_prefix}--${local.etl_name}--sds"
+  }
+}
+
 module "worker_extract" {
   source = "./worker/"
 
@@ -40,7 +56,8 @@ module "worker_extract" {
   third_party_layer_arn = var.third_party_layer_arn
   etl_bucket_name       = module.bucket.s3_bucket_id
   etl_bucket_arn        = module.bucket.s3_bucket_arn
-  etl_layer_arn         = module.layer.lambda_layer_arn
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  sds_layer_arn         = module.sds_layer.lambda_layer_arn
 }
 
 module "notify" {

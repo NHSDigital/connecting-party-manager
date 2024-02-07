@@ -1,5 +1,7 @@
 from enum import StrEnum, auto
 
+FILTER_TERMS = [("objectClass", "nhsMHS"), ("objectClass", "nhsAS")]
+
 
 class CaseInsensitiveEnum(StrEnum):
     @classmethod

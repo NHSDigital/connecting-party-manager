@@ -1,8 +1,8 @@
 from types import FunctionType
 
 import pytest
+from domain.logging.step_decorators import logging_step_decorators
 from event.logging.logger import setup_logger
-from event.logging.step_decorators import logging_step_decorators
 from event.step_chain import StepChain
 from event.versioning.constants import VERSIONING_STEP_ARGS
 from event.versioning.models import Event, VersionHeader

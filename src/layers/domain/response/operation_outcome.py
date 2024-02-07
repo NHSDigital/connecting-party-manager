@@ -7,7 +7,6 @@ from domain.fhir.r4 import (
     OperationOutcomeIssue,
     ProfileItem,
 )
-from event.response.validation_errors import ValidationErrorItem, parse_validation_error
 from pydantic import ValidationError
 
 from .coding import CODE_SYSTEM, CpmCoding, FhirCoding, IssueSeverity, IssueType
@@ -16,6 +15,7 @@ from .response_matrix import (
     FHIR_CODING_TO_HTTP_STATUS,
     HTTP_STATUS_TO_CPM_CODING,
 )
+from .validation_errors import ValidationErrorItem, parse_validation_error
 
 META = Meta(profile=[ProfileItem(__root__=CODE_SYSTEM)])
 

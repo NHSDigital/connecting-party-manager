@@ -17,9 +17,9 @@ class BaseEnvironment(BaseModel, ABC):
         class Environment(BaseEnvironment):
             SOMETHING: str
 
-        Environment.model_construct()
+        Environment.build()
     """
 
     @classmethod
-    def build(cls: Model) -> Model:
+    def build(cls: type[Model]) -> Model:
         return cls(**os.environ)

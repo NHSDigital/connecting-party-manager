@@ -6,32 +6,55 @@ from typing import IO, Callable, Generator
 from etl_utils.ldif.model import DistinguishedName
 from smart_open import open as _smart_open
 
-from ._ldif import LDIFParser
+from ._ldif import LDIFParser, LDIFWriter
+
+# Annotation imports
+try:
+    from mypy_boto3_s3 import S3Client
+except ModuleNotFoundError:
+    S3Client = None
+
 
 EMPTY_BYTESTRING = b""
+
+PARSED_RECORD = tuple[DistinguishedName, dict[str, set[str]]]
 
 
 def _decode_record(record: dict[str, list[bytes]]) -> dict[str, set[str]]:
     decoded_record = {}
     for field_name, field_items in record.items():
         non_empty_items = filter(bool, field_items)
-        decoded_items = set(
-            map(bytes.decode, non_empty_items)
-        )  # duplicate values (values, not keys) are removed here
+        decoded_items = set(map(bytes.decode, non_empty_items))
         if decoded_items:
-            decoded_record[field_name] = decoded_items
+            decoded_record[field_name.lower()] = decoded_items
     return decoded_record
 
 
 def parse_ldif(
     file_opener: Callable[[str | bytes], IO], path_or_data: str | bytes
-) -> Generator[tuple[DistinguishedName, dict[str, set[str]]], None, None]:
+) -> Generator[PARSED_RECORD, None, None]:
     with file_opener(path_or_data) as input_file:
         ldif_parser = LDIFParser(input_file=input_file)
         for raw_distinguished_name, record in ldif_parser.parse():
             distinguished_name = DistinguishedName.parse(raw_distinguished_name)
             decoded_record = _decode_record(record=record)
             yield (distinguished_name, decoded_record)
+
+
+def _encode_record(record: dict[str, set[str]]) -> dict[str, list[bytes]]:
+    return {
+        field_name: sorted(item.encode() for item in field_items)
+        for field_name, field_items in record.items()
+    }
+
+
+def ldif_dump(fp: IO, obj: list[PARSED_RECORD]) -> str:
+    ldif_writer = LDIFWriter(output_file=fp)
+    for distinguished_name, record in obj:
+        ldif_writer.unparse(
+            dn=distinguished_name.raw,
+            record=_encode_record(record=record),
+        )
 
 
 class StreamBlock:
@@ -62,7 +85,7 @@ class StreamBlock:
 
 
 def filter_ldif_from_s3_by_property(
-    bucket: str, key: str, filter_terms: list[tuple[str, str]]
+    s3_path, filter_terms: list[tuple[str, str]], s3_client: S3Client
 ) -> memoryview:
     """
     Efficiently streams a file from S3 directly into a bytes memoryview,
@@ -75,7 +98,7 @@ def filter_ldif_from_s3_by_property(
 
     stream_block = StreamBlock(filter_terms)
 
-    with _smart_open(f"s3://{bucket}/{key}", mode="rb") as f:
+    with _smart_open(s3_path, mode="rb", transport_params={"client": s3_client}) as f:
         for line in f.readlines():
             line_is_empty = line.strip() == EMPTY_BYTESTRING
             if line_is_empty and stream_block:
