@@ -32,7 +32,7 @@ class Question(BaseModel, Generic[T]):
     @validator("answer_type")
     def validate_question_type(cls, answer_type):
         if answer_type not in ALLOWED_QUESTION_TYPES:
-            raise ValueError
+            raise ValueError(f"Answer type {answer_type} is not allowed.")
         return answer_type
 
 
@@ -71,7 +71,7 @@ class Questionnaire(BaseModel):
             isinstance(choice, answer_type) for choice in choices
         ):
             raise ValueError(
-                f"Choices must be of the same type as the question type: {answer_type}"
+                f"Choices must be of the same type as the question type: {answer_type}."
             )
 
         question = Question(
