@@ -18,17 +18,19 @@ TYPE_MAPPING = {
 }
 
 
-@when("I create a Questionnaire with the following attributes")
+@when("the user creates a Questionnaire with the following attributes")
 def when_create_questionnaire(context: Context):
     for row in context.table:
-        questionnaire_name = row["name"]
-        questionnaire_version = int(row["version"])
+        try:
+            questionnaire_name = row["name"]
+            questionnaire_version = int(row["version"])
+            q = Questionnaire(name=questionnaire_name, version=questionnaire_version)
+            context.questionnaires[(questionnaire_name, questionnaire_version)] = q
+        except (ValidationError, ValueError) as e:
+            context.error = e
 
-        q = Questionnaire(name=questionnaire_name, version=questionnaire_version)
-        context.questionnaires[(questionnaire_name, questionnaire_version)] = q
 
-
-@then("a questionnaire with the following attributes is created")
+@then("the result is a Questionnaire with the following attributes")
 def then_result_is_questionnaire_with(context: Context):
     for row in context.table:
         expected_name = row["expected_name"]
@@ -48,20 +50,18 @@ def given_questionnaire(context: Context, name: str, version: int):
     context.questionnaires[(name, version)] = q
 
 
-@when("I add the following questions to Questionnaire {name} version {version}")
+@when("the user adds the following Questions to Questionnaire {name} version {version}")
 def step_impl(context: Context, name, version):
     subject = context.questionnaires[(name, version)]
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
-        multiple = row["multiple"].lower() == "true"
-
-        # Convert the string to the corresponding Python type
-        answer_type = TYPE_MAPPING.get(answer_type_str.lower())
-
-        subject.add_question(
-            name=question_name, answer_type=answer_type, multiple=multiple
-        )
+        try:
+            answer_type = TYPE_MAPPING.get(answer_type_str.lower())
+            subject.add_question(name=question_name, answer_type=answer_type)
+            q = context.questionnaires[(name, version)]
+        except (ValidationError, ValueError, DuplicateError) as e:
+            context.error = e
 
 
 @then("Questionnaire {name} version {version} has the questions")
@@ -72,7 +72,6 @@ def step_impl(context: Context, name, version):
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
-        multiple = row["multiple"].lower() == "true"
 
         # Convert the string to the corresponding Python type
         answer_type = TYPE_MAPPING.get(answer_type_str.lower())
@@ -80,7 +79,6 @@ def step_impl(context: Context, name, version):
         q = subject.questions[question_name]
         assert q is not None
         assert q.answer_type == answer_type
-        assert q.multiple == multiple
 
         ix = ix + 1
     assert len(subject.questions) == ix
@@ -92,12 +90,11 @@ def given_questionnaire(context: Context, name: str, version: int):
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
-        multiple = row["multiple"].lower() == "true"
 
         # Convert the string to the corresponding Python type
         answer_type = TYPE_MAPPING.get(answer_type_str.lower())
 
-        q.add_question(name=question_name, answer_type=answer_type, multiple=multiple)
+        q.add_question(name=question_name, answer_type=answer_type)
     context.questionnaires[(name, version)] = q
 
 
@@ -106,28 +103,29 @@ def given_questionnaire(context: Context, name: str, version: int):
 )
 def when_questionnaire_responses_provided(context: Context, name: str, version: int):
     context.questionnaire_response = []
-    # questionnaire_name = name
-    # questionnaire_version = version
     for row in context.table:
         question_name = row["question"]
         answer = row["answer"]
-        question_type = (
-            context.questionnaires[(name, version)].questions[question_name].answer_type
-        )
+        answer_type = row["answer_type"]
 
-        if question_type == str:
+        if answer_type == "str":
             answer = str(answer)
-        elif question_type == int:
+        elif answer_type == "int":
             answer = int(answer)
-        elif question_type == bool:
-            answer = bool(answer)
-        elif question_type == datetime:
+        elif answer_type == "bool":
+            if answer.lower() == "true" or answer.lower() == "false":
+                answer = bool(answer)
+            else:
+                raise ValidationError(
+                    f"answer type for question '{question_name}' must be bool"
+                )
+        elif answer_type == "datetime":
             answer = datetime.strptime(answer, "%Y-%m-%d %H:%M:%S")
-        elif question_type == float:
+        elif answer_type == "float":
             answer = float(answer)
-        elif question_type == date:
+        elif answer_type == "date":
             answer = datetime.strptime(answer, "%Y-%m-%d").date()
-        elif question_type == time:
+        elif answer_type == "time":
             answer = datetime.strptime(answer, "%H:%M:%S").time()
 
         context.questionnaire_response.append((question_name, [answer]))
@@ -135,107 +133,11 @@ def when_questionnaire_responses_provided(context: Context, name: str, version: 
     assert len(context.questionnaire_response) != 0
 
 
-@then(
-    "the questionnaire responses are validated successfully against Questionnaire {name} version {version}"
-)
+@when("the responses are validated against Questionnaire {name} version {version}")
 def validate_responses(context: Context, name: str, version: int):
     questionnaire_answered = context.questionnaires[(name, version)]
     responses = context.questionnaire_response
-
-    QuestionnaireResponse(questionnaire=questionnaire_answered, responses=responses)
-    # Assert anything?
-
-
-@when("I try to create a Questionnaire without a name attribute")
-def when_try_to_create_questionnaire_missing_name(context: Context):
-    try:
-        for row in context.table:
-            questionnaire_version = int(row["version"])
-
-            q = Questionnaire(version=questionnaire_version)
-    except ValidationError as e:
-        context.error = str(e)
-
-
-@then("the result for missing name is error ValidationError")
-def then_result_is_error(context: Context):
-    assert context.error is not None
-    assert "validation error" in context.error.lower()
-    assert "name" in context.error.lower()
-    assert "field required" in context.error.lower()
-
-
-@when("I try to create a Questionnaire without a version attribute")
-def when_try_to_create_questionnaire(context: Context):
-    try:
-        for row in context.table:
-            questionnaire_name = row["name"]
-
-            q = Questionnaire(name=questionnaire_name)
-    except ValidationError as e:
-        context.error = str(e)
-
-
-@then("the result for missing version is error ValidationError")
-def then_result_is_error(context: Context):
-    assert context.error is not None
-    assert "validation error" in context.error.lower()
-    assert "version" in context.error.lower()
-    assert "field required" in context.error.lower()
-
-
-@when("I try to add an invalid question to Questionnaire {name} version {version}")
-def add_invalid_question(context: Context, name: str, version: int):
-    q = context.questionnaires[(name, version)]
-
-    try:
-        q.add_question()
-    except TypeError as e:
-        context.error = str(e)
-
-
-@then("the result is TypeError for missing question name")
-def then_result_is_error(context: Context):
-    assert context.error is not None
-    assert "missing 1 required positional argument: 'name'" in context.error.lower()
-
-
-@then(
-    "the questionnaire responses fail validation against the Questionnaire {name} version {version}"
-)
-def validate_responses(context: Context, name: str, version: int):
-    questionnaire_answered = context.questionnaires[(name, version)]
-    responses = context.questionnaire_response
-
     try:
         QuestionnaireResponse(questionnaire=questionnaire_answered, responses=responses)
-    except ValidationError as e:
-        context.error = str(e)
-
-
-@when(
-    "I try to add the following duplicate questions to Questionnaire {name} version {version}"
-)
-def step_impl(context: Context, name, version):
-    subject = context.questionnaires[(name, version)]
-    for row in context.table:
-        question_name = row["name"]
-        answer_type_str = row["type"]
-        multiple = row["multiple"].lower() == "true"
-
-        # Convert the string to the corresponding Python type
-        answer_type = TYPE_MAPPING.get(answer_type_str.lower())
-
-        try:
-            subject.add_question(
-                name=question_name, answer_type=answer_type, multiple=multiple
-            )
-        except DuplicateError as e:
-            context.error = str(e)
-
-
-@then("the result for duplicate questions is error DuplicateError")
-def then_result_is_error(context: Context):
-    assert context.error is not None
-    assert "question" in context.error.lower()
-    assert "already exists" in context.error.lower()
+    except (ValidationError, ValueError) as e:
+        context.error = e

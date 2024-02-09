@@ -23,7 +23,7 @@ class Question(BaseModel, Generic[T]):
 
         arbitrary_types_allowed = True
 
-    name: str
+    name: str = Field(regex=ENTITY_NAME_REGEX)
     answer_type: T
     multiple: bool
     validation_rules: set[FunctionType] = None

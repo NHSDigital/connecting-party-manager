@@ -62,6 +62,7 @@ EXPECTED_TYPES = {
     "DeviceKeyAddedEvent": DeviceKeyAddedEvent,
     "ValidationError": ValidationError,
     "DuplicateError": DuplicateError,
+    "ValueError": ValueError,
 }
 
 

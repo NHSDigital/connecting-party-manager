@@ -1,41 +1,56 @@
 Feature: Success Scenarios
 
   Scenario: Create new questionnaire
-    When I create a Questionnaire with the following attributes
+    When the user creates a Questionnaire with the following attributes
       | name                   | version |
       | example_questionnaire  | 1       |
       | example_questionnaire2 | 1       |
-    Then a questionnaire with the following attributes is created
+    Then the operation is successful
+    And the result is a questionnaire with the following attributes
       | expected_name          | expected_version |
       | example_questionnaire  | 1                |
       | example_questionnaire2 | 1                |
 
   Scenario: Add questions to a questionnaire
     Given Questionnaire "example_questionnaire" version 1
-    When I add the following questions to Questionnaire "example_questionnaire" version 1
-      | name         | type | multiple |
-      | given_name   | str  | False    |
-      | middle_names | str  | True     |
-      | family_name  | str  | False    |
-      | age          | int  | False    |
-    Then Questionnaire "example_questionnaire" version 1 has the questions
-      | name         | type | multiple |
-      | given_name   | str  | False    |
-      | middle_names | str  | True     |
-      | family_name  | str  | False    |
-      | age          | int  | False    |
+    When the user adds the following questions to Questionnaire "example_questionnaire" version 1
+      | name      | type     |
+      | string    | str      |
+      | integer   | int      |
+      | boolean   | bool     |
+      | date-time | datetime |
+      | float     | float    |
+      | date      | date     |
+      | time      | time     |
+    Then the operation is successful
+    And Questionnaire "example_questionnaire" version 1 has the questions
+      | name      | type     |
+      | string    | str      |
+      | integer   | int      |
+      | boolean   | bool     |
+      | date-time | datetime |
+      | float     | float    |
+      | date      | date     |
+      | time      | time     |
 
   Scenario: Successfully validate questionnaire responses
-    Given the following questions in Questionnaire "contact details" version 1
-      | name         | type | multiple |
-      | given_name   | str  | False    |
-      | middle_names | str  | True     |
-      | family_name  | str  | False    |
-      | age          | int  | False    |
-    When the following questionnaire responses are provided to Questionnaire "contact details" version 1
-      | question     | answer |
-      | given_name   | "Jane" |
-      | middle_names | ""     |
-      | family_name  | "Doe"  |
-      | age          | 22     |
-    Then the questionnaire responses are validated successfully against Questionnaire "contact details" version 1
+    Given the following questions in Questionnaire "example_questionnaire" version 1
+      | name      | type     |
+      | string    | str      |
+      | integer   | int      |
+      | boolean   | bool     |
+      | date-time | datetime |
+      | float     | float    |
+      | date      | date     |
+      | time      | time     |
+    When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
+      | question  | answer              | answer_type |
+      | string    | alpha               | str         |
+      | integer   | 27                  | int         |
+      | boolean   | True                | bool        |
+      | date-time | 2024-02-05 14:30:00 | datetime    |
+      | float     | 2.22                | float       |
+      | date      | 2024-02-05          | date        |
+      | time      | 14:30:00            | time        |
+    And the responses are validated against Questionnaire "example_questionnaire" version 1
+    Then the operation is successful
