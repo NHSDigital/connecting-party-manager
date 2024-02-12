@@ -59,7 +59,6 @@ def step_impl(context: Context, name, version):
         try:
             answer_type = TYPE_MAPPING.get(answer_type_str.lower())
             subject.add_question(name=question_name, answer_type=answer_type)
-            q = context.questionnaires[(name, version)]
         except (ValidationError, ValueError, DuplicateError) as e:
             context.error = e
 
@@ -87,13 +86,13 @@ def step_impl(context: Context, name, version):
 @given("the following questions in Questionnaire {name} version {version}")
 def given_questionnaire(context: Context, name: str, version: int):
     q = Questionnaire(name=name, version=version)
+
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
 
         # Convert the string to the corresponding Python type
         answer_type = TYPE_MAPPING.get(answer_type_str.lower())
-
         q.add_question(name=question_name, answer_type=answer_type)
     context.questionnaires[(name, version)] = q
 

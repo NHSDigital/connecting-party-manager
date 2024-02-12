@@ -36,7 +36,7 @@ Feature: Failure Scenarios
     Then the operation is not successful
     And the error is ValidationError
 
-  Scenario: Invalid questionnaire response provided
+  Scenario: Invalid questionnaire response provided - answer types invalid
     Given the following questions in Questionnaire "example_questionnaire" version 1
       | name      | type     |
       | string    | str      |
@@ -55,6 +55,26 @@ Feature: Failure Scenarios
       | float     | True     | bool        |
       | date      | 14:30:00 | time        |
       | time      | gamma    | str         |
+    And the responses are validated against Questionnaire "example_questionnaire" version 1
+    Then the operation is not successful
+    And the error is ValidationError
+
+  Scenario: Invalid questionnaire response provided - questions answered that are not in questionnaire
+    Given the following questions in Questionnaire "example_questionnaire" version 1
+      | name      | type     |
+      | string    | str      |
+      | integer   | int      |
+      | boolean   | bool     |
+      | date-time | datetime |
+      | float     | float    |
+      | date      | date     |
+      | time      | time     |
+    When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
+      | question | answer | answer_type |
+      | string   | alpha  | str         |
+      | integer  | 27     | int         |
+      | boolean  | True   | bool        |
+      | name     | name   | str         |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is not successful
     And the error is ValidationError

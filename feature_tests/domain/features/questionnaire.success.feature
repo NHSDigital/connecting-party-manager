@@ -54,3 +54,15 @@ Feature: Success Scenarios
       | time      | 14:30:00            | time        |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is successful
+
+  Scenario: Successfully validate questionnaire response that does not answer all the questions in the questionnaire
+    Given the following questions in Questionnaire "example_questionnaire" version 1
+      | name    | type |
+      | string  | str  |
+      | integer | int  |
+      | boolean | bool |
+    When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
+      | question | answer | answer_type |
+      | string   | alpha  | str         |
+    And the responses are validated against Questionnaire "example_questionnaire" version 1
+    Then the operation is successful
