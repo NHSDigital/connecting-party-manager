@@ -243,6 +243,19 @@
         "states:TagResource"
       ],
       "Resource": ["arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*"]
+    },
+    {
+      "Sid": "Route53Permissions",
+      "Effect": "Allow",
+      "Action": [
+        "route53:CreateHostedZone",
+        "route53:GetChange",
+        "route53:GetHostedZone",
+        "route53:ListTagsForResource",
+        "route53:DeleteHostedZone",
+        "route53:ChangeTagsForResource"
+      ],
+      "Resource": ["*"]
     }
   ]
 }

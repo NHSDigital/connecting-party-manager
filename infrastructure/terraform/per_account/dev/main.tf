@@ -44,3 +44,9 @@ module "bucket" {
     Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--test-data"
   }
 }
+
+# -------- ROUTE 53 ---------
+
+resource "aws_route53_zone" "dev-ns" {
+  name = "api.cpm.dev.national.nhs.uk"
+}

@@ -31,3 +31,9 @@ module "iam__api-gateway-to-cloudwatch" {
   source  = "../modules/iam__api-gateway-to-cloudwatch"
   project = local.project
 }
+
+# -------- ROUTE 53 ---------
+
+resource "aws_route53_zone" "qa-ns" {
+  name = "api.cpm.qa.national.nhs.uk"
+}
