@@ -211,3 +211,19 @@ Lambda permissions are able to be set individually, To do this,
 - In here create a `json` file named after the aws resource type that you wish to create permissions for. For example if you wanted to add permissions to access s3 buckets then you would add a file called `s3.json`
 - In this file add a list of permissions for s3 access. e.g. `["s3:ListBucket", "s3:GetObject"]`
 - Finally in `infrastructure/terraform/per_workspace/locals.tf` there is a mapping `permission_resource_map`. Add the mapping to the resources that these permissions need access to. e.g.`s3 = "${module.s3.s3_arn}"`
+
+## Terraform
+
+If you find yourself with a locked terraform state, do:
+
+```
+make terraform--unlock TERRAFORM_ARGS=<lock_id>
+```
+
+## ETL
+
+Before running the bulk trigger, you need to clear the initial ETL state, do:
+
+```
+make etl--clear-state
+```

@@ -1,18 +1,15 @@
 import json
-from datetime import datetime as dt
-from functools import cache
 
 import boto3
 import pytest
 from etl_utils.constants import WorkerKey
+from etl_utils.trigger.model import StateMachineInput
 from event.json import json_loads
 from mypy_boto3_stepfunctions.type_defs import StartSyncExecutionOutputTypeDef
 
 from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
 from test_helpers.terraform import read_terraform_output
 
-NAME_SEPARATOR = "."
-BAD_CHARACTERS = [" ", ":"]
 GOOD_SDS_RECORD_AS_JSON = {
     "description": None,
     "distinguished_name": {
@@ -42,7 +39,7 @@ GOOD_SDS_RECORD_AS_JSON = {
 
 @pytest.fixture
 def state_machine_input(request: pytest.FixtureRequest):
-    execute_state_machine(**request.param)
+    execute_state_machine(state_machine_input=request.param)
     return request.param
 
 
@@ -55,24 +52,16 @@ def worker_data(request: pytest.FixtureRequest):
         client.put_object(Bucket=etl_bucket, Key=key, Body=data)
 
 
-def _execution_name(state_machine_input):
-    params = NAME_SEPARATOR.join(map(str, state_machine_input.values()))
-    date_str = str(dt.now())
-    name = f"{params}{NAME_SEPARATOR}{date_str}"
-    for char in BAD_CHARACTERS:
-        name = name.replace(char, NAME_SEPARATOR)
-    return name
-
-
-@cache
-def execute_state_machine(**state_machine_input) -> StartSyncExecutionOutputTypeDef:
+def execute_state_machine(
+    state_machine_input: StateMachineInput,
+) -> StartSyncExecutionOutputTypeDef:
     client = boto3.client("stepfunctions")
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
-    name = _execution_name(state_machine_input)
+    name = state_machine_input.name
     response = client.start_sync_execution(
         stateMachineArn=state_machine_arn,
         name=name,
-        input=json.dumps(state_machine_input),
+        input=json.dumps(state_machine_input.dict()),
     )
     if response["status"] != "SUCCEEDED":
         cause = json_loads(response["cause"])
@@ -111,20 +100,14 @@ def get_object(key: WorkerKey) -> str:
 @pytest.mark.parametrize(
     "state_machine_input",
     [
-        {
-            "init": "extract",
-            "changelog-number": 123,
-        },
-        {
-            "init": "extract",
-            "changelog-number": "abc",
-        },
+        StateMachineInput.changelog("123"),
+        StateMachineInput.changelog("abc"),
     ],
     indirect=True,
 )
-def test_changelog_number_update(worker_data, state_machine_input):
+def test_changelog_number_update(worker_data, state_machine_input: StateMachineInput):
     changelog_number_from_s3 = get_changelog_number_from_s3()
-    assert changelog_number_from_s3 == state_machine_input["changelog-number"]
+    assert changelog_number_from_s3 == state_machine_input.changelog_number
 
 
 @pytest.mark.integration
@@ -141,7 +124,9 @@ def test_changelog_number_update(worker_data, state_machine_input):
 )
 @pytest.mark.parametrize(
     "state_machine_input",
-    [{"init": "extract", "changelog-number": 345}],
+    [
+        StateMachineInput.bulk(),
+    ],
     indirect=True,
 )
 def test_extract_worker(worker_data, state_machine_input):

@@ -1,12 +1,12 @@
 from types import FunctionType
 
 import pytest
+from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.models import Event, VersionHeader
+from api_utils.versioning.steps import versioning_steps
 from domain.logging.step_decorators import logging_step_decorators
 from event.logging.logger import setup_logger
 from event.step_chain import StepChain
-from event.versioning.constants import VERSIONING_STEP_ARGS
-from event.versioning.models import Event, VersionHeader
-from event.versioning.steps import versioning_steps
 from nhs_context_logging.fixtures import (  # noqa: F401
     log_capture_fixture as log_capture,
 )

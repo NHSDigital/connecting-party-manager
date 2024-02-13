@@ -1,14 +1,14 @@
 from types import ModuleType
 
-from domain.logging.step_decorators import logging_step_decorators
-from domain.response.steps import response_steps
-from event.step_chain import StepChain
-from event.versioning.constants import VERSIONING_STEP_ARGS
-from event.versioning.steps import (
+from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.steps import (
     get_largest_possible_version,
     get_steps_for_requested_version,
     versioning_steps,
 )
+from domain.logging.step_decorators import logging_step_decorators
+from domain.response.steps import response_steps
+from event.step_chain import StepChain
 
 STEP_DECORATORS = [*logging_step_decorators]
 

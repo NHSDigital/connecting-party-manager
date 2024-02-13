@@ -12,7 +12,7 @@ from etl_utils.worker.steps import (
 )
 from event.json import json_loads
 from event.step_chain import StepChain
-from moto import mock_s3
+from moto import mock_aws
 
 
 class MyException(Exception):
@@ -68,7 +68,7 @@ def test_save_unprocessed_records():
         s3_output_path=S3_OUTPUT_PATH,
     )
 
-    with mock_s3(), mock.patch.dict(
+    with mock_aws(), mock.patch.dict(
         os.environ, {"AWS_DEFAULT_REGION": "us-east-1"}, clear=True
     ):
         s3_client = boto3.client("s3")
@@ -99,7 +99,7 @@ def test_save_processed_records():
         s3_output_path=S3_OUTPUT_PATH,
     )
 
-    with mock_s3(), mock.patch.dict(
+    with mock_aws(), mock.patch.dict(
         os.environ, {"AWS_DEFAULT_REGION": "us-east-1"}, clear=True
     ):
         s3_client = boto3.client("s3")

@@ -1,5 +1,7 @@
 from enum import StrEnum
 
+CHANGELOG_NUMBER = "changelog-number"
+
 
 class WorkerKey(StrEnum):
     EXTRACT = "input--extract/unprocessed"

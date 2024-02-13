@@ -9,3 +9,7 @@ output "bucket" {
 output "changelog_key" {
   value = var.changelog_key
 }
+
+output "bulk_trigger_prefix" {
+  value = local.bulk_trigger_prefix
+}

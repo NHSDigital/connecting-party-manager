@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from event.environment import BaseEnvironment
 
@@ -27,5 +27,5 @@ class WorkerActionResponse:
     unprocessed_records: list[dict]
     processed_records: list[dict]
     s3_input_path: str
-    s3_output_path: str
     exception: Exception | None
+    s3_output_path: str | None = field(default=None)

@@ -139,3 +139,35 @@ module "step_function" {
     Name = "${var.workspace_prefix}--${local.etl_name}"
   }
 }
+
+
+module "trigger_bulk" {
+  source = "./trigger/"
+
+  trigger_name          = "bulk"
+  etl_name              = local.etl_name
+  assume_account        = var.assume_account
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_layer_arn
+  etl_bucket_arn        = module.bucket.s3_bucket_arn
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  notify_lambda_arn     = module.notify.arn
+  state_machine_arn     = module.step_function.state_machine_arn
+  allowed_triggers = {
+    "${replace(var.workspace_prefix, "_", "-")}--AllowExecutionFromS3--${local.etl_name}--bulk" = {
+      service    = "s3"
+      source_arn = "${module.bucket.s3_bucket_arn}/${local.bulk_trigger_prefix}/*"
+    }
+  }
+}
+
+
+module "bulk_trigger_notification" {
+  source        = "../bucket_notification"
+  target_lambda = module.trigger_bulk.lambda_function
+  source_bucket = module.bucket
+  filter_prefix = "${local.bulk_trigger_prefix}/"
+  filter_suffix = ".ldif"
+}

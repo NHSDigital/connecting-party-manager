@@ -7,7 +7,7 @@ from unittest import mock
 import pytest
 from etl_utils.constants import WorkerKey
 from event.json import json_loads
-from moto import mock_s3
+from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
 LDIF_RECORD_DELIMITER = "\n\n"
@@ -51,7 +51,7 @@ PROCESSED_SDS_RECORD = {}  # Empty dict as a dummy value, doesn't matter for ext
 
 @pytest.fixture(scope="session")
 def mock_s3_client():
-    with mock_s3(), mock.patch.dict(
+    with mock_aws(), mock.patch.dict(
         os.environ,
         {"ETL_BUCKET": BUCKET_NAME, "AWS_DEFAULT_REGION": "us-east-1"},
         clear=True,

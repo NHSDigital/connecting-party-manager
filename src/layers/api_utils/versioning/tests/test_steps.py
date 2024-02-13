@@ -1,12 +1,15 @@
 from pathlib import Path
 
 import pytest
+from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.errors import VersionException
+from api_utils.versioning.models import Event
+from api_utils.versioning.steps import (
+    get_largest_possible_version,
+    get_requested_version,
+)
 from event.step_chain import StepChain
 from event.step_chain.tests.utils import step_data
-from event.versioning.constants import VERSIONING_STEP_ARGS
-from event.versioning.errors import VersionException
-from event.versioning.models import Event
-from event.versioning.steps import get_largest_possible_version, get_requested_version
 from hypothesis import given
 from hypothesis.strategies import builds, dictionaries, none, text
 from pydantic import ValidationError

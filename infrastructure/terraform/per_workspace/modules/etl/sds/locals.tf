@@ -1,3 +1,4 @@
 locals {
-  etl_name = "sds"
+  etl_name            = "sds"
+  bulk_trigger_prefix = "bulk-trigger"
 }

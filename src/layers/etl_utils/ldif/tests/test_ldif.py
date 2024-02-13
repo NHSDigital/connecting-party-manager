@@ -10,7 +10,7 @@ from etl_utils.ldif.ldif import (
     ldif_dump,
     parse_ldif,
 )
-from moto import mock_s3
+from moto import mock_aws
 from pytest_lazyfixture import lazy_fixture
 
 # Lifted from https://ldap.com/ldif-the-ldap-data-interchange-format/
@@ -174,7 +174,7 @@ def test_ldif_dump():
     "etl_utils.ldif.ldif._smart_open", return_value=BytesIO(SAMPLE_LDIF_DATA.encode())
 )
 def test_filter_ldif_from_s3_by_property(mocked_open):
-    with mock_s3():
+    with mock_aws():
         s3_client = boto3.client("s3")
         filtered_ldif = filter_ldif_from_s3_by_property(
             s3_client=s3_client,

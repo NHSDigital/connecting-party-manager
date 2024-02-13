@@ -4,7 +4,7 @@ from types import FunctionType
 from unittest import mock
 
 import pytest
-from event.versioning.constants import VERSION_RE
+from api_utils.versioning.constants import VERSION_RE
 
 from test_helpers.constants import PROJECT_ROOT
 
@@ -61,10 +61,10 @@ def test_no_zombie_versions(api: Path):
 def test_zombie_versions():
     index_file_path = Path(__file__).parent / "example_api" / "index.py"
     api_index_module_path = _module_path_from_file_path(
-        index_file_path, api_root_dirname="event"
+        index_file_path, api_root_dirname="api_utils"
     )
     api_index = import_module(api_index_module_path)
     versioned_steps = get_steps_by_version(
-        index_file_path=index_file_path, api_root_dirname="event"
+        index_file_path=index_file_path, api_root_dirname="api_utils"
     )
     assert api_index.versioned_steps != versioned_steps
