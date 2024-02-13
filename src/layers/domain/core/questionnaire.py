@@ -1,32 +1,39 @@
-from datetime import datetime
-from enum import Enum
-from uuid import UUID
+from datetime import date, datetime, time
+from types import FunctionType
+from typing import Generic, Type, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
-from .error import DuplicateError
+from .error import DuplicateError, InvalidResponseError
 from .validation import ENTITY_NAME_REGEX
 
-
-class QuestionType(Enum):
-    """
-    The data type of the question
-    """
-
-    STRING = str
-    INT = int
-    BOOL = bool
-    DATE_TIME = datetime
+T = TypeVar("T")
+ALLOWED_QUESTION_TYPES = {str, int, bool, datetime, float, date, time}
 
 
-class Question(BaseModel):
+class Question(BaseModel, Generic[T]):
     """
     A single Questionnaire Question
     """
 
-    name: str
-    type: QuestionType
+    class Config:
+        """
+        Validation rules are not pydantic classes
+        """
+
+        arbitrary_types_allowed = True
+
+    name: str = Field(regex=ENTITY_NAME_REGEX)
+    answer_type: T
     multiple: bool
+    validation_rules: set[FunctionType] = None
+    choices: set[T] = None
+
+    @validator("answer_type")
+    def validate_question_type(cls, answer_type):
+        if answer_type not in ALLOWED_QUESTION_TYPES:
+            raise ValueError(f"Answer type {answer_type} is not allowed.")
+        return answer_type
 
 
 class Questionnaire(BaseModel):
@@ -34,42 +41,106 @@ class Questionnaire(BaseModel):
     A Questionnaire represents a collection of Questions, in a specific order.
     """
 
-    id: UUID
     name: str = Field(regex=ENTITY_NAME_REGEX)
-    _questions: list[Question] = (lambda: [])()
+    version: int
+    questions: dict[str, Question] = Field(default_factory=dict)
 
     def __contains__(self, question_name: str) -> bool:
         """
         Returns true if the question specified exists within the questionnaire
         """
-        return question_name in (q.name for q in self._questions)
+
+        return question_name in self.questions
 
     def add_question(
         self,
         name: str,
-        type: QuestionType = QuestionType.STRING,
+        answer_type: Type = str,
         multiple: bool = False,
+        validation_rules: set[FunctionType] = None,
+        choices: set[T] = None,
     ):
         """
-        Adds a new question to the questionnaire.  Once a questionnaire is
-        locked this method will throw an error.
+        Adds a new question to the questionnaire.
         """
-        if name in self:
-            raise DuplicateError(f"Question exists: {name}")
-        result = Question(name=name, type=type, multiple=multiple)
-        self._questions.append(result)
-        return result
+        if name in self.questions:
+            raise DuplicateError(f"Question '{name}' already exists.")
 
-    def remove_question(self, name: str):
-        """
-        Removes a question from the questionnaire.  Once a questionnaire is
-        locked this method will throw an error.
-        """
-        raise NotImplementedError()
+        # Validate choices are of the same type as the question type
+        if choices is not None and not all(
+            isinstance(choice, answer_type) for choice in choices
+        ):
+            raise ValueError(
+                f"Choices must be of the same type as the question type: {answer_type}."
+            )
 
-    def revise(self) -> "Questionnaire":
-        """
-        Creates an exact duplicate of the questionnaire, which is the only way
-        to edit questionnaires once they become locked.
-        """
-        raise NotImplementedError()
+        question = Question(
+            name=name,
+            answer_type=answer_type,
+            multiple=multiple,
+            validation_rules=validation_rules,
+            choices=choices,
+        )
+
+        self.questions[name] = question
+        return question
+
+
+class QuestionnaireResponse(BaseModel):
+    """
+    Validates questionnaire responses against questionnaire questions
+    """
+
+    questionnaire: Questionnaire
+    responses: list[tuple[str, list]]
+
+    @validator("responses", each_item=True)
+    def validate_responses(
+        response: tuple[str, list], values: dict[str, Questionnaire]
+    ):
+        questionnaire = values.get("questionnaire")
+        question_name, answers = response
+        if questionnaire is not None:
+            questionnaire_name = questionnaire.name
+            question = questionnaire.questions.get(question_name)
+            if question is None:
+                raise InvalidResponseError(
+                    f"Unexpected answer for the question '{question_name}'. The questionnaire '{questionnaire_name}' does not contain this question."
+                )
+            validate_response_against_question(question=question, answers=answers)
+        return response
+
+
+def validate_response_against_question(answers: list, question: Question):
+    if not question.multiple and len(answers) > 1:
+        raise InvalidResponseError(
+            f"Question '{question.name}' does not allow multiple responses. Response given: {answers}."
+        )
+
+    errors = (
+        []
+    )  # accumulate errors here for multianswer question and raise under a single ValueError
+    for answer in answers:
+        if not isinstance(answer, question.answer_type):
+            errors.append(
+                f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
+            )
+
+        if question.validation_rules is not None:
+            for validation_rule in question.validation_rules:
+                try:
+                    validation_rule(answer)
+                except ValueError as e:
+                    errors.append(
+                        f"Question '{question.name}' rule '{validation_rule.__name__}' failed validation for response '{answer}' with error: {e}."
+                    )
+
+        if question.choices and answer not in question.choices:
+            errors.append(
+                f"Question '{question.name}' expects choices {question.choices}. Response given: {answer}."
+            )
+
+    if errors:
+        raise InvalidResponseError("\n".join(errors))
+
+    return answers

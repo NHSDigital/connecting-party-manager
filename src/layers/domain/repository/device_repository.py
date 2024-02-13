@@ -38,7 +38,7 @@ class DeviceRepository(Repository[Device]):
         return TransactionItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=sk, **asdict(event)),
+                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=sk, **asdict(event)),
                 ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
             )
         )

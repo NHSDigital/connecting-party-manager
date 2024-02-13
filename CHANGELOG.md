@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-02-06
+- [PI-187] Questionnaire response validation logic
+
 ## 2024-01-26
 - [PI-200] Parsing LDIF files
 - [PI-122] Proxygen in the CI

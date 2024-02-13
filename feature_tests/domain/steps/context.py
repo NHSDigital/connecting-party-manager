@@ -12,6 +12,7 @@ from domain.events.event import Event
 class Context(BehaveContext):
     # Extra domain specific fields
     questionnaires: dict[str, Questionnaire]
+    questionnaire_response: list[tuple[str, list]]
     ods_organisations: dict[str, OdsOrganisation]
     product_teams: dict[str, ProductTeam]
     events: list[Event]
