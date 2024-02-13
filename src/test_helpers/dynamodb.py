@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from typing import Generator
 
 from event.aws.client import dynamodb_client
-from moto import mock_dynamodb
+from moto import mock_aws
 
 CHUNK_SIZE = 25
 
@@ -89,7 +89,7 @@ def patch_dynamodb_client():
 
 @contextmanager
 def mock_table(table_name: str):
-    with mock_dynamodb():
+    with mock_aws():
         with patch_dynamodb_client() as client:
             client.create_table(
                 TableName=table_name,
