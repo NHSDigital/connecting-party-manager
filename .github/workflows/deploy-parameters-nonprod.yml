@@ -22,3 +22,5 @@ jobs:
       workspace: ${{ inputs.account }}
       scope: "per_account/${{ inputs.account }}/parameters"
     secrets: inherit # pragma: allowlist secret
+
+run-name: Deploying parameters to nonprod workspace - ${{ inputs.account }}
