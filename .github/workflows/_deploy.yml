@@ -109,6 +109,7 @@ jobs:
 
   terraform--apply:
     needs: [get-branch-from-workflow-file, terraform--plan]
+    environment: ${{ inputs.account }}
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v4

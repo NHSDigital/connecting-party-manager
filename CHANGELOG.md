@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-02-13
+- [PI-45] DNS
+- [PI-221] Sonarcloud security hotspot fixes
+
 ## 2024-02-06
 - [PI-187] Questionnaire response validation logic
 

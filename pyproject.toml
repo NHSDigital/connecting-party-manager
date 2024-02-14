@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.02.06"
+version = "2024.02.13"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -36,7 +36,7 @@ pytest-mock = "^3.12.0"
 datamodel-code-generator = "^0.25.1"
 pyyaml = "^6.0.1"
 proxygen-cli = "^2.1.1"
-moto = "^4.2.9"
+moto = "^5.0.1"
 urllib3 = "<2"
 boto3-stubs = {extras = ["dynamodb", "lambda", "s3", "secretsmanager", "stepfunctions"], version = "^1.34.19"}
 pytest-lazy-fixture = "^0.6.3"
