@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-02-15
+- [PI-229] Github Actions workflow run names
+- [PI-201] ETL: Extract worker
+- [PI-204] ETL: Bulk trigger
+
 ## 2024-02-13
 - [PI-45] DNS
 - [PI-221] Sonarcloud security hotspot fixes
