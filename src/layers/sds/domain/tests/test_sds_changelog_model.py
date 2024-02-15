@@ -4,7 +4,7 @@ import pytest
 from etl_utils.ldif.ldif import parse_ldif
 from etl_utils.ldif.model import DistinguishedName
 from sds.domain.changelog import ChangelogRecord
-from sds.domain.parse import _parse_sds_record
+from sds.domain.parse import parse_sds_record
 
 
 # all files listed here get downloaded to the paths listed in 'test_data_paths'
@@ -69,7 +69,7 @@ def test_changelog_changes_are_valid_ldif(test_data_paths):
 
     # Check that the change is a valid SDS record
     ((nested_distinguished_name, nested_record),) = nested_ldif_lines
-    sds_record = _parse_sds_record(
+    sds_record = parse_sds_record(
         distinguished_name=nested_distinguished_name, record=nested_record
     )
     assert sds_record.dict() == {

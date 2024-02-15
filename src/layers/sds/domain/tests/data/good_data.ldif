@@ -1,0 +1,53 @@
+dn: uniqueIdentifier=000428682512,ou=Services,o=nhs
+objectClass: nhsAS
+objectClass: top
+nhsApproverURP: uniqueIdentifier=562983788547,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs
+nhsAsClient: RVL
+nhsAsSvcIA: urn:nhs:names:services:pds:QUPA_IN040000UK01
+nhsDateApproved: 20090601140104
+nhsDateRequested: 20090601135904
+nhsIDCode: RVL
+nhsMhsManufacturerOrg: LSP04
+nhsMHSPartyKey: RVL-806539
+nhsProductKey: 634
+nhsProductName: Cerner Millennium
+nhsProductVersion: 2005.02
+nhsRequestorURP: uniqueIdentifier=977624345541,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs
+nhsTempUid: 9713
+uniqueIdentifier: 000428682512
+
+dn: uniqueIdentifier=000428682512,ou=Services,o=nhs
+objectClass: nhsAS
+objectClass: top
+nhsApproverURP: uniqueIdentifier=562983788547,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs
+nhsAsClient: RVL
+nhsAsSvcIA: urn:nhs:names:services:pds:QUPA_IN040000UK01
+nhsDateApproved: 20090601140104
+nhsDateRequested: 20090601135904
+nhsIDCode: RVL
+nhsMhsManufacturerOrg: LSP04
+nhsMHSPartyKey: RVL-806539
+nhsProductKey: 634
+nhsProductName: Cerner Millennium
+nhsProductVersion: 2005.02
+nhsRequestorURP: uniqueIdentifier=977624345541,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs
+nhsTempUid: 9713
+uniqueIdentifier: 000428682512
+
+dn: uniqueIdentifier=000428682512,ou=Services,o=nhs
+objectClass: nhsAS
+objectClass: top
+nhsApproverURP: uniqueIdentifier=562983788547,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs
+nhsAsClient: RVL
+nhsAsSvcIA: urn:nhs:names:services:pds:QUPA_IN040000UK01
+nhsDateApproved: 20090601140104
+nhsDateRequested: 20090601135904
+nhsIDCode: RVL
+nhsMhsManufacturerOrg: LSP04
+nhsMHSPartyKey: RVL-806539
+nhsProductKey: 634
+nhsProductName: Cerner Millennium
+nhsProductVersion: 2005.02
+nhsRequestorURP: uniqueIdentifier=977624345541,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs
+nhsTempUid: 9713
+uniqueIdentifier: 000428682512

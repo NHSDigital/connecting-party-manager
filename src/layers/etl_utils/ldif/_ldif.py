@@ -6,10 +6,12 @@ The only modifications were (search this file for '**We modified this**'):
     * lowercase all attribute names
 Other than that, unnecessary features were removed.
 """
+
 __version__ = "3.4.4"
 
 import re
-from base64 import b64decode
+from base64 import b64decode, b64encode
+from typing import IO
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -21,6 +23,9 @@ rdn_pattern = (
 )
 dn_pattern = rdn_pattern + r"([ ]*,[ ]*" + rdn_pattern + r")*[ ]*"
 dn_regex = re.compile("^%s$" % dn_pattern)
+
+SAFE_STRING_PATTERN = b"(^(\000|\n|\r| |:|<)|[\000\n\r\200-\377]+|[ ]+$)"  # NOSONAR
+safe_string_re = re.compile(SAFE_STRING_PATTERN)
 
 
 CHANGE_TYPES = ["add", "delete", "modify", "modrdn"]
@@ -56,10 +61,10 @@ class LDIFParser:
 
     def __init__(
         self,
-        input_file,
-        ignored_attr_types=None,
+        input_file: IO,
+        ignored_attr_types: list[str] = None,
         max_entries=0,
-        process_url_schemes=None,
+        process_url_schemes: list[str] = None,
         line_sep="\n",
     ):
         """
@@ -264,4 +269,108 @@ class LDIFParser:
             self.records_read = self.records_read + 1
             # Consume empty separator line(s)
             k, v = self._consume_empty_lines()
+        return
+
+
+class LDIFWriter:
+    """
+    Write LDIF entry or change records to file object
+    Copy LDIF input to a file output object containing all data retrieved
+    via URLs
+    """
+
+    def __init__(self, output_file: IO, base64_attrs=None, cols=76, line_sep="\n"):
+        """
+        output_file
+            file object for output; should be opened in *text* mode
+        base64_attrs
+            list of attribute types to be base64-encoded in any case
+        cols
+            Specifies how many columns a line may have before it's
+            folded into many lines.
+        line_sep
+            String used as line separator
+        """
+        self._output_file = output_file
+        self._base64_attrs = list_dict([a.lower() for a in (base64_attrs or [])])
+        self._cols = cols
+        self._last_line_sep = line_sep
+        self.records_written = 0
+
+    def _unfold_lines(self, line: str):
+        """
+        Write string line as one or more folded lines
+        """
+        # Check maximum line length
+        line_len = len(line)
+        if line_len <= self._cols:
+            self._output_file.write(line.encode())
+            self._output_file.write(self._last_line_sep.encode())
+        else:
+            # Fold line
+            pos = self._cols
+            self._output_file.write(line[0 : min(line_len, self._cols)].encode())
+            self._output_file.write(self._last_line_sep.encode())
+            while pos < line_len:
+                self._output_file.write(" ".encode())
+                self._output_file.write(
+                    line[pos : min(line_len, pos + self._cols - 1)].encode()
+                )
+                self._output_file.write(self._last_line_sep.encode())
+                pos = pos + self._cols - 1
+        return  # _unfold_lines()
+
+    def _needs_base64_encoding(self, attr_type, attr_value):
+        """
+        returns 1 if attr_value has to be base-64 encoded because
+        of special chars or because attr_type is in self._base64_attrs
+        """
+        return (
+            attr_type.lower() in self._base64_attrs
+            or not safe_string_re.search(attr_value) is None
+        )
+
+    def _unparseAttrTypeandValue(self, attr_type, attr_value):
+        """
+        Write a single attribute type/value pair
+
+        attr_type
+              attribute type (text)
+        attr_value
+              attribute value (bytes)
+        """
+        if self._needs_base64_encoding(attr_type, attr_value):
+            # Encode with base64
+            encoded = b64encode(attr_value).decode("ascii")
+            encoded = encoded.replace("\n", "")
+            self._unfold_lines(":: ".join([attr_type, encoded]))
+        else:
+            self._unfold_lines(": ".join([attr_type, attr_value.decode("ascii")]))
+        return  # _unparseAttrTypeandValue()
+
+    def _unparseEntryRecord(self, entry):
+        """
+        entry
+            dictionary holding an entry
+        """
+        for attr_type, values in sorted(entry.items()):
+            for attr_value in values:
+                self._unparseAttrTypeandValue(attr_type, attr_value)
+
+    def unparse(self, dn: str, record):
+        """
+        dn
+              string-representation of distinguished name
+        record
+              Either a dictionary holding the LDAP entry {attrtype:record}
+              or a list with a modify list like for LDAPObject.modify().
+        """
+        # Start with line containing the distinguished name
+        dn = dn.encode("utf-8")
+        self._unparseAttrTypeandValue("dn", dn)
+        self._unparseEntryRecord(record)
+        # Write empty line separating the records
+        self._output_file.write(self._last_line_sep.encode())
+        # Count records written
+        self.records_written = self.records_written + 1
         return

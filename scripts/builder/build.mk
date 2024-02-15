@@ -1,12 +1,12 @@
 .PHONY: build
 
-BUILD_TIMESTAMP = $(TIMESTAMP_DIR)/.build.stamp
+BUILD_TIMESTAMP = $(TIMESTAMP_DIR)/.build.timestamp
 POSTMAN_COLLECTION = $(CURDIR)/feature_tests/end_to_end/postman-collection.json
 
 TOOL_VERSIONS_COPY = $(TIMESTAMP_DIR)/tool-versions.copy
 POETRY_LOCK = $(CURDIR)/poetry.lock
 INIT_TIMESTAMP = $(CURDIR)/.timestamp/init.timestamp
-SRC_FILES = $(shell find src -type f -name "*.py" -not -path "*/test_*" -not -path "*/fhir/r4/strict_models.py" -path "*/fhir/r4/models.py")
+SRC_FILES = $(shell find src -type f -name "*.py" -not -path "*/test_*" -not -path "*/fhir/r4/strict_models.py" -not -path "*/fhir/r4/models.py")
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml

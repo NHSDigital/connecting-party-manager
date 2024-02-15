@@ -1,17 +1,17 @@
 from types import ModuleType
 
-from event.aws.client import dynamodb_client
-from event.environment import BaseEnvironment
-from event.logging.logger import setup_logger
-from event.logging.step_decorators import logging_step_decorators
-from event.response.steps import response_steps
-from event.step_chain import StepChain
-from event.versioning.constants import VERSIONING_STEP_ARGS
-from event.versioning.steps import (
+from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.steps import (
     get_largest_possible_version,
     get_steps_for_requested_version,
     versioning_steps,
 )
+from domain.logging.step_decorators import logging_step_decorators
+from domain.response.steps import response_steps
+from event.aws.client import dynamodb_client
+from event.environment import BaseEnvironment
+from event.logging.logger import setup_logger
+from event.step_chain import StepChain
 
 from .src.v1.steps import steps as v1_steps
 

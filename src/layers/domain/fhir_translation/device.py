@@ -13,7 +13,7 @@ from domain.fhir.r4.cpm_model import (
     ProductTeamIdentifier,
 )
 from domain.fhir_translation.parse import create_fhir_model_from_fhir_json
-from event.response.validation_errors import mark_validation_errors_as_inbound
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 
 @mark_validation_errors_as_inbound

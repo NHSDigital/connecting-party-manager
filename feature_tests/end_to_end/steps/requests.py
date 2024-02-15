@@ -5,8 +5,8 @@ from unittest import mock
 from urllib.parse import quote_plus
 
 from aws_lambda_powertools.utilities.parser.models import APIGatewayProxyEventModel
+from domain.response.aws_lambda_response import AwsLambdaResponse
 from event.json import json_loads
-from event.response.aws_lambda_response import AwsLambdaResponse
 from requests import HTTPError, Response, request
 
 from feature_tests.end_to_end.steps.data import DUMMY_CONTEXT

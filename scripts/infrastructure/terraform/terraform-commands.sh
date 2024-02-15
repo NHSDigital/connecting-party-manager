@@ -6,8 +6,7 @@ TERRAFORM_COMMAND="$1"
 AWS_ACCOUNT="$2"
 TERRAFORM_WORKSPACE="$3"
 TERRAFORM_SCOPE="$4"
-PARAMETER_DEPLOY="$5"
-TERRAFORM_ARGS="$6"
+TERRAFORM_ARGS="$5"
 AWS_REGION_NAME="eu-west-2"
 
 function _terraform() {
@@ -83,7 +82,7 @@ function _terraform() {
         ;;
         #----------------
         "unlock")
-            _terraform_unlock "$workspace" "$TERRAFORM_ARGS"
+            TF_WORKSPACE=$workspace _terraform_unlock "$TERRAFORM_ARGS"
         ;;
     esac
 }
