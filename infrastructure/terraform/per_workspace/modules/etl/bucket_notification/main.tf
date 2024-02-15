@@ -10,7 +10,7 @@ resource "aws_s3_bucket_notification" "notification" {
 }
 
 resource "aws_lambda_permission" "s3_bucket_can_invoke_lambda" {
-  statement_id  = "${var.target_lambda.lambda_function_name}--${var.source_bucket.s3_bucket_id}--AllowExecution"
+  statement_id  = "${var.source_bucket.s3_bucket_id}--AllowExecution"
   action        = "lambda:InvokeFunction"
   function_name = var.target_lambda.lambda_function_arn
   principal     = "s3.amazonaws.com"
