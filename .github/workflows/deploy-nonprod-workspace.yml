@@ -26,3 +26,5 @@ jobs:
       workspace: ${{ inputs.account }}${{ inputs.sandbox == true && '-sandbox' || '' }}
       scope: "per_workspace"
     secrets: inherit # pragma: allowlist secret
+
+run-name: "Deploying to nonprod workspace - ${{ inputs.account }} sandbox:${{ inputs.sandbox }}"
