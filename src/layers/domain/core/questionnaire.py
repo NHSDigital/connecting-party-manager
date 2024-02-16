@@ -25,6 +25,7 @@ class Question(BaseModel, Generic[T]):
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
     answer_type: T
+    mandatory: bool
     multiple: bool
     validation_rules: set[FunctionType] = None
     choices: set[T] = None
@@ -56,6 +57,7 @@ class Questionnaire(BaseModel):
         self,
         name: str,
         answer_type: Type = str,
+        mandatory: bool = False,
         multiple: bool = False,
         validation_rules: set[FunctionType] = None,
         choices: set[T] = None,
@@ -77,6 +79,7 @@ class Questionnaire(BaseModel):
         question = Question(
             name=name,
             answer_type=answer_type,
+            mandatory=mandatory,
             multiple=multiple,
             validation_rules=validation_rules,
             choices=choices,
@@ -93,6 +96,8 @@ class QuestionnaireResponse(BaseModel):
 
     questionnaire: Questionnaire
     responses: list[tuple[str, list]]
+
+    # validate_mandatory_questions_answered(questionnaire, responses)
 
     @validator("responses", each_item=True)
     def validate_responses(
@@ -144,3 +149,17 @@ def validate_response_against_question(answers: list, question: Question):
         raise InvalidResponseError("\n".join(errors))
 
     return answers
+
+
+# Logic for validating mandatory questions - needs to be implemented
+def validate_mandatory_questions_answered(
+    questionnaire: Questionnaire, responses: list[tuple[str, list]]
+):
+    if questionnaire is not None:
+        questionnaire_name = questionnaire.name
+        # If question is not present in the response, check if it is mandatory
+        for question in questionnaire.questions.values():
+            if question.mandatory and (question.name not in dict(responses)):
+                raise InvalidResponseError(
+                    f"Mandatory question '{question.name}' in questionnaire '{questionnaire_name}' has not been answered."
+                )

@@ -9,6 +9,7 @@ from domain.core.questionnaire import (
     Questionnaire,
     QuestionnaireResponse,
     T,
+    validate_mandatory_questions_answered,
     validate_response_against_question,
 )
 from domain.core.questionnaire_validation_custom_rules import url
@@ -226,6 +227,47 @@ def test_incorrect_questionnaire_answered(response: list[tuple[str, list]]):
     assert (
         error.value.errors()[0]["msg"]
         == f"Unexpected answer for the question '{question_name}'. The questionnaire 'sample_questionnaire' does not contain this question."
+    )
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        [
+            ("mandatory_question", ["answer"]),
+            ("not_mandatory_question", [1]),
+        ],
+    ],
+)
+def test_mandatory_questions_answered(response: list[tuple[str, list]]):
+    questionnaire = Questionnaire(name="sample_questionnaire", version=1)
+    questionnaire.add_question(name="mandatory_question", mandatory=True)
+    questionnaire.add_question(name="not_mandatory_question", answer_type=int)
+    questionnaire_response = validate_mandatory_questions_answered(
+        questionnaire=questionnaire, responses=response
+    )
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        [
+            ("not_mandatory_question", [1]),
+        ],
+    ],
+)
+def test_mandatory_questions_not_answered(response: list[tuple[str, list]]):
+    questionnaire = Questionnaire(name="sample_questionnaire", version=1)
+    questionnaire.add_question(name="mandatory_question", mandatory=True)
+    questionnaire.add_question(name="not_mandatory_question", answer_type=int)
+    with pytest.raises(InvalidResponseError) as error:
+        questionnaire_response = validate_mandatory_questions_answered(
+            questionnaire=questionnaire, responses=response
+        )
+    assert (
+        str(error.value)
+        == f"Mandatory question 'mandatory_question' in questionnaire '{questionnaire.name}' has not been answered."
     )
 
 
