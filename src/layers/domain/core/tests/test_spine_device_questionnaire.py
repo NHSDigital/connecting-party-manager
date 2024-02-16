@@ -18,6 +18,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     Q1 = Question(
         name="ManufacturingOdsCode",
         answer_type=str,
+        mandatory=False,
         multiple=False,
         validation_rules=None,
         choices=None,
@@ -25,6 +26,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     Q2 = Question(
         name="InteractionIds",
         answer_type=str,
+        mandatory=True,
         multiple=True,
         validation_rules=None,
         choices=None,
@@ -32,6 +34,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     Q3 = Question(
         name="Owner",
         answer_type=str,
+        mandatory=False,
         multiple=False,
         validation_rules=None,
         choices=None,
@@ -39,6 +42,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     Q4 = Question(
         name="PartyKey",
         answer_type=str,
+        mandatory=False,
         multiple=False,
         validation_rules=None,
         choices=None,
