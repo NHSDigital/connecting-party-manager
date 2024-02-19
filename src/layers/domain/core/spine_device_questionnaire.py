@@ -5,13 +5,42 @@ from .questionnaire import Questionnaire
 def create_spine_device_questionnaire_v1():
     spine_device_questionnaire = Questionnaire(name="spine_device", version=1)
     spine_device_questionnaire.add_question(
-        name="ManufacturingOdsCode", answer_type=str
+        name="object_class", answer_type=str, mandatory=True, choices=["nhsas"]
     )
     spine_device_questionnaire.add_question(
-        name="InteractionIds", answer_type=str, mandatory=True, multiple=True
+        name="nhs_approver_urp", answer_type=str, mandatory=True
     )
-    spine_device_questionnaire.add_question(name="Owner", answer_type=str)
-    spine_device_questionnaire.add_question(name="PartyKey", answer_type=str)
-    # nhsIDCode ods_code?
+    spine_device_questionnaire.add_question(
+        name="nhs_date_approved", answer_type=str, mandatory=True
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_requestor_urp", answer_type=str, mandatory=True
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_date_requested", answer_type=str, mandatory=True
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_id_code", answer_type=str, mandatory=True
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_mhs_manufacturer_org", answer_type=str
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_mhs_party_key", answer_type=str, mandatory=True
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_product_key", answer_type=str, mandatory=True
+    )
+    spine_device_questionnaire.add_question(name="nhs_product_name", answer_type=str)
+    spine_device_questionnaire.add_question(name="nhs_product_version", answer_type=str)
+    spine_device_questionnaire.add_question(
+        name="nhs_as_acf", answer_type=str, multiple=True
+    )
+    spine_device_questionnaire.add_question(
+        name="nhs_as_svc_ia", answer_type=str, mandatory=True, multiple=True
+    )
+    spine_device_questionnaire.add_question(name="nhs_temp_uid", answer_type=str)
+    spine_device_questionnaire.add_question(name="description", answer_type=str)
+    spine_device_questionnaire.add_question(name="nhs_as_category_bag", answer_type=str)
 
     return spine_device_questionnaire

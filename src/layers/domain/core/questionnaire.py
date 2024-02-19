@@ -2,7 +2,7 @@ from datetime import date, datetime, time
 from types import FunctionType
 from typing import Generic, Type, TypeVar
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, validator
 
 from .error import DuplicateError, InvalidResponseError
 from .validation import ENTITY_NAME_REGEX
@@ -88,6 +88,10 @@ class Questionnaire(BaseModel):
         self.questions[name] = question
         return question
 
+    @property
+    def mandatory_questions(self) -> list[Question]:
+        return [q for q in self.questions.values() if q.mandatory]
+
 
 class QuestionnaireResponse(BaseModel):
     """
@@ -97,12 +101,19 @@ class QuestionnaireResponse(BaseModel):
     questionnaire: Questionnaire
     responses: list[tuple[str, list]]
 
-    @root_validator
-    def validate_mandatory_questions(cls, values: dict):
+    @validator("responses")
+    def validate_mandatory_questions_are_answered(
+        responses: list[tuple[str, list]], values: dict[str, Questionnaire]
+    ):
         questionnaire = values.get("questionnaire")
-        responses = values.get("responses", [])
-        validate_mandatory_questions_answered(questionnaire, responses)
-        return values
+        mandatory_questions = (
+            [] if questionnaire is None else questionnaire.mandatory_questions
+        )
+        validate_mandatory_questions_answered(
+            questionnaire=questionnaire,
+            mandatory_questions=mandatory_questions,
+            responses=responses,
+        )
 
     @validator("responses", each_item=True)
     def validate_responses(
@@ -122,16 +133,16 @@ class QuestionnaireResponse(BaseModel):
 
 
 def validate_mandatory_questions_answered(
-    questionnaire: Questionnaire, responses: list[tuple[str, list]]
+    questionnaire: Questionnaire,
+    mandatory_questions: list[Question],
+    responses: list[tuple[str, list]],
 ):
-    if questionnaire is not None:
-        questionnaire_name = questionnaire.name
-        for question in questionnaire.questions.values():
-            # If question is not present in the response, check if it is mandatory
-            if question.mandatory and question.name not in dict(responses):
-                raise InvalidResponseError(
-                    f"Mandatory question '{question.name}' in questionnaire '{questionnaire_name}' has not been answered."
-                )
+    for question in mandatory_questions:
+        if question.name not in dict(responses):
+            raise InvalidResponseError(
+                f"Mandatory question '{question.name}' in questionnaire '{questionnaire.name}' has not been answered."
+            )
+    return responses
 
 
 def validate_response_against_question(answers: list, question: Question):
