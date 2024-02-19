@@ -263,8 +263,12 @@ def test_mandatory_questions_answered(response: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionnaire", version=1)
     questionnaire.add_question(name="mandatory_question", mandatory=True)
     questionnaire.add_question(name="not_mandatory_question", answer_type=int)
+
+    mandatory_questions = [q for q in questionnaire.questions.values() if q.mandatory]
     questionnaire_response = validate_mandatory_questions_answered(
-        questionnaire=questionnaire, responses=response
+        questionnaire=questionnaire,
+        mandatory_questions=mandatory_questions,
+        responses=response,
     )
     # if no error raised, the test has implicitly passed
 
@@ -300,9 +304,12 @@ def test_mandatory_questions_not_answered(response: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionnaire", version=1)
     questionnaire.add_question(name="mandatory_question", mandatory=True)
     questionnaire.add_question(name="not_mandatory_question", answer_type=int)
+    mandatory_questions = [q for q in questionnaire.questions.values() if q.mandatory]
     with pytest.raises(InvalidResponseError) as error:
         questionnaire_response = validate_mandatory_questions_answered(
-            questionnaire=questionnaire, responses=response
+            questionnaire=questionnaire,
+            mandatory_questions=mandatory_questions,
+            responses=response,
         )
     assert (
         str(error.value)
