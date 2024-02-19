@@ -2,7 +2,7 @@ from datetime import date, datetime, time
 from types import FunctionType
 from typing import Generic, Type, TypeVar
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, root_validator, validator
 
 from .error import DuplicateError, InvalidResponseError
 from .validation import ENTITY_NAME_REGEX
@@ -97,7 +97,12 @@ class QuestionnaireResponse(BaseModel):
     questionnaire: Questionnaire
     responses: list[tuple[str, list]]
 
-    # validate_mandatory_questions_answered(questionnaire, responses)
+    @root_validator
+    def validate_mandatory_questions(cls, values: dict):
+        questionnaire = values.get("questionnaire")
+        responses = values.get("responses", [])
+        validate_mandatory_questions_answered(questionnaire, responses)
+        return values
 
     @validator("responses", each_item=True)
     def validate_responses(
@@ -114,6 +119,19 @@ class QuestionnaireResponse(BaseModel):
                 )
             validate_response_against_question(question=question, answers=answers)
         return response
+
+
+def validate_mandatory_questions_answered(
+    questionnaire: Questionnaire, responses: list[tuple[str, list]]
+):
+    if questionnaire is not None:
+        questionnaire_name = questionnaire.name
+        for question in questionnaire.questions.values():
+            # If question is not present in the response, check if it is mandatory
+            if question.mandatory and question.name not in dict(responses):
+                raise InvalidResponseError(
+                    f"Mandatory question '{question.name}' in questionnaire '{questionnaire_name}' has not been answered."
+                )
 
 
 def validate_response_against_question(answers: list, question: Question):
@@ -149,17 +167,3 @@ def validate_response_against_question(answers: list, question: Question):
         raise InvalidResponseError("\n".join(errors))
 
     return answers
-
-
-# Logic for validating mandatory questions - needs to be implemented
-def validate_mandatory_questions_answered(
-    questionnaire: Questionnaire, responses: list[tuple[str, list]]
-):
-    if questionnaire is not None:
-        questionnaire_name = questionnaire.name
-        # If question is not present in the response, check if it is mandatory
-        for question in questionnaire.questions.values():
-            if question.mandatory and (question.name not in dict(responses)):
-                raise InvalidResponseError(
-                    f"Mandatory question '{question.name}' in questionnaire '{questionnaire_name}' has not been answered."
-                )

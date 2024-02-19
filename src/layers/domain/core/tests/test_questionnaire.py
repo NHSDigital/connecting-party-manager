@@ -29,17 +29,18 @@ def test_questionnaire_constructor(name: str, version: int):
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "multiple", "validation_rules", "choices"],
+    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", str, False, None, {"choice1", "choice2", "choice3"}],
-        ["question2", int, True, None, {1, 2, 3}],
-        ["question3", bool, False, None, None],
-        ["question4", datetime, True, None, None],
+        ["question1", str, False, False, None, {"choice1", "choice2", "choice3"}],
+        ["question2", int, False, True, None, {1, 2, 3}],
+        ["question3", bool, False, False, None, None],
+        ["question4", datetime, False, True, None, None],
     ],
 )
 def test_question_constructor(
     name: str,
     answer_type: Type,
+    mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
     choices: set[str],
@@ -47,6 +48,7 @@ def test_question_constructor(
     question = Question(
         name=name,
         answer_type=answer_type,
+        mandatory=mandatory,
         multiple=multiple,
         validation_rules=validation_rules,
         choices=choices,
@@ -54,21 +56,23 @@ def test_question_constructor(
 
     assert question.name == name
     assert question.answer_type == answer_type
+    assert question.mandatory == mandatory
     assert question.multiple == multiple
     assert question.validation_rules == validation_rules
     assert question.choices == choices
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "multiple", "validation_rules", "choices"],
+    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", str, False, None, {"choice1", "choice2", "choice3"}],
-        ["question2", int, True, None, None],
+        ["question1", str, True, False, None, {"choice1", "choice2", "choice3"}],
+        ["question2", int, False, True, None, None],
     ],
 )
 def test_add_question(
     name: str,
     answer_type: Type,
+    mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
     choices: set[str],
@@ -78,6 +82,7 @@ def test_add_question(
     result = questionnaire.add_question(
         name=name,
         answer_type=answer_type,
+        mandatory=mandatory,
         multiple=multiple,
         validation_rules=validation_rules,
         choices=choices,
@@ -99,14 +104,15 @@ def test_cannot_add_duplicate_question(question_name: str):
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "multiple", "validation_rules", "choices"],
+    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", list, False, None, None],
+        ["question1", list, False, False, None, None],
     ],
 )
 def test_cannot_add_question_of_wrong_type(
     name: str,
     answer_type: Type,
+    mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
     choices: set[str],
@@ -117,6 +123,7 @@ def test_cannot_add_question_of_wrong_type(
         result = questionnaire.add_question(
             name=name,
             answer_type=answer_type,
+            mandatory=mandatory,
             multiple=multiple,
             validation_rules=validation_rules,
             choices=choices,
@@ -138,14 +145,22 @@ def test_has_question(name: str):
 
 
 @pytest.mark.parametrize(
-    ["question_name", "answer_type", "multiple", "validation_rules", "choices"],
     [
-        ["question", str, False, {"not_custom_rule_function"}, None],
+        "question_name",
+        "answer_type",
+        "mandatory",
+        "multiple",
+        "validation_rules",
+        "choices",
+    ],
+    [
+        ["question", str, False, False, {"not_custom_rule_function"}, None],
     ],
 )
 def test_invalid_question_validation_rules_type(
     question_name: str,
     answer_type: Type,
+    mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
     choices: set[T],
@@ -156,6 +171,7 @@ def test_invalid_question_validation_rules_type(
         questionnaire.add_question(
             name=question_name,
             answer_type=answer_type,
+            mandatory=mandatory,
             multiple=multiple,
             validation_rules=validation_rules,
             choices=choices,
@@ -165,15 +181,16 @@ def test_invalid_question_validation_rules_type(
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "multiple", "validation_rules", "choices"],
+    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", str, False, None, {1, 2, 3}],
-        ["question2", int, True, None, {"not_int", "not_int2"}],
+        ["question1", str, False, False, None, {1, 2, 3}],
+        ["question2", int, False, True, None, {"not_int", "not_int2"}],
     ],
 )
 def test_invalid_question_choices_type(
     name: str,
     answer_type: Type,
+    mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
     choices: set[T],
@@ -185,6 +202,7 @@ def test_invalid_question_choices_type(
         questionnaire.add_question(
             name=name,
             answer_type=answer_type,
+            mandatory=mandatory,
             multiple=multiple,
             validation_rules=validation_rules,
             choices=choices,
@@ -211,7 +229,9 @@ def test_invalid_question_choices_type(
         ],
     ],
 )
-def test_incorrect_questionnaire_answered(response: list[tuple[str, list]]):
+def test_incorrect_questionnaire_answered_raises_error(
+    response: list[tuple[str, list]]
+):
     questionnaire = Questionnaire(name="sample_questionnaire", version=1)
     questionnaire.add_question(name="question1")
     questionnaire.add_question(name="question2", answer_type=int)
@@ -253,6 +273,25 @@ def test_mandatory_questions_answered(response: list[tuple[str, list]]):
     "response",
     [
         [
+            ("mandatory_question", ["answer"]),
+            ("not_mandatory_question", [1]),
+        ],
+    ],
+)
+def test_mandatory_questions_answered_successfully(response: list[tuple[str, list]]):
+    questionnaire = Questionnaire(name="sample_questionnaire", version=1)
+    questionnaire.add_question(name="mandatory_question", mandatory=True)
+    questionnaire.add_question(name="not_mandatory_question", answer_type=int)
+    questionnaire_response = QuestionnaireResponse(
+        questionnaire=questionnaire, responses=response
+    )
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        [
             ("not_mandatory_question", [1]),
         ],
     ],
@@ -267,6 +306,31 @@ def test_mandatory_questions_not_answered(response: list[tuple[str, list]]):
         )
     assert (
         str(error.value)
+        == f"Mandatory question 'mandatory_question' in questionnaire '{questionnaire.name}' has not been answered."
+    )
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        [
+            ("not_mandatory_question", [1]),
+        ],
+    ],
+)
+def test_mandatory_questions_not_answered_raises_error(
+    response: list[tuple[str, list]]
+):
+    questionnaire = Questionnaire(name="sample_questionnaire", version=1)
+    questionnaire.add_question(name="mandatory_question", mandatory=True)
+    questionnaire.add_question(name="not_mandatory_question", answer_type=int)
+    with pytest.raises(ValidationError) as error:
+        questionnaire_response = QuestionnaireResponse(
+            questionnaire=questionnaire, responses=response
+        )
+
+    assert (
+        error.value.errors()[0]["msg"]
         == f"Mandatory question 'mandatory_question' in questionnaire '{questionnaire.name}' has not been answered."
     )
 
@@ -307,7 +371,9 @@ def test_multiple_questions_responses_allowed(response: list[tuple[str, list]]):
     ],
 )
 def test_multiple_question_responses_allowed(response: list):
-    question = Question(name="Question", answer_type=str, multiple=True)
+    question = Question(
+        name="Question", answer_type=str, mandatory=False, multiple=True
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -357,7 +423,9 @@ def test_multiple_questions_responses_not_allowed(response: list[tuple[str, list
     ],
 )
 def test_multiple_question_responses_not_allowed(response: list):
-    question = Question(name="Question", answer_type=str, multiple=False)
+    question = Question(
+        name="Question", answer_type=str, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -425,7 +493,9 @@ def test_valid_questionnaire_responses_types(response: list[tuple[str, list]]):
         ],
     ],
 )
-def test_invalid_questionnaire_responses_types(response: list[tuple[str, list]]):
+def test_invalid_questionnaire_responses_types_raises_error(
+    response: list[tuple[str, list]]
+):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(name="String response", answer_type=str, multiple=True)
     questionnaire.add_question(name="Integer response", answer_type=int)
@@ -463,7 +533,9 @@ def test_invalid_questionnaire_responses_types(response: list[tuple[str, list]])
     ],
 )
 def test_valid_question_response_type_string(response: list):
-    question = Question(name="String response", answer_type=str, multiple=False)
+    question = Question(
+        name="String response", answer_type=str, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -476,8 +548,10 @@ def test_valid_question_response_type_string(response: list):
         [1],
     ],
 )
-def test_invalid_question_response_type_string(response: list):
-    question = Question(name="String response", answer_type=str, multiple=False)
+def test_invalid_question_response_type_string_raises_error(response: list):
+    question = Question(
+        name="String response", answer_type=str, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -495,7 +569,9 @@ def test_invalid_question_response_type_string(response: list):
     ],
 )
 def test_valid_question_response_type_integer(response: list):
-    question = Question(name="Integer response", answer_type=int, multiple=False)
+    question = Question(
+        name="Integer response", answer_type=int, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -508,8 +584,10 @@ def test_valid_question_response_type_integer(response: list):
         ["answer"],
     ],
 )
-def test_invalid_question_response_type_integer(response: list):
-    question = Question(name="Integer response", answer_type=int, multiple=False)
+def test_invalid_question_response_type_integer_raises_error(response: list):
+    question = Question(
+        name="Integer response", answer_type=int, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -527,7 +605,9 @@ def test_invalid_question_response_type_integer(response: list):
     ],
 )
 def test_valid_question_response_type_bool(response: list):
-    question = Question(name="Boolean response", answer_type=bool, multiple=False)
+    question = Question(
+        name="Boolean response", answer_type=bool, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -540,8 +620,10 @@ def test_valid_question_response_type_bool(response: list):
         [1],
     ],
 )
-def test_invalid_question_response_type_bool(response: list):
-    question = Question(name="Boolean response", answer_type=bool, multiple=False)
+def test_invalid_question_response_type_bool_raises_error(response: list):
+    question = Question(
+        name="Boolean response", answer_type=bool, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -559,7 +641,9 @@ def test_invalid_question_response_type_bool(response: list):
     ],
 )
 def test_valid_question_response_type_datetime(response: list):
-    question = Question(name="Date-Time response", answer_type=datetime, multiple=False)
+    question = Question(
+        name="Date-Time response", answer_type=datetime, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -572,8 +656,10 @@ def test_valid_question_response_type_datetime(response: list):
         ["answer"],
     ],
 )
-def test_invalid_question_response_type_datetime(response: list):
-    question = Question(name="Date-Time response", answer_type=datetime, multiple=False)
+def test_invalid_question_response_type_datetime_raises_error(response: list):
+    question = Question(
+        name="Date-Time response", answer_type=datetime, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -591,7 +677,9 @@ def test_invalid_question_response_type_datetime(response: list):
     ],
 )
 def test_valid_question_response_type_float(response: list):
-    question = Question(name="Decimal response", answer_type=float, multiple=False)
+    question = Question(
+        name="Decimal response", answer_type=float, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -604,8 +692,10 @@ def test_valid_question_response_type_float(response: list):
         [True],
     ],
 )
-def test_invalid_question_response_type_float(response: list):
-    question = Question(name="Decimal response", answer_type=float, multiple=False)
+def test_invalid_question_response_type_float_raises_error(response: list):
+    question = Question(
+        name="Decimal response", answer_type=float, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -623,7 +713,9 @@ def test_invalid_question_response_type_float(response: list):
     ],
 )
 def test_valid_question_response_type_date(response: list):
-    question = Question(name="Date response", answer_type=date, multiple=False)
+    question = Question(
+        name="Date response", answer_type=date, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -636,8 +728,10 @@ def test_valid_question_response_type_date(response: list):
         [False],
     ],
 )
-def test_invalid_question_response_type_date(response: list):
-    question = Question(name="Date response", answer_type=date, multiple=False)
+def test_invalid_question_response_type_date_raises_error(response: list):
+    question = Question(
+        name="Date response", answer_type=date, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -655,7 +749,9 @@ def test_invalid_question_response_type_date(response: list):
     ],
 )
 def test_valid_question_response_type_time(response: list):
-    question = Question(name="Time response", answer_type=time, multiple=False)
+    question = Question(
+        name="Time response", answer_type=time, mandatory=False, multiple=False
+    )
 
     result = validate_response_against_question(answers=response, question=question)
 
@@ -668,8 +764,10 @@ def test_valid_question_response_type_time(response: list):
         [1],
     ],
 )
-def test_invalid_question_response_type_time(response: list):
-    question = Question(name="Time response", answer_type=time, multiple=False)
+def test_invalid_question_response_type_time_raises_error(response: list):
+    question = Question(
+        name="Time response", answer_type=time, mandatory=False, multiple=False
+    )
 
     with pytest.raises(InvalidResponseError) as error:
         result = validate_response_against_question(answers=response, question=question)
@@ -721,6 +819,7 @@ def test_valid_question_response_choice(response: list):
     question = Question(
         name="Question",
         answer_type=str,
+        mandatory=False,
         multiple=False,
         choices={"answer_a", "answer_b", "answer_c"},
     )
@@ -743,7 +842,9 @@ def test_valid_question_response_choice(response: list):
         ],
     ],
 )
-def test_invalid_questionnaire_responses_choices(response: list[tuple[str, list]]):
+def test_invalid_questionnaire_responses_choices_raises_error(
+    response: list[tuple[str, list]]
+):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(
         name="question1", multiple=True, choices={"a1", "a2", "answer3", "a4"}
@@ -776,9 +877,13 @@ def test_invalid_questionnaire_responses_choices(response: list[tuple[str, list]
         ["not_in_choices"],
     ],
 )
-def test_invalid_question_response_choice(response: list):
+def test_invalid_question_response_choice_raises_error(response: list):
     question = Question(
-        name="Question", answer_type=str, multiple=False, choices=["a", "b", "c"]
+        name="Question",
+        answer_type=str,
+        mandatory=False,
+        multiple=False,
+        choices=["a", "b", "c"],
     )
 
     with pytest.raises(InvalidResponseError) as error:
@@ -815,7 +920,11 @@ def test_valid_questionnaire_responses_rules(response: list[tuple[str, list]]):
 )
 def test_valid_question_response_rule(response: list):
     question = Question(
-        name="url", answer_type=str, multiple=False, validation_rules={url}
+        name="url",
+        answer_type=str,
+        mandatory=False,
+        multiple=False,
+        validation_rules={url},
     )
 
     result = validate_response_against_question(answers=response, question=question)
@@ -829,7 +938,9 @@ def test_valid_question_response_rule(response: list):
         [("url", ["not_a_url"])],
     ],
 )
-def test_invalid_questionnaire_response_rules(responses: list[tuple[str, list]]):
+def test_invalid_questionnaire_response_rules_raises_error(
+    responses: list[tuple[str, list]]
+):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(name="url", validation_rules={url})
 
@@ -848,9 +959,13 @@ def test_invalid_questionnaire_response_rules(responses: list[tuple[str, list]])
     "response",
     [["not_a_url"]],
 )
-def test_invalid_question_response_rule(response: list):
+def test_invalid_question_response_rule_raises_error(response: list):
     question = Question(
-        name="url", answer_type=str, multiple=False, validation_rules={url}
+        name="url",
+        answer_type=str,
+        mandatory=False,
+        multiple=False,
+        validation_rules={url},
     )
 
     with pytest.raises(InvalidResponseError) as error:

@@ -56,9 +56,12 @@ def step_impl(context: Context, name, version):
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
+        mandatory = row["mandatory"].lower() == "true"
         try:
             answer_type = TYPE_MAPPING.get(answer_type_str.lower())
-            subject.add_question(name=question_name, answer_type=answer_type)
+            subject.add_question(
+                name=question_name, answer_type=answer_type, mandatory=mandatory
+            )
         except (ValidationError, ValueError, DuplicateError) as e:
             context.error = e
 
@@ -71,6 +74,7 @@ def step_impl(context: Context, name, version):
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
+        mandatory = row["mandatory"].lower() == "true"
 
         # Convert the string to the corresponding Python type
         answer_type = TYPE_MAPPING.get(answer_type_str.lower())
@@ -78,6 +82,7 @@ def step_impl(context: Context, name, version):
         q = subject.questions[question_name]
         assert q is not None
         assert q.answer_type == answer_type
+        assert q.mandatory == mandatory
 
         ix = ix + 1
     assert len(subject.questions) == ix
@@ -90,10 +95,11 @@ def given_questionnaire(context: Context, name: str, version: int):
     for row in context.table:
         question_name = row["name"]
         answer_type_str = row["type"]
+        mandatory = row["mandatory"].lower() == "true"
 
         # Convert the string to the corresponding Python type
         answer_type = TYPE_MAPPING.get(answer_type_str.lower())
-        q.add_question(name=question_name, answer_type=answer_type)
+        q.add_question(name=question_name, answer_type=answer_type, mandatory=mandatory)
     context.questionnaires[(name, version)] = q
 
 
