@@ -16,54 +16,6 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     assert spine_device_questionnaire_v1.questions is not None
 
     Q1 = Question(
-        name="object_class",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=["nhsas"],
-    )
-    Q2 = Question(
-        name="nhs_approver_urp",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=None,
-    )
-    Q3 = Question(
-        name="nhs_date_approved",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=None,
-    )
-    Q4 = Question(
-        name="nhs_requestor_urp",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=None,
-    )
-    Q5 = Question(
-        name="nhs_date_requested",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=None,
-    )
-    Q6 = Question(
-        name="nhs_id_code",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=None,
-    )
-    Q7 = Question(
         name="nhs_mhs_manufacturer_org",
         answer_type=str,
         mandatory=False,
@@ -71,7 +23,15 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         validation_rules=None,
         choices=None,
     )
-    Q8 = Question(
+    Q2 = Question(
+        name="nhs_as_svc_ia",
+        answer_type=str,
+        mandatory=True,
+        multiple=True,
+        validation_rules=None,
+        choices=None,
+    )
+    Q3 = Question(
         name="nhs_mhs_party_key",
         answer_type=str,
         mandatory=True,
@@ -79,15 +39,16 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         validation_rules=None,
         choices=None,
     )
-    Q9 = Question(
-        name="nhs_product_key",
+
+    Q4 = Question(
+        name="nhs_id_code",
         answer_type=str,
         mandatory=True,
         multiple=False,
         validation_rules=None,
         choices=None,
     )
-    Q10 = Question(
+    Q5 = Question(
         name="nhs_product_name",
         answer_type=str,
         mandatory=False,
@@ -95,7 +56,56 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         validation_rules=None,
         choices=None,
     )
+
+    Q6 = Question(
+        name="object_class",
+        answer_type=str,
+        mandatory=True,
+        multiple=False,
+        validation_rules=None,
+        choices=["nhsas"],
+    )
+    Q7 = Question(
+        name="nhs_approver_urp",
+        answer_type=str,
+        mandatory=True,
+        multiple=False,
+        validation_rules=None,
+        choices=None,
+    )
+    Q8 = Question(
+        name="nhs_date_approved",
+        answer_type=str,
+        mandatory=True,
+        multiple=False,
+        validation_rules=None,
+        choices=None,
+    )
+    Q9 = Question(
+        name="nhs_requestor_urp",
+        answer_type=str,
+        mandatory=True,
+        multiple=False,
+        validation_rules=None,
+        choices=None,
+    )
+    Q10 = Question(
+        name="nhs_date_requested",
+        answer_type=str,
+        mandatory=True,
+        multiple=False,
+        validation_rules=None,
+        choices=None,
+    )
     Q11 = Question(
+        name="nhs_product_key",
+        answer_type=str,
+        mandatory=True,
+        multiple=False,
+        validation_rules=None,
+        choices=None,
+    )
+    Q12 = Question(
         name="nhs_product_version",
         answer_type=str,
         mandatory=False,
@@ -103,18 +113,10 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         validation_rules=None,
         choices=None,
     )
-    Q12 = Question(
+    Q13 = Question(
         name="nhs_as_acf",
         answer_type=str,
         mandatory=False,
-        multiple=True,
-        validation_rules=None,
-        choices=None,
-    )
-    Q13 = Question(
-        name="nhs_as_svc_ia",
-        answer_type=str,
-        mandatory=True,
         multiple=True,
         validation_rules=None,
         choices=None,
