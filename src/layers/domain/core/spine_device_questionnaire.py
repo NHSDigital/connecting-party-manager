@@ -21,6 +21,12 @@ def create_spine_device_questionnaire_v1():
     # covered in cpm device class but may need to override?
 
     spine_device_questionnaire.add_question(
+        name="unique_identifier", answer_type=str, mandatory=True
+    )  # This is the ASID
+    spine_device_questionnaire.add_question(
+        name="nhs_as_client", answer_type=str, multiple=True
+    )
+    spine_device_questionnaire.add_question(
         name="object_class", answer_type=str, mandatory=True, choices=["nhsas"]
     )
     spine_device_questionnaire.add_question(
@@ -44,6 +50,8 @@ def create_spine_device_questionnaire_v1():
     )
     spine_device_questionnaire.add_question(name="nhs_temp_uid", answer_type=str)
     spine_device_questionnaire.add_question(name="description", answer_type=str)
-    spine_device_questionnaire.add_question(name="nhs_as_category_bag", answer_type=str)
+    spine_device_questionnaire.add_question(
+        name="nhs_as_category_bag", answer_type=str, multiple=True
+    )
 
     return spine_device_questionnaire
