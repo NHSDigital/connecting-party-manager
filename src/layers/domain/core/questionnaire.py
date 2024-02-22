@@ -171,6 +171,10 @@ def validate_response_against_question(answers: list, question: Question):
                 errors.append(
                     f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
                 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> dabc929 (Added multiple answer types functionality and empty string custom rule)
         if question.validation_rules is not None:
             for validation_rule in question.validation_rules:
                 try:

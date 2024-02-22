@@ -1095,6 +1095,65 @@ def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list
 
 
 @pytest.mark.parametrize(
+    "response",
+    [
+        [
+            ("empty string", [""]),
+            ("empty string or int", [1]),
+        ],
+    ],
+)
+def test_valid_questionnaire_responses_rule_empty_str(response: list[tuple[str, list]]):
+    questionnaire = Questionnaire(name="sample_questionaire", version=1)
+    questionnaire.add_question(name="empty string", validation_rules={empty_str})
+    questionnaire.add_question(
+        name="empty string or int", answer_type=(str, int), validation_rules={empty_str}
+    )
+
+    questionnaire_response = QuestionnaireResponse(
+        questionnaire=questionnaire, responses=response
+    )
+
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
+    "response",
+    [[""]],
+)
+def test_valid_question_response_rule_empty_str(response: list[tuple[str, list]]):
+    question = Question(
+        name="empty string",
+        answer_type=str,
+        mandatory=False,
+        multiple=False,
+        validation_rules={empty_str},
+    )
+
+    result = validate_response_against_question(answers=response, question=question)
+
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
+    "response",
+    [["", 1]],
+)
+def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list]]):
+    question = Question(
+        name="empty string or int",
+        answer_type=(str, int),
+        mandatory=False,
+        multiple=True,
+        validation_rules={empty_str},
+    )
+
+    result = validate_response_against_question(answers=response, question=question)
+
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
     "responses",
     [
         [
@@ -1122,6 +1181,10 @@ def test_invalid_questionnaire_response_rules_raises_error(
     assert (
         error.value.errors()[1]["msg"]
         == f"Question '{EMPTY_STR_QUESTION_NAME}' rule 'empty_str' failed validation for response 'not an empty string' with error: Expected empty string."
+    )
+    assert (
+        error.value.errors()[1]["msg"]
+        == f"Question 'empty string' rule 'empty_str' failed validation for response 'not an empty string' with error: Expected empty string."
     )
 
 
