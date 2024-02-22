@@ -1098,22 +1098,24 @@ def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list
     "response",
     [
         [
-            ("empty string", [""]),
-            ("empty string or int", [1]),
+            (EMPTY_STR_QUESTION_NAME, [""]),
+            (EMPTY_STR_OR_INT_QUESTION_NAME, ["", 1]),
         ],
     ],
 )
 def test_valid_questionnaire_responses_rule_empty_str(response: list[tuple[str, list]]):
-    questionnaire = Questionnaire(name="sample_questionaire", version=1)
-    questionnaire.add_question(name="empty string", validation_rules={empty_str})
+    questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
-        name="empty string or int", answer_type=(str, int), validation_rules={empty_str}
+        name=EMPTY_STR_QUESTION_NAME, validation_rules={empty_str}
+    )
+    questionnaire.add_question(
+        name=EMPTY_STR_OR_INT_QUESTION_NAME,
+        answer_type=(str, int),
+        multiple=True,
+        validation_rules={empty_str},
     )
 
-    questionnaire_response = QuestionnaireResponse(
-        questionnaire=questionnaire, responses=response
-    )
-
+    QuestionnaireResponse(questionnaire=questionnaire, responses=response)
     # if no error raised, the test has implicitly passed
 
 
@@ -1123,15 +1125,14 @@ def test_valid_questionnaire_responses_rule_empty_str(response: list[tuple[str, 
 )
 def test_valid_question_response_rule_empty_str(response: list[tuple[str, list]]):
     question = Question(
-        name="empty string",
+        name=EMPTY_STR_QUESTION_NAME,
         answer_type=str,
         mandatory=False,
         multiple=False,
         validation_rules={empty_str},
     )
 
-    result = validate_response_against_question(answers=response, question=question)
-
+    validate_response_against_question(answers=response, question=question)
     # if no error raised, the test has implicitly passed
 
 
@@ -1141,15 +1142,14 @@ def test_valid_question_response_rule_empty_str(response: list[tuple[str, list]]
 )
 def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list]]):
     question = Question(
-        name="empty string or int",
+        name=EMPTY_STR_QUESTION_NAME,
         answer_type=(str, int),
         mandatory=False,
         multiple=True,
         validation_rules={empty_str},
     )
 
-    result = validate_response_against_question(answers=response, question=question)
-
+    validate_response_against_question(answers=response, question=question)
     # if no error raised, the test has implicitly passed
 
 
@@ -1181,10 +1181,6 @@ def test_invalid_questionnaire_response_rules_raises_error(
     assert (
         error.value.errors()[1]["msg"]
         == f"Question '{EMPTY_STR_QUESTION_NAME}' rule 'empty_str' failed validation for response 'not an empty string' with error: Expected empty string."
-    )
-    assert (
-        error.value.errors()[1]["msg"]
-        == f"Question 'empty string' rule 'empty_str' failed validation for response 'not an empty string' with error: Expected empty string."
     )
 
 
