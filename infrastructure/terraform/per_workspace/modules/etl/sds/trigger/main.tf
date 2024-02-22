@@ -20,6 +20,7 @@ module "lambda_function" {
   environment_variables = {
     STATE_MACHINE_ARN = var.state_machine_arn
     NOTIFY_LAMBDA_ARN = var.notify_lambda_arn
+    TABLE_NAME        = var.table_name
   }
 
   create_package         = false
@@ -65,13 +66,26 @@ module "lambda_function" {
                 "Effect": "Allow",
                 "Resource": ["${var.etl_bucket_arn}/bulk-trigger/*ldif"]
             },
-
             {
                 "Action": [
                     "lambda:InvokeFunction"
                 ],
                 "Effect": "Allow",
                 "Resource": ["${var.notify_lambda_arn}"]
+            },
+            {
+                "Action": [
+                    "dynamodb:Scan"
+                ],
+                "Effect": "Allow",
+                "Resource": ["${var.table_arn}"]
+            },
+            {
+                "Action": [
+                    "kms:Decrypt"
+                ],
+                "Effect": "Allow",
+                "Resource": ["*"]
             },
             {
                 "Action": [

@@ -25,7 +25,7 @@ def test__status_check_not_ok():
 
 
 def test_index():
-    with mock_table(table_name=TABLE_NAME), mock.patch.dict(
+    with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -33,7 +33,9 @@ def test_index():
         },
         clear=True,
     ):
-        from api.status.index import handler
+        from api.status.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
 
         result = handler(event={})
 
@@ -81,7 +83,7 @@ def test_index():
 
 
 def test_index_not_ok():
-    with mock_table(table_name="not-a-table"), mock.patch.dict(
+    with mock_table(table_name="not-a-table") as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -89,7 +91,9 @@ def test_index_not_ok():
         },
         clear=True,
     ):
-        from api.status.index import handler
+        from api.status.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
 
         result = handler(event={})
 

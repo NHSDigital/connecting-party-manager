@@ -23,17 +23,18 @@ ALLOWED_EXCEPTIONS = (JSONDecodeError,)
 
 
 def _ask_s3(s3_client: S3Client, bucket: str, key: str, question: FunctionType = None):
-    result = False
+    result = True
     try:
         response = s3_client.get_object(Bucket=bucket, Key=key)
     except ClientError:
-        pass
-    else:
+        result = False
+
+    if result and question is not None:
         data = response["Body"].read().decode()
         try:
             result = question(data)
         except ALLOWED_EXCEPTIONS:
-            pass
+            result = False
     return result
 
 

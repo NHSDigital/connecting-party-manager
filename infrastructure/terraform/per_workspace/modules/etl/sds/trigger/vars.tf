@@ -44,3 +44,10 @@ variable "assume_account" {
 
 variable "allowed_triggers" {
 }
+
+variable "table_name" {
+
+}
+variable "table_arn" {
+
+}

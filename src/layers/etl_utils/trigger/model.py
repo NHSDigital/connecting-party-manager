@@ -51,3 +51,4 @@ class StateMachineInput(BaseModel):
 class TriggerEnvironment(BaseEnvironment):
     STATE_MACHINE_ARN: str
     NOTIFY_LAMBDA_ARN: str
+    TABLE_NAME: str

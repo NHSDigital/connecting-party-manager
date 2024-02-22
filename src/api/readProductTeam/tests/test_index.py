@@ -33,7 +33,9 @@ def test_index(version):
         },
         clear=True,
     ):
-        from api.readProductTeam.index import handler
+        from api.readProductTeam.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
 
         product_team_repo = ProductTeamRepository(
             table_name=TABLE_NAME, dynamodb_client=client
@@ -101,7 +103,9 @@ def test_index_no_such_product_team(version):
         },
         clear=True,
     ):
-        from api.readProductTeam.index import handler
+        from api.readProductTeam.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
 
         product_team_repo = ProductTeamRepository(
             table_name=TABLE_NAME, dynamodb_client=client

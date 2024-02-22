@@ -155,6 +155,8 @@ module "trigger_bulk" {
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn
   state_machine_arn     = module.step_function.state_machine_arn
+  table_arn             = var.table_arn
+  table_name            = var.table_name
   allowed_triggers = {
     "${replace(var.workspace_prefix, "_", "-")}--AllowExecutionFromS3--${local.etl_name}--bulk" = {
       service    = "s3"
