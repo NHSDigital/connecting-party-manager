@@ -59,7 +59,6 @@ class Questionnaire(BaseModel):
         """
         Returns true if the question specified exists within the questionnaire
         """
-
         return question_name in self.questions
 
     def add_question(
@@ -77,7 +76,6 @@ class Questionnaire(BaseModel):
         """
         if name in self.questions:
             raise DuplicateError(f"Question '{name}' already exists.")
-
         # Validate choices are of the same type as the question type
         if choices is not None and not all(
             isinstance(choice, answer_type) for choice in choices
@@ -85,7 +83,6 @@ class Questionnaire(BaseModel):
             raise ValueError(
                 f"Choices must be of the same type as the question type: {answer_type}."
             )
-
         question = Question(
             name=name,
             human_readable_name=human_readable_name,
@@ -95,7 +92,6 @@ class Questionnaire(BaseModel):
             validation_rules=validation_rules,
             choices=choices,
         )
-
         self.questions[name] = question
         return question
 
@@ -161,7 +157,6 @@ def validate_response_against_question(answers: list, question: Question):
         raise InvalidResponseError(
             f"Question '{question.name}' does not allow multiple responses. Response given: {answers}."
         )
-
     errors = (
         []
     )  # accumulate errors here for multianswer question and raise under a single ValueError
@@ -176,7 +171,6 @@ def validate_response_against_question(answers: list, question: Question):
                 errors.append(
                     f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
                 )
-
         if question.validation_rules is not None:
             for validation_rule in question.validation_rules:
                 try:
@@ -185,13 +179,10 @@ def validate_response_against_question(answers: list, question: Question):
                     errors.append(
                         f"Question '{question.name}' rule '{validation_rule.__name__}' failed validation for response '{answer}' with error: {e}."
                     )
-
         if question.choices and answer not in question.choices:
             errors.append(
                 f"Question '{question.name}' expects choices {question.choices}. Response given: {answer}."
             )
-
     if errors:
         raise InvalidResponseError("\n".join(errors))
-
     return answers
