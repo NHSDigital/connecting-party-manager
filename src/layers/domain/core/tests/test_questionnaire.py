@@ -32,16 +32,33 @@ def test_questionnaire_constructor(name: str, version: int):
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", str, False, False, None, {"choice1", "choice2", "choice3"}],
-        ["question2", int, False, True, None, {1, 2, 3}],
-        ["question3", bool, False, False, None, None],
-        ["question4", datetime, False, True, None, None],
+        "name",
+        "human_readable_name",
+        "answer_type",
+        "mandatory",
+        "multiple",
+        "validation_rules",
+        "choices",
+    ],
+    [
+        [
+            "Q1",
+            "question 1",
+            str,
+            False,
+            False,
+            None,
+            {"choice1", "choice2", "choice3"},
+        ],
+        ["Q2", "question 2", int, False, True, None, {1, 2, 3}],
+        ["Q3", "question 3", bool, False, False, None, None],
+        ["Q4", "question 4", datetime, False, True, None, None],
     ],
 )
 def test_question_constructor(
     name: str,
+    human_readable_name: str,
     answer_type: Type,
     mandatory: bool,
     multiple: bool,
@@ -50,6 +67,7 @@ def test_question_constructor(
 ):
     question = Question(
         name=name,
+        human_readable_name=human_readable_name,
         answer_type=answer_type,
         mandatory=mandatory,
         multiple=multiple,
@@ -58,6 +76,7 @@ def test_question_constructor(
     )
 
     assert question.name == name
+    assert question.human_readable_name == human_readable_name
     assert question.answer_type == answer_type
     assert question.mandatory == mandatory
     assert question.multiple == multiple
@@ -66,14 +85,23 @@ def test_question_constructor(
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", str, True, False, None, {"choice1", "choice2", "choice3"}],
-        ["question2", int, False, True, None, None],
+        "name",
+        "human_readable_name",
+        "answer_type",
+        "mandatory",
+        "multiple",
+        "validation_rules",
+        "choices",
+    ],
+    [
+        ["question1", "", str, True, False, None, {"choice1", "choice2", "choice3"}],
+        ["question2", "", int, False, True, None, None],
     ],
 )
 def test_add_question(
     name: str,
+    human_readable_name: str,
     answer_type: Type,
     mandatory: bool,
     multiple: bool,
@@ -84,6 +112,7 @@ def test_add_question(
 
     result = questionnaire.add_question(
         name=name,
+        human_readable_name=human_readable_name,
         answer_type=answer_type,
         mandatory=mandatory,
         multiple=multiple,
@@ -107,13 +136,22 @@ def test_cannot_add_duplicate_question(question_name: str):
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", list, False, False, None, None],
+        "name",
+        "human_readable_name",
+        "answer_type",
+        "mandatory",
+        "multiple",
+        "validation_rules",
+        "choices",
+    ],
+    [
+        ["question1", "", list, False, False, None, None],
     ],
 )
 def test_cannot_add_question_of_wrong_type(
     name: str,
+    human_readable_name: str,
     answer_type: Type,
     mandatory: bool,
     multiple: bool,
@@ -125,6 +163,7 @@ def test_cannot_add_question_of_wrong_type(
     with pytest.raises(ValueError) as error:
         questionnaire.add_question(
             name=name,
+            human_readable_name=human_readable_name,
             answer_type=answer_type,
             mandatory=mandatory,
             multiple=multiple,
@@ -138,13 +177,22 @@ def test_cannot_add_question_of_wrong_type(
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", (list, dict), False, False, None, None],
+        "name",
+        "human_readable_name",
+        "answer_type",
+        "mandatory",
+        "multiple",
+        "validation_rules",
+        "choices",
+    ],
+    [
+        ["question1", "", (list, dict), False, False, None, None],
     ],
 )
 def test_cannot_add_question_of_wrong_type_2(
     name: str,
+    human_readable_name: str,
     answer_type: Type,
     mandatory: bool,
     multiple: bool,
@@ -157,6 +205,7 @@ def test_cannot_add_question_of_wrong_type_2(
     with pytest.raises(ValueError) as error:
         questionnaire.add_question(
             name=name,
+            human_readable_name=human_readable_name,
             answer_type=answer_type,
             mandatory=mandatory,
             multiple=multiple,
@@ -183,6 +232,7 @@ def test_has_question(name: str):
 @pytest.mark.parametrize(
     [
         "question_name",
+        "human_readable_name",
         "answer_type",
         "mandatory",
         "multiple",
@@ -190,11 +240,12 @@ def test_has_question(name: str):
         "choices",
     ],
     [
-        ["question", str, False, False, {"not_custom_rule_function"}, None],
+        ["question", "", str, False, False, {"not_custom_rule_function"}, None],
     ],
 )
 def test_invalid_question_validation_rules_type(
     question_name: str,
+    human_readable_name: str,
     answer_type: Type,
     mandatory: bool,
     multiple: bool,
@@ -206,6 +257,7 @@ def test_invalid_question_validation_rules_type(
     with pytest.raises(ValidationError) as error:
         questionnaire.add_question(
             name=question_name,
+            human_readable_name=human_readable_name,
             answer_type=answer_type,
             mandatory=mandatory,
             multiple=multiple,
@@ -217,14 +269,23 @@ def test_invalid_question_validation_rules_type(
 
 
 @pytest.mark.parametrize(
-    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
     [
-        ["question1", str, False, False, None, {1, 2, 3}],
-        ["question2", int, False, True, None, {"not_int", "not_int2"}],
+        "name",
+        "human_readable_name",
+        "answer_type",
+        "mandatory",
+        "multiple",
+        "validation_rules",
+        "choices",
+    ],
+    [
+        ["question1", "", str, False, False, None, {1, 2, 3}],
+        ["question2", "", int, False, True, None, {"not_int", "not_int2"}],
     ],
 )
 def test_invalid_question_choices_type(
     name: str,
+    human_readable_name: str,
     answer_type: Type,
     mandatory: bool,
     multiple: bool,
@@ -237,6 +298,7 @@ def test_invalid_question_choices_type(
     with pytest.raises(ValueError) as error:
         questionnaire.add_question(
             name=name,
+            human_readable_name=human_readable_name,
             answer_type=answer_type,
             mandatory=mandatory,
             multiple=multiple,

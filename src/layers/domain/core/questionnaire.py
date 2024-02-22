@@ -24,6 +24,7 @@ class Question(BaseModel, Generic[T]):
         arbitrary_types_allowed = True
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
+    human_readable_name: str = ""
     answer_type: T
     mandatory: bool
     multiple: bool
@@ -64,6 +65,7 @@ class Questionnaire(BaseModel):
     def add_question(
         self,
         name: str,
+        human_readable_name: str = "",
         answer_type: Type = str,
         mandatory: bool = False,
         multiple: bool = False,
@@ -86,6 +88,7 @@ class Questionnaire(BaseModel):
 
         question = Question(
             name=name,
+            human_readable_name=human_readable_name,
             answer_type=answer_type,
             mandatory=mandatory,
             multiple=multiple,

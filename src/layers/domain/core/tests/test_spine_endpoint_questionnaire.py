@@ -20,6 +20,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
 
     Q_nhs_mhs_end_point = Question(
         name="nhs_mhs_end_point",
+        human_readable_name="This is the address",
         answer_type=str,
         mandatory=True,
         multiple=False,
@@ -28,6 +29,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_unique_identifier = Question(
         name="unique_identifier",
+        human_readable_name="This is the ASID",
         answer_type=str,
         mandatory=True,
         multiple=False,
@@ -36,14 +38,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_id_code = Question(
         name="nhs_id_code",
-        answer_type=str,
-        mandatory=True,
-        multiple=False,
-        validation_rules=None,
-        choices=None,
-    )
-    Q_nhsMhsFQDN = Question(
-        name="nhsMhsFQDN",
+        human_readable_name="This is the Managing Organization",
         answer_type=str,
         mandatory=True,
         multiple=False,
@@ -76,6 +71,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_actor = Question(
         name="nhs_mhs_actor",
+        human_readable_name="This is the Reliability Configuration Actor",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -87,6 +83,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_sync_reply_mode = Question(
         name="nhs_mhs_sync_reply_mode",
+        human_readable_name="This is the Reliability Configuration Reply Mode",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -95,6 +92,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_retry_interval = Question(
         name="nhs_mhs_retry_interval",
+        human_readable_name="This is the Reliability Configuration Retry Interval",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -103,6 +101,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_retries = Question(
         name="nhs_mhs_retries",
+        human_readable_name="This is the Reliability Configuration Retries",
         answer_type=(str, int),
         mandatory=False,
         multiple=False,
@@ -111,6 +110,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_persist_duration = Question(
         name="nhs_mhs_persist_duration",
+        human_readable_name="This is the Reliability Configuration Persist Duration",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -119,6 +119,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_duplicate_elimination = Question(
         name="nhs_mhs_duplicate_elimination",
+        human_readable_name="This is the Reliability Configuration Duplication Elimination",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -127,6 +128,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_ack_requested = Question(
         name="nhs_mhs_ack_requested",
+        human_readable_name="This is the Reliability Configuration Ack Requested",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -135,6 +137,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_svc_ia = Question(
         name="nhs_mhs_svc_ia",
+        human_readable_name="This is the interaction ID",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -289,7 +292,6 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     assert Q_nhs_mhs_end_point.name in spine_endpoint_questionnaire_v1.questions
     assert Q_unique_identifier.name in spine_endpoint_questionnaire_v1.questions
     assert Q_nhs_id_code.name in spine_endpoint_questionnaire_v1.questions
-    assert Q_nhsMhsFQDN.name in spine_endpoint_questionnaire_v1.questions
     assert Q_nhs_mhs_party_key.name in spine_endpoint_questionnaire_v1.questions
     assert Q_nhs_mhs_cpa_id.name in spine_endpoint_questionnaire_v1.questions
     assert Q_nhsMHSId.name in spine_endpoint_questionnaire_v1.questions
@@ -339,7 +341,6 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     assert (
         Q_nhs_id_code == spine_endpoint_questionnaire_v1.questions[Q_nhs_id_code.name]
     )
-    assert Q_nhsMhsFQDN == spine_endpoint_questionnaire_v1.questions[Q_nhsMhsFQDN.name]
     assert (
         Q_nhs_mhs_party_key
         == spine_endpoint_questionnaire_v1.questions[Q_nhs_mhs_party_key.name]
