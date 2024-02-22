@@ -8,6 +8,6 @@ def url(value):
 
 
 def empty_str(value):
-    if type(value) == str:
-        if not len(value) == 0:
+    if isinstance(value, str):
+        if len(value) != 0:
             raise ValueError("Expected empty string")
