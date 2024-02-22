@@ -24,6 +24,7 @@ class Question(BaseModel, Generic[T]):
         arbitrary_types_allowed = True
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
+    human_readable_name: str = ""
     answer_type: T
     mandatory: bool
     multiple: bool
@@ -32,7 +33,15 @@ class Question(BaseModel, Generic[T]):
 
     @validator("answer_type")
     def validate_question_type(cls, answer_type):
-        if answer_type not in ALLOWED_QUESTION_TYPES:
+        if isinstance(answer_type, tuple):
+            invalid_types = [
+                item for item in answer_type if item not in ALLOWED_QUESTION_TYPES
+            ]
+            if invalid_types:
+                raise ValueError(
+                    f"Answer types {', '.join(map(str, invalid_types))} are not allowed."
+                )
+        elif answer_type not in ALLOWED_QUESTION_TYPES:
             raise ValueError(f"Answer type {answer_type} is not allowed.")
         return answer_type
 
@@ -50,12 +59,12 @@ class Questionnaire(BaseModel):
         """
         Returns true if the question specified exists within the questionnaire
         """
-
         return question_name in self.questions
 
     def add_question(
         self,
         name: str,
+        human_readable_name: str = "",
         answer_type: Type = str,
         mandatory: bool = False,
         multiple: bool = False,
@@ -67,7 +76,6 @@ class Questionnaire(BaseModel):
         """
         if name in self.questions:
             raise DuplicateError(f"Question '{name}' already exists.")
-
         # Validate choices are of the same type as the question type
         if choices is not None and not all(
             isinstance(choice, answer_type) for choice in choices
@@ -75,16 +83,15 @@ class Questionnaire(BaseModel):
             raise ValueError(
                 f"Choices must be of the same type as the question type: {answer_type}."
             )
-
         question = Question(
             name=name,
+            human_readable_name=human_readable_name,
             answer_type=answer_type,
             mandatory=mandatory,
             multiple=multiple,
             validation_rules=validation_rules,
             choices=choices,
         )
-
         self.questions[name] = question
         return question
 
@@ -150,16 +157,20 @@ def validate_response_against_question(answers: list, question: Question):
         raise InvalidResponseError(
             f"Question '{question.name}' does not allow multiple responses. Response given: {answers}."
         )
-
     errors = (
         []
     )  # accumulate errors here for multianswer question and raise under a single ValueError
     for answer in answers:
-        if not isinstance(answer, question.answer_type):
-            errors.append(
-                f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
-            )
-
+        if isinstance(question.answer_type, tuple):
+            if not any(isinstance(answer, item) for item in question.answer_type):
+                errors.append(
+                    f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
+                )
+        else:
+            if not isinstance(answer, question.answer_type):
+                errors.append(
+                    f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
+                )
         if question.validation_rules is not None:
             for validation_rule in question.validation_rules:
                 try:
@@ -168,13 +179,10 @@ def validate_response_against_question(answers: list, question: Question):
                     errors.append(
                         f"Question '{question.name}' rule '{validation_rule.__name__}' failed validation for response '{answer}' with error: {e}."
                     )
-
         if question.choices and answer not in question.choices:
             errors.append(
                 f"Question '{question.name}' expects choices {question.choices}. Response given: {answer}."
             )
-
     if errors:
         raise InvalidResponseError("\n".join(errors))
-
     return answers
