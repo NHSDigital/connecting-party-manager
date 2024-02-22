@@ -23,7 +23,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         answer_type=str,
         mandatory=True,
         multiple=False,
-        validation_rules=[url],
+        validation_rules={url},
         choices=None,
     )
     Q_unique_identifier = Question(
@@ -80,10 +80,10 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=False,
         multiple=False,
         validation_rules=None,
-        choices=[
+        choices={
             "urn:oasis:names:tc:ebxml-msg:actor:topartymsh",
             "urn:oasis:names:tc:ebxml-msg:actor:nextmsh",
-        ],
+        },
     )
     Q_nhs_mhs_sync_reply_mode = Question(
         name="nhs_mhs_sync_reply_mode",
@@ -91,7 +91,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=False,
         multiple=False,
         validation_rules=None,
-        choices=["MSHSIGNALSONLY", "NEVER", "NONE", "SIGNALSANDRESPONSE"],
+        choices={"MSHSIGNALSONLY", "NEVER", "NONE", "SIGNALSANDRESPONSE"},
     )
     Q_nhs_mhs_retry_interval = Question(
         name="nhs_mhs_retry_interval",
@@ -106,7 +106,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         answer_type=(str, int),
         mandatory=False,
         multiple=False,
-        validation_rules=[empty_str],
+        validation_rules={empty_str},
         choices=None,
     )
     Q_nhs_mhs_persist_duration = Question(
@@ -123,7 +123,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=False,
         multiple=False,
         validation_rules=None,
-        choices=["ALWAYS", "NEVER"],
+        choices={"ALWAYS", "NEVER"},
     )
     Q_nhs_mhs_ack_requested = Question(
         name="nhs_mhs_ack_requested",
@@ -131,7 +131,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=False,
         multiple=False,
         validation_rules=None,
-        choices=["ALWAYS", "NEVER"],
+        choices={"ALWAYS", "NEVER"},
     )
     Q_nhs_mhs_svc_ia = Question(
         name="nhs_mhs_svc_ia",
@@ -147,7 +147,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=True,
         multiple=False,
         validation_rules=None,
-        choices=["nhsmhs"],
+        choices={"nhsmhs"},
     )
     Q_nhs_approver_urp = Question(
         name="nhs_approver_urp",
@@ -203,7 +203,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=True,
         multiple=False,
         validation_rules=None,
-        choices=["FHIR", "HL7", "EBXML", "N/A", "MSHSIGNALSONLY"],
+        choices={"FHIR", "HL7", "EBXML", "N/A", "MSHSIGNALSONLY"},
     )
     Q_nhs_mhs_fqdn = Question(
         name="nhs_mhs_fqdn",
@@ -235,7 +235,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         mandatory=True,
         multiple=False,
         validation_rules=None,
-        choices=["NONE", "TRANSIENT", "PERSISTENT"],
+        choices={"NONE", "TRANSIENT", "PERSISTENT"},
     )
     Q_nhs_mhs_sn = Question(
         name="nhs_mhs_sn",

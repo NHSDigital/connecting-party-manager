@@ -9,7 +9,7 @@ def create_spine_endpoint_questionnaire_v1():
         name="nhs_mhs_end_point",
         answer_type=str,
         mandatory=True,
-        validation_rules=[url],
+        validation_rules={url},
     )  # This is the address
     spine_endpoint_questionnaire.add_question(
         name="unique_identifier", answer_type=str, mandatory=True
@@ -32,21 +32,21 @@ def create_spine_endpoint_questionnaire_v1():
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_actor",
         answer_type=str,
-        choices=[
+        choices={
             "urn:oasis:names:tc:ebxml-msg:actor:topartymsh",
             "urn:oasis:names:tc:ebxml-msg:actor:nextmsh",
-        ],
+        },
     )  # This is the reliabilityConfigurationActor - ticket mandatory, Joel optional
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_sync_reply_mode",
         answer_type=str,
-        choices=["MSHSIGNALSONLY", "NEVER", "NONE", "SIGNALSANDRESPONSE"],
+        choices={"MSHSIGNALSONLY", "NEVER", "NONE", "SIGNALSANDRESPONSE"},
     )  # This is the reliabilityConfigurationReplyMode - mandatory on ticket? Optional for Joel
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_retry_interval", answer_type=str
     )  # This is the reliabilityConfigurationRetryInterval - mandatory on ticket, optional Joel
     spine_endpoint_questionnaire.add_question(
-        name="nhs_mhs_retries", answer_type=(str, int), validation_rules=[empty_str]
+        name="nhs_mhs_retries", answer_type=(str, int), validation_rules={empty_str}
     )  # This is the reliabilityConfigurationRetries - mandatory on ticket, optional Joel
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_persist_duration", answer_type=str
@@ -54,10 +54,10 @@ def create_spine_endpoint_questionnaire_v1():
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_duplicate_elimination",
         answer_type=str,
-        choices=["ALWAYS", "NEVER"],
+        choices={"ALWAYS", "NEVER"},
     )  # This is the reliabilityConfigurationDuplicationElimination - optional?
     spine_endpoint_questionnaire.add_question(
-        name="nhs_mhs_ack_requested", answer_type=str, choices=["ALWAYS", "NEVER"]
+        name="nhs_mhs_ack_requested", answer_type=str, choices={"ALWAYS", "NEVER"}
     )  # This is the reliabilityConfigurationAckRequested - optional?
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_svc_ia", answer_type=str
@@ -65,7 +65,7 @@ def create_spine_endpoint_questionnaire_v1():
 
     # not on ticket:
     spine_endpoint_questionnaire.add_question(
-        name="object_class", answer_type=str, mandatory=True, choices=["nhsmhs"]
+        name="object_class", answer_type=str, mandatory=True, choices={"nhsmhs"}
     )
     spine_endpoint_questionnaire.add_question(
         name="nhs_approver_urp", answer_type=str, mandatory=True
@@ -89,7 +89,7 @@ def create_spine_endpoint_questionnaire_v1():
         name="nhs_ep_interaction_type",
         answer_type=str,
         mandatory=True,
-        choices=["FHIR", "HL7", "EBXML", "N/A", "MSHSIGNALSONLY"],
+        choices={"FHIR", "HL7", "EBXML", "N/A", "MSHSIGNALSONLY"},
     )
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_fqdn", answer_type=str, mandatory=True
@@ -104,7 +104,7 @@ def create_spine_endpoint_questionnaire_v1():
         name="nhs_mhs_is_authenticated",
         answer_type=str,
         mandatory=True,
-        choices=["NONE", "TRANSIENT", "PERSISTENT"],
+        choices={"NONE", "TRANSIENT", "PERSISTENT"},
     )
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_sn", answer_type=str, mandatory=True
