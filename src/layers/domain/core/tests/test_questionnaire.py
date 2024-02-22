@@ -12,7 +12,7 @@ from domain.core.questionnaire import (
     validate_mandatory_questions_answered,
     validate_response_against_question,
 )
-from domain.core.questionnaire_validation_custom_rules import url
+from domain.core.questionnaire_validation_custom_rules import empty_str, url
 from pydantic import ValidationError
 
 
@@ -131,6 +131,39 @@ def test_cannot_add_question_of_wrong_type(
 
     assert (
         error.value.errors()[0]["msg"] == f"Answer type {answer_type} is not allowed."
+    )
+
+
+@pytest.mark.parametrize(
+    ["name", "answer_type", "mandatory", "multiple", "validation_rules", "choices"],
+    [
+        ["question1", (list, dict), False, False, None, None],
+    ],
+)
+def test_cannot_add_question_of_wrong_type_2(
+    name: str,
+    answer_type: Type,
+    mandatory: bool,
+    multiple: bool,
+    validation_rules: set[FunctionType],
+    choices: set[str],
+):
+    questionnaire = Questionnaire(name="sample_questionnaire", version=1)
+    invalid_answer_types = [list, dict]
+
+    with pytest.raises(ValueError) as error:
+        result = questionnaire.add_question(
+            name=name,
+            answer_type=answer_type,
+            mandatory=mandatory,
+            multiple=multiple,
+            validation_rules=validation_rules,
+            choices=choices,
+        )
+
+    assert (
+        error.value.errors()[0]["msg"]
+        == f"Answer types {', '.join(map(str, invalid_answer_types))} are not allowed."
     )
 
 
@@ -441,6 +474,35 @@ def test_multiple_question_responses_not_allowed(response: list):
         str(error.value)
         == f"Question 'Question' does not allow multiple responses. Response given: {response}."
     )
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        [
+            ("String or integer response", ["answer_a", 1]),
+            ("Integer or boolean", [1]),
+            ("Integer or boolean or string multiple", [True, 1, "string"]),
+        ],
+    ],
+)
+def test_multiple_answer_types_allowed(response: list[tuple[str, list]]):
+    questionnaire = Questionnaire(name="sample_questionaire", version=1)
+    questionnaire.add_question(
+        name="String or integer response", answer_type=(str, int), multiple=True
+    )
+    questionnaire.add_question(name="Integer or boolean", answer_type=(int, bool))
+    questionnaire.add_question(
+        name="Integer or boolean or string multiple",
+        answer_type=(str, int, bool),
+        multiple=True,
+    )
+
+    questionnaire_response = QuestionnaireResponse(
+        questionnaire=questionnaire, responses=response
+    )
+
+    # if no error raised, the test has implicitly passed
 
 
 @pytest.mark.parametrize(
@@ -910,7 +972,7 @@ def test_invalid_question_response_choice_raises_error(response: list):
         ],
     ],
 )
-def test_valid_questionnaire_responses_rules(response: list[tuple[str, list]]):
+def test_valid_questionnaire_responses_rule_url(response: list[tuple[str, list]]):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(name="url", validation_rules={url})
 
@@ -925,7 +987,7 @@ def test_valid_questionnaire_responses_rules(response: list[tuple[str, list]]):
     "response",
     [["https://www.example.com"]],
 )
-def test_valid_question_response_rule(response: list):
+def test_valid_question_response_rule_url(response: list):
     question = Question(
         name="url",
         answer_type=str,
@@ -940,9 +1002,68 @@ def test_valid_question_response_rule(response: list):
 
 
 @pytest.mark.parametrize(
+    "response",
+    [
+        [
+            ("empty string", [""]),
+            ("empty string or int", [1]),
+        ],
+    ],
+)
+def test_valid_questionnaire_responses_rule_empty_str(response: list[tuple[str, list]]):
+    questionnaire = Questionnaire(name="sample_questionaire", version=1)
+    questionnaire.add_question(name="empty string", validation_rules={empty_str})
+    questionnaire.add_question(
+        name="empty string or int", answer_type=(str, int), validation_rules={empty_str}
+    )
+
+    questionnaire_response = QuestionnaireResponse(
+        questionnaire=questionnaire, responses=response
+    )
+
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
+    "response",
+    [[""]],
+)
+def test_valid_question_response_rule_empty_str(response: list[tuple[str, list]]):
+    question = Question(
+        name="empty string",
+        answer_type=str,
+        mandatory=False,
+        multiple=False,
+        validation_rules={empty_str},
+    )
+
+    result = validate_response_against_question(answers=response, question=question)
+
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
+    "response",
+    [["", 1]],
+)
+def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list]]):
+    question = Question(
+        name="empty string or int",
+        answer_type=(str, int),
+        mandatory=False,
+        multiple=True,
+        validation_rules={empty_str},
+    )
+
+    result = validate_response_against_question(answers=response, question=question)
+
+    # if no error raised, the test has implicitly passed
+
+
+@pytest.mark.parametrize(
     "responses",
     [
-        [("url", ["not_a_url"])],
+        [("url", ["not_a_url"]), ("empty string", ["not an empty string"])],
     ],
 )
 def test_invalid_questionnaire_response_rules_raises_error(
@@ -950,6 +1071,7 @@ def test_invalid_questionnaire_response_rules_raises_error(
 ):
     questionnaire = Questionnaire(name="sample_questionaire", version=1)
     questionnaire.add_question(name="url", validation_rules={url})
+    questionnaire.add_question(name="empty string", validation_rules={empty_str})
 
     with pytest.raises(ValidationError) as error:
         questionnaire_response = QuestionnaireResponse(
@@ -960,13 +1082,17 @@ def test_invalid_questionnaire_response_rules_raises_error(
         error.value.errors()[0]["msg"]
         == f"Question 'url' rule 'url' failed validation for response 'not_a_url' with error: Invalid URL format."
     )
+    assert (
+        error.value.errors()[1]["msg"]
+        == f"Question 'empty string' rule 'empty_str' failed validation for response 'not an empty string' with error: Expected empty string."
+    )
 
 
 @pytest.mark.parametrize(
     "response",
     [["not_a_url"]],
 )
-def test_invalid_question_response_rule_raises_error(response: list):
+def test_invalid_question_response_rule_url_raises_error(response: list):
     question = Question(
         name="url",
         answer_type=str,
@@ -981,4 +1107,26 @@ def test_invalid_question_response_rule_raises_error(response: list):
     assert (
         str(error.value)
         == f"Question '{question.name}' rule 'url' failed validation for response '{response[0]}' with error: Invalid URL format."
+    )
+
+
+@pytest.mark.parametrize(
+    "response",
+    [[1, "not_a_empty_string"]],
+)
+def test_invalid_question_response_rule_empty_str_raises_error(response: list):
+    question = Question(
+        name="empty string",
+        answer_type=(str, int),
+        mandatory=False,
+        multiple=True,
+        validation_rules={empty_str},
+    )
+
+    with pytest.raises(InvalidResponseError) as error:
+        result = validate_response_against_question(answers=response, question=question)
+
+    assert (
+        str(error.value)
+        == f"Question '{question.name}' rule 'empty_str' failed validation for response '{response[1]}' with error: Expected empty string."
     )

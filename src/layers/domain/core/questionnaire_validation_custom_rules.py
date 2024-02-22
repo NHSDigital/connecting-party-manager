@@ -5,3 +5,9 @@ def url(value):
     parsed_url = urlparse(value)
     if not parsed_url.scheme or not parsed_url.netloc:
         raise ValueError("Invalid URL format")
+
+
+def empty_str(value):
+    if type(value) == str:
+        if not len(value) == 0:
+            raise ValueError("Expected empty string")

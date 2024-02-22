@@ -32,7 +32,15 @@ class Question(BaseModel, Generic[T]):
 
     @validator("answer_type")
     def validate_question_type(cls, answer_type):
-        if answer_type not in ALLOWED_QUESTION_TYPES:
+        if isinstance(answer_type, tuple):
+            invalid_types = [
+                item for item in answer_type if item not in ALLOWED_QUESTION_TYPES
+            ]
+            if invalid_types:
+                raise ValueError(
+                    f"Answer types {', '.join(map(str, invalid_types))} are not allowed."
+                )
+        elif answer_type not in ALLOWED_QUESTION_TYPES:
             raise ValueError(f"Answer type {answer_type} is not allowed.")
         return answer_type
 
@@ -155,10 +163,16 @@ def validate_response_against_question(answers: list, question: Question):
         []
     )  # accumulate errors here for multianswer question and raise under a single ValueError
     for answer in answers:
-        if not isinstance(answer, question.answer_type):
-            errors.append(
-                f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
-            )
+        if isinstance(question.answer_type, tuple):
+            if not any(isinstance(answer, item) for item in question.answer_type):
+                errors.append(
+                    f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
+                )
+        else:
+            if not isinstance(answer, question.answer_type):
+                errors.append(
+                    f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
+                )
 
         if question.validation_rules is not None:
             for validation_rule in question.validation_rules:

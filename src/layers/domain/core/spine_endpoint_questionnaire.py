@@ -1,5 +1,5 @@
 from .questionnaire import Questionnaire
-from .questionnaire_validation_custom_rules import url
+from .questionnaire_validation_custom_rules import empty_str, url
 
 
 # You must bump the version if you edit this questionnaire
@@ -46,9 +46,8 @@ def create_spine_endpoint_questionnaire_v1():
         name="nhs_mhs_retry_interval", answer_type=str
     )  # This is the reliabilityConfigurationRetryInterval - mandatory on ticket, optional Joel
     spine_endpoint_questionnaire.add_question(
-        name="nhs_mhs_retries", answer_type=str
+        name="nhs_mhs_retries", answer_type=(str, int), validation_rules=[empty_str]
     )  # This is the reliabilityConfigurationRetries - mandatory on ticket, optional Joel
-    # str or int, empty if str  ???
     spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_persist_duration", answer_type=str
     )  # This is the reliabilityConfigurationPersistDuration - ticket mandatory, Joel optional

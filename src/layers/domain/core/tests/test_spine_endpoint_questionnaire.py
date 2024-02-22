@@ -1,6 +1,6 @@
 import pytest
 from domain.core.questionnaire import Question
-from domain.core.questionnaire_validation_custom_rules import url
+from domain.core.questionnaire_validation_custom_rules import empty_str, url
 from domain.core.spine_endpoint_questionnaire import (
     create_spine_endpoint_questionnaire_v1,
 )
@@ -103,10 +103,10 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_mhs_retries = Question(
         name="nhs_mhs_retries",
-        answer_type=str,
+        answer_type=(str, int),
         mandatory=False,
         multiple=False,
-        validation_rules=None,
+        validation_rules=[empty_str],
         choices=None,
     )
     Q_nhs_mhs_persist_duration = Question(
