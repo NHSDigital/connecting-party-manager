@@ -27,7 +27,7 @@ def create_spine_device_questionnaire_v1():
         name="nhs_as_client", answer_type=str, multiple=True
     )
     spine_device_questionnaire.add_question(
-        name="object_class", answer_type=str, mandatory=True, choices=["nhsas"]
+        name="object_class", answer_type=str, mandatory=True, choices={"nhsas"}
     )
     spine_device_questionnaire.add_question(
         name="nhs_approver_urp", answer_type=str, mandatory=True
