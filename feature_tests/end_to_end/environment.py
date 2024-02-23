@@ -40,9 +40,9 @@ def before_all(context: Context):
         context.session = aws_session
 
     if context.test_mode is TestMode.LOCAL:
-        use_fixture(mock_requests, context=context)
-        use_fixture(mock_dynamodb, context=context, table_name=context.table_name)
         use_fixture(mock_environment, context=context, table_name=context.table_name)
+        use_fixture(mock_dynamodb, context=context, table_name=context.table_name)
+        use_fixture(mock_requests, context=context)
 
 
 def before_feature(context: Context, feature: Feature):

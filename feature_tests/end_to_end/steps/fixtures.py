@@ -3,13 +3,21 @@ from unittest import mock
 
 from behave import fixture
 
+from feature_tests.end_to_end.steps.context import Context
+from feature_tests.end_to_end.steps.endpoint_lambda_mapping import (
+    get_endpoint_lambda_mapping,
+)
 from feature_tests.end_to_end.steps.requests import mock_request
 from test_helpers.dynamodb import mock_table
 
 
 @fixture(name="fixture.mock.dynamodb")
-def mock_dynamodb(context, table_name):
-    with mock_table(table_name=table_name):
+def mock_dynamodb(context: Context, table_name):
+    with mock_table(table_name=table_name) as dynamodb_client:
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+        for path_index_mapping in endpoint_lambda_mapping.values():
+            for index in path_index_mapping.values():
+                index.cache["DYNAMODB_CLIENT"] = dynamodb_client
         yield
 
 

@@ -68,7 +68,7 @@ def _mocked_request(
     """Implement the desired mocked behaviour of the 'request' function"""
     endpoint_lambda_mapping = get_endpoint_lambda_mapping()
     _, path = url.split(sep="/", maxsplit=1)
-    path_params, query_params, handler = parse_api_path(
+    path_params, query_params, index = parse_api_path(
         method=method,
         path=path,
         endpoint_lambda_mapping=endpoint_lambda_mapping,
@@ -94,7 +94,7 @@ def _mocked_request(
         isBase64Encoded=False,
         **optional_fields,
     )
-    raw_response = handler(event.dict())
+    raw_response = index.handler(event.dict())
     response = AwsLambdaResponse(**raw_response)
     return MockedResponse(
         url=url,
