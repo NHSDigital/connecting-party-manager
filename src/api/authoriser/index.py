@@ -1,6 +1,6 @@
+from domain.logging.step_decorators import logging_step_decorators
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
-from event.logging.step_decorators import logging_step_decorators
 from event.step_chain import StepChain
 
 

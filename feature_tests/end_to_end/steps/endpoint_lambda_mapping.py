@@ -29,13 +29,13 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
 
     return {
         "POST": {
-            "Device": api.createDevice.index.handler,
-            "Organization": api.createProductTeam.index.handler,
+            "Device": api.createDevice.index,
+            "Organization": api.createProductTeam.index,
         },
         "GET": {
-            "Device/{id}": api.readDevice.index.handler,
-            "Organization/{id}": api.readProductTeam.index.handler,
-            "_status": api.status.index.handler,
+            "Device/{id}": api.readDevice.index,
+            "Organization/{id}": api.readProductTeam.index,
+            "_status": api.status.index,
         },
     }
 
@@ -99,17 +99,17 @@ def parse_api_path(
     method: str, path: str, endpoint_lambda_mapping: ENDPOINT_LAMBDA_MAPPING
 ):
     """
-    Iterate over 'endpoint_lambda_mapping' to find a matching method/path/handler
+    Iterate over 'endpoint_lambda_mapping' to find a matching method/path/index
     and parse out any path and query parameters
     """
-    path_handler_mapping = endpoint_lambda_mapping.get(method, {})
-    for path_template, handler in path_handler_mapping.items():
+    path_index_mapping = endpoint_lambda_mapping.get(method, {})
+    for path_template, index in path_index_mapping.items():
         path_params, query_params, result = _parse_params_from_url(
             path_template=path_template, path=path
         )
         if result:
-            return (path_params, query_params, handler)
+            return (path_params, query_params, index)
     raise EndpointConfigurationError(
-        "Configuration error: add the handler for"
+        "Configuration error: add the index for"
         f" ({method}, {path}) to endpoint_lambda_mapping"
     )

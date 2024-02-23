@@ -27,3 +27,7 @@ class DistinguishedName(BaseModel):
 
     def __hash__(self):
         return hash(self.parts)
+
+    @property
+    def raw(self) -> str:
+        return ",".join("=".join(part) for part in self.parts)

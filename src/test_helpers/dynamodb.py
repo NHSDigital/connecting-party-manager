@@ -99,3 +99,4 @@ def mock_table(table_name: str):
                 BillingMode="PAY_PER_REQUEST",
             )
             yield client
+            client.delete_table(TableName=table_name)

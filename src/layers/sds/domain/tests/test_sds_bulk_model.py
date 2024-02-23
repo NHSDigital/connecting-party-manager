@@ -1,28 +1,42 @@
 # all files listed here get downloaded to the paths listed in 'test_data_paths'
-from collections import Counter
+from collections import Counter, deque
 from io import BytesIO
 
+import boto3
 import pytest
-from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property
+from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property, parse_ldif
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.nhs_mhs_action import NhsMhsAction
 from sds.domain.nhs_mhs_cp import NhsMhsCp
 from sds.domain.nhs_mhs_service import NhsMhsService
 from sds.domain.organizational_unit import OrganizationalUnit
-from sds.domain.parse import parse_ldif_to_sds
+from sds.domain.parse import parse_sds_record
 
+from test_helpers.ci_skip import memory_intensive
 from test_helpers.terraform import read_terraform_output
+
+BULK_SKIPS = [245315]
+BULK_FILTER_SKIPS = [64320]
 
 
 @pytest.mark.s3("sds/etl/bulk/1701246-mini.ldif")
 def test_bulk_data_is_valid_sds_mini(test_data_paths):
     (ldif_path,) = test_data_paths
 
-    processed_records = [
-        type(sds_record) if not isinstance(sds_record, ExceptionGroup) else sds_record
-        for sds_record in parse_ldif_to_sds(file_opener=open, path_or_data=ldif_path)
-    ]
+    unprocessed_records = deque(parse_ldif(file_opener=open, path_or_data=ldif_path))
+    processed_records = []
+    while unprocessed_records:
+        distinguished_name, record = unprocessed_records[0]
+        try:
+            sds_record = parse_sds_record(
+                distinguished_name=distinguished_name, record=record
+            )
+            processed_records.append(type(sds_record))
+        except Exception as exception:
+            processed_records.append(exception)
+        else:
+            unprocessed_records.popleft()
 
     assert Counter(processed_records) == {
         NhsMhsAction: 1660,
@@ -33,16 +47,28 @@ def test_bulk_data_is_valid_sds_mini(test_data_paths):
     }
 
 
+@memory_intensive
 @pytest.mark.s3("sds/etl/bulk/1701246.ldif")
 def test_bulk_data_is_valid_sds_full(test_data_paths):
     (ldif_path,) = test_data_paths
 
-    processed_records = [
-        type(sds_record)
-        for sds_record in parse_ldif_to_sds(
-            file_opener=open, path_or_data=ldif_path, skip=[245315]
-        )
-    ]
+    unprocessed_records = deque(parse_ldif(file_opener=open, path_or_data=ldif_path))
+
+    index = 0
+    processed_records = []
+    while unprocessed_records:
+        distinguished_name, record = unprocessed_records[0]
+        try:
+            if index not in BULK_SKIPS:
+                sds_record = parse_sds_record(
+                    distinguished_name=distinguished_name, record=record
+                )
+                processed_records.append(type(sds_record))
+        except Exception as exception:
+            processed_records.append(exception)
+        else:
+            unprocessed_records.popleft()
+        index += 1
 
     assert Counter(processed_records) == {
         NhsMhs: 155574,
@@ -59,17 +85,30 @@ def test_filter_ldif_from_s3_by_property_mini():
     test_data_bucket = read_terraform_output("test_data_bucket.value")
 
     filtered_ldif = filter_ldif_from_s3_by_property(
-        bucket=test_data_bucket,
-        key="sds/etl/bulk/1701246-mini.ldif",
+        s3_client=boto3.client("s3"),
+        s3_path=f"s3://{test_data_bucket}/sds/etl/bulk/1701246-mini.ldif",
         filter_terms=[("objectClass", "nhsMHS"), ("objectClass", "nhsAS")],
     )
 
-    processed_records = [
-        type(sds_record)
-        for sds_record in parse_ldif_to_sds(
-            file_opener=BytesIO, path_or_data=filtered_ldif
-        )
-    ]
+    unprocessed_records = deque(
+        parse_ldif(file_opener=BytesIO, path_or_data=filtered_ldif)
+    )
+
+    index = 0
+    processed_records = []
+    while unprocessed_records:
+        distinguished_name, record = unprocessed_records[0]
+        try:
+            if index not in BULK_FILTER_SKIPS:
+                sds_record = parse_sds_record(
+                    distinguished_name=distinguished_name, record=record
+                )
+                processed_records.append(type(sds_record))
+        except Exception as exception:
+            processed_records.append(exception)
+        else:
+            unprocessed_records.popleft()
+        index += 1
 
     assert Counter(processed_records) == {
         NhsMhs: 1655,
@@ -77,22 +116,36 @@ def test_filter_ldif_from_s3_by_property_mini():
     }
 
 
+@memory_intensive
 @pytest.mark.integration
 def test_filter_ldif_from_s3_by_property_full():
     test_data_bucket = read_terraform_output("test_data_bucket.value")
 
     filtered_ldif = filter_ldif_from_s3_by_property(
-        bucket=test_data_bucket,
-        key="sds/etl/bulk/1701246.ldif",
+        s3_client=boto3.client("s3"),
+        s3_path=f"s3://{test_data_bucket}/sds/etl/bulk/1701246.ldif",
         filter_terms=[("objectClass", "nhsMHS"), ("objectClass", "nhsAS")],
     )
 
-    processed_records = [
-        type(sds_record)
-        for sds_record in parse_ldif_to_sds(
-            file_opener=BytesIO, path_or_data=filtered_ldif, skip=[64320]
-        )
-    ]
+    unprocessed_records = deque(
+        parse_ldif(file_opener=BytesIO, path_or_data=filtered_ldif)
+    )
+
+    index = 0
+    processed_records = []
+    while unprocessed_records:
+        distinguished_name, record = unprocessed_records[0]
+        try:
+            if index not in BULK_FILTER_SKIPS:
+                sds_record = parse_sds_record(
+                    distinguished_name=distinguished_name, record=record
+                )
+                processed_records.append(type(sds_record))
+        except Exception as exception:
+            processed_records.append(exception)
+        else:
+            unprocessed_records.popleft()
+        index += 1
 
     assert Counter(processed_records) == {
         NhsMhs: 155574,

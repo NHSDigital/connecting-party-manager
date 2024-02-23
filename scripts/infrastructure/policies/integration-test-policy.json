@@ -28,10 +28,22 @@
       "Resource": ["arn:aws:s3:::*/*"]
     },
     {
+      "Sid": "S3IntegrationDeletePermissions",
+      "Effect": "Allow",
+      "Action": ["s3:DeleteObject"],
+      "Resource": ["arn:aws:s3:::*--sds--etl/*"]
+    },
+    {
       "Sid": "StepFunctionIntegrationPermissions",
       "Effect": "Allow",
-      "Action": ["states:StartSyncExecution"],
+      "Action": ["states:StartSyncExecution", "states:StartExecution"],
       "Resource": ["arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*"]
+    },
+    {
+      "Sid": "LambdaIntegrationPermissions",
+      "Effect": "Allow",
+      "Action": ["lambda:InvokeFunction"],
+      "Resource": ["arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--notify"]
     },
     {
       "Sid": "ApigeeSecretsIntegrationPermissions",

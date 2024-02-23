@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.02.13"
+version = "2024.02.15"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -9,6 +9,9 @@ packages = [
     { include = "api", from = "src" },
     { include = "domain", from = "src/layers" },
     { include = "event", from = "src/layers" },
+    { include = "api_utils", from = "src/layers" },
+    { include = "etl_utils", from = "src/layers" },
+    { include = "sds", from = "src/layers" },
     { include = "builder", from = "scripts" },
 ]
 
@@ -38,8 +41,9 @@ pyyaml = "^6.0.1"
 proxygen-cli = "^2.1.1"
 moto = "^5.0.1"
 urllib3 = "<2"
-boto3-stubs = {extras = ["dynamodb", "lambda", "s3", "secretsmanager", "stepfunctions"], version = "^1.34.19"}
+boto3-stubs = {extras = ["dynamodb", "iam", "lambda", "s3", "secretsmanager", "stepfunctions"], version = "^1.34.37"}
 pytest-lazy-fixture = "^0.6.3"
+pytest-timeout = "^2.2.0"
 
 
 [tool.poetry.group.local.dependencies]
@@ -55,7 +59,7 @@ profile = "black"
 [tool.pytest.ini_options]
 markers = ["unit", "integration", "smoke", "slow", "s3"]
 addopts = "--import-mode=importlib"
-filterwarnings = ["ignore:from_type:"]                    # Ignores an annoying hypothesis warning
+filterwarnings = ["ignore:from_type:"]                   # Ignores an annoying hypothesis warning
 
 [tool.black]
 line-length = 88

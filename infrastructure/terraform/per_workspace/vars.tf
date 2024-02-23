@@ -36,7 +36,8 @@ variable "api_lambda_layers" {
   default = [
     "domain",
     "event",
-    "third_party"
+    "third_party",
+    "api_utils"
   ]
 }
 

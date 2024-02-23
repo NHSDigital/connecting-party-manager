@@ -26,6 +26,10 @@ variable "etl_layer_arn" {
   type = string
 }
 
+variable "sds_layer_arn" {
+  type = string
+}
+
 variable "event_layer_arn" {
   type = string
 }

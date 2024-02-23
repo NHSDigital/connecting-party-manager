@@ -4,7 +4,7 @@ from domain.fhir.r4 import Organization, StrictOrganization
 from domain.fhir.r4.cpm_model import OdsIdentifier, OdsReference
 from domain.fhir.r4.cpm_model import Organization as ProductTeamOrganization
 from domain.fhir.r4.cpm_model import ProductTeamIdentifier
-from event.response.validation_errors import mark_validation_errors_as_inbound
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 from .parse import create_fhir_model_from_fhir_json
 

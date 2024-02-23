@@ -5,8 +5,8 @@ from unittest import mock
 from urllib.parse import quote_plus
 
 from aws_lambda_powertools.utilities.parser.models import APIGatewayProxyEventModel
+from domain.response.aws_lambda_response import AwsLambdaResponse
 from event.json import json_loads
-from event.response.aws_lambda_response import AwsLambdaResponse
 from requests import HTTPError, Response, request
 
 from feature_tests.end_to_end.steps.data import DUMMY_CONTEXT
@@ -68,7 +68,7 @@ def _mocked_request(
     """Implement the desired mocked behaviour of the 'request' function"""
     endpoint_lambda_mapping = get_endpoint_lambda_mapping()
     _, path = url.split(sep="/", maxsplit=1)
-    path_params, query_params, handler = parse_api_path(
+    path_params, query_params, index = parse_api_path(
         method=method,
         path=path,
         endpoint_lambda_mapping=endpoint_lambda_mapping,
@@ -94,7 +94,7 @@ def _mocked_request(
         isBase64Encoded=False,
         **optional_fields,
     )
-    raw_response = handler(event.dict())
+    raw_response = index.handler(event.dict())
     response = AwsLambdaResponse(**raw_response)
     return MockedResponse(
         url=url,

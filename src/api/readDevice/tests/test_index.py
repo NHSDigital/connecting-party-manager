@@ -38,7 +38,9 @@ def test_index(version):
         },
         clear=True,
     ):
-        from api.readDevice.index import handler
+        from api.readDevice.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
 
         device_repo = DeviceRepository(table_name=TABLE_NAME, dynamodb_client=client)
         device_repo.write(entity=device)

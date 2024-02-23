@@ -145,4 +145,6 @@ module "sds_etl" {
   python_version        = var.python_version
   event_layer_arn       = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
   third_party_layer_arn = element([for instance in module.layers : instance if instance.name == "third_party"], 0).layer_arn
+  table_arn             = module.table.dynamodb_table_arn
+  table_name            = module.table.dynamodb_table_name
 }

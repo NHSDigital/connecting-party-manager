@@ -26,10 +26,6 @@ inputs:
     description: "[Optional] save to cache?"
     required: false
     default: "false"
-  parameter-deploy:
-    description: "If account wide parameter deploy then specify 'parameter_deploy'"
-    required: false
-    default: ""
 runs:
   using: "composite"
   steps:
