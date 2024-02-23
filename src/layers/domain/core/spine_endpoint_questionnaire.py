@@ -31,9 +31,6 @@ def create_spine_endpoint_questionnaire_v1():
         name="nhs_mhs_cpa_id", answer_type=str, mandatory=True
     )
     spine_endpoint_questionnaire.add_question(
-        name="nhsMHSId", answer_type=str, mandatory=True
-    )  # not in Joel's model or nhs_mhs.py model
-    spine_endpoint_questionnaire.add_question(
         name="nhs_mhs_actor",
         human_readable_name="This is the Reliability Configuration Actor",
         answer_type=str,
