@@ -69,6 +69,7 @@ def test_bulk_trigger():
     s3_client.put_object(
         Bucket=etl_bucket, Key=WorkerKey.TRANSFORM, Body=EMPTY_JSON_DATA
     )
+    s3_client.put_object(Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA)
     s3_client.delete_object(Bucket=etl_bucket, Key=initial_trigger_key)
     s3_client.delete_object(Bucket=etl_bucket, Key=final_trigger_key)
     s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
