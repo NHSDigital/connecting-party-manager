@@ -17,6 +17,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
 
     Q_nhs_mhs_manufacturer_org = Question(
         name="nhs_mhs_manufacturer_org",
+        human_readable_name="This is the Manufacturing Ods Code",
         answer_type=str,
         mandatory=False,
         multiple=False,
@@ -25,6 +26,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     )
     Q_nhs_as_svc_ia = Question(
         name="nhs_as_svc_ia",
+        human_readable_name="These are the Interaction Ids",
         answer_type=str,
         mandatory=True,
         multiple=True,
@@ -58,6 +60,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     )
     Q_unique_identifier = Question(
         name="unique_identifier",
+        human_readable_name="This is the ASID",
         answer_type=str,
         mandatory=True,
         multiple=False,

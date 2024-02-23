@@ -5,24 +5,30 @@ from .questionnaire import Questionnaire
 def create_spine_device_questionnaire_v1():
     spine_device_questionnaire = Questionnaire(name="spine_device", version=1)
     spine_device_questionnaire.add_question(
-        name="nhs_mhs_manufacturer_org", answer_type=str
-    )  # This is the ManufacturingOdsCode
+        name="nhs_mhs_manufacturer_org",
+        human_readable_name="This is the Manufacturing Ods Code",
+        answer_type=str,
+    )
     spine_device_questionnaire.add_question(
-        name="nhs_as_svc_ia", answer_type=str, mandatory=True, multiple=True
-    )  # These are the InteractionIds
+        name="nhs_as_svc_ia",
+        human_readable_name="These are the Interaction Ids",
+        answer_type=str,
+        mandatory=True,
+        multiple=True,
+    )
     spine_device_questionnaire.add_question(
         name="nhs_mhs_party_key", answer_type=str, mandatory=True
     )
-
     spine_device_questionnaire.add_question(
         name="nhs_id_code", answer_type=str, mandatory=True
-    )  # What is this? Different to nhs_as_client
+    )
     spine_device_questionnaire.add_question(name="nhs_product_name", answer_type=str)
-    # covered in cpm device class but may need to override?
-
     spine_device_questionnaire.add_question(
-        name="unique_identifier", answer_type=str, mandatory=True
-    )  # This is the ASID
+        name="unique_identifier",
+        human_readable_name="This is the ASID",
+        answer_type=str,
+        mandatory=True,
+    )
     spine_device_questionnaire.add_question(
         name="nhs_as_client", answer_type=str, multiple=True
     )
