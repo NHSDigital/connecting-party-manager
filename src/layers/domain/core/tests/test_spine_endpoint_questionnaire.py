@@ -289,12 +289,4 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
             expected_question.name
         ]
 
-        assert actual_question.name == expected_question.name
-        assert (
-            actual_question.human_readable_name == expected_question.human_readable_name
-        )
-        assert actual_question.answer_type == expected_question.answer_type
-        assert actual_question.mandatory == expected_question.mandatory
-        assert actual_question.multiple == expected_question.multiple
-        assert actual_question.validation_rules == expected_question.validation_rules
-        assert actual_question.choices == expected_question.choices
+        assert expected_question == actual_question
