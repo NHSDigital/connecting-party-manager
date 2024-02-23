@@ -17,7 +17,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
 
     Q_nhs_mhs_manufacturer_org = Question(
         name="nhs_mhs_manufacturer_org",
-        human_readable_name="This is the Manufacturing Ods Code",
+        human_readable_name="This is the Manufacturer Ods Code",
         answer_type=str,
         mandatory=False,
         multiple=False,
