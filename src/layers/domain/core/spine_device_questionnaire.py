@@ -6,7 +6,7 @@ def create_spine_device_questionnaire_v1():
     spine_device_questionnaire = Questionnaire(name="spine_device", version=1)
     spine_device_questionnaire.add_question(
         name="nhs_mhs_manufacturer_org",
-        human_readable_name="This is the Manufacturing Ods Code",
+        human_readable_name="This is the Manufacturer Ods Code",
         answer_type=str,
     )
     spine_device_questionnaire.add_question(
