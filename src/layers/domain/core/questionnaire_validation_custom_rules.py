@@ -8,21 +8,5 @@ def url(value):
 
 
 def empty_str(value):
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     if isinstance(value, str) and len(value) != 0:
         raise ValueError("Expected empty string")
-=======
-    if type(value) == str:
-        if not len(value) == 0:
-=======
-    if isinstance(value, str):
-        if len(value) != 0:
->>>>>>> d364e92 (sonarcloud suggestions)
-            raise ValueError("Expected empty string")
->>>>>>> dabc929 (Added multiple answer types functionality and empty string custom rule)
-=======
-    if isinstance(value, str) and len(value) != 0:
-        raise ValueError("Expected empty string")
->>>>>>> 5244225 (More sonarcloud suggestions)

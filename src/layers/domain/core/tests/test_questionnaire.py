@@ -1176,7 +1176,7 @@ def test_invalid_questionnaire_response_rules_raises_error(
 
     assert (
         error.value.errors()[0]["msg"]
-        == "Question 'url' rule 'url' failed validation for response 'not_a_url' with error: Invalid URL format."
+        == f"Question '{URL_QUESTION_NAME}' rule 'url' failed validation for response 'not_a_url' with error: Invalid URL format."
     )
     assert (
         error.value.errors()[1]["msg"]
