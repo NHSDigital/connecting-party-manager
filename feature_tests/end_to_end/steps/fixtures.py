@@ -30,5 +30,12 @@ def mock_requests(context, *args, **kwargs):
 
 @fixture(name="fixture.mock.environment")
 def mock_environment(context, table_name):
-    with mock.patch.dict(os.environ, {"DYNAMODB_TABLE": table_name}, clear=True):
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
         yield

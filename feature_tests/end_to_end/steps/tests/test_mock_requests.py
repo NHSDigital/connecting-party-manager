@@ -6,19 +6,25 @@ from feature_tests.end_to_end.steps.requests import make_request, mock_request
 PATH = "feature_tests.end_to_end.steps.requests.{}"
 
 
+class Index:
+    def __init__(self, response_body):
+        self.response_body = response_body
+
+    def handler(self, event):
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Length": len(self.response_body), "Version": "1"},
+            "body": self.response_body,
+        }
+
+
 def test__mock_requests():
     response_body = "hiya"
+    index = Index(response_body=response_body)
+
     with mock_request(), mock.patch(
         PATH.format("get_endpoint_lambda_mapping"),
-        return_value={
-            "GET": {
-                "my_url/{id}/{something}": lambda event: {
-                    "statusCode": 200,
-                    "headers": {"Content-Length": len(response_body), "Version": "1"},
-                    "body": response_body,
-                }
-            }
-        },
+        return_value={"GET": {"my_url/{id}/{something}": index}},
     ):
         response = make_request(
             base_url="BASE_URL/my_url/my_id/my_something",
