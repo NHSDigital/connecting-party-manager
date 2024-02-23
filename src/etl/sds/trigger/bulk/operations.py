@@ -48,12 +48,17 @@ def validate_no_changelog_number(s3_client, source_bucket):
 def _validate_s3_file_content(
     s3_client: "S3Client", source_bucket: str, key: WorkerKey, content: str
 ):
-    response = s3_client.get_object(Bucket=source_bucket, Key=key)
-    data = response["Body"].read().decode()
-    if data != content:
-        raise StateFileNotEmpty(
-            bucket=source_bucket, key=key, data=data, content=content
-        )
+    try:
+        response = s3_client.get_object(Bucket=source_bucket, Key=key)
+    except ClientError as error:
+        if error.response["Error"]["Code"] != "NoSuchKey":
+            raise error
+    else:
+        data = response["Body"].read().decode()
+        if data != content:
+            raise StateFileNotEmpty(
+                bucket=source_bucket, key=key, data=data, content=content
+            )
 
 
 def validate_state_keys_are_empty(s3_client: "S3Client", source_bucket):

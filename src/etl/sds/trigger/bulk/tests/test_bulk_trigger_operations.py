@@ -115,6 +115,11 @@ def test_validate_state_keys_are_empty(s3_client: "S3Client", key, expectation):
         validate_state_keys_are_empty(s3_client=s3_client, source_bucket=BUCKET_NAME)
 
 
+def test_validate_state_keys_are_empty_when_no_initial_state(s3_client: "S3Client"):
+    with does_not_raise():
+        validate_state_keys_are_empty(s3_client=s3_client, source_bucket=BUCKET_NAME)
+
+
 @pytest.mark.parametrize(
     ["item", "expectation"],
     [
