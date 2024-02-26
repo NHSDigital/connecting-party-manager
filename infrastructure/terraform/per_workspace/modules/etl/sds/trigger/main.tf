@@ -25,7 +25,8 @@ module "lambda_function" {
     # all compiled dependencies can find each other. Note: this is a hack - and
     # may result in version mismatches between system libs on the lambda. The stable
     # alternative is to run or deploy the service from a container.
-    LD_LIBRARY_PATH = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+    LD_LIBRARY_PATH   = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+    TRUSTSTORE_BUCKET = var.truststore_bucket
   }
 
   create_package         = false

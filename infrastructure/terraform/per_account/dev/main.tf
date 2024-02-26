@@ -45,6 +45,20 @@ module "bucket" {
   }
 }
 
+module "truststore_bucket" {
+  source        = "terraform-aws-modules/s3-bucket/aws"
+  version       = "3.15.2"
+  bucket        = "${local.project}--${replace(terraform.workspace, "_", "-")}--truststore"
+  force_destroy = true
+  versioning = {
+    enabled = true
+  }
+  tags = {
+    Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--truststore"
+  }
+}
+
+
 # -------- ROUTE 53 ---------
 
 resource "aws_route53_zone" "dev-ns" {

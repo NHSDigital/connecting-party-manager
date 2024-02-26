@@ -299,9 +299,10 @@ module "trigger_update" {
   state_machine_arn     = module.step_function.state_machine_arn
   table_arn             = var.table_arn
   table_name            = var.table_name
-  allowed_triggers = {
-  }
+  allowed_triggers      = {}
+  truststore_bucket     = var.truststore_bucket
 }
+
 
 module "bulk_trigger_notification" {
   source        = "../bucket_notification"

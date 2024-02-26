@@ -173,6 +173,11 @@ module "api_entrypoint" {
   depends_on          = [module.domain]
 }
 
+data "aws_s3_bucket" "truststore_bucket" {
+  bucket = "${local.project}--${replace(var.environment, "_", "-")}--truststore"
+}
+
+
 module "sds_etl" {
   source                           = "./modules/etl/sds"
   workspace_prefix                 = "${local.project}--${replace(terraform.workspace, "_", "-")}"
@@ -184,4 +189,5 @@ module "sds_etl" {
   domain_layer                     = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
   table_name                       = module.table.dynamodb_table_name
   table_arn                        = module.table.dynamodb_table_arn
+  truststore_bucket                = data.aws_s3_bucket.truststore_bucket.id
 }

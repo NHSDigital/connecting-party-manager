@@ -51,3 +51,7 @@ variable "table_name" {
 variable "table_arn" {
 
 }
+
+variable "truststore_bucket" {
+  default = ""
+}
