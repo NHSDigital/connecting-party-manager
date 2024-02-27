@@ -46,14 +46,14 @@ Feature: Failure Scenarios
       | Question with a date answer                     | date     | false     |
       | Question with a time answer independent of date | time     | false     |
     When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
-      | question                                        | answer   | answer_type |
-      | Question with a short free-text entry answer    | 1        | int         |
-      | Question with an integer answer                 | alpha    | str         |
-      | Question with a true/flase answer               | 2.22     | float       |
-      | Question with a date and time answer            | beta     | str         |
-      | Question with a real number answer              | True     | bool        |
-      | Question with a date answer                     | 14:30:00 | time        |
-      | Question with a time answer independent of date | gamma    | str         |
+      | question                                        | answer   | answer_types |
+      | Question with a short free-text entry answer    | 1        | int          |
+      | Question with an integer answer                 | alpha    | str          |
+      | Question with a true/flase answer               | 2.22     | float        |
+      | Question with a date and time answer            | beta     | str          |
+      | Question with a real number answer              | True     | bool         |
+      | Question with a date answer                     | 14:30:00 | time         |
+      | Question with a time answer independent of date | gamma    | str          |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is not successful
     And the error is ValidationError
@@ -65,9 +65,9 @@ Feature: Failure Scenarios
       | not mandatory question 2 | str  | false     |
       | mandatory question       | str  | true      |
     When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
-      | question                 | answer | answer_type |
-      | not mandatory question   | answer | str         |
-      | not mandatory question 2 | answer | str         |
+      | question                 | answer | answer_types |
+      | not mandatory question   | answer | str          |
+      | not mandatory question 2 | answer | str          |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is not successful
     And the error is ValidationError
@@ -83,11 +83,11 @@ Feature: Failure Scenarios
       | Question with a date answer                     | date     | false     |
       | Question with a time answer independent of date | time     | false     |
     When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
-      | question                                     | answer | answer_type |
-      | Question with a short free-text entry answer | alpha  | str         |
-      | Question with an integer answer              | 27     | int         |
-      | Question with a true/flase answer            | True   | bool        |
-      | Question not in questionnaire                | name   | str         |
+      | question                                     | answer | answer_types |
+      | Question with a short free-text entry answer | alpha  | str          |
+      | Question with an integer answer              | 27     | int          |
+      | Question with a true/flase answer            | True   | bool         |
+      | Question not in questionnaire                | name   | str          |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is not successful
     And the error is ValidationError

@@ -55,12 +55,12 @@ def step_impl(context: Context, name, version):
     subject = context.questionnaires[(name, version)]
     for row in context.table:
         question_name = row["name"]
-        answer_type_str = row["type"]
+        answer_types_str = row["type"]
         mandatory = row["mandatory"].lower() == "true"
         try:
-            answer_type = TYPE_MAPPING.get(answer_type_str.lower())
+            answer_types = {TYPE_MAPPING.get(answer_types_str.lower())}
             subject.add_question(
-                name=question_name, answer_type=answer_type, mandatory=mandatory
+                name=question_name, answer_types=answer_types, mandatory=mandatory
             )
         except (ValidationError, ValueError, DuplicateError) as e:
             context.error = e
@@ -73,15 +73,15 @@ def step_impl(context: Context, name, version):
     ix = 0
     for row in context.table:
         question_name = row["name"]
-        answer_type_str = row["type"]
+        answer_types_str = row["type"]
         mandatory = row["mandatory"].lower() == "true"
 
         # Convert the string to the corresponding Python type
-        answer_type = TYPE_MAPPING.get(answer_type_str.lower())
+        answer_types = {TYPE_MAPPING.get(answer_types_str.lower())}
 
         q = subject.questions[question_name]
         assert q is not None
-        assert q.answer_type == answer_type
+        assert q.answer_types == answer_types
         assert q.mandatory == mandatory
 
         ix = ix + 1
@@ -94,12 +94,14 @@ def given_questionnaire(context: Context, name: str, version: int):
 
     for row in context.table:
         question_name = row["name"]
-        answer_type_str = row["type"]
+        answer_types_str = row["type"]
         mandatory = row["mandatory"].lower() == "true"
 
         # Convert the string to the corresponding Python type
-        answer_type = TYPE_MAPPING.get(answer_type_str.lower())
-        q.add_question(name=question_name, answer_type=answer_type, mandatory=mandatory)
+        answer_types = {TYPE_MAPPING.get(answer_types_str.lower())}
+        q.add_question(
+            name=question_name, answer_types=answer_types, mandatory=mandatory
+        )
     context.questionnaires[(name, version)] = q
 
 
@@ -111,26 +113,26 @@ def when_questionnaire_responses_provided(context: Context, name: str, version: 
     for row in context.table:
         question_name = row["question"]
         answer = row["answer"]
-        answer_type = row["answer_type"]
+        answer_types = row["answer_types"]
 
-        if answer_type == "str":
+        if answer_types == "str":
             answer = str(answer)
-        elif answer_type == "int":
+        elif answer_types == "int":
             answer = int(answer)
-        elif answer_type == "bool":
+        elif answer_types == "bool":
             if answer.lower() == "true" or answer.lower() == "false":
                 answer = bool(answer)
             else:
                 raise ValidationError(
                     f"answer type for question '{question_name}' must be bool"
                 )
-        elif answer_type == "datetime":
+        elif answer_types == "datetime":
             answer = datetime.strptime(answer, "%Y-%m-%d %H:%M:%S")
-        elif answer_type == "float":
+        elif answer_types == "float":
             answer = float(answer)
-        elif answer_type == "date":
+        elif answer_types == "date":
             answer = datetime.strptime(answer, "%Y-%m-%d").date()
-        elif answer_type == "time":
+        elif answer_types == "time":
             answer = datetime.strptime(answer, "%H:%M:%S").time()
 
         context.questionnaire_response.append((question_name, [answer]))

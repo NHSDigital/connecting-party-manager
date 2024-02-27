@@ -44,14 +44,14 @@ Feature: Success Scenarios
       | Question with a date answer                     | date     | false     |
       | Question with a time answer independent of date | time     | false     |
     When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
-      | question                                        | answer              | answer_type |
-      | Question with a short free-text entry answer    | alpha               | str         |
-      | Question with an integer answer                 | 27                  | int         |
-      | Question with a true/flase answer               | True                | bool        |
-      | Question with a date and time answer            | 2024-02-05 14:30:00 | datetime    |
-      | Question with a real number answer              | 2.22                | float       |
-      | Question with a date answer                     | 2024-02-05          | date        |
-      | Question with a time answer independent of date | 14:30:00            | time        |
+      | question                                        | answer              | answer_types |
+      | Question with a short free-text entry answer    | alpha               | str          |
+      | Question with an integer answer                 | 27                  | int          |
+      | Question with a true/flase answer               | True                | bool         |
+      | Question with a date and time answer            | 2024-02-05 14:30:00 | datetime     |
+      | Question with a real number answer              | 2.22                | float        |
+      | Question with a date answer                     | 2024-02-05          | date         |
+      | Question with a time answer independent of date | 14:30:00            | time         |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is successful
 
@@ -62,7 +62,7 @@ Feature: Success Scenarios
       | Question with an integer answer              | int  | false     |
       | Question with a true/flase answer            | bool | false     |
     When the following questionnaire responses are provided to Questionnaire "example_questionnaire" version 1
-      | question                                     | answer | answer_type |
-      | Question with a short free-text entry answer | alpha  | str         |
+      | question                                     | answer | answer_types |
+      | Question with a short free-text entry answer | alpha  | str          |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is successful
