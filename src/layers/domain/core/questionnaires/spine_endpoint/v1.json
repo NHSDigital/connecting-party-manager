@@ -1,0 +1,168 @@
+[
+  {
+    "name": "nhs_mhs_end_point",
+    "human_readable_name": "This is the address",
+    "answer_types": ["str"],
+    "mandatory": true,
+    "validation_rules": ["url"]
+  },
+  {
+    "name": "unique_identifier",
+    "human_readable_name": "This is the ASID",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_id_code",
+    "human_readable_name": "This is the Managing Organization",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_mhs_party_key",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_mhs_cpa_id",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_mhs_actor",
+    "human_readable_name": "This is the Reliability Configuration Actor",
+    "answer_types": ["str"],
+    "choices": [
+      "urn:oasis:names:tc:ebxml-msg:actor:topartymsh",
+      "urn:oasis:names:tc:ebxml-msg:actor:nextmsh"
+    ]
+  },
+  {
+    "name": "nhs_mhs_sync_reply_mode",
+    "human_readable_name": "This is the Reliability Configuration Reply Mode",
+    "answer_types": ["str"],
+    "choices": ["MSHSIGNALSONLY", "NEVER", "NONE", "SIGNALSANDRESPONSE"]
+  },
+  {
+    "name": "nhs_mhs_retry_interval",
+    "human_readable_name": "This is the Reliability Configuration Retry Interval",
+    "answer_types": ["str"]
+  },
+  {
+    "name": "nhs_mhs_retries",
+    "human_readable_name": "This is the Reliability Configuration Retries",
+    "answer_types": ["str", "int"],
+    "validation_rules": ["empty_str"]
+  },
+  {
+    "name": "nhs_mhs_persist_duration",
+    "human_readable_name": "This is the Reliability Configuration Persist Duration",
+    "answer_types": ["str"]
+  },
+  {
+    "name": "nhs_mhs_duplicate_elimination",
+    "human_readable_name": "This is the Reliability Configuration Duplication Elimination",
+    "answer_types": ["str"],
+    "choices": ["ALWAYS", "NEVER"]
+  },
+  {
+    "name": "nhs_mhs_ack_requested",
+    "human_readable_name": "This is the Reliability Configuration Ack Requested",
+    "answer_types": ["str"],
+    "choices": ["ALWAYS", "NEVER"]
+  },
+  {
+    "name": "nhs_mhs_svc_ia",
+    "human_readable_name": "This is the interaction ID",
+    "answer_types": ["str"]
+  },
+  {
+    "name": "object_class",
+    "answer_types": ["str"],
+    "mandatory": true,
+    "choices": ["nhsmhs"]
+  },
+  {
+    "name": "nhs_approver_urp",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_contract_property_template_key",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_date_approved",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_date_dns_approved",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_date_requested",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_dns_approver",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_ep_interaction_type",
+    "answer_types": ["str"],
+    "mandatory": true,
+    "choices": ["FHIR", "HL7", "EBXML", "N/A", "MSHSIGNALSONLY"]
+  },
+  {
+    "name": "nhs_mhs_fqdn",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_mhs_in",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_mhs_ip_address",
+    "answer_types": ["str"]
+  },
+  {
+    "name": "nhs_mhs_is_authenticated",
+    "answer_types": ["str"],
+    "mandatory": true,
+    "choices": ["NONE", "TRANSIENT", "PERSISTENT"]
+  },
+  {
+    "name": "nhs_mhs_sn",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_product_key",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_product_name",
+    "answer_types": ["str"]
+  },
+  {
+    "name": "nhs_product_version",
+    "answer_types": ["str"]
+  },
+  {
+    "name": "nhs_requestor_urp",
+    "answer_types": ["str"],
+    "mandatory": true
+  },
+  {
+    "name": "nhs_mhs_service_description",
+    "answer_types": ["str"]
+  }
+]

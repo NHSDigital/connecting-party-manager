@@ -1,6 +1,7 @@
 from datetime import date, datetime, time
+from functools import partial
 from types import FunctionType
-from typing import Generic, Type, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, validator
 
@@ -24,26 +25,21 @@ class Question(BaseModel, Generic[T]):
         arbitrary_types_allowed = True
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
-    human_readable_name: str = ""
-    answer_type: T
+    human_readable_name: str
+    answer_types: set[T]
     mandatory: bool
     multiple: bool
-    validation_rules: set[FunctionType] = None
-    choices: set[T] = None
+    validation_rules: set[FunctionType]
+    choices: set[T]
 
-    @validator("answer_type")
-    def validate_question_type(cls, answer_type):
-        if isinstance(answer_type, tuple):
-            invalid_types = [
-                item for item in answer_type if item not in ALLOWED_QUESTION_TYPES
-            ]
-            if invalid_types:
-                raise ValueError(
-                    f"Answer types {', '.join(map(str, invalid_types))} are not allowed."
-                )
-        elif answer_type not in ALLOWED_QUESTION_TYPES:
-            raise ValueError(f"Answer type {answer_type} is not allowed.")
-        return answer_type
+    @validator("answer_types")
+    def validate_question_type(cls, answer_types):
+        invalid_types = {
+            item for item in answer_types if item not in ALLOWED_QUESTION_TYPES
+        }
+        if invalid_types:
+            raise ValueError(f"Answer types {invalid_types} are not allowed.")
+        return answer_types
 
 
 class Questionnaire(BaseModel):
@@ -65,7 +61,7 @@ class Questionnaire(BaseModel):
         self,
         name: str,
         human_readable_name: str = "",
-        answer_type: Type = str,
+        answer_types: set[T] = None,
         mandatory: bool = False,
         multiple: bool = False,
         validation_rules: set[FunctionType] = None,
@@ -74,19 +70,24 @@ class Questionnaire(BaseModel):
         """
         Adds a new question to the questionnaire.
         """
+        validation_rules = validation_rules or set()
+        choices = choices or set()
+        answer_types = answer_types or {str}
+
         if name in self.questions:
             raise DuplicateError(f"Question '{name}' already exists.")
-        # Validate choices are of the same type as the question type
+        # Validate each choice is one of the allowed answer types
         if choices is not None and not all(
-            isinstance(choice, answer_type) for choice in choices
+            any(isinstance(choice, answer_type) for answer_type in answer_types)
+            for choice in choices
         ):
             raise ValueError(
-                f"Choices must be of the same type as the question type: {answer_type}."
+                f"Choices must be of the same type as the answer types: {answer_types}."
             )
         question = Question(
             name=name,
             human_readable_name=human_readable_name,
-            answer_type=answer_type,
+            answer_types=answer_types,
             mandatory=mandatory,
             multiple=multiple,
             validation_rules=validation_rules,
@@ -113,14 +114,14 @@ class QuestionnaireResponse(BaseModel):
         responses: list[tuple[str, list]], values: dict[str, Questionnaire]
     ):
         questionnaire = values.get("questionnaire")
-        mandatory_questions = (
-            [] if questionnaire is None else questionnaire.mandatory_questions
-        )
         validate_mandatory_questions_answered(
-            questionnaire=questionnaire,
-            mandatory_questions=mandatory_questions,
-            responses=responses,
+            questionnaire_name=questionnaire.name,
+            mandatory_questions=(
+                [] if questionnaire is None else questionnaire.mandatory_questions
+            ),
+            answered_question_names=(question_name for question_name, _ in responses),
         )
+        return responses
 
     @validator("responses", each_item=True)
     def validate_responses(
@@ -140,16 +141,36 @@ class QuestionnaireResponse(BaseModel):
 
 
 def validate_mandatory_questions_answered(
-    questionnaire: Questionnaire,
+    questionnaire_name: str,
     mandatory_questions: list[Question],
-    responses: list[tuple[str, list]],
+    answered_question_names: list[tuple[str, list]],
 ):
     for question in mandatory_questions:
-        if question.name not in dict(responses):
+        if question.name not in answered_question_names:
             raise InvalidResponseError(
-                f"Mandatory question '{question.name}' in questionnaire '{questionnaire.name}' has not been answered."
+                f"Mandatory question '{question.name}' in questionnaire '{questionnaire_name}' has not been answered."
             )
-    return responses
+    return mandatory_questions
+
+
+def validate_answer_types(answer, answer_types, question_name):
+    if not any(isinstance(answer, _type) for _type in answer_types):
+        raise ValueError(
+            f"Question '{question_name}' expects type {answer_types}. Response '{answer}' is of type '{type(answer)}'"
+        )
+
+
+def validate_choices(answer, choices, question_name):
+    if choices and answer not in choices:
+        raise ValueError(
+            f"Question '{question_name}' expects choices {choices}. Response given: {answer}"
+        )
+
+
+def named_partial(fn, *args, **kwargs):
+    _fn = partial(fn, *args, **kwargs)
+    _fn.__name__ = fn.__name__
+    return _fn
 
 
 def validate_response_against_question(answers: list, question: Question):
@@ -157,32 +178,26 @@ def validate_response_against_question(answers: list, question: Question):
         raise InvalidResponseError(
             f"Question '{question.name}' does not allow multiple responses. Response given: {answers}."
         )
-    errors = (
-        []
-    )  # accumulate errors here for multianswer question and raise under a single ValueError
+    errors = []
+    answer_types_rule = named_partial(
+        validate_answer_types,
+        answer_types=question.answer_types,
+        question_name=question.name,
+    )
+    choices_rule = named_partial(
+        validate_choices, choices=question.choices, question_name=question.name
+    )
+
     for answer in answers:
-        if isinstance(question.answer_type, tuple):
-            if not any(isinstance(answer, item) for item in question.answer_type):
+        for validation_rule in question.validation_rules.union(
+            [answer_types_rule, choices_rule]
+        ):
+            try:
+                validation_rule(answer)
+            except ValueError as e:
                 errors.append(
-                    f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
+                    f"Question '{question.name}' rule '{validation_rule.__name__}' failed validation for response '{answer}' with error: {e}."
                 )
-        else:
-            if not isinstance(answer, question.answer_type):
-                errors.append(
-                    f"Question '{question.name}' expects type {question.answer_type}. Response '{answer}' is of type '{type(answer)}'."
-                )
-        if question.validation_rules is not None:
-            for validation_rule in question.validation_rules:
-                try:
-                    validation_rule(answer)
-                except ValueError as e:
-                    errors.append(
-                        f"Question '{question.name}' rule '{validation_rule.__name__}' failed validation for response '{answer}' with error: {e}."
-                    )
-        if question.choices and answer not in question.choices:
-            errors.append(
-                f"Question '{question.name}' expects choices {question.choices}. Response given: {answer}."
-            )
     if errors:
         raise InvalidResponseError("\n".join(errors))
     return answers
