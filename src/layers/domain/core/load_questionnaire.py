@@ -1,16 +1,11 @@
 from pathlib import Path
 
-from domain.core.questionnaire_validation_custom_rules import empty_str, url
+from domain.core import questionnaire_validation_custom_rules
 from event.json import json_load
 
 from .questionnaire import ALLOWED_QUESTION_TYPES, Questionnaire
 
 PATH_TO_HERE = Path(__file__).parent
-
-VALIDATION_RULE_MAPPING = {
-    "empty_str": empty_str,
-    "url": url,
-}
 
 
 def load_json_file(file_path):
@@ -19,7 +14,7 @@ def load_json_file(file_path):
     return data
 
 
-def process_answer_types(answer_types):
+def convert_answer_type_names_to_python_types(answer_types):
     answer_types = set(
         _type for _type in ALLOWED_QUESTION_TYPES if _type.__name__ in answer_types
     )
@@ -27,8 +22,11 @@ def process_answer_types(answer_types):
     return answer_types
 
 
-def process_validation_rules(validation_rules):
-    return [VALIDATION_RULE_MAPPING[rule] for rule in validation_rules]
+def convert_rule_names_to_rule_functions(validation_rules):
+    return [
+        getattr(questionnaire_validation_custom_rules, rule)
+        for rule in validation_rules
+    ]
 
 
 def render_questionnaire(questionnaire_name, questionnaire_version):
@@ -39,12 +37,13 @@ def render_questionnaire(questionnaire_name, questionnaire_version):
     )
 
     for question in questions:
-        # Convert answer_type string to Python type
         if "answer_types" in question:
-            question["answer_types"] = process_answer_types(question["answer_types"])
+            question["answer_types"] = convert_answer_type_names_to_python_types(
+                question["answer_types"]
+            )
 
         if "validation_rules" in question:
-            question["validation_rules"] = process_validation_rules(
+            question["validation_rules"] = convert_rule_names_to_rule_functions(
                 question["validation_rules"]
             )
 
