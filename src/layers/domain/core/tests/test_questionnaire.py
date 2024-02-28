@@ -364,7 +364,7 @@ def test_mandatory_questions_answered(response: list[tuple[str, list]]):
     mandatory_questions = questionnaire.mandatory_questions
     answered_question_names = [question_name for question_name, _ in response]
 
-    mandatory_questions = [q for q in questionnaire.questions.values() if q.mandatory]
+    # mandatory_questions = [q for q in questionnaire.questions.values() if q.mandatory]
     validate_mandatory_questions_answered(
         questionnaire_name=questionnaire.name,
         mandatory_questions=mandatory_questions,
