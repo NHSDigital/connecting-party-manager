@@ -7,8 +7,8 @@ KEY_SEPARATOR = "#"
 class TableKeys(StrEnum):
     DEVICE = "D"
     DEVICE_KEY = "DK"
-    DEVICE_RELATIONSHIP = "DR"
-    DEVICE_PAGE = "DP"
+    DEVICE_TYPE = "DT"
+    DEVICE_KEY_TYPE = "DKT"
     PRODUCT_TEAM = "PT"
     ODS_ORGANISATION = "O"
 

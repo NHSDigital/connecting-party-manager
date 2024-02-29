@@ -22,22 +22,17 @@ variable "etl_bucket_arn" {
   type = string
 }
 
-variable "etl_layer_arn" {
-  type = string
+variable "layers" {
+  type = list(string)
 }
-
-variable "sds_layer_arn" {
-  type = string
-}
-
-variable "event_layer_arn" {
-  type = string
-}
-
-variable "third_party_layer_arn" {
-  type = string
-}
-
 variable "assume_account" {
   type = string
+}
+
+variable "environment_variables" {
+  default = {}
+}
+
+variable "policy_json" {
+
 }

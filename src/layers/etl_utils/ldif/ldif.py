@@ -1,18 +1,15 @@
 import re
 from io import BytesIO
 from types import FunctionType
-from typing import IO, Callable, Generator
+from typing import IO, TYPE_CHECKING, Callable, Generator
 
 from etl_utils.ldif.model import DistinguishedName
 from smart_open import open as _smart_open
 
 from ._ldif import LDIFParser, LDIFWriter
 
-# Annotation imports
-try:
+if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
-except ModuleNotFoundError:
-    S3Client = None
 
 
 EMPTY_BYTESTRING = b""
@@ -85,7 +82,7 @@ class StreamBlock:
 
 
 def filter_ldif_from_s3_by_property(
-    s3_path, filter_terms: list[tuple[str, str]], s3_client: S3Client
+    s3_path, filter_terms: list[tuple[str, str]], s3_client: "S3Client"
 ) -> memoryview:
     """
     Efficiently streams a file from S3 directly into a bytes memoryview,

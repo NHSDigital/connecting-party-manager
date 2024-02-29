@@ -7,9 +7,13 @@ from pydantic import BaseModel, Field
 
 from .errors import AlreadyExistsError, UnhandledTransaction
 
+ATTRIBUTE_NOT_EXISTS = "attribute_not_exists({})".format
+
 
 class ConditionExpression(StrEnum):
-    MUST_NOT_EXIST = "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+    MUST_NOT_EXIST = " AND ".join(
+        map(ATTRIBUTE_NOT_EXISTS, ("pk", "sk", "pk_1", "sk_1", "pk_2", "sk_2"))
+    )
 
 
 TRANSACTION_ERROR_MAPPING = {
@@ -70,4 +74,5 @@ def handle_client_errors(commands: list[TransactionItem]):
         raise UnhandledTransaction(
             message=response.Error.Message,
             code=response.Error.Code,
+            unhandled_transactions=commands,
         )

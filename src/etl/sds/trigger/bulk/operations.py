@@ -35,7 +35,7 @@ class ChangelogNumberExists(Exception):
         )
 
 
-def validate_no_changelog_number(s3_client, source_bucket):
+def validate_no_changelog_number(s3_client: "S3Client", source_bucket):
     try:
         s3_client.head_object(Bucket=source_bucket, Key=CHANGELOG_NUMBER)
     except ClientError as error:

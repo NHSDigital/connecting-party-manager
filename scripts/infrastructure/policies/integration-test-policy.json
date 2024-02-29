@@ -36,8 +36,11 @@
     {
       "Sid": "StepFunctionIntegrationPermissions",
       "Effect": "Allow",
-      "Action": ["states:StartSyncExecution", "states:StartExecution"],
-      "Resource": ["arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*"]
+      "Action": ["states:StartExecution", "states:DescribeExecution"],
+      "Resource": [
+        "arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*",
+        "arn:aws:states:*:${ACCOUNT_ID}:execution:*"
+      ]
     },
     {
       "Sid": "LambdaIntegrationPermissions",

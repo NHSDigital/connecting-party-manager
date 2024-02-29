@@ -26,15 +26,15 @@ def test__render_exception_group():
     )
     assert render_exception(nested_exception) == (
         "outer-group\n"
-        "  -- Error 1 --\n"
+        "  -- Error 1 (ValueError) --\n"
         "  oops\n"
-        "  -- Error 2 --\n"
+        "  -- Error 2 (ExceptionGroup) --\n"
         "  inner-group\n"
-        "    -- Error 2.1 --\n"
+        "    -- Error 2.1 (ExceptionGroup) --\n"
         "    inner-inner-group\n"
-        "      -- Error 2.1.1 --\n"
+        "      -- Error 2.1.1 (ValueError) --\n"
         "      inner-inner-oops\n"
-        "    -- Error 2.2 --\n"
+        "    -- Error 2.2 (ValueError) --\n"
         "    inner-oops-note-1, inner-oops-note-2\n"
         "    inner-oops"
     )

@@ -70,6 +70,79 @@
                   "BackoffRate": 2
                 }
               ],
+              "Next": "extract-result"
+            },
+            "extract-result": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.error_message",
+                  "IsNull": true,
+                  "Next": "transform"
+                }
+              ],
+              "Default": "worker-failed"
+            },
+            "transform": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${transform_worker_arn}:$LATEST"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 1,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "Next": "transform-result"
+            },
+            "transform-result": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.error_message",
+                  "IsNull": true,
+                  "Next": "load"
+                }
+              ],
+              "Default": "worker-failed"
+            },
+            "load": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${load_worker_arn}:$LATEST"
+              },
+
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 1,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "End": true
+            },
+            "worker-failed": {
+              "Type": "Pass",
               "End": true
             },
             "invalid-init-value": {
