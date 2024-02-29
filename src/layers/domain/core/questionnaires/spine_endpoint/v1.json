@@ -167,6 +167,7 @@
   },
   {
     "name": "nhs_mhs_manufacturer_org",
+    "human_readable_name": "Manufacturer ODS code",
     "answer_types": ["str"],
     "mandatory": true
   }

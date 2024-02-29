@@ -302,7 +302,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_manufacturer_org",
-            human_readable_name="",
+            human_readable_name="Manufacturer ODS code",
             answer_types={str},
             mandatory=True,
             multiple=False,
