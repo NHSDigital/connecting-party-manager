@@ -40,7 +40,7 @@ Feature: Failure Scenarios
       | name                                            | type     | mandatory |
       | Question with a short free-text entry answer    | str      | false     |
       | Question with an integer answer                 | int      | false     |
-      | Question with a true/flase answer               | bool     | false     |
+      | Question with a true/false answer               | bool     | false     |
       | Question with a date and time answer            | datetime | false     |
       | Question with a real number answer              | float    | false     |
       | Question with a date answer                     | date     | false     |
@@ -49,7 +49,7 @@ Feature: Failure Scenarios
       | question                                        | answer   | answer_types |
       | Question with a short free-text entry answer    | 1        | int          |
       | Question with an integer answer                 | alpha    | str          |
-      | Question with a true/flase answer               | 2.22     | float        |
+      | Question with a true/false answer               | 2.22     | float        |
       | Question with a date and time answer            | beta     | str          |
       | Question with a real number answer              | True     | bool         |
       | Question with a date answer                     | 14:30:00 | time         |
@@ -77,7 +77,7 @@ Feature: Failure Scenarios
       | name                                            | type     | mandatory |
       | Question with a short free-text entry answer    | str      | false     |
       | Question with an integer answer                 | int      | false     |
-      | Question with a true/flase answer               | bool     | false     |
+      | Question with a true/false answer               | bool     | false     |
       | Question with a date and time answer            | datetime | false     |
       | Question with a real number answer              | float    | false     |
       | Question with a date answer                     | date     | false     |
@@ -86,7 +86,7 @@ Feature: Failure Scenarios
       | question                                     | answer | answer_types |
       | Question with a short free-text entry answer | alpha  | str          |
       | Question with an integer answer              | 27     | int          |
-      | Question with a true/flase answer            | True   | bool         |
+      | Question with a true/false answer            | True   | bool         |
       | Question not in questionnaire                | name   | str          |
     And the responses are validated against Questionnaire "example_questionnaire" version 1
     Then the operation is not successful
