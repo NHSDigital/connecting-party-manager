@@ -1,23 +1,25 @@
 [
   {
     "name": "nhs_mhs_manufacturer_org",
-    "human_readable_name": "This is the Manufacturer Ods Code",
+    "human_readable_name": "Manufacturer Ods Code",
     "answer_types": ["str"]
   },
   {
     "name": "nhs_as_svc_ia",
-    "human_readable_name": "These are the Interaction Ids",
+    "human_readable_name": "Interaction Ids",
     "answer_types": ["str"],
     "mandatory": true,
     "multiple": true
   },
   {
     "name": "nhs_mhs_party_key",
+    "human_readable_name": "Party Key",
     "answer_types": ["str"],
     "mandatory": true
   },
   {
     "name": "nhs_id_code",
+    "human_readable_name": "Owner",
     "answer_types": ["str"],
     "mandatory": true
   },
@@ -27,12 +29,13 @@
   },
   {
     "name": "unique_identifier",
-    "human_readable_name": "This is the ASID",
+    "human_readable_name": "ASID",
     "answer_types": ["str"],
     "mandatory": true
   },
   {
     "name": "nhs_as_client",
+    "human_readable_name": "Owner",
     "answer_types": ["str"],
     "multiple": true
   },

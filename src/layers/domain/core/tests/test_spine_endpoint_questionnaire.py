@@ -20,7 +20,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
     EXPECTED_QUESTIONS = [
         Question(
             name="nhs_mhs_end_point",
-            human_readable_name="This is the address",
+            human_readable_name="Address",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -29,7 +29,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="unique_identifier",
-            human_readable_name="This is the ASID",
+            human_readable_name="ASID",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -38,7 +38,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_id_code",
-            human_readable_name="This is the Managing Organization",
+            human_readable_name="Managing Organization",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -47,7 +47,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_party_key",
-            human_readable_name="",
+            human_readable_name="Mhs Party key",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -56,7 +56,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_cpa_id",
-            human_readable_name="",
+            human_readable_name="Mhs CPA ID",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -65,7 +65,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_actor",
-            human_readable_name="This is the Reliability Configuration Actor",
+            human_readable_name="Reliability Configuration Actor",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -77,7 +77,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_sync_reply_mode",
-            human_readable_name="This is the Reliability Configuration Reply Mode",
+            human_readable_name="Reliability Configuration Reply Mode",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -86,7 +86,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_retry_interval",
-            human_readable_name="This is the Reliability Configuration Retry Interval",
+            human_readable_name="Reliability Configuration Retry Interval",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -95,7 +95,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_retries",
-            human_readable_name="This is the Reliability Configuration Retries",
+            human_readable_name="Reliability Configuration Retries",
             answer_types={str, int},
             mandatory=False,
             multiple=False,
@@ -104,7 +104,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_persist_duration",
-            human_readable_name="This is the Reliability Configuration Persist Duration",
+            human_readable_name="Reliability Configuration Persist Duration",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -113,7 +113,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_duplicate_elimination",
-            human_readable_name="This is the Reliability Configuration Duplication Elimination",
+            human_readable_name="Reliability Configuration Duplication Elimination",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -122,7 +122,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_ack_requested",
-            human_readable_name="This is the Reliability Configuration Ack Requested",
+            human_readable_name="Reliability Configuration Ack Requested",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -131,7 +131,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_svc_ia",
-            human_readable_name="This is the interaction ID",
+            human_readable_name="Interaction ID",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -212,7 +212,7 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_fqdn",
-            human_readable_name="",
+            human_readable_name="Mhs FQDN",
             answer_types={str},
             mandatory=True,
             multiple=False,

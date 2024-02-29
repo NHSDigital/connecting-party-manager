@@ -19,7 +19,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
     EXPECTED_QUESTIONS = [
         Question(
             name="nhs_mhs_manufacturer_org",
-            human_readable_name="This is the Manufacturer Ods Code",
+            human_readable_name="Manufacturer Ods Code",
             answer_types={str},
             mandatory=False,
             multiple=False,
@@ -28,7 +28,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_as_svc_ia",
-            human_readable_name="These are the Interaction Ids",
+            human_readable_name="Interaction Ids",
             answer_types={str},
             mandatory=True,
             multiple=True,
@@ -37,7 +37,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_mhs_party_key",
-            human_readable_name="",
+            human_readable_name="Party Key",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -46,7 +46,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="nhs_id_code",
-            human_readable_name="",
+            human_readable_name="Owner",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -64,7 +64,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         ),
         Question(
             name="unique_identifier",
-            human_readable_name="This is the ASID",
+            human_readable_name="ASID",
             answer_types={str},
             mandatory=True,
             multiple=False,
@@ -74,7 +74,7 @@ def test_spine_device_questionnaire_v1(name: str, version: int):
         Question(
             name="nhs_as_client",
             answer_types={str},
-            human_readable_name="",
+            human_readable_name="Owner",
             mandatory=False,
             multiple=True,
             validation_rules=set(),
