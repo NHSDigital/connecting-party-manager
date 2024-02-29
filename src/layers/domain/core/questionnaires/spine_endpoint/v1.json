@@ -164,5 +164,10 @@
   {
     "name": "nhs_mhs_service_description",
     "answer_types": ["str"]
+  },
+  {
+    "name": "nhs_mhs_manufacturer_org",
+    "answer_types": ["str"],
+    "mandatory": true
   }
 ]

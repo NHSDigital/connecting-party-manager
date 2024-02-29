@@ -300,6 +300,15 @@ def test_spine_endpoint_questionnaire_v1(name: str, version: int):
             validation_rules=set(),
             choices=set(),
         ),
+        Question(
+            name="nhs_mhs_manufacturer_org",
+            human_readable_name="",
+            answer_types={str},
+            mandatory=True,
+            multiple=False,
+            validation_rules=set(),
+            choices=set(),
+        ),
     ]
 
     assert len(EXPECTED_QUESTIONS) == len(spine_endpoint_questionnaire_v1.questions)
