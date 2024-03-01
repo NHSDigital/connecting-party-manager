@@ -80,7 +80,7 @@ module "step_function" {
   type                              = "EXPRESS"
   name                              = "${var.workspace_prefix}--${local.etl_name}"
   use_existing_cloudwatch_log_group = true
-  cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function
+  cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
 
   definition = templatefile(
     "${path.module}/step-function.asl.json",
@@ -140,8 +140,6 @@ module "step_function" {
   tags = {
     Name = "${var.workspace_prefix}--${local.etl_name}"
   }
-
-  depends_on = [aws_cloudwatch_log_group.step_function]
 }
 
 
