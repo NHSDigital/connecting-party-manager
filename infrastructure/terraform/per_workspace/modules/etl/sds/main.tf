@@ -70,7 +70,7 @@ module "notify" {
 }
 
 resource "aws_cloudwatch_log_group" "step_function" {
-  name = "${var.workspace_prefix}--${local.etl_name}--step-function"
+  name = "/aws/vendedlogs/states/${var.workspace_prefix}--${local.etl_name}"
 }
 
 module "step_function" {
