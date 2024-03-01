@@ -138,6 +138,8 @@ module "step_function" {
   tags = {
     Name = "${var.workspace_prefix}--${local.etl_name}"
   }
+
+  depends_on = [aws_cloudwatch_log_group.step_function]
 }
 
 
