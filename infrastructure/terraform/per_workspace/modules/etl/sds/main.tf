@@ -77,8 +77,9 @@ module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
   version = "4.1.0"
 
-  type = "EXPRESS"
-  name = "${var.workspace_prefix}--${local.etl_name}"
+  type                              = "EXPRESS"
+  name                              = "${var.workspace_prefix}--${local.etl_name}"
+  use_existing_cloudwatch_log_group = true
 
   definition = templatefile(
     "${path.module}/step-function.asl.json",
