@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-02-28
+- [PI-192] create spine device questionnaire
+- [PI-191] create spine endpoint questionnaire
+
 ## 2024-02-15
 - [PI-229] Github Actions workflow run names
 - [PI-201] ETL: Extract worker

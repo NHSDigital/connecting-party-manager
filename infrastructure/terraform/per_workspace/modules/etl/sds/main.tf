@@ -70,15 +70,17 @@ module "notify" {
 }
 
 resource "aws_cloudwatch_log_group" "step_function" {
-  name = "${var.workspace_prefix}--${local.etl_name}--step-function"
+  name = "/aws/vendedlogs/states/${var.workspace_prefix}--${local.etl_name}"
 }
 
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
   version = "4.1.0"
 
-  type = "EXPRESS"
-  name = "${var.workspace_prefix}--${local.etl_name}"
+  type                              = "EXPRESS"
+  name                              = "${var.workspace_prefix}--${local.etl_name}"
+  use_existing_cloudwatch_log_group = true
+  cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
 
   definition = templatefile(
     "${path.module}/step-function.asl.json",
@@ -138,6 +140,8 @@ module "step_function" {
   tags = {
     Name = "${var.workspace_prefix}--${local.etl_name}"
   }
+
+  depends_on = [aws_cloudwatch_log_group.step_function]
 }
 
 
