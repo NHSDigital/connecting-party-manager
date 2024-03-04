@@ -23,6 +23,13 @@ workflow--create-feature-branch: workflow--check--rebased-on-main  ## Create a f
 	fi
 	@bash $(PATH_TO_WORKFLOW)/create-feature-branch.sh $(JIRA_TICKET) "$(DESCRIPTION)"
 
+workflow--create-changelog: workflow--check--release-branch-name  ## Create a changelog file for this release
+	@bash $(PATH_TO_WORKFLOW)/create-changelog.sh
+
+workflow--create-release-commit: ## The initial commit for this release
+	@bash $(PATH_TO_WORKFLOW)/create-release-commit.sh
+
+
 
 workflow--codebase-checks:  ## Runs all codebase checks (lint, changelog, etc)
 	.venv/bin/pre-commit run --all-files
