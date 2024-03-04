@@ -182,7 +182,7 @@ module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
   version = "4.1.0"
 
-  type                              = "EXPRESS"
+  type                              = "STANDARD"
   name                              = "${var.workspace_prefix}--${local.etl_name}"
   use_existing_cloudwatch_log_group = true
   cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name

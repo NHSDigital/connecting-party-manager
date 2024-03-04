@@ -7,12 +7,15 @@ from types import FunctionType
 import boto3
 import pytest
 from botocore.exceptions import ClientError
+from domain.core.device import DeviceType
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from event.aws.client import dynamodb_client
 from event.json import json_loads
 from mypy_boto3_s3 import S3Client
 
 from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
-from etl.sds.worker.transform.tests.test_transform_worker import GOOD_SDS_RECORD_AS_JSON
+from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.terraform import read_terraform_output
 
 TEST_DATA_NAME = "test.ldif"
@@ -46,6 +49,10 @@ def test_bulk_trigger():
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
     initial_trigger_key = f"{bulk_trigger_prefix}/{TEST_DATA_NAME}"
     final_trigger_key = f"history/{bulk_trigger_prefix}/{TEST_DATA_NAME}"
+    table_name = read_terraform_output("dynamodb_table_name.value")
+
+    client = dynamodb_client()
+    repository = MockDeviceRepository(table_name=table_name, dynamodb_client=client)
 
     # Set some questions
     s3_client = boto3.client("s3")
@@ -59,9 +66,20 @@ def test_bulk_trigger():
         key=CHANGELOG_NUMBER,
         question=lambda x: json_loads(x) == EXPECTED_CHANGELOG_NUMBER,
     )
-    was_state_machine_successful = lambda: ask_s3(
-        key=WorkerKey.TRANSFORM,
-        question=lambda x: json_loads(x) == [GOOD_SDS_RECORD_AS_JSON],
+    was_state_machine_successful = (
+        lambda: ask_s3(
+            key=WorkerKey.EXTRACT,
+            question=lambda x: x == "",
+        )
+        and ask_s3(
+            key=WorkerKey.TRANSFORM,
+            question=lambda x: json_loads(x) == [],
+        )
+        and ask_s3(
+            key=WorkerKey.LOAD,
+            question=lambda x: json_loads(x) == [],
+        )
+        and repository.count(by=DeviceType.PRODUCT) > 0
     )
 
     # Clear/set the initial state
@@ -73,6 +91,7 @@ def test_bulk_trigger():
     s3_client.delete_object(Bucket=etl_bucket, Key=initial_trigger_key)
     s3_client.delete_object(Bucket=etl_bucket, Key=final_trigger_key)
     s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
+    clear_dynamodb_table(client=client, table_name=table_name)
 
     # Trigger the bulk load
     s3_client.put_object(

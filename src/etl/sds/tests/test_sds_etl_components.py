@@ -8,6 +8,7 @@ from domain.core.device_key import DeviceKeyType
 from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from etl_utils.trigger.model import StateMachineInput
+from event.aws.client import dynamodb_client
 from event.json import json_loads
 from mypy_boto3_stepfunctions.type_defs import StartSyncExecutionOutputTypeDef
 
@@ -39,10 +40,10 @@ def worker_data(request: pytest.FixtureRequest):
 
 @pytest.fixture
 def repository():
-    dynamodb_client = dynamodb_client()
+    client = dynamodb_client()
     table_name = read_terraform_output("dynamodb_table_name.value")
-    clear_dynamodb_table(client=dynamodb_client, table_name=table_name)
-    return MockDeviceRepository(table_name=table_name, dynamodb_client=dynamodb_client)
+    clear_dynamodb_table(client=client, table_name=table_name)
+    return MockDeviceRepository(table_name=table_name, dynamodb_client=client)
 
 
 def execute_state_machine(

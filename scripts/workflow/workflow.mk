@@ -3,6 +3,7 @@
 PATH_TO_WORKFLOW := $(CURDIR)/scripts/workflow
 JIRA_TICKET :=
 DESCRIPTION :=
+MESSAGE :=
 
 workflow--create-release-branch: workflow--check--rebased-on-main ## Create a release branch based on the current date
 	@bash $(PATH_TO_WORKFLOW)/create-release-branch.sh
@@ -29,7 +30,12 @@ workflow--create-changelog: workflow--check--release-branch-name  ## Create a ch
 workflow--create-release-commit: ## The initial commit for this release
 	@bash $(PATH_TO_WORKFLOW)/create-release-commit.sh
 
-
+workflow--commit: ## Format the the commit message with [branch-name] <message> using MESSAGE="<message>"
+	@if [ -z "$(MESSAGE)" ]; then \
+		echo "Error: MESSAGE must be provided."; \
+		exit 1; \
+	fi
+	@MESSAGE="$(MESSAGE)" bash $(PATH_TO_WORKFLOW)/commit.sh
 
 workflow--codebase-checks:  ## Runs all codebase checks (lint, changelog, etc)
 	.venv/bin/pre-commit run --all-files

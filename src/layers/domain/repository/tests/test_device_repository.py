@@ -127,7 +127,7 @@ def test__device_repository__query_by_key_type():
     device_3.add_key(key="DEF:3333333333", type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     device_4 = team.create_device(name="Device_4", type=DeviceType.ENDPOINT)
     device_4.add_key(
-        key="DEF-444:4444444444", type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID
+        key="ABC:DEF-444:4444444444", type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID
     )
 
     device_repo = DeviceRepository(table_name=table_name, dynamodb_client=client)
@@ -157,7 +157,7 @@ def test__device_repository__query_by_type():
     device_3.add_key(key="DEF:3333333333", type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     device_4 = team.create_device(name="Device_4", type=DeviceType.ENDPOINT)
     device_4.add_key(
-        key="DEF-444:4444444444", type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID
+        key="ABC:DEF-444:4444444444", type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID
     )
 
     device_repo = DeviceRepository(table_name=table_name, dynamodb_client=client)

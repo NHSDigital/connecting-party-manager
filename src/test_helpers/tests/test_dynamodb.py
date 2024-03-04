@@ -6,9 +6,10 @@ from test_helpers.dynamodb import mock_table, patch_dynamodb_client
 
 def test_patch_dynamodb_client_patches_the_client():
     client = dynamodb_client()
-    with patch_dynamodb_client() as patched_client:
+    original_query_name = client.query.__name__
+    with patch_dynamodb_client(client=client):
         # Test query is patched
-        assert patched_client.query.__name__ != client.query.__name__
+        assert client.query.__name__ != original_query_name
 
 
 def test_mock_table_query_pk():
