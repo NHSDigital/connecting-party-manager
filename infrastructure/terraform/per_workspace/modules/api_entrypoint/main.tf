@@ -5,4 +5,5 @@ module "api_gateway" {
   assume_account      = var.assume_account
   project             = var.project
   authoriser_metadata = var.authoriser_metadata
+  domain              = var.domain
 }

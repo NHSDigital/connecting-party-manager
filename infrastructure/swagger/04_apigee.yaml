@@ -9,7 +9,7 @@ x-nhsd-apim:
   target: # Only one target (omit for NO backend)
     type: external
     healthcheck: /_status
-    url: ${ terraform_output("invoke_url.value") } # pull out 'invoke_url.value' from tf output
+    url: ${ terraform_output("certificate_domain_name.value") } # pull out deployed validated domain name from tf output
     security:
       type: apikey
       header: apikey

@@ -15,3 +15,7 @@ variable "project" {
 
 variable "authoriser_metadata" {
 }
+
+variable "domain" {
+  type = string
+}

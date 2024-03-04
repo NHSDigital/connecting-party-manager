@@ -26,6 +26,10 @@ output "test_data_bucket" {
   value = "${local.project}--${replace(var.account_name, "_", "-")}--test-data"
 }
 
+output "certificate_domain_name" {
+  value = module.domain.domain_cert
+}
+
 # output "assumed_role" {
 #   value = var.assume_role
 # }
