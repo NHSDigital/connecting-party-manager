@@ -1,10 +1,12 @@
 from dataclasses import asdict
+from typing import TYPE_CHECKING
 
 from domain.core.device import (
     Device,
     DeviceCreatedEvent,
     DeviceKey,
     DeviceKeyAddedEvent,
+    DeviceType,
 )
 
 from .errors import ItemNotFound
@@ -12,6 +14,9 @@ from .keys import TableKeys, strip_key_prefix
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
 from .transaction import ConditionExpression, TransactionItem, TransactionStatement
+
+if TYPE_CHECKING:
+    from mypy_boto3_dynamodb.type_defs import QueryOutputTypeDef
 
 
 class DeviceRepository(Repository[Device]):
@@ -24,10 +29,11 @@ class DeviceRepository(Repository[Device]):
         self, event: DeviceCreatedEvent, entity: Device
     ) -> TransactionItem:
         pk = TableKeys.DEVICE.key(event.id)
+        pk_1 = TableKeys.DEVICE_TYPE.key(event.type)
         return TransactionItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=pk, **asdict(event)),
+                Item=marshall(pk=pk, sk=pk, pk_1=pk_1, sk_1=pk, **asdict(event)),
                 ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
             )
         )
@@ -35,13 +41,38 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceKeyAddedEvent(self, event: DeviceKeyAddedEvent, entity: Device):
         pk = TableKeys.DEVICE.key(event.id)
         sk = TableKeys.DEVICE_KEY.key(event.key)
+        pk_2 = TableKeys.DEVICE_KEY_TYPE.key(event.type)
         return TransactionItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=sk, **asdict(event)),
+                Item=marshall(
+                    pk=pk, sk=sk, pk_1=sk, sk_1=sk, pk_2=pk_2, sk_2=sk, **asdict(event)
+                ),
                 ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
             )
         )
+
+    def query_by_key_type(self, key_type, **kwargs) -> "QueryOutputTypeDef":
+        pk_2 = TableKeys.DEVICE_KEY_TYPE.key(key_type)
+        args = {
+            "TableName": self.table_name,
+            "IndexName": "idx_gsi_2",
+            "KeyConditionExpression": "pk_2 = :pk_2",
+            "ExpressionAttributeValues": {":pk_2": marshall_value(pk_2)},
+        }
+        return self.client.query(**args, **kwargs)
+
+    def query_by_device_type(self, type: DeviceType, **kwargs) -> "QueryOutputTypeDef":
+        pk_1 = TableKeys.DEVICE_TYPE.key(type)
+        args = {
+            "TableName": self.table_name,
+            "IndexName": "idx_gsi_1",
+            "KeyConditionExpression": "pk_1 = :pk_1",
+            "ExpressionAttributeValues": {
+                ":pk_1": marshall_value(pk_1),
+            },
+        }
+        return self.client.query(**args, **kwargs)
 
     def read_by_key(self, key) -> Device:
         pk_1 = TableKeys.DEVICE_KEY.key(key)
@@ -55,9 +86,7 @@ class DeviceRepository(Repository[Device]):
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
             raise ItemNotFound(key)
-
         (item,) = items
-
         return self.read(strip_key_prefix(item["pk"]))
 
     def read(self, id) -> Device:

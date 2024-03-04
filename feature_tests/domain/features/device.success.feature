@@ -41,7 +41,7 @@ Feature: Device Success Scenarios
       | type        | product              |
       | keys.0.key  | P.AAA-CCC            |
       | keys.0.type | product_id           |
-      | keys.1.key  | 12345                |
+      | keys.1.key  | ABC:12345            |
       | keys.1.type | accredited_system_id |
     Then the operation is successful
     And the result is a Device with
@@ -52,8 +52,8 @@ Feature: Device Success Scenarios
       | ods_code                | H8S7A                |
       | keys.P#DOT#AAA-CCC.key  | P.AAA-CCC            |
       | keys.P#DOT#AAA-CCC.type | product_id           |
-      | keys.12345.key          | 12345                |
-      | keys.12345.type         | accredited_system_id |
+      | keys.ABC:12345.key      | ABC:12345            |
+      | keys.ABC:12345.type     | accredited_system_id |
     And the following events were raised for the result
       | event                 |
       | DeviceCreatedEvent    |
@@ -71,5 +71,5 @@ Feature: Device Success Scenarios
       | type     | product_id |
     And event #3 of the result is DeviceKeyAddedEvent with
       | property | value                |
-      | key      | 12345                |
+      | key      | ABC:12345            |
       | type     | accredited_system_id |

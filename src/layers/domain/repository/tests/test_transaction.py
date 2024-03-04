@@ -10,6 +10,20 @@ from domain.repository.transaction import (
     handle_client_errors,
 )
 
+COMMANDS = [
+    TransactionItem(
+        Put=TransactionStatement(
+            TableName="table",
+            Item={},
+            ConditionExpression=(
+                "attribute_not_exists(pk) AND attribute_not_exists(sk) "
+                "AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) "
+                "AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"
+            ),
+        )
+    )
+]
+
 
 @pytest.mark.parametrize(
     ["error_response", "exception"],
@@ -22,7 +36,9 @@ from domain.repository.transaction import (
                 ),
                 CancellationReasons=[],
             ),
-            UnhandledTransaction(message="oops", code="oops123"),
+            UnhandledTransaction(
+                message="oops", code="oops123", unhandled_transactions=COMMANDS
+            ),
         ),
         (
             TransactionErrorResponse(
@@ -32,7 +48,9 @@ from domain.repository.transaction import (
                 ),
                 CancellationReasons=[CancellationReason(Code="woopsy")],
             ),
-            UnhandledTransaction(message="oops", code="oops123"),
+            UnhandledTransaction(
+                message="oops", code="oops123", unhandled_transactions=COMMANDS
+            ),
         ),
         (
             TransactionErrorResponse(
@@ -47,17 +65,8 @@ from domain.repository.transaction import (
     ],
 )
 def test_handle_client_errors(error_response: TransactionErrorResponse, exception):
-    commands = [
-        TransactionItem(
-            Put=TransactionStatement(
-                TableName="table",
-                Item={},
-                ConditionExpression="attribute_not_exists(pk) AND attribute_not_exists(sk)",
-            )
-        )
-    ]
     with pytest.raises(type(exception)) as exc:
-        with handle_client_errors(commands=commands):
+        with handle_client_errors(commands=COMMANDS):
             raise ClientError(
                 error_response=error_response.dict(), operation_name="PUT"
             )

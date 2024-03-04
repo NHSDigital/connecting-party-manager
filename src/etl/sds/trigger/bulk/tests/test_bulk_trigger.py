@@ -11,8 +11,8 @@ from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from event.json import json_loads
 from mypy_boto3_s3 import S3Client
 
-from etl.sds.tests.test_sds_etl_components import GOOD_SDS_RECORD_AS_JSON
 from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
+from etl.sds.worker.transform.tests.test_transform_worker import GOOD_SDS_RECORD_AS_JSON
 from test_helpers.terraform import read_terraform_output
 
 TEST_DATA_NAME = "test.ldif"

@@ -5,15 +5,15 @@ we have implemented 'render_exception' which fully and recursively
 stringifies an ExceptionGroup in the form:
 
 >    outer-group
->      -- Error 1 --
+>      -- Error 1 (ValueError) --
 >      oops
->      -- Error 2 --
+>      -- Error 2 (ExceptionGroup) --
 >      inner-group
->        -- Error 2.1 --
+>        -- Error 2.1 (ExceptionGroup) --
 >        inner-inner-group
->          -- Error 2.1.1 --
+>          -- Error 2.1.1 (TypeError) --
 >          inner-inner-oops
->        -- Error 2.2 --
+>        -- Error 2.2 (ValueError) --
 >        inner-oops-note-1, inner-oops-note-2
 >        inner-oops
 """
@@ -39,7 +39,7 @@ def _render_nested_exception(exception: Exception, nested_index: list[int]):
     indentation = INDENTATION * len(nested_index)
     message = render_exception(exception=exception, nested_index=nested_index)
     error_index = ".".join(map(str, nested_index))
-    prefix = f"-- Error {error_index} --\n"
+    prefix = f"-- Error {error_index} ({type(exception).__name__}) --\n"
     return f"{indentation}{prefix}{message}"
 
 

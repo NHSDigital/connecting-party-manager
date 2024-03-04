@@ -1,3 +1,6 @@
+from pydantic import BaseModel
+
+
 class UnableToUnmarshall(Exception):
     pass
 
@@ -13,5 +16,8 @@ class AlreadyExistsError(Exception):
 
 
 class UnhandledTransaction(Exception):
-    def __init__(self, message: str, code: str):
-        super().__init__(f"{code}: {message}")
+    def __init__(
+        self, message: str, code: str, unhandled_transactions: list[BaseModel]
+    ):
+        _unhandled_transactions = "\n".join(map(BaseModel.json, unhandled_transactions))
+        super().__init__(f"{code}: {message}\n{_unhandled_transactions}")

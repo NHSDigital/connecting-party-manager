@@ -11,7 +11,7 @@
     },
     {
       "system": "connecting-party-manager/accredited_system_id",
-      "value": "12345"
+      "value": "ABC:12345"
     }
   ],
   "definition": {

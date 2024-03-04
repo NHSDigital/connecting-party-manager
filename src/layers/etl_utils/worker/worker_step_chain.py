@@ -7,9 +7,6 @@ from nhs_context_logging import log_action
 from .model import WorkerActionResponse, WorkerResponse
 from .steps import execute_action, save_processed_records, save_unprocessed_records
 
-_log_action_with_result = lambda function: log_action(
-    log_args=["data", "cache"], log_result=True
-)(function)
 _log_action_without_inputs = lambda function: log_action(log_args=[], log_result=False)(
     function
 )
@@ -76,7 +73,7 @@ def execute_step_chain(
     if isinstance(action_chain.result, WorkerActionResponse):
         save_chain = StepChain(
             step_chain=[save_unprocessed_records, save_processed_records],
-            step_decorators=[_log_action_with_result],
+            step_decorators=[_log_action_without_inputs],
         )
         save_chain.run(
             init=(action_chain.result, s3_client, unprocessed_dumper, processed_dumper)

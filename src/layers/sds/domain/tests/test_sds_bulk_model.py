@@ -13,7 +13,7 @@ from sds.domain.nhs_mhs_service import NhsMhsService
 from sds.domain.organizational_unit import OrganizationalUnit
 from sds.domain.parse import parse_sds_record
 
-from test_helpers.ci_skip import memory_intensive
+from test_helpers.pytest_skips import memory_intensive
 from test_helpers.terraform import read_terraform_output
 
 BULK_SKIPS = [245315]
