@@ -37,27 +37,27 @@ module "zones" {
 
 }
 
-resource "aws_route53_record" "prod_zone" {
-  zone_id = module.zones.route53_zone_zone_id["cpm.national.nhs.uk"]
-  name    = "api.cpm.national.nhs.uk"
-  records = [
-    "ns-453.awsdns-56.com.",
-    "ns-980.awsdns-58.net.",
-    "ns-1983.awsdns-55.co.uk.",
-    "ns-1103.awsdns-09.org."
-  ]
-  ttl  = 300
-  type = "NS"
-}
+# resource "aws_route53_record" "prod_zone" {
+#   zone_id = module.zones.route53_zone_zone_id["cpm.national.nhs.uk"]
+#   name    = "api.cpm.national.nhs.uk"
+#   records = [
+#     "ns-453.awsdns-56.com.",
+#     "ns-980.awsdns-58.net.",
+#     "ns-1983.awsdns-55.co.uk.",
+#     "ns-1103.awsdns-09.org."
+#   ]
+#   ttl  = 300
+#   type = "NS"
+# }
 
 resource "aws_route53_record" "dev_zone" {
   zone_id = module.zones.route53_zone_zone_id["cpm.dev.national.nhs.uk"]
   name    = "api.cpm.dev.national.nhs.uk"
   records = [
-    "ns-1028.awsdns-00.org.",
-    "ns-201.awsdns-25.com.",
-    "ns-2007.awsdns-58.co.uk.",
-    "ns-823.awsdns-38.net."
+    "ns-81.awsdns-10.com.",
+    "ns-1238.awsdns-26.org.",
+    "ns-776.awsdns-33.net.",
+    "ns-1540.awsdns-00.co.uk."
   ]
   ttl  = 300
   type = "NS"
@@ -67,10 +67,10 @@ resource "aws_route53_record" "qa_zone" {
   zone_id = module.zones.route53_zone_zone_id["cpm.qa.national.nhs.uk"]
   name    = "api.cpm.qa.national.nhs.uk"
   records = [
-    "ns-286.awsdns-35.com.",
-    "ns-596.awsdns-10.net.",
-    "ns-1571.awsdns-04.co.uk.",
-    "ns-1244.awsdns-27.org."
+    "ns-488.awsdns-61.com.",
+    "ns-1386.awsdns-45.org.",
+    "ns-1805.awsdns-33.co.uk.",
+    "ns-992.awsdns-60.net."
   ]
   ttl  = 300
   type = "NS"
@@ -80,10 +80,10 @@ resource "aws_route53_record" "int_zone" {
   zone_id = module.zones.route53_zone_zone_id["cpm.int.national.nhs.uk"]
   name    = "api.cpm.int.national.nhs.uk"
   records = [
-    "ns-1843.awsdns-38.co.uk.",
-    "ns-1350.awsdns-40.org.",
-    "ns-1020.awsdns-63.net.",
-    "ns-26.awsdns-03.com."
+    "ns-1155.awsdns-16.org.",
+    "ns-1601.awsdns-08.co.uk.",
+    "ns-259.awsdns-32.com.",
+    "ns-742.awsdns-28.net."
   ]
   ttl  = 300
   type = "NS"
@@ -93,10 +93,10 @@ resource "aws_route53_record" "ref_zone" {
   zone_id = module.zones.route53_zone_zone_id["cpm.ref.national.nhs.uk"]
   name    = "api.cpm.ref.national.nhs.uk"
   records = [
-    "ns-287.awsdns-35.com.",
-    "ns-1587.awsdns-06.co.uk.",
-    "ns-1109.awsdns-10.org.",
-    "ns-746.awsdns-29.net."
+    "ns-1032.awsdns-01.org.",
+    "ns-1703.awsdns-20.co.uk.",
+    "ns-698.awsdns-23.net.",
+    "ns-20.awsdns-02.com."
   ]
   ttl  = 300
   type = "NS"

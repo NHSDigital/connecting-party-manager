@@ -129,6 +129,12 @@ module "authoriser" {
   EOT
 }
 
+module "domain" {
+  source = "./modules/domain"
+  domain = local.domain
+  zone   = local.zone
+}
+
 module "api_entrypoint" {
   source              = "./modules/api_entrypoint"
   assume_account      = var.assume_account
@@ -136,6 +142,8 @@ module "api_entrypoint" {
   name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
   lambdas             = setsubtract(var.lambdas, ["authoriser"])
   authoriser_metadata = module.authoriser.metadata
+  domain              = module.domain.domain_cert
+  depends_on          = [module.domain]
 }
 
 module "sds_etl" {
