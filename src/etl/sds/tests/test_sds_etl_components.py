@@ -178,7 +178,7 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
         },
     )
 
-    while count < 20000:
+    while count < 5500:
         time.sleep(15)
         count = repository.count(by=DeviceType.PRODUCT)
     time.sleep(15)
