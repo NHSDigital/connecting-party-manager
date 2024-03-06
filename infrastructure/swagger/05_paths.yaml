@@ -119,7 +119,7 @@ paths:
         - app-level0: []
     get:
       parameters:
-        - name: type
+        - name: device_type
           in: query
           required: true
           description: "Type of device (product or endpoint)"
@@ -128,6 +128,12 @@ paths:
             enum:
               - product
               - endpoint
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
