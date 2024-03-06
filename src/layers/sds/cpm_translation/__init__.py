@@ -41,14 +41,12 @@ def nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs) -> Device:
     party_key = nhs_mhs.nhs_mhs_party_key.strip()
     interaction_id = nhs_mhs.nhs_mhs_svc_ia.strip()
     ods_code = nhs_mhs.nhs_id_code
-    product_name = nhs_mhs.nhs_product_name or party_key
+    scoped_party_key = DEVICE_KEY_SEPARATOR.join((ods_code, party_key, interaction_id))
+    product_name = nhs_mhs.nhs_product_name or scoped_party_key
     organisation = Root.create_ods_organisation(ods_code=ods_code)
     product_team = organisation.create_product_team(**DEFAULT_PRODUCT_TEAM)
     device = product_team.create_device(name=product_name, type=DeviceType.ENDPOINT)
-    device.add_key(
-        type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
-        key=DEVICE_KEY_SEPARATOR.join((ods_code, party_key, interaction_id)),
-    )
+    device.add_key(type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID, key=scoped_party_key)
     return device
 
 
