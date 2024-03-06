@@ -117,6 +117,29 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
+    get:
+      parameters:
+        - name: type
+          in: query
+          required: true
+          description: "Type of device (product or endpoint)"
+          schema:
+            type: string
+            enum:
+              - product
+              - endpoint
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
 
   /Device/{id}:
     get:
