@@ -10,14 +10,14 @@ def get_results(data, cache):
     device_type = event.query_string_parameters["device_type"]
     dir_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),
-        os.path.join("tests", "test_data", "endpoints_response.json"),
+        os.path.join("src", "data", "endpoints_response.json"),
     )
     if device_type.lower() == "product":
         dir_path = os.path.join(
             os.path.dirname(
                 os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
             ),
-            os.path.join("tests", "test_data", "devices_response.json"),
+            os.path.join("src", "data", "devices_response.json"),
         )
     with open(dir_path, "r") as f:
         return json_loads(f)
