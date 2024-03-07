@@ -1,3 +1,4 @@
+import json
 import os
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
@@ -20,7 +21,7 @@ def get_results(data, cache):
             os.path.join("src", "data", "devices_response.json"),
         )
     with open(dir_path, "r") as f:
-        return json_loads(f)
+        return json_loads(json.dumps(f))
 
 
 steps = [
