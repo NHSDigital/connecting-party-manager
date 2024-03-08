@@ -4,21 +4,23 @@ from enum import StrEnum, auto
 from domain.core.error import InvalidDeviceKeyError
 from pydantic import BaseModel, validator
 
-from .validation import ACCREDITED_SYSTEM_ID_REGEX, PRODUCT_ID_REGEX
+from .validation import CpmId, SdsId
 
 
 class DeviceKeyType(StrEnum):
     PRODUCT_ID = auto()
     ACCREDITED_SYSTEM_ID = auto()
-    # SERVICE_NOW_ID = auto()
+    MESSAGE_HANDLING_SYSTEM_ID = auto()
 
     @property
     def pattern(self) -> re.Pattern:
         match self:
             case DeviceKeyType.PRODUCT_ID:
-                return PRODUCT_ID_REGEX
+                return CpmId.Product.ID_PATTERN
             case DeviceKeyType.ACCREDITED_SYSTEM_ID:
-                return ACCREDITED_SYSTEM_ID_REGEX
+                return SdsId.AccreditedSystem.ID_PATTERN
+            case DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID:
+                return SdsId.MessageHandlingSystem.ID_PATTERN
             case _:
                 raise NotImplementedError(f"No ID validation configured for '{self}'")
 

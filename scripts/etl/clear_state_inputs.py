@@ -28,6 +28,9 @@ def main():
         s3_client.put_object(
             Bucket=etl_bucket, Key=WorkerKey.TRANSFORM, Body=EMPTY_JSON_DATA
         )
+        s3_client.put_object(
+            Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA
+        )
         s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
 
 

@@ -22,9 +22,8 @@ module "lambda_function" {
       source_arn = "arn:aws:states:eu-west-2:${var.assume_account}:stateMachine:${var.workspace_prefix}--${var.etl_name}"
     }
   }
-  environment_variables = {
-    ETL_BUCKET = var.etl_bucket_name
-  }
+  environment_variables = merge(var.environment_variables, { ETL_BUCKET = var.etl_bucket_name })
+
 
   create_package         = false
   local_existing_package = "${path.root}/../../../src/etl/sds/worker/${var.etl_stage}/dist/${var.etl_stage}.zip"
@@ -33,7 +32,7 @@ module "lambda_function" {
     Name = "${var.workspace_prefix}--${var.etl_name}--${var.etl_stage}"
   }
 
-  layers = [var.sds_layer_arn, var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
+  layers = var.layers
 
   trusted_entities = [
     {
@@ -45,24 +44,5 @@ module "lambda_function" {
   ]
 
   attach_policy_json = true
-  policy_json        = <<-EOT
-      {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Action": [
-                    "s3:PutObject",
-                    "s3:AbortMultipartUpload",
-                    "s3:GetBucketLocation",
-                    "s3:GetObject",
-                    "s3:ListBucket",
-                    "s3:ListBucketMultipartUploads",
-                    "s3:PutObjectVersionTagging"
-                ],
-                "Effect": "Allow",
-                "Resource": ["${var.etl_bucket_arn}", "${var.etl_bucket_arn}/*"]
-            }
-        ]
-      }
-    EOT
+  policy_json        = var.policy_json
 }

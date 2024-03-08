@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from itertools import permutations
 from typing import Callable
 from unittest import mock
 
@@ -33,6 +34,28 @@ nhsTempUid: 9713
 uniqueIdentifier: 000428682512
 """
 
+ANOTHER_GOOD_SDS_RECORD = """
+dn: uniqueIdentifier=000842065542,ou=Services,o=nhs
+objectClass: nhsAS
+objectClass: top
+description: prtobjfx
+nhsApproverURP: uniqueIdentifier=019732391545,uniqueIdentifier=114738800548,uid=803163224543,ou=People,o=nhs
+nhsAsACF: AAA
+nhsAsClient: 5AW
+nhsAsSvcIA: piwhgu:COPC_IN000001UK01
+nhsDateApproved: 20080625141536
+nhsDateRequested: 20080625141515
+nhsIDCode: 5AW
+nhsMhsManufacturerOrg: 00000
+nhsMHSPartyKey: 5AW-802977
+nhsProductKey: 2946
+nhsProductName: 04575133
+nhsProductVersion: 23790687
+nhsRequestorURP: uniqueIdentifier=393864514541,uniqueIdentifier=114738800548,uid=803163224543,ou=People,o=nhs
+nhsTempUid: 3881
+uniqueIdentifier: 000842065542
+"""
+
 # Bad because fields are missing (fails domain)
 BAD_SDS_RECORD = """
 dn: uniqueIdentifier=000428682512,ou=Services,o=nhs
@@ -49,7 +72,7 @@ objectClass: foo
 PROCESSED_SDS_RECORD = {}  # Empty dict as a dummy value, doesn't matter for extract
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def mock_s3_client():
     with mock_aws(), mock.patch.dict(
         os.environ,
@@ -58,8 +81,8 @@ def mock_s3_client():
     ):
         from etl.sds.worker.extract import extract
 
-        extract.CLIENT.create_bucket(Bucket=BUCKET_NAME)
-        yield extract.CLIENT
+        extract.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
+        yield extract.S3_CLIENT
 
 
 @pytest.fixture
@@ -125,48 +148,36 @@ def test_extract_worker_pass(
 
 
 @pytest.mark.parametrize(
-    ("initial_unprocessed_data", "expected_extra_processed_records"),
-    [
-        (
-            "\n".join([BAD_SDS_RECORD, GOOD_SDS_RECORD, GOOD_SDS_RECORD]),
-            0,
-        ),
-        (
-            "\n".join([GOOD_SDS_RECORD, BAD_SDS_RECORD, GOOD_SDS_RECORD]),
-            1,
-        ),
-        (
-            "\n".join([GOOD_SDS_RECORD, GOOD_SDS_RECORD, BAD_SDS_RECORD]),
-            2,
-        ),
-    ],
-    ids=["first-record-bad", "second-record-bad", "third-record-bad"],
+    "initial_unprocessed_data",
+    permutations([BAD_SDS_RECORD, GOOD_SDS_RECORD, GOOD_SDS_RECORD]),
 )
 def test_extract_worker_bad_record(
     initial_unprocessed_data: str,
-    expected_extra_processed_records: int,
     put_object: Callable[[str], None],
     get_object: Callable[[str], str],
 ):
     from etl.sds.worker.extract import extract
 
+    _initial_unprocessed_data = "\n".join(initial_unprocessed_data)
+    bad_record_index = initial_unprocessed_data.index(BAD_SDS_RECORD)
+
     # Initial state
     n_initial_processed = 5
-    n_initial_unprocessed = len(_split_ldif(initial_unprocessed_data))
+    n_initial_unprocessed = len(initial_unprocessed_data)
     initial_processed_data = json.dumps(n_initial_processed * [PROCESSED_SDS_RECORD])
-    put_object(key=WorkerKey.EXTRACT, body=initial_unprocessed_data)
+    put_object(key=WorkerKey.EXTRACT, body=_initial_unprocessed_data)
     put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
 
     # Execute the extract worker
     response = extract.handler(event=None, context=None)
     assert response == {
         "stage_name": "extract",
-        "processed_records": n_initial_processed + expected_extra_processed_records,
-        "unprocessed_records": n_initial_unprocessed - expected_extra_processed_records,
+        "processed_records": n_initial_processed + bad_record_index,
+        "unprocessed_records": n_initial_unprocessed - bad_record_index,
         "error_message": (
             "The following errors were encountered\n"
-            "  -- Error 1 --\n"
-            f"  Failed to parse record {expected_extra_processed_records}\n"
+            "  -- Error 1 (ValidationError) --\n"
+            f"  Failed to parse record {bad_record_index}\n"
             "  {'objectclass': ['nhsAS', 'top']}\n"
             "  9 validation errors for NhsAccreditedSystem\n"
             "  uniqueidentifier\n"
@@ -199,20 +210,13 @@ def test_extract_worker_bad_record(
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
     assert n_final_unprocessed > 0
-    assert n_final_processed == n_initial_processed + expected_extra_processed_records
-    assert (
-        n_final_unprocessed == n_initial_unprocessed - expected_extra_processed_records
-    )
+    assert n_final_processed == n_initial_processed + bad_record_index
+    assert n_final_unprocessed == n_initial_unprocessed - bad_record_index
 
 
 @pytest.mark.parametrize(
     "initial_unprocessed_data",
-    [
-        "\n".join([FATAL_SDS_RECORD, GOOD_SDS_RECORD, GOOD_SDS_RECORD]),
-        "\n".join([GOOD_SDS_RECORD, FATAL_SDS_RECORD, GOOD_SDS_RECORD]),
-        "\n".join([GOOD_SDS_RECORD, GOOD_SDS_RECORD, FATAL_SDS_RECORD]),
-    ],
-    ids=["first-record-bad", "second-record-bad", "third-record-bad"],
+    permutations([FATAL_SDS_RECORD, GOOD_SDS_RECORD, GOOD_SDS_RECORD]),
 )
 def test_extract_worker_fatal_record(
     initial_unprocessed_data: str,
@@ -222,11 +226,11 @@ def test_extract_worker_fatal_record(
     from etl.sds.worker.extract import extract
 
     # Initial state
-    _split_data = _split_ldif(initial_unprocessed_data)
-    n_initial_unprocessed = len(_split_data)
+    _initial_unprocessed_data = "\n".join(initial_unprocessed_data)
+    n_initial_unprocessed = len(initial_unprocessed_data)
     n_initial_processed = 5
     initial_processed_data = json.dumps(n_initial_processed * [PROCESSED_SDS_RECORD])
-    put_object(key=WorkerKey.EXTRACT, body=initial_unprocessed_data)
+    put_object(key=WorkerKey.EXTRACT, body=_initial_unprocessed_data)
     put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
 
     # Execute the extract worker
@@ -235,7 +239,7 @@ def test_extract_worker_fatal_record(
     # The line number in the error changes for each example, so
     # substitute it for the value 'NUMBER'
     response["error_message"] = re.sub(
-        "Line \d{1,2}", "Line NUMBER", response["error_message"]
+        r"Line \d{1,2}", "Line NUMBER", response["error_message"]
     )
 
     assert response == {
@@ -244,7 +248,7 @@ def test_extract_worker_fatal_record(
         "unprocessed_records": None,
         "error_message": (
             "The following errors were encountered\n"
-            "  -- Error 1 --\n"
+            "  -- Error 1 (ValueError) --\n"
             '  Line NUMBER: First line of record does not start with "dn:": '
             "'objectclass'"
         ),

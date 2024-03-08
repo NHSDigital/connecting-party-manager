@@ -1,6 +1,6 @@
 from domain.core.device_id import generate_device_key
 from domain.core.device_key import DeviceKeyType
-from domain.core.validation import PRODUCT_ID_REGEX
+from domain.core.validation import CpmId
 
 
 def test__deterministic_generate():
@@ -8,10 +8,10 @@ def test__deterministic_generate():
     b = generate_device_key(DeviceKeyType.PRODUCT_ID)
 
     assert a != b
-    assert PRODUCT_ID_REGEX.match(a) is not None
-    assert PRODUCT_ID_REGEX.match(b) is not None
+    assert CpmId.Product.ID_PATTERN.match(a) is not None
+    assert CpmId.Product.ID_PATTERN.match(b) is not None
 
 
 def test__deterministic_generate_failure():
     a = "FOO"
-    assert PRODUCT_ID_REGEX.match(a) is None
+    assert CpmId.Product.ID_PATTERN.match(a) is None

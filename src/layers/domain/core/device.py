@@ -7,7 +7,7 @@ from pydantic import Field
 from .aggregate_root import AggregateRoot
 from .device_key import DeviceKey, DeviceKeyType
 from .error import DuplicateError
-from .event import Event
+from .event import Event, EventDeserializer
 from .validation import DEVICE_NAME_REGEX
 
 
@@ -40,6 +40,7 @@ class DeviceType(StrEnum):
     """
 
     PRODUCT = auto()
+    ENDPOINT = auto()
     # SERVICE = auto()
     # API = auto()
 
@@ -87,3 +88,7 @@ class Device(AggregateRoot):
         event = DeviceKeyAddedEvent(id=self.id, **device_key.dict())
         self.keys[key] = device_key
         return self.add_event(event=event)
+
+
+class DeviceEventDeserializer(EventDeserializer):
+    event_types = (DeviceCreatedEvent, DeviceKeyAddedEvent)

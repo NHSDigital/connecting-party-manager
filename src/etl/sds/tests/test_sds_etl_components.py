@@ -1,40 +1,25 @@
 import json
+import time
 
 import boto3
 import pytest
-from etl_utils.constants import WorkerKey
+from domain.core.device import DeviceType
+from domain.core.device_key import DeviceKeyType
+from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
+from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from etl_utils.trigger.model import StateMachineInput
+from event.aws.client import dynamodb_client
 from event.json import json_loads
 from mypy_boto3_stepfunctions.type_defs import StartSyncExecutionOutputTypeDef
 
-from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
+from etl.sds.worker.extract.tests.test_extract_worker import (
+    ANOTHER_GOOD_SDS_RECORD,
+    GOOD_SDS_RECORD,
+)
+from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from test_helpers.dynamodb import clear_dynamodb_table
+from test_helpers.pytest_skips import long_running
 from test_helpers.terraform import read_terraform_output
-
-GOOD_SDS_RECORD_AS_JSON = {
-    "description": None,
-    "distinguished_name": {
-        "organisation": "nhs",
-        "organisational_unit": "services",
-        "unique_identifier": None,
-    },
-    "nhs_approver_urp": "uniqueIdentifier=562983788547,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs",
-    "nhs_as_acf": None,
-    "nhs_as_category_bag": None,
-    "nhs_as_client": ["RVL"],
-    "nhs_as_svc_ia": ["urn:nhs:names:services:pds:QUPA_IN040000UK01"],
-    "nhs_date_approved": "20090601140104",
-    "nhs_date_requested": "20090601135904",
-    "nhs_id_code": "RVL",
-    "nhs_mhs_manufacturer_org": "LSP04",
-    "nhs_mhs_party_key": "RVL-806539",
-    "nhs_product_key": "634",
-    "nhs_product_name": "Cerner Millennium",
-    "nhs_product_version": "2005.02",
-    "nhs_requestor_urp": "uniqueIdentifier=977624345541,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs",
-    "nhs_temp_uid": "9713",
-    "object_class": "nhsAS",
-    "unique_identifier": "000428682512",
-}
 
 
 @pytest.fixture
@@ -50,6 +35,15 @@ def worker_data(request: pytest.FixtureRequest):
 
     for key, data in request.param.items():
         client.put_object(Bucket=etl_bucket, Key=key, Body=data)
+    return request.param
+
+
+@pytest.fixture
+def repository():
+    client = dynamodb_client()
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    clear_dynamodb_table(client=client, table_name=table_name)
+    return MockDeviceRepository(table_name=table_name, dynamodb_client=client)
 
 
 def execute_state_machine(
@@ -58,17 +52,31 @@ def execute_state_machine(
     client = boto3.client("stepfunctions")
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     name = state_machine_input.name
-    response = client.start_sync_execution(
+    execution_response = client.start_execution(
         stateMachineArn=state_machine_arn,
         name=name,
         input=json.dumps(state_machine_input.dict()),
     )
+
+    status = "RUNNING"
+    while status == "RUNNING":
+        response = client.describe_execution(
+            executionArn=execution_response["executionArn"]
+        )
+        status = response["status"]
+
     if response["status"] != "SUCCEEDED":
-        cause = json_loads(response["cause"])
-        stack_trace = cause["stackTrace"]
+        try:
+            cause = json_loads(response["cause"])
+            error_message = cause["errorMessage"]
+            stack_trace = cause["stackTrace"]
+        except Exception:
+            error_message = response["cause"]
+            stack_trace = []
+
         print(  # noqa: T201
             "Error captured from state machine:\n",
-            cause["errorMessage"],
+            error_message,
             "\n",
             *stack_trace,
         )
@@ -94,7 +102,7 @@ def get_object(key: WorkerKey) -> str:
 @pytest.mark.integration
 @pytest.mark.parametrize(
     "worker_data",
-    [{WorkerKey.EXTRACT: "", WorkerKey.TRANSFORM: "{}"}],  # empty
+    [{WorkerKey.EXTRACT: "", WorkerKey.TRANSFORM: "[]", WorkerKey.LOAD: "[]"}],  # empty
     indirect=True,
 )
 @pytest.mark.parametrize(
@@ -115,12 +123,12 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
     "worker_data",
     [
         {
-            WorkerKey.EXTRACT: "\n".join([GOOD_SDS_RECORD] * 10),
-            WorkerKey.TRANSFORM: json.dumps([GOOD_SDS_RECORD_AS_JSON] * 5),
+            WorkerKey.EXTRACT: "\n".join([GOOD_SDS_RECORD, ANOTHER_GOOD_SDS_RECORD]),
+            WorkerKey.TRANSFORM: json.dumps([]),
+            WorkerKey.LOAD: json.dumps([]),
         }
     ],
     indirect=True,
-    ids=["10-unprocessed-and-5-processed"],
 )
 @pytest.mark.parametrize(
     "state_machine_input",
@@ -129,9 +137,66 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
     ],
     indirect=True,
 )
-def test_extract_worker(worker_data, state_machine_input):
+def test_end_to_end(repository: MockDeviceRepository, worker_data, state_machine_input):
     extract_data = get_object(key=WorkerKey.EXTRACT)
     transform_data = json_loads(get_object(key=WorkerKey.TRANSFORM))
+    load_data = json_loads(get_object(key=WorkerKey.LOAD))
 
     assert len(extract_data) == 0
-    assert transform_data == [GOOD_SDS_RECORD_AS_JSON] * 15
+    assert len(transform_data) == 0
+    assert len(load_data) == 0
+    assert len(list(repository.all_devices())) == len(
+        worker_data[WorkerKey.EXTRACT].split("\n\n")
+    )
+
+
+@long_running
+@pytest.mark.integration
+def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
+    s3_client = boto3.client("s3")
+    bucket = read_terraform_output("sds_etl.value.bucket")
+    test_data_bucket = read_terraform_output("test_data_bucket.value")
+    bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
+    initial_trigger_key = f"{bulk_trigger_prefix}/input.ldif"
+
+    # Clear/set the initial state
+    s3_client.put_object(Bucket=bucket, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF_DATA)
+    s3_client.put_object(Bucket=bucket, Key=WorkerKey.TRANSFORM, Body=EMPTY_JSON_DATA)
+    s3_client.put_object(Bucket=bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA)
+    s3_client.delete_object(Bucket=bucket, Key=CHANGELOG_NUMBER)
+
+    count = repository.count(by=DeviceType.PRODUCT)
+    assert count == 0
+
+    # Trigger the bulk load
+    s3_client.copy_object(
+        Bucket=bucket,
+        Key=initial_trigger_key,
+        CopySource={
+            "Bucket": test_data_bucket,
+            "Key": "sds/etl/bulk/1701246-fixed-fixed.ldif",
+        },
+    )
+
+    while count < 5500:
+        time.sleep(15)
+        count = repository.count(by=DeviceType.PRODUCT)
+    time.sleep(15)
+
+    extract_data = get_object(key=WorkerKey.EXTRACT)
+    transform_data = json_loads(get_object(key=WorkerKey.TRANSFORM))
+    load_data = json_loads(get_object(key=WorkerKey.LOAD))
+    assert len(extract_data) == 0
+    assert len(transform_data) == 0
+    assert len(load_data) == 0
+
+    product_count = repository.count(by=DeviceType.PRODUCT)
+    endpoint_count = repository.count(by=DeviceType.ENDPOINT)
+
+    accredited_system_count = repository.count(by=DeviceKeyType.ACCREDITED_SYSTEM_ID)
+    message_handling_system_count = repository.count(
+        by=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID
+    )
+
+    assert product_count == accredited_system_count == 5670
+    assert endpoint_count == message_handling_system_count == 155030

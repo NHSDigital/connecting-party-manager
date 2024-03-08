@@ -1,6 +1,8 @@
+from dataclasses import asdict
+
 from pydantic import BaseModel, Field
 
-from .event import Event
+from .event import Event, ExportedEventsTypeDef
 
 
 class AggregateRoot(BaseModel):
@@ -41,3 +43,23 @@ class AggregateRoot(BaseModel):
         to the event bus or for testing purposes)
         """
         self.events.clear()
+
+    def export_events(self) -> ExportedEventsTypeDef:
+        """
+        Export events in a form that is independent of the domain. The form is:
+
+            [
+                {"event_name_in_snake_case": {"event_data": "event_value", ...}},
+                ...
+            ]
+
+        for example:
+
+            [
+                {"device_created_event": {"id": "123", ...}},
+                {"device_key_added_event": {"key_type": "asid", ...}},
+                ...
+            ]
+
+        """
+        return [{event.public_name: asdict(event)} for event in self.events]

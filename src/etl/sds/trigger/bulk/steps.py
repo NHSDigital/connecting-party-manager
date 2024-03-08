@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from etl_utils.trigger.model import StateMachineInput
 from event.step_chain import StepChain
 
@@ -9,6 +11,9 @@ from .operations import (
 )
 
 Data = tuple[str, str, StateMachineInput]
+
+if TYPE_CHECKING:
+    from mypy_boto3_s3 import S3Client
 
 
 def _validate_no_changelog_number(data, cache: dict):
@@ -33,7 +38,8 @@ def _validate_database_is_empty(data, cache: dict):
 
 def _copy_to_state_machine(data: dict[str, Data], cache):
     source_bucket, source_key, state_machine_input = data[StepChain.INIT]
-    return cache["s3_client"].copy_object(
+    s3_client: "S3Client" = cache["s3_client"]
+    return s3_client.copy_object(
         Bucket=source_bucket,
         Key=state_machine_input.init,
         CopySource=f"{source_bucket}/{source_key}",
@@ -42,7 +48,8 @@ def _copy_to_state_machine(data: dict[str, Data], cache):
 
 def _copy_to_history(data: dict[str, Data], cache):
     source_bucket, source_key, _ = data[StepChain.INIT]
-    return cache["s3_client"].copy_object(
+    s3_client: "S3Client" = cache["s3_client"]
+    return s3_client.copy_object(
         Bucket=source_bucket,
         Key=f"history/{source_key}",
         CopySource=f"{source_bucket}/{source_key}",
@@ -51,7 +58,8 @@ def _copy_to_history(data: dict[str, Data], cache):
 
 def _delete_object(data: dict[str, Data], cache):
     source_bucket, source_key, _ = data[StepChain.INIT]
-    return cache["s3_client"].delete_object(Bucket=source_bucket, Key=source_key)
+    s3_client: "S3Client" = cache["s3_client"]
+    return s3_client.delete_object(Bucket=source_bucket, Key=source_key)
 
 
 def _start_execution(data: dict[str, Data], cache):

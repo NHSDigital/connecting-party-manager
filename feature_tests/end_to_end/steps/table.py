@@ -21,13 +21,12 @@ def parse_table(table: Table) -> dict:
 
 
 def _expand(value: str):
-    _match: list[str] = FN_REGEX.findall(value)
-    if not _match:
-        return value
-    ((fn_name, _args),) = _match
-    args = filter(bool, map(str.strip, _args.split(",")))
-    expanded_value = EXPAND_FUNCTIONS[fn_name](*args)
-    return FN_REGEX.sub(expanded_value, value)
+    _match: list[tuple[str, str]] = FN_REGEX.findall(value)
+    for fn_name, _args in _match:
+        args = filter(bool, map(str.strip, _args.split(",")))
+        expanded_value = EXPAND_FUNCTIONS[fn_name](*args)
+        value = FN_REGEX.sub(expanded_value, value)
+    return value
 
 
 T = TypeVar("T")

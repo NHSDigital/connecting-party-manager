@@ -3,8 +3,9 @@ from typing import Generator
 
 from event.aws.client import dynamodb_client
 from moto import mock_aws
+from mypy_boto3_dynamodb import DynamoDBClient
 
-CHUNK_SIZE = 25
+CHUNK_SIZE = 100
 
 KEY_SCHEMAS = [
     {"AttributeName": "pk", "KeyType": "HASH"},
@@ -31,16 +32,14 @@ ATTRIBUTE_DEFINITIONS = (
 )
 
 
-def _chunk_list(list_a, chunk_size=CHUNK_SIZE):
-    for i in range(0, len(list_a), chunk_size):
-        yield list_a[i : i + chunk_size]
-
-
-def _scan(client, table_name: str) -> Generator[dict, None, None]:
+def _scan(client: DynamoDBClient, table_name: str) -> Generator[dict, None, None]:
     start_key_kwargs = {}
-
     while True:
-        response = client.scan(TableName=table_name, **start_key_kwargs)
+        response = client.scan(
+            TableName=table_name,
+            ProjectionExpression="pk,sk",
+            **start_key_kwargs,
+        )
         yield from response["Items"]
         try:
             start_key_kwargs = {"ExclusiveStartKey": response["LastEvaluatedKey"]}
@@ -48,29 +47,27 @@ def _scan(client, table_name: str) -> Generator[dict, None, None]:
             break
 
 
-def clear_dynamodb_table(client, table_name: str):
-    transact_items = [
-        {
-            "Delete": {
-                "TableName": table_name,
-                "Key": {"pk": item["pk"], "sk": item["sk"]},
-            }
-        }
-        for item in _scan(client=client, table_name=table_name)
-    ]
-    for chunk in _chunk_list(transact_items):
-        client.transact_write_items(TransactItems=chunk)
+def clear_dynamodb_table(
+    client: DynamoDBClient, table_name: str, chunk_size=CHUNK_SIZE
+):
+    transact_items = []
+    for item in _scan(client=client, table_name=table_name):
+        transact_items.append({"Delete": {"TableName": table_name, "Key": item}})
+        if len(transact_items) == chunk_size:
+            client.transact_write_items(TransactItems=transact_items)
+            transact_items = []
+    if transact_items:
+        client.transact_write_items(TransactItems=transact_items)
 
 
 @contextmanager
-def patch_dynamodb_client():
+def patch_dynamodb_client(client: DynamoDBClient):
     """
     Patch dynamodb 'query' operations that hit just a 'pk' because moto
     has a bug that doesn't return all results if there are multiple matches
     to the pk (i.e. with different values 'sk'). The alternative for
     testing purposes is to patch the 'query' into a 'scan' with filter
     """
-    client = dynamodb_client()
     bare_query = client.query
 
     def _mocked_query(TableName, KeyConditionExpression=None, **kwargs):
@@ -83,14 +80,15 @@ def patch_dynamodb_client():
         return operation(TableName=TableName, **kwargs)
 
     client.query = _mocked_query
-    yield client
+    yield
     client.query = bare_query
 
 
 @contextmanager
 def mock_table(table_name: str):
     with mock_aws():
-        with patch_dynamodb_client() as client:
+        client = dynamodb_client()
+        with patch_dynamodb_client(client=client):
             client.create_table(
                 TableName=table_name,
                 AttributeDefinitions=ATTRIBUTE_DEFINITIONS,
