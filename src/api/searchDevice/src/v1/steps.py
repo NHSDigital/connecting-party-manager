@@ -1,6 +1,7 @@
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from event.step_chain import StepChain
-from searchDevice.src.data.response import devices, endpoints
+
+from ..data.response import devices, endpoints
 
 
 def get_results(data, cache):
