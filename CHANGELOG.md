@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-03-11
+- [PI-223] LDAP search on Lambda
+- [PI-240] Domain name updates
+
 ## 2024-03-04
 - [PI-203] Transform and load
 
