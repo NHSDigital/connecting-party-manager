@@ -70,6 +70,15 @@ module "layers" {
   source_path    = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
+module "third_party_layers" {
+  for_each       = toset(var.third_party_layers)
+  source         = "./modules/api_worker/api_layer"
+  name           = each.key
+  python_version = var.python_version
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+  source_path    = "${path.module}/../../../src/layers/third_party/dist/${each.key}.zip"
+}
+
 module "lambdas" {
   for_each       = setsubtract(var.lambdas, ["authoriser"])
   source         = "./modules/api_worker/api_lambda"
@@ -77,7 +86,10 @@ module "lambdas" {
   name           = each.key
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
   //Compact will remove all nulls from the list and create a new one - this is because TF throws an error if there is a null item in the list.
-  layers      = compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null])
+  layers = concat(
+    compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
+    [element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn]
+  )
   source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
   allowed_triggers = {
     "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
@@ -104,7 +116,10 @@ module "authoriser" {
   python_version = var.python_version
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
-  layers         = compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null])
+  layers = concat(
+    compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
+    [element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn]
+  )
   trusted_entities = [
     {
       type = "Service",
@@ -147,13 +162,14 @@ module "api_entrypoint" {
 }
 
 module "sds_etl" {
-  source                = "./modules/etl/sds"
-  workspace_prefix      = "${local.project}--${replace(terraform.workspace, "_", "-")}"
-  assume_account        = var.assume_account
-  python_version        = var.python_version
-  event_layer_arn       = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
-  third_party_layer_arn = element([for instance in module.layers : instance if instance.name == "third_party"], 0).layer_arn
-  domain_layer          = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
-  table_name            = module.table.dynamodb_table_name
-  table_arn             = module.table.dynamodb_table_arn
+  source                           = "./modules/etl/sds"
+  workspace_prefix                 = "${local.project}--${replace(terraform.workspace, "_", "-")}"
+  assume_account                   = var.assume_account
+  python_version                   = var.python_version
+  event_layer_arn                  = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
+  third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn
+  third_party_sds_update_layer_arn = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds_update"], 0).layer_arn
+  domain_layer                     = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
+  table_name                       = module.table.dynamodb_table_name
+  table_arn                        = module.table.dynamodb_table_arn
 }

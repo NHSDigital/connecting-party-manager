@@ -54,7 +54,7 @@ module "worker_extract" {
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
   etl_bucket_arn   = module.bucket.s3_bucket_arn
-  layers           = [var.event_layer_arn, var.third_party_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn]
+  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn]
 
   policy_json = <<-EOT
       {
@@ -89,7 +89,7 @@ module "worker_transform" {
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
   etl_bucket_arn   = module.bucket.s3_bucket_arn
-  layers           = [var.event_layer_arn, var.third_party_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
 
   policy_json = <<-EOT
       {
@@ -127,7 +127,7 @@ module "worker_load" {
   environment_variables = {
     TABLE_NAME = var.table_name
   }
-  layers = [var.event_layer_arn, var.third_party_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
 
   policy_json = <<-EOT
       {
@@ -268,7 +268,7 @@ module "trigger_bulk" {
   workspace_prefix      = var.workspace_prefix
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
-  third_party_layer_arn = var.third_party_layer_arn
+  third_party_layer_arn = var.third_party_core_layer_arn
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn
@@ -283,6 +283,25 @@ module "trigger_bulk" {
   }
 }
 
+module "trigger_update" {
+  source = "./trigger/"
+
+  trigger_name          = "update"
+  etl_name              = local.etl_name
+  assume_account        = var.assume_account
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_sds_update_layer_arn
+  etl_bucket_arn        = module.bucket.s3_bucket_arn
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  notify_lambda_arn     = module.notify.arn
+  state_machine_arn     = module.step_function.state_machine_arn
+  table_arn             = var.table_arn
+  table_name            = var.table_name
+  allowed_triggers = {
+  }
+}
 
 module "bulk_trigger_notification" {
   source        = "../bucket_notification"

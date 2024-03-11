@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 
-import sh
 from builder.common import (
     BUILD_DIR,
     DIST_DIR,
@@ -30,16 +29,19 @@ def create_zip_package(
 ) -> Generator[Path, None, None]:
     dist_dir = base_dir / DIST_DIR
     build_dir = dist_dir / BUILD_DIR
+    zip_path = dist_dir / f"{package_name}.zip"
     package_dir = build_dir / "python"
-    if not third_party:
+    if third_party:
+        clean_dir(build_dir)
+        zip_path.unlink(missing_ok=True)
+    else:
         package_dir = package_dir / package_name
-
-    clean_dir(dist_dir)
+        clean_dir(dist_dir)
 
     print(f"Building {package_name}")  # noqa: T201
     yield package_dir
     zip_package(build_dir)
-    shutil.move(dist_dir / f"{BUILD_DIR}.zip", dist_dir / f"{package_name}.zip")
+    shutil.move(dist_dir / f"{BUILD_DIR}.zip", zip_path)
 
     clean_dir(build_dir)
 
@@ -81,30 +83,3 @@ def clean_unnecessary_files(directory: Path):
                 shutil.rmtree(filename)
             else:
                 filename.unlink()
-
-
-def build_third_party(file):
-    layer_base_dir = get_base_dir(file)
-    package_name = layer_base_dir.name
-    root_dir = layer_base_dir.parent.parent.parent
-
-    with create_zip_package(
-        package_name=package_name, base_dir=layer_base_dir, third_party=True
-    ) as build_dir:
-        requirements_txt_path = layer_base_dir / "requirements.txt"
-        with create_temp_path(path=requirements_txt_path, is_dir=False):
-            requirements = sh.poetry(
-                "export", "-f", "requirements.txt", "--without-hashes", _cwd=root_dir
-            )
-            with open(requirements_txt_path, "w") as f:
-                data_split = str(requirements).split("\n")
-                f.write("\n".join(data_split[:-1]))
-            sh.pip(
-                "install",
-                "-r",
-                requirements_txt_path,
-                "--target",
-                build_dir,
-                _cwd=layer_base_dir,
-            )
-        clean_unnecessary_files(build_dir)

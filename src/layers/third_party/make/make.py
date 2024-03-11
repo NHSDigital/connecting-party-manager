@@ -1,41 +1,63 @@
-import re
 import shutil
+import tomllib
 from pathlib import Path
 
-from builder.layer_build import build_third_party
+from builder.third_party_build import build_third_party
 
-path_to_zip = Path(__file__).parent.parent / "dist" / "third_party.zip"
-path_to_previous_pyproject_toml = path_to_zip.parent / "pyproject.toml"
-path_to_current_pyproject_toml = (
-    Path(__file__).parent.parent.parent.parent.parent / "pyproject.toml"
-)
+from test_helpers.constants import PROJECT_ROOT
 
-
-def escape_ansi(line):
-    ansi_escape = re.compile(r"(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]")
-    return ansi_escape.sub("", line)
+PYPROJECT_TOML = "pyproject.toml"
+PATH_TO_DIST = Path(__file__).parent.parent / "dist"
+PATH_TO_PREVIOUS_PYPROJECT_TOML = PATH_TO_DIST / PYPROJECT_TOML
+PATH_TO_CURRENT_PYPROJECT_TOML = PROJECT_ROOT / PYPROJECT_TOML
+DEV_GROUPS = {"dev", "local"}
 
 
-def change_detected():
-    with open(path_to_previous_pyproject_toml) as f:
-        old_pyproject = f.read()
-    with open(path_to_current_pyproject_toml) as f:
-        new_pyproject = f.read()
-    return old_pyproject != new_pyproject
+def parse_groups(pyproject_toml_path) -> dict[str, dict[str, str]]:
+    if not Path(pyproject_toml_path).exists():
+        return {}
+    with open(pyproject_toml_path, "rb") as f:
+        pyproject = tomllib.load(f)
+    poetry_config: dict[str, dict] = pyproject["tool"]["poetry"]
+
+    core_dependencies = poetry_config["dependencies"]
+    core = {"core": core_dependencies}
+
+    dependency_groups = {
+        group: {**core_dependencies, **config["dependencies"]}
+        for group, config in poetry_config["group"].items()
+        if group not in DEV_GROUPS
+    }
+
+    return {**core, **dependency_groups}
 
 
 if __name__ == "__main__":
-    if (
-        not path_to_zip.exists()
-        or not path_to_previous_pyproject_toml.exists()
-        or change_detected()
-    ):
-        build_third_party(__file__)
+    old_groups = parse_groups(PATH_TO_PREVIOUS_PYPROJECT_TOML)
+    current_groups = parse_groups(PATH_TO_CURRENT_PYPROJECT_TOML)
+
+    any_change_detected = False
+    for group, dependencies in current_groups.items():
+        path_to_zip = PATH_TO_DIST / f"third_party_{group}.zip"
+        change_detected = old_groups.get(group) != dependencies
+        any_change_detected = any_change_detected or change_detected
+        if (
+            not path_to_zip.exists()
+            or not PATH_TO_PREVIOUS_PYPROJECT_TOML.exists()
+            or change_detected
+        ):
+            build_third_party(
+                file=__file__,
+                pyproject_toml_path=PATH_TO_CURRENT_PYPROJECT_TOML,
+                group=group,
+                dependencies=dependencies,
+            )
+        else:
+            print(  # noqa: T201
+                f"Skipping rebuild of {path_to_zip} since no changes detected to group '{group}'"
+            )
+
+    if any_change_detected:
         shutil.copy(
-            src=path_to_current_pyproject_toml, dst=path_to_previous_pyproject_toml
+            src=PATH_TO_CURRENT_PYPROJECT_TOML, dst=PATH_TO_PREVIOUS_PYPROJECT_TOML
         )
-    else:
-        print(  # noqa: T201
-            f"Skipping rebuild of {path_to_zip} since no changes detected in 'pyproject.toml'"
-        )
-    pass

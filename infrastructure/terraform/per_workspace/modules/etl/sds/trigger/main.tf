@@ -21,6 +21,11 @@ module "lambda_function" {
     STATE_MACHINE_ARN = var.state_machine_arn
     NOTIFY_LAMBDA_ARN = var.notify_lambda_arn
     TABLE_NAME        = var.table_name
+    # prepend '/opt/python' (the root path of the layer) to LD_LIBRARY_PATH so that
+    # all compiled dependencies can find each other. Note: this is a hack - and
+    # may result in version mismatches between system libs on the lambda. The stable
+    # alternative is to run or deploy the service from a container.
+    LD_LIBRARY_PATH = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
   }
 
   create_package         = false
