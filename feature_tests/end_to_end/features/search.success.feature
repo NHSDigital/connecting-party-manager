@@ -4,11 +4,11 @@ Feature: Search
   Background:
     Given "default" request headers:
       | name          | value   |
+      | version       | 1       |
       | Authorization | letmein |
 
   Scenario: Confirm Search endpoint is active
     When I make a "GET" request with "default" headers to "Device?device_type=product"
-    Then I receive a status code "200"
     Then I receive a status code "200" with body
       | path                                  | value                 |
       | resourceType                          | Bundle                |
