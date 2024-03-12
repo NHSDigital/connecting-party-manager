@@ -27,7 +27,7 @@ output "test_data_bucket" {
 }
 
 output "certificate_domain_name" {
-  value = module.domain.domain_cert
+  value = "https://${module.domain.domain_cert}"
 }
 
 # output "assumed_role" {
