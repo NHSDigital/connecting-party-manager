@@ -7,5 +7,5 @@ output "domain" {
 }
 
 output "domain_cert" {
-  value = aws_acm_certificate.certificate.domain_name
+  value = "https://${aws_acm_certificate.certificate.domain_name}"
 }

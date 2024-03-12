@@ -9,7 +9,7 @@ x-nhsd-apim:
   target: # Only one target (omit for NO backend)
     type: external
     healthcheck: /_status
-    url: 'https://${ terraform_output("certificate_domain_name.value") }'
+    url: ${ terraform_output("certificate_domain_name.value") }
     security:
       type: apikey
       header: apikey
