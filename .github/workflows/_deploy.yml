@@ -142,7 +142,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: swagger
-          path: infrastructure/swagger/dist
+          path: |
+            infrastructure/swagger/dist/public/swagger.yaml
+            infrastructure/swagger/dist/aws/swagger.yaml
+            infrastructure/swagger/dist/apigee/swagger.yaml
         if: ${{ always() }}
 
   test--smoke:
