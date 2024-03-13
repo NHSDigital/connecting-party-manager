@@ -2,7 +2,7 @@ import json as _json
 from contextlib import contextmanager
 from dataclasses import dataclass
 from unittest import mock
-from urllib.parse import quote_plus
+from urllib.parse import parse_qs, quote_plus
 
 from aws_lambda_powertools.utilities.parser.models import APIGatewayProxyEventModel
 from domain.response.aws_lambda_response import AwsLambdaResponse
@@ -18,6 +18,22 @@ from feature_tests.end_to_end.steps.endpoint_lambda_mapping import (
 THIS_MODULE = "feature_tests.end_to_end.steps.requests"
 
 
+def _parse_url(base_url: str, endpoint: str) -> str:
+    _endpoint, *tail = endpoint.split("?")
+    query_string_parts = parse_qs(tail[0]) if tail else {}
+
+    url = f"{base_url}{_endpoint}"
+    query_params = [
+        f"{quote_plus(query_param)}={quote_plus(value)}"
+        for query_param, values in query_string_parts.items()
+        for value in values
+    ]
+    if query_params:
+        url += "?" + "&".join(query_params)
+
+    return url
+
+
 def make_request(
     base_url: str,
     http_method: str,
@@ -26,7 +42,7 @@ def make_request(
     body: dict = None,
     raise_for_status=False,
 ) -> Response:
-    url = base_url + "/".join(map(quote_plus, endpoint.split("/")))
+    url = _parse_url(base_url=base_url, endpoint=endpoint)
     json = body if type(body) is dict else None
     data = None if type(body) is dict else body
     response = request(
@@ -73,7 +89,6 @@ def _mocked_request(
         path=path,
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     )
-
     optional_fields = {}
     if data:
         optional_fields["body"] = data
@@ -83,7 +98,6 @@ def _mocked_request(
         optional_fields["queryStringParameters"] = query_params
     if path_params:
         optional_fields["pathParameters"] = path_params
-
     event = APIGatewayProxyEventModel(
         resource=url,
         path=url,

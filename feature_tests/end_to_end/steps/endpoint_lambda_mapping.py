@@ -35,7 +35,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
         },
         "GET": {
             "Device/{id}": api.readDevice.index,
-            "Device": api.searchDevice.index,
+            "Device?device_type={device_type}": api.searchDevice.index,
             "Organization/{id}": api.readProductTeam.index,
             "_status": api.status.index,
         },
