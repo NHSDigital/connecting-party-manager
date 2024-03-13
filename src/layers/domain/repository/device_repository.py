@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from attr import asdict
+from attr import asdict as _asdict
 from domain.core.device import (
     Device,
     DeviceCreatedEvent,
@@ -29,6 +29,10 @@ from .transaction import ConditionExpression, TransactionStatement, TransactItem
 
 if TYPE_CHECKING:
     from mypy_boto3_dynamodb.type_defs import QueryOutputTypeDef
+
+
+def asdict(obj) -> dict:
+    return _asdict(obj, recurse=False)
 
 
 class DeviceRepository(Repository[Device]):
