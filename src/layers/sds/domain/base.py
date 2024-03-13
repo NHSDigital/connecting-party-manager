@@ -1,6 +1,7 @@
 from typing import ClassVar, Literal
 
 from etl_utils.ldif.model import DistinguishedName
+from event.json import json_loads
 from pydantic import BaseModel, Extra, root_validator
 from pydantic.fields import ModelField
 
@@ -60,6 +61,10 @@ def _validate_object_class(cls: "SdsBaseModel", values: dict) -> dict:
     return values
 
 
+def _is_iterable(obj):
+    return isinstance(obj, (set, list, tuple))
+
+
 class SdsBaseModel(BaseModel):
     _distinguished_name: DistinguishedName
     OBJECT_CLASS: ClassVar[Literal[""]] = ""
@@ -90,3 +95,7 @@ class SdsBaseModel(BaseModel):
         ):
             values = transform(cls=cls, values=values)
         return values
+
+    def as_questionnaire_response_responses(self) -> list[dict[str, list]]:
+        data = json_loads(self.json(exclude_none=True))
+        return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]

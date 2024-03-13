@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Generator, Generic, TypeVar
 
 from domain.core.aggregate_root import AggregateRoot
 
-from .transaction import Transaction, TransactionItem, handle_client_errors
+from .transaction import Transaction, TransactItem, handle_client_errors
 
 if TYPE_CHECKING:
     from mypy_boto3_dynamodb import DynamoDBClient
@@ -33,16 +33,16 @@ class Repository(Generic[ModelType]):
         self.client: "DynamoDBClient" = dynamodb_client
 
     def write(self, entity: ModelType, batch_size=BATCH_SIZE):
-        def generate_transaction_statements(event) -> TransactionItem:
+        def generate_transaction_statements(event) -> TransactItem:
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
-            return handler(event=event, entity=entity)
+            return handler(event=event)
 
         responses = []
         for events in batched(entity.events, n=batch_size):
             transact_items = list(map(generate_transaction_statements, events))
             transaction = Transaction(TransactItems=transact_items)
-            with handle_client_errors(commands=transaction.TransactItems):
+            with handle_client_errors(commands=transact_items):
                 _response = self.client.transact_write_items(
                     **transaction.dict(exclude_none=True)
                 )

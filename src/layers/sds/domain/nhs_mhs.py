@@ -14,7 +14,7 @@ from .organizational_unit import OrganizationalUnitDistinguishedName
 
 
 class NhsMhs(SdsBaseModel):
-    distinguished_name: OrganizationalUnitDistinguishedName
+    distinguished_name: OrganizationalUnitDistinguishedName = Field(exclude=True)
 
     OBJECT_CLASS: ClassVar[Literal["nhsmhs"]] = "nhsmhs"
     object_class: str = Field(alias=OBJECT_CLASS_FIELD_NAME)

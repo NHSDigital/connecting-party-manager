@@ -16,11 +16,6 @@ class ProductTeamCreatedEvent(Event):
     ods_code: str
 
 
-@dataclass(kw_only=True, slots=True)
-class ProductTeamDeletedEvent(Event):
-    id: UUID
-
-
 class ProductTeam(AggregateRoot):
     """
     A ProductTeam is the entity that owns Products, and is derived from ODS
@@ -49,6 +44,3 @@ class ProductTeam(AggregateRoot):
         device.add_event(device_created_event)
         self.add_event(device_created_event)
         return device
-
-    def delete(self) -> list[Event]:
-        return [ProductTeamDeletedEvent(id=self.id)]

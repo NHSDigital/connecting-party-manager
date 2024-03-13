@@ -7,7 +7,7 @@ def marshall_value(value):
     if value is None:
         return {"Null": True}
     if type(value) is bool:
-        return {"B": value}
+        return {"BOOL": value}
     if type(value) is int or isinstance(value, float):
         return {"N": str(value)}
     if isinstance(value, list):
@@ -58,22 +58,23 @@ def _unmarshall_mapping(mapping: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return {k: unmarshall_value(v) for (k, v) in mapping["M"].items()}
 
 
-def unmarshall_value(record: dict[str, Any]):
-    if "Null" in record:
-        return None
-    if "S" in record:
-        return str(record["S"])
-    if "B" in record:
-        return bool(record["B"])
-    if "N" in record:
-        return float(record["N"])
-    if "S" in record:
-        return str(record["S"])
-    if "L" in record:
-        return [unmarshall_value(v) for v in record["L"]]
-    if "M" in record:
-        return _unmarshall_mapping(mapping=record)
-    raise UnableToUnmarshall(f"Unhandled record {record}")
+def unmarshall_value(record: dict[str, str | dict | list]):
+    ((_type_name, value),) = record.items()
+    match _type_name:
+        case "Null":
+            return None
+        case "S":
+            return str(value)
+        case "BOOL":
+            return bool(value)
+        case "N":
+            return int(value) if value.isdigit() else float(value)
+        case "L":
+            return list(map(unmarshall_value, value))
+        case "M":
+            return _unmarshall_mapping(mapping=record)
+        case _:
+            raise UnableToUnmarshall(f"Unhandled record {record}")
 
 
 def unmarshall(record) -> dict[str, Any]:

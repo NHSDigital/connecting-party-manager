@@ -187,11 +187,12 @@ def test_load_worker_pass(
     assert final_unprocessed_data == []
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "initial_unprocessed_data",
     permutations([BAD_CPM_EVENT, GOOD_CPM_EVENT_1, GOOD_CPM_EVENT_2]),
 )
-def test_transform_worker_bad_record(
+def test_load_worker_bad_record(
     initial_unprocessed_data: str,
     put_object: Callable[[str], None],
     get_object: Callable[[str], str],

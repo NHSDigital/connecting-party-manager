@@ -36,12 +36,11 @@
   {
     "name": "nhs_as_client",
     "human_readable_name": "Owner",
-    "answer_types": ["str"],
-    "multiple": true
+    "answer_types": ["str"]
   },
   {
     "name": "object_class",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "mandatory": true,
     "choices": ["nhsas"]
   },

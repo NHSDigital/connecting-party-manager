@@ -10,7 +10,8 @@ class TableKeys(StrEnum):
     DEVICE_TYPE = "DT"
     DEVICE_KEY_TYPE = "DKT"
     PRODUCT_TEAM = "PT"
-    ODS_ORGANISATION = "O"
+    QUESTIONNAIRE = "Q"
+    QUESTIONNAIRE_RESPONSE = "QR"
 
     def key(self, *args) -> str:
         return KEY_SEPARATOR.join(map(str, (self, *args)))

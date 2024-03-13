@@ -42,7 +42,7 @@
   {
     "name": "nhs_mhs_sync_reply_mode",
     "human_readable_name": "Reliability Configuration Reply Mode",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "choices": ["MSHSIGNALSONLY", "NEVER", "NONE", "SIGNALSANDRESPONSE"]
   },
   {
@@ -64,13 +64,13 @@
   {
     "name": "nhs_mhs_duplicate_elimination",
     "human_readable_name": "Reliability Configuration Duplication Elimination",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "choices": ["ALWAYS", "NEVER"]
   },
   {
     "name": "nhs_mhs_ack_requested",
     "human_readable_name": "Reliability Configuration Ack Requested",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "choices": ["ALWAYS", "NEVER"]
   },
   {
@@ -80,7 +80,7 @@
   },
   {
     "name": "object_class",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "mandatory": true,
     "choices": ["nhsmhs"]
   },
@@ -116,7 +116,7 @@
   },
   {
     "name": "nhs_ep_interaction_type",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "mandatory": true,
     "choices": ["FHIR", "HL7", "EBXML", "N/A", "MSHSIGNALSONLY"]
   },
@@ -137,7 +137,7 @@
   },
   {
     "name": "nhs_mhs_is_authenticated",
-    "answer_types": ["str"],
+    "answer_types": ["CaseInsensitiveString"],
     "mandatory": true,
     "choices": ["NONE", "TRANSIENT", "PERSISTENT"]
   },
