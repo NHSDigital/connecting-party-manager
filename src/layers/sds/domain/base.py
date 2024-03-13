@@ -1,7 +1,7 @@
 from typing import ClassVar, Literal
 
+import orjson
 from etl_utils.ldif.model import DistinguishedName
-from event.json import json_loads
 from pydantic import BaseModel, Extra, root_validator
 from pydantic.fields import ModelField
 
@@ -65,6 +65,11 @@ def _is_iterable(obj):
     return isinstance(obj, (set, list, tuple))
 
 
+def orjson_dumps(v, *, default):
+    # orjson.dumps returns bytes, to match standard json.dumps we need to decode
+    return orjson.dumps(v, default=default).decode()
+
+
 class SdsBaseModel(BaseModel):
     _distinguished_name: DistinguishedName
     OBJECT_CLASS: ClassVar[Literal[""]] = ""
@@ -73,6 +78,7 @@ class SdsBaseModel(BaseModel):
     class Config:
         extra = Extra.forbid
         allow_population_by_field_name = True
+        json_dumps = orjson_dumps
 
     @classmethod
     def matches_object_class(cls, object_class: str) -> bool:
@@ -97,5 +103,5 @@ class SdsBaseModel(BaseModel):
         return values
 
     def as_questionnaire_response_responses(self) -> list[dict[str, list]]:
-        data = json_loads(self.json(exclude_none=True))
+        data = orjson.loads(self.json(exclude_none=True))
         return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]

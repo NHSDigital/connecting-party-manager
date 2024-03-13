@@ -157,6 +157,7 @@ def test_load_worker_pass(
     initial_processed_data = [
         device_factory(id=(i + 1) * 1000) for i in range(n_initial_processed)
     ]
+
     put_object(
         key=WorkerKey.LOAD, body=json.dumps(initial_unprocessed_data, cls=EtlEncoder)
     )

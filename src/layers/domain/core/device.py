@@ -1,8 +1,8 @@
 from collections import defaultdict
-from dataclasses import dataclass
 from enum import StrEnum, auto
 from uuid import UUID, uuid4
 
+from attr import dataclass
 from domain.core.questionnaire import (
     QuestionnaireInstanceEvent,
     QuestionnaireResponse,
@@ -131,8 +131,10 @@ class Device(AggregateRoot):
         return self.add_event(event)
 
     def add_questionnaire_response(
-        self, questionnaire_response: QuestionnaireResponse
+        self, questionnaire_response: QuestionnaireResponse, _questionnaire: dict = None
     ) -> list[QuestionnaireInstanceEvent, QuestionnaireResponseAddedEvent]:
+        _questionnaire = _questionnaire or questionnaire_response.questionnaire.dict()
+
         questionnaire_responses = self.questionnaire_responses[
             questionnaire_response.questionnaire.id
         ]
@@ -145,9 +147,10 @@ class Device(AggregateRoot):
             questionnaire_event = QuestionnaireInstanceEvent(
                 entity_id=self.id,
                 questionnaire_id=questionnaire_response.questionnaire.id,
-                **questionnaire_response.questionnaire.dict(),
+                **_questionnaire,
             )
-            events.append(self.add_event(questionnaire_event))
+            events.append(questionnaire_event)
+            self.add_event(questionnaire_event)
 
         questionnaire_response_event = QuestionnaireResponseAddedEvent(
             entity_id=self.id,
@@ -155,7 +158,8 @@ class Device(AggregateRoot):
             questionnaire_id=questionnaire_response.questionnaire.id,
             responses=questionnaire_response.responses,
         )
-        events.append(self.add_event(questionnaire_response_event))
+        events.append(questionnaire_response_event)
+        self.add_event(questionnaire_response_event)
 
         return events
 

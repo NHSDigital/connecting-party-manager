@@ -74,11 +74,6 @@ def test_changelog_changes_are_valid_ldif(test_data_paths):
     )
     assert sds_record.dict() == {
         "description": None,
-        "distinguished_name": {
-            "organisation": "nhs",
-            "organisational_unit": "services",
-            "unique_identifier": "200000042019",
-        },
         "nhs_approver_urp": "System",
         "nhs_as_acf": None,
         "nhs_as_category_bag": None,

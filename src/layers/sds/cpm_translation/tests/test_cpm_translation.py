@@ -65,7 +65,11 @@ def test_nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs):
     questionnaire = render_questionnaire(
         questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT, questionnaire_version=1
     )
-    device = nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs, questionnaire=questionnaire)
+    device = nhs_mhs_to_cpm_device(
+        nhs_mhs=nhs_mhs,
+        questionnaire=questionnaire,
+        _questionnaire=questionnaire.dict(),
+    )
     events = device.export_events()
     event_names = list(chain.from_iterable(map(dict.keys, events)))
     assert event_names == EXPECTED_EVENTS
@@ -80,7 +84,9 @@ def test_nhs_accredited_system_to_cpm_devices(
     )
     for i, device in enumerate(
         nhs_accredited_system_to_cpm_devices(
-            nhs_accredited_system=nhs_accredited_system, questionnaire=questionnaire
+            nhs_accredited_system=nhs_accredited_system,
+            questionnaire=questionnaire,
+            _questionnaire=questionnaire.dict(),
         ),
         start=1,
     ):
@@ -90,14 +96,35 @@ def test_nhs_accredited_system_to_cpm_devices(
     assert i > 0
 
 
-@pytest.mark.s3("sds/etl/bulk/1701246-fixed-fixed.json")
+@pytest.mark.s3("sds/etl/bulk/1701246-fixed-fixed-fixed.json")
 def test_translate(test_data_paths):
     (path,) = test_data_paths
     with open(path) as f:
         data = json_load(f)
     assert len(data) > 0
 
-    for obj, events in zip(data, map(translate, data)):
+    spine_device_questionnaire = render_questionnaire(
+        questionnaire_name=QuestionnaireInstance.SPINE_DEVICE, questionnaire_version=1
+    )
+    _spine_device_questionnaire = spine_device_questionnaire.dict()
+    spine_endpoint_questionnaire = render_questionnaire(
+        questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT, questionnaire_version=1
+    )
+    _spine_endpoint_questionnaire = spine_endpoint_questionnaire.dict()
+
+    for obj, events in zip(
+        data,
+        map(
+            lambda record: translate(
+                obj=record,
+                spine_device_questionnaire=spine_device_questionnaire,
+                _spine_device_questionnaire=_spine_device_questionnaire,
+                spine_endpoint_questionnaire=spine_endpoint_questionnaire,
+                _spine_endpoint_questionnaire=_spine_endpoint_questionnaire,
+            ),
+            data,
+        ),
+    ):
         event_names = list(chain.from_iterable(map(dict.keys, events)))
         ods_codes = obj.get("nhs_as_client") or ["dummy_org"]
         n_ods_codes = len(ods_codes)

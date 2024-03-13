@@ -1,5 +1,4 @@
-from dataclasses import asdict
-
+from attr import asdict
 from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
 
 from .errors import ItemNotFound

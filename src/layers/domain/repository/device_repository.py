@@ -1,7 +1,7 @@
 from collections import defaultdict
-from dataclasses import asdict
 from typing import TYPE_CHECKING
 
+from attr import asdict
 from domain.core.device import (
     Device,
     DeviceCreatedEvent,

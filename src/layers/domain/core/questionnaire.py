@@ -1,12 +1,13 @@
-from dataclasses import dataclass
 from datetime import date, datetime, time
 from functools import partial
 from types import FunctionType
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 
-from event.json import json_loads
-from pydantic import BaseModel, Field, validator
+import orjson
+from attr import dataclass
+from pydantic import Field, validator
 
+from .base import BaseModel
 from .error import DuplicateError, InvalidResponseError
 from .event import Event
 from .validation import ENTITY_NAME_REGEX
@@ -87,14 +88,6 @@ class Question(BaseModel, Generic[T]):
     A single Questionnaire Question
     """
 
-    class Config:
-        arbitrary_types_allowed = True  # Validation rules are not pydantic classes
-        json_encoders = {
-            set: list,
-            FunctionType: lambda fn: fn.__name__,
-            type: lambda _type: _type.__name__,
-        }
-
     name: str = Field(regex=ENTITY_NAME_REGEX)
     human_readable_name: str
     answer_types: set[type[T]]
@@ -114,7 +107,7 @@ class Question(BaseModel, Generic[T]):
 
     def dict(self, **kwargs):
         _data = self.json(**kwargs)
-        return json_loads(_data)
+        return orjson.loads(_data)
 
 
 def choice_type_matches_answer_types(choice, answer_types: set):
@@ -147,6 +140,13 @@ class Questionnaire(BaseModel):
         Returns true if the question specified exists within the questionnaire
         """
         return question_name in self.questions
+
+    def __hash__(self):
+        question_names = ".".join(self.questions)
+        return hash(f"{self.id}.{question_names}")
+
+    def __eq__(self, other: Self):
+        return self.id == other.id
 
     def add_question(
         self,

@@ -3,6 +3,8 @@ from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 import boto3
+from domain.core.load_questionnaire import render_questionnaire
+from domain.core.questionnaires import QuestionnaireInstance
 from etl_utils.constants import WorkerKey
 from etl_utils.json import json_dump_bytes
 from etl_utils.smart_open import smart_open
@@ -31,10 +33,26 @@ def transform(
     with smart_open(s3_path=s3_output_path, s3_client=s3_client) as f:
         processed_records: list[dict] = json_load(f)
 
+    spine_device_questionnaire = render_questionnaire(
+        questionnaire_name=QuestionnaireInstance.SPINE_DEVICE, questionnaire_version=1
+    )
+    spine_endpoint_questionnaire = render_questionnaire(
+        questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT, questionnaire_version=1
+    )
+
+    _spine_device_questionnaire = spine_device_questionnaire.dict()
+    _spine_endpoint_questionnaire = spine_endpoint_questionnaire.dict()
+
     exception = apply_action(
         unprocessed_records=unprocessed_records,
         processed_records=processed_records,
-        action=lambda record: translate(record),
+        action=lambda record: translate(
+            obj=record,
+            spine_device_questionnaire=spine_device_questionnaire,
+            _spine_device_questionnaire=_spine_device_questionnaire,
+            spine_endpoint_questionnaire=spine_endpoint_questionnaire,
+            _spine_endpoint_questionnaire=_spine_endpoint_questionnaire,
+        ),
     )
 
     return WorkerActionResponse(

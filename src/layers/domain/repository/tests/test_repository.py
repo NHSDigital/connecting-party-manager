@@ -1,6 +1,5 @@
-from dataclasses import asdict, dataclass
-
 import pytest
+from attr import asdict, dataclass
 from domain.repository.errors import AlreadyExistsError, UnhandledTransaction
 from domain.repository.marshall import marshall, marshall_value, unmarshall
 from domain.repository.repository import Repository
@@ -35,6 +34,9 @@ class MyModel(BaseModel):
     events: list[MyEventAdd | MyOtherEventAdd | MyEventDelete] = Field(
         default_factory=list, exclude=True
     )
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 @pytest.fixture

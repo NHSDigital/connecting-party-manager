@@ -1,6 +1,6 @@
-from dataclasses import dataclass
 from uuid import UUID
 
+from attr import dataclass
 from pydantic import Field
 
 from .aggregate_root import AggregateRoot

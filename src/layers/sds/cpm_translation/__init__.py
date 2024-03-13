@@ -5,9 +5,7 @@ from uuid import UUID
 from domain.core.aggregate_root import ExportedEventsTypeDef
 from domain.core.device import Device, DeviceType
 from domain.core.device_key import DeviceKeyType
-from domain.core.load_questionnaire import render_questionnaire
 from domain.core.questionnaire import Questionnaire
-from domain.core.questionnaires import QuestionnaireInstance
 from domain.core.root import Root
 from domain.core.validation import DEVICE_KEY_SEPARATOR
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
@@ -29,7 +27,9 @@ def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
 
 
 def nhs_accredited_system_to_cpm_devices(
-    nhs_accredited_system: NhsAccreditedSystem, questionnaire: Questionnaire
+    nhs_accredited_system: NhsAccreditedSystem,
+    questionnaire: Questionnaire,
+    _questionnaire: dict,
 ) -> Generator[Device, None, None]:
     ods_codes = nhs_accredited_system.nhs_as_client or [DEFAULT_ORGANISATION]
     unique_identifier = nhs_accredited_system.unique_identifier
@@ -55,12 +55,15 @@ def nhs_accredited_system_to_cpm_devices(
             key=DEVICE_KEY_SEPARATOR.join((ods_code, unique_identifier)),
         )
         _device.add_questionnaire_response(
-            questionnaire_response=_questionnaire_response
+            questionnaire_response=_questionnaire_response,
+            _questionnaire=_questionnaire,
         )
         yield _device
 
 
-def nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs, questionnaire: Questionnaire) -> Device:
+def nhs_mhs_to_cpm_device(
+    nhs_mhs: NhsMhs, questionnaire: Questionnaire, _questionnaire: dict
+) -> Device:
     party_key = nhs_mhs.nhs_mhs_party_key.strip()
     interaction_id = nhs_mhs.nhs_mhs_svc_ia.strip()
     ods_code = nhs_mhs.nhs_id_code
@@ -75,29 +78,35 @@ def nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs, questionnaire: Questionnaire) -> Devi
     product_team = organisation.create_product_team(**DEFAULT_PRODUCT_TEAM)
     device = product_team.create_device(name=product_name, type=DeviceType.ENDPOINT)
     device.add_key(type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID, key=scoped_party_key)
-    device.add_questionnaire_response(questionnaire_response=questionnaire_response)
+    device.add_questionnaire_response(
+        questionnaire_response=questionnaire_response, _questionnaire=_questionnaire
+    )
     return device
 
 
-def translate(obj: dict[str, str]) -> ExportedEventsTypeDef:
+def translate(
+    obj: dict[str, str],
+    spine_device_questionnaire: Questionnaire,
+    _spine_device_questionnaire: dict,
+    spine_endpoint_questionnaire: Questionnaire,
+    _spine_endpoint_questionnaire: dict,
+) -> ExportedEventsTypeDef:
     match obj["object_class"].lower():
         case NhsAccreditedSystem.OBJECT_CLASS:
             nhs_accredited_system = NhsAccreditedSystem.construct(**obj)
-            questionnaire = render_questionnaire(
-                questionnaire_name=QuestionnaireInstance.SPINE_DEVICE,
-                questionnaire_version=1,
-            )
             devices = nhs_accredited_system_to_cpm_devices(
-                nhs_accredited_system=nhs_accredited_system, questionnaire=questionnaire
+                nhs_accredited_system=nhs_accredited_system,
+                questionnaire=spine_device_questionnaire,
+                _questionnaire=_spine_device_questionnaire,
             )
         case NhsMhs.OBJECT_CLASS:
             nhs_mhs = NhsMhs.construct(**obj)
-            questionnaire = render_questionnaire(
-                questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT,
-                questionnaire_version=1,
-            )
             devices = [
-                nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs, questionnaire=questionnaire)
+                nhs_mhs_to_cpm_device(
+                    nhs_mhs=nhs_mhs,
+                    questionnaire=spine_endpoint_questionnaire,
+                    _questionnaire=_spine_endpoint_questionnaire,
+                )
             ]
         case _ as obj_type:
             raise NotImplementedError(

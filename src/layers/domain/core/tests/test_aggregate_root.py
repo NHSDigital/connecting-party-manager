@@ -1,6 +1,5 @@
-from dataclasses import dataclass
-
 import pytest
+from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.error import ImmutableFieldError, UnknownFields
 from domain.core.event import Event
