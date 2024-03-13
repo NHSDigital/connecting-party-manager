@@ -1,8 +1,23 @@
 from dataclasses import asdict
+from typing import TypeVar
 
-from pydantic import BaseModel, Field
+from domain.core.error import ImmutableFieldError, UnknownFields
+from pydantic import BaseModel, Field, validate_model
 
 from .event import Event, ExportedEventsTypeDef
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+def _validate_model(model, input_data):
+    """
+    Shallow wrapper around pydantic's 'validate_model' to raise an error
+    if one was discovered during validation of the input_data against the model
+    """
+    _, _, error = validate_model(model=model, input_data=input_data)
+    if error is not None:
+        raise error
 
 
 class AggregateRoot(BaseModel):
@@ -63,3 +78,37 @@ class AggregateRoot(BaseModel):
 
         """
         return [{event.public_name: asdict(event)} for event in self.events]
+
+    @property
+    def model_fields(self) -> set[str]:
+        return set(
+            field_name
+            for field_name in self.__fields__
+            if self.__fields__[field_name].field_info.exclude is not True
+        )
+
+    @property
+    def immutable_fields(self) -> set[str]:
+        return set(
+            field_name
+            for field_name in self.__fields__
+            if self.__fields__[field_name].field_info.extra.get("immutable") is True
+        )
+
+    def _update(self, data: dict[K, V]) -> dict[K, V]:
+        fields_to_update = set(data)
+        unknown_fields = fields_to_update - self.model_fields
+        if unknown_fields:
+            raise UnknownFields(", ".join(unknown_fields))
+
+        immutable_fields = fields_to_update.intersection(self.immutable_fields)
+        if immutable_fields:
+            raise ImmutableFieldError(", ".join(immutable_fields))
+
+        _data = self.dict()
+        _data.update(data)
+        _validate_model(model=self.__class__, input_data=_data)
+
+        for field, value in data.items():
+            setattr(self, field, value)
+        return _data

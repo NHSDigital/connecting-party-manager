@@ -174,7 +174,7 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
         Key=initial_trigger_key,
         CopySource={
             "Bucket": test_data_bucket,
-            "Key": "sds/etl/bulk/1701246-fixed-fixed.ldif",
+            "Key": "sds/etl/bulk/1701246-fixed-fixed-fixed.ldif",
         },
     )
 

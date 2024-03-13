@@ -2,10 +2,13 @@ from itertools import chain
 from string import ascii_letters, digits
 
 import pytest
+from domain.core.load_questionnaire import render_questionnaire
+from domain.core.questionnaires import QuestionnaireInstance
 from domain.core.validation import ODS_CODE_REGEX, SdsId
 from etl_utils.ldif.model import DistinguishedName
 from event.json import json_load
 from hypothesis import given
+from hypothesis.provisional import urls
 from hypothesis.strategies import builds, from_regex, just, sets, text
 from sds.cpm_translation import (
     nhs_accredited_system_to_cpm_devices,
@@ -18,53 +21,66 @@ from sds.domain.nhs_mhs import NhsMhs
 DUMMY_DISTINGUISHED_NAME = DistinguishedName(
     parts=(("ou", "services"), ("uniqueidentifier", "foobar"), ("o", "nhs"))
 )
-EXPECTED_EVENTS = ["device_created_event", "device_key_added_event"]
+EXPECTED_EVENTS = [
+    "device_created_event",
+    "device_key_added_event",
+    "questionnaire_instance_event",
+    "questionnaire_response_added_event",
+]
 
 
-@given(
-    nhs_mhs=builds(
-        NhsMhs,
-        _distinguished_name=just(DUMMY_DISTINGUISHED_NAME),
-        objectclass=just(
-            {
-                "nhsmhs",
-            }
-        ),
-        nhsidcode=from_regex(ODS_CODE_REGEX, fullmatch=True),
-        nhsproductname=text(alphabet=ascii_letters + digits + " -_", min_size=1),
-        nhsmhspartykey=from_regex(
-            SdsId.MessageHandlingSystem.PARTY_KEY_REGEX, fullmatch=True
-        ),
-        nhsmhssvcia=text(alphabet=ascii_letters + digits + ":", min_size=1),
-    )
+NHS_MHS_STRATEGY = builds(
+    NhsMhs,
+    _distinguished_name=just(DUMMY_DISTINGUISHED_NAME),
+    objectclass=just(
+        {
+            "nhsmhs",
+        }
+    ),
+    nhsidcode=from_regex(ODS_CODE_REGEX, fullmatch=True),
+    nhsproductname=text(alphabet=ascii_letters + digits + " -_", min_size=1),
+    nhsmhspartykey=from_regex(
+        SdsId.MessageHandlingSystem.PARTY_KEY_REGEX, fullmatch=True
+    ),
+    nhsmhssvcia=text(alphabet=ascii_letters + digits + ":", min_size=1),
+    nhsmhsendpoint=urls(),
 )
+
+NHS_ACCREDITED_SYSTEM_STRATEGY = builds(
+    NhsAccreditedSystem,
+    _distinguished_name=just(DUMMY_DISTINGUISHED_NAME),
+    objectclass=just(
+        {
+            "nhsas",
+        }
+    ),
+    nhsproductname=text(alphabet=ascii_letters + digits + " -_", min_size=1),
+    nhsasclient=sets(from_regex(ODS_CODE_REGEX, fullmatch=True)),
+    uniqueidentifier=text(alphabet=digits, min_size=1, max_size=8),
+)
+
+
+@given(nhs_mhs=NHS_MHS_STRATEGY)
 def test_nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs):
-    device = nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs)
+    questionnaire = render_questionnaire(
+        questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT, questionnaire_version=1
+    )
+    device = nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs, questionnaire=questionnaire)
     events = device.export_events()
     event_names = list(chain.from_iterable(map(dict.keys, events)))
     assert event_names == EXPECTED_EVENTS
 
 
-@given(
-    nhs_accredited_system=builds(
-        NhsAccreditedSystem,
-        _distinguished_name=just(DUMMY_DISTINGUISHED_NAME),
-        objectclass=just(
-            {
-                "nhsas",
-            }
-        ),
-        nhsproductname=text(alphabet=ascii_letters + digits + " -_", min_size=1),
-        nhsasclient=sets(from_regex(ODS_CODE_REGEX, fullmatch=True)),
-        uniqueidentifier=text(alphabet=digits, min_size=1, max_size=8),
-    )
-)
+@given(nhs_accredited_system=NHS_ACCREDITED_SYSTEM_STRATEGY)
 def test_nhs_accredited_system_to_cpm_devices(
     nhs_accredited_system: NhsAccreditedSystem,
 ):
+    questionnaire = render_questionnaire(
+        questionnaire_name=QuestionnaireInstance.SPINE_DEVICE, questionnaire_version=1
+    )
     for i, device in enumerate(
         nhs_accredited_system_to_cpm_devices(
-            nhs_accredited_system=nhs_accredited_system
+            nhs_accredited_system=nhs_accredited_system, questionnaire=questionnaire
         ),
         start=1,
     ):
