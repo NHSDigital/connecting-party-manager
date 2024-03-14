@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
           command: destroy--expired TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
