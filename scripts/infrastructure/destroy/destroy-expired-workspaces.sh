@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
-source ./scripts/infrastructure/terraform/terraform-commands.sh
 
 AWS_REGION_NAME="eu-west-2"
 ENV="dev"
@@ -41,6 +40,7 @@ function _destroy_expired_workspaces() {
                         local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
                         local expired=$(python -c "from datetime import datetime, timezone; import sys; print(1) if datetime.strptime('$timestamp', '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime('$expirationDate', '%Y-%m-%dT%H:%M:%SZ') else print(0)")
                         if [ -n "$expirationDate" ] && [ "$expired" = 1 ]; then
+                            echo "$workspace"
                             workspaces+=("$workspace")
                         fi
                     fi
@@ -67,7 +67,7 @@ function _destroy_expired_workspaces() {
 
     for workspace in "${workspaces[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
-        bash ./scripts/infrastructure/terraform/terraform-commands.sh destroy $workspace "non_account_wide" "" "-input=false -auto-approve -no-color"
+        bash ./scripts/infrastructure/terraform/terraform-commands.sh destroy "$ENV" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
         # Add your additional logic here
     done
 }
