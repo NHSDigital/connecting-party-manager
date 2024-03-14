@@ -28,6 +28,7 @@ function _destroy_expired_workspaces() {
         export AWS_SESSION_TOKEN="$session_token"
 
         workspaces=()
+        pwd #remove
         groups=$(aws resource-groups search-resources --resource-query file://scripts/infrastructure/destroy/expired-workspace-query.json --region "${AWS_REGION_NAME}")
         if [ $? -eq 0 ]; then
             resourceArns=($(echo "$groups" | jq -r '.ResourceIdentifiers[].ResourceArn'))
