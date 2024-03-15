@@ -233,9 +233,10 @@ jobs:
           command: test--feature--integration
           requires-aws: true
 
-  destroy-redundant-workspaces:
+  destroy-redundant-workspaces-releases:
     runs-on: [self-hosted, ci]
     needs: [build-head]
+    if: contains(env.BRANCH_NAME, 'release/')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -248,6 +249,17 @@ jobs:
         with:
           command: destroy--redundant-workspaces ENVIRONMENT=dev BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           requires-aws: true
+
+  destroy-redundant-workspaces-features:
+    runs-on: [self-hosted, ci]
+    needs: [build-head]
+    if: contains(env.BRANCH_NAME, 'feature/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+          fetch-depth: 0
       - name: Remove redundant workspaces from ref
         if: ${{ env.BRANCH_NAME }} == *"feature/"*
         uses: ./.github/actions/make/
