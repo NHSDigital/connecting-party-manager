@@ -123,8 +123,12 @@ function _get_expiration_date() {
 }
 
 function _get_layer_list() {
-    local dir=$(pwd)
-    local layers=$(find "$(pwd)/src/layers" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+    local layers=$(find "$(pwd)/src/layers"  ! -path *third_party* -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+    echo $layers
+}
+
+function _get_third_party_layer_list() {
+    local layers=$(find "$(pwd)/src/layers/third_party/" -type f -name *.zip -exec basename {} .zip \; | jq -R -s -c 'split("\n")[:-1]')
     echo $layers
 }
 

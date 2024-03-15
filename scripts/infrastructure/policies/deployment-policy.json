@@ -255,7 +255,22 @@
         "route53:GetHostedZone",
         "route53:ListTagsForResource",
         "route53:DeleteHostedZone",
-        "route53:ChangeTagsForResource"
+        "route53:ChangeTagsForResource",
+        "route53:ListHostedZones",
+        "route53:ChangeResourceRecordSets",
+        "route53:ListResourceRecordSets"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "AcmPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "acm:RequestCertificate",
+        "acm:AddTagsToCertificate",
+        "acm:DescribeCertificate",
+        "acm:ListTagsForCertificate",
+        "acm:DeleteCertificate"
       ],
       "Resource": ["*"]
     }

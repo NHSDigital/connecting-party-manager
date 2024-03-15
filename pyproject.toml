@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.03.04"
+version = "2024.03.11"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -23,6 +23,7 @@ requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
 email-validator = "^2.1.0.post1"
 smart-open = "^6.4.0"
+urllib3 = "<2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
@@ -38,16 +39,30 @@ parse = "^1.19.1"
 pytest-mock = "^3.12.0"
 datamodel-code-generator = "^0.25.1"
 pyyaml = "^6.0.1"
-proxygen-cli = "^2.1.1"
+proxygen-cli = "^2.1.4"
 moto = "^5.0.1"
-urllib3 = "<2"
-boto3-stubs = {extras = ["dynamodb", "iam", "lambda", "s3", "secretsmanager", "stepfunctions"], version = "^1.34.37"}
+boto3-stubs = { extras = [
+    "dynamodb",
+    "iam",
+    "lambda",
+    "s3",
+    "secretsmanager",
+    "stepfunctions",
+], version = "^1.34.37" }
 pytest-lazy-fixture = "^0.6.3"
 pytest-timeout = "^2.2.0"
 
+[tool.poetry.group.local]
+optional = true
 
 [tool.poetry.group.local.dependencies]
 ipython = "^8.17.2"
+
+[tool.poetry.group.sds_update]
+optional = true
+
+[tool.poetry.group.sds_update.dependencies]
+python-ldap = "^3.4.4"
 
 [build-system]
 requires = ["poetry-core"]

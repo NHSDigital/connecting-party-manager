@@ -7,4 +7,8 @@ locals {
     kms      = "*"
     dynamodb = "${module.table.dynamodb_table_arn}"
   }
+  # e.g. api.cpm.dev.national.nhs.uk
+  zone = var.domain
+
+  domain = "${terraform.workspace}.${var.domain}"
 }

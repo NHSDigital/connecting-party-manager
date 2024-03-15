@@ -31,12 +31,15 @@ variable "layers" {
   type = list(string)
 }
 
+variable "third_party_layers" {
+  type = list(string)
+}
+
 variable "api_lambda_layers" {
   type = list(string)
   default = [
     "domain",
     "event",
-    "third_party",
     "api_utils"
   ]
 }
@@ -57,4 +60,8 @@ variable "apigateway_arn_prefix" {
 
 variable "python_version" {
   default = "python3.11"
+}
+
+variable "domain" {
+  type = string
 }

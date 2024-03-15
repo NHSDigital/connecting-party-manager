@@ -138,6 +138,15 @@ jobs:
           command: apigee--deploy
           requires-aws: true
           cache-suffix: ${{ env.CACHE_NAME }}
+      - name: Archive swagger
+        uses: actions/upload-artifact@v4
+        with:
+          name: swagger
+          path: |
+            infrastructure/swagger/dist/public/swagger.yaml
+            infrastructure/swagger/dist/aws/swagger.yaml
+            infrastructure/swagger/dist/apigee/swagger.yaml
+        if: ${{ always() }}
 
   test--smoke:
     needs: [get-branch-from-workflow-file, apigee--deploy]

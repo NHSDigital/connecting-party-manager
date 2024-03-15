@@ -13,3 +13,7 @@ output "kms_key" {
 output "invoke_url" {
   value = aws_api_gateway_stage.api_gateway_stage.invoke_url
 }
+
+output "api_base_url" {
+  value = "https://${var.domain}"
+}

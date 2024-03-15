@@ -17,9 +17,10 @@ function _terraform() {
     local terraform_dir
     local expiration_time
     local terraform_role_name="NHSDeploymentRole"
+    lowercase_string=$(echo "$TERRAFORM_WORKSPACE" | tr '[:upper:]' '[:lower:]')
 
-    account=$(_get_account_name "$AWS_ACCOUNT" "$TERRAFORM_WORKSPACE") || return 1
-    workspace=$(_get_workspace_name "$account" "$TERRAFORM_WORKSPACE") || return 1
+    account=$(_get_account_name "$AWS_ACCOUNT" "$lowercase_string") || return 1
+    workspace=$(_get_workspace_name "$account" "$lowercase_string") || return 1
     aws_account_id=$(_get_aws_account_id "$account" "$PROFILE_PREFIX" "$VERSION") || return 1
 
     var_file=$(_get_workspace_vars_file "$account") || return 1
@@ -30,6 +31,7 @@ function _terraform() {
     expiration_date=$(_get_expiration_date "$workspace_expiration")
     current_date=$(_get_current_date) || return 1
     layers=$(_get_layer_list) || return 1
+    third_party_layers=$(_get_third_party_layer_list) || return 1
     lambdas=$(_get_lambda_list) || return 1
     login_account=$(_get_account_full_name) || return 1
     local plan_file="./tfplan"
@@ -117,7 +119,8 @@ function _terraform_plan() {
             -var "expiration_date=${expiration_date}" \
             -var "lambdas=${lambdas}" \
             -var "workspace_type=${workspace_type}" \
-            -var "layers=${layers}" || return 1
+            -var "layers=${layers}" \
+            -var "third_party_layers=${third_party_layers}" || return 1
     else
         terraform plan $args \
             -out="$plan_file" \
@@ -156,6 +159,7 @@ function _terraform_destroy() {
         -var "workspace_type=${workspace_type}" \
         -var "lambdas=${lambdas}" \
         -var "layers=${layers}" \
+        -var "third_party_layers=${third_party_layers}" \
     || return 1
 
     if [ "$workspace" != "default" ]; then
