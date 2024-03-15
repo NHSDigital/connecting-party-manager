@@ -243,5 +243,10 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/make/
         with:
-          command: destroy--redundant-workspaces BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          command: |
+            if [[ ${{ env.BRANCH_NAME }} == *"release/"* ]]; then
+              destroy--redundant-workspaces ENVIRONMENT=dev BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+            else
+              destroy--redundant-workspaces ENVIRONMENT=ref BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+            fi
           requires-aws: true

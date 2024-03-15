@@ -2,12 +2,12 @@
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 
-BRANCH_NAME="$1"
-DESTROY_ALL_COMMITS_ON_BRANCH="$2"
-KILL_ALL="$3"
-CURRENT_COMMIT="$4"
+ENV="$1"
+BRANCH_NAME="$2"
+DESTROY_ALL_COMMITS_ON_BRANCH="$3"
+KILL_ALL="$4"
+CURRENT_COMMIT="$5"
 AWS_REGION_NAME="eu-west-2"
-ENV="dev"
 
 function _get_valid_workspaces_to_destroy() {
     local object_name="$1"
@@ -76,7 +76,7 @@ function _destroy_redundant_workspaces() {
     # Print the matching object names
     for workspace in "${matching_objects[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
-        bash ./scripts/infrastructure/terraform/terraform-commands.sh "destroy" "ref" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
+        bash ./scripts/infrastructure/terraform/terraform-commands.sh "destroy" "$ENV" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
     done
 }
 
