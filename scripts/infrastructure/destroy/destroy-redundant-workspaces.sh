@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
+source ./scripts/infrastructure/terraform/terraform-constants.sh
 
 BRANCH_NAME="$1"
 DESTROY_ALL_COMMITS_ON_BRANCH="$2"
