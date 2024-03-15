@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-03-15
+- [PI-193] Search for a Device (MOCK)
+
 ## 2024-03-11
 - [PI-223] LDAP search on Lambda
 - [PI-240] Domain name updates
