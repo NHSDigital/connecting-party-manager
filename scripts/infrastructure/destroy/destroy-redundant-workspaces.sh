@@ -31,6 +31,7 @@ function _get_valid_workspaces_to_destroy() {
 }
 
 function _destroy_redundant_workspaces() {
+    echo "Finding workspaces to destroy"
     local bucket="s3://nhse-cpm--terraform-state-${VERSION}/${PROFILE_PREFIX}/"
     workspaces=$(aws s3 ls "$bucket" --no-paginate | awk '{print $NF}' | sed 's:/$::')
 
@@ -42,6 +43,9 @@ function _destroy_redundant_workspaces() {
         workspace_id="${BRANCH_NAME##*release/}"
         ENVIRONMENT="dev"
     fi
+    echo "The workspace ID is: $workspace_id"
+    echo "Destroying workspaces in: $ENVIRONMENT"
+    echo "The current commit is: $CURRENT_COMMIT"
     # get current short commit from branch
     if [ -z "$CURRENT_COMMIT" ]; then
         CURRENT_COMMIT=$(git rev-parse --short "$BRANCH_NAME")
