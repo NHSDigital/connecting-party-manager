@@ -10,4 +10,4 @@
 # described in https://hl7.org/fhir/r4b/http.html
 
 Organization: [create, read]
-Device: [create, read]
+Device: [create, read, search]
