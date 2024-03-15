@@ -2,11 +2,10 @@
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 
-ENV="$1"
-BRANCH_NAME="$2"
-DESTROY_ALL_COMMITS_ON_BRANCH="$3"
-KILL_ALL="$4"
-CURRENT_COMMIT="$5"
+BRANCH_NAME="$1"
+DESTROY_ALL_COMMITS_ON_BRANCH="$2"
+KILL_ALL="$3"
+CURRENT_COMMIT="$4"
 AWS_REGION_NAME="eu-west-2"
 
 function _get_valid_workspaces_to_destroy() {
@@ -37,8 +36,10 @@ function _destroy_redundant_workspaces() {
     # get JIRA ID from branch name
     if [[ $BRANCH_NAME =~ feature\/(PI-[0-9]+)[-_] ]]; then
         workspace_id="${BASH_REMATCH[1]}"
+        ENVIRONMENT="ref"
     elif [[ $BRANCH_NAME == *release/* ]]; then
         workspace_id="${BRANCH_NAME##*release/}"
+        ENVIRONMENT="dev"
     fi
     # get current short commit from branch
     if [ -z "$CURRENT_COMMIT" ]; then
@@ -76,7 +77,7 @@ function _destroy_redundant_workspaces() {
     # Print the matching object names
     for workspace in "${matching_objects[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
-        bash ./scripts/infrastructure/terraform/terraform-commands.sh "destroy" "$ENV" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
+        bash ./scripts/infrastructure/terraform/terraform-commands.sh "destroy" "$ENVIRONMENT" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
     done
 }
 
