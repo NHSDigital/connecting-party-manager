@@ -237,16 +237,20 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [build-head]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
           fetch-depth: 0
-      - uses: ./.github/actions/make/
+      - name: Remove redundant workspaces from dev
+        if: ${{ env.BRANCH_NAME }} == *"release/"*
+        uses: ./.github/actions/make/
         with:
-          command: |
-            if [[ ${{ env.BRANCH_NAME }} == *"release/"* ]]; then
-              destroy--redundant-workspaces ENVIRONMENT=dev BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-            else
-              destroy--redundant-workspaces ENVIRONMENT=ref BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
-            fi
+          command: destroy--redundant-workspaces ENVIRONMENT=dev BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          requires-aws: true
+      - name: Remove redundant workspaces from ref
+        if: ${{ env.BRANCH_NAME }} == *"feature/"*
+        uses: ./.github/actions/make/
+        with:
+          command: destroy--redundant-workspaces ENVIRONMENT=ref BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false CURRENT_COMMIT="${{ env.BRANCH_GITHUB_SHA_SHORT }}" TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           requires-aws: true
