@@ -1,7 +1,7 @@
 from datetime import date, datetime, time
 from functools import partial
 from types import FunctionType
-from typing import Generic, Self, TypeVar
+from typing import Self
 
 import orjson
 from attr import dataclass
@@ -35,7 +35,6 @@ ALLOWED_QUESTION_TYPES = {
     time,
     CaseInsensitiveString,
 }
-T = TypeVar("T", *ALLOWED_QUESTION_TYPES)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -83,18 +82,18 @@ class QuestionnaireResponseDeletedEvent(Event):
     questionnaire_response_index: int
 
 
-class Question(BaseModel, Generic[T]):
+class Question(BaseModel):
     """
     A single Questionnaire Question
     """
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
     human_readable_name: str
-    answer_types: set[type[T]]
+    answer_types: set[type]
     mandatory: bool
     multiple: bool
     validation_rules: set[FunctionType]
-    choices: set[T]
+    choices: set
 
     @validator("answer_types")
     def validate_question_type(cls, answer_types):
@@ -152,11 +151,11 @@ class Questionnaire(BaseModel):
         self,
         name: str,
         human_readable_name: str = "",
-        answer_types: set[T] = None,
+        answer_types: set[type] = None,
         mandatory: bool = False,
         multiple: bool = False,
         validation_rules: set[FunctionType] = None,
-        choices: set[T] = None,
+        choices: set = None,
     ):
         """
         Adds a new question to the questionnaire.
