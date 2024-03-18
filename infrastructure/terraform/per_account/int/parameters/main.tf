@@ -30,3 +30,7 @@ JSON
 resource "aws_secretsmanager_secret" "apigee-credentials" {
   name = "${terraform.workspace}-apigee-credentials"
 }
+
+resource "aws_secretsmanager_secret" "apigee-cpm-apikey" {
+  name = "${terraform.workspace}-apigee-cpm-apikey"
+}

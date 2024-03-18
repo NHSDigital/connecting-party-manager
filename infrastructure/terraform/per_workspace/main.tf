@@ -27,6 +27,10 @@ JSON
   }
 }
 
+data "aws_secretsmanager_secret" "cpm_apigee_api_key" {
+  name = "${var.environment}-apigee-cpm-apikey"
+}
+
 module "table" {
   source                      = "./modules/api_storage"
   name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--table"
@@ -116,6 +120,9 @@ module "authoriser" {
   python_version = var.python_version
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
+  environment_variables = {
+    ENVIRONMENT = var.environment
+  }
   layers = concat(
     compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
     [element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn]
@@ -138,6 +145,11 @@ module "authoriser" {
               "Action": "lambda:InvokeFunction",
               "Effect": "Allow",
               "Resource": "arn:aws:lambda:eu-west-2:${var.assume_account}:function:${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+          },
+          {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": "${data.aws_secretsmanager_secret.cpm_apigee_api_key.arn}"
           }
       ]
     }
