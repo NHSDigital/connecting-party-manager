@@ -52,7 +52,9 @@ def test_incorrect_apikey():
 
     assert result == {
         "principalId": index.__file__,
-        "context": {"error": "Provided apikey does not match cpm apikey"},
+        "context": {
+            "error": "Provided apikey in request does not match the Connecting Party Manager apikey"
+        },
         "policyDocument": {
             "Version": "2012-10-17",
             "Statement": [
