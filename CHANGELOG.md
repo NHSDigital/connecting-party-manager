@@ -2,6 +2,7 @@
 
 ## 2024-03-15
 - [PI-193] Search for a Device (MOCK)
+- [PI-278] Fix expired workspace
 
 ## 2024-03-11
 - [PI-223] LDAP search on Lambda
