@@ -42,6 +42,7 @@ function _terraform() {
     login_account        ${login_account}
     scope                ${scope}
     account              ${account}
+    raw_workspace        ${TERRAFORM_WORKSPACE}
     workspace            ${workspace}
     workspace_type       ${workspace_type}
     workspace_expiration ${workspace_expiration}
@@ -75,12 +76,12 @@ function _terraform() {
         ;;
         #----------------
         "destroy")
-            if [[ -z ${workspace} ]]; then
+            if [[ -z ${TERRAFORM_WORKSPACE} ]]; then
                 echo "Non-mgmt parameter required" >&2
                 return 1
             fi
 
-            _terraform_destroy "$workspace" "$var_file" "$aws_account_id" "$TERRAFORM_ARGS"
+            _terraform_destroy "$TERRAFORM_WORKSPACE" "$var_file" "$aws_account_id" "$TERRAFORM_ARGS"
         ;;
         #----------------
         "unlock")

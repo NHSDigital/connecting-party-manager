@@ -1,9 +1,10 @@
 #!/bin/bash
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
+source ./scripts/infrastructure/terraform/terraform-constants.sh
 
 AWS_REGION_NAME="eu-west-2"
-ENV="dev"
+ENV="$1"
 
 function _destroy_expired_workspaces() {
     dev_acct=$(_get_aws_account_id "$ENV" "$PROFILE_PREFIX" "$VERSION")

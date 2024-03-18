@@ -41,10 +41,19 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [build-base]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
-      - uses: ./.github/actions/make/
+
+      - name: Destroy expired dev workspaces
+        uses: ./.github/actions/make/
         with:
-          command: destroy--expired TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          command: destroy--expired ENVIRONMENT=dev TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          requires-aws: true
+
+      - name: Destroy expired ref workspaces
+        uses: ./.github/actions/make/
+        with:
+          command: destroy--expired ENVIRONMENT=ref TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
           requires-aws: true
