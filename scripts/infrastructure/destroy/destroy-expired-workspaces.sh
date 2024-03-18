@@ -41,6 +41,7 @@ function _destroy_expired_workspaces() {
                         local timestamp=$(python -c "from datetime import datetime, timedelta, timezone; print(format(datetime.now(timezone.utc), '%Y-%m-%dT%H:%M:%SZ'))")
                         local expired=$(python -c "from datetime import datetime, timezone; import sys; print(1) if datetime.strptime('$timestamp', '%Y-%m-%dT%H:%M:%SZ') > datetime.strptime('$expirationDate', '%Y-%m-%dT%H:%M:%SZ') else print(0)")
                         if [ -n "$expirationDate" ] && [ "$expired" = 1 ]; then
+                            echo "$workspace"
                             workspaces+=("$workspace")
                         fi
                     fi
