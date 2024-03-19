@@ -5,7 +5,11 @@ from moto import mock_aws
 
 
 def test_correct_apikey():
-    with mock_aws(), mock.patch.dict(os.environ, {"ENVIRONMENT": "dev"}, clear=True):
+    with mock_aws(), mock.patch.dict(
+        os.environ,
+        {"ENVIRONMENT": "dev", "AWS_DEFAULT_REGION": "us-east-1"},
+        clear=True,
+    ):
         import api.authoriser.index as index
 
         index.CLIENT.create_secret(
@@ -36,7 +40,11 @@ def test_correct_apikey():
 
 
 def test_incorrect_apikey():
-    with mock_aws(), mock.patch.dict(os.environ, {"ENVIRONMENT": "dev"}, clear=True):
+    with mock_aws(), mock.patch.dict(
+        os.environ,
+        {"ENVIRONMENT": "dev", "AWS_DEFAULT_REGION": "us-east-1"},
+        clear=True,
+    ):
         import api.authoriser.index as index
 
         index.CLIENT.create_secret(
