@@ -1,7 +1,8 @@
 from collections import defaultdict
-from dataclasses import asdict
 from typing import TYPE_CHECKING
 
+import orjson
+from attr import asdict as _asdict
 from domain.core.device import (
     Device,
     DeviceCreatedEvent,
@@ -20,6 +21,7 @@ from domain.core.questionnaire import (
     QuestionnaireResponseDeletedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
+from event.json import json_loads
 
 from .errors import ItemNotFound
 from .keys import TableKeys, strip_key_prefix
@@ -29,6 +31,10 @@ from .transaction import ConditionExpression, TransactionStatement, TransactItem
 
 if TYPE_CHECKING:
     from mypy_boto3_dynamodb.type_defs import QueryOutputTypeDef
+
+
+def asdict(obj) -> dict:
+    return _asdict(obj, recurse=False)
 
 
 class DeviceRepository(Repository[Device]):
@@ -44,11 +50,17 @@ class DeviceRepository(Repository[Device]):
     ) -> TransactItem:
         pk = TableKeys.DEVICE.key(event.id)
         pk_1 = TableKeys.DEVICE_TYPE.key(event.type)
+        event_data = asdict(event)
+        _condition_expression = (
+            {"ConditionExpression": condition_expression}
+            if event_data.get("_trust", False) is False
+            else {}
+        )
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=pk, pk_1=pk_1, sk_1=pk, **asdict(event)),
-                ConditionExpression=condition_expression,
+                Item=marshall(pk=pk, sk=pk, pk_1=pk_1, sk_1=pk, **event_data),
+                **_condition_expression,
             )
         )
 
@@ -61,13 +73,19 @@ class DeviceRepository(Repository[Device]):
         pk = TableKeys.DEVICE.key(event.id)
         sk = TableKeys.DEVICE_KEY.key(event.key)
         pk_2 = TableKeys.DEVICE_KEY_TYPE.key(event.type)
+        event_data = asdict(event)
+        condition_expression = (
+            {"ConditionExpression": ConditionExpression.MUST_NOT_EXIST}
+            if event_data.get("_trust", False) is False
+            else {}
+        )
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
                 Item=marshall(
-                    pk=pk, sk=sk, pk_1=sk, sk_1=sk, pk_2=pk_2, sk_2=sk, **asdict(event)
+                    pk=pk, sk=sk, pk_1=sk, sk_1=sk, pk_2=pk_2, sk_2=sk, **event_data
                 ),
-                ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
+                **condition_expression,
             )
         )
 
@@ -87,10 +105,12 @@ class DeviceRepository(Repository[Device]):
     def handle_QuestionnaireInstanceEvent(self, event: QuestionnaireInstanceEvent):
         pk = TableKeys.DEVICE.key(event.entity_id)
         sk = TableKeys.QUESTIONNAIRE.key(event.questionnaire_id)
+        event_data = asdict(event)
+        event_data["questions"] = orjson.dumps(event_data["questions"]).decode()
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=pk, **asdict(event)),
+                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=pk, **event_data),
             )
         )
 
@@ -103,11 +123,18 @@ class DeviceRepository(Repository[Device]):
         sk = TableKeys.QUESTIONNAIRE_RESPONSE.key(
             event.questionnaire_id, event.questionnaire_response_index
         )
+        event_data = asdict(event)
+        event_data["responses"] = orjson.dumps(event_data["responses"]).decode()
+        condition_expression = (
+            {"ConditionExpression": condition_expression}
+            if event_data.get("_trust", False) is False
+            else {}
+        )
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=pk, **asdict(event)),
-                ConditionExpression=condition_expression,
+                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=pk, **event_data),
+                **condition_expression,
             )
         )
 
@@ -189,7 +216,7 @@ class DeviceRepository(Repository[Device]):
         for id_, data in TableKeys.QUESTIONNAIRE.filter_and_group(items, key="sk"):
             data["questions"] = {
                 question_name: render_question(question)
-                for question_name, question in data["questions"].items()
+                for question_name, question in json_loads(data["questions"]).items()
             }
             questionnaires[id_] = Questionnaire(**data)
 
@@ -197,8 +224,7 @@ class DeviceRepository(Repository[Device]):
         for qr in TableKeys.QUESTIONNAIRE_RESPONSE.filter(items, key="sk"):
             qid = qr["questionnaire_id"]
             _questionnaire_response = QuestionnaireResponse(
-                questionnaire=questionnaires[qid],
-                responses=qr["responses"],
+                questionnaire=questionnaires[qid], responses=json_loads(qr["responses"])
             )
             questionnaire_responses[qid].append(_questionnaire_response)
 

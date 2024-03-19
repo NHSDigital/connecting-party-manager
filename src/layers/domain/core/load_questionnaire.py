@@ -1,4 +1,3 @@
-from functools import cache
 from pathlib import Path
 
 from domain.core import questionnaire_validation_custom_rules
@@ -44,7 +43,6 @@ def render_question(question):
     return question
 
 
-@cache
 def render_questionnaire(
     questionnaire_name: str, questionnaire_version: int
 ) -> Questionnaire:

@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING
 
 import boto3
 from etl_utils.constants import WorkerKey
-from etl_utils.json import EtlEncoder, json_dump_bytes
+from etl_utils.io import EtlEncoder, pkl_dump_lz4, pkl_load_lz4
 from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property, ldif_dump, parse_ldif
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
 from etl_utils.worker.model import WorkerActionResponse, WorkerEnvironment
 from etl_utils.worker.worker_step_chain import execute_step_chain
-from event.json import json_load, json_loads
+from event.json import json_loads
 from sds.domain.constants import FILTER_TERMS
 from sds.domain.parse import parse_sds_record
 
@@ -35,7 +35,7 @@ def extract(
     )
 
     with smart_open(s3_client=s3_client, s3_path=s3_output_path) as f:
-        processed_records: list[dict] = json_load(f)
+        processed_records: deque[dict] = pkl_load_lz4(f)
 
     exception = apply_action(
         unprocessed_records=unprocessed_records,
@@ -62,6 +62,6 @@ def handler(event, context):
         s3_input_path=ENVIRONMENT.s3_path(WorkerKey.EXTRACT),
         s3_output_path=ENVIRONMENT.s3_path(WorkerKey.TRANSFORM),
         unprocessed_dumper=ldif_dump,
-        processed_dumper=json_dump_bytes,
+        processed_dumper=pkl_dump_lz4,
     )
     return asdict(response)

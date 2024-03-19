@@ -4,17 +4,18 @@ Run with
     poetry run python scripts/etl/clear_state_inputs.py
 """
 
-import json
+from collections import deque
 
 import boto3
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.io import pkl_dumps_lz4
 
 from test_helpers.aws_session import aws_session
 from test_helpers.terraform import read_terraform_output
 
 EXPECTED_CHANGELOG_NUMBER = "0"
 EMPTY_LDIF_DATA = b""
-EMPTY_JSON_DATA = json.dumps([]).encode()
+EMPTY_JSON_DATA = pkl_dumps_lz4(deque())
 
 
 def main():

@@ -95,7 +95,7 @@ repos:
     hooks:
       - id: forbid_json_load
         name: Don't use json.load(s) - use json_load(s) instead
-        entry: json\.load
+        entry: \ json\.load
         language: pygrep
         types: [python]
         exclude: src/layers/event/json/__init__.py

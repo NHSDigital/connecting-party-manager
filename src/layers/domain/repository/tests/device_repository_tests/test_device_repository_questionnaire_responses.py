@@ -85,7 +85,7 @@ def test__device_repository__delete_questionnaire_response_that_has_been_persist
 
 
 @pytest.mark.integration
-def test__device_repository__modify_questionnaire_response_that_isnt_persisted_yet(
+def test__device_repository__modify_questionnaire_response_that_has_been_persisted(
     device: Device, repository: DeviceRepository
 ):
     # Persist model before updating model

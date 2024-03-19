@@ -42,6 +42,7 @@ class Repository(Generic[ModelType]):
         for events in batched(entity.events, n=batch_size):
             transact_items = list(map(generate_transaction_statements, events))
             transaction = Transaction(TransactItems=transact_items)
+
             with handle_client_errors(commands=transact_items):
                 _response = self.client.transact_write_items(
                     **transaction.dict(exclude_none=True)

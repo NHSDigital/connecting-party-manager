@@ -1,5 +1,5 @@
-import json
 import os
+from collections import deque
 from itertools import chain, permutations
 from typing import Callable, Generator
 from unittest import mock
@@ -13,8 +13,8 @@ from domain.repository.device_repository import DeviceRepository
 from domain.repository.keys import TableKeys
 from domain.repository.marshall import unmarshall
 from etl_utils.constants import WorkerKey
-from etl_utils.json import EtlEncoder
-from event.json import json_loads
+from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -103,9 +103,9 @@ def put_object(mock_s3_client: S3Client):
 
 
 @pytest.fixture
-def get_object(mock_s3_client: S3Client):
+def get_object(mock_s3_client: S3Client) -> bytes:
     return lambda key: (
-        mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read().decode()
+        mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read()
     )
 
 
@@ -141,7 +141,7 @@ def test_load_worker_pass(
     n_initial_unprocessed: int,
     n_initial_processed: int,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
     repository: MockDeviceRepository,
 ):
     from etl.sds.worker.load import load
@@ -150,16 +150,15 @@ def test_load_worker_pass(
     _initial_unprocessed_data = [
         device_factory(id=i + 1) for i in range(n_initial_unprocessed)
     ]
-    initial_unprocessed_data = []
+    initial_unprocessed_data = deque()
     for device in _initial_unprocessed_data:
         initial_unprocessed_data += device.export_events()
 
     initial_processed_data = [
         device_factory(id=(i + 1) * 1000) for i in range(n_initial_processed)
     ]
-    put_object(
-        key=WorkerKey.LOAD, body=json.dumps(initial_unprocessed_data, cls=EtlEncoder)
-    )
+
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_unprocessed_data))
     for device in initial_processed_data:
         repository.write(device)
 
@@ -173,7 +172,7 @@ def test_load_worker_pass(
     }
 
     # Final state
-    final_unprocessed_data = json_loads(get_object(key=WorkerKey.LOAD))
+    final_unprocessed_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
     final_processed_data: list[Device] = list(repository.all_devices())
 
     initial_ids = sorted(
@@ -184,7 +183,7 @@ def test_load_worker_pass(
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
     assert final_processed_ids == initial_ids
-    assert final_unprocessed_data == []
+    assert final_unprocessed_data == deque([])
 
 
 @pytest.mark.slow
@@ -195,7 +194,7 @@ def test_load_worker_pass(
 def test_load_worker_bad_record(
     initial_unprocessed_data: str,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
     repository: DeviceRepository,
 ):
     from etl.sds.worker.load import load
@@ -203,7 +202,7 @@ def test_load_worker_bad_record(
     # Initial state
     bad_record_index = initial_unprocessed_data.index(BAD_CPM_EVENT)
     n_initial_unprocessed = len(initial_unprocessed_data)
-    put_object(key=WorkerKey.LOAD, body=json.dumps(initial_unprocessed_data))
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(deque(initial_unprocessed_data)))
 
     n_initial_processed = 1000
     repository.write(
@@ -235,7 +234,7 @@ def test_load_worker_bad_record(
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.LOAD)
     final_processed_data: list[Device] = list(repository.all_devices())
-    n_final_unprocessed = len(json_loads(final_unprocessed_data))
+    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
     n_final_processed = len(final_processed_data)
 
     # Confirm that there are still unprocessed records, and that there may have been

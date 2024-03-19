@@ -1,9 +1,10 @@
-from dataclasses import asdict
 from typing import TypeVar
 
+from attr import asdict
 from domain.core.error import ImmutableFieldError, UnknownFields
-from pydantic import BaseModel, Field, validate_model
+from pydantic import Field, validate_model
 
+from .base import BaseModel
 from .event import Event, ExportedEventsTypeDef
 
 K = TypeVar("K")
@@ -77,7 +78,9 @@ class AggregateRoot(BaseModel):
             ]
 
         """
-        return [{event.public_name: asdict(event)} for event in self.events]
+        return list(
+            {event.public_name: asdict(event, recurse=False)} for event in self.events
+        )
 
     @property
     def model_fields(self) -> set[str]:

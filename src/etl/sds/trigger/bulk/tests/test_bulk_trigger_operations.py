@@ -8,6 +8,7 @@ import boto3
 import pytest
 from botocore.exceptions import ClientError
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.io import pkl_dumps_lz4
 from etl_utils.trigger.model import StateMachineInput
 from moto import mock_aws
 
@@ -105,9 +106,13 @@ def test_start_execution(state_machine_input: StateMachineInput):
 def test_validate_state_keys_are_empty(s3_client: "S3Client", key, expectation):
     s3_client.put_object(Bucket=BUCKET_NAME, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF)
     s3_client.put_object(
-        Bucket=BUCKET_NAME, Key=WorkerKey.TRANSFORM, Body=EMPTY_JSON_ARRAY
+        Bucket=BUCKET_NAME,
+        Key=WorkerKey.TRANSFORM,
+        Body=pkl_dumps_lz4(EMPTY_JSON_ARRAY),
     )
-    s3_client.put_object(Bucket=BUCKET_NAME, Key=WorkerKey.LOAD, Body=EMPTY_JSON_ARRAY)
+    s3_client.put_object(
+        Bucket=BUCKET_NAME, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_ARRAY)
+    )
 
     if key is not None:
         s3_client.put_object(Bucket=BUCKET_NAME, Key=key, Body=b" ")

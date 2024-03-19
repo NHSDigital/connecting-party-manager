@@ -3,6 +3,7 @@ from enum import StrEnum
 from typing import Literal, Optional
 
 from botocore.exceptions import ClientError
+from domain.core.error import NotFoundError
 from pydantic import BaseModel, Field
 
 from .errors import AlreadyExistsError, UnhandledTransaction
@@ -19,6 +20,7 @@ class ConditionExpression(StrEnum):
 
 TRANSACTION_ERROR_MAPPING = {
     ConditionExpression.MUST_NOT_EXIST: AlreadyExistsError,
+    ConditionExpression.MUST_EXIST: NotFoundError,
 }
 
 

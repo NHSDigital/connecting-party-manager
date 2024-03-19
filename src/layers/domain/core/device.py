@@ -1,8 +1,8 @@
 from collections import defaultdict
-from dataclasses import dataclass
 from enum import StrEnum, auto
 from uuid import UUID, uuid4
 
+from attr import dataclass, field
 from domain.core.questionnaire import (
     QuestionnaireInstanceEvent,
     QuestionnaireResponse,
@@ -35,6 +35,7 @@ class DeviceCreatedEvent(Event):
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
+    _trust: bool = field(alias="_trust", default=False)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -52,6 +53,7 @@ class DeviceKeyAddedEvent(Event):
     id: str
     key: str
     type: DeviceKeyType
+    _trust: bool = field(alias="_trust", default=False)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -114,12 +116,12 @@ class Device(AggregateRoot):
     def delete(self) -> DeviceUpdatedEvent:
         return self.update(status=DeviceStatus.INACTIVE)
 
-    def add_key(self, type: str, key: str) -> DeviceKeyAddedEvent:
+    def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
         if key in self.keys:
             raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
         device_key = DeviceKey(key=key, type=type)
         self.keys[key] = device_key
-        event = DeviceKeyAddedEvent(id=self.id, **device_key.dict())
+        event = DeviceKeyAddedEvent(id=self.id, _trust=_trust, **device_key.dict())
         return self.add_event(event)
 
     def delete_key(self, key: str) -> DeviceKeyDeletedEvent:
@@ -131,8 +133,13 @@ class Device(AggregateRoot):
         return self.add_event(event)
 
     def add_questionnaire_response(
-        self, questionnaire_response: QuestionnaireResponse
+        self,
+        questionnaire_response: QuestionnaireResponse,
+        _questionnaire: dict = None,
+        _trust=False,
     ) -> list[QuestionnaireInstanceEvent, QuestionnaireResponseAddedEvent]:
+        _questionnaire = _questionnaire or questionnaire_response.questionnaire.dict()
+
         questionnaire_responses = self.questionnaire_responses[
             questionnaire_response.questionnaire.id
         ]
@@ -145,17 +152,20 @@ class Device(AggregateRoot):
             questionnaire_event = QuestionnaireInstanceEvent(
                 entity_id=self.id,
                 questionnaire_id=questionnaire_response.questionnaire.id,
-                **questionnaire_response.questionnaire.dict(),
+                **_questionnaire,
             )
-            events.append(self.add_event(questionnaire_event))
+            events.append(questionnaire_event)
+            self.add_event(questionnaire_event)
 
         questionnaire_response_event = QuestionnaireResponseAddedEvent(
             entity_id=self.id,
             questionnaire_response_index=questionnaire_response_index,
             questionnaire_id=questionnaire_response.questionnaire.id,
             responses=questionnaire_response.responses,
+            _trust=_trust,
         )
-        events.append(self.add_event(questionnaire_response_event))
+        events.append(questionnaire_response_event)
+        self.add_event(questionnaire_response_event)
 
         return events
 

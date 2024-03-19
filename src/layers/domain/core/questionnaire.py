@@ -1,12 +1,13 @@
-from dataclasses import dataclass
 from datetime import date, datetime, time
 from functools import partial
 from types import FunctionType
-from typing import Generic, TypeVar
+from typing import Self
 
-from event.json import json_loads
-from pydantic import BaseModel, Field, validator
+import orjson
+from attr import dataclass, field
+from pydantic import Field, validator
 
+from .base import BaseModel
 from .error import DuplicateError, InvalidResponseError
 from .event import Event
 from .validation import ENTITY_NAME_REGEX
@@ -34,7 +35,6 @@ ALLOWED_QUESTION_TYPES = {
     time,
     CaseInsensitiveString,
 }
-T = TypeVar("T", *ALLOWED_QUESTION_TYPES)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -57,6 +57,7 @@ class QuestionnaireInstanceEvent(Event):
     name: str
     version: int
     questions: dict[str, _Question]
+    _trust: bool = field(alias="_trust", default=False)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -65,6 +66,7 @@ class QuestionnaireResponseAddedEvent(Event):
     questionnaire_id: str
     questionnaire_response_index: int
     responses: list[dict[str, list]]
+    _trust: bool = field(alias="_trust", default=False)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -82,26 +84,18 @@ class QuestionnaireResponseDeletedEvent(Event):
     questionnaire_response_index: int
 
 
-class Question(BaseModel, Generic[T]):
+class Question(BaseModel):
     """
     A single Questionnaire Question
     """
 
-    class Config:
-        arbitrary_types_allowed = True  # Validation rules are not pydantic classes
-        json_encoders = {
-            set: list,
-            FunctionType: lambda fn: fn.__name__,
-            type: lambda _type: _type.__name__,
-        }
-
     name: str = Field(regex=ENTITY_NAME_REGEX)
     human_readable_name: str
-    answer_types: set[type[T]]
+    answer_types: set[type]
     mandatory: bool
     multiple: bool
     validation_rules: set[FunctionType]
-    choices: set[T]
+    choices: set
 
     @validator("answer_types")
     def validate_question_type(cls, answer_types):
@@ -114,7 +108,7 @@ class Question(BaseModel, Generic[T]):
 
     def dict(self, **kwargs):
         _data = self.json(**kwargs)
-        return json_loads(_data)
+        return orjson.loads(_data)
 
 
 def choice_type_matches_answer_types(choice, answer_types: set):
@@ -148,15 +142,22 @@ class Questionnaire(BaseModel):
         """
         return question_name in self.questions
 
+    def __hash__(self):
+        question_names = ".".join(self.questions)
+        return hash(f"{self.id}.{question_names}")
+
+    def __eq__(self, other: Self):
+        return self.id == other.id
+
     def add_question(
         self,
         name: str,
         human_readable_name: str = "",
-        answer_types: set[T] = None,
+        answer_types: set = None,
         mandatory: bool = False,
         multiple: bool = False,
         validation_rules: set[FunctionType] = None,
-        choices: set[T] = None,
+        choices: set = None,
     ):
         """
         Adds a new question to the questionnaire.

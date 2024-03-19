@@ -67,7 +67,7 @@ def test_spine_device_questionnaire_v1_local(
     )
 
 
-@pytest.mark.s3("sds/etl/bulk/1701246-fixed-fixed-fixed.json")
+@pytest.mark.s3("sds/etl/bulk/1701246-fix-18032023.json")
 def test_spine_device_questionnaire_v1_integration(
     spine_device_questionnaire_v1: Questionnaire, test_data_paths
 ):
