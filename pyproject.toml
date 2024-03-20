@@ -22,7 +22,7 @@ nhs-context-logging = "^0.4.2"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
 email-validator = "^2.1.0.post1"
-smart-open = "^6.4.0"
+smart-open = "^7.0.1"
 urllib3 = "<2"
 
 [tool.poetry.group.dev.dependencies]
