@@ -20,6 +20,9 @@ class Context(BehaveContext):
     table_name: str = None
     session: ContextManager = None
     dynamodb_client: DynamoDBClient = None
+    workspace: str = None
+    workspace_type: str = None
+    apikey: str = None
 
     postman_collection: PostmanCollection = None
     postman_feature: PostmanItem = None
