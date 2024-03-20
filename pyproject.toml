@@ -23,7 +23,7 @@ requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
 email-validator = "^2.1.0.post1"
 smart-open = "^6.4.0"
-urllib3 = "<2"
+urllib3 = "<3"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
