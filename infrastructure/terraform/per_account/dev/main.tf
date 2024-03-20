@@ -58,6 +58,10 @@ module "truststore_bucket" {
   }
 }
 
+module "vpc" {
+  source = "../modules/vpc"
+}
+
 
 # -------- ROUTE 53 ---------
 
