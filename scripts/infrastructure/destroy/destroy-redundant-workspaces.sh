@@ -1,13 +1,14 @@
 #!/bin/bash
+shopt -s nocasematch
 
 source ./scripts/infrastructure/terraform/terraform-utils.sh
+source ./scripts/infrastructure/terraform/terraform-constants.sh
 
 BRANCH_NAME="$1"
 DESTROY_ALL_COMMITS_ON_BRANCH="$2"
 KILL_ALL="$3"
 CURRENT_COMMIT="$4"
 AWS_REGION_NAME="eu-west-2"
-ENV="dev"
 
 function _get_valid_workspaces_to_destroy() {
     local object_name="$1"
@@ -31,15 +32,21 @@ function _get_valid_workspaces_to_destroy() {
 }
 
 function _destroy_redundant_workspaces() {
+    echo "Finding workspaces to destroy"
     local bucket="s3://nhse-cpm--terraform-state-${VERSION}/${PROFILE_PREFIX}/"
     workspaces=$(aws s3 ls "$bucket" --no-paginate | awk '{print $NF}' | sed 's:/$::')
 
     # get JIRA ID from branch name
     if [[ $BRANCH_NAME =~ feature\/(PI-[0-9]+)[-_] ]]; then
         workspace_id="${BASH_REMATCH[1]}"
+        ENVIRONMENT="ref"
     elif [[ $BRANCH_NAME == *release/* ]]; then
         workspace_id="${BRANCH_NAME##*release/}"
+        ENVIRONMENT="dev"
     fi
+    echo "The workspace ID is: $workspace_id"
+    echo "Destroying workspaces in: $ENVIRONMENT"
+    echo "The current commit is: $CURRENT_COMMIT"
     # get current short commit from branch
     if [ -z "$CURRENT_COMMIT" ]; then
         CURRENT_COMMIT=$(git rev-parse --short "$BRANCH_NAME")
@@ -76,7 +83,7 @@ function _destroy_redundant_workspaces() {
     # Print the matching object names
     for workspace in "${matching_objects[@]}"; do
         echo "Attempting to destroy workspace: $workspace"
-        bash ./scripts/infrastructure/terraform/terraform-commands.sh "destroy" "ref" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
+        bash ./scripts/infrastructure/terraform/terraform-commands.sh "destroy" "$ENVIRONMENT" "$workspace" "per_workspace" "-input=false -auto-approve -no-color"
     done
 }
 

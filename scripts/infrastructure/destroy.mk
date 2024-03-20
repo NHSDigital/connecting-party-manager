@@ -16,7 +16,7 @@ destroy--expired: aws--login ## Destroy any workspaces that have gone past their
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
-	bash $(PATH_TO_INFRASTRUCTURE)/destroy/destroy-expired-workspaces.sh
+	bash $(PATH_TO_INFRASTRUCTURE)/destroy/destroy-expired-workspaces.sh $(ENVIRONMENT)
 
 destroy--corrupted: aws--login ## Destroy any workspaces that cannot be detroyed with terraform.
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
