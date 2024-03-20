@@ -42,13 +42,18 @@ def before_all(context: Context):
         context.workspace_type = read_terraform_output("workspace_type.value")
         context.workspace = read_terraform_output("workspace.value")
         context.session = aws_session
+
         with context.session():
             client = secretsmanager_client()
-            secret_name = (  # pragma: allowlist secret
-                "dev-apigee-cpm-apikey"
-                if context.workspace_type == "LOCAL"
-                else f"{context.workspace}-apigee-cpm-apikey"
-            )
+            if context.workspace_type == "LOCAL":
+                secret_name = "dev-apigee-cpm-apikey"  # pragma: allowlist secret
+            elif context.workspace_type == "CI":
+                secret_name = "ref-apigee-cpm-apikey"  # pragma: allowlist secret
+            else:
+                secret_name = (
+                    f"{context.workspace}-apigee-cpm-apikey"  # pragma: allowlist secret
+                )
+
             response = client.get_secret_value(SecretId=secret_name)
             context.apikey = response["SecretString"]
 
