@@ -58,6 +58,14 @@ function generate_proxy(){
     _apigee_environment=$(get_apigee_environment ${_workspace_name})
     _apigee_stage=$(get_apigee_stage ${_workspace_name})
 
+        echo "
+    Apigeeing
+    -------------------- ----------------------------------------
+    workspace_name        ${_workspace_name}
+    apigee_environment    ${_apigee_environment}
+    apigee_stage          ${_apigee_stage}
+"
+
     # Some validation rules to avoid being rejected by proxygen:
     # 1. No double hyphens part 1
     if [[ ${_workspace_name} == *--* ]];
