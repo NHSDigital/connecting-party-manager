@@ -53,7 +53,8 @@
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
       "Resource": [
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*"
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*"
       ]
     }
   ]

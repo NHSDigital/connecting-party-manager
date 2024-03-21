@@ -17,7 +17,11 @@ from feature_tests.end_to_end.steps.table import parse_table
 
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
-    context.headers[header_name] = parse_table(table=context.table)
+    table_headers = parse_table(table=context.table)
+    apikey_header = {
+        "apikey": context.apikey
+    }  # Hidden here because the value cant be written in the tests
+    context.headers[header_name] = {**table_headers, **apikey_header}
 
 
 @given(

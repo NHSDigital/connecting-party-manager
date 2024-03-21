@@ -3,7 +3,7 @@ from pathlib import Path
 
 from behave import use_fixture
 from behave.model import Feature, Scenario, Step
-from event.aws.client import dynamodb_client
+from event.aws.client import dynamodb_client, secretsmanager_client
 
 from feature_tests.end_to_end.steps.context import Context
 from feature_tests.end_to_end.steps.fixtures import (
@@ -33,16 +33,35 @@ def before_all(context: Context):
     context.base_url = BASE_URL
     context.session = nullcontext
     context.headers = {}
+    context.workspace = ""
+    context.workspace_type = ""
 
     if context.test_mode is TestMode.INTEGRATION:
         context.table_name = read_terraform_output("dynamodb_table_name.value")
-        context.base_url = read_terraform_output("invoke_url.value") + "/"
+        context.base_url = read_terraform_output("certificate_domain_name.value") + "/"
+        context.workspace_type = read_terraform_output("workspace_type.value")
+        context.workspace = read_terraform_output("workspace.value")
         context.session = aws_session
+
+        with context.session():
+            client = secretsmanager_client()
+            if context.workspace_type == "LOCAL":
+                secret_name = "dev-apigee-cpm-apikey"  # pragma: allowlist secret
+            elif context.workspace_type == "CI":
+                secret_name = "ref-apigee-cpm-apikey"  # pragma: allowlist secret
+            else:
+                secret_name = (
+                    f"{context.workspace}-apigee-cpm-apikey"  # pragma: allowlist secret
+                )
+
+            response = client.get_secret_value(SecretId=secret_name)
+            context.apikey = response["SecretString"]
 
     if context.test_mode is TestMode.LOCAL:
         use_fixture(mock_environment, context=context, table_name=context.table_name)
         use_fixture(mock_dynamodb, context=context, table_name=context.table_name)
         use_fixture(mock_requests, context=context)
+        context.apikey = "mock"  # pragma: allowlist secret
 
 
 def before_feature(context: Context, feature: Feature):
