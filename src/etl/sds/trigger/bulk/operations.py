@@ -1,10 +1,12 @@
 import hashlib
 import json
+from collections import deque
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 from botocore.exceptions import ClientError
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.io import pkl_dumps_lz4
 from etl_utils.trigger.model import StateMachineInput
 from event.json import json_loads
 
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     from mypy_boto3_stepfunctions import SFNClient
 
 EMPTY_LDIF = ""
-EMPTY_JSON_ARRAY = "[]"
+EMPTY_JSON_ARRAY = deque()
 
 
 class StateFileNotEmpty(Exception):
@@ -55,19 +57,19 @@ def validate_no_changelog_number(s3_client: "S3Client", source_bucket):
 
 
 def _validate_s3_file_content(
-    s3_client: "S3Client", source_bucket: str, key: WorkerKey, content: str
+    s3_client: "S3Client", source_bucket: str, key: WorkerKey, content: bytes
 ):
     s3_file_hash = _object_exists(s3_client=s3_client, bucket=source_bucket, key=key)
-    expected_file_hash = hashlib.md5(content.encode()).hexdigest()
+    expected_file_hash = hashlib.md5(content).hexdigest()
     if s3_file_hash and (s3_file_hash != expected_file_hash):
         raise StateFileNotEmpty(bucket=source_bucket, key=key, content=content)
 
 
 def validate_state_keys_are_empty(s3_client: "S3Client", source_bucket):
     for key, content in (
-        (WorkerKey.EXTRACT, EMPTY_LDIF),
-        (WorkerKey.TRANSFORM, EMPTY_JSON_ARRAY),
-        (WorkerKey.LOAD, EMPTY_JSON_ARRAY),
+        (WorkerKey.EXTRACT, EMPTY_LDIF.encode()),
+        (WorkerKey.TRANSFORM, pkl_dumps_lz4(EMPTY_JSON_ARRAY)),
+        (WorkerKey.LOAD, pkl_dumps_lz4(EMPTY_JSON_ARRAY)),
     ):
         _validate_s3_file_content(
             s3_client=s3_client, source_bucket=source_bucket, key=key, content=content

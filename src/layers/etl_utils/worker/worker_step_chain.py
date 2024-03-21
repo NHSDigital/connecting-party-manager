@@ -61,12 +61,13 @@ def execute_step_chain(
     s3_output_path: str,
     unprocessed_dumper: FunctionType,
     processed_dumper: FunctionType,
+    **kwargs
 ) -> WorkerResponse:
     # Run the main action chain
     action_chain = StepChain(
         step_chain=[execute_action], step_decorators=[_log_action_without_inputs]
     )
-    action_chain.run(init=(action, s3_client, s3_input_path, s3_output_path))
+    action_chain.run(init=(action, s3_client, s3_input_path, s3_output_path, kwargs))
 
     # Save the action chain results if there were no unhandled (fatal) exceptions
     save_chain_response = None

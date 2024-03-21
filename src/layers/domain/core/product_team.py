@@ -1,6 +1,6 @@
-from dataclasses import dataclass
 from uuid import UUID
 
+from attr import dataclass
 from pydantic import Field
 
 from .aggregate_root import AggregateRoot
@@ -14,11 +14,6 @@ class ProductTeamCreatedEvent(Event):
     id: UUID
     name: str
     ods_code: str
-
-
-@dataclass(kw_only=True, slots=True)
-class ProductTeamDeletedEvent(Event):
-    id: UUID
 
 
 class ProductTeam(AggregateRoot):
@@ -37,6 +32,7 @@ class ProductTeam(AggregateRoot):
         name: str,
         type: DeviceType,
         status: DeviceStatus = DeviceStatus.ACTIVE,
+        _trust=False,
     ) -> Device:
         device = Device(
             name=name,
@@ -45,10 +41,7 @@ class ProductTeam(AggregateRoot):
             product_team_id=self.id,
             ods_code=self.ods_code,
         )
-        device_created_event = DeviceCreatedEvent(**device.dict())
+        device_created_event = DeviceCreatedEvent(**device.dict(), _trust=_trust)
         device.add_event(device_created_event)
         self.add_event(device_created_event)
         return device
-
-    def delete(self) -> list[Event]:
-        return [ProductTeamDeletedEvent(id=self.id)]

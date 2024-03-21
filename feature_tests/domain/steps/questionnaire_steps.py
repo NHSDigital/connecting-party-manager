@@ -135,7 +135,7 @@ def when_questionnaire_responses_provided(context: Context, name: str, version: 
         elif answer_types == "time":
             answer = datetime.strptime(answer, "%H:%M:%S").time()
 
-        context.questionnaire_response.append((question_name, [answer]))
+        context.questionnaire_response.append({question_name: [answer]})
 
     assert len(context.questionnaire_response) != 0
 

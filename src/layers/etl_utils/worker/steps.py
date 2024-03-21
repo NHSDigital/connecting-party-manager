@@ -1,3 +1,4 @@
+from collections import deque
 from types import FunctionType
 from typing import TYPE_CHECKING
 
@@ -11,14 +12,17 @@ if TYPE_CHECKING:
 
 
 def execute_action(data: dict, cache: dict) -> WorkerActionResponse:
-    action, s3_client, s3_input_path, s3_output_path = data[StepChain.INIT]
+    action, s3_client, s3_input_path, s3_output_path, kwargs = data[StepChain.INIT]
     return action(
-        s3_client=s3_client, s3_input_path=s3_input_path, s3_output_path=s3_output_path
+        s3_client=s3_client,
+        s3_input_path=s3_input_path,
+        s3_output_path=s3_output_path,
+        **kwargs
     )
 
 
 def _save_records_to_s3(
-    s3_client: "S3Client", s3_path: str, dumper: FunctionType, records: list
+    s3_client: "S3Client", s3_path: str, dumper: FunctionType, records: deque
 ):
     with smart_open(s3_path=s3_path, mode="wb", s3_client=s3_client) as f:
         dumper(fp=f, obj=records)

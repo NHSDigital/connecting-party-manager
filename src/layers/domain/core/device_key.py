@@ -2,8 +2,9 @@ import re
 from enum import StrEnum, auto
 
 from domain.core.error import InvalidDeviceKeyError
-from pydantic import BaseModel, validator
+from pydantic import validator
 
+from .base import BaseModel
 from .validation import CpmId, SdsId
 
 

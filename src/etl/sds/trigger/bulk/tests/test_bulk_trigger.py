@@ -1,5 +1,5 @@
-import json
 import time
+from collections import deque
 from functools import partial
 from json import JSONDecodeError
 from types import FunctionType
@@ -9,6 +9,8 @@ import pytest
 from botocore.exceptions import ClientError
 from domain.core.device import DeviceType
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.aws.client import dynamodb_client
 from event.json import json_loads
 from mypy_boto3_s3 import S3Client
@@ -21,7 +23,7 @@ from test_helpers.terraform import read_terraform_output
 TEST_DATA_NAME = "test.ldif"
 EXPECTED_CHANGELOG_NUMBER = "0"
 EMPTY_LDIF_DATA = b""
-EMPTY_JSON_DATA = json.dumps([]).encode()
+EMPTY_JSON_DATA = deque()
 ALLOWED_EXCEPTIONS = (JSONDecodeError,)
 
 
@@ -33,7 +35,7 @@ def _ask_s3(s3_client: S3Client, bucket: str, key: str, question: FunctionType =
         result = False
 
     if result and question is not None:
-        data = response["Body"].read().decode()
+        data = response["Body"].read()
         try:
             result = question(data)
         except ALLOWED_EXCEPTIONS:
@@ -60,7 +62,7 @@ def test_bulk_trigger():
 
     was_trigger_key_deleted = lambda: not ask_s3(key=initial_trigger_key)
     was_trigger_key_moved_to_history = lambda: ask_s3(
-        key=final_trigger_key, question=lambda x: x == GOOD_SDS_RECORD
+        key=final_trigger_key, question=lambda x: x == GOOD_SDS_RECORD.encode()
     )
     was_changelog_number_updated = lambda: ask_s3(
         key=CHANGELOG_NUMBER,
@@ -69,15 +71,15 @@ def test_bulk_trigger():
     was_state_machine_successful = (
         lambda: ask_s3(
             key=WorkerKey.EXTRACT,
-            question=lambda x: x == "",
+            question=lambda x: x == b"",
         )
         and ask_s3(
             key=WorkerKey.TRANSFORM,
-            question=lambda x: json_loads(x) == [],
+            question=lambda x: pkl_loads_lz4(x) == deque(),
         )
         and ask_s3(
             key=WorkerKey.LOAD,
-            question=lambda x: json_loads(x) == [],
+            question=lambda x: pkl_loads_lz4(x) == deque(),
         )
         and repository.count(by=DeviceType.PRODUCT) > 0
     )
@@ -85,9 +87,11 @@ def test_bulk_trigger():
     # Clear/set the initial state
     s3_client.put_object(Bucket=etl_bucket, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF_DATA)
     s3_client.put_object(
-        Bucket=etl_bucket, Key=WorkerKey.TRANSFORM, Body=EMPTY_JSON_DATA
+        Bucket=etl_bucket, Key=WorkerKey.TRANSFORM, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
     )
-    s3_client.put_object(Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA)
+    s3_client.put_object(
+        Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
+    )
     s3_client.delete_object(Bucket=etl_bucket, Key=initial_trigger_key)
     s3_client.delete_object(Bucket=etl_bucket, Key=final_trigger_key)
     s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)

@@ -24,6 +24,8 @@ aws-lambda-powertools = "^2.26.0"
 email-validator = "^2.1.0.post1"
 smart-open = "^7.0.1"
 urllib3 = "<3"
+orjson = "^3.9.15"
+attrs = "^23.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
@@ -63,6 +65,11 @@ optional = true
 
 [tool.poetry.group.sds_update.dependencies]
 python-ldap = "^3.4.4"
+lz4 = "^4.3.3"
+
+
+[tool.poetry.group.sds.dependencies]
+lz4 = "^4.3.3"
 
 [build-system]
 requires = ["poetry-core"]

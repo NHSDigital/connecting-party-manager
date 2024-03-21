@@ -29,24 +29,29 @@ def convert_rule_names_to_rule_functions(validation_rules):
     ]
 
 
-def render_questionnaire(questionnaire_name, questionnaire_version):
+def render_question(question):
+    if "answer_types" in question:
+        question["answer_types"] = convert_answer_type_names_to_python_types(
+            question["answer_types"]
+        )
+
+    if "validation_rules" in question:
+        question["validation_rules"] = convert_rule_names_to_rule_functions(
+            question["validation_rules"]
+        )
+
+    return question
+
+
+def render_questionnaire(
+    questionnaire_name: str, questionnaire_version: int
+) -> Questionnaire:
     json_file_path = f"{PATH_TO_HERE}/questionnaires/{questionnaire_name}/v{questionnaire_version}.json"
     questions = load_json_file(json_file_path)
     questionnaire = Questionnaire(
         name=questionnaire_name, version=questionnaire_version
     )
-
-    for question in questions:
-        if "answer_types" in question:
-            question["answer_types"] = convert_answer_type_names_to_python_types(
-                question["answer_types"]
-            )
-
-        if "validation_rules" in question:
-            question["validation_rules"] = convert_rule_names_to_rule_functions(
-                question["validation_rules"]
-            )
-
+    for question in map(render_question, questions):
         questionnaire.add_question(**question)
 
     return questionnaire

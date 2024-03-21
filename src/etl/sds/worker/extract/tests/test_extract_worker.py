@@ -1,4 +1,3 @@
-import json
 import os
 import re
 from itertools import permutations
@@ -7,7 +6,8 @@ from unittest import mock
 
 import pytest
 from etl_utils.constants import WorkerKey
-from event.json import json_loads
+from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -93,9 +93,9 @@ def put_object(mock_s3_client: S3Client):
 
 
 @pytest.fixture
-def get_object(mock_s3_client: S3Client):
+def get_object(mock_s3_client: S3Client) -> bytes:
     return lambda key: (
-        mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read().decode()
+        mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read()
     )
 
 
@@ -106,9 +106,9 @@ def _split_ldif(data: str) -> list[str]:
 @pytest.mark.parametrize(
     ("initial_unprocessed_data", "initial_processed_data"),
     [
-        ("", json.dumps([PROCESSED_SDS_RECORD] * 10)),
-        ("\n".join([GOOD_SDS_RECORD] * 5), json.dumps([PROCESSED_SDS_RECORD] * 5)),
-        ("\n".join([GOOD_SDS_RECORD] * 10), "[]"),
+        ("", [PROCESSED_SDS_RECORD] * 10),
+        ("\n".join([GOOD_SDS_RECORD] * 5), [PROCESSED_SDS_RECORD] * 5),
+        ("\n".join([GOOD_SDS_RECORD] * 10), []),
     ],
     ids=["processed-only", "partly-processed", "unprocessed-only"],
 )
@@ -116,15 +116,15 @@ def test_extract_worker_pass(
     initial_unprocessed_data: str,
     initial_processed_data: str,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
 ):
     from etl.sds.worker.extract import extract
 
     # Initial state
     n_initial_unprocessed = len(_split_ldif(initial_unprocessed_data))
-    n_initial_processed = len(json_loads(initial_processed_data))
+    n_initial_processed = len(initial_processed_data)
     put_object(key=WorkerKey.EXTRACT, body=initial_unprocessed_data)
-    put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
+    put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_processed_data))
 
     # Execute the extract worker
     response = extract.handler(event=None, context=None)
@@ -136,10 +136,10 @@ def test_extract_worker_pass(
     }
 
     # Final state
-    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT)
+    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT).decode()
     final_processed_data: str = get_object(key=WorkerKey.TRANSFORM)
     n_final_unprocessed = len(_split_ldif(final_unprocessed_data))
-    n_final_processed = len(json_loads(final_processed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
@@ -154,7 +154,7 @@ def test_extract_worker_pass(
 def test_extract_worker_bad_record(
     initial_unprocessed_data: str,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
 ):
     from etl.sds.worker.extract import extract
 
@@ -164,7 +164,7 @@ def test_extract_worker_bad_record(
     # Initial state
     n_initial_processed = 5
     n_initial_unprocessed = len(initial_unprocessed_data)
-    initial_processed_data = json.dumps(n_initial_processed * [PROCESSED_SDS_RECORD])
+    initial_processed_data = pkl_dumps_lz4(n_initial_processed * [PROCESSED_SDS_RECORD])
     put_object(key=WorkerKey.EXTRACT, body=_initial_unprocessed_data)
     put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
 
@@ -202,10 +202,10 @@ def test_extract_worker_bad_record(
     }
 
     # Final state
-    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT)
+    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT).decode()
     final_processed_data: str = get_object(key=WorkerKey.TRANSFORM)
     n_final_unprocessed = len(_split_ldif(final_unprocessed_data))
-    n_final_processed = len(json_loads(final_processed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
@@ -221,7 +221,7 @@ def test_extract_worker_bad_record(
 def test_extract_worker_fatal_record(
     initial_unprocessed_data: str,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
 ):
     from etl.sds.worker.extract import extract
 
@@ -229,7 +229,7 @@ def test_extract_worker_fatal_record(
     _initial_unprocessed_data = "\n".join(initial_unprocessed_data)
     n_initial_unprocessed = len(initial_unprocessed_data)
     n_initial_processed = 5
-    initial_processed_data = json.dumps(n_initial_processed * [PROCESSED_SDS_RECORD])
+    initial_processed_data = pkl_dumps_lz4(n_initial_processed * [PROCESSED_SDS_RECORD])
     put_object(key=WorkerKey.EXTRACT, body=_initial_unprocessed_data)
     put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
 
@@ -255,10 +255,10 @@ def test_extract_worker_fatal_record(
     }
 
     # Final state
-    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT)
+    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT).decode()
     final_processed_data: str = get_object(key=WorkerKey.TRANSFORM)
     n_final_unprocessed = len(_split_ldif(final_unprocessed_data))
-    n_final_processed = len(json_loads(final_processed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that no changes were persisted
     assert n_final_unprocessed == n_initial_unprocessed

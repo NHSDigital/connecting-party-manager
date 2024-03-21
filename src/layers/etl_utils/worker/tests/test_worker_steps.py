@@ -3,14 +3,14 @@ from unittest import mock
 
 import boto3
 import pytest
-from etl_utils.json import json_dump_bytes
+from etl_utils.io import pkl_dump_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
 from etl_utils.worker.model import WorkerActionResponse
 from etl_utils.worker.steps import (
     execute_action,
     save_processed_records,
     save_unprocessed_records,
 )
-from event.json import json_loads
 from event.step_chain import StepChain
 from moto import mock_aws
 
@@ -30,7 +30,7 @@ def test_execute_action_pass():
 
     action_response = execute_action(
         data={
-            StepChain.INIT: (action, "a_client", S3_INPUT_PATH, S3_OUTPUT_PATH),
+            StepChain.INIT: (action, "a_client", S3_INPUT_PATH, S3_OUTPUT_PATH, {}),
         },
         cache=None,
     )
@@ -51,7 +51,7 @@ def test_execute_action_fail():
     with pytest.raises(MyException):
         execute_action(
             data={
-                StepChain.INIT: (action, "a_client", S3_INPUT_PATH, S3_OUTPUT_PATH),
+                StepChain.INIT: (action, "a_client", S3_INPUT_PATH, S3_OUTPUT_PATH, {}),
             },
             cache=None,
         )
@@ -76,12 +76,12 @@ def test_save_unprocessed_records():
 
         save_unprocessed_records(
             data={
-                StepChain.INIT: (action_response, s3_client, json_dump_bytes, None),
+                StepChain.INIT: (action_response, s3_client, pkl_dump_lz4, None),
             },
             cache=None,
         )
 
-        saved_data = json_loads(
+        saved_data = pkl_loads_lz4(
             s3_client.get_object(Bucket=BUCKET_NAME, Key="an_input_path")["Body"].read()
         )
 
@@ -107,12 +107,12 @@ def test_save_processed_records():
 
         save_processed_records(
             data={
-                StepChain.INIT: (action_response, s3_client, None, json_dump_bytes),
+                StepChain.INIT: (action_response, s3_client, None, pkl_dump_lz4),
             },
             cache=None,
         )
 
-        saved_data = json_loads(
+        saved_data = pkl_loads_lz4(
             s3_client.get_object(Bucket=BUCKET_NAME, Key="an_output_path")[
                 "Body"
             ].read()

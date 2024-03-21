@@ -6,10 +6,11 @@ import pytest
 from domain.core import questionnaire_validation_custom_rules
 from domain.core.error import DuplicateError, InvalidResponseError
 from domain.core.questionnaire import (
+    InvalidChoiceType,
     Question,
     Questionnaire,
     QuestionnaireResponse,
-    T,
+    TooManyAnswerTypes,
     validate_mandatory_questions_answered,
     validate_response_against_question,
 )
@@ -252,7 +253,7 @@ def test_invalid_question_validation_rules_type(
     mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
-    choices: set[T],
+    choices: set,
 ):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
 
@@ -279,10 +280,39 @@ def test_invalid_question_validation_rules_type(
         "multiple",
         "validation_rules",
         "choices",
+        "expected_error",
     ],
     [
-        ["question1", "", {str, bool}, False, False, None, {1, 2, 3}],
-        ["question2", "", {int}, False, True, None, {"not_int", "not_int2"}],
+        [
+            "question1",
+            "",
+            {str, bool},
+            False,
+            False,
+            None,
+            {1, 2, 3},
+            InvalidChoiceType,
+        ],
+        [
+            "question2",
+            "",
+            {int},
+            False,
+            True,
+            None,
+            {"not_int", "not_int2"},
+            InvalidChoiceType,
+        ],
+        [
+            "question3",
+            "",
+            {str, bool},
+            False,
+            False,
+            None,
+            {"foo", "bar", True},
+            TooManyAnswerTypes,
+        ],
     ],
 )
 def test_invalid_question_choices_type(
@@ -292,12 +322,13 @@ def test_invalid_question_choices_type(
     mandatory: bool,
     multiple: bool,
     validation_rules: set[FunctionType],
-    choices: set[T],
+    choices: set,
+    expected_error: Exception,
 ):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
 
     # can't add question with set of choices that don't match question type
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(expected_error):
         questionnaire.add_question(
             name=name,
             human_readable_name=human_readable_name,
@@ -308,30 +339,23 @@ def test_invalid_question_choices_type(
             choices=choices,
         )
 
-    assert (
-        str(error.value)
-        == f"Choices must be of the same type as the answer types: {answer_types}."
-    )
-
 
 @pytest.mark.parametrize(
     "response",
     [
         [
-            ("question1", ["answer_a"]),
-            ("not_a_question", [1]),
-            ("question3", [True]),
+            {"question1": ["answer_a"]},
+            {"not_a_question": [1]},
+            {"question3": [True]},
         ],
         [
-            ("not_a_question", ["answer_c"]),
-            ("question2", [1]),
-            ("question3", [False]),
+            {"not_a_question": ["answer_c"]},
+            {"question2": [1]},
+            {"question3": [False]},
         ],
     ],
 )
-def test_incorrect_questionnaire_answered_raises_error(
-    response: list[tuple[str, list]]
-):
+def test_incorrect_questionnaire_answered_raises_error(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="question1")
     questionnaire.add_question(name="question2", answer_types={int})
@@ -352,17 +376,19 @@ def test_incorrect_questionnaire_answered_raises_error(
     "response",
     [
         [
-            ("mandatory_question", ["answer"]),
-            ("not_mandatory_question", [1]),
+            {"mandatory_question": ["answer"]},
+            {"not_mandatory_question": [1]},
         ],
     ],
 )
-def test_mandatory_questions_answered(response: list[tuple[str, list]]):
+def test_mandatory_questions_answered(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="mandatory_question", mandatory=True)
     questionnaire.add_question(name="not_mandatory_question", answer_types={int})
     mandatory_questions = questionnaire.mandatory_questions
-    answered_question_names = [question_name for question_name, _ in response]
+    answered_question_names = [
+        question_name for (question_name, _), in map(dict.items, response)
+    ]
 
     validate_mandatory_questions_answered(
         questionnaire_name=questionnaire.name,
@@ -376,12 +402,12 @@ def test_mandatory_questions_answered(response: list[tuple[str, list]]):
     "response",
     [
         [
-            ("mandatory_question", ["answer"]),
-            ("not_mandatory_question", [1]),
+            {"mandatory_question": ["answer"]},
+            {"not_mandatory_question": [1]},
         ],
     ],
 )
-def test_mandatory_questions_answered_successfully(response: list[tuple[str, list]]):
+def test_mandatory_questions_answered_successfully(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="mandatory_question", mandatory=True)
     questionnaire.add_question(name="not_mandatory_question", answer_types={int})
@@ -393,16 +419,18 @@ def test_mandatory_questions_answered_successfully(response: list[tuple[str, lis
     "response",
     [
         [
-            ("not_mandatory_question", [1]),
+            {"not_mandatory_question": [1]},
         ],
     ],
 )
-def test_mandatory_questions_not_answered(response: list[tuple[str, list]]):
+def test_mandatory_questions_not_answered(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="mandatory_question", mandatory=True)
     questionnaire.add_question(name="not_mandatory_question", answer_types={int})
     mandatory_questions = questionnaire.mandatory_questions
-    answered_question_names = [question_name for question_name, _ in response]
+    answered_question_names = [
+        question_name for (question_name, _), in map(dict.items, response)
+    ]
     with pytest.raises(InvalidResponseError) as error:
         validate_mandatory_questions_answered(
             questionnaire_name=questionnaire.name,
@@ -419,13 +447,11 @@ def test_mandatory_questions_not_answered(response: list[tuple[str, list]]):
     "response",
     [
         [
-            ("not_mandatory_question", [1]),
+            {"not_mandatory_question": [1]},
         ],
     ],
 )
-def test_mandatory_questions_not_answered_raises_error(
-    response: list[tuple[str, list]]
-):
+def test_mandatory_questions_not_answered_raises_error(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="mandatory_question", mandatory=True)
     questionnaire.add_question(name="not_mandatory_question", answer_types={int})
@@ -442,18 +468,18 @@ def test_mandatory_questions_not_answered_raises_error(
     "response",
     [
         [
-            ("question1", ["answer_a", "answer_b"]),
-            ("question2", [1, 2, 3]),
-            ("question3", [True, False]),
+            {"question1": ["answer_a", "answer_b"]},
+            {"question2": [1, 2, 3]},
+            {"question3": [True, False]},
         ],
         [
-            ("question1", ["answer_c"]),
-            ("question2", [4, 5]),
-            ("question3", [False]),
+            {"question1": ["answer_c"]},
+            {"question2": [4, 5]},
+            {"question3": [False]},
         ],
     ],
 )
-def test_multiple_questions_responses_allowed(response: list[tuple[str, list]]):
+def test_multiple_questions_responses_allowed(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="question1", multiple=True)
     questionnaire.add_question(name="question2", answer_types={int}, multiple=True)
@@ -489,18 +515,18 @@ def test_multiple_question_responses_allowed(response: list):
     "response",
     [
         [
-            ("question1", ["answer_a", "answer_b"]),
-            ("question2", [1, 2, 3]),
-            ("question3", [True, False]),
+            {"question1": ["answer_a", "answer_b"]},
+            {"question2": [1, 2, 3]},
+            {"question3": [True, False]},
         ],
         [
-            ("question1", ["answer_c", "answer_d"]),
-            ("question2", [4, 5]),
-            ("question3", [False]),
+            {"question1": ["answer_c", "answer_d"]},
+            {"question2": [4, 5]},
+            {"question3": [False]},
         ],
     ],
 )
-def test_multiple_questions_responses_not_allowed(response: list[tuple[str, list]]):
+def test_multiple_questions_responses_not_allowed(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(name="question1")
     questionnaire.add_question(name="question2", answer_types={int})
@@ -549,13 +575,13 @@ def test_multiple_question_responses_not_allowed(response: list):
     "response",
     [
         [
-            ("String or integer response", ["answer_a", 1]),
-            ("Integer or boolean", [1]),
-            ("Integer or boolean or string multiple", [True, 1, "string"]),
+            {"String or integer response": ["answer_a", 1]},
+            {"Integer or boolean": [1]},
+            {"Integer or boolean or string multiple": [True, 1, "string"]},
         ],
     ],
 )
-def test_multiple_answer_types_allowed(response: list[tuple[str, list]]):
+def test_multiple_answer_types_allowed(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name="String or integer response", answer_types={str, int}, multiple=True
@@ -575,17 +601,17 @@ def test_multiple_answer_types_allowed(response: list[tuple[str, list]]):
     "response",
     [
         [
-            ("String response", ["answer_a", "answer_b"]),
-            ("Integer response", [1]),
-            ("Boolean response", [True]),
-            ("Date-Time response", [datetime(2024, 1, 24, 14, 21, 7, 484991)]),
-            ("Decimal response", [1.1]),
-            ("Date response", [datetime(2024, 1, 24)]),
-            ("Time response", [datetime.strptime("14:21:07", "%H:%M:%S").time()]),
+            {"String response": ["answer_a", "answer_b"]},
+            {"Integer response": [1]},
+            {"Boolean response": [True]},
+            {"Date-Time response": [datetime(2024, 1, 24, 14, 21, 7, 484991)]},
+            {"Decimal response": [1.1]},
+            {"Date response": [datetime(2024, 1, 24)]},
+            {"Time response": [datetime.strptime("14:21:07", "%H:%M:%S").time()]},
         ],
     ],
 )
-def test_valid_questionnaire_responses_types(response: list[tuple[str, list]]):
+def test_valid_questionnaire_responses_types(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name="String response", answer_types={str}, multiple=True
@@ -605,30 +631,30 @@ def test_valid_questionnaire_responses_types(response: list[tuple[str, list]]):
     "response",
     [
         [
-            ("String response", [1]),
+            {"String response": [1]},
         ],
         [
-            ("Integer response", ["answer"]),
+            {"Integer response": ["answer"]},
         ],
         [
-            ("Boolean response", [1.1]),
+            {"Boolean response": [1.1]},
         ],
         [
-            ("Date-Time response", [1]),
+            {"Date-Time response": [1]},
         ],
         [
-            ("Decimal response", [False]),
+            {"Decimal response": [False]},
         ],
         [
-            ("Date response", ["answer"]),
+            {"Date response": ["answer"]},
         ],
         [
-            ("Time response", [True]),
+            {"Time response": [True]},
         ],
     ],
 )
 def test_invalid_questionnaire_responses_types_raises_error(
-    response: list[tuple[str, list]]
+    response: list[dict[str, list]]
 ):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
@@ -993,16 +1019,16 @@ def test_invalid_question_response_type_time_raises_error(response: list):
     "response",
     [
         [
-            ("question1", ["answer_a", "answer_b"]),
-            ("question2", [1, 2, 3]),
+            {"question1": ["answer_a", "answer_b"]},
+            {"question2": [1, 2, 3]},
         ],
         [
-            ("question1", ["answer_c"]),
-            ("question2", [4, 5]),
+            {"question1": ["answer_c"]},
+            {"question2": [4, 5]},
         ],
     ],
 )
-def test_valid_questionnaire_responses_choices(response: list[tuple[str, list]]):
+def test_valid_questionnaire_responses_choices(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name="question1", multiple=True, choices={"answer_a", "answer_b", "answer_c"}
@@ -1045,17 +1071,17 @@ def test_valid_question_response_choice(response: list):
     "response",
     [
         [
-            ("question1", ["not_in_choices"]),
-            ("question2", [27, 7, 2]),
+            {"question1": ["not_in_choices"]},
+            {"question2": [27, 7, 2]},
         ],
         [
-            ("question1", ["not_in_choices"]),
-            ("question2", [2, 3, 4]),
+            {"question1": ["not_in_choices"]},
+            {"question2": [2, 3, 4]},
         ],
     ],
 )
 def test_invalid_questionnaire_responses_choices_raises_error(
-    response: list[tuple[str, list]]
+    response: list[dict[str, list]]
 ):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
@@ -1117,11 +1143,11 @@ URL_QUESTION_NAME = "url"
     "response",
     [
         [
-            (URL_QUESTION_NAME, ["https://www.example.com"]),
+            {URL_QUESTION_NAME: ["https://www.example.com"]},
         ],
     ],
 )
-def test_valid_questionnaire_responses_rule_url(response: list[tuple[str, list]]):
+def test_valid_questionnaire_responses_rule_url(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name=URL_QUESTION_NAME,
@@ -1155,12 +1181,12 @@ def test_valid_question_response_rule_url(response: list):
     "response",
     [
         [
-            (EMPTY_STR_QUESTION_NAME, [""]),
-            (EMPTY_STR_OR_INT_QUESTION_NAME, ["", 1]),
+            {EMPTY_STR_QUESTION_NAME: [""]},
+            {EMPTY_STR_OR_INT_QUESTION_NAME: ["", 1]},
         ],
     ],
 )
-def test_valid_questionnaire_responses_rule_empty_str(response: list[tuple[str, list]]):
+def test_valid_questionnaire_responses_rule_empty_str(response: list[dict[str, list]]):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name=EMPTY_STR_QUESTION_NAME,
@@ -1181,7 +1207,7 @@ def test_valid_questionnaire_responses_rule_empty_str(response: list[tuple[str, 
     "response",
     [[""]],
 )
-def test_valid_question_response_rule_empty_str(response: list[tuple[str, list]]):
+def test_valid_question_response_rule_empty_str(response: list[dict[str, list]]):
     question = Question(
         name=EMPTY_STR_QUESTION_NAME,
         human_readable_name="",
@@ -1200,7 +1226,7 @@ def test_valid_question_response_rule_empty_str(response: list[tuple[str, list]]
     "response",
     [["", 1]],
 )
-def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list]]):
+def test_valid_question_response_rule_empty_str_2(response: list[dict[str, list]]):
     question = Question(
         name=EMPTY_STR_QUESTION_NAME,
         human_readable_name="",
@@ -1219,13 +1245,13 @@ def test_valid_question_response_rule_empty_str_2(response: list[tuple[str, list
     "responses",
     [
         [
-            (URL_QUESTION_NAME, ["not_a_url"]),
-            (EMPTY_STR_QUESTION_NAME, ["not an empty string"]),
+            {URL_QUESTION_NAME: ["not_a_url"]},
+            {EMPTY_STR_QUESTION_NAME: ["not an empty string"]},
         ],
     ],
 )
 def test_invalid_questionnaire_response_rules_raises_error(
-    responses: list[tuple[str, list]]
+    responses: list[dict[str, list]]
 ):
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(

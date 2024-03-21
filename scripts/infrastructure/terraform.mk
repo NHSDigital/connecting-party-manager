@@ -11,12 +11,17 @@ VERSION =
 WORKSPACE_OUTPUT_JSON = $(CURDIR)/infrastructure/terraform/per_workspace/output.json
 TERRAFORM_PLAN_TIMESTAMP = $(TIMESTAMP_DIR)/tfplan.timestamp
 BUILD_TIMESTAMP = $(TIMESTAMP_DIR)/.build.timestamp
-TERRAFORM_FILES = $(shell find infrastructure/terraform -type f -name "*.tf*")
+TERRAFORM_FILES = $(shell find infrastructure/terraform -type f -name "*.tf*") $(shell find infrastructure/terraform -type f -name "*.asl.json")
 
+terraform--clean:
+	[[ -f $(TERRAFORM_PLAN_TIMESTAMP) ]] && rm $(TERRAFORM_PLAN_TIMESTAMP) || :
+	[[ -f $(WORKSPACE_OUTPUT_JSON) ]] && rm $(WORKSPACE_OUTPUT_JSON) || :
 terraform--validate: _terraform--validate ## Run terraform validate
 terraform--init: _terraform--init ## Run terraform init
 terraform--plan: $(TERRAFORM_PLAN_TIMESTAMP)  ## Run terraform plan
 terraform--apply: $(WORKSPACE_OUTPUT_JSON) ## Run terraform apply
+terraform--apply--force: terraform--clean terraform--apply ## Run terraform apply
+
 terraform--destroy: _terraform--destroy ## Run terraform destroy
 terraform--unlock: _terraform--unlock ## Run terraform unlock
 _terraform--%: aws--login

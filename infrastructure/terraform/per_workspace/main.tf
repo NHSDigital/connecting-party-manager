@@ -179,7 +179,7 @@ module "sds_etl" {
   assume_account                   = var.assume_account
   python_version                   = var.python_version
   event_layer_arn                  = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
-  third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn
+  third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds"], 0).layer_arn
   third_party_sds_update_layer_arn = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds_update"], 0).layer_arn
   domain_layer                     = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
   table_name                       = module.table.dynamodb_table_name

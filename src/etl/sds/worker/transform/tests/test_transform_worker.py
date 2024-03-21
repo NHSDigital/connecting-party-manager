@@ -1,13 +1,14 @@
-import json
 import os
 import re
+from collections import deque
 from itertools import permutations
 from typing import Callable
 from unittest import mock
 
 import pytest
 from etl_utils.constants import WorkerKey
-from event.json import json_loads
+from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -68,44 +69,42 @@ def put_object(mock_s3_client: S3Client):
 
 
 @pytest.fixture
-def get_object(mock_s3_client: S3Client):
+def get_object(mock_s3_client: S3Client) -> bytes:
     return lambda key: (
-        mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read().decode()
+        mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read()
     )
 
 
 @pytest.mark.parametrize(
     ("initial_unprocessed_data", "initial_processed_data"),
     [
-        (json.dumps([]), json.dumps([PROCESSED_SDS_JSON_RECORD] * 10)),
-        (
-            json.dumps([GOOD_SDS_RECORD_AS_JSON] * 5),
-            json.dumps([PROCESSED_SDS_JSON_RECORD] * 5),
-        ),
-        (json.dumps([GOOD_SDS_RECORD_AS_JSON] * 10), "[]"),
+        (deque([]), deque([PROCESSED_SDS_JSON_RECORD]) * 10),
+        (deque([GOOD_SDS_RECORD_AS_JSON]) * 5, deque([PROCESSED_SDS_JSON_RECORD]) * 5),
+        (deque([GOOD_SDS_RECORD_AS_JSON]) * 10, deque([])),
     ],
     ids=["processed-only", "partly-processed", "unprocessed-only"],
 )
-def test_transform_worker_pass(
+def test_transform_worker_pass_dupe_check_mock(
     initial_unprocessed_data: str,
     initial_processed_data: str,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
 ):
     from etl.sds.worker.transform import transform
 
     # Initial state
-    n_initial_unprocessed = len(json_loads(initial_unprocessed_data))
-    n_initial_processed = len(json_loads(initial_processed_data))
-    put_object(key=WorkerKey.TRANSFORM, body=initial_unprocessed_data)
-    put_object(key=WorkerKey.LOAD, body=initial_processed_data)
+    n_initial_unprocessed = len(initial_unprocessed_data)
+    n_initial_processed = len(initial_processed_data)
+    put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_unprocessed_data))
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
 
     # Execute the transform worker
-    response = transform.handler(event=None, context=None)
+    with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
+        response = transform.handler(event={}, context=None)
     assert response == {
         "stage_name": "transform",
-        # 2 x initial unprocessed because a key event is also created
-        "processed_records": n_initial_processed + 2 * n_initial_unprocessed,
+        # 4 x initial unprocessed because a key event + 2 questionnaire events are also created
+        "processed_records": n_initial_processed + 4 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -113,13 +112,97 @@ def test_transform_worker_pass(
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
     final_processed_data: str = get_object(key=WorkerKey.LOAD)
-    n_final_unprocessed = len(json_loads(final_unprocessed_data))
-    n_final_processed = len(json_loads(final_processed_data))
+    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + 2 * n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 4 * n_initial_unprocessed
     assert n_final_unprocessed == 0
+
+
+def test_transform_worker_pass_no_dupes(
+    put_object: Callable[[str], None],
+    get_object: Callable[[str], bytes],
+):
+    from etl.sds.worker.transform import transform
+
+    initial_unprocessed_data = deque([GOOD_SDS_RECORD_AS_JSON])
+    initial_processed_data = deque([])
+
+    # Initial state
+    n_initial_unprocessed = len(initial_unprocessed_data)
+    n_initial_processed = len(initial_processed_data)
+    put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_unprocessed_data))
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
+
+    # Execute the transform worker
+    with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
+        response = transform.handler(event=None, context=None)
+
+    assert response == {
+        "stage_name": "transform",
+        # 2 x initial unprocessed because a key event is also created
+        "processed_records": n_initial_processed + 4 * n_initial_unprocessed,
+        "unprocessed_records": 0,
+        "error_message": None,
+    }
+
+    # Final state
+    final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
+    final_processed_data: str = get_object(key=WorkerKey.LOAD)
+    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
+
+    # Confirm that everything has now been processed, and that there is no
+    # unprocessed data left in the bucket
+    assert n_final_processed == n_initial_processed + 4 * n_initial_unprocessed
+    assert n_final_unprocessed == 0
+
+
+def test_transform_worker_pass_duplicate_fail(
+    put_object: Callable[[str], None],
+    get_object: Callable[[str], bytes],
+):
+    from etl.sds.worker.transform import transform
+
+    initial_unprocessed_data = (
+        deque([GOOD_SDS_RECORD_AS_JSON]) * 10
+    )  # duplicates should make this fail
+    initial_processed_data = deque([])
+
+    # Initial state
+    n_initial_unprocessed = len(initial_unprocessed_data)
+    n_initial_processed = len(initial_processed_data)
+    put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_unprocessed_data))
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
+
+    # Execute the transform worker
+    response = transform.handler(event=None, context=None)
+    assert response == {
+        "stage_name": "transform",
+        "processed_records": None,
+        "unprocessed_records": None,
+        "error_message": (
+            "The following errors were encountered\n"
+            "  -- Error 1 (DuplicateSdsKey) --\n"
+            "  {"
+            "'key': 'RVL:000428682512', "
+            "'type': <DeviceKeyType.ACCREDITED_SYSTEM_ID: 'accredited_system_id'>, "
+            "'_trust': True"
+            "}"
+        ),
+    }
+
+    # Final state
+    final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
+    final_processed_data: str = get_object(key=WorkerKey.LOAD)
+    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
+
+    # Confirm that no changes were persisted
+    assert n_final_processed == n_initial_processed
+    assert n_final_unprocessed == n_initial_unprocessed
 
 
 @pytest.mark.parametrize(
@@ -131,27 +214,29 @@ def test_transform_worker_pass(
 def test_transform_worker_bad_record(
     initial_unprocessed_data: str,
     put_object: Callable[[str], None],
-    get_object: Callable[[str], str],
+    get_object: Callable[[str], bytes],
 ):
     from etl.sds.worker.transform import transform
 
-    _initial_unprocessed_data = json.dumps(initial_unprocessed_data)
+    _initial_unprocessed_data = pkl_dumps_lz4(deque(initial_unprocessed_data))
     bad_record_index = initial_unprocessed_data.index(BAD_SDS_RECORD_AS_JSON)
 
     # Initial state
     n_initial_processed = 5
     n_initial_unprocessed = len(initial_unprocessed_data)
-    initial_processed_data = json.dumps(
-        n_initial_processed * [PROCESSED_SDS_JSON_RECORD]
+    initial_processed_data = pkl_dumps_lz4(
+        deque(n_initial_processed * [PROCESSED_SDS_JSON_RECORD])
     )
     put_object(key=WorkerKey.TRANSFORM, body=_initial_unprocessed_data)
     put_object(key=WorkerKey.LOAD, body=initial_processed_data)
 
     # Execute the transform worker
-    response = transform.handler(event=None, context=None)
+    with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
+        response = transform.handler(event={}, context=None)
     assert response == {
         "stage_name": "transform",
-        "processed_records": n_initial_processed + (2 * bad_record_index),
+        # 4 x initial unprocessed because a key event + 2 questionnaire events are also created
+        "processed_records": n_initial_processed + (4 * bad_record_index),
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
         "error_message": (
             "The following errors were encountered\n"
@@ -165,13 +250,14 @@ def test_transform_worker_bad_record(
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
     final_processed_data: str = get_object(key=WorkerKey.LOAD)
-    n_final_unprocessed = len(json_loads(final_unprocessed_data))
-    n_final_processed = len(json_loads(final_processed_data))
+    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
     assert n_final_unprocessed > 0
-    assert n_final_processed == n_initial_processed + (2 * bad_record_index)
+    # 4 x initial unprocessed because a key event + 2 questionnaire events are also created
+    assert n_final_processed == n_initial_processed + (4 * bad_record_index)
     assert n_final_unprocessed == n_initial_unprocessed - bad_record_index
 
 
@@ -183,14 +269,14 @@ def test_transform_worker_fatal_record(
     # Initial state
     n_initial_processed = 5
     initial_unprocessed_data = FATAL_SDS_RECORD_AS_JSON
-    initial_processed_data = json.dumps(
-        n_initial_processed * [PROCESSED_SDS_JSON_RECORD]
+    initial_processed_data = pkl_dumps_lz4(
+        deque(n_initial_processed * [PROCESSED_SDS_JSON_RECORD])
     )
     put_object(key=WorkerKey.TRANSFORM, body=initial_unprocessed_data)
     put_object(key=WorkerKey.LOAD, body=initial_processed_data)
 
     # Execute the transform worker
-    response = transform.handler(event=None, context=None)
+    response = transform.handler(event={}, context=None)
 
     # The line number in the error changes for each example, so
     # substitute it for the value 'NUMBER'
@@ -204,13 +290,13 @@ def test_transform_worker_fatal_record(
         "unprocessed_records": None,
         "error_message": (
             "The following errors were encountered\n"
-            "  -- Error 1 (JSONDecodeError) --\n"
-            "  Expecting value: line 1 column 1 (char 0)"
+            "  -- Error 1 (RuntimeError) --\n"
+            "  LZ4F_decompress failed with code: ERROR_frameType_unknown"
         ),
     }
 
     # Final state
-    final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
+    final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM).decode()
     final_processed_data: str = get_object(key=WorkerKey.LOAD)
 
     # Confirm that no changes were persisted

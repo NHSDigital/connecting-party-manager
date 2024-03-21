@@ -1,3 +1,4 @@
+from collections import deque
 from dataclasses import dataclass, field
 
 from event.environment import BaseEnvironment
@@ -24,8 +25,8 @@ class WorkerResponse:
 class WorkerActionResponse:
     """The response on an ETL worker lambda's action"""
 
-    unprocessed_records: list[dict]
-    processed_records: list[dict]
+    unprocessed_records: deque[dict]
+    processed_records: deque[dict]
     s3_input_path: str
     exception: Exception | None
     s3_output_path: str | None = field(default=None)

@@ -1,5 +1,6 @@
 import json
 import time
+from collections import deque
 
 import boto3
 import pytest
@@ -7,6 +8,8 @@ from domain.core.device import DeviceType
 from domain.core.device_key import DeviceKeyType
 from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
 from etl_utils.trigger.model import StateMachineInput
 from event.aws.client import dynamodb_client
 from event.json import json_loads
@@ -102,7 +105,13 @@ def get_object(key: WorkerKey) -> str:
 @pytest.mark.integration
 @pytest.mark.parametrize(
     "worker_data",
-    [{WorkerKey.EXTRACT: "", WorkerKey.TRANSFORM: "[]", WorkerKey.LOAD: "[]"}],  # empty
+    [
+        {
+            WorkerKey.EXTRACT: "",
+            WorkerKey.TRANSFORM: pkl_dumps_lz4(deque()),
+            WorkerKey.LOAD: pkl_dumps_lz4(deque()),
+        }
+    ],  # empty
     indirect=True,
 )
 @pytest.mark.parametrize(
@@ -124,8 +133,8 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
     [
         {
             WorkerKey.EXTRACT: "\n".join([GOOD_SDS_RECORD, ANOTHER_GOOD_SDS_RECORD]),
-            WorkerKey.TRANSFORM: json.dumps([]),
-            WorkerKey.LOAD: json.dumps([]),
+            WorkerKey.TRANSFORM: pkl_dumps_lz4(deque()),
+            WorkerKey.LOAD: pkl_dumps_lz4(deque()),
         }
     ],
     indirect=True,
@@ -139,8 +148,8 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
 )
 def test_end_to_end(repository: MockDeviceRepository, worker_data, state_machine_input):
     extract_data = get_object(key=WorkerKey.EXTRACT)
-    transform_data = json_loads(get_object(key=WorkerKey.TRANSFORM))
-    load_data = json_loads(get_object(key=WorkerKey.LOAD))
+    transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
+    load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
 
     assert len(extract_data) == 0
     assert len(transform_data) == 0
@@ -165,8 +174,11 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
     s3_client.put_object(Bucket=bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA)
     s3_client.delete_object(Bucket=bucket, Key=CHANGELOG_NUMBER)
 
-    count = repository.count(by=DeviceType.PRODUCT)
-    assert count == 0
+    product_count = repository.count(by=DeviceType.PRODUCT)
+    assert product_count == 0
+
+    endpoint_count = repository.count(by=DeviceType.ENDPOINT)
+    assert endpoint_count == 0
 
     # Trigger the bulk load
     s3_client.copy_object(
@@ -174,21 +186,18 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
         Key=initial_trigger_key,
         CopySource={
             "Bucket": test_data_bucket,
-            "Key": "sds/etl/bulk/1701246-fixed-fixed.ldif",
+            "Key": "sds/etl/bulk/1701246-fix-18032023.ldif",
         },
     )
 
-    while count < 5500:
-        time.sleep(15)
-        count = repository.count(by=DeviceType.PRODUCT)
-    time.sleep(15)
-
     extract_data = get_object(key=WorkerKey.EXTRACT)
-    transform_data = json_loads(get_object(key=WorkerKey.TRANSFORM))
-    load_data = json_loads(get_object(key=WorkerKey.LOAD))
-    assert len(extract_data) == 0
-    assert len(transform_data) == 0
-    assert len(load_data) == 0
+    transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
+    load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+    while len(extract_data) + len(transform_data) + len(load_data) > 0:
+        time.sleep(15)
+        extract_data = get_object(key=WorkerKey.EXTRACT)
+        transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
+        load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
 
     product_count = repository.count(by=DeviceType.PRODUCT)
     endpoint_count = repository.count(by=DeviceType.ENDPOINT)
@@ -199,4 +208,4 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
     )
 
     assert product_count == accredited_system_count == 5670
-    assert endpoint_count == message_handling_system_count == 155030
+    assert endpoint_count == message_handling_system_count == 154506
