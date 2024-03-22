@@ -160,6 +160,7 @@ jobs:
           command: test--smoke
           workspace: ${{ env.WORKSPACE }}
           requires-aws: true
+          cache-suffix: ${{ env.CACHE_NAME }}
 
   set-success:
     name: Set Success
