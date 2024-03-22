@@ -96,13 +96,6 @@ function _update_policy() {
   fi
 }
 
-
-#
-# Create the NHSDeploymentPolicy that will be used for Developer access and
-# NHSDeploymentRole (above)
-#
-_update_policy "NHSDeploymentPolicy" "deployment" "NHSDeploymentRole" "NHSDevelopmentRole"
-
 #
 # Create the NHSSupportPolicy that will be linked through to SSO for Developer
 # and DevOps access We don't need to use a Role, as this Policy will only be
