@@ -116,15 +116,12 @@ def get_object(key: WorkerKey) -> str:
 )
 @pytest.mark.parametrize(
     "state_machine_input",
-    [
-        StateMachineInput.changelog("123"),
-        StateMachineInput.changelog("abc"),
-    ],
+    [StateMachineInput.update(changelog_number_start=1, changelog_number_end=1)],
     indirect=True,
 )
 def test_changelog_number_update(worker_data, state_machine_input: StateMachineInput):
     changelog_number_from_s3 = get_changelog_number_from_s3()
-    assert changelog_number_from_s3 == state_machine_input.changelog_number
+    assert changelog_number_from_s3 == state_machine_input.changelog_number_end
 
 
 @pytest.mark.integration
@@ -142,7 +139,7 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
 @pytest.mark.parametrize(
     "state_machine_input",
     [
-        StateMachineInput.bulk(),
+        StateMachineInput.bulk(changelog_number=123),
     ],
     indirect=True,
 )
@@ -166,7 +163,7 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
     bucket = read_terraform_output("sds_etl.value.bucket")
     test_data_bucket = read_terraform_output("test_data_bucket.value")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
-    initial_trigger_key = f"{bulk_trigger_prefix}/input.ldif"
+    initial_trigger_key = f"{bulk_trigger_prefix}/1701246.ldif"
 
     # Clear/set the initial state
     s3_client.put_object(Bucket=bucket, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF_DATA)

@@ -89,7 +89,10 @@ module "worker_transform" {
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
   etl_bucket_arn   = module.bucket.s3_bucket_arn
-  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  environment_variables = {
+    TABLE_NAME = var.table_name
+  }
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
 
   policy_json = <<-EOT
       {
@@ -107,6 +110,20 @@ module "worker_transform" {
                 ],
                 "Effect": "Allow",
                 "Resource": ["${module.bucket.s3_bucket_arn}", "${module.bucket.s3_bucket_arn}/*"]
+            },
+            {
+                "Action": [
+                    "dynamodb:Query"
+                ],
+                "Effect": "Allow",
+                "Resource": ["${var.table_arn}"]
+            },
+            {
+                "Action": [
+                    "kms:Decrypt"
+                ],
+                "Effect": "Allow",
+                "Resource": ["*"]
             }
         ]
       }
@@ -301,6 +318,13 @@ module "trigger_update" {
   table_name            = var.table_name
   allowed_triggers = {
   }
+}
+
+module "schedule_trigger_update" {
+  source              = "./schedule/"
+  lambda_arn          = module.trigger_update.lambda_function.lambda_function_arn
+  lambda_name         = module.trigger_update.lambda_function.lambda_function_name
+  schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
 }
 
 module "bulk_trigger_notification" {
