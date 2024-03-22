@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {}
 # VPC
 #------------------------------------------------------------------------------
 
-resource "aws_vpc" "lambda-connectivity-vpc" {
+resource "aws_vpc" "lambda-connectivity" {
   cidr_block           = var.vpc_cidr_block
   instance_tenancy     = "default"
   enable_dns_support   = true
@@ -20,9 +20,9 @@ resource "aws_vpc" "lambda-connectivity-vpc" {
 # Subnets
 #------------------------------------------------------------------------------
 
-resource "aws_subnet" "private-subnet" {
+resource "aws_subnet" "lambda-connectivity-private" {
   count             = var.subnet_count.private
-  vpc_id            = aws_vpc.lambda-connectivity-vpc.id
+  vpc_id            = aws_vpc.lambda-connectivity.id
   cidr_block        = element(var.private_subnet_cidr_blocks, count.index)
   availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
