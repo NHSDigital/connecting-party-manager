@@ -94,6 +94,7 @@ def test_alias_fields():
     assert set(MyModel.alias_fields().keys()) == {
         "object_class",  # from SdsBaseModel
         "my-aliased-field",
+        "changetype",  # from SdsBaseModel
         "my_normal_field",
     }
 

@@ -73,6 +73,7 @@ def test_changelog_changes_are_valid_ldif(test_data_paths):
         distinguished_name=nested_distinguished_name, record=nested_record
     )
     assert sds_record.dict() == {
+        "change_type": "add",
         "description": None,
         "nhs_approver_urp": "System",
         "nhs_as_acf": None,

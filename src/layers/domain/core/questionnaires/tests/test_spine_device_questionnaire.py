@@ -4,10 +4,10 @@ from domain.core.questionnaire import Questionnaire
 from domain.core.questionnaires import QuestionnaireInstance
 from event.json import json_load
 from hypothesis import assume, given
-from sds.cpm_translation import update_in_list_of_dict
 from sds.cpm_translation.tests.test_cpm_translation import (
     NHS_ACCREDITED_SYSTEM_STRATEGY,
 )
+from sds.cpm_translation.translations import update_in_list_of_dict
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 
 

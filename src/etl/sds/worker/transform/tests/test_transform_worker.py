@@ -13,6 +13,7 @@ from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
 BUCKET_NAME = "my-bucket"
+TABLE_NAME = "my-table"
 
 GOOD_SDS_RECORD_AS_JSON = {
     "description": None,
@@ -52,7 +53,11 @@ PROCESSED_SDS_JSON_RECORD = {}  # dummy value, doesn't matter for transform
 def mock_s3_client():
     with mock_aws(), mock.patch.dict(
         os.environ,
-        {"ETL_BUCKET": BUCKET_NAME, "AWS_DEFAULT_REGION": "us-east-1"},
+        {
+            "ETL_BUCKET": BUCKET_NAME,
+            "TABLE_NAME": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "us-east-1",
+        },
         clear=True,
     ):
         from etl.sds.worker.transform import transform
