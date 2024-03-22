@@ -158,6 +158,7 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: test--smoke
+          workspace: ${{ env.WORKSPACE }}
           requires-aws: true
 
   set-success:
