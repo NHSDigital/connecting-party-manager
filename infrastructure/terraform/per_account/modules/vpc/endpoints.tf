@@ -1,5 +1,5 @@
 module "endpoints" {
-  source  = "terraform-aws-modules/vpc/aws/modules/vpc-endpoints"
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "5.5.3"
 
   vpc_id             = aws_vpc.lambda-connectivity-vpc.id

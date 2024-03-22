@@ -59,7 +59,9 @@ module "truststore_bucket" {
 }
 
 module "vpc" {
-  source = "../modules/vpc"
+  source      = "../modules/vpc"
+  environment = terraform.workspace
+  prefix      = "${local.project}--${local.environment}"
 }
 
 

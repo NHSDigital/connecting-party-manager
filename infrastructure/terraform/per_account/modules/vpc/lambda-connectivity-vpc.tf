@@ -11,8 +11,8 @@ resource "aws_vpc" "lambda-connectivity-vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name        = "${local.project}-lambda-connectivity-vpc-${local.environment}"
-    Environment = local.environment
+    Name        = "${var.prefix}-lambda-connectivity-vpc-${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -27,8 +27,8 @@ resource "aws_subnet" "private-subnet" {
   availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
-    Name        = "${local.project}-private-subnet-${count.index}-${local.environment}"
-    Environment = local.environment
+    Name        = "${var.prefix}-private-subnet-${count.index}-${var.environment}"
+    Environment = var.environment
     Tier        = "private"
   }
 }

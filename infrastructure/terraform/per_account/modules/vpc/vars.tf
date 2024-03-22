@@ -22,3 +22,8 @@ variable "private_subnet_cidr_blocks" {
     "10.0.4.0/24",
   ]
 }
+
+variable "environment" {
+}
+variable "prefix" {
+}
