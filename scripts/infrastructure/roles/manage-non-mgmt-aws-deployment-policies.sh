@@ -19,6 +19,11 @@ if _validate_current_account "MGMT"; then
   exit 1
 fi
 
+#
+# Create the NHSDeploymentPolicy that will be used for Developer access and
+# NHSDeploymentRole. This policy is split into 2 as the file size was too large.
+#
+
 policy_name="NHSDeploymentPolicy"
 role_name="NHSDeploymentRole"
 
