@@ -172,7 +172,8 @@
         "ec2:DescribeNetworkInterfaces",
         "ec2:DescribeSecurityGroups",
         "ec2:CreateVpcEndpoint",
-        "ec2:DescribeVpcEndpoints"
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribePrefixLists"
       ],
       "Resource": ["*"]
     },
@@ -222,6 +223,14 @@
       "Effect": "Allow",
       "Action": ["ec2:DeleteSecurityGroup", "ec2:RevokeSecurityGroupEgress"],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/sg-*"]
+    },
+    {
+      "Sid": "SecretsPermissions",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": [
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-sds-ldap-endpoint"
+      ]
     }
   ]
 }
