@@ -311,3 +311,19 @@ module "bulk_trigger_notification" {
   filter_prefix = "${local.bulk_trigger_prefix}/"
   filter_suffix = ".ldif"
 }
+
+#------------------------------------------------------------------------------
+# Security Groups
+#------------------------------------------------------------------------------
+
+resource "aws_security_group" "sds-ldap" {
+  name        = "${var.prefix}-default-sg-${var.environment}"
+  description = "Default security group for ${var.prefix} lambda connectivity VPC"
+  vpc_id      = aws_vpc.lambda-connectivity.id
+
+  # read to s3
+  # write to s3
+  # read from hscn
+  # attach to lambda
+
+}

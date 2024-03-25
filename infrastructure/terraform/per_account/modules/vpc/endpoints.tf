@@ -1,3 +1,7 @@
+data "aws_secretsmanager_secret_version" "sds-ldap-endpoint" {
+  secret_id = "${terraform.workspace}-sds-ldap-endpoint"
+}
+
 module "endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "5.5.3"
@@ -7,9 +11,11 @@ module "endpoints" {
 
   endpoints = {
     s3 = {
-      # interface endpoint
-      service = "s3"
+      service_name = "s3"
     },
+    ldap_endpoint = {
+      service_endpoint = data.aws_secretsmanager_secret_version.sds-ldap-endpoint
+    }
   }
 
   tags = {

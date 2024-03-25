@@ -166,15 +166,62 @@
       "Effect": "Allow",
       "Action": [
         "ec2:DescribeAvailabilityZones",
-        "ec2:DescribeVpcEndpointServices"
+        "ec2:DescribeVpcEndpointServices",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeVpcEndpoints"
       ],
       "Resource": ["*"]
     },
     {
       "Sid": "VpcPermissionsApply",
       "Effect": "Allow",
-      "Action": ["ec2:CreateVpc"],
+      "Action": ["ec2:CreateVpc", "ec2:CreateTags"],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc/*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply2",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeVpcAttribute",
+        "ec2:ModifyVpcAttribute",
+        "ec2:CreateSubnet",
+        "ec2:CreateSecurityGroup"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc/vpc-*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply3",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateVpcEndpoint", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc-endpoint/*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply4",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateSubnet", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:subnet/*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply5",
+      "Effect": "Allow",
+      "Action": ["ec2:DeleteSubnet"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:subnet/subnet-*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply6",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateSecurityGroup", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply7",
+      "Effect": "Allow",
+      "Action": ["ec2:DeleteSecurityGroup", "ec2:RevokeSecurityGroupEgress"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/sg-*"]
     }
   ]
 }

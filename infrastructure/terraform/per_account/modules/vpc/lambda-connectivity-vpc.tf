@@ -1,16 +1,5 @@
 data "aws_availability_zones" "available" {}
 
-#------------------------------------------------------------------------------
-# Security Groups
-#------------------------------------------------------------------------------
-
-resource "aws_security_group" "default" {
-  name        = "${var.prefix}-default-sg-${var.environment}"
-  description = "Default security group for ${var.prefix} lambda connectivity VPC"
-  vpc_id      = aws_vpc.lambda-connectivity.id
-
-}
-
 
 #------------------------------------------------------------------------------
 # VPC

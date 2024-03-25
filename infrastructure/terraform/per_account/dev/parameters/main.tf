@@ -34,3 +34,6 @@ resource "aws_secretsmanager_secret" "apigee-credentials" {
 resource "aws_secretsmanager_secret" "apigee-cpm-apikey" {
   name = "${terraform.workspace}-apigee-cpm-apikey"
 }
+resource "aws_secretsmanager_secret" "sds-ldap-endpoint" {
+  name = "${terraform.workspace}-sds-ldap-endpoint"
+}
