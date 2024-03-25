@@ -27,7 +27,7 @@ def authenticate_apikey(data, cache):
 
     if provided_apikey != cpm_apikey_value:
         raise AuthoriserError(
-            f"Provided apikey in request does not match the Connecting Party Manager apikey"
+            "Provided apikey in request does not match the Connecting Party Manager apikey"
         )
 
     return True
