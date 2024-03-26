@@ -17,8 +17,8 @@ module "endpoints" {
       service = "s3"
       tags    = { Name = "s3-vpc-endpoint" }
     },
-    # Retrieving service name from secretsmanager
-    local.sds_ldap_endpoint_parse[4] = {
+    # Retrieve service name from secretsmanager
+    "${local.sds_ldap_endpoint_parse[4]}" = {
       service_name = data.aws_secretsmanager_secret_version.sds-ldap-endpoint.secret_string
       # service_endpoint = data.aws_secretsmanager_secret_version.sds-ldap-endpoint.secret_string
       tags = { Name = "ldap-vpc-endpoint" }

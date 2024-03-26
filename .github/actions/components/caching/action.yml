@@ -33,6 +33,7 @@ inputs:
       **/infrastructure/swagger/**/*.yaml
       **/fhir-base/*json
       **/.proxygen/*
+      **/infrastructure/terraform/**/*.asl.json
 
 runs:
   using: "composite"
