@@ -11,10 +11,12 @@ module "endpoints" {
 
   endpoints = {
     s3 = {
-      service_name = "s3"
+      service = "s3"
+      tags    = { Name = "s3-vpc-endpoint" }
     },
     ldap_endpoint = {
       service_endpoint = data.aws_secretsmanager_secret_version.sds-ldap-endpoint
+      tags             = { Name = "ldap-vpc-endpoint" }
     }
   }
 
