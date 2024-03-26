@@ -1,5 +1,9 @@
 data "aws_availability_zones" "available" {}
 
+data "aws_secretsmanager_secret_version" "sds-ldap-endpoint" {
+  secret_id = "${terraform.workspace}-sds-ldap-endpoint"
+}
+
 
 #------------------------------------------------------------------------------
 # VPC
@@ -51,6 +55,11 @@ resource "aws_route_table_association" "private" {
 #------------------------------------------------------------------------------
 # VPC endpoints
 #------------------------------------------------------------------------------
+
+resource "aws_vpc_endpoint_security_group_association" "lambda-connectivity" {
+  vpc_endpoint_id   = aws_vpc.lambda-connectivity.id
+  security_group_id = [aws_vpc.lambda-connectivity.default_security_group_id]
+}
 
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.lambda-connectivity.id
