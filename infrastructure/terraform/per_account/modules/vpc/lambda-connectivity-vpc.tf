@@ -38,6 +38,22 @@ resource "aws_subnet" "lambda-connectivity-private" {
   }
 }
 
+# #------------------------------------------------------------------------------
+# # Security Groups
+# #------------------------------------------------------------------------------
+
+# resource "aws_security_group" "sds-ldap" {
+#   name        = "${var.prefix}-default-sg-${var.environment}"
+#   description = "Default security group for ${var.prefix} lambda connectivity VPC"
+#   vpc_id      = aws_vpc.lambda-connectivity.id
+
+#   # read to s3
+#   # write to s3
+#   # read from hscn
+#   # attach to lambda
+
+# }
+
 #------------------------------------------------------------------------------
 # Route Table
 #------------------------------------------------------------------------------
@@ -58,7 +74,7 @@ resource "aws_route_table_association" "private" {
 
 resource "aws_vpc_endpoint_security_group_association" "lambda-connectivity" {
   vpc_endpoint_id   = aws_vpc.lambda-connectivity.id
-  security_group_id = [aws_vpc.lambda-connectivity.default_security_group_id]
+  security_group_id = aws_vpc.lambda-connectivity.default_security_group_id
 }
 
 resource "aws_vpc_endpoint" "s3" {
