@@ -15,8 +15,8 @@ module "endpoints" {
       tags    = { Name = "s3-vpc-endpoint" }
     },
     hscn_endpoint = {
-      service_name     = data.aws_secretsmanager_secret_version.sds-ldap-endpoint
-      service_endpoint = data.aws_secretsmanager_secret_version.sds-ldap-endpoint
+      service_name     = data.aws_secretsmanager_secret_version.sds-ldap-endpoint.secret_string
+      service_endpoint = data.aws_secretsmanager_secret_version.sds-ldap-endpoint.secret_string
       tags             = { Name = "ldap-vpc-endpoint" }
     }
   }
