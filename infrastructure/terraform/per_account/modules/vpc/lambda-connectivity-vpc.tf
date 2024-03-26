@@ -71,10 +71,6 @@ resource "aws_route_table_association" "private" {
 #------------------------------------------------------------------------------
 # VPC endpoints
 #------------------------------------------------------------------------------
-resource "aws_vpc_endpoint_security_group_association" "s3" {
-  vpc_endpoint_id   = aws_vpc_endpoint.s3.id
-  security_group_id = aws_vpc.lambda-connectivity.default_security_group_id
-}
 
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.lambda-connectivity.id
@@ -85,9 +81,10 @@ resource "aws_vpc_endpoint" "s3" {
     Environment = var.environment
   }
 }
-resource "aws_vpc_endpoint_security_group_association" "hscn_endpoint" {
-  vpc_endpoint_id   = aws_vpc_endpoint.hscn_endpoint.id
-  security_group_id = aws_vpc.lambda-connectivity.default_security_group_id
+
+resource "aws_vpc_endpoint_route_table_association" "s3" {
+  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  route_table_id  = aws_route_table.private.id
 }
 
 resource "aws_vpc_endpoint" "hscn_endpoint" {
@@ -99,4 +96,9 @@ resource "aws_vpc_endpoint" "hscn_endpoint" {
     Name        = "ldap-vpc-endpoint"
     Environment = var.environment
   }
+}
+
+resource "aws_vpc_endpoint_security_group_association" "hscn_endpoint" {
+  vpc_endpoint_id   = aws_vpc_endpoint.hscn_endpoint.id
+  security_group_id = aws_vpc.lambda-connectivity.default_security_group_id
 }
