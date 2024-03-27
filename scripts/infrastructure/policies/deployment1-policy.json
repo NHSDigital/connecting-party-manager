@@ -173,7 +173,8 @@
         "ec2:DescribeSecurityGroups",
         "ec2:CreateVpcEndpoint",
         "ec2:DescribeVpcEndpoints",
-        "ec2:DescribePrefixLists"
+        "ec2:DescribePrefixLists",
+        "ec2:DescribeRouteTables"
       ],
       "Resource": ["*"]
     },
@@ -190,36 +191,47 @@
         "ec2:DescribeVpcAttribute",
         "ec2:ModifyVpcAttribute",
         "ec2:CreateSubnet",
-        "ec2:CreateSecurityGroup"
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateRouteTable"
       ],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc/vpc-*"]
     },
     {
-      "Sid": "VpcPermissionsApply3",
+      "Sid": "VpcEndpointPermissions",
       "Effect": "Allow",
-      "Action": ["ec2:CreateVpcEndpoint", "ec2:CreateTags"],
+      "Action": [
+        "ec2:CreateVpcEndpoint",
+        "ec2:CreateTags",
+        "ec2:DeleteVpcEndpoints"
+      ],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc-endpoint/*"]
     },
     {
-      "Sid": "VpcPermissionsApply4",
+      "Sid": "VpcEndpointPermissions2",
+      "Effect": "Allow",
+      "Action": ["ec2:ModifyVpcEndpoint"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc-endpoint/vpce-*"]
+    },
+    {
+      "Sid": "SubnetPermissions",
       "Effect": "Allow",
       "Action": ["ec2:CreateSubnet", "ec2:CreateTags"],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:subnet/*"]
     },
     {
-      "Sid": "VpcPermissionsApply5",
+      "Sid": "SubnetPermissions2",
       "Effect": "Allow",
-      "Action": ["ec2:DeleteSubnet"],
+      "Action": ["ec2:DeleteSubnet", "ec2:AssociateRouteTable"],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:subnet/subnet-*"]
     },
     {
-      "Sid": "VpcPermissionsApply6",
+      "Sid": "SecurityGroupPermissions",
       "Effect": "Allow",
       "Action": ["ec2:CreateSecurityGroup", "ec2:CreateTags"],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/*"]
     },
     {
-      "Sid": "VpcPermissionsApply7",
+      "Sid": "SecurityGroupPermissions2",
       "Effect": "Allow",
       "Action": ["ec2:DeleteSecurityGroup", "ec2:RevokeSecurityGroupEgress"],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/sg-*"]
@@ -229,8 +241,24 @@
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
       "Resource": [
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-sds-ldap-endpoint"
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-sds-ldap-endpoint-*"
       ]
+    },
+    {
+      "Sid": "RouteTablePermissions",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateRouteTable", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:route-table/*"]
+    },
+    {
+      "Sid": "RouteTablePermissions2",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DeleteRouteTable",
+        "ec2:ModifyVpcEndpoint",
+        "ec2:AssociateRouteTable"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:route-table/rtb-*"]
     }
   ]
 }
