@@ -18,5 +18,9 @@
     "popleft",
     "stepfunctions",
     "unmarshall"
-  ]
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "nhsdigital",
+    "projectKey": "NHSDigital_connecting-party-manager"
+  }
 }
