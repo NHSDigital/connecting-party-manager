@@ -31,7 +31,7 @@ resource "aws_subnet" "lambda-connectivity-private" {
   availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
-    Name        = "${var.prefix}-private-subnet-${count.index}-${var.environment}"
+    Name        = "${var.prefix}-lambda-connectivity-private-${var.environment}"
     Environment = var.environment
     Tier        = "private"
   }
@@ -42,9 +42,14 @@ resource "aws_subnet" "lambda-connectivity-private" {
 # #------------------------------------------------------------------------------
 
 resource "aws_security_group" "sds-ldap" {
-  name        = "${var.prefix}-default-sg-${var.environment}"
+  name        = "${var.prefix}-sds-ldap-${var.environment}"
   description = "Default security group for ${var.prefix} lambda connectivity VPC"
   vpc_id      = aws_vpc.lambda-connectivity.id
+
+  tags = {
+    Name        = "${var.prefix}-sds-ldap-${var.environment}"
+    Environment = var.environment
+  }
 
   # read to s3
   # write to s3
@@ -98,5 +103,5 @@ resource "aws_vpc_endpoint" "hscn_endpoint" {
 
 resource "aws_vpc_endpoint_security_group_association" "hscn_endpoint" {
   vpc_endpoint_id   = aws_vpc_endpoint.hscn_endpoint.id
-  security_group_id = aws_vpc.lambda-connectivity.default_security_group_id
+  security_group_id = aws_security_group.sds-ldap.id
 }
