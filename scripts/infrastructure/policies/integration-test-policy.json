@@ -13,48 +13,30 @@
         "dynamodb:GetItem",
         "dynamodb:ListTables"
       ],
-      "Resource": [
-        "arn:aws:dynamodb:*:${ACCOUNT_ID}:table/*"
-      ]
+      "Resource": ["arn:aws:dynamodb:*:${ACCOUNT_ID}:table/*"]
     },
     {
       "Sid": "KMSIntegrationPermissions",
       "Effect": "Allow",
-      "Action": [
-        "kms:Decrypt"
-      ],
-      "Resource": [
-        "*"
-      ]
+      "Action": ["kms:Decrypt"],
+      "Resource": ["*"]
     },
     {
       "Sid": "S3IntegrationPermissions",
       "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::*/*"
-      ]
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": ["arn:aws:s3:::*/*"]
     },
     {
       "Sid": "S3IntegrationDeletePermissions",
       "Effect": "Allow",
-      "Action": [
-        "s3:DeleteObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::*--sds--etl/*"
-      ]
+      "Action": ["s3:DeleteObject"],
+      "Resource": ["arn:aws:s3:::*--sds--etl/*"]
     },
     {
       "Sid": "StepFunctionIntegrationPermissions",
       "Effect": "Allow",
-      "Action": [
-        "states:StartExecution",
-        "states:DescribeExecution"
-      ],
+      "Action": ["states:StartExecution", "states:DescribeExecution"],
       "Resource": [
         "arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*",
         "arn:aws:states:*:${ACCOUNT_ID}:execution:*"
@@ -63,19 +45,13 @@
     {
       "Sid": "LambdaIntegrationPermissions",
       "Effect": "Allow",
-      "Action": [
-        "lambda:InvokeFunction"
-      ],
-      "Resource": [
-        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--notify"
-      ]
+      "Action": ["lambda:InvokeFunction"],
+      "Resource": ["arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--notify"]
     },
     {
       "Sid": "ApigeeSecretsIntegrationPermissions",
       "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetSecretValue"
-      ],
+      "Action": ["secretsmanager:GetSecretValue"],
       "Resource": [
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*"
