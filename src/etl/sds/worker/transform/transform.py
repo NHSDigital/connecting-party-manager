@@ -7,22 +7,34 @@ from domain.core.device import DeviceKeyAddedEvent
 from domain.core.event import ExportedEventsTypeDef, ExportedEventTypeDef
 from domain.core.load_questionnaire import render_questionnaire
 from domain.core.questionnaires import QuestionnaireInstance
+from domain.repository.device_repository import DeviceRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
-from etl_utils.worker.model import WorkerActionResponse, WorkerEnvironment
+from etl_utils.worker.model import WorkerActionResponse
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
+from event.environment import BaseEnvironment
 from sds.cpm_translation import translate
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
 
 
+class TransformWorkerEnvironment(BaseEnvironment):
+    ETL_BUCKET: str
+    TABLE_NAME: str
+
+    def s3_path(self, key) -> str:
+        return f"s3://{self.ETL_BUCKET}/{key}"
+
+
 S3_CLIENT = boto3.client("s3")
-DYNAMODB_CLIENT = dynamodb_client()
-ENVIRONMENT = WorkerEnvironment.build()
+ENVIRONMENT = TransformWorkerEnvironment.build()
+REPOSITORY = DeviceRepository(
+    table_name=ENVIRONMENT.TABLE_NAME, dynamodb_client=dynamodb_client()
+)
 
 
 class DuplicateSdsKey(Exception):
@@ -71,6 +83,7 @@ def transform(
             spine_endpoint_questionnaire=spine_endpoint_questionnaire,
             _spine_endpoint_questionnaire=_spine_endpoint_questionnaire,
             _trust=True,
+            repository=REPOSITORY,
         ),
     )
 

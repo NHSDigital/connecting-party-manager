@@ -2,8 +2,9 @@ from typing import ClassVar, Literal
 
 import orjson
 from etl_utils.ldif.model import DistinguishedName
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, Extra, Field, root_validator
 from pydantic.fields import ModelField
+from sds.domain.constants import ChangeType
 
 OBJECT_CLASS_FIELD_NAME = "objectclass"
 _EXCLUDED_OBJECT_CLASS_VALUES = {"nhsExternalChangelogEntry", "top"}
@@ -74,6 +75,7 @@ class SdsBaseModel(BaseModel):
     _distinguished_name: DistinguishedName
     OBJECT_CLASS: ClassVar[Literal[""]] = ""
     object_class: Literal[""]
+    change_type: ChangeType = Field(alias="changetype", default=ChangeType.ADD)
 
     class Config:
         extra = Extra.forbid
@@ -103,5 +105,5 @@ class SdsBaseModel(BaseModel):
         return values
 
     def as_questionnaire_response_responses(self) -> list[dict[str, list]]:
-        data = orjson.loads(self.json(exclude_none=True))
+        data = orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
         return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]
