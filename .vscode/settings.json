@@ -17,6 +17,7 @@
     "objectclass",
     "popleft",
     "stepfunctions",
+    "TRUSTSTORE",
     "unmarshall"
   ]
 }

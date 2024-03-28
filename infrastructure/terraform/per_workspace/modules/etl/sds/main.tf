@@ -283,25 +283,41 @@ module "trigger_bulk" {
   }
 }
 
+data "aws_subnets" "lambda-connectivity-private" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.workspace_prefix}-lambda-connectivity-private-${var.assume_account}"]
+  }
+}
+
+data "aws_security_groups" "lambda-connectivity-private" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.workspace_prefix}-sds-ldap-${var.assume_account}"]
+  }
+}
 module "trigger_update" {
   source = "./trigger/"
 
-  trigger_name          = "update"
-  etl_name              = local.etl_name
-  assume_account        = var.assume_account
-  workspace_prefix      = var.workspace_prefix
-  python_version        = var.python_version
-  event_layer_arn       = var.event_layer_arn
-  third_party_layer_arn = var.third_party_sds_update_layer_arn
-  etl_bucket_arn        = module.bucket.s3_bucket_arn
-  etl_layer_arn         = module.etl_layer.lambda_layer_arn
-  notify_lambda_arn     = module.notify.arn
-  state_machine_arn     = module.step_function.state_machine_arn
-  table_arn             = var.table_arn
-  table_name            = var.table_name
-  allowed_triggers = {
-  }
+  trigger_name           = "update"
+  etl_name               = local.etl_name
+  assume_account         = var.assume_account
+  workspace_prefix       = var.workspace_prefix
+  python_version         = var.python_version
+  event_layer_arn        = var.event_layer_arn
+  third_party_layer_arn  = var.third_party_sds_update_layer_arn
+  etl_bucket_arn         = module.bucket.s3_bucket_arn
+  etl_layer_arn          = module.etl_layer.lambda_layer_arn
+  notify_lambda_arn      = module.notify.arn
+  state_machine_arn      = module.step_function.state_machine_arn
+  table_arn              = var.table_arn
+  table_name             = var.table_name
+  allowed_triggers       = {}
+  truststore_bucket      = var.truststore_bucket
+  vpc_subnet_ids         = toset(data.aws_subnets.lambda-connectivity-private.ids)
+  vpc_security_group_ids = toset(data.aws_security_groups.lambda-connectivity-private.ids)
 }
+
 
 module "bulk_trigger_notification" {
   source        = "../bucket_notification"
