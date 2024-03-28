@@ -1,5 +1,6 @@
 {
   "Comment": "SDS ETL",
+  "TimeoutSeconds": 3600,
   "StartAt": "root",
   "States": {
     "root": {
@@ -17,7 +18,7 @@
                   "Next": "write-changelog-number"
                 }
               ],
-              "Default": "pass"
+              "Default": "no-changelog-number"
             },
             "write-changelog-number": {
               "Type": "Task",
@@ -29,7 +30,7 @@
               },
               "Resource": "arn:aws:states:::aws-sdk:s3:putObject"
             },
-            "pass": {
+            "no-changelog-number": {
               "Type": "Pass",
               "End": true
             }
@@ -125,7 +126,6 @@
                 "Payload.$": "$",
                 "FunctionName": "${load_worker_arn}:$LATEST"
               },
-
               "Retry": [
                 {
                   "ErrorEquals": [
@@ -139,6 +139,38 @@
                   "BackoffRate": 2
                 }
               ],
+              "Next": "load-result"
+            },
+            "load-result": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Not": {
+                    "Variable": "$.error_message",
+                    "IsNull": true
+                  },
+                  "Next": "worker-failed"
+                },
+                {
+                  "And": [
+                    {
+                      "Variable": "$.error_message",
+                      "IsNull": true
+                    },
+                    {
+                      "Not": {
+                        "Variable": "$.unprocessed_records",
+                        "NumericEquals": 0
+                      }
+                    }
+                  ],
+                  "Next": "load"
+                }
+              ],
+              "Default": "load-successful"
+            },
+            "load-successful": {
+              "Type": "Pass",
               "End": true
             },
             "worker-failed": {

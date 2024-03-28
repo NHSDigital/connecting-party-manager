@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-03-21
+- [PI-272] Enable APIKey
+- [PI-282] Fix int deploy
+- [PI-260] Questionnaire responses in ETL
+
 ## 2024-03-15
 - [PI-193] Search for a Device (MOCK)
 - [PI-278] Fix expired workspace

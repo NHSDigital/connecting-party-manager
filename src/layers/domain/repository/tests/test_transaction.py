@@ -5,13 +5,13 @@ from domain.repository.transaction import (
     CancellationReason,
     TransactionErrorMetadata,
     TransactionErrorResponse,
-    TransactionItem,
     TransactionStatement,
+    TransactItem,
     handle_client_errors,
 )
 
 COMMANDS = [
-    TransactionItem(
+    TransactItem(
         Put=TransactionStatement(
             TableName="table",
             Item={},

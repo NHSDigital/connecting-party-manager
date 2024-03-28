@@ -1,6 +1,7 @@
 import re
 from abc import ABC, ABCMeta
-from dataclasses import is_dataclass
+
+from attr import has as is_dataclass
 
 ExportedEventTypeDef = dict[str, dict]
 ExportedEventsTypeDef = list[ExportedEventTypeDef]
@@ -17,7 +18,9 @@ class MetaEvent(ABCMeta):
 
     def __init_subclass__(cls):
         if not is_dataclass(cls):
-            raise TypeError("All subclasses of 'Event' decorated with @dataclass")
+            raise TypeError(
+                "All subclasses of 'Event' should be decorated with @attr.dataclass"
+            )
         super().__init_subclass__()
 
 

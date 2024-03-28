@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.03.15"
+version = "2024.03.21"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -18,12 +18,14 @@ packages = [
 [tool.poetry.dependencies]
 python = "3.11.4"
 pydantic = "1.10.14"
-nhs-context-logging = "^0.4.2"
+nhs-context-logging = "^0.5.1"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
 email-validator = "^2.1.0.post1"
-smart-open = "^6.4.0"
-urllib3 = "<2"
+smart-open = "^7.0.1"
+urllib3 = "<3"
+orjson = "^3.9.15"
+attrs = "^23.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.4.0"
@@ -63,6 +65,11 @@ optional = true
 
 [tool.poetry.group.sds_update.dependencies]
 python-ldap = "^3.4.4"
+lz4 = "^4.3.3"
+
+
+[tool.poetry.group.sds.dependencies]
+lz4 = "^4.3.3"
 
 [build-system]
 requires = ["poetry-core"]

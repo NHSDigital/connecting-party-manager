@@ -1,10 +1,5 @@
 import pytest
-from domain.repository.marshall import (
-    _marshall,
-    marshall,
-    marshall_value,
-    unmarshall_value,
-)
+from domain.repository.marshall import marshall, marshall_value, unmarshall_value
 
 
 class Nested:
@@ -20,7 +15,7 @@ class Nested:
         [None, {"Null": True}],
         ["foo", {"S": "foo"}],
         [123, {"N": "123"}],
-        [True, {"B": True}],
+        [True, {"BOOL": True}],
         [[], {"L": []}],
         [
             [
@@ -38,7 +33,7 @@ class Nested:
                     {"N": "1"},
                     {"N": "2.0"},
                     {"S": "3"},
-                    {"B": False},
+                    {"BOOL": False},
                     {"L": []},
                     {"M": {}},
                 ]
@@ -57,7 +52,7 @@ class Nested:
             {
                 "M": {
                     "none": {"Null": True},
-                    "bool": {"B": False},
+                    "bool": {"BOOL": False},
                     "int": {"N": "1"},
                     "float": {"N": "2"},
                     "string": {"S": "str"},
@@ -68,7 +63,7 @@ class Nested:
         ],
     ],
 )
-def test__marshall_value(value, expected):
+def test_marshall_value(value, expected):
     actual = marshall_value(value)
     assert actual == expected
 
@@ -77,8 +72,8 @@ def test__marshall_value(value, expected):
     "value,expected",
     [
         [{"Null": True}, None],
-        [{"B": False}, False],
-        [{"B": True}, True],
+        [{"BOOL": False}, False],
+        [{"BOOL": True}, True],
         [{"N": "0"}, 0.0],
         [{"N": "1"}, 1.0],
         [{"N": "1.2"}, 1.2],
@@ -86,18 +81,11 @@ def test__marshall_value(value, expected):
         [{"L": []}, []],
         [{"L": [{"Null": True}]}, [None]],
         [{"M": {}}, {}],
-        [{"M": {"foo": {"B": False}, "bar": {"N": "1"}}}, {"foo": False, "bar": 1}],
+        [{"M": {"foo": {"BOOL": False}, "bar": {"N": "1"}}}, {"foo": False, "bar": 1}],
     ],
 )
 def test__unmarshall_value(value, expected):
     actual = unmarshall_value(value)
-    assert actual == expected
-
-
-def test__marshall():
-    input = {"one": 1, "two": 2, "three": 3}
-    actual = _marshall(input)
-    expected = {"one": {"N": "1"}, "two": {"N": "2"}, "three": {"N": "3"}}
     assert actual == expected
 
 

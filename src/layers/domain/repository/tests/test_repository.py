@@ -1,13 +1,12 @@
-from dataclasses import asdict, dataclass
-
 import pytest
+from attr import asdict, dataclass
 from domain.repository.errors import AlreadyExistsError, UnhandledTransaction
 from domain.repository.marshall import marshall, marshall_value, unmarshall
 from domain.repository.repository import Repository
 from domain.repository.transaction import (
     ConditionExpression,
-    TransactionItem,
     TransactionStatement,
+    TransactItem,
 )
 from event.aws.client import dynamodb_client
 from pydantic import BaseModel, Field
@@ -16,24 +15,48 @@ from test_helpers.terraform import read_terraform_output
 
 
 @dataclass
-class MyEvent:
+class MyEventAdd:
     field: str
 
 
 @dataclass
-class MyOtherEvent:
+class MyOtherEventAdd:
+    field: str
+
+
+@dataclass
+class MyEventDelete:
     field: str
 
 
 class MyModel(BaseModel):
     field: str
-    events: list[MyEvent | MyOtherEvent] = Field(default_factory=list, exclude=True)
+    events: list[MyEventAdd | MyOtherEventAdd | MyEventDelete] = Field(
+        default_factory=list, exclude=True
+    )
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+@pytest.fixture
+def repository() -> "MyRepository":
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    return MyRepository(
+        table_name=table_name,
+        model=MyModel,
+        dynamodb_client=dynamodb_client(),
+    )
+
+
+class _NotFoundError(Exception):
+    pass
 
 
 class MyRepository(Repository[MyModel]):
-    def handle_MyEvent(self, event: MyEvent, entity: MyModel):
+    def handle_MyEventAdd(self, event: MyEventAdd):
         # This event will raise a transaction error on duplicates
-        return TransactionItem(
+        return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
                 Item=marshall(pk=event.field, sk=event.field, **asdict(event)),
@@ -41,13 +64,24 @@ class MyRepository(Repository[MyModel]):
             )
         )
 
-    def handle_MyOtherEvent(self, event: MyEvent, entity: MyModel):
+    def handle_MyOtherEventAdd(self, event: MyOtherEventAdd):
         # This event will never raise a transaction error
         key = "prefix:" + event.field
-        return TransactionItem(
+        return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
                 Item=marshall(pk=key, sk=key, **asdict(event)),
+            )
+        )
+
+    def handle_MyEventDelete(self, event: MyEventDelete):
+        # This event will never raise a transaction error
+        key = event.field
+        return TransactItem(
+            Delete=TransactionStatement(
+                TableName=self.table_name,
+                Key=marshall(pk=key, sk=key),
+                ConditionExpression=ConditionExpression.MUST_EXIST,
             )
         )
 
@@ -59,87 +93,79 @@ class MyRepository(Repository[MyModel]):
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
+        if len(items) == 0:
+            raise _NotFoundError()
         return MyModel(**items[0])
 
 
 @pytest.mark.integration
-def test_repository():
-    table_name = read_terraform_output("dynamodb_table_name.value")
-    repo = MyRepository(
-        table_name=table_name,
-        model=MyModel,
-        dynamodb_client=dynamodb_client(),
-    )
-
+def test_repository_write(repository: MyRepository):
     value = "123"
-    my_item = MyModel(field=value, events=[MyEvent(field=value)])
-    repo.write(my_item)
-    assert repo.read(pk=value).dict() == my_item.dict()
+    my_item = MyModel(field=value, events=[MyEventAdd(field=value)])
+    repository.write(my_item)
+    assert repository.read(pk=value).dict() == my_item.dict()
 
 
 @pytest.mark.integration
-def test_repository_raise_already_exists():
-    table_name = read_terraform_output("dynamodb_table_name.value")
-    repo = MyRepository(
-        table_name=table_name,
-        model=MyModel,
-        dynamodb_client=dynamodb_client(),
-    )
-
-    my_item = MyModel(field="123", events=[MyEvent(field="123")])
-    repo.write(my_item)
+def test_repository_raise_already_exists(repository: MyRepository):
+    my_item = MyModel(field="123", events=[MyEventAdd(field="123")])
+    repository.write(my_item)
     with pytest.raises(AlreadyExistsError):
-        repo.write(my_item)
+        repository.write(my_item)
 
 
 @pytest.mark.integration
-def test_repository_raise_already_exists_multiple_events():
-    table_name = read_terraform_output("dynamodb_table_name.value")
-    repo = MyRepository(
-        table_name=table_name,
-        model=MyModel,
-        dynamodb_client=dynamodb_client(),
-    )
-
+def test_repository_raise_already_exists_multiple_events(repository: MyRepository):
     my_item = MyModel(
         field="123",
         events=[
-            MyOtherEvent(field="456"),
-            MyEvent(field="123"),
-            MyOtherEvent(field="345"),
+            MyOtherEventAdd(field="456"),
+            MyEventAdd(field="123"),
+            MyOtherEventAdd(field="345"),
         ],
     )
-    repo.write(my_item)
+    repository.write(my_item)
     with pytest.raises(AlreadyExistsError):
-        repo.write(my_item)  # Should cause AlreadyExistsError
+        repository.write(my_item)  # Should cause AlreadyExistsError
 
 
 @pytest.mark.integration
-def test_repository_raise_already_exists_from_single_transaction():
-    table_name = read_terraform_output("dynamodb_table_name.value")
-    repo = MyRepository(
-        table_name=table_name,
-        model=MyModel,
-        dynamodb_client=dynamodb_client(),
-    )
-
+def test_repository_raise_already_exists_from_single_transaction(
+    repository: MyRepository,
+):
     my_item = MyModel(
         field="123",
         events=[
-            MyOtherEvent(field="456"),
-            MyEvent(field="123"),
-            MyOtherEvent(field="345"),
-            MyEvent(field="123"),
+            MyOtherEventAdd(field="456"),
+            MyEventAdd(field="123"),
+            MyOtherEventAdd(field="345"),
+            MyEventAdd(field="123"),
         ],
     )
     with pytest.raises(UnhandledTransaction) as exc:
-        repo.write(my_item)
+        repository.write(my_item)
     assert str(exc.value) == "\n".join(
         (
             "ValidationException: Transaction request cannot include multiple operations on one item",
-            f'{{"Put": {{"TableName": "{table_name}", "Item": {{"pk": {{"S": "prefix:456"}}, "sk": {{"S": "prefix:456"}}, "field": {{"S": "456"}}}}, "ConditionExpression": null}}}}',
-            f'{{"Put": {{"TableName": "{table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk) AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"}}}}',
-            f'{{"Put": {{"TableName": "{table_name}", "Item": {{"pk": {{"S": "prefix:345"}}, "sk": {{"S": "prefix:345"}}, "field": {{"S": "345"}}}}, "ConditionExpression": null}}}}',
-            f'{{"Put": {{"TableName": "{table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk) AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"}}}}',
+            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "prefix:456"}}, "sk": {{"S": "prefix:456"}}, "field": {{"S": "456"}}}}}}}}',
+            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk) AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"}}}}',
+            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "prefix:345"}}, "sk": {{"S": "prefix:345"}}, "field": {{"S": "345"}}}}}}}}',
+            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk) AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"}}}}',
         )
     )
+
+
+@pytest.mark.integration
+def test_repository_add_and_delete_separate_transactions(repository: MyRepository):
+    value = "123"
+    my_item = MyModel(field=value, events=[MyEventAdd(field=value)])
+    repository.write(my_item)
+    intermediate_item = repository.read(pk=value)
+
+    assert intermediate_item == my_item
+
+    intermediate_item.events.append(MyEventDelete(field=value))
+    repository.write(intermediate_item)
+
+    with pytest.raises(_NotFoundError):
+        repository.read(pk=value)

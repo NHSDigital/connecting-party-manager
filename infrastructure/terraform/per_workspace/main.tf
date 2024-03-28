@@ -27,6 +27,10 @@ JSON
   }
 }
 
+data "aws_secretsmanager_secret" "cpm_apigee_api_key" {
+  name = "${var.environment}-apigee-cpm-apikey"
+}
+
 module "table" {
   source                      = "./modules/api_storage"
   name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--table"
@@ -116,6 +120,9 @@ module "authoriser" {
   python_version = var.python_version
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
   source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
+  environment_variables = {
+    ENVIRONMENT = var.environment
+  }
   layers = concat(
     compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
     [element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn]
@@ -138,6 +145,11 @@ module "authoriser" {
               "Action": "lambda:InvokeFunction",
               "Effect": "Allow",
               "Resource": "arn:aws:lambda:eu-west-2:${var.assume_account}:function:${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+          },
+          {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": "${data.aws_secretsmanager_secret.cpm_apigee_api_key.arn}"
           }
       ]
     }
@@ -167,7 +179,7 @@ module "sds_etl" {
   assume_account                   = var.assume_account
   python_version                   = var.python_version
   event_layer_arn                  = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
-  third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn
+  third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds"], 0).layer_arn
   third_party_sds_update_layer_arn = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds_update"], 0).layer_arn
   domain_layer                     = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
   table_name                       = module.table.dynamodb_table_name

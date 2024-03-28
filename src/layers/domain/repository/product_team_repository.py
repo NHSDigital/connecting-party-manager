@@ -1,12 +1,11 @@
-from dataclasses import asdict
-
+from attr import asdict
 from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
 
 from .errors import ItemNotFound
 from .keys import TableKeys
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
-from .transaction import ConditionExpression, TransactionItem, TransactionStatement
+from .transaction import ConditionExpression, TransactionStatement, TransactItem
 
 
 class ProductTeamRepository(Repository[ProductTeam]):
@@ -15,11 +14,9 @@ class ProductTeamRepository(Repository[ProductTeam]):
             table_name=table_name, model=ProductTeam, dynamodb_client=dynamodb_client
         )
 
-    def handle_ProductTeamCreatedEvent(
-        self, event: ProductTeamCreatedEvent, entity: ProductTeam
-    ):
+    def handle_ProductTeamCreatedEvent(self, event: ProductTeamCreatedEvent):
         pk = TableKeys.PRODUCT_TEAM.key(event.id)
-        return TransactionItem(
+        return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
                 Item=marshall(pk=pk, sk=pk, **asdict(event)),
