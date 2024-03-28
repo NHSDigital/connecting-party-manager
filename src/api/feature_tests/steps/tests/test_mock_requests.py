@@ -1,9 +1,9 @@
 from dataclasses import asdict
 from unittest import mock
 
-from feature_tests.end_to_end.steps.requests import make_request, mock_request
+from api.feature_tests.steps.requests import make_request, mock_request
 
-PATH = "feature_tests.end_to_end.steps.requests.{}"
+PATH = "api.feature_tests.steps.requests.{}"
 
 
 class Index:
