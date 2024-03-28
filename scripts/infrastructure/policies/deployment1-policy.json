@@ -234,7 +234,11 @@
     {
       "Sid": "SecurityGroupPermissions2",
       "Effect": "Allow",
-      "Action": ["ec2:DeleteSecurityGroup", "ec2:RevokeSecurityGroupEgress"],
+      "Action": [
+        "ec2:DeleteSecurityGroup",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:ModifyVpcEndpoint"
+      ],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/sg-*"]
     },
     {
