@@ -192,7 +192,8 @@
         "ec2:ModifyVpcAttribute",
         "ec2:CreateSubnet",
         "ec2:CreateSecurityGroup",
-        "ec2:CreateRouteTable"
+        "ec2:CreateRouteTable",
+        "ec2:DeleteVpc"
       ],
       "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc/vpc-*"]
     },

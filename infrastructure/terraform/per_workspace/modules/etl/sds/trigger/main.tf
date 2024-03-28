@@ -38,8 +38,8 @@ module "lambda_function" {
 
   layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
 
-  vpc_subnet_ids         = ["${aws_subnet.private-subnet.*.id}"]
-  vpc_security_group_ids = [aws_vpc.lambda-connectivity-vpc.default_security_group_id]
+  vpc_subnet_ids         = ["${aws_subnet.lambda-connectivity-private.*.id}"]
+  vpc_security_group_ids = [aws_security_group.sds-ldap.id]
 
   trusted_entities = [
     {
