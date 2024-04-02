@@ -13,6 +13,12 @@ class CaseInsensitiveEnum(StrEnum):
         return None
 
 
+class ChangeType(CaseInsensitiveEnum):
+    ADD = auto()
+    MODIFY = auto()
+    DELETE = auto()
+
+
 class InteractionType(CaseInsensitiveEnum):
     FHIR = auto()
     HL7 = auto()

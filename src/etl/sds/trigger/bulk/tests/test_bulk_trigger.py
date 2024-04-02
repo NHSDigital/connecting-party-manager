@@ -20,8 +20,8 @@ from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.terraform import read_terraform_output
 
-TEST_DATA_NAME = "test.ldif"
-EXPECTED_CHANGELOG_NUMBER = "0"
+TEST_DATA_NAME = "123.ldif"
+EXPECTED_CHANGELOG_NUMBER = 123
 EMPTY_LDIF_DATA = b""
 EMPTY_JSON_DATA = deque()
 ALLOWED_EXCEPTIONS = (JSONDecodeError,)
@@ -50,7 +50,7 @@ def test_bulk_trigger():
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
     initial_trigger_key = f"{bulk_trigger_prefix}/{TEST_DATA_NAME}"
-    final_trigger_key = f"history/{bulk_trigger_prefix}/{TEST_DATA_NAME}"
+    final_trigger_key = f"history/{initial_trigger_key}"
     table_name = read_terraform_output("dynamodb_table_name.value")
 
     client = dynamodb_client()

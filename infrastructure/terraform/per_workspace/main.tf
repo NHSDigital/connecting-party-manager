@@ -184,4 +184,5 @@ module "sds_etl" {
   domain_layer                     = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
   table_name                       = module.table.dynamodb_table_name
   table_arn                        = module.table.dynamodb_table_arn
+  is_persistent                    = var.workspace_type == "PERSISTENT"
 }
