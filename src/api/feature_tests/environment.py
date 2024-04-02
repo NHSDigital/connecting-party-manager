@@ -5,18 +5,14 @@ from behave import use_fixture
 from behave.model import Feature, Scenario, Step
 from event.aws.client import dynamodb_client, secretsmanager_client
 
-from feature_tests.end_to_end.steps.context import Context
-from feature_tests.end_to_end.steps.fixtures import (
+from api.feature_tests.feature_test_helpers import TestMode
+from api.feature_tests.steps.context import Context
+from api.feature_tests.steps.fixtures import (
     mock_dynamodb,
     mock_environment,
     mock_requests,
 )
-from feature_tests.end_to_end.steps.postman import (
-    BASE_URL,
-    PostmanCollection,
-    PostmanItem,
-)
-from feature_tests.feature_test_helpers import TestMode
+from api.feature_tests.steps.postman import BASE_URL, PostmanCollection, PostmanItem
 from test_helpers.aws_session import aws_session
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.terraform import read_terraform_output
