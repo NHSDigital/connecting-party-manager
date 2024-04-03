@@ -22,6 +22,7 @@ terraform--init: _terraform--init ## Run terraform init
 terraform--plan: $(TERRAFORM_PLAN_TIMESTAMP)  ## Run terraform plan
 terraform--apply: $(WORKSPACE_OUTPUT_JSON) ## Run terraform apply
 terraform--apply--force: terraform--clean terraform--apply ## Run terraform apply
+terraform--apply--qa: $(MAKE) _terraform--apply AWS_ACCOUNT=qa ## Deploy local workspace to qa
 
 terraform--destroy: _terraform--destroy ## Run terraform destroy
 terraform--unlock: _terraform--unlock ## Run terraform unlock
