@@ -27,6 +27,8 @@ APIGEE_ENV_FOR_WORKSPACE = {
     "prod": "prod",
 }
 
+PERSISTENT_ENVS = ["dev", "qa", "int", "prod", "ref"]
+
 
 def is_2xx(status_code: int):
     return 200 <= status_code < 300
@@ -80,6 +82,7 @@ def create_apigee_url(apigee_env: str, workspace: str):
 
 def _prepare_base_request(workspace: str) -> tuple[str, dict]:
     client = boto3.client("secretsmanager")
+    workspace = "dev" if workspace not in PERSISTENT_ENVS else workspace
 
     secret_name = f"{workspace}-apigee-app-key"
 
