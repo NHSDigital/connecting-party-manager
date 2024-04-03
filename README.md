@@ -150,7 +150,9 @@ We have some automated behaviour for destroying our workspaces - we build off a 
 
 We have several roles that we currently handle outside of terraform as its needed to deploy the terraform:
 
--
+- NHSDeploymentRole
+- NHSDevelopmentRole
+- NHSTestCIRole
 
 To update any of the roles used for SSO then you need to do the following command which should prompt you to log in via SSO:
 
