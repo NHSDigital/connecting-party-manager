@@ -2,7 +2,7 @@ module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
-  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}-trigger"
+  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}"
   description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.trigger_name}) trigger lambda function"
   handler       = "etl.sds.trigger.${var.trigger_name}.${var.trigger_name}.handler"
   runtime       = var.python_version
