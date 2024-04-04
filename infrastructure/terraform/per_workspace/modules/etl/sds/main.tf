@@ -286,6 +286,7 @@ module "trigger_bulk" {
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
   third_party_layer_arn = var.third_party_core_layer_arn
+  sds_layer_arn         = var.sds_layer_arn
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn
@@ -310,6 +311,7 @@ module "trigger_update" {
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
   third_party_layer_arn = var.third_party_sds_update_layer_arn
+  sds_layer_arn         = var.sds_layer_arn
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn

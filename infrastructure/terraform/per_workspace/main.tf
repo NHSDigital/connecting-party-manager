@@ -182,6 +182,7 @@ module "sds_etl" {
   third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds"], 0).layer_arn
   third_party_sds_update_layer_arn = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds_update"], 0).layer_arn
   domain_layer                     = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
+  sds_layer_arn                    = element([for instance in module.layers : instance if instance.name == "sds"], 0).layer_arn
   table_name                       = module.table.dynamodb_table_name
   table_arn                        = module.table.dynamodb_table_arn
   is_persistent                    = var.workspace_type == "PERSISTENT"
