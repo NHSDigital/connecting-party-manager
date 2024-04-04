@@ -35,7 +35,7 @@ module "lambda_function" {
     Name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}"
   }
 
-  layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
+  layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn, var.sds_layer_arn]
 
   trusted_entities = [
     {
