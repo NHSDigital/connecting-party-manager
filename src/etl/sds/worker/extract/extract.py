@@ -13,8 +13,13 @@ from etl_utils.worker.action import apply_action
 from etl_utils.worker.model import WorkerActionResponse, WorkerEnvironment
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.json import json_loads
+from nhs_context_logging import log_action
 from sds.domain.constants import FILTER_TERMS
 from sds.domain.parse import parse_sds_record
+
+_log_action_without_inputs = lambda function: log_action(log_args=[], log_result=False)(
+    function
+)
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
@@ -24,15 +29,18 @@ S3_CLIENT = boto3.client("s3")
 ENVIRONMENT = WorkerEnvironment.build()
 
 
-def extract(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str
-) -> WorkerActionResponse:
+@_log_action_without_inputs
+def _read(s3_client: "S3Client", s3_input_path: str) -> deque[dict]:
     filtered_ldif = filter_ldif_from_s3_by_property(
         s3_path=s3_input_path, filter_terms=FILTER_TERMS, s3_client=s3_client
     )
-    unprocessed_records = deque(
-        parse_ldif(file_opener=BytesIO, path_or_data=filtered_ldif)
-    )
+    return deque(parse_ldif(file_opener=BytesIO, path_or_data=filtered_ldif))
+
+
+def extract(
+    s3_client: "S3Client", s3_input_path: str, s3_output_path: str
+) -> WorkerActionResponse:
+    unprocessed_records = _read(s3_client=s3_client, s3_input_path=s3_input_path)
 
     with smart_open(s3_client=s3_client, s3_path=s3_output_path) as f:
         processed_records: deque[dict] = pkl_load_lz4(f)

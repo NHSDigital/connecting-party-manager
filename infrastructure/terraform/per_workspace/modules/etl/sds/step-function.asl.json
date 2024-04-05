@@ -208,7 +208,21 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "success"
+      "Next": "parse-status"
+    },
+    "parse-status": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$",
+          "StringEquals": "fail",
+          "Next": "fail"
+        }
+      ],
+      "Default": "success"
+    },
+    "fail": {
+      "Type": "Fail"
     },
     "success": {
       "Type": "Succeed"

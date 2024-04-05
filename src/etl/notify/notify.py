@@ -1,3 +1,5 @@
-def handler(event, context):
-    print(event)  # noqa: T201
-    return "not yet implemented"
+def handler(event: list[dict], context):
+    for item in event:
+        if item.get("error_message") is not None:
+            return "fail"
+    return "pass"

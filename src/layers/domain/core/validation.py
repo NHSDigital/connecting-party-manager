@@ -2,7 +2,7 @@ import re
 
 DEVICE_KEY_SEPARATOR = ":"
 
-_ODS_CODE_REGEX = r"[a-zA-Z0-9]{1,6}"
+_ODS_CODE_REGEX = r"[a-zA-Z0-9]{1,9}"
 UUID_REGEX = (
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )

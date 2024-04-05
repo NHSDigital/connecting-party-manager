@@ -36,7 +36,8 @@
     "answer_types": ["str"],
     "choices": [
       "urn:oasis:names:tc:ebxml-msg:actor:topartymsh",
-      "urn:oasis:names:tc:ebxml-msg:actor:nextmsh"
+      "urn:oasis:names:tc:ebxml-msg:actor:nextmsh",
+      "IGNORED"
     ]
   },
   {
@@ -171,7 +172,6 @@
   {
     "name": "nhs_mhs_manufacturer_org",
     "human_readable_name": "Manufacturer ODS code",
-    "answer_types": ["str"],
-    "mandatory": true
+    "answer_types": ["str"]
   }
 ]
