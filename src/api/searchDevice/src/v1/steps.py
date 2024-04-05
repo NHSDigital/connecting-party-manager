@@ -1,5 +1,6 @@
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.device import DeviceType
+from domain.fhir_translation import create_fhir_model_from_device
 from domain.repository.device_repository import DeviceRepository
 from event.step_chain import StepChain
 
@@ -31,26 +32,31 @@ def read_devices_by_type(data, cache):
 
 def read_devices_by_id(data, cache):
     devices = data[read_devices_by_type]
+    full_devices = []
     for device in devices:
-        _read_devices_by_id(device)
+        full_devices.append(_read_devices_by_id(device))
+    return full_devices
 
 
 def _read_devices_by_id(device):
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.read(device.get("pk1"))
+    return device_repo.read(device.get("id"))
+
+
+def devices_to_fhir(data, cache) -> dict:
+    devices = data[read_devices_by_id]
+    fhir_devices = []
+    for device in devices:
+        fhir_org = create_fhir_model_from_device(device=device)
+        fhir_devices.append(fhir_org.dict())
+    return fhir_devices
 
 
 def devices_to_fhir_bundle(data, cache) -> dict:
-    devices = data[read_devices_by_id]
+    devices = data[devices_to_fhir]
     return devices
-
-
-# def device_to_fhir_org(data, cache) -> dict:
-#     device = data[read_devices]
-#     fhir_org = create_fhir_model_from_device(device=device)
-#     return fhir_org.dict()
 
 
 def get_results(data, cache):
@@ -64,5 +70,6 @@ steps = [
     set_device_type,
     read_devices_by_type,
     read_devices_by_id,
+    devices_to_fhir,
     devices_to_fhir_bundle,
 ]

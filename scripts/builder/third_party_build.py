@@ -55,6 +55,7 @@ def docker_run(docker_file: Path, root_dir: Path, group: str):
         shutil.copy(source_file, root_dir)
     python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
     image_name = f"{group}:latest"
+    sh.docker("network", "create", "-d", "bridge", "third_party_bridge_network")
     sh.docker(
         "build",
         ".",
@@ -70,6 +71,8 @@ def docker_run(docker_file: Path, root_dir: Path, group: str):
         "run",
         "-v",
         f"{root_dir}:/var/task",
+        "--network",
+        "third_party_bridge_network",
         image_name,
         "/bin/bash",
         "-c",
