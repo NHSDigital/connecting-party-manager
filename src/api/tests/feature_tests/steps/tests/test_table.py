@@ -1,7 +1,7 @@
 import pytest
 
-from api.feature_tests.steps.assertion import assert_is_subset
-from api.feature_tests.steps.table import _unpack_nested_lists
+from api.tests.feature_tests.steps.assertion import assert_is_subset
+from api.tests.feature_tests.steps.table import _unpack_nested_lists
 
 
 @pytest.mark.parametrize(

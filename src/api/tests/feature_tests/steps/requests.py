@@ -9,13 +9,13 @@ from domain.response.aws_lambda_response import AwsLambdaResponse
 from event.json import json_loads
 from requests import HTTPError, Response, request
 
-from api.feature_tests.steps.data import DUMMY_CONTEXT
-from api.feature_tests.steps.endpoint_lambda_mapping import (
+from api.tests.feature_tests.steps.data import DUMMY_CONTEXT
+from api.tests.feature_tests.steps.endpoint_lambda_mapping import (
     get_endpoint_lambda_mapping,
     parse_api_path,
 )
 
-THIS_MODULE = "api.feature_tests.steps.requests"
+THIS_MODULE = "api.tests.feature_tests.steps.requests"
 
 
 def _parse_url(base_url: str, endpoint: str) -> str:

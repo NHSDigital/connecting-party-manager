@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from api.feature_tests.steps.endpoint_lambda_mapping import (
+from api.tests.feature_tests.steps.endpoint_lambda_mapping import (
     EndpointConfigurationError,
     _parse_params_from_url,
     _template_to_regex,

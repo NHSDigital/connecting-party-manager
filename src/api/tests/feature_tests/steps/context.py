@@ -6,8 +6,8 @@ from behave.runner import Context as BehaveContext
 from mypy_boto3_dynamodb import DynamoDBClient
 from requests import Response
 
-from api.feature_tests.feature_test_helpers import TestMode
-from api.feature_tests.steps.postman import PostmanCollection, PostmanItem
+from api.tests.feature_tests.feature_test_helpers import TestMode
+from api.tests.feature_tests.steps.postman import PostmanCollection, PostmanItem
 
 
 @dataclass
