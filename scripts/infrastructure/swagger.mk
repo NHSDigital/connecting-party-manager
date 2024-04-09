@@ -6,6 +6,8 @@ PATH_TO_SWAGGER_GENERATOR_JAR := $(DOWNLOADS_DIR)/$(SWAGGER_GENERATOR_JAR)
 
 FHIR_DEFINITION = $(CURDIR)/infrastructure/swagger/swagger-fhir-generator-definitions/endpoints.yaml
 WORKSPACE_OUTPUT_JSON = $(CURDIR)/infrastructure/terraform/per_workspace/output.json
+VENV_PYTHON = $(CURDIR)/.venv/bin/python
+INIT_TIMESTAMP = $(CURDIR)/.timestamp/init.timestamp
 
 FHIR_BASE_TIMESTAMP =  $(TIMESTAMP_DIR)/.fhir-base.stamp
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
@@ -29,13 +31,13 @@ swagger--generate-fhir-base: $(FHIR_BASE_TIMESTAMP)
 swagger--download-generator: $(PATH_TO_SWAGGER_GENERATOR_JAR)  ## Downloads the latest swagger fhir generator
 
 
-$(PATH_TO_SWAGGER_GENERATOR_JAR): $(DOWNLOADS_DIR)
+$(PATH_TO_SWAGGER_GENERATOR_JAR): $(INIT_TIMESTAMP)
 	@echo "Downloading FHIR Swagger Generator to $(DOWNLOADS_DIR)"
 	@wget -q https://github.com/IBM/FHIR/releases/download/$(SWAGGER_GENERATOR_VERSION)/$(SWAGGER_GENERATOR_JAR) -P $(DOWNLOADS_DIR)
 	touch $(PATH_TO_SWAGGER_GENERATOR_JAR)
 
 
-$(FHIR_BASE_TIMESTAMP): $(PATH_TO_SWAGGER_GENERATOR_JAR) $(FHIR_DEFINITION) ## Generate the FHIR base swagger from the definitions file
+$(FHIR_BASE_TIMESTAMP): $(INIT_TIMESTAMP) $(VENV_PYTHON) $(PATH_TO_SWAGGER_GENERATOR_JAR) $(FHIR_DEFINITION) ## Generate the FHIR base swagger from the definitions file
 	mkdir -p $(SWAGGER_FHIR_BASE)
 	@env \
 		PATH_TO_FHIR_DEFINITIONS=$(FHIR_DEFINITION) \

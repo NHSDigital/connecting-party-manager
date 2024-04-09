@@ -36,19 +36,21 @@ function _terraform() {
     login_account=$(_get_account_full_name) || return 1
     local plan_file="./tfplan"
 
-    echo "
-    Terraforming
-    -------------------- ----------------------------------------
-    login_account        ${login_account}
-    scope                ${scope}
-    account              ${account}
-    raw_workspace        ${TERRAFORM_WORKSPACE}
-    workspace            ${workspace}
-    workspace_type       ${workspace_type}
-    workspace_expiration ${workspace_expiration}
-    expiration_date      ${expiration_date}
-    role                 ${terraform_role_name}
-"
+    if [[ "${TERRAFORM_COMMAND}" != "clean" ]]; then
+        echo "
+        Terraforming
+        -------------------- ----------------------------------------
+        login_account        ${login_account}
+        scope                ${scope}
+        account              ${account}
+        raw_workspace        ${TERRAFORM_WORKSPACE}
+        workspace            ${workspace}
+        workspace_type       ${workspace_type}
+        workspace_expiration ${workspace_expiration}
+        expiration_date      ${expiration_date}
+        role                 ${terraform_role_name}
+    "
+    fi
 
     if [[ "${login_account}" != "NHS Digital Spine Core CPM MGMT" ]]; then
         echo "Please log in as the mgmt account" >&2
@@ -86,6 +88,10 @@ function _terraform() {
         #----------------
         "unlock")
             TF_WORKSPACE=$workspace _terraform_unlock "$TERRAFORM_ARGS"
+        ;;
+        #----------------
+        "clean")
+            terraform workspace select default
         ;;
     esac
 }
