@@ -6,7 +6,7 @@ module "lambda_function" {
   description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.trigger_name}) trigger lambda function"
   handler       = "etl.sds.trigger.${var.trigger_name}.${var.trigger_name}.handler"
   runtime       = var.python_version
-  timeout       = 30
+  timeout       = 120
 
   timeouts = {
     create = "5m"

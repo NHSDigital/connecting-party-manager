@@ -184,6 +184,11 @@ def test_transform_worker_pass_duplicate_fail(
 
     # Execute the transform worker
     response = transform.handler(event=None, context=None)
+    response["error_message"] = re.sub(
+        r"'RVL:000428682512'\n(.+)\n",
+        r"'RVL:000428682512'\nREDACTED\n",
+        response["error_message"],
+    )
     assert response == {
         "stage_name": "transform",
         "processed_records": None,
@@ -191,11 +196,9 @@ def test_transform_worker_pass_duplicate_fail(
         "error_message": (
             "The following errors were encountered\n"
             "  -- Error 1 (DuplicateSdsKey) --\n"
-            "  {"
-            "'key': 'RVL:000428682512', "
-            "'type': <DeviceKeyType.ACCREDITED_SYSTEM_ID: 'accredited_system_id'>, "
-            "'_trust': True"
-            "}"
+            "  Duplicates found for device key 'RVL:000428682512'\n"
+            "REDACTED\n"
+            "  ==============="
         ),
     }
 

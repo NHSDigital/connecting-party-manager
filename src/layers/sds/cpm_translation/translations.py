@@ -3,6 +3,7 @@ from uuid import UUID
 
 from domain.core.device import Device, DeviceType
 from domain.core.device_key import DeviceKeyType
+from domain.core.product_team import ProductTeam
 from domain.core.questionnaire import Questionnaire
 from domain.core.root import Root
 from domain.core.validation import DEVICE_KEY_SEPARATOR
@@ -14,7 +15,20 @@ DEFAULT_PRODUCT_TEAM = {
     "id": UUID(int=0x12345678123456781234567812345678),
     "name": "ROOT",
 }
-
+EXCEPTIONAL_ODS_CODES = {
+    "696B001",
+    "TESTEBS1",
+    "TESTLSP0",
+    "TESTLSP1",
+    "TESTLSP3",
+    "TMSAsync1",
+    "TMSAsync2",
+    "TMSAsync3",
+    "TMSAsync4",
+    "TMSAsync5",
+    "TMSAsync6",
+    "TMSEbs2",
+}
 
 DEFAULT_ORGANISATION = "CDEF"
 
@@ -41,6 +55,15 @@ def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
             item[key] = value
             return
     obj.append({key: value})
+
+
+def create_product_team(ods_code: str) -> ProductTeam:
+    if ods_code in EXCEPTIONAL_ODS_CODES:
+        product_team = ProductTeam(**DEFAULT_PRODUCT_TEAM, ods_code=ods_code)
+    else:
+        organisation = Root.create_ods_organisation(ods_code=ods_code)
+        product_team = organisation.create_product_team(**DEFAULT_PRODUCT_TEAM)
+    return product_team
 
 
 def nhs_accredited_system_to_cpm_devices(
@@ -123,8 +146,7 @@ def nhs_mhs_to_cpm_device(
         responses=questionnaire_response_responses
     )
 
-    organisation = Root.create_ods_organisation(ods_code=ods_code)
-    product_team = organisation.create_product_team(**DEFAULT_PRODUCT_TEAM)
+    product_team = create_product_team(ods_code=ods_code)
     device = product_team.create_device(
         name=product_name, type=DeviceType.ENDPOINT, _trust=_trust
     )

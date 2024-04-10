@@ -183,7 +183,7 @@ module "worker_load" {
 }
 
 module "notify" {
-  source = "./../notify/"
+  source = "./notify/"
 
   etl_name         = local.etl_name
   assume_account   = var.assume_account
