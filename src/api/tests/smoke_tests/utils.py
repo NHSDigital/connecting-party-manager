@@ -30,7 +30,11 @@ def get_headers(app_key: str) -> dict:
 
 
 def get_base_url(workspace: str, environment: str) -> str:
-    apigee_url_prefix = APIGEE_URL_PREFIX_BY_ENVIRONMENT[environment]
+    apigee_url_prefix = (
+        APIGEE_URL_PREFIX_BY_ENVIRONMENT[workspace]
+        if workspace == f"{environment}-sandbox"
+        else APIGEE_URL_PREFIX_BY_ENVIRONMENT[environment]
+    )
     base_url = ".".join(filter(bool, (apigee_url_prefix, APIGEE_BASE_URL)))
     return f"https://{base_url}/cpm-{workspace}"
 
