@@ -2,7 +2,7 @@ module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
-  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}-trigger"
+  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}"
   description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.trigger_name}) trigger lambda function"
   handler       = "etl.sds.trigger.${var.trigger_name}.${var.trigger_name}.handler"
   runtime       = var.python_version
@@ -35,7 +35,7 @@ module "lambda_function" {
     Name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}"
   }
 
-  layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
+  layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn, var.sds_layer_arn]
 
   trusted_entities = [
     {

@@ -5,7 +5,6 @@ from event.json import json_loads
 from moto import mock_aws
 
 FUNCTION_NAME = "my-function"
-STATE_MACHINE_NAME = "my-state-machine"
 ROLE_NAME = "my-role"
 
 
@@ -34,12 +33,12 @@ def test_trigger_notify(input_result, expected_status, expected_error_message):
         response = notify(
             lambda_client=lambda_client,
             function_name=FUNCTION_NAME,
-            state_machine_name=STATE_MACHINE_NAME,
+            trigger_type="foo",
             result=input_result,
         )
         iam_client.delete_role(RoleName=ROLE_NAME)
         lambda_client.delete_function(FunctionName=FUNCTION_NAME)
     assert json_loads(response) == {
-        "message": f"{expected_status} trigger of state machine {STATE_MACHINE_NAME}",
+        "message": f"{expected_status} 'foo' trigger of state machine.",
         "error_message": expected_error_message,
     }

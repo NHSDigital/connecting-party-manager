@@ -3,11 +3,11 @@ from unittest import mock
 
 from behave import fixture
 
-from feature_tests.end_to_end.steps.context import Context
-from feature_tests.end_to_end.steps.endpoint_lambda_mapping import (
+from api.tests.feature_tests.steps.context import Context
+from api.tests.feature_tests.steps.endpoint_lambda_mapping import (
     get_endpoint_lambda_mapping,
 )
-from feature_tests.end_to_end.steps.requests import mock_request
+from api.tests.feature_tests.steps.requests import mock_request
 from test_helpers.dynamodb import mock_table
 
 

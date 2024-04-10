@@ -5,8 +5,7 @@ _pytest:
 	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
 
 _behave:
-	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m behave feature_tests/domain $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS) --no-skipped
-	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m behave feature_tests/end_to_end $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS) --no-skipped
+	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m behave src/api/tests/feature_tests $(BEHAVE_FLAGS) $(_INTERNAL_FLAGS) --no-skipped
 
 test--unit: ## Run unit (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'unit' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR)
@@ -20,8 +19,8 @@ test--slow:  ## Run slow (pytest) tests
 test--s3: aws--login ## Run (pytest) tests that require s3 downloads
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 's3'" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
 
-test--smoke:  ## Run end-to-end smoke tests (pytest)
-	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'smoke'" _CACHE_CLEAR=$(_CACHE_CLEAR)
+test--smoke: aws--login ## Run end-to-end smoke tests (pytest)
+	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'smoke'" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
 
 test--%--rerun: ## Rerun failed integration or unit (pytest) tests
 	$(MAKE) test--$* _INTERNAL_FLAGS="--last-failed --last-failed-no-failures none" _CACHE_CLEAR=

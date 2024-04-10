@@ -23,6 +23,10 @@ def is_integration(request: FixtureRequest) -> bool:
     return request.node.get_closest_marker("integration") is not None
 
 
+def is_smoke(request: FixtureRequest) -> bool:
+    return request.node.get_closest_marker("smoke") is not None
+
+
 def is_s3(request: FixtureRequest) -> bool:
     return request.node.get_closest_marker("s3") is not None
 
@@ -80,7 +84,7 @@ def log_on_failure(request: FixtureRequest, log_capture):
 
 @fixture(autouse=True)
 def aws_session_(request: FixtureRequest):
-    if is_integration(request):
+    if is_integration(request) or is_smoke(request):
         with aws_session():
             yield
     else:

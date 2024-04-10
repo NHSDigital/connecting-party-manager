@@ -3,16 +3,16 @@ import json
 from behave import given, then, when
 from requests import JSONDecodeError
 
-from feature_tests.end_to_end.steps.assertion import (
+from api.tests.feature_tests.steps.assertion import (
     assert_equal,
     assert_is_subset,
     assert_many,
     assert_same_type,
 )
-from feature_tests.end_to_end.steps.context import Context
-from feature_tests.end_to_end.steps.postman import Body, HeaderItem, PostmanRequest, Url
-from feature_tests.end_to_end.steps.requests import make_request
-from feature_tests.end_to_end.steps.table import parse_table
+from api.tests.feature_tests.steps.context import Context
+from api.tests.feature_tests.steps.postman import Body, HeaderItem, PostmanRequest, Url
+from api.tests.feature_tests.steps.requests import make_request
+from api.tests.feature_tests.steps.table import parse_table
 
 
 @given('"{header_name}" request headers')

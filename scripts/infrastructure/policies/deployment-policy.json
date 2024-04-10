@@ -273,6 +273,21 @@
         "acm:DeleteCertificate"
       ],
       "Resource": ["*"]
+    },
+    {
+      "Sid": "EventsPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "events:TagResource",
+        "events:PutRule",
+        "events:DescribeRule",
+        "events:ListTagsForResource",
+        "events:DeleteRule",
+        "events:PutTargets",
+        "events:ListTargetsByRule",
+        "events:RemoveTargets"
+      ],
+      "Resource": ["*"]
     }
   ]
 }

@@ -16,6 +16,7 @@ TERRAFORM_FILES = $(shell find infrastructure/terraform -type f -name "*.tf*") $
 terraform--clean:
 	[[ -f $(TERRAFORM_PLAN_TIMESTAMP) ]] && rm $(TERRAFORM_PLAN_TIMESTAMP) || :
 	[[ -f $(WORKSPACE_OUTPUT_JSON) ]] && rm $(WORKSPACE_OUTPUT_JSON) || :
+	$(MAKE) _terraform--clean
 terraform--validate: _terraform--validate ## Run terraform validate
 terraform--init: _terraform--init ## Run terraform init
 terraform--plan: $(TERRAFORM_PLAN_TIMESTAMP)  ## Run terraform plan

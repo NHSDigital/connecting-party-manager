@@ -14,6 +14,7 @@ API_LAMBDAS = set((PROJECT_ROOT / "src" / API_ROOT_DIRNAME).iterdir()) - set(
     [
         PROJECT_ROOT / "src" / API_ROOT_DIRNAME / "authoriser",
         PROJECT_ROOT / "src" / API_ROOT_DIRNAME / "status",
+        PROJECT_ROOT / "src" / API_ROOT_DIRNAME / "tests",
     ]
 )
 

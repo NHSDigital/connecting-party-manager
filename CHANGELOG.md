@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-04-02
+- [PI-180] Smoke tests
+- [PI-205] Updates trigger
+- [PI-288] Remove feature tests
+
 ## 2024-03-21
 - [PI-272] Enable APIKey
 - [PI-282] Fix int deploy
