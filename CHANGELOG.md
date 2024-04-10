@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-04-10
+- [PI-307] Deploy user workspaces to qa environment
+- [PI-292] Prod bulk data (SDS ETL)
+
 ## 2024-04-02
 - [PI-180] Smoke tests
 - [PI-205] Updates trigger
