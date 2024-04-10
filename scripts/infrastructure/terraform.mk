@@ -22,8 +22,15 @@ terraform--init: _terraform--init ## Run terraform init
 terraform--plan: $(TERRAFORM_PLAN_TIMESTAMP)  ## Run terraform plan
 terraform--apply: $(WORKSPACE_OUTPUT_JSON) ## Run terraform apply
 terraform--apply--force: terraform--clean terraform--apply ## Run terraform apply
-
 terraform--destroy: _terraform--destroy ## Run terraform destroy
+
+terraform--plan--qa: ## Run terraform plan against qa
+	$(MAKE) terraform--plan AWS_ACCOUNT=qa
+terraform--apply--qa: ## Run terraform apply against qa
+	$(MAKE) terraform--apply AWS_ACCOUNT=qa
+terraform--destroy--qa: ## Run terraform destroy on qa workspace
+	$(MAKE) terraform--destroy AWS_ACCOUNT=qa
+
 terraform--unlock: _terraform--unlock ## Run terraform unlock
 _terraform--%: aws--login
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
