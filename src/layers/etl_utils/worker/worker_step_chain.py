@@ -16,6 +16,8 @@ def _render_response(
     action_name: str,
     action_chain_response: WorkerActionResponse | Exception,
     save_chain_response: None | Exception,
+    count_processed_records: int,
+    count_unprocessed_records: int,
 ) -> WorkerResponse:
     # Collect exceptions in the order that they occurred
     exceptions, is_fatal = [], False
@@ -38,18 +40,11 @@ def _render_response(
         else None
     )
 
-    # Determine the counts of un/processed records if no fatal errors occurred
-    count_processed_records = None
-    count_unprocessed_records = None
-    if not is_fatal:
-        count_unprocessed_records = len(action_chain_response.unprocessed_records)
-        count_processed_records = len(action_chain_response.processed_records)
-
     # Pack up the summary
     return WorkerResponse(
         stage_name=action_name,
-        processed_records=count_processed_records,
-        unprocessed_records=count_unprocessed_records,
+        processed_records=count_processed_records if not is_fatal else None,
+        unprocessed_records=count_unprocessed_records if not is_fatal else None,
         error_message=error_message,
     )
 
@@ -70,8 +65,13 @@ def execute_step_chain(
     action_chain.run(init=(action, s3_client, s3_input_path, s3_output_path, kwargs))
 
     # Save the action chain results if there were no unhandled (fatal) exceptions
+    count_unprocessed_records = None
+    count_processed_records = None
     save_chain_response = None
     if isinstance(action_chain.result, WorkerActionResponse):
+        count_unprocessed_records = len(action_chain.result.unprocessed_records)
+        count_processed_records = len(action_chain.result.processed_records)
+
         save_chain = StepChain(
             step_chain=[save_unprocessed_records, save_processed_records],
             step_decorators=[_log_action_without_inputs],
@@ -86,4 +86,6 @@ def execute_step_chain(
         action_name=action.__name__,
         action_chain_response=action_chain.result,
         save_chain_response=save_chain_response,
+        count_unprocessed_records=count_unprocessed_records,
+        count_processed_records=count_processed_records,
     )

@@ -23,6 +23,22 @@ ACCREDITED_SYSTEM_TRANSLATIONS = {
     ChangeType.DELETE: delete_accredited_system_devices,
 }
 
+BAD_UNIQUE_IDENTIFIERS = {
+    "31af51067f47f1244d38",  # pragma: allowlist secret
+    "a83e1431f26461894465",  # pragma: allowlist secret
+    "S2202584A2577603",
+    "S100049A300185",
+}
+
+
+def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
+    for item in obj:
+        if key in item:
+            item[key] = value
+            return
+    obj.append({key: value})
+
+
 MESSAGE_HANDLING_SYSTEM_TRANSLATIONS = {
     ChangeType.ADD: lambda **kwargs: [nhs_mhs_to_cpm_device(**kwargs)],
     ChangeType.MODIFY: lambda **kwargs: [modify_mhs_device(**kwargs)],
@@ -48,6 +64,9 @@ def translate(
     repository: DeviceRepository = None,
     _trust=False,
 ) -> ExportedEventsTypeDef:
+    if obj.get("unique_identifier") in BAD_UNIQUE_IDENTIFIERS:
+        return []
+
     object_class = _parse_object_class(obj["object_class"])
 
     if object_class == NhsAccreditedSystem.OBJECT_CLASS:
