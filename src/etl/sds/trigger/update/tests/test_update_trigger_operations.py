@@ -1,10 +1,12 @@
 import os
+from io import StringIO
 from unittest import mock
 from unittest.mock import Mock
 
 import boto3
 import pytest
 from etl_utils.constants import CHANGELOG_NUMBER
+from etl_utils.ldif.ldif import parse_ldif
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -58,15 +60,38 @@ def test_get_current_changelog_number_from_s3_good_number(
 
 
 def test_get_latest_changelog_number_from_ldap():
+    mock_ldap_client = mock.Mock()
+    mock_ldap_client.result.return_value = (
+        101,
+        [
+            (
+                "foo=bar",
+                {"foo": "bar"},
+            ),
+        ],
+    )
     assert (
-        get_latest_changelog_number_from_ldap(ldap_connection=None, scope=None) == "123"
+        get_latest_changelog_number_from_ldap(
+            ldap_client=mock_ldap_client, ldap=mock.Mock()
+        )
+        == 0
     )
 
 
 def test_get_changelog_entries_from_ldap():
+    mock_ldap_client = mock.Mock()
+    mock_ldap_client.result.return_value = (
+        101,
+        [
+            (
+                "foo=bar",
+                {"foo": "bar"},
+            ),
+        ],
+    )
     ldif_collection = get_changelog_entries_from_ldap(
-        ldap_connection=Mock(),
-        scope=None,
+        ldap_client=mock_ldap_client,
+        ldap=Mock(),
         current_changelog_number=12,
         latest_changelog_number=25,
     )
@@ -74,9 +99,19 @@ def test_get_changelog_entries_from_ldap():
 
 
 def test_get_changelog_entries_from_ldap_no_changes():
+    mock_ldap_client = mock.Mock()
+    mock_ldap_client.result.return_value = (
+        101,
+        [
+            (
+                "foo=bar",
+                {"foo": "bar"},
+            ),
+        ],
+    )
     ldif_collection = get_changelog_entries_from_ldap(
-        ldap_connection=Mock(),
-        scope=None,
+        ldap_client=mock_ldap_client,
+        ldap=Mock(),
         current_changelog_number=12,
         latest_changelog_number=12,
     )
@@ -89,37 +124,10 @@ def test_parse_changelog_changes(test_data_paths):
     with open(path) as f:
         ldif = f.read()
 
+    ((_, record),) = parse_ldif(file_opener=StringIO, path_or_data=ldif)
     assert (
-        parse_changelog_changes(ldif=ldif)
-        == """
-objectClass: nhsas
-objectClass: top
-nhsApproverURP: System
-nhsAsClient: K81045
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.registerpatient-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:location-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:organization-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:patient-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:practitioner-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:organization-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:practitioner-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:cancel:appointment-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:create:appointment-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:appointment-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient_appointments-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:slot-1
-nhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:update:appointment-1
-nhsDateApproved: 20240116173441
-nhsDateRequested: 20240116173439
-nhsIDCode: K81045
-nhsMHSPartyKey: R3U6M-831547
-nhsProductKey: 6255
-nhsProductName: Continuum Health GPC
-nhsProductVersion: Consumer AS
-nhsRequestorURP: uniqueidentifier=865945089569,uniqueidentifier=065150856568,uid=798965609042,ou=people, o=nhs
-uniqueIdentifier: 200000042019"""
+        parse_changelog_changes(
+            distinguished_name="changenumber=75852519,cn=changelog,o=nhs", record=record
+        )
+        == "\nobjectClass: nhsas\nobjectClass: top\nnhsApproverURP: System\nnhsAsClient: K81045\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.registerpatient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:location-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:organization-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:patient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:practitioner-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:organization-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:practitioner-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:cancel:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:create:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient_appointments-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:slot-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:update:appointment-1\nnhsDateApproved: 20240116173441\nnhsDateRequested: 20240116173439\nnhsIDCode: K81045\nnhsMHSPartyKey: R3U6M-831547\nnhsProductKey: 6255\nnhsProductName: Continuum Health GPC\nnhsProductVersion: Consumer AS\nnhsRequestorURP: uniqueidentifier=865945089569,uniqueidentifier=065150856568,uid=798965609042,ou=people, o=nhs\nuniqueIdentifier: 200000042019"
     )

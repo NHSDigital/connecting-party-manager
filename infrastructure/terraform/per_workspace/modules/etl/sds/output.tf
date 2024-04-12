@@ -13,3 +13,7 @@ output "changelog_key" {
 output "bulk_trigger_prefix" {
   value = local.bulk_trigger_prefix
 }
+
+output "notify_lambda_arn" {
+  value = module.notify.arn
+}

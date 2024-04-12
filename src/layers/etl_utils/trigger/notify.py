@@ -18,10 +18,12 @@ def notify(
     response = lambda_client.invoke(
         FunctionName=function_name,
         Payload=json.dumps(
-            {
-                "message": f"{status} '{trigger_type}' trigger of state machine.",
-                "error_message": error_message,
-            }
+            [
+                {
+                    "message": f"{status} '{trigger_type}' trigger of state machine.",
+                    "error_message": error_message,
+                }
+            ]
         ).encode(),
     )
     return response["Payload"].read()

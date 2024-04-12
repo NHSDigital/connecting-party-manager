@@ -1,3 +1,6 @@
+
+
+
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
@@ -17,16 +20,12 @@ module "lambda_function" {
   create_current_version_allowed_triggers = false
   allowed_triggers                        = var.allowed_triggers
 
-  environment_variables = {
+  environment_variables = merge({
     STATE_MACHINE_ARN = var.state_machine_arn
     NOTIFY_LAMBDA_ARN = var.notify_lambda_arn
-    TABLE_NAME        = var.table_name
-    # prepend '/opt/python' (the root path of the layer) to LD_LIBRARY_PATH so that
-    # all compiled dependencies can find each other. Note: this is a hack - and
-    # may result in version mismatches between system libs on the lambda. The stable
-    # alternative is to run or deploy the service from a container.
-    LD_LIBRARY_PATH = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
-  }
+    },
+    var.environment_variables
+  )
 
   create_package         = false
   local_existing_package = "${path.root}/../../../src/etl/sds/trigger/${var.trigger_name}/dist/${var.trigger_name}.zip"
@@ -36,6 +35,9 @@ module "lambda_function" {
   }
 
   layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn, var.sds_layer_arn]
+
+  vpc_subnet_ids         = var.vpc_subnet_ids
+  vpc_security_group_ids = var.vpc_security_group_ids
 
   trusted_entities = [
     {
@@ -47,59 +49,57 @@ module "lambda_function" {
   ]
 
   attach_policy_json = true
-  policy_json        = <<-EOT
+  policy_json = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : concat([
       {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Action": [
-                    "s3:PutObject",
-                    "s3:AbortMultipartUpload",
-                    "s3:GetBucketLocation",
-                    "s3:GetObject",
-                    "s3:ListBucket",
-                    "s3:ListBucketMultipartUploads",
-                    "s3:PutObjectVersionTagging"
-                ],
-                "Effect": "Allow",
-                "Resource": ["${var.etl_bucket_arn}", "${var.etl_bucket_arn}/*"]
-            },
-            {
-                "Action": [
-                    "s3:DeleteObject"
-                ],
-                "Effect": "Allow",
-                "Resource": ["${var.etl_bucket_arn}/bulk-trigger/*ldif"]
-            },
-            {
-                "Action": [
-                    "lambda:InvokeFunction"
-                ],
-                "Effect": "Allow",
-                "Resource": ["${var.notify_lambda_arn}"]
-            },
-            {
-                "Action": [
-                    "dynamodb:Scan"
-                ],
-                "Effect": "Allow",
-                "Resource": ["${var.table_arn}"]
-            },
-            {
-                "Action": [
-                    "kms:Decrypt"
-                ],
-                "Effect": "Allow",
-                "Resource": ["*"]
-            },
-            {
-                "Action": [
-                    "states:StartExecution"
-                ],
-                "Effect": "Allow",
-                "Resource": ["${var.state_machine_arn}"]
-            }
-        ]
-      }
-    EOT
+        "Action" : [
+          "s3:PutObject",
+          "s3:AbortMultipartUpload",
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:PutObjectVersionTagging"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["${var.etl_bucket_arn}", "${var.etl_bucket_arn}/*"]
+      },
+      {
+        "Action" : [
+          "s3:DeleteObject"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["${var.etl_bucket_arn}/bulk-trigger/*ldif"]
+      },
+      {
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["${var.notify_lambda_arn}"]
+      },
+      {
+        "Action" : [
+          "dynamodb:Scan"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["${var.table_arn}"]
+      },
+      {
+        "Action" : [
+          "kms:Decrypt"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["*"]
+      },
+      {
+        "Action" : [
+          "states:StartExecution"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["${var.state_machine_arn}"]
+      },
+    ], var.extra_policies)
+  })
 }

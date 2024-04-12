@@ -1,18 +1,26 @@
 import boto3
 from aws_lambda_powertools.utilities.data_classes import S3Event, event_source
 from etl_utils.trigger.logger import log_action
-from etl_utils.trigger.model import StateMachineInputType, TriggerEnvironment
+from etl_utils.trigger.model import StateMachineInputType
 from etl_utils.trigger.notify import notify
 from event.aws.client import dynamodb_client
+from event.environment import BaseEnvironment
 from event.step_chain import StepChain
 
 from .steps import steps
+
+
+class BulkTriggerEnvironment(BaseEnvironment):
+    STATE_MACHINE_ARN: str
+    NOTIFY_LAMBDA_ARN: str
+    TABLE_NAME: str
+
 
 S3_CLIENT = boto3.client("s3")
 DYNAMODB_CLIENT = dynamodb_client()
 STEP_FUNCTIONS_CLIENT = boto3.client("stepfunctions")
 LAMBDA_CLIENT = boto3.client("lambda")
-ENVIRONMENT = TriggerEnvironment.build()
+ENVIRONMENT = BulkTriggerEnvironment.build()
 
 CACHE = {
     "s3_client": S3_CLIENT,

@@ -4,6 +4,7 @@ Run with
     poetry run python scripts/etl/clear_state_inputs.py
 """
 
+import os
 from collections import deque
 
 import boto3
@@ -33,6 +34,11 @@ def main():
             Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA
         )
         s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
+
+        if os.environ.get("SET_CHANGELOG_NUMBER"):
+            s3_client.put_object(
+                Bucket=etl_bucket, Key=CHANGELOG_NUMBER, Body=EXPECTED_CHANGELOG_NUMBER
+            )
 
 
 if __name__ == "__main__":

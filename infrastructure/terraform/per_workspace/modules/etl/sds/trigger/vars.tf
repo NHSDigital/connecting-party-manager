@@ -1,3 +1,4 @@
+
 variable "workspace_prefix" {
   type = string
 }
@@ -42,16 +43,24 @@ variable "sds_layer_arn" {
   type = string
 }
 
-variable "assume_account" {
-  type = string
-}
 
 variable "allowed_triggers" {
 }
 
-variable "table_name" {
-
-}
 variable "table_arn" {
 
+}
+
+variable "vpc_subnet_ids" {
+  default = null
+}
+
+variable "vpc_security_group_ids" {
+  default = null
+}
+variable "extra_policies" {
+  default = []
+}
+
+variable "environment_variables" {
 }
