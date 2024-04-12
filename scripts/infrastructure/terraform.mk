@@ -2,7 +2,7 @@
 
 AWS_ACCOUNT =
 TERRAFORM_WORKSPACE =
-TERRAFORM_SCOPE = "per_workspace"
+TERRAFORM_SCOPE = per_workspace
 TERRAFORM_ARGS =
 
 PREFIX =
@@ -11,7 +11,7 @@ VERSION =
 WORKSPACE_OUTPUT_JSON = $(CURDIR)/infrastructure/terraform/per_workspace/output.json
 TERRAFORM_PLAN_TIMESTAMP = $(TIMESTAMP_DIR)/tfplan.timestamp
 BUILD_TIMESTAMP = $(TIMESTAMP_DIR)/.build.timestamp
-TERRAFORM_FILES = $(shell find infrastructure/terraform -type f -name "*.tf*") $(shell find infrastructure/terraform -type f -name "*.asl.json")
+TERRAFORM_FILES = $(shell find infrastructure/terraform/per_workspace -type f -name "*.tf*") $(shell find infrastructure/terraform -type f -name "*.asl.json")
 
 terraform--clean:
 	[[ -f $(TERRAFORM_PLAN_TIMESTAMP) ]] && rm $(TERRAFORM_PLAN_TIMESTAMP) || :
@@ -19,7 +19,7 @@ terraform--clean:
 	$(MAKE) _terraform--clean
 terraform--validate: _terraform--validate ## Run terraform validate
 terraform--init: _terraform--init ## Run terraform init
-terraform--plan: $(TERRAFORM_PLAN_TIMESTAMP)  ## Run terraform plan
+terraform--plan: $(TERRAFORM_PLAN_TIMESTAMP)--$(TERRAFORM_SCOPE)  ## Run terraform plan
 terraform--apply: $(WORKSPACE_OUTPUT_JSON) ## Run terraform apply
 terraform--apply--force: terraform--clean terraform--apply ## Run terraform apply
 terraform--destroy: _terraform--destroy ## Run terraform destroy
@@ -38,10 +38,13 @@ _terraform--%: aws--login
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
 	bash $(PATH_TO_INFRASTRUCTURE)/terraform/terraform-commands.sh $* "${AWS_ACCOUNT}" "$(TERRAFORM_WORKSPACE)" "$(TERRAFORM_SCOPE)" "$(TERRAFORM_ARGS)"
 
-$(TERRAFORM_PLAN_TIMESTAMP): $(BUILD_TIMESTAMP) $(TERRAFORM_FILES)
+$(TERRAFORM_PLAN_TIMESTAMP)--per_workspace: $(BUILD_TIMESTAMP) $(TERRAFORM_FILES)
 	$(MAKE) _terraform--plan
-	touch $(TERRAFORM_PLAN_TIMESTAMP)
+	touch $(TERRAFORM_PLAN_TIMESTAMP)--per_workspace
 
+$(TERRAFORM_PLAN_TIMESTAMP)--%: $(TOOL_VERSIONS_COPY)
+	$(MAKE) _terraform--plan
+	bash $(PATH_TO_INFRASTRUCTURE)/terraform/touch.sh $(TERRAFORM_PLAN_TIMESTAMP)--$*
 
-$(WORKSPACE_OUTPUT_JSON): $(TERRAFORM_PLAN_TIMESTAMP)
+$(WORKSPACE_OUTPUT_JSON): $(TERRAFORM_PLAN_TIMESTAMP)--$(TERRAFORM_SCOPE)
 	$(MAKE) _terraform--apply

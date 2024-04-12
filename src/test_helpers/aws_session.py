@@ -34,7 +34,7 @@ def _get_access_token(account_id: str = None):
 
 @cache
 def aws_session_env_vars() -> boto3.Session:
-    env = read_terraform_output("environment.value")
+    env = os.environ.get("ACCOUNT") or read_terraform_output("environment.value")
     account_id = _aws_account_id_from_secret(env=env)
     access_key_id, secret_access_key, session_token = _get_access_token(
         account_id=account_id

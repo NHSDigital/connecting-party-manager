@@ -54,10 +54,10 @@ resource "aws_route53_record" "dev_zone" {
   zone_id = module.zones.route53_zone_zone_id["cpm.dev.national.nhs.uk"]
   name    = "api.cpm.dev.national.nhs.uk"
   records = [
-    "ns-81.awsdns-10.com.",
-    "ns-1238.awsdns-26.org.",
-    "ns-776.awsdns-33.net.",
-    "ns-1540.awsdns-00.co.uk."
+    "ns-821.awsdns-38.net.",
+    "ns-1945.awsdns-51.co.uk.",
+    "ns-366.awsdns-45.com.",
+    "ns-1311.awsdns-35.org.",
   ]
   ttl  = 300
   type = "NS"
