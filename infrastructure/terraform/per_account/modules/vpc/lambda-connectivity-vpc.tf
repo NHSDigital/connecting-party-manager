@@ -1,7 +1,7 @@
 data "aws_availability_zones" "available" {}
 
-data "aws_secretsmanager_secret_version" "sds-ldap-endpoint" {
-  secret_id = "${terraform.workspace}-sds-ldap-endpoint"
+data "aws_secretsmanager_secret_version" "sds-hscn-endpoint" {
+  secret_id = "${terraform.workspace}-sds-hscn-endpoint"
 }
 
 #------------------------------------------------------------------------------
@@ -115,26 +115,26 @@ resource "aws_vpc_endpoint_route_table_association" "s3" {
   route_table_id  = aws_route_table.private.id
 }
 
-resource "aws_vpc_endpoint" "ldap_endpoint" {
+resource "aws_vpc_endpoint" "hscn_endpoint" {
   vpc_id              = aws_vpc.lambda-connectivity.id
   vpc_endpoint_type   = "Interface"
-  service_name        = data.aws_secretsmanager_secret_version.sds-ldap-endpoint.secret_string
+  service_name        = data.aws_secretsmanager_secret_version.sds-hscn-endpoint.secret_string
   private_dns_enabled = true
 
   tags = {
-    Name        = "${var.prefix}-ldap-vpc-endpoint-${var.environment}"
+    Name        = "${var.prefix}-hscn-vpc-endpoint-${var.environment}"
     Environment = var.environment
   }
 }
 
-resource "aws_vpc_endpoint_subnet_association" "ldap_endpoint" {
+resource "aws_vpc_endpoint_subnet_association" "hscn_endpoint" {
   count           = var.subnet_count.private
-  vpc_endpoint_id = aws_vpc_endpoint.ldap_endpoint.id
+  vpc_endpoint_id = aws_vpc_endpoint.hscn_endpoint.id
   subnet_id       = element(aws_subnet.lambda-connectivity-private, count.index).id
 }
 
-resource "aws_vpc_endpoint_security_group_association" "ldap_endpoint" {
-  vpc_endpoint_id   = aws_vpc_endpoint.ldap_endpoint.id
+resource "aws_vpc_endpoint_security_group_association" "hscn_endpoint" {
+  vpc_endpoint_id   = aws_vpc_endpoint.hscn_endpoint.id
   security_group_id = aws_security_group.sds-ldap.id
 }
 
