@@ -31,9 +31,20 @@ function get_workspace_name(){
     jq -r '.workspace.value' ${WORKSPACE_OUTPUT_JSON}
 }
 
+function get_aws_environment(){
+    jq -r '.environment.value' ${WORKSPACE_OUTPUT_JSON}
+}
+
 function get_apigee_environment(){
     workspace_name=${1}
-    apigee_environment=$(yq ".${workspace_name}" ${ENVIRONMENT_MAPPING_YAML})
+    aws_environment=${2}
+
+    _scoped_environment=${aws_environment}
+    if [[ ${workspace_name} == "${aws_environment}-sandbox" ]]; then
+        _scoped_environment=${workspace_name}
+    fi
+
+    apigee_environment=$(yq ".${_scoped_environment}" ${ENVIRONMENT_MAPPING_YAML})
     if [[ ${apigee_environment} == "null" ]]; then
         # Default to internal-dev if not named in ${ENVIRONMENT_MAPPING_YAML}
         echo "internal-dev"
@@ -55,13 +66,15 @@ function get_apigee_stage(){
 
 function generate_proxy(){
     _workspace_name=$(get_workspace_name)
-    _apigee_environment=$(get_apigee_environment ${_workspace_name})
+    _aws_environment=$(get_aws_environment)
+    _apigee_environment=$(get_apigee_environment ${_workspace_name} ${_aws_environment})
     _apigee_stage=$(get_apigee_stage ${_workspace_name})
 
         echo "
     Apigeeing
     -------------------- ----------------------------------------
     workspace_name        ${_workspace_name}
+    aws_environment       ${_aws_environment}
     apigee_environment    ${_apigee_environment}
     apigee_stage          ${_apigee_stage}
 "
