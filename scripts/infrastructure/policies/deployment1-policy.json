@@ -130,7 +130,8 @@
         "route53:ChangeTagsForResource",
         "route53:ListHostedZones",
         "route53:ChangeResourceRecordSets",
-        "route53:ListResourceRecordSets"
+        "route53:ListResourceRecordSets",
+        "route53:AssociateVPCWithHostedZone"
       ],
       "Resource": ["*"]
     },
