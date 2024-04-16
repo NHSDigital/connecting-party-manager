@@ -142,7 +142,7 @@ Feature: Create Product Team - failure scenarios
       | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
       | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
       | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | string does not match regex "^([a-zA-Z0-9]{1,6})$"                  |
+      | issue.0.diagnostics              | string does not match regex "^([a-zA-Z0-9]{1,9})$"                  |
       | issue.0.expression.0             | Organization.partOf.identifier.value                                |
     And the response headers contain:
       | name           | value            |

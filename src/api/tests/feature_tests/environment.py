@@ -35,20 +35,20 @@ def before_all(context: Context):
     context.headers = {}
     context.workspace = ""
     context.workspace_type = ""
+    context.environment = ""
 
     if context.test_mode is TestMode.INTEGRATION:
         context.table_name = read_terraform_output("dynamodb_table_name.value")
         context.base_url = read_terraform_output("certificate_domain_name.value") + "/"
         context.workspace_type = read_terraform_output("workspace_type.value")
         context.workspace = read_terraform_output("workspace.value")
+        context.environment = read_terraform_output("environment.value")
         context.session = aws_session
 
         with context.session():
             client = secretsmanager_client()
-            if context.workspace_type == "LOCAL":
-                secret_name = "dev-apigee-cpm-apikey"  # pragma: allowlist secret
-            elif context.workspace_type == "CI":
-                secret_name = "ref-apigee-cpm-apikey"  # pragma: allowlist secret
+            if context.workspace_type in {"LOCAL", "CI"}:
+                secret_name = f"{context.environment}-apigee-cpm-apikey"  # pragma: allowlist secret
             else:
                 secret_name = (
                     f"{context.workspace}-apigee-cpm-apikey"  # pragma: allowlist secret

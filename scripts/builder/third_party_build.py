@@ -62,6 +62,8 @@ def docker_run(docker_file: Path, root_dir: Path, group: str):
         image_name,
         "--build-arg",
         f"PYTHON_VERSION={python_version}",
+        "--platform",
+        "linux/x86_64",
         _cwd=root_dir,
     )
     sh.docker(

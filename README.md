@@ -41,13 +41,24 @@ Do `make build` every time you would like to pick up and install new local/proje
 
 The first time it will also set up your pre-commit hooks.
 
-### Proxygen - WIP
+### Proxygen
 
-If you wish to deploy proxies to Apigee then we use the proxygen-cli which is installed as part of the project
+We use [Proxygen](https://github.com/NHSDigital/proxygen-cli) to deploy our proxies and specs to APIM which we have wrapped up into a make command:
 
-There is also some credential setup that is required, at this stage we do not have a standard set of "dev" credentials but when we do then this section will be completed - for now here is the link to the README for the cli
+- `make apigee-deploy`
 
-https://github.com/NHSDigital/proxygen-cli
+This when run locally will need you to have done a local `terraform--plan` and `terraform--apply` (as it will read some details from the output files)
+
+Caveats
+
+- At present we have one set of credentials that we use across PTL and PROD (so that the name of the api remains constant)
+- We are temporarily using the apikey method of authentication, which requires the deployment of a key that is used in the swagger - example below:
+  - `proxygen secret put sandbox cpm-1 --apikey --secret-value=iamsecret`
+  - We plan on replacing this with MTLS as soon as we can
+
+#### Temporary Proxies
+
+To avoid us having too many proxies deployed that we fail to manage, for anything that isnt a Persistent Environment or equivalent sandbox (dev, dev-sandbox) - then the Proxy will be tagged as `temporary`. This means that it will be deleted after a period of time determined by APIM and the code can be found in the swagger generation files under the `x-nhsd-apim` header
 
 ### AWS SSO Setup
 
@@ -88,7 +99,7 @@ export AWS_PROFILE=<profile>
 
 This is the preferred method of switching between profiles, as it will cause the profile name to appear in your BASH prompt.
 
-### Build a local workspace on AWS
+### Build a local workspace on AWS (DEV)
 
 You can build a working copy of the CPM service in your own workspace within the `dev` environment. To do this follow these steps. (You must have SSO setup on your system and have MGMT admin access)
 
@@ -100,6 +111,16 @@ make terraform--plan TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Wi
 make terraform--apply TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>"
 ```
 
+### Build a local workspace on AWS (QA)
+
+For testing purposes we have another command to allow testers to deploy to QA (to avoid the often change heavy dev) - very similar to the above except the command hard codes the QA environment behind the scenes.
+
+```shell
+make terraform--init TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
+make terraform--plan--qa TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to build the project first
+make terraform--apply--qa TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>"
+```
+
 ### Destroy a local workspace on AWS
 
 Destroy the local workspace and it's corresponding state file on mgmt
@@ -108,7 +129,30 @@ Destroy the local workspace and it's corresponding state file on mgmt
 make terraform--destroy TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
 ```
 
+### Automated workspace destroys
+
+We have some automated behaviour for destroying our workspaces - we build off a new commit each time we deploy and there are times where we forget to destroy old workspaces or have CI workspaces be removed. So we have two processes:
+
+#### Destroy Expired Workspaces
+
+- This is run on a cron job as a github workflow every evening and scans the workspaces in dev (local deployments) and ref (CI deployments)
+- Each deployment is deployed with a resource group that has an expiration date on it, the workspace is destroyed if its past that date
+- Each deploy or change within a workspace extends the expiration date
+- Can be run adhoc by using the command: `make destroy--expired TERRAFORM_WORKSPACE="dev"`
+
+#### Destroy Redundant Workspaces
+
+- This is part of the Pull Request github workflow and checks to destroy previous commits on the same workspace leaving only the latest
+- When you run locally you can override this with the `KILL_ALL` flag which destroys the current commit too
+- Can be run adhoc with the command: `make destroy--redundant-workspaces BRANCH_NAME=mybranch DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false`
+
 ## Updating Roles
+
+We have several roles that we currently handle outside of terraform as its needed to deploy the terraform:
+
+- NHSDeploymentRole
+- NHSDevelopmentRole
+- NHSTestCIRole
 
 To update any of the roles used for SSO then you need to do the following command which should prompt you to log in via SSO:
 

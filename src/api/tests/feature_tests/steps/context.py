@@ -21,6 +21,7 @@ class Context(BehaveContext):
     session: ContextManager = None
     dynamodb_client: DynamoDBClient = None
     workspace: str = None
+    environment: str = None
     workspace_type: str = None
     apikey: str = None
 

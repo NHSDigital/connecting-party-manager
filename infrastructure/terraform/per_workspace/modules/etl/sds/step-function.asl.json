@@ -1,6 +1,6 @@
 {
   "Comment": "SDS ETL",
-  "TimeoutSeconds": 3600,
+  "TimeoutSeconds": 5400,
   "StartAt": "root",
   "States": {
     "root": {
@@ -208,7 +208,21 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "success"
+      "Next": "parse-status"
+    },
+    "parse-status": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$",
+          "StringEquals": "fail",
+          "Next": "fail"
+        }
+      ],
+      "Default": "success"
+    },
+    "fail": {
+      "Type": "Fail"
     },
     "success": {
       "Type": "Succeed"
