@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-04-16
+- [PI-311] Smoke tests
+- [PI-213] Connect to LDAP
+- [PI-222] Connect to LDAP via VPC endpoint
+
 ## 2024-04-10
 - [PI-307] Deploy user workspaces to qa environment
 - [PI-292] Prod bulk data (SDS ETL)
