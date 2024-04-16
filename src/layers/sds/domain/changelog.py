@@ -6,6 +6,10 @@ from sds.domain.base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
 from sds.domain.constants import ChangelogCommonName, ChangeType, OrganizationalUnitNhs
 
 
+class InconsistentChangelogNumber(Exception):
+    pass
+
+
 class ChangelogDistinguishedName(BaseModel):
     change_number: str = Field(alias="changenumber")
     common_name: ChangelogCommonName = Field(alias="cn")
@@ -36,5 +40,8 @@ class ChangelogRecord(SdsBaseModel):
         if dn is None:
             return change_number
         if change_number != dn.change_number:
-            raise ValueError(change_number)
+            raise InconsistentChangelogNumber(
+                f"change number '{change_number}' is not consistent "
+                f"with DN change number '{dn.change_number}'"
+            )
         return change_number

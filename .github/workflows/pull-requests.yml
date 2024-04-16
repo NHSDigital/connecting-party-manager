@@ -112,25 +112,8 @@ jobs:
         with:
           command: test--feature--local
 
-  helpers--truststore-pull:
-    runs-on: [self-hosted, ci]
-    needs: [workflow--check--branch-name]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH_NAME }}
-      - uses: ./.github/actions/make/
-        with:
-          command: helpers--truststore-pull WORKSPACE=ref
-
   terraform-base-build:
-    needs:
-      [
-        create-workspace-name,
-        build-base,
-        helpers--truststore-pull,
-        parse-secrets,
-      ]
+    needs: [create-workspace-name, build-base, parse-secrets]
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v4
@@ -157,7 +140,6 @@ jobs:
         workflow--codebase-checks,
         test--unit,
         test--feature--local,
-        helpers--truststore-pull,
         parse-secrets,
         terraform-base-build,
       ]
@@ -231,6 +213,26 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: test--feature--integration
+          requires-aws: true
+
+  test--smoke:
+    needs:
+      [
+        build-head,
+        workflow--codebase-checks,
+        test--unit,
+        test--feature--local,
+        terraform-head-build,
+        apigee--deploy,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: test--smoke
           requires-aws: true
 
   destroy-redundant-workspaces:

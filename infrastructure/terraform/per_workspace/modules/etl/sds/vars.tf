@@ -12,3 +12,7 @@ variable "changelog_key" {
 variable "table_name" {}
 variable "table_arn" {}
 variable "is_persistent" {}
+variable "truststore_bucket" {}
+variable "environment" {
+
+}

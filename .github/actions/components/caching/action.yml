@@ -18,21 +18,13 @@ inputs:
     default: |
       .venv
       .timestamp
-      **/.terraform
-      **/dist/*zip
-      **/tfplan
-      **/swagger.yaml
-      **/infrastructure/terraform/**/output.json
       .downloads
-      **/fhir/r4/*models.py
       .tool-versions
       pyproject.toml
       poetry.lock
-      **/make.py
-      **/infrastructure/swagger/*.yaml
-      **/infrastructure/swagger/**/*.yaml
-      **/fhir-base/*json
-      **/.proxygen/*
+      src
+      infrastructure
+      !**/.terraform/modules/**/*
 
 runs:
   using: "composite"
@@ -49,6 +41,11 @@ runs:
         key: "dummy"
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
+
+    # # For debugging, uncomment the following:
+    # - id: tree
+    #   shell: bash
+    #   run: tree -D -I '__pycache__|.git|.venv|.hypothesis|.pytest_cache'
 
     - if: ${{ inputs.save-or-restore == 'save' }}
       id: save-cache

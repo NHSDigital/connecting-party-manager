@@ -281,7 +281,6 @@ module "trigger_bulk" {
 
   trigger_name          = "bulk"
   etl_name              = local.etl_name
-  assume_account        = var.assume_account
   workspace_prefix      = var.workspace_prefix
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
@@ -292,7 +291,9 @@ module "trigger_bulk" {
   notify_lambda_arn     = module.notify.arn
   state_machine_arn     = module.step_function.state_machine_arn
   table_arn             = var.table_arn
-  table_name            = var.table_name
+  environment_variables = {
+    TABLE_NAME = var.table_name
+  }
   allowed_triggers = {
     "${replace(var.workspace_prefix, "_", "-")}--AllowExecutionFromS3--${local.etl_name}--bulk" = {
       service    = "s3"
@@ -301,12 +302,29 @@ module "trigger_bulk" {
   }
 }
 
+data "aws_subnets" "lambda-connectivity-private" {
+  filter {
+    name   = "tag:Name"
+    values = ["${local.project}-lambda-connectivity-private-${var.environment}"]
+  }
+}
+
+data "aws_security_groups" "sds-ldap" {
+  filter {
+    name   = "tag:Name"
+    values = ["${local.project}-sds-ldap-${var.environment}"]
+  }
+}
+
+data "aws_secretsmanager_secret_version" "ldap_host" {
+  secret_id = "${var.environment}-ldap-host"
+}
+
 module "trigger_update" {
   source = "./trigger/"
 
   trigger_name          = "update"
   etl_name              = local.etl_name
-  assume_account        = var.assume_account
   workspace_prefix      = var.workspace_prefix
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
@@ -317,9 +335,57 @@ module "trigger_update" {
   notify_lambda_arn     = module.notify.arn
   state_machine_arn     = module.step_function.state_machine_arn
   table_arn             = var.table_arn
-  table_name            = var.table_name
-  allowed_triggers = {
+  allowed_triggers      = {}
+  environment_variables = {
+    # prepend '/opt/python' (the root path of the layer) to LD_LIBRARY_PATH so that
+    # all compiled dependencies can find each other. Note: this is a hack - and
+    # may result in version mismatches between system libs on the lambda. The stable
+    # alternative is to run or deploy the service from a container.
+    LD_LIBRARY_PATH   = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+    TRUSTSTORE_BUCKET = var.truststore_bucket.id
+    CPM_FQDN          = "cpm.thirdparty.nhs.uk"
+    LDAP_HOST         = data.aws_secretsmanager_secret_version.ldap_host.secret_string
+    ETL_BUCKET        = module.bucket.s3_bucket_id
   }
+
+  vpc_subnet_ids         = data.aws_subnets.lambda-connectivity-private.ids
+  vpc_security_group_ids = data.aws_security_groups.sds-ldap.ids
+  extra_policies = [
+    {
+      "Action" : [
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface"
+      ],
+      "Effect" : "Allow",
+      "Resource" : concat(
+        data.aws_security_groups.sds-ldap.arns
+      )
+    },
+    {
+      "Sid" : "AWSLambdaVPCAccessExecutionPermissions",
+      "Effect" : "Allow",
+      "Action" : [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSubnets",
+        "ec2:DeleteNetworkInterface",
+        "ec2:AssignPrivateIpAddresses",
+        "ec2:UnassignPrivateIpAddresses"
+      ],
+      "Resource" : "*"
+    },
+    {
+      "Action" : [
+        "s3:GetObject"
+      ],
+      "Effect" : "Allow",
+      "Resource" : ["${var.truststore_bucket.arn}/*"]
+    }
+  ]
 }
 
 module "schedule_trigger_update" {

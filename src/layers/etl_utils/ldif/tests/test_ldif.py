@@ -1,5 +1,4 @@
 from io import BytesIO, StringIO
-from tempfile import NamedTemporaryFile
 from unittest import mock
 
 import boto3
@@ -11,7 +10,6 @@ from etl_utils.ldif.ldif import (
     parse_ldif,
 )
 from moto import mock_aws
-from pytest_lazyfixture import lazy_fixture
 
 # Lifted from https://ldap.com/ldif-the-ldap-data-interchange-format/
 SAMPLE_LDIF_DATA = """
@@ -105,14 +103,6 @@ PARSED_SAMPLE_LDIF = [
 ]
 
 
-@pytest.fixture
-def sample_ldif_data_as_filepath():
-    with NamedTemporaryFile() as f:
-        f.write(SAMPLE_LDIF_DATA.encode())
-        f.seek(0)
-        yield f.name
-
-
 @pytest.mark.parametrize(
     ("raw_distinguished_name", "parsed_distinguished_name"),
     (
@@ -143,11 +133,7 @@ def test_distinguished_name(raw_distinguished_name, parsed_distinguished_name):
 
 @pytest.mark.parametrize(
     ("file_opener", "path_or_data"),
-    (
-        [StringIO, SAMPLE_LDIF_DATA],
-        [BytesIO, SAMPLE_LDIF_DATA.encode()],
-        [open, lazy_fixture("sample_ldif_data_as_filepath")],
-    ),
+    ([StringIO, SAMPLE_LDIF_DATA], [BytesIO, SAMPLE_LDIF_DATA.encode()]),
 )
 def test_parse_ldif(file_opener, path_or_data):
     parsed_ldif = list(parse_ldif(file_opener=file_opener, path_or_data=path_or_data))

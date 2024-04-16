@@ -18,4 +18,5 @@ if _validate_current_account "MGMT"; then
 fi
 
 ./scripts/infrastructure/roles/manage-non-mgmt-aws-roles.sh
-./scripts/infrastructure/roles/manage-non-mgmt-aws-policies.sh
+./scripts/infrastructure/roles/manage-non-mgmt-aws-deployment-policies.sh
+./scripts/infrastructure/roles/manage-non-mgmt-aws-support-integration-policies.sh
