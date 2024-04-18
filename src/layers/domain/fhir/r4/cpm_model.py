@@ -36,6 +36,11 @@ class ProductTeamIdentifier(BaseModel):
         return {"system": self.system, "value": str(self.value)}
 
 
+# class Link(BaseModel):
+#     relation: str
+#     url: str
+
+
 class OdsIdentifier(BaseModel):
     system: str = ConstStrField(ODS_API_BASE)
     value: str = Field(regex=ODS_CODE_REGEX)
@@ -117,3 +122,20 @@ class Device(BaseModel):
             if count > 1:
                 raise ValueError("It is forbidden to supply a product_id")
         return identifier
+
+
+class Bundle(BaseModel):
+    resourceType: Literal["Bundle"]
+    id: UUID
+    total: str
+    # link: [Link]
+
+
+class CollectionBundle(Bundle):
+    type: str = ConstStrField("collection")
+    entry: list[Device]
+
+
+class SearchsetBundle(Bundle):
+    type: str = ConstStrField("searchset")
+    entry: list[CollectionBundle]

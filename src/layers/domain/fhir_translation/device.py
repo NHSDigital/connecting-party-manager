@@ -1,16 +1,20 @@
+from typing import List
+from uuid import UUID
+
 from domain.core.device import Device as DomainDevice
 from domain.core.product_team import ProductTeam
 from domain.fhir.r4 import Device as FhirDevice
 from domain.fhir.r4 import StrictDevice as StrictFhirDevice
-from domain.fhir.r4.cpm_model import SYSTEM
+from domain.fhir.r4.cpm_model import SYSTEM, CollectionBundle  # Link,
 from domain.fhir.r4.cpm_model import Device as CpmFhirDevice
-from domain.fhir.r4.cpm_model import (
+from domain.fhir.r4.cpm_model import (  # Link,
     DeviceDefinitionIdentifier,
     DeviceDefinitionReference,
     DeviceIdentifier,
     DeviceName,
     DeviceOwnerReference,
     ProductTeamIdentifier,
+    SearchsetBundle,
 )
 from domain.fhir_translation.parse import create_fhir_model_from_fhir_json
 from domain.response.validation_errors import mark_validation_errors_as_inbound
@@ -53,4 +57,26 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
         owner=DeviceOwnerReference(
             identifier=ProductTeamIdentifier(value=device.product_team_id)
         ),
+    )
+
+
+def create_fhir_model_from_devices(devices: List[DomainDevice]) -> SearchsetBundle:
+    return SearchsetBundle(
+        resourceType="Bundle",
+        id=UUID,
+        total="1",
+        # link=[
+        #     Link(relation="self", url="https://cpm.co.uk/Device?device_type=product")
+        # ],
+        entry=[
+            CollectionBundle(
+                resourceType="Bundle",
+                id=UUID,
+                total=str(len(devices)),
+                # link=[
+                #     Link(relation="self", url="https://cpm.co.uk/Device/2938472398476")
+                # ],
+                entry=devices,
+            )
+        ],
     )
