@@ -88,10 +88,6 @@ class Organization(BaseModel):
     partOf: OdsReference
 
 
-class QuestionnaireResponse(BaseModel):
-    resourceType: Literal["QuestionnaireResponse"]
-
-
 class Device(BaseModel):
     resourceType: Literal["Device"]
     deviceName: list[DeviceName] = Field(min_items=1, max_items=1)
@@ -126,6 +122,21 @@ class Device(BaseModel):
             if count > 1:
                 raise ValueError("It is forbidden to supply a product_id")
         return identifier
+
+
+class Answer(BaseModel):
+    valueString: str
+
+
+class QuestionAndAnswer(BaseModel):
+    link_id: str
+    text: str
+    answer: list[Answer]
+
+
+class QuestionnaireResponse(BaseModel):
+    resourceType: Literal["QuestionnaireResponse"]
+    item: list[QuestionAndAnswer] = Field(min_items=0)
 
 
 class Bundle(BaseModel):

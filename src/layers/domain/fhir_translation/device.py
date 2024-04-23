@@ -5,7 +5,7 @@ from domain.core.device import Device as DomainDevice
 from domain.core.product_team import ProductTeam
 from domain.fhir.r4 import Device as FhirDevice
 from domain.fhir.r4 import StrictDevice as StrictFhirDevice
-from domain.fhir.r4.cpm_model import SYSTEM, CollectionBundle
+from domain.fhir.r4.cpm_model import SYSTEM, Answer, CollectionBundle
 from domain.fhir.r4.cpm_model import Device as CpmFhirDevice
 from domain.fhir.r4.cpm_model import (
     DeviceDefinitionIdentifier,
@@ -15,6 +15,7 @@ from domain.fhir.r4.cpm_model import (
     DeviceOwnerReference,
     Link,
     ProductTeamIdentifier,
+    QuestionAndAnswer,
 )
 from domain.fhir.r4.cpm_model import (
     QuestionnaireResponse as CpmFhirQuestionnaireResponse,
@@ -67,8 +68,30 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
 def create_fhir_model_from_questionnaire_response(
     device: DomainDevice,
 ) -> CpmFhirQuestionnaireResponse:
+    items = []
+    for identifier, responses in device.questionnaire_responses.items():
+        for questionnaire_response in responses:
+            for ques_res in questionnaire_response.responses:
+                for question, answers in ques_res.items():
+                    answer_objects = [Answer(valueString=answer) for answer in answers]
+                    question_and_answer = QuestionAndAnswer(
+                        link_id=question, text=question, answer=answer_objects
+                    )
+                    items.append(question_and_answer)
+
     return CpmFhirQuestionnaireResponse(
         resourceType=CpmFhirQuestionnaireResponse.__name__,
+        # identifier="010057927542",
+        # questionnaire="https://cpm.co.uk/Questionnaire/spine_device|v1",
+        # "status": "completed",
+        # "subject": {
+        #     "reference": "https://cpm.co.uk/Device/39ae1fe2-dd84-4d9a-af2a-ca0e63f53cae"
+        # },
+        # "authored": "<dateTime>",
+        # "author": {
+        #     "reference": "https://cpm.co.uk/Organization/ae2ab026-0b53-7e7c-7a65-f0407a6e75f5"
+        # },
+        item=items,
     )
 
 
