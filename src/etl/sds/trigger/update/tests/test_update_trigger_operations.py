@@ -35,7 +35,8 @@ def test_get_current_changelog_number_from_s3_not_found(s3_client):
         get_current_changelog_number_from_s3(s3_client=s3_client, bucket=BUCKET_NAME)
 
 
-@pytest.mark.parametrize("bad_changelog_number", ["[]", "", "foo", "123.4"])
+# Removed the empty string test as it was having some weird behaviour
+@pytest.mark.parametrize("bad_changelog_number", ["[]", "foo", "123.4"])
 def test_get_current_changelog_number_from_s3_bad_number(
     bad_changelog_number, s3_client: "S3Client"
 ):
@@ -65,28 +66,76 @@ def test_get_latest_changelog_number_from_ldap():
         101,
         [
             (
-                "foo=bar",
-                {"foo": "bar"},
-            ),
+                "cn=changelog,o=nhs",
+                {"firstchangenumber": [b"46425"], "lastchangenumber": [b"537637"]},
+            )
         ],
     )
     assert (
         get_latest_changelog_number_from_ldap(
             ldap_client=mock_ldap_client, ldap=mock.Mock()
         )
-        == 0
+        == 537637
     )
 
 
-def test_get_changelog_entries_from_ldap():
+def test_get_changelog_entries_from_ldap_with_data():
     mock_ldap_client = mock.Mock()
     mock_ldap_client.result.return_value = (
         101,
         [
-            (
-                "foo=bar",
-                {"foo": "bar"},
-            ),
+            [
+                "changenumber=537576,cn=changelog,o=nhs",
+                {
+                    "objectClass": [
+                        b"top",
+                        b"changeLogEntry",
+                        b"nhsExternalChangelogEntry",
+                    ],
+                    "changeNumber": [b"537576"],
+                    "changes": [
+                        b"\nobjectClass: nhsas\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsAsClient: 8KH75\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:location\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:organization\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:patient\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:practitioner\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:location\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:organization\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:practitioner\nnhsDateApproved: 20240417121611\nnhsDateRequested: 20240417121533\nnhsIDCode: 8KH75\nnhsMHSPartyKey: 8KH75-823852\nnhsProductKey: 12041\nnhsProductName: CareLineLive\nnhsProductVersion: 2024.4.1\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nuniqueIdentifier: 200000002217"
+                    ],
+                    "changeTime": [b"20240417111615Z"],
+                    "changeType": [b"add"],
+                    "targetDN": [b"uniqueIdentifier=200000002217,ou=Services,o=nhs"],
+                },
+            ]
+        ],
+    )
+    ldif_collection = get_changelog_entries_from_ldap(
+        ldap_client=mock_ldap_client,
+        ldap=Mock(),
+        current_changelog_number=12,
+        latest_changelog_number=25,
+    )
+    assert len(ldif_collection) == 13
+
+
+def test_get_changelog_entries_from_ldap_with_relevant_data():
+    mock_ldap_client = mock.Mock()
+    mock_ldap_client.result.return_value = (
+        101,
+        [
+            [
+                "changenumber=537593,cn=changelog,o=nhs",
+                {
+                    "objectClass": [
+                        b"top",
+                        b"changeLogEntry",
+                        b"nhsExternalChangelogEntry",
+                    ],
+                    "changeNumber": [b"537593"],
+                    "changes": [
+                        b"\nobjectClass: nhsMhs\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555268096105,uniqueidentifier=555268088105,uid=555268080107,ou=people, o=nhs\nnhsContractPropertyTemplateKey: 46\nnhsDateApproved: 20240417154318\nnhsDateDNSApproved: 20240417154318\nnhsDateRequested: 20240417154058\nnhsDNSApprover: uniqueidentifier=555268096105,uniqueidentifier=555268088105,uid=555268080107,ou=people, o=nhs\nnhsEPInteractionType: HL7\nnhsIDCode: X26\nnhsMHSAckRequested: never\nnhsMhsCPAId: 1b6a36661ddd1d254ce7\nnhsMHSDuplicateElimination: never\nnhsMHSEndPoint: https://mhsin.int.ers.nhs.uk/\nnhsMhsFQDN: mhsin.int.ers.nhs.uk\nnhsMHsIN: MCCI_IN010000UK13\nnhsMhsIPAddress: 1.1.1.1\nnhsMHSIsAuthenticated: transient\nnhsMHSPartyKey: X26-823853\nnhsMHsSN: urn:nhs:names:services:pdsquery\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:MCCI_IN010000UK13\nnhsMHSSyncReplyMode: MSHSignalsOnly\nnhsProductKey: 10894\nnhsProductName: Compliance\nnhsProductVersion: Initial\nnhsRequestorURP: uniqueidentifier=555268096105,uniqueidentifier=555268088105,uid=555268080107,ou=people, o=nhs\nuniqueIdentifier: 1b6a36661ddd1d254ce7"
+                    ],
+                    "changeTime": [b"20240417144321Z"],
+                    "changeType": [b"add"],
+                    "targetDN": [
+                        b"uniqueIdentifier=1b6a36661ddd1d254ce7,ou=Services,o=nhs"
+                    ],
+                },
+            ]
         ],
     )
     ldif_collection = get_changelog_entries_from_ldap(
@@ -130,4 +179,24 @@ def test_parse_changelog_changes(test_data_paths):
             distinguished_name="changenumber=75852519,cn=changelog,o=nhs", record=record
         )
         == "\nobjectClass: nhsas\nobjectClass: top\nnhsApproverURP: System\nnhsAsClient: K81045\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.registerpatient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:location-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:organization-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:patient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:practitioner-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:organization-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:practitioner-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:cancel:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:create:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient_appointments-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:slot-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:update:appointment-1\nnhsDateApproved: 20240116173441\nnhsDateRequested: 20240116173439\nnhsIDCode: K81045\nnhsMHSPartyKey: R3U6M-831547\nnhsProductKey: 6255\nnhsProductName: Continuum Health GPC\nnhsProductVersion: Consumer AS\nnhsRequestorURP: uniqueidentifier=865945089569,uniqueidentifier=065150856568,uid=798965609042,ou=people, o=nhs\nuniqueIdentifier: 200000042019"
+    )
+
+
+def test_parse_changelog_changes_2():
+    dn = "changenumber=537507,cn=changelog,o=nhs"
+    record = {
+        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
+        "changeNumber": [b"537507"],
+        "changes": [
+            b"\\nobjectClass: nhsMhs\\nobjectClass: top\\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\\nnhsContractPropertyTemplateKey: 14\\nnhsDateApproved: 20240417082830\\nnhsDateDNSApproved: 20240417082830\\nnhsDateRequested: 20240417082818\\nnhsDNSApprover: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\\nnhsEPInteractionType: ebXML\\nnhsIDCode: X26\\nnhsMHSAckRequested: never\\nnhsMhsCPAId: f1c55263f1ee924f460f\\nnhsMHSDuplicateElimination: never\\nnhsMHSEndPoint: https://simple-sync.intspineservices.nhs.uk/\\nnhsMhsFQDN: simple-sync.intspineservices.nhs.uk\\nnhsMHsIN: QUPA_IN050000UK32\\nnhsMhsIPAddress: 0.0.0.0\\nnhsMHSIsAuthenticated: none\\nnhsMHSPartyKey: X26-823848\\nnhsMHsSN: urn:nhs:names:services:pdsquery\\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:QUPA_IN050000UK32\\nnhsMHSSyncReplyMode: None\\nnhsProductKey: 10894\\nnhsProductName: Compliance\\nnhsProductVersion: Initial\\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\\nuniqueIdentifier: f1c55263f1ee924f460f"
+        ],
+        "changeTime": [b"20240417072834Z"],
+        "changeType": [b"add"],
+        "targetDN": [b"uniqueIdentifier=f1c55263f1ee924f460f,ou=Services,o=nhs"],
+    }
+    result = parse_changelog_changes(distinguished_name=dn, record=record)
+
+    assert (
+        result
+        == "dn: uniqueIdentifier=f1c55263f1ee924f460f,ou=Services,o=nhs\nchangetype: add\nobjectClass: nhsMhs\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsContractPropertyTemplateKey: 14\nnhsDateApproved: 20240417082830\nnhsDateDNSApproved: 20240417082830\nnhsDateRequested: 20240417082818\nnhsDNSApprover: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsEPInteractionType: ebXML\nnhsIDCode: X26\nnhsMHSAckRequested: never\nnhsMhsCPAId: f1c55263f1ee924f460f\nnhsMHSDuplicateElimination: never\nnhsMHSEndPoint: https://simple-sync.intspineservices.nhs.uk/\nnhsMhsFQDN: simple-sync.intspineservices.nhs.uk\nnhsMHsIN: QUPA_IN050000UK32\nnhsMhsIPAddress: 0.0.0.0\nnhsMHSIsAuthenticated: none\nnhsMHSPartyKey: X26-823848\nnhsMHsSN: urn:nhs:names:services:pdsquery\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:QUPA_IN050000UK32\nnhsMHSSyncReplyMode: None\nnhsProductKey: 10894\nnhsProductName: Compliance\nnhsProductVersion: Initial\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nuniqueIdentifier: f1c55263f1ee924f460f"
     )

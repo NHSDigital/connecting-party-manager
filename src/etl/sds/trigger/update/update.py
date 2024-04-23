@@ -17,6 +17,8 @@ class ChangelogTriggerEnvironment(BaseEnvironment):
     CPM_FQDN: str
     LDAP_HOST: str
     ETL_BUCKET: str
+    LDAP_CHANGELOG_USER: str
+    LDAP_CHANGELOG_PASSWORD: str
 
 
 S3_CLIENT = boto3.client("s3")
@@ -34,6 +36,8 @@ CACHE = {
     "key_file": Path(f"/tmp/{ENVIRONMENT.CPM_FQDN}.key"),
     "etl_bucket": ENVIRONMENT.ETL_BUCKET,
     "ldap_host": ENVIRONMENT.LDAP_HOST,
+    "ldap_changelog_user": ENVIRONMENT.LDAP_CHANGELOG_USER,
+    "ldap_changelog_password": ENVIRONMENT.LDAP_CHANGELOG_PASSWORD,
 }
 
 

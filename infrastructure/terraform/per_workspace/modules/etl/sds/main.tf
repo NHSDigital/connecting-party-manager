@@ -319,6 +319,12 @@ data "aws_security_groups" "sds-ldap" {
 data "aws_secretsmanager_secret_version" "ldap_host" {
   secret_id = "${var.environment}-ldap-host"
 }
+data "aws_secretsmanager_secret_version" "ldap_changelog_user" {
+  secret_id = "${var.environment}-ldap-changelog-user"
+}
+data "aws_secretsmanager_secret_version" "ldap_changelog_password" {
+  secret_id = "${var.environment}-ldap-changelog-password"
+}
 
 module "trigger_update" {
   source = "./trigger/"
@@ -341,11 +347,13 @@ module "trigger_update" {
     # all compiled dependencies can find each other. Note: this is a hack - and
     # may result in version mismatches between system libs on the lambda. The stable
     # alternative is to run or deploy the service from a container.
-    LD_LIBRARY_PATH   = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
-    TRUSTSTORE_BUCKET = var.truststore_bucket.id
-    CPM_FQDN          = "cpm.thirdparty.nhs.uk"
-    LDAP_HOST         = data.aws_secretsmanager_secret_version.ldap_host.secret_string
-    ETL_BUCKET        = module.bucket.s3_bucket_id
+    LD_LIBRARY_PATH         = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+    TRUSTSTORE_BUCKET       = var.truststore_bucket.id
+    CPM_FQDN                = "cpm.thirdparty.nhs.uk"
+    LDAP_HOST               = data.aws_secretsmanager_secret_version.ldap_host.secret_string
+    LDAP_CHANGELOG_USER     = data.aws_secretsmanager_secret_version.ldap_changelog_user.secret_string
+    LDAP_CHANGELOG_PASSWORD = data.aws_secretsmanager_secret_version.ldap_changelog_password.secret_string
+    ETL_BUCKET              = module.bucket.s3_bucket_id
   }
 
   vpc_subnet_ids         = data.aws_subnets.lambda-connectivity-private.ids

@@ -16,6 +16,8 @@ MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
     "LDAP_HOST": "ldap-host",
     "ETL_BUCKET": "etl-bucket",
     "ETL_EXTRACT_INPUT_KEY": "etl-input",
+    "LDAP_CHANGELOG_USER": "user",
+    "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret
 }
 
 

@@ -11,6 +11,8 @@ from sds.domain.changelog import ChangelogRecord
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
 
+LDAP_OBJECTS = ["nhsas", "nhsmhs"]
+
 
 class NoExistingChangeLogNumber(Exception):
     pass
@@ -28,14 +30,19 @@ def get_certs_from_s3_truststore(
 
 
 def prepare_ldap_client(
-    ldap: LdapModuleProtocol, ldap_host: str, cert_file: str, key_file: str
+    ldap: LdapModuleProtocol,
+    ldap_host: str,
+    cert_file: str,
+    key_file: str,
+    ldap_changelog_user: str,
+    ldap_changelog_password: str,
 ) -> LdapClientProtocol:
     ldap_client = ldap.initialize(ldap_host)
     ldap_client.set_option(ldap.OPT_X_TLS_CERTFILE, cert_file)
     ldap_client.set_option(ldap.OPT_X_TLS_KEYFILE, key_file)
     ldap_client.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
     ldap_client.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
-    ldap_client.simple_bind_s()
+    ldap_client.simple_bind_s(ldap_changelog_user, ldap_changelog_password)
     return ldap_client
 
 
@@ -78,8 +85,10 @@ def get_latest_changelog_number_from_ldap(
         filterstr="(objectClass=*)",
         attrlist=["firstchangenumber", "lastchangenumber"],
     )
-    # return record["lastchangenumber"]  <-- think this is what we need to return, but currently empty
-    return 0
+
+    _, (unpack_record) = record
+
+    return int(unpack_record["lastchangenumber"][0].decode("utf-8"))
 
 
 def get_changelog_entries_from_ldap(
@@ -99,9 +108,40 @@ def get_changelog_entries_from_ldap(
             filterstr=f"(changenumber={changelog_number})",
         )
         changelog_records.append(record)
+
     return changelog_records
 
 
 def parse_changelog_changes(distinguished_name: str, record: dict) -> str:
     _distinguished_name = DistinguishedName.parse(distinguished_name)
-    return ChangelogRecord(_distinguished_name=_distinguished_name, **record).changes
+
+    record_dict = {
+        "object_class": record["objectClass"][0].decode("utf-8"),
+        "change_number": record["changeNumber"][0].decode("utf-8"),
+        "change_time": record["changeTime"][0].decode("utf-8"),
+        "change_type": record["changeType"][0].decode("utf-8"),
+        "target_distinguished_name": record["targetDN"][0].decode("utf-8"),
+    }
+
+    if "changes" in record:
+        record_dict["changes"] = (
+            record["changes"][0].decode("utf-8").replace("\\n", "\n")
+        )  # I struggled to find a solution to this, so this is my hack
+
+    changelog = ChangelogRecord(_distinguished_name=_distinguished_name, **record_dict)
+
+    if changelog.change_type == "delete":
+        return "\n".join(
+            [
+                f'dn: {record["targetDN"][0].decode("utf-8")}',
+                f"changetype: {changelog.change_type}",
+            ]
+        )
+
+    return "\n".join(
+        [
+            f'dn: {record["targetDN"][0].decode("utf-8")}',
+            f"changetype: {changelog.change_type}",
+            changelog.changes.strip("\n"),
+        ]
+    )

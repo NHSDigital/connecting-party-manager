@@ -53,6 +53,8 @@ def _prepare_ldap_client(data, cache: Cache):
         ldap_host=cache["ldap_host"],
         cert_file=str(cache["cert_file"]),
         key_file=str(cache["key_file"]),
+        ldap_changelog_user=cache["ldap_changelog_user"],
+        ldap_changelog_password=cache["ldap_changelog_password"],
     )
 
 
