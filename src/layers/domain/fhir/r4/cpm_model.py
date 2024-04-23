@@ -1,5 +1,5 @@
 import re
-from typing import Literal
+from typing import Literal, Union
 from uuid import UUID
 
 from domain.core.device import DeviceKeyType, DeviceType
@@ -36,9 +36,9 @@ class ProductTeamIdentifier(BaseModel):
         return {"system": self.system, "value": str(self.value)}
 
 
-# class Link(BaseModel):
-#     relation: str
-#     url: str
+class Link(BaseModel):
+    relation: str
+    url: str
 
 
 class OdsIdentifier(BaseModel):
@@ -88,6 +88,10 @@ class Organization(BaseModel):
     partOf: OdsReference
 
 
+class QuestionnaireResponse(BaseModel):
+    resourceType: Literal["QuestionnaireResponse"]
+
+
 class Device(BaseModel):
     resourceType: Literal["Device"]
     deviceName: list[DeviceName] = Field(min_items=1, max_items=1)
@@ -126,16 +130,16 @@ class Device(BaseModel):
 
 class Bundle(BaseModel):
     resourceType: Literal["Bundle"]
-    id: UUID
+    id: str
     total: str
-    # link: [Link]
+    link: list[Link]
 
 
 class CollectionBundle(Bundle):
     type: str = ConstStrField("collection")
-    entry: list[Device]
+    entry: list[Union[Device, QuestionnaireResponse]] = Field(min_items=1)
 
 
 class SearchsetBundle(Bundle):
     type: str = ConstStrField("searchset")
-    entry: list[CollectionBundle]
+    entry: list[CollectionBundle] = Field(min_items=0)

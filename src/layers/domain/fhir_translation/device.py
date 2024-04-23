@@ -1,21 +1,25 @@
 from typing import List
-from uuid import UUID
+from uuid import uuid4
 
 from domain.core.device import Device as DomainDevice
 from domain.core.product_team import ProductTeam
 from domain.fhir.r4 import Device as FhirDevice
 from domain.fhir.r4 import StrictDevice as StrictFhirDevice
-from domain.fhir.r4.cpm_model import SYSTEM, CollectionBundle  # Link,
+from domain.fhir.r4.cpm_model import SYSTEM, CollectionBundle
 from domain.fhir.r4.cpm_model import Device as CpmFhirDevice
-from domain.fhir.r4.cpm_model import (  # Link,
+from domain.fhir.r4.cpm_model import (
     DeviceDefinitionIdentifier,
     DeviceDefinitionReference,
     DeviceIdentifier,
     DeviceName,
     DeviceOwnerReference,
+    Link,
     ProductTeamIdentifier,
-    SearchsetBundle,
 )
+from domain.fhir.r4.cpm_model import (
+    QuestionnaireResponse as CpmFhirQuestionnaireResponse,
+)
+from domain.fhir.r4.cpm_model import SearchsetBundle
 from domain.fhir_translation.parse import create_fhir_model_from_fhir_json
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
@@ -60,23 +64,41 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
     )
 
 
-def create_fhir_model_from_devices(devices: List[DomainDevice]) -> SearchsetBundle:
+def create_fhir_model_from_questionnaire_response(
+    device: DomainDevice,
+) -> CpmFhirQuestionnaireResponse:
+    return CpmFhirQuestionnaireResponse(
+        resourceType=CpmFhirQuestionnaireResponse.__name__,
+    )
+
+
+def create_fhir_collection_bundle(device: DomainDevice) -> CollectionBundle:
+    fhir_device = create_fhir_model_from_device(device=device)
+    fhir_questionnaire = create_fhir_model_from_questionnaire_response(device=device)
+    return CollectionBundle(
+        resourceType="Bundle",
+        id=str(uuid4()),
+        total="1",
+        link=[Link(relation="self", url=f"https://cpm.co.uk/Device/{device.id}")],
+        entry=[fhir_device, fhir_questionnaire],
+    )
+
+
+def create_fhir_searchset_bundle(
+    devices: List[DomainDevice], device_type
+) -> SearchsetBundle:
+    entries = []
+    for device in devices:
+        entries.append(create_fhir_collection_bundle(device))
     return SearchsetBundle(
         resourceType="Bundle",
-        id=UUID,
-        total="1",
-        # link=[
-        #     Link(relation="self", url="https://cpm.co.uk/Device?device_type=product")
-        # ],
-        entry=[
-            CollectionBundle(
-                resourceType="Bundle",
-                id=UUID,
-                total=str(len(devices)),
-                # link=[
-                #     Link(relation="self", url="https://cpm.co.uk/Device/2938472398476")
-                # ],
-                entry=devices,
+        id=str(uuid4()),
+        total=str(len(devices)),
+        link=[
+            Link(
+                relation="self",
+                url=f"https://cpm.co.uk/Device?device_type={device_type.lower()}",
             )
         ],
+        entry=entries,
     )
