@@ -79,7 +79,7 @@ def test_get_latest_changelog_number_from_ldap():
     )
 
 
-def test_get_changelog_entries_from_ldap_with_data():
+def test_get_changelog_entries_from_ldap_with_add():
     mock_ldap_client = mock.Mock()
     mock_ldap_client.result.return_value = (
         101,
@@ -112,27 +112,57 @@ def test_get_changelog_entries_from_ldap_with_data():
     assert len(ldif_collection) == 13
 
 
-def test_get_changelog_entries_from_ldap_with_relevant_data():
+def test_get_changelog_entries_from_ldap_with_modify():
     mock_ldap_client = mock.Mock()
     mock_ldap_client.result.return_value = (
         101,
         [
             [
-                "changenumber=537593,cn=changelog,o=nhs",
+                "changenumber=538407,cn=changelog,o=nhs",
                 {
                     "objectClass": [
                         b"top",
                         b"changeLogEntry",
                         b"nhsExternalChangelogEntry",
                     ],
-                    "changeNumber": [b"537593"],
+                    "changeNumber": [b"538407"],
                     "changes": [
-                        b"\nobjectClass: nhsMhs\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555268096105,uniqueidentifier=555268088105,uid=555268080107,ou=people, o=nhs\nnhsContractPropertyTemplateKey: 46\nnhsDateApproved: 20240417154318\nnhsDateDNSApproved: 20240417154318\nnhsDateRequested: 20240417154058\nnhsDNSApprover: uniqueidentifier=555268096105,uniqueidentifier=555268088105,uid=555268080107,ou=people, o=nhs\nnhsEPInteractionType: HL7\nnhsIDCode: X26\nnhsMHSAckRequested: never\nnhsMhsCPAId: 1b6a36661ddd1d254ce7\nnhsMHSDuplicateElimination: never\nnhsMHSEndPoint: https://mhsin.int.ers.nhs.uk/\nnhsMhsFQDN: mhsin.int.ers.nhs.uk\nnhsMHsIN: MCCI_IN010000UK13\nnhsMhsIPAddress: 1.1.1.1\nnhsMHSIsAuthenticated: transient\nnhsMHSPartyKey: X26-823853\nnhsMHsSN: urn:nhs:names:services:pdsquery\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:MCCI_IN010000UK13\nnhsMHSSyncReplyMode: MSHSignalsOnly\nnhsProductKey: 10894\nnhsProductName: Compliance\nnhsProductVersion: Initial\nnhsRequestorURP: uniqueidentifier=555268096105,uniqueidentifier=555268088105,uid=555268080107,ou=people, o=nhs\nuniqueIdentifier: 1b6a36661ddd1d254ce7"
+                        b"\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
                     ],
-                    "changeTime": [b"20240417144321Z"],
-                    "changeType": [b"add"],
+                    "changeTime": [b"20240422081609Z"],
+                    "changeType": [b"modify"],
+                    "targetDN": [b"uniqueIdentifier=200000002202,ou=Services,o=nhs"],
+                },
+            ]
+        ],
+    )
+    ldif_collection = get_changelog_entries_from_ldap(
+        ldap_client=mock_ldap_client,
+        ldap=Mock(),
+        current_changelog_number=12,
+        latest_changelog_number=25,
+    )
+    assert len(ldif_collection) == 13
+
+
+def test_get_changelog_entries_from_ldap_with_delete():
+    mock_ldap_client = mock.Mock()
+    mock_ldap_client.result.return_value = (
+        101,
+        [
+            [
+                "changenumber=538210,cn=changelog,o=nhs",
+                {
+                    "objectClass": [
+                        b"top",
+                        b"changeLogEntry",
+                        b"nhsExternalChangelogEntry",
+                    ],
+                    "changeNumber": [b"538210"],
+                    "changeTime": [b"20240422081603Z"],
+                    "changeType": [b"delete"],
                     "targetDN": [
-                        b"uniqueIdentifier=1b6a36661ddd1d254ce7,ou=Services,o=nhs"
+                        b"uniqueIdentifier=7abed27a247a511b7f0a,ou=Services,o=nhs"
                     ],
                 },
             ]
@@ -182,7 +212,7 @@ def test_parse_changelog_changes(test_data_paths):
     )
 
 
-def test_parse_changelog_changes_2():
+def test_parse_changelog_changes_with_add():
     dn = "changenumber=537507,cn=changelog,o=nhs"
     record = {
         "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
@@ -199,4 +229,41 @@ def test_parse_changelog_changes_2():
     assert (
         result
         == "dn: uniqueIdentifier=f1c55263f1ee924f460f,ou=Services,o=nhs\nchangetype: add\nobjectClass: nhsMhs\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsContractPropertyTemplateKey: 14\nnhsDateApproved: 20240417082830\nnhsDateDNSApproved: 20240417082830\nnhsDateRequested: 20240417082818\nnhsDNSApprover: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsEPInteractionType: ebXML\nnhsIDCode: X26\nnhsMHSAckRequested: never\nnhsMhsCPAId: f1c55263f1ee924f460f\nnhsMHSDuplicateElimination: never\nnhsMHSEndPoint: https://simple-sync.intspineservices.nhs.uk/\nnhsMhsFQDN: simple-sync.intspineservices.nhs.uk\nnhsMHsIN: QUPA_IN050000UK32\nnhsMhsIPAddress: 0.0.0.0\nnhsMHSIsAuthenticated: none\nnhsMHSPartyKey: X26-823848\nnhsMHsSN: urn:nhs:names:services:pdsquery\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:QUPA_IN050000UK32\nnhsMHSSyncReplyMode: None\nnhsProductKey: 10894\nnhsProductName: Compliance\nnhsProductVersion: Initial\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nuniqueIdentifier: f1c55263f1ee924f460f"
+    )
+
+
+def test_parse_changelog_changes_with_modify():
+    dn = "changenumber=538407,cn=changelog,o=nhs"
+    record = {
+        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
+        "changeNumber": [b"538407"],
+        "changes": [
+            b"\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
+        ],
+        "changeTime": [b"20240422081609Z"],
+        "changeType": [b"modify"],
+        "targetDN": [b"uniqueIdentifier=200000002202,ou=Services,o=nhs"],
+    }
+    result = parse_changelog_changes(distinguished_name=dn, record=record)
+
+    assert (
+        result
+        == "dn: uniqueIdentifier=200000002202,ou=Services,o=nhs\nchangetype: modify\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
+    )
+
+
+def test_parse_changelog_changes_with_delete():
+    dn = "changenumber=538210,cn=changelog,o=nhs"
+    record = {
+        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
+        "changeNumber": [b"538210"],
+        "changeTime": [b"20240422081603Z"],
+        "changeType": [b"delete"],
+        "targetDN": [b"uniqueIdentifier=7abed27a247a511b7f0a,ou=Services,o=nhs"],
+    }
+    result = parse_changelog_changes(distinguished_name=dn, record=record)
+
+    assert (
+        result
+        == "dn: uniqueIdentifier=7abed27a247a511b7f0a,ou=Services,o=nhs\nchangetype: delete"
     )
