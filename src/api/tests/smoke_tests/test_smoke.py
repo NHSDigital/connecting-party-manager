@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 import requests
@@ -45,8 +46,10 @@ REQUEST_METHODS = [
 
 @pytest.mark.smoke
 def test_smoke_tests():
-    workspace = read_terraform_output("workspace.value")
-    environment = read_terraform_output("environment.value")
+    workspace = os.environ.get("WORKSPACE") or read_terraform_output("workspace.value")
+    environment = os.environ.get("ACCOUNT") or read_terraform_output(
+        "environment.value"
+    )
     app_key = get_app_key(environment=environment)
     headers = get_headers(app_key=app_key)
     base_url = get_base_url(workspace=workspace, environment=environment)

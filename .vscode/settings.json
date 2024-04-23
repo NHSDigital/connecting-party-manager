@@ -9,14 +9,21 @@
   "editor.formatOnSave": true,
   "black-formatter.args": ["--line-length=88"],
   "cSpell.words": [
+    "attrlist",
     "changetype",
+    "filterstr",
+    "firstchangenumber",
     "getbuffer",
+    "hscn",
     "ldif",
+    "ldifs",
+    "NEWCTX",
     "nhsexternalchangelogentry",
     "NOSONAR",
     "objectclass",
     "popleft",
     "stepfunctions",
+    "TRUSTSTORE",
     "unmarshall"
   ],
   "sonarlint.connectedMode.project": {

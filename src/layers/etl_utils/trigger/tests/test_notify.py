@@ -1,44 +1,36 @@
-import boto3
+import json
+from io import StringIO
+from unittest.mock import Mock
+
 import pytest
 from etl_utils.trigger.notify import notify
 from event.json import json_loads
-from moto import mock_aws
+
+from etl.notify.notify import handler
 
 FUNCTION_NAME = "my-function"
-ROLE_NAME = "my-role"
+
+
+def mocked_lambda(FunctionName, Payload):
+    result = handler(event=json_loads(Payload))
+    return {"Payload": StringIO(json.dumps(result))}
 
 
 @pytest.mark.parametrize(
-    ("input_result", "expected_status", "expected_error_message"),
+    ("input_result", "expected_result"),
     [
-        ("all_good", "Successful", None),
-        (ValueError("oops!"), "Unsuccessful", "oops!"),
+        ("all_good", "pass"),
+        (ValueError("oops!"), "fail"),
     ],
 )
-def test_trigger_notify(input_result, expected_status, expected_error_message):
-    with mock_aws(config={"lambda": {"use_docker": False}}):
-        lambda_client = boto3.client("lambda", region_name="us-east-1")
-        iam_client = boto3.client("iam", region_name="us-east-1")
-        iam_response = iam_client.create_role(
-            RoleName=ROLE_NAME, AssumeRolePolicyDocument="some policy"
-        )
-        lambda_client.create_function(
-            FunctionName=FUNCTION_NAME,
-            Runtime="python3.10",
-            Role=iam_response["Role"]["Arn"],
-            Handler="notify.handler",
-            Code={"ZipFile": ""},
-            Publish=True,
-        )
-        response = notify(
-            lambda_client=lambda_client,
-            function_name=FUNCTION_NAME,
-            trigger_type="foo",
-            result=input_result,
-        )
-        iam_client.delete_role(RoleName=ROLE_NAME)
-        lambda_client.delete_function(FunctionName=FUNCTION_NAME)
-    assert json_loads(response) == {
-        "message": f"{expected_status} 'foo' trigger of state machine.",
-        "error_message": expected_error_message,
-    }
+def test_trigger_notify(input_result, expected_result):
+    lambda_client = Mock()
+    lambda_client.invoke.side_effect = mocked_lambda
+    response = notify(
+        lambda_client=lambda_client,
+        function_name=FUNCTION_NAME,
+        trigger_type="foo",
+        result=input_result,
+    )
+
+    assert json_loads(response) == expected_result

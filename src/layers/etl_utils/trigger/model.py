@@ -4,7 +4,6 @@ from enum import StrEnum, auto
 from typing import Self
 
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
-from event.environment import BaseEnvironment
 from pydantic import BaseModel, Field
 
 NAME_SEPARATOR = "."
@@ -65,9 +64,3 @@ class StateMachineInput(BaseModel):
         for char in BAD_CHARACTERS:
             state_machine_name = state_machine_name.replace(char, NAME_SEPARATOR)
         return state_machine_name
-
-
-class TriggerEnvironment(BaseEnvironment):
-    STATE_MACHINE_ARN: str
-    NOTIFY_LAMBDA_ARN: str
-    TABLE_NAME: str
