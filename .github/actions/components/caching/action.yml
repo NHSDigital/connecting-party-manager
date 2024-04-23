@@ -27,7 +27,7 @@ inputs:
       !**/.terraform/modules/**/*
 
 runs:
-  using: "c\omposite"
+  using: "composite"
   steps:
     - id: set-date
       shell: bash
