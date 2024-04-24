@@ -139,16 +139,21 @@ class QuestionnaireResponse(BaseModel):
     item: list[QuestionAndAnswer] = Field(min_items=0)
 
 
+class Resource(BaseModel):
+    fullUrl: str
+    resource: Device
+
+
 class Bundle(BaseModel):
     resourceType: Literal["Bundle"]
     id: str
-    total: str
+    total: int
     link: list[Link]
 
 
 class CollectionBundle(Bundle):
     type: str = ConstStrField("collection")
-    entry: list[Union[Device, QuestionnaireResponse]] = Field(min_items=1)
+    entry: list[Union[Resource, QuestionnaireResponse]] = Field(min_items=1)
 
 
 class SearchsetBundle(Bundle):

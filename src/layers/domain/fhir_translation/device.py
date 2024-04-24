@@ -20,7 +20,7 @@ from domain.fhir.r4.cpm_model import (
 from domain.fhir.r4.cpm_model import (
     QuestionnaireResponse as CpmFhirQuestionnaireResponse,
 )
-from domain.fhir.r4.cpm_model import SearchsetBundle
+from domain.fhir.r4.cpm_model import Resource, SearchsetBundle
 from domain.fhir_translation.parse import create_fhir_model_from_fhir_json
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
@@ -97,13 +97,16 @@ def create_fhir_model_from_questionnaire_response(
 
 def create_fhir_collection_bundle(device: DomainDevice) -> CollectionBundle:
     fhir_device = create_fhir_model_from_device(device=device)
+    fhir_resource = Resource(
+        fullUrl=f"https://cpm.co.uk/Device/{device.id}", resource=fhir_device
+    )
     fhir_questionnaire = create_fhir_model_from_questionnaire_response(device=device)
     return CollectionBundle(
         resourceType="Bundle",
         id=str(uuid4()),
-        total="1",
+        total=1,
         link=[Link(relation="self", url=f"https://cpm.co.uk/Device/{device.id}")],
-        entry=[fhir_device, fhir_questionnaire],
+        entry=[fhir_resource, fhir_questionnaire],
     )
 
 
@@ -116,7 +119,7 @@ def create_fhir_searchset_bundle(
     return SearchsetBundle(
         resourceType="Bundle",
         id=str(uuid4()),
-        total=str(len(devices)),
+        total=len(devices),
         link=[
             Link(
                 relation="self",
