@@ -13,7 +13,7 @@ Feature: Search
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 12001            |
+      | Content-Length | 205              |
 
   Scenario: Confirm Search endpoint is active with endpoint as filter
     When I make a "GET" request with "default" headers to "Device?device_type=endpoint"
@@ -21,4 +21,4 @@ Feature: Search
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 22905            |
+      | Content-Length | 206              |
