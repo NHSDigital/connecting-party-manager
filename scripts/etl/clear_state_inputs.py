@@ -43,5 +43,8 @@ def main(changelog_number):
 
 
 if __name__ == "__main__":
-    changelog_number = sys.argv[1]
+    changelog_number = ""
+    if len(sys.argv) > 1:
+        changelog_number = sys.argv[1]
+
     main(changelog_number)
