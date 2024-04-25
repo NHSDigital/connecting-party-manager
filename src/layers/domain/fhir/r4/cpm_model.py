@@ -1,5 +1,5 @@
 import re
-from typing import Literal, Union
+from typing import Dict, Literal, Union
 from uuid import UUID
 
 from domain.core.device import DeviceKeyType, DeviceType
@@ -124,6 +124,10 @@ class Device(BaseModel):
         return identifier
 
 
+class Reference(BaseModel):
+    reference: str
+
+
 class Answer(BaseModel):
     valueString: str
 
@@ -136,12 +140,16 @@ class QuestionAndAnswer(BaseModel):
 
 class QuestionnaireResponse(BaseModel):
     resourceType: Literal["QuestionnaireResponse"]
+    status: str = ConstStrField("completed")
+    subject: Reference
+    author: Reference
     item: list[QuestionAndAnswer] = Field(min_items=0)
 
 
 class Resource(BaseModel):
     fullUrl: str
     resource: Device
+    search: Dict[str, str] = Field(default_factory=lambda: {"mode": "match"})
 
 
 class Bundle(BaseModel):

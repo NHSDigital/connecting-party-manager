@@ -20,7 +20,7 @@ from domain.fhir.r4.cpm_model import (
 from domain.fhir.r4.cpm_model import (
     QuestionnaireResponse as CpmFhirQuestionnaireResponse,
 )
-from domain.fhir.r4.cpm_model import Resource, SearchsetBundle
+from domain.fhir.r4.cpm_model import Reference, Resource, SearchsetBundle
 from domain.fhir_translation.parse import create_fhir_model_from_fhir_json
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
@@ -82,15 +82,12 @@ def create_fhir_model_from_questionnaire_response(
     return CpmFhirQuestionnaireResponse(
         resourceType=CpmFhirQuestionnaireResponse.__name__,
         # identifier="010057927542",
-        # questionnaire="https://cpm.co.uk/Questionnaire/spine_device|v1",
-        # "status": "completed",
-        # "subject": {
-        #     "reference": "https://cpm.co.uk/Device/39ae1fe2-dd84-4d9a-af2a-ca0e63f53cae"
-        # },
+        # questionnaire="https://cpm.co.uk/Questionnaire/spine_device|v1", Doesn't exist yet
+        subject=Reference(reference=f"https://cpm.co.uk/Device/{device.id}"),
         # "authored": "<dateTime>",
-        # "author": {
-        #     "reference": "https://cpm.co.uk/Organization/ae2ab026-0b53-7e7c-7a65-f0407a6e75f5"
-        # },
+        author=Reference(
+            reference=f"https://cpm.co.uk/Organization/{device.product_team_id}"
+        ),
         item=items,
     )
 

@@ -155,19 +155,18 @@ def test_index(version):
                                     }
                                 },
                             },
+                            "search": {"mode": "match"},
                         },
                         {
                             "resourceType": "QuestionnaireResponse",
                             # "identifier": "010057927542",
                             # "questionnaire": "https://cpm.co.uk/Questionnaire/spine_device|v1",
-                            # "status": "completed",
-                            # "subject": {
-                            #     "reference": "https://cpm.co.uk/Device/39ae1fe2-dd84-4d9a-af2a-ca0e63f53cae"
-                            # },
+                            "status": "completed",
+                            "subject": {"reference": result_collection_url},
                             # "authored": "<dateTime>",
-                            # "author": {
-                            #     "reference": "https://cpm.co.uk/Organization/ae2ab026-0b53-7e7c-7a65-f0407a6e75f5"
-                            # },
+                            "author": {
+                                "reference": f"https://cpm.co.uk/Organization/{result_product_id}"
+                            },
                             "item": [
                                 {
                                     "link_id": "nhs_as_svc_ia",
@@ -277,70 +276,3 @@ def test_index(version):
     _response_assertions(
         result=result, expected=expected, check_body=True, check_content_length=True
     )
-
-
-# @pytest.mark.parametrize(
-#     "version",
-#     [
-#         "1",
-#     ],
-# )
-# def test_index_no_such_device(version):
-#     with mock_table(TABLE_NAME), mock.patch.dict(
-#         os.environ,
-#         {
-#             "DYNAMODB_TABLE": TABLE_NAME,
-#             "AWS_DEFAULT_REGION": "eu-west-2",
-#         },
-#         clear=True,
-#     ):
-#         from api.readDevice.index import handler
-
-#         result = handler(
-#             event={
-#                 "headers": {"version": version},
-#                 "pathParameters": {"id": "123"},
-#             }
-#         )
-
-#     expected_result = json.dumps(
-#         {
-#             "resourceType": "OperationOutcome",
-#             "id": app_logger.service_name,
-#             "meta": {
-#                 "profile": [
-#                     "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-#                 ]
-#             },
-#             "issue": [
-#                 {
-#                     "severity": "error",
-#                     "code": "processing",
-#                     "details": {
-#                         "coding": [
-#                             {
-#                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-#                                 "code": "RESOURCE_NOT_FOUND",
-#                                 "display": "Resource not found",
-#                             }
-#                         ]
-#                     },
-#                     "diagnostics": "Could not find object with key '123'",
-#                 }
-#             ],
-#         }
-#     )
-
-#     expected = {
-#         "statusCode": 404,
-#         "body": expected_result,
-#         "headers": {
-#             "Content-Length": str(len(expected_result)),
-#             "Content-Type": "application/json",
-#             "Version": version,
-#             "Location": None,
-#         },
-#     }
-#     _response_assertions(
-#         result=result, expected=expected, check_body=True, check_content_length=True
-#     )
