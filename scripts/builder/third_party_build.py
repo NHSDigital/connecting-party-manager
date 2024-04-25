@@ -70,8 +70,6 @@ def docker_run(docker_file: Path, root_dir: Path, group: str):
         "run",
         "-v",
         f"{root_dir}:/var/task",
-        "--network",
-        "third_party_bridge_network",
         image_name,
         "/bin/bash",
         "-c",
