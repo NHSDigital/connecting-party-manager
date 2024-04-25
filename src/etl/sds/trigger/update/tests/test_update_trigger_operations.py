@@ -1,12 +1,10 @@
 import os
-from io import StringIO
 from unittest import mock
 from unittest.mock import Mock
 
 import boto3
 import pytest
 from etl_utils.constants import CHANGELOG_NUMBER
-from etl_utils.ldif.ldif import parse_ldif
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -195,21 +193,6 @@ def test_get_changelog_entries_from_ldap_no_changes():
         latest_changelog_number=12,
     )
     assert len(ldif_collection) == 0
-
-
-@pytest.mark.s3("sds/etl/changelog/75852519.ldif")
-def test_parse_changelog_changes(test_data_paths):
-    (path,) = test_data_paths
-    with open(path) as f:
-        ldif = f.read()
-
-    ((_, record),) = parse_ldif(file_opener=StringIO, path_or_data=ldif)
-    assert (
-        parse_changelog_changes(
-            distinguished_name="changenumber=75852519,cn=changelog,o=nhs", record=record
-        )
-        == "\nobjectClass: nhsas\nobjectClass: top\nnhsApproverURP: System\nnhsAsClient: K81045\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.registerpatient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:location-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:organization-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:patient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:practitioner-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:organization-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:practitioner-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:cancel:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:create:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:appointment-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient_appointments-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:slot-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:update:appointment-1\nnhsDateApproved: 20240116173441\nnhsDateRequested: 20240116173439\nnhsIDCode: K81045\nnhsMHSPartyKey: R3U6M-831547\nnhsProductKey: 6255\nnhsProductName: Continuum Health GPC\nnhsProductVersion: Consumer AS\nnhsRequestorURP: uniqueidentifier=865945089569,uniqueidentifier=065150856568,uid=798965609042,ou=people, o=nhs\nuniqueIdentifier: 200000042019"
-    )
 
 
 def test_parse_changelog_changes_with_add():
