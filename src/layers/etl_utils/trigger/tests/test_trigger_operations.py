@@ -89,32 +89,6 @@ def test_validate_state_keys_are_empty(s3_client: "S3Client", key, expectation):
         validate_state_keys_are_empty(s3_client=s3_client, bucket=BUCKET_NAME)
 
 
-@pytest.mark.parametrize(
-    ["key", "expectation"],
-    [
-        (None, does_not_raise()),
-        (WorkerKey.EXTRACT, pytest.raises(StateFileNotEmpty)),
-        (WorkerKey.TRANSFORM, pytest.raises(StateFileNotEmpty)),
-        (WorkerKey.LOAD, pytest.raises(StateFileNotEmpty)),
-    ],
-)
-def test_validate_state_keys_are_empty(s3_client: "S3Client", key, expectation):
-    s3_client.put_object(Bucket=BUCKET_NAME, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF)
-    s3_client.put_object(
-        Bucket=BUCKET_NAME,
-        Key=WorkerKey.TRANSFORM,
-        Body=pkl_dumps_lz4(EMPTY_ARRAY),
-    )
-    s3_client.put_object(
-        Bucket=BUCKET_NAME, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_ARRAY)
-    )
-
-    if key is not None:
-        s3_client.put_object(Bucket=BUCKET_NAME, Key=key, Body=b" ")
-    with expectation:
-        validate_state_keys_are_empty(s3_client=s3_client, bucket=BUCKET_NAME)
-
-
 def test_validate_state_keys_are_empty_when_no_initial_state(s3_client: "S3Client"):
     with does_not_raise():
         validate_state_keys_are_empty(s3_client=s3_client, bucket=BUCKET_NAME)
