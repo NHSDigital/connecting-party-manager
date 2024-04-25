@@ -49,11 +49,7 @@ module "lambda_function" {
   ]
 
   attach_policy_json = true
-  policy_json        = aws_iam_role_policy.trigger_policy
-}
-
-resource "aws_iam_role_policy" "trigger_policy" {
-  policy = jsonencode({
+  policy_json = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : concat([
       {
@@ -104,16 +100,6 @@ resource "aws_iam_role_policy" "trigger_policy" {
         "Effect" : "Allow",
         "Resource" : ["${var.state_machine_arn}"]
       },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "lambda:InvokeFunction"
-        ],
-        "Resource" : [module.lambda_function.lambda_function_arn],
-        "Principal" : {
-          "Service" : "events.amazonaws.com"
-        }
-      }
     ], var.extra_policies)
   })
 }
