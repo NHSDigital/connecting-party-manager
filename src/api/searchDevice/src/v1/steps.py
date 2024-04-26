@@ -11,6 +11,8 @@ from event.step_chain import StepChain
 # Think we require a validation decorator here.
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
+    print("HEADERS", event.headers)  # noqa:T201
+    print("MULTIVALUE_HEADERS", event.multi_value_headers)  # noqa:T201
     return (
         event.query_string_parameters["device_type"].upper()
         if event.query_string_parameters["device_type"]
