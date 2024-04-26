@@ -11,8 +11,6 @@ from sds.domain.changelog import ChangelogRecord
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
 
-LDAP_OBJECTS = ["nhsas", "nhsmhs"]
-
 
 class NoExistingChangeLogNumber(Exception):
     pass
@@ -73,11 +71,6 @@ def _ldap_search(
 def get_latest_changelog_number_from_ldap(
     ldap_client: LdapClientProtocol, ldap: LdapModuleProtocol
 ) -> int:
-    """
-    'record' returned / printed below *should* contain the first and last changelog number,
-    but currently doesn't. Speak with Arvind to understand why not.
-    In the meanwhile, we return the value int(2) as a placeholder.
-    """
     _, (record,) = _ldap_search(
         ldap_client=ldap_client,
         base="cn=Changelog,o=nhs",
