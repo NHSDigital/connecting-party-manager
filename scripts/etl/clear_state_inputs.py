@@ -5,6 +5,7 @@ Run with
 """
 
 import os
+import sys
 from collections import deque
 
 import boto3
@@ -19,7 +20,7 @@ EMPTY_LDIF_DATA = b""
 EMPTY_JSON_DATA = pkl_dumps_lz4(deque())
 
 
-def main():
+def main(changelog_number):
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
 
     with aws_session():
@@ -37,9 +38,13 @@ def main():
 
         if os.environ.get("SET_CHANGELOG_NUMBER"):
             s3_client.put_object(
-                Bucket=etl_bucket, Key=CHANGELOG_NUMBER, Body=EXPECTED_CHANGELOG_NUMBER
+                Bucket=etl_bucket, Key=CHANGELOG_NUMBER, Body=changelog_number
             )
 
 
 if __name__ == "__main__":
-    main()
+    changelog_number = ""
+    if len(sys.argv) > 1:
+        changelog_number = sys.argv[1]
+
+    main(changelog_number)

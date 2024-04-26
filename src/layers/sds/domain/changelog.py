@@ -1,4 +1,4 @@
-from typing import ClassVar, Literal
+from typing import ClassVar, Literal, Optional
 
 from etl_utils.ldif.model import DistinguishedName
 from pydantic import BaseModel, Field, validator
@@ -23,7 +23,7 @@ class ChangelogRecord(SdsBaseModel):
     object_class: str = Field(alias=OBJECT_CLASS_FIELD_NAME)
 
     change_number: str = Field(alias="changenumber")
-    changes: str
+    changes: Optional[str] = ""
     change_time: str = Field(alias="changetime")
     change_type: ChangeType = Field(alias="changetype")
     target_distinguished_name: DistinguishedName = Field(alias="targetdn")

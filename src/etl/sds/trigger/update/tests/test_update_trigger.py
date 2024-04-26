@@ -1,4 +1,5 @@
 import os
+from json import JSONDecodeError
 from unittest import mock
 
 import boto3
@@ -16,7 +17,12 @@ MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
     "LDAP_HOST": "ldap-host",
     "ETL_BUCKET": "etl-bucket",
     "ETL_EXTRACT_INPUT_KEY": "etl-input",
+    "LDAP_CHANGELOG_USER": "user",
+    "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret
 }
+
+ALLOWED_EXCEPTIONS = (JSONDecodeError,)
+CHANGELOG_NUMBER_VALUE = "538684"
 
 
 def test_update():
