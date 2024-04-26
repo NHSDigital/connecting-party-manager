@@ -103,7 +103,7 @@ def _mocked_request(
         path=url,
         httpMethod=method,
         headers=headers,
-        multiValueHeaders={},
+        multiValueHeaders={"Host": ["foo.co.uk"]},
         requestContext=DUMMY_CONTEXT,
         isBase64Encoded=False,
         **optional_fields,
