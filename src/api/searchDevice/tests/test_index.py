@@ -95,9 +95,9 @@ def test_index(version):
             event={
                 "headers": {"version": version},
                 "queryStringParameters": {"device_type": "product"},
+                "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-
     result_body = json_loads(result["body"])
     result_id = result_body.get("id")
     result_collection_id = result_body["entry"][0]["id"]
@@ -114,7 +114,7 @@ def test_index(version):
             "link": [
                 {
                     "relation": "self",
-                    "url": "https://cpm.co.uk/Device?device_type=product",
+                    "url": "https://foo.co.uk/Device?device_type=product",
                 }
             ],
             "type": "searchset",
@@ -165,7 +165,7 @@ def test_index(version):
                             "subject": {"reference": result_collection_url},
                             # "authored": "<dateTime>",
                             "author": {
-                                "reference": f"https://cpm.co.uk/Organization/{result_product_id}"
+                                "reference": f"https://foo.co.uk/Organization/{result_product_id}"
                             },
                             "item": [
                                 {
