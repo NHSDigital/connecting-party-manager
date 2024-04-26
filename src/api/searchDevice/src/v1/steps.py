@@ -11,17 +11,19 @@ from event.step_chain import StepChain
 # Think we require a validation decorator here.
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    print("HEADERS", event.headers)  # noqa:T201
-    print("MULTIVALUE_HEADERS", event.multi_value_headers)  # noqa:T201
     return (
-        event.query_string_parameters["device_type"].upper()
+        {
+            "query_string": event.query_string_parameters["device_type"].upper(),
+            "host": event.multi_value_headers["Host"],
+        }
         if event.query_string_parameters["device_type"]
         else None
     )
 
 
 def set_device_type(data, cache):
-    device_query_param = data[parse_event_query]
+    event_data = data[parse_event_query]
+    device_query_param = event_data.get("query_string")
     return (
         DeviceType.PRODUCT if device_query_param == "PRODUCT" else DeviceType.ENDPOINT
     )
@@ -59,9 +61,13 @@ def _read_devices_by_id(device, table_name, dynamodb_client) -> Device:
 
 
 def devices_to_fhir_bundle(data, cache) -> dict:
-    device_type = data[parse_event_query]
+    event_data = data[parse_event_query]
+    device_type = event_data.get("query_string")
+    host = event_data.get("host")[0]
     devices = data[read_devices_by_id]
-    fhir_org = create_fhir_searchset_bundle(devices=devices, device_type=device_type)
+    fhir_org = create_fhir_searchset_bundle(
+        devices=devices, device_type=device_type, host=host
+    )
     return fhir_org.dict()
 
 

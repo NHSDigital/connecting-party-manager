@@ -67,6 +67,7 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
 
 def create_fhir_model_from_questionnaire_response(
     device: DomainDevice,
+    host,
 ) -> CpmFhirQuestionnaireResponse:
     items = []
     for identifier, responses in device.questionnaire_responses.items():
@@ -83,36 +84,43 @@ def create_fhir_model_from_questionnaire_response(
         resourceType=CpmFhirQuestionnaireResponse.__name__,
         # identifier="010057927542",
         # questionnaire="https://cpm.co.uk/Questionnaire/spine_device|v1", Doesn't exist yet
-        subject=Reference(reference=f"https://cpm.co.uk/Device/{device.id}"),
+        subject=Reference(reference=f"https://{host}/Device/{device.id}"),
         # "authored": "<dateTime>",
         author=Reference(
-            reference=f"https://cpm.co.uk/Organization/{device.product_team_id}"
+            reference=f"https://{host}/Organization/{device.product_team_id}"
         ),
         item=items,
     )
 
 
-def create_fhir_collection_bundle(device: DomainDevice) -> CollectionBundle:
+def create_fhir_collection_bundle(
+    device: DomainDevice,
+    host,
+) -> CollectionBundle:
     fhir_device = create_fhir_model_from_device(device=device)
     fhir_resource = Resource(
-        fullUrl=f"https://cpm.co.uk/Device/{device.id}", resource=fhir_device
+        fullUrl=f"https://{host}/Device/{device.id}", resource=fhir_device
     )
-    fhir_questionnaire = create_fhir_model_from_questionnaire_response(device=device)
+    fhir_questionnaire = create_fhir_model_from_questionnaire_response(
+        device=device, host=host
+    )
     return CollectionBundle(
         resourceType="Bundle",
         id=str(uuid4()),
         total=1,
-        link=[Link(relation="self", url=f"https://cpm.co.uk/Device/{device.id}")],
+        link=[Link(relation="self", url=f"https://{host}/Device/{device.id}")],
         entry=[fhir_resource, fhir_questionnaire],
     )
 
 
 def create_fhir_searchset_bundle(
-    devices: List[DomainDevice], device_type
+    devices: List[DomainDevice],
+    device_type,
+    host,
 ) -> SearchsetBundle:
     entries = []
     for device in devices:
-        entries.append(create_fhir_collection_bundle(device))
+        entries.append(create_fhir_collection_bundle(device, host))
     return SearchsetBundle(
         resourceType="Bundle",
         id=str(uuid4()),
@@ -120,7 +128,7 @@ def create_fhir_searchset_bundle(
         link=[
             Link(
                 relation="self",
-                url=f"https://cpm.co.uk/Device?device_type={device_type.lower()}",
+                url=f"https://{host}/Device?device_type={device_type.lower()}",
             )
         ],
         entry=entries,
