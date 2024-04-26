@@ -1,13 +1,10 @@
 import os
 from json import JSONDecodeError
-from types import FunctionType
 from unittest import mock
 
 import boto3
-from botocore.exceptions import ClientError
 from etl_utils.constants import CHANGELOG_NUMBER
 from moto import mock_aws
-from mypy_boto3_s3 import S3Client
 
 from etl.sds.trigger.update.steps import _start_execution
 
@@ -25,24 +22,6 @@ MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
 }
 
 ALLOWED_EXCEPTIONS = (JSONDecodeError,)
-
-
-def _ask_s3(s3_client: S3Client, bucket: str, key: str, question: FunctionType = None):
-    result = True
-    try:
-        response = s3_client.get_object(Bucket=bucket, Key=key)
-    except ClientError:
-        result = False
-
-    if result and question is not None:
-        data = response["Body"].read()
-        try:
-            result = question(data)
-        except ALLOWED_EXCEPTIONS:
-            result = False
-    return result
-
-
 CHANGELOG_NUMBER_VALUE = "538684"
 
 
@@ -116,74 +95,3 @@ def test_update():
         response = update.handler()
 
     assert response == "abc"
-
-
-# @pytest.mark.timeout(30)
-# @pytest.mark.integration
-# def test_update_trigger_integration():
-#     # Where the state is located
-#     etl_bucket = read_terraform_output("sds_etl.value.bucket")
-#     table_name = read_terraform_output("dynamodb_table_name.value")
-
-#     client = dynamodb_client()
-#     repository = MockDeviceRepository(table_name=table_name, dynamodb_client=client)
-
-#     # Set some questions
-#     s3_client = boto3.client("s3")
-#     ask_s3 = partial(_ask_s3, s3_client=s3_client, bucket=etl_bucket)
-
-#     was_changelog_number_updated = lambda: ask_s3(
-#         key=CHANGELOG_NUMBER,
-#         question=lambda x: int(json_loads(x)) > int(CHANGELOG_NUMBER_VALUE),
-#     )
-
-#     was_state_machine_successful = (
-#         lambda: ask_s3(
-#             key=WorkerKey.EXTRACT,
-#             question=lambda x: x == b"",
-#         )
-#         and ask_s3(
-#             key=WorkerKey.TRANSFORM,
-#             question=lambda x: pkl_loads_lz4(x) == deque(),
-#         )
-#         and ask_s3(
-#             key=WorkerKey.LOAD,
-#             question=lambda x: pkl_loads_lz4(x) == deque(),
-#         )
-#         and repository.count(by=DeviceType.PRODUCT) > 0
-#     )
-
-#     # Clear/set the initial state
-#     s3_client.put_object(Bucket=etl_bucket, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF_DATA)
-#     s3_client.put_object(
-#         Bucket=etl_bucket, Key=WorkerKey.TRANSFORM, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
-#     )
-#     s3_client.put_object(
-#         Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
-#     )
-#     s3_client.put_object(
-#         Bucket=etl_bucket, Key=CHANGELOG_NUMBER, Body=CHANGELOG_NUMBER_VALUE
-#     )
-#     clear_dynamodb_table(client=client, table_name=table_name)
-
-#     # How do we trigger the update
-
-#     changelog_number_updated = False
-#     state_machine_successful = False
-#     while not all(
-#         (
-#             changelog_number_updated,
-#             state_machine_successful,
-#         )
-#     ):
-#         time.sleep(5)
-#         changelog_number_updated = (
-#             changelog_number_updated or was_changelog_number_updated()
-#         )
-#         state_machine_successful = (
-#             state_machine_successful or was_state_machine_successful()
-#         )
-
-#     # Confirm the final state
-#     assert changelog_number_updated
-#     assert state_machine_successful
