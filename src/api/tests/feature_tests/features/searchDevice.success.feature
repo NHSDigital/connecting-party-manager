@@ -3,10 +3,9 @@ Feature: Search
 
   Background:
     Given "default" request headers:
-      | name          | value     |
-      | version       | 1         |
-      | Authorization | letmein   |
-      | Host          | foo.co.uk |
+      | name          | value   |
+      | version       | 1       |
+      | Authorization | letmein |
 
   Scenario: Confirm Search endpoint is active with product as filter
     When I make a "GET" request with "default" headers to "Device?device_type=product"
