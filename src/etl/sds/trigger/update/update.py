@@ -1,3 +1,4 @@
+import base64
 from pathlib import Path
 
 import boto3
@@ -37,7 +38,11 @@ CACHE = {
     "etl_bucket": ENVIRONMENT.ETL_BUCKET,
     "ldap_host": ENVIRONMENT.LDAP_HOST,
     "ldap_changelog_user": ENVIRONMENT.LDAP_CHANGELOG_USER,
-    "ldap_changelog_password": ENVIRONMENT.LDAP_CHANGELOG_PASSWORD,
+    "ldap_changelog_password": str(
+        base64.b64encode(ENVIRONMENT.LDAP_CHANGELOG_PASSWORD.encode("utf-8")).decode(
+            "utf-8"
+        )
+    ),
 }
 
 
