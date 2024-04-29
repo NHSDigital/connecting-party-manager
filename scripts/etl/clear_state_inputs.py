@@ -20,8 +20,11 @@ EMPTY_LDIF_DATA = b""
 EMPTY_JSON_DATA = pkl_dumps_lz4(deque())
 
 
-def main(changelog_number):
-    etl_bucket = read_terraform_output("sds_etl.value.bucket")
+def main(changelog_number, workspace):
+    if workspace is None:
+        etl_bucket = read_terraform_output("sds_etl.value.bucket")
+    else:
+        etl_bucket = f"nhse-cpm--{workspace}--sds--etl"
 
     with aws_session():
         s3_client = boto3.client("s3")
@@ -44,7 +47,8 @@ def main(changelog_number):
 
 if __name__ == "__main__":
     changelog_number = ""
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 2:
         changelog_number = sys.argv[1]
+        workspace = sys.argv[2]
 
-    main(changelog_number)
+    main(changelog_number, workspace)
