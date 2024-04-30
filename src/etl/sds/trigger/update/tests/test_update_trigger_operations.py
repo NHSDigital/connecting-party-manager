@@ -14,6 +14,7 @@ from etl.sds.trigger.update.operations import (
     get_changelog_entries_from_ldap,
     get_current_changelog_number_from_s3,
     get_latest_changelog_number_from_ldap,
+    is_nhs_org_person_role,
     parse_changelog_changes,
 )
 
@@ -28,7 +29,7 @@ def s3_client():
         yield client
 
 
-def test_get_current_changelog_number_from_s3_not_found(s3_client):
+def test_get_current_changelog_number_from_s3_not_found(s3_client: S3Client):
     with pytest.raises(NoExistingChangeLogNumber):
         get_current_changelog_number_from_s3(s3_client=s3_client, bucket=BUCKET_NAME)
 
@@ -211,7 +212,7 @@ def test_parse_changelog_changes_with_add():
 
     assert (
         result
-        == "dn: uniqueIdentifier=f1c55263f1ee924f460f,ou=Services,o=nhs\nchangetype: add\nobjectClass: nhsMhs\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsContractPropertyTemplateKey: 14\nnhsDateApproved: 20240417082830\nnhsDateDNSApproved: 20240417082830\nnhsDateRequested: 20240417082818\nnhsDNSApprover: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsEPInteractionType: ebXML\nnhsIDCode: X26\nnhsMHSAckRequested: never\nnhsMhsCPAId: f1c55263f1ee924f460f\nnhsMHSDuplicateElimination: never\nnhsMHSEndPoint: https://simple-sync.intspineservices.nhs.uk/\nnhsMhsFQDN: simple-sync.intspineservices.nhs.uk\nnhsMHsIN: QUPA_IN050000UK32\nnhsMhsIPAddress: 0.0.0.0\nnhsMHSIsAuthenticated: none\nnhsMHSPartyKey: X26-823848\nnhsMHsSN: urn:nhs:names:services:pdsquery\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:QUPA_IN050000UK32\nnhsMHSSyncReplyMode: None\nnhsProductKey: 10894\nnhsProductName: Compliance\nnhsProductVersion: Initial\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nuniqueIdentifier: f1c55263f1ee924f460f"
+        == "dn: o=nhs,ou=Services,uniqueIdentifier=f1c55263f1ee924f460f\nchangetype: add\nobjectClass: nhsMhs\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsContractPropertyTemplateKey: 14\nnhsDateApproved: 20240417082830\nnhsDateDNSApproved: 20240417082830\nnhsDateRequested: 20240417082818\nnhsDNSApprover: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsEPInteractionType: ebXML\nnhsIDCode: X26\nnhsMHSAckRequested: never\nnhsMhsCPAId: f1c55263f1ee924f460f\nnhsMHSDuplicateElimination: never\nnhsMHSEndPoint: https://simple-sync.intspineservices.nhs.uk/\nnhsMhsFQDN: simple-sync.intspineservices.nhs.uk\nnhsMHsIN: QUPA_IN050000UK32\nnhsMhsIPAddress: 0.0.0.0\nnhsMHSIsAuthenticated: none\nnhsMHSPartyKey: X26-823848\nnhsMHsSN: urn:nhs:names:services:pdsquery\nnhsMhsSvcIA: urn:nhs:names:services:pdsquery:QUPA_IN050000UK32\nnhsMHSSyncReplyMode: None\nnhsProductKey: 10894\nnhsProductName: Compliance\nnhsProductVersion: Initial\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nuniqueIdentifier: f1c55263f1ee924f460f"
     )
 
 
@@ -231,7 +232,7 @@ def test_parse_changelog_changes_with_modify():
 
     assert (
         result
-        == "dn: uniqueIdentifier=200000002202,ou=Services,o=nhs\nchangetype: modify\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
+        == "dn: o=nhs,ou=Services,uniqueIdentifier=200000002202\nchangetype: modify\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
     )
 
 
@@ -248,5 +249,15 @@ def test_parse_changelog_changes_with_delete():
 
     assert (
         result
-        == "dn: uniqueIdentifier=7abed27a247a511b7f0a,ou=Services,o=nhs\nchangetype: delete"
+        == "dn: o=nhs,ou=Services,uniqueIdentifier=7abed27a247a511b7f0a\nchangetype: delete"
     )
+
+
+def test_is_nhs_org_person_role_false():
+    changes_as_ldif = "dn: o=nhs,ou=Services,uniqueIdentifier=200000002202\nchangetype: modify\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
+    assert not is_nhs_org_person_role(changes_as_ldif)
+
+
+def test_is_nhs_org_person_role_true():
+    changes_as_ldif = 'dn: o=nhs,ou=Services,uniqueIdentifier=f1c55263f1ee924f460f\nchangetype: add\nobjectClass: nhsOrgPersonRole\nobjectClass: top\nnhsIDCode: A9A5A\nnhsJobRole: "Clinical":"Clinical Support":"Medical Secretary Access Role"\nnhsJobRoleCode: S8000:G8001:R8006\nnhsOrgOpenDate: 20240419\nuniqueIdentifier: 555306132104'
+    assert is_nhs_org_person_role(changes_as_ldif)

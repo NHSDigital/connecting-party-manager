@@ -1,7 +1,13 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from etl_utils.constants import CHANGELOG_NUMBER  # , CHANGELOG_QUERY
+from etl_utils.constants import (
+    CHANGELOG_BASE,
+    CHANGELOG_NUMBER,
+    LDAP_FILTER_ALL,
+    SDS_NHS_ORG_PERSON_ROLE,
+    ChangelogAttributes,
+)
 from etl_utils.ldap_typing import LdapClientProtocol, LdapModuleProtocol
 from etl_utils.ldif.model import DistinguishedName
 from etl_utils.trigger.operations import object_exists
@@ -73,15 +79,20 @@ def get_latest_changelog_number_from_ldap(
 ) -> int:
     _, (record,) = _ldap_search(
         ldap_client=ldap_client,
-        base="cn=Changelog,o=nhs",
+        base=CHANGELOG_BASE,
         scope=ldap.SCOPE_BASE,
-        filterstr="(objectClass=*)",
-        attrlist=["firstchangenumber", "lastchangenumber"],
+        filterstr=LDAP_FILTER_ALL,
+        attrlist=[
+            ChangelogAttributes.FIRST_CHANGELOG_NUMBER,
+            ChangelogAttributes.LAST_CHANGELOG_NUMBER,
+        ],
     )
 
     _, (unpack_record) = record
 
-    return int(unpack_record["lastchangenumber"][0].decode("utf-8"))
+    return int(
+        unpack_record[ChangelogAttributes.LAST_CHANGELOG_NUMBER][0].decode("utf-8")
+    )
 
 
 def get_changelog_entries_from_ldap(
@@ -96,7 +107,7 @@ def get_changelog_entries_from_ldap(
     ):
         _, (record,) = _ldap_search(
             ldap_client=ldap_client,
-            base="cn=Changelog,o=nhs",
+            base=CHANGELOG_BASE,
             scope=ldap.SCOPE_ONELEVEL,
             filterstr=f"(changenumber={changelog_number})",
         )
@@ -105,36 +116,18 @@ def get_changelog_entries_from_ldap(
     return changelog_records
 
 
-def parse_changelog_changes(distinguished_name: str, record: dict) -> str:
+def _normalise_value(v: list[bytes]) -> set:
+    return {value.decode("unicode_escape") for value in v}
+
+
+def parse_changelog_changes(distinguished_name: str, record: dict[str, any]) -> str:
     _distinguished_name = DistinguishedName.parse(distinguished_name)
-
-    record_dict = {
-        "object_class": record["objectClass"][0].decode("utf-8"),
-        "change_number": record["changeNumber"][0].decode("utf-8"),
-        "change_time": record["changeTime"][0].decode("utf-8"),
-        "change_type": record["changeType"][0].decode("utf-8"),
-        "target_distinguished_name": record["targetDN"][0].decode("utf-8"),
-    }
-
-    if "changes" in record:
-        record_dict["changes"] = (
-            record["changes"][0].decode("utf-8").replace("\\n", "\n")
-        )  # I struggled to find a solution to this, so this is my hack
-
-    changelog = ChangelogRecord(_distinguished_name=_distinguished_name, **record_dict)
-
-    if changelog.change_type == "delete":
-        return "\n".join(
-            [
-                f'dn: {record["targetDN"][0].decode("utf-8")}',
-                f"changetype: {changelog.change_type}",
-            ]
-        )
-
-    return "\n".join(
-        [
-            f'dn: {record["targetDN"][0].decode("utf-8")}',
-            f"changetype: {changelog.change_type}",
-            changelog.changes.strip("\n"),
-        ]
+    normalised_record = {k.lower(): _normalise_value(v) for k, v in record.items()}
+    changelog = ChangelogRecord(
+        _distinguished_name=_distinguished_name, **normalised_record
     )
+    return changelog.changes_as_ldif()
+
+
+def is_nhs_org_person_role(changes_as_ldif: str):
+    return SDS_NHS_ORG_PERSON_ROLE in changes_as_ldif.lower()

@@ -45,3 +45,18 @@ class ChangelogRecord(SdsBaseModel):
                 f"with DN change number '{dn.change_number}'"
             )
         return change_number
+
+    @validator("changes")
+    def validate_changes(cls, changes):
+        if isinstance(changes, bytes):
+            changes = changes.decode("unicode_escape")
+        return changes
+
+    def changes_as_ldif(self) -> str:
+        change_lines = [
+            f"dn: {self.target_distinguished_name.raw}",
+            f"changetype: {self.change_type}",
+        ]
+        if self.change_type is not ChangeType.DELETE:
+            change_lines.append(self.changes.strip("\n"))
+        return "\n".join(change_lines)
