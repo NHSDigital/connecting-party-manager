@@ -1,6 +1,6 @@
 import os
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import cache
 from typing import Generator
 
@@ -18,11 +18,11 @@ def _aws_account_id_from_secret(env: str):
     return response["SecretString"]
 
 
-def _get_access_token(account_id: str = None):
+def _get_access_token(account_id: str = None, role_name: str = "NHSTestCIRole"):
     sts_client = boto3.client("sts")
-    current_time = datetime.utcnow().timestamp()
+    current_time = datetime.now(timezone.utc).timestamp()
     response = sts_client.assume_role(
-        RoleArn=f"arn:aws:iam::{account_id}:role/NHSTestCIRole",
+        RoleArn=f"arn:aws:iam::{account_id}:role/{role_name}",
         RoleSessionName=f"role--{current_time}",
     )
 
@@ -33,11 +33,11 @@ def _get_access_token(account_id: str = None):
 
 
 @cache
-def aws_session_env_vars() -> boto3.Session:
+def aws_session_env_vars(role_name: str) -> boto3.Session:
     env = os.environ.get("ACCOUNT") or read_terraform_output("environment.value")
     account_id = _aws_account_id_from_secret(env=env)
     access_key_id, secret_access_key, session_token = _get_access_token(
-        account_id=account_id
+        account_id=account_id, role_name=role_name
     )
     return {
         "AWS_ACCESS_KEY_ID": access_key_id,
@@ -47,9 +47,9 @@ def aws_session_env_vars() -> boto3.Session:
 
 
 @contextmanager
-def aws_session() -> Generator[None, None, None]:
+def aws_session(role_name: str) -> Generator[None, None, None]:
     original_env = dict(os.environ)
-    env_vars = aws_session_env_vars()
+    env_vars = aws_session_env_vars(role_name=role_name)
 
     exception = None
     try:

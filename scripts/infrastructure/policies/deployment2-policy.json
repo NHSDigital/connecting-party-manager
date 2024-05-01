@@ -128,6 +128,16 @@
       "Effect": "Allow",
       "Action": ["s3:DeleteObject", "s3:DeleteObjectVersion"],
       "Resource": ["arn:aws:s3:::*--etl/*"]
+    },
+    {
+      "Sid": "ApigeeSecretsIntegrationPermissions",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": [
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*"
+      ]
     }
   ]
 }

@@ -37,18 +37,18 @@ module "zones" {
 
 }
 
-# resource "aws_route53_record" "prod_zone" {
-#   zone_id = module.zones.route53_zone_zone_id["cpm.national.nhs.uk"]
-#   name    = "api.cpm.national.nhs.uk"
-#   records = [
-#     "ns-453.awsdns-56.com.",
-#     "ns-980.awsdns-58.net.",
-#     "ns-1983.awsdns-55.co.uk.",
-#     "ns-1103.awsdns-09.org."
-#   ]
-#   ttl  = 300
-#   type = "NS"
-# }
+resource "aws_route53_record" "prod_zone" {
+  zone_id = module.zones.route53_zone_zone_id["cpm.national.nhs.uk"]
+  name    = "api.cpm.national.nhs.uk"
+  records = [
+    "ns-815.awsdns-37.net.",
+    "ns-1169.awsdns-18.org.",
+    "ns-330.awsdns-41.com.",
+    "ns-1759.awsdns-27.co.uk."
+  ]
+  ttl  = 300
+  type = "NS"
+}
 
 resource "aws_route53_record" "dev_zone" {
   zone_id = module.zones.route53_zone_zone_id["cpm.dev.national.nhs.uk"]
