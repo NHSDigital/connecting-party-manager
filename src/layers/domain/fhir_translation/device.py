@@ -107,7 +107,7 @@ def create_fhir_collection_bundle(
     return CollectionBundle(
         resourceType="Bundle",
         id=str(uuid4()),
-        total=1,
+        total=2,
         link=[Link(relation="self", url=f"https://{host}/Device/{device.id}")],
         entry=[fhir_resource, fhir_questionnaire],
     )
