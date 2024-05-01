@@ -4,7 +4,12 @@ from enum import StrEnum
 CHANGELOG_NUMBER = "changelog-number"
 CHANGELOG_BASE = "cn=Changelog,o=nhs"
 LDAP_FILTER_ALL = "(objectClass=*)"
-SDS_NHS_ORG_PERSON_ROLE = "objectClass: nhsOrgPersonRole".lower()
+SDS_NHS_PERSON_FILTERS = (
+    "objectClass: nhsOrgPersonRole".lower(),
+    "objectClass: organizationalPerson".lower(),
+    "objectClass: nhsPerson".lower(),
+    "objectClass: person".lower(),
+)
 EMPTY_LDIF = ""
 EMPTY_ARRAY = deque()
 LDIF_RECORD_DELIMITER = "\n\n"

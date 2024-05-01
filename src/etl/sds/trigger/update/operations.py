@@ -5,7 +5,7 @@ from etl_utils.constants import (
     CHANGELOG_BASE,
     CHANGELOG_NUMBER,
     LDAP_FILTER_ALL,
-    SDS_NHS_ORG_PERSON_ROLE,
+    SDS_NHS_PERSON_FILTERS,
     ChangelogAttributes,
 )
 from etl_utils.ldap_typing import LdapClientProtocol, LdapModuleProtocol
@@ -130,4 +130,5 @@ def parse_changelog_changes(distinguished_name: str, record: dict[str, any]) -> 
 
 
 def is_nhs_org_person_role(changes_as_ldif: str):
-    return SDS_NHS_ORG_PERSON_ROLE in changes_as_ldif.lower()
+    lower_ldif = changes_as_ldif.lower()
+    return any(person in lower_ldif for person in SDS_NHS_PERSON_FILTERS)

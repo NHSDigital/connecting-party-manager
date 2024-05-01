@@ -258,6 +258,15 @@ def test_is_nhs_org_person_role_false():
     assert not is_nhs_org_person_role(changes_as_ldif)
 
 
-def test_is_nhs_org_person_role_true():
-    changes_as_ldif = 'dn: o=nhs,ou=Services,uniqueIdentifier=f1c55263f1ee924f460f\nchangetype: add\nobjectClass: nhsOrgPersonRole\nobjectClass: top\nnhsIDCode: A9A5A\nnhsJobRole: "Clinical":"Clinical Support":"Medical Secretary Access Role"\nnhsJobRoleCode: S8000:G8001:R8006\nnhsOrgOpenDate: 20240419\nuniqueIdentifier: 555306132104'
+@pytest.mark.parametrize(
+    "person",
+    (
+        "nhsOrgPersonRole",
+        "organizationalPerson",
+        "nhsPerson",
+        "person",
+    ),
+)
+def test_is_nhs_org_person_role_true(person):
+    changes_as_ldif = f'dn: o=nhs,ou=Services,uniqueIdentifier=f1c55263f1ee924f460f\nchangetype: add\nobjectClass: {person}\nobjectClass: top\nnhsIDCode: A9A5A\nnhsJobRole: "Clinical":"Clinical Support":"Medical Secretary Access Role"\nnhsJobRoleCode: S8000:G8001:R8006\nnhsOrgOpenDate: 20240419\nuniqueIdentifier: 555306132104'
     assert is_nhs_org_person_role(changes_as_ldif)
