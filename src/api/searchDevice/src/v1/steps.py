@@ -12,8 +12,11 @@ device_type_map = {"PRODUCT": DeviceType.PRODUCT, "ENDPOINT": DeviceType.ENDPOIN
 
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
+    if len(event.query_string_parameters) > 1:
+        raise ValueError("Only 'device_type' query parameter is allowed.")
+
     if (
-        len(event.query_string_parameters) > 1
+        len(event.query_string_parameters) > 0
         and "device_type" not in event.query_string_parameters
     ):
         raise ValueError("Only 'device_type' query parameter is allowed.")
