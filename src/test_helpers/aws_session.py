@@ -18,7 +18,7 @@ def _aws_account_id_from_secret(env: str):
     return response["SecretString"]
 
 
-def _get_access_token(account_id: str = None, role_name: str = "NHSTestCIRole"):
+def _get_access_token(role_name: str, account_id: str = None):
     sts_client = boto3.client("sts")
     current_time = datetime.now(timezone.utc).timestamp()
     response = sts_client.assume_role(
@@ -47,7 +47,7 @@ def aws_session_env_vars(role_name: str) -> boto3.Session:
 
 
 @contextmanager
-def aws_session(role_name: str) -> Generator[None, None, None]:
+def aws_session(role_name: str = "NHSTestCIRole") -> Generator[None, None, None]:
     original_env = dict(os.environ)
     env_vars = aws_session_env_vars(role_name=role_name)
 
