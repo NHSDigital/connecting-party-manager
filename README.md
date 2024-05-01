@@ -271,3 +271,21 @@ Before running the bulk trigger, you need to clear the initial ETL state, do:
 ```
 make etl--clear-state
 ```
+
+Before running the changelog trigger you additionally need to specify a changelog number (ideally close to the true latest changelog number, otherwise the logs will be pretty heavy!)
+
+```
+make etl--clear-state SET_CHANGELOG_NUMBER=540210
+```
+
+You can additionally set the workspace name if you want to clear the state for a given (e.g. persistent) workspace name:
+
+```
+make etl--clear-state WORKSPACE=dev
+```
+
+and
+
+```
+make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210
+```

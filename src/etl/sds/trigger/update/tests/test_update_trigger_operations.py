@@ -14,7 +14,6 @@ from etl.sds.trigger.update.operations import (
     get_changelog_entries_from_ldap,
     get_current_changelog_number_from_s3,
     get_latest_changelog_number_from_ldap,
-    is_organisational_unit_person,
     parse_changelog_changes,
 )
 
@@ -251,27 +250,3 @@ def test_parse_changelog_changes_with_delete():
         result
         == "dn: o=nhs,ou=Services,uniqueIdentifier=7abed27a247a511b7f0a\nchangetype: delete"
     )
-
-
-def test_is_organisational_unit_person_false():
-    dn = "changenumber=538210,cn=changelog,o=nhs"
-    record = {
-        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
-        "changeNumber": [b"538210"],
-        "changeTime": [b"20240422081603Z"],
-        "changeType": [b"delete"],
-        "targetDN": [b"uniqueIdentifier=7abed27a247a511b7f0a,ou=Services,o=nhs"],
-    }
-    assert not is_organisational_unit_person((dn, record))
-
-
-def test_is_organisational_unit_person_true():
-    dn = "changenumber=538210,cn=changelog,o=nhs"
-    record = {
-        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
-        "changeNumber": [b"538210"],
-        "changeTime": [b"20240422081603Z"],
-        "changeType": [b"delete"],
-        "targetDN": [b"uniqueIdentifier=7abed27a247a511b7f0a,ou=people,o=nhs"],
-    }
-    assert not is_organisational_unit_person((dn, record))
