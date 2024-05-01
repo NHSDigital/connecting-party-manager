@@ -1,11 +1,13 @@
 from pathlib import Path
+from types import FunctionType
 from typing import TYPE_CHECKING
 
 from etl_utils.constants import (
     CHANGELOG_BASE,
     CHANGELOG_NUMBER,
+    FILTERED_OUT,
     LDAP_FILTER_ALL,
-    SDS_NHS_PERSON_FILTERS,
+    SDS_ORGANISATIONAL_UNIT_PEOPLE,
     ChangelogAttributes,
 )
 from etl_utils.ldap_typing import LdapClientProtocol, LdapModuleProtocol
@@ -69,9 +71,16 @@ def _ldap_search(
     scope: str,
     filterstr: str,
     attrlist: list[str] = None,
+    filter_function: FunctionType = None,
 ):
     ldap_client.search(base=base, scope=scope, filterstr=filterstr, attrlist=attrlist)
-    return ldap_client.result()
+    status, records = ldap_client.result()
+    if filter_function:
+        records = [
+            FILTERED_OUT if filter_function(record) else (dn, record)
+            for dn, record in records
+        ]
+    return status, records
 
 
 def get_latest_changelog_number_from_ldap(
@@ -110,8 +119,13 @@ def get_changelog_entries_from_ldap(
             base=CHANGELOG_BASE,
             scope=ldap.SCOPE_ONELEVEL,
             filterstr=f"(changenumber={changelog_number})",
+            filter_function=(
+                lambda record: SDS_ORGANISATIONAL_UNIT_PEOPLE
+                in record["targetDN"][0].lower()
+            ),
         )
-        changelog_records.append(record)
+        if record != FILTERED_OUT:
+            changelog_records.append(record)
 
     return changelog_records
 
@@ -127,8 +141,3 @@ def parse_changelog_changes(distinguished_name: str, record: dict[str, any]) -> 
         _distinguished_name=_distinguished_name, **normalised_record
     )
     return changelog.changes_as_ldif()
-
-
-def is_nhs_org_person_role(changes_as_ldif: str):
-    lower_ldif = changes_as_ldif.lower()
-    return any(person in lower_ldif for person in SDS_NHS_PERSON_FILTERS)

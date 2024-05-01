@@ -14,7 +14,7 @@ from etl.sds.trigger.update.operations import (
     get_changelog_entries_from_ldap,
     get_current_changelog_number_from_s3,
     get_latest_changelog_number_from_ldap,
-    is_nhs_org_person_role,
+    is_organisational_unit_person,
     parse_changelog_changes,
 )
 
@@ -253,20 +253,25 @@ def test_parse_changelog_changes_with_delete():
     )
 
 
-def test_is_nhs_org_person_role_false():
-    changes_as_ldif = "dn: o=nhs,ou=Services,uniqueIdentifier=200000002202\nchangetype: modify\nreplace: nhsAsSvcIA\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13\nnhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01"
-    assert not is_nhs_org_person_role(changes_as_ldif)
+def test_is_organisational_unit_person_false():
+    dn = "changenumber=538210,cn=changelog,o=nhs"
+    record = {
+        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
+        "changeNumber": [b"538210"],
+        "changeTime": [b"20240422081603Z"],
+        "changeType": [b"delete"],
+        "targetDN": [b"uniqueIdentifier=7abed27a247a511b7f0a,ou=Services,o=nhs"],
+    }
+    assert not is_organisational_unit_person((dn, record))
 
 
-@pytest.mark.parametrize(
-    "person",
-    (
-        "nhsOrgPersonRole",
-        "organizationalPerson",
-        "nhsPerson",
-        "person",
-    ),
-)
-def test_is_nhs_org_person_role_true(person):
-    changes_as_ldif = f'dn: o=nhs,ou=Services,uniqueIdentifier=f1c55263f1ee924f460f\nchangetype: add\nobjectClass: {person}\nobjectClass: top\nnhsIDCode: A9A5A\nnhsJobRole: "Clinical":"Clinical Support":"Medical Secretary Access Role"\nnhsJobRoleCode: S8000:G8001:R8006\nnhsOrgOpenDate: 20240419\nuniqueIdentifier: 555306132104'
-    assert is_nhs_org_person_role(changes_as_ldif)
+def test_is_organisational_unit_person_true():
+    dn = "changenumber=538210,cn=changelog,o=nhs"
+    record = {
+        "objectClass": [b"top", b"changeLogEntry", b"nhsExternalChangelogEntry"],
+        "changeNumber": [b"538210"],
+        "changeTime": [b"20240422081603Z"],
+        "changeType": [b"delete"],
+        "targetDN": [b"uniqueIdentifier=7abed27a247a511b7f0a,ou=people,o=nhs"],
+    }
+    assert not is_organisational_unit_person((dn, record))

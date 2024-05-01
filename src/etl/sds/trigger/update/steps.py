@@ -1,5 +1,5 @@
 import base64
-from itertools import filterfalse, starmap
+from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
@@ -13,7 +13,6 @@ from .operations import (
     get_changelog_entries_from_ldap,
     get_current_changelog_number_from_s3,
     get_latest_changelog_number_from_ldap,
-    is_nhs_org_person_role,
     parse_changelog_changes,
     prepare_ldap_client,
 )
@@ -116,8 +115,7 @@ def _get_changelog_entries_from_ldap(data, cache: Cache):
 def _parse_and_join_changelog_changes(data, cache):
     changelog_records: list[tuple[str, dict]] = data[_get_changelog_entries_from_ldap]
     changes_ldif = starmap(parse_changelog_changes, changelog_records)
-    changes_ldif_excluding_people = filterfalse(is_nhs_org_person_role, changes_ldif)
-    return LDIF_RECORD_DELIMITER.join(changes_ldif_excluding_people)
+    return LDIF_RECORD_DELIMITER.join(changes_ldif)
 
 
 def _put_to_state_machine(data, cache: Cache):
