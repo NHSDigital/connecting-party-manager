@@ -8,17 +8,26 @@ from domain.repository.marshall import unmarshall_value
 from event.step_chain import StepChain
 
 
-# Think we require a validation decorator here.
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    return (
-        {
-            "query_string": event.query_string_parameters["device_type"].upper(),
-            "host": event.multi_value_headers["Host"],
-        }
-        if event.query_string_parameters["device_type"]
-        else None
-    )
+    if (
+        len(event.query_string_parameters) > 1
+        and "device_type" not in event.query_string_parameters
+    ):
+        raise ValueError("Only 'device_type' query parameter is allowed.")
+
+    if event.query_string_parameters["device_type"].upper() not in [
+        "PRODUCT",
+        "ENDPOINT",
+    ]:
+        raise ValueError(
+            "'device_type' query parameter must be one of 'product' or 'endpoint'."
+        )
+
+    return {
+        "query_string": event.query_string_parameters["device_type"].upper(),
+        "host": event.multi_value_headers["Host"],
+    }
 
 
 def set_device_type(data, cache):
