@@ -7,6 +7,8 @@ from domain.repository.device_repository import DeviceRepository
 from domain.repository.marshall import unmarshall_value
 from event.step_chain import StepChain
 
+device_type_map = {"PRODUCT": DeviceType.PRODUCT, "ENDPOINT": DeviceType.ENDPOINT}
+
 
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
@@ -33,9 +35,7 @@ def parse_event_query(data, cache):
 def set_device_type(data, cache):
     event_data = data[parse_event_query]
     device_query_param = event_data.get("query_string")
-    return (
-        DeviceType.PRODUCT if device_query_param == "PRODUCT" else DeviceType.ENDPOINT
-    )
+    return device_type_map.get(device_query_param, DeviceType.ENDPOINT)
 
 
 def read_devices_by_type(data, cache) -> List[Device]:
