@@ -53,13 +53,14 @@ def read_devices_by_id(data, cache) -> List[Device]:
     devices = data[read_devices_by_type]
     full_devices = []
     for device in devices.get("Items"):
-        full_devices.append(
-            _read_devices_by_id(
-                device,
-                table_name=cache["DYNAMODB_TABLE"],
-                dynamodb_client=cache["DYNAMODB_CLIENT"],
+        if unmarshall_value(device.get("status", {"S": "inactive"})) == "active":
+            full_devices.append(
+                _read_devices_by_id(
+                    device,
+                    table_name=cache["DYNAMODB_TABLE"],
+                    dynamodb_client=cache["DYNAMODB_CLIENT"],
+                )
             )
-        )
     return full_devices
 
 
