@@ -2,6 +2,7 @@
 
 ## 2024-04-26
 - [PI-315] Update trigger
+- [PI-343] Remove people branch
 
 ## 2024-04-16
 - [PI-311] Smoke tests
