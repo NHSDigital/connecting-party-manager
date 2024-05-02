@@ -4,7 +4,7 @@ Run with
     poetry run python scripts/etl/clear_state_inputs.py
 """
 
-import os
+import sys
 from collections import deque
 
 import boto3
@@ -19,8 +19,12 @@ EMPTY_LDIF_DATA = b""
 EMPTY_JSON_DATA = pkl_dumps_lz4(deque())
 
 
-def main():
-    etl_bucket = read_terraform_output("sds_etl.value.bucket")
+def main(changelog_number, workspace):
+    etl_bucket = (
+        f"nhse-cpm--{workspace}--sds--etl"
+        if workspace
+        else read_terraform_output("sds_etl.value.bucket")
+    )
 
     with aws_session():
         s3_client = boto3.client("s3")
@@ -35,11 +39,12 @@ def main():
         )
         s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
 
-        if os.environ.get("SET_CHANGELOG_NUMBER"):
-            s3_client.put_object(
-                Bucket=etl_bucket, Key=CHANGELOG_NUMBER, Body=EXPECTED_CHANGELOG_NUMBER
-            )
+    if changelog_number:
+        s3_client.put_object(
+            Bucket=etl_bucket, Key=CHANGELOG_NUMBER, Body=changelog_number
+        )
 
 
 if __name__ == "__main__":
-    main()
+    _, changelog_number, workspace = sys.argv
+    main(changelog_number, workspace)

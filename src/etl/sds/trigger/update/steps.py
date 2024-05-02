@@ -1,3 +1,4 @@
+import base64
 from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
@@ -53,6 +54,12 @@ def _prepare_ldap_client(data, cache: Cache):
         ldap_host=cache["ldap_host"],
         cert_file=str(cache["cert_file"]),
         key_file=str(cache["key_file"]),
+        ldap_changelog_user=cache["ldap_changelog_user"],
+        ldap_changelog_password=str(
+            base64.b64decode(cache["ldap_changelog_password"].encode("utf-8")).decode(
+                "utf-8"
+            )
+        ),
     )
 
 
@@ -107,9 +114,8 @@ def _get_changelog_entries_from_ldap(data, cache: Cache):
 
 def _parse_and_join_changelog_changes(data, cache):
     changelog_records: list[tuple[str, dict]] = data[_get_changelog_entries_from_ldap]
-    return LDIF_RECORD_DELIMITER.join(
-        starmap(parse_changelog_changes, changelog_records)
-    )
+    changes_ldif = starmap(parse_changelog_changes, changelog_records)
+    return LDIF_RECORD_DELIMITER.join(changes_ldif)
 
 
 def _put_to_state_machine(data, cache: Cache):

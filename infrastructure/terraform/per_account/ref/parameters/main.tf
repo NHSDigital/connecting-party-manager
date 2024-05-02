@@ -46,3 +46,11 @@ resource "aws_secretsmanager_secret" "sds-hscn-endpoint" {
 resource "aws_secretsmanager_secret" "ldap-host" {
   name = "${terraform.workspace}-ldap-host"
 }
+
+resource "aws_secretsmanager_secret" "ldap-changelog-user" {
+  name = "${terraform.workspace}-ldap-changelog-user"
+}
+
+resource "aws_secretsmanager_secret" "ldap-changelog-password" {
+  name = "${terraform.workspace}-ldap-changelog-password"
+}

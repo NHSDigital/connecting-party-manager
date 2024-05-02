@@ -1,7 +1,15 @@
 from pathlib import Path
+from types import FunctionType
 from typing import TYPE_CHECKING
 
-from etl_utils.constants import CHANGELOG_NUMBER  # , CHANGELOG_QUERY
+from etl_utils.constants import (
+    CHANGELOG_BASE,
+    CHANGELOG_NUMBER,
+    FILTERED_OUT,
+    LDAP_FILTER_ALL,
+    SDS_ORGANISATIONAL_UNIT_PEOPLE,
+    ChangelogAttributes,
+)
 from etl_utils.ldap_typing import LdapClientProtocol, LdapModuleProtocol
 from etl_utils.ldif.model import DistinguishedName
 from etl_utils.trigger.operations import object_exists
@@ -28,14 +36,19 @@ def get_certs_from_s3_truststore(
 
 
 def prepare_ldap_client(
-    ldap: LdapModuleProtocol, ldap_host: str, cert_file: str, key_file: str
+    ldap: LdapModuleProtocol,
+    ldap_host: str,
+    cert_file: str,
+    key_file: str,
+    ldap_changelog_user: str,
+    ldap_changelog_password: str,
 ) -> LdapClientProtocol:
     ldap_client = ldap.initialize(ldap_host)
     ldap_client.set_option(ldap.OPT_X_TLS_CERTFILE, cert_file)
     ldap_client.set_option(ldap.OPT_X_TLS_KEYFILE, key_file)
     ldap_client.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
     ldap_client.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
-    ldap_client.simple_bind_s()
+    ldap_client.simple_bind_s(ldap_changelog_user, ldap_changelog_password)
     return ldap_client
 
 
@@ -58,28 +71,37 @@ def _ldap_search(
     scope: str,
     filterstr: str,
     attrlist: list[str] = None,
+    filter_function: FunctionType = None,
 ):
     ldap_client.search(base=base, scope=scope, filterstr=filterstr, attrlist=attrlist)
-    return ldap_client.result()
+    status, records = ldap_client.result()
+    if filter_function:
+        records = [
+            FILTERED_OUT if filter_function(record) else (dn, record)
+            for dn, record in records
+        ]
+    return status, records
 
 
 def get_latest_changelog_number_from_ldap(
     ldap_client: LdapClientProtocol, ldap: LdapModuleProtocol
 ) -> int:
-    """
-    'record' returned / printed below *should* contain the first and last changelog number,
-    but currently doesn't. Speak with Arvind to understand why not.
-    In the meanwhile, we return the value int(2) as a placeholder.
-    """
     _, (record,) = _ldap_search(
         ldap_client=ldap_client,
-        base="cn=Changelog,o=nhs",
+        base=CHANGELOG_BASE,
         scope=ldap.SCOPE_BASE,
-        filterstr="(objectClass=*)",
-        attrlist=["firstchangenumber", "lastchangenumber"],
+        filterstr=LDAP_FILTER_ALL,
+        attrlist=[
+            ChangelogAttributes.FIRST_CHANGELOG_NUMBER,
+            ChangelogAttributes.LAST_CHANGELOG_NUMBER,
+        ],
     )
-    # return record["lastchangenumber"]  <-- think this is what we need to return, but currently empty
-    return 0
+
+    _, (unpack_record) = record
+
+    return int(
+        unpack_record[ChangelogAttributes.LAST_CHANGELOG_NUMBER][0].decode("utf-8")
+    )
 
 
 def get_changelog_entries_from_ldap(
@@ -94,14 +116,28 @@ def get_changelog_entries_from_ldap(
     ):
         _, (record,) = _ldap_search(
             ldap_client=ldap_client,
-            base="cn=Changelog,o=nhs",
+            base=CHANGELOG_BASE,
             scope=ldap.SCOPE_ONELEVEL,
             filterstr=f"(changenumber={changelog_number})",
+            filter_function=(
+                lambda record: SDS_ORGANISATIONAL_UNIT_PEOPLE
+                in record["targetDN"][0].lower()
+            ),
         )
-        changelog_records.append(record)
+        if record != FILTERED_OUT:
+            changelog_records.append(record)
+
     return changelog_records
 
 
-def parse_changelog_changes(distinguished_name: str, record: dict) -> str:
+def _normalise_value(v: list[bytes]) -> set:
+    return {value.decode("unicode_escape") for value in v}
+
+
+def parse_changelog_changes(distinguished_name: str, record: dict[str, any]) -> str:
     _distinguished_name = DistinguishedName.parse(distinguished_name)
-    return ChangelogRecord(_distinguished_name=_distinguished_name, **record).changes
+    normalised_record = {k.lower(): _normalise_value(v) for k, v in record.items()}
+    changelog = ChangelogRecord(
+        _distinguished_name=_distinguished_name, **normalised_record
+    )
+    return changelog.changes_as_ldif()

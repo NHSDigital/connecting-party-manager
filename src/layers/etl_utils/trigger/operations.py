@@ -1,18 +1,16 @@
-import hashlib
 import json
-from http import HTTPStatus
 from typing import TYPE_CHECKING
 
-from botocore.exceptions import ClientError
 from etl_utils.constants import EMPTY_ARRAY, EMPTY_LDIF, WorkerKey
 from etl_utils.io import pkl_dumps_lz4
-from event.json import json_loads
 
 from .model import StateMachineInput
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
     from mypy_boto3_stepfunctions import SFNClient
+
+NOT_FOUND_CODE = "NoSuchKey"
 
 
 class StateFileNotEmpty(Exception):
@@ -37,13 +35,13 @@ def start_execution(
 
 def object_exists(s3_client: "S3Client", bucket: str, key: str) -> str:
     try:
-        response = s3_client.head_object(Bucket=bucket, Key=key)
-    except ClientError as error:
-        if error.response["Error"]["Code"] != str(HTTPStatus.NOT_FOUND):
+        response = s3_client.get_object(Bucket=bucket, Key=key)
+    except Exception as error:
+        if error.response["Error"]["Code"] != NOT_FOUND_CODE:
             raise error
         file_hash = None
     else:
-        file_hash = json_loads(response["ETag"])
+        file_hash = response["Body"].read()
     return file_hash
 
 
@@ -51,8 +49,7 @@ def _validate_s3_file_content(
     s3_client: "S3Client", source_bucket: str, key: WorkerKey, content: bytes
 ):
     s3_file_hash = object_exists(s3_client=s3_client, bucket=source_bucket, key=key)
-    expected_file_hash = hashlib.md5(content).hexdigest()
-    if s3_file_hash and (s3_file_hash != expected_file_hash):
+    if s3_file_hash and (s3_file_hash != content):
         raise StateFileNotEmpty(bucket=source_bucket, key=key, content=content)
 
 
