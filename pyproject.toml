@@ -17,7 +17,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "3.11.4"
-pydantic = "1.10.14"
+pydantic = "1.10.15"
 nhs-context-logging = "^0.5.1"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
@@ -32,7 +32,7 @@ pre-commit = "^3.4.0"
 black = "^24.1.1"
 flake8 = "^7.0.0"
 behave = "^1.2.6"
-pytest = "^7.4.2"
+pytest = "^8.2.0"
 pytest-custom-exit-code = "^0.3.0"
 sh = "^2.0.6"
 hypothesis = "^6.87.3"
