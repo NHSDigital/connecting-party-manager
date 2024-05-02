@@ -21,7 +21,6 @@ THIS_MODULE = "api.tests.feature_tests.steps.requests"
 def _parse_url(base_url: str, endpoint: str) -> str:
     _endpoint, *tail = endpoint.split("?")
     query_string_parts = parse_qs(tail[0]) if tail else {}
-
     url = f"{base_url}{_endpoint}"
     query_params = [
         f"{quote_plus(query_param)}={quote_plus(value)}"
@@ -95,6 +94,15 @@ def _mocked_request(
     if json:
         optional_fields["body"] = _json.dumps(json)
     if query_params:
+        # Get any extra unwanted query params
+        first_key = next(iter(query_params))
+        key_value_pairs = query_params[first_key].split("&")
+        updated_params = {}
+        updated_params[first_key] = key_value_pairs.pop(0)
+        for pair in key_value_pairs:
+            key, value = pair.split("=")
+            updated_params[key] = value
+        query_params.update(updated_params)
         optional_fields["queryStringParameters"] = query_params
     if path_params:
         optional_fields["pathParameters"] = path_params
@@ -103,7 +111,7 @@ def _mocked_request(
         path=url,
         httpMethod=method,
         headers=headers,
-        multiValueHeaders={},
+        multiValueHeaders={"Host": ["foo.co.uk"]},
         requestContext=DUMMY_CONTEXT,
         isBase64Encoded=False,
         **optional_fields,

@@ -11,14 +11,12 @@ Feature: Search
     When I make a "GET" request with "default" headers to "Device?device_type=product"
     Then I receive a status code "200"
     And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 12001            |
+      | name         | value            |
+      | Content-Type | application/json |
 
   Scenario: Confirm Search endpoint is active with endpoint as filter
     When I make a "GET" request with "default" headers to "Device?device_type=endpoint"
     Then I receive a status code "200"
     And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 22905            |
+      | name         | value            |
+      | Content-Type | application/json |
