@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-05-02
+- [PI-341] Prod permissions
+- [PI-268] Search for a device
+- [PI-321] Inactive devices not returned during search
+
 ## 2024-04-26
 - [PI-315] Update trigger
 - [PI-343] Remove people branch
