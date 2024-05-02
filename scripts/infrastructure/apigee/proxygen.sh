@@ -1,6 +1,7 @@
 set -e
 
 PATH_TO_HERE="scripts/infrastructure/apigee"
+APIGEE_DEPLOYMENT_ROLE="NHSDeploymentRole"
 
 if [[ -z ${WORKSPACE_OUTPUT_JSON} ]]; then
     echo "WORKSPACE_OUTPUT_JSON not set"
@@ -96,7 +97,7 @@ function generate_proxy(){
 
     # Download the pem file if it does not exist
     if [ ! -f "${APIGEE_CONFIG_PATH}/${_apigee_stage}/.proxygen/private_key.pem" ]; then
-        poetry run python ${PATH_TO_HERE}/download_pem.py ${_apigee_stage}
+        poetry run python ${PATH_TO_HERE}/download_pem.py ${_apigee_stage} ${APIGEE_DEPLOYMENT_ROLE}
     fi
 
     DOT_PROXYGEN=${APIGEE_CONFIG_PATH}/${_apigee_stage} \
