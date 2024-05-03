@@ -6,6 +6,7 @@ from attr import asdict as _asdict
 from domain.core.device import (
     Device,
     DeviceCreatedEvent,
+    DeviceIndexAddedEvent,
     DeviceKey,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
@@ -160,6 +161,25 @@ class DeviceRepository(Repository[Device]):
             )
         )
 
+    def handle_DeviceIndexAddedEvent(self, event: DeviceIndexAddedEvent):
+        pk = TableKeys.DEVICE.key(event.id)
+        sk = TableKeys.DEVICE_INDEX.key(
+            event.questionnaire_id, event.question_name, event.value
+        )
+        event_data = asdict(event)
+        condition_expression = (
+            {"ConditionExpression": ConditionExpression.MUST_NOT_EXIST}
+            if event_data.get("_trust", False) is False
+            else {}
+        )
+        return TransactItem(
+            Put=TransactionStatement(
+                TableName=self.table_name,
+                Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=pk, **asdict(event)),
+                **condition_expression,
+            )
+        )
+
     def query_by_key_type(self, key_type, **kwargs) -> "QueryOutputTypeDef":
         pk_2 = TableKeys.DEVICE_KEY_TYPE.key(key_type)
         args = {
@@ -181,6 +201,19 @@ class DeviceRepository(Repository[Device]):
             },
         }
         return self.client.query(**args, **kwargs)
+
+    def read_by_index(self, questionnaire_id: str, question_name: str, value: str):
+        pk_1 = TableKeys.DEVICE_INDEX.key(questionnaire_id, question_name, value)
+        result = self.client.query(
+            TableName=self.table_name,
+            IndexName="idx_gsi_1",
+            KeyConditionExpression="pk_1 = :pk_1",
+            ExpressionAttributeValues={
+                ":pk_1": marshall_value(pk_1),
+            },
+        )
+        items = (unmarshall(i) for i in result["Items"])
+        return [self.read(strip_key_prefix(item["pk"])) for item in items]
 
     def read_by_key(self, key) -> Device:
         pk_1 = TableKeys.DEVICE_KEY.key(key)

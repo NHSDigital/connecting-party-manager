@@ -9,6 +9,7 @@ class TableKeys(StrEnum):
     DEVICE_KEY = "DK"
     DEVICE_TYPE = "DT"
     DEVICE_KEY_TYPE = "DKT"
+    DEVICE_INDEX = "DI"
     PRODUCT_TEAM = "PT"
     QUESTIONNAIRE = "Q"
     QUESTIONNAIRE_RESPONSE = "QR"

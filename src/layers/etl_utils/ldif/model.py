@@ -16,7 +16,7 @@ class DistinguishedName(BaseModel):
 
     @classmethod
     def parse(cls, raw_distinguished_name: str) -> Self:
-        unsorted_parts = DISTINGUISHED_NAME_RE.findall(raw_distinguished_name)
+        unsorted_parts = DISTINGUISHED_NAME_RE.findall(raw_distinguished_name.lower())
         if not unsorted_parts:
             raise BadDistinguishedName(raw_distinguished_name)
         sorted_parts = sorted(unsorted_parts, key=lambda *args: args)

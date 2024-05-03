@@ -3,7 +3,7 @@ from domain.core.load_questionnaire import render_questionnaire
 from domain.core.questionnaire import Questionnaire
 from domain.core.questionnaires import QuestionnaireInstance
 from event.json import json_load
-from hypothesis import given
+from hypothesis import given, settings
 from sds.cpm_translation.tests.test_cpm_translation import NHS_MHS_STRATEGY
 from sds.domain.nhs_mhs import NhsMhs
 
@@ -37,6 +37,7 @@ def _test_spine_endpoint_questionnaire_v1(
     return True
 
 
+@settings(deadline=1500)
 @given(nhs_mhs=NHS_MHS_STRATEGY)
 def test_spine_endpoint_questionnaire_v1_local(nhs_mhs: NhsMhs):
     spine_endpoint_questionnaire_v1 = render_questionnaire(

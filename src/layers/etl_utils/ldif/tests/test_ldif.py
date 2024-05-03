@@ -109,25 +109,25 @@ PARSED_SAMPLE_LDIF = [
         [
             "foo=FOO",
             DistinguishedName(
-                parts=(("foo", "FOO"),),
+                parts=(("foo", "foo"),),
             ),
         ],
         [
             "foo=FOO,bar.baz=BAR.BAZ",
             DistinguishedName(
                 parts=(
-                    ("bar.baz", "BAR.BAZ"),
-                    ("foo", "FOO"),
+                    ("bar.baz", "bar.baz"),
+                    ("foo", "foo"),
                 ),
             ),
         ],
     ),
 )
-def test_distinguished_name(raw_distinguished_name, parsed_distinguished_name):
+def test_distinguished_name(raw_distinguished_name: str, parsed_distinguished_name):
     distinguished_name = DistinguishedName.parse(raw_distinguished_name)
     assert distinguished_name == parsed_distinguished_name
     assert sorted(distinguished_name.raw.split(",")) == sorted(
-        raw_distinguished_name.split(",")
+        raw_distinguished_name.lower().split(",")
     )
 
 

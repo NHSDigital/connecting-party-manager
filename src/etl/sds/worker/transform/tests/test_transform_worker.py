@@ -108,8 +108,8 @@ def test_transform_worker_pass_dupe_check_mock(
         response = transform.handler(event={}, context=None)
     assert response == {
         "stage_name": "transform",
-        # 4 x initial unprocessed because a key event + 2 questionnaire events are also created
-        "processed_records": n_initial_processed + 4 * n_initial_unprocessed,
+        # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
+        "processed_records": n_initial_processed + 5 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -122,7 +122,7 @@ def test_transform_worker_pass_dupe_check_mock(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + 4 * n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 5 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -148,7 +148,7 @@ def test_transform_worker_pass_no_dupes(
     assert response == {
         "stage_name": "transform",
         # 2 x initial unprocessed because a key event is also created
-        "processed_records": n_initial_processed + 4 * n_initial_unprocessed,
+        "processed_records": n_initial_processed + 5 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -161,7 +161,7 @@ def test_transform_worker_pass_no_dupes(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + 4 * n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 5 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -243,8 +243,8 @@ def test_transform_worker_bad_record(
         response = transform.handler(event={}, context=None)
     assert response == {
         "stage_name": "transform",
-        # 4 x initial unprocessed because a key event + 2 questionnaire events are also created
-        "processed_records": n_initial_processed + (4 * bad_record_index),
+        # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
+        "processed_records": n_initial_processed + (5 * bad_record_index),
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
         "error_message": (
             "The following errors were encountered\n"
@@ -264,8 +264,8 @@ def test_transform_worker_bad_record(
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
     assert n_final_unprocessed > 0
-    # 4 x initial unprocessed because a key event + 2 questionnaire events are also created
-    assert n_final_processed == n_initial_processed + (4 * bad_record_index)
+    # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
+    assert n_final_processed == n_initial_processed + (5 * bad_record_index)
     assert n_final_unprocessed == n_initial_unprocessed - bad_record_index
 
 

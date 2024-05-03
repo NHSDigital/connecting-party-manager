@@ -4,7 +4,7 @@ from collections import deque
 
 import boto3
 import pytest
-from domain.core.device import DeviceType
+from domain.core.device import DeviceStatus, DeviceType
 from domain.core.device_key import DeviceKeyType
 from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
@@ -23,6 +23,21 @@ from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.pytest_skips import long_running
 from test_helpers.terraform import read_terraform_output
+
+# Note that unique identifier "000428682512" is the identifier of 'GOOD_SDS_RECORD'
+DELETION_REQUEST_000428682512 = """
+dn: o=nhs,ou=Services,uniqueIdentifier=000428682512
+changetype: delete
+objectclass: delete
+uniqueidentifier: 000428682512
+"""
+
+DELETION_REQUEST_000842065542 = """
+dn: o=nhs,ou=Services,uniqueIdentifier=000842065542
+changetype: delete
+objectclass: delete
+uniqueidentifier: 000842065542
+"""
 
 
 @pytest.fixture
@@ -74,7 +89,7 @@ def execute_state_machine(
             error_message = cause["errorMessage"]
             stack_trace = cause["stackTrace"]
         except Exception:
-            error_message = response["cause"]
+            error_message = response.get("cause", "no error message")
             stack_trace = []
 
         print(  # noqa: T201
@@ -83,7 +98,7 @@ def execute_state_machine(
             "\n",
             *stack_trace,
         )
-        raise RuntimeError(response["error"])
+        raise RuntimeError(response.get("error", "no error message"))
     return response
 
 
@@ -100,6 +115,12 @@ def get_object(key: WorkerKey) -> str:
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     response = client.get_object(Bucket=etl_bucket, Key=key)
     return response["Body"].read()
+
+
+def put_object(key: WorkerKey, body: bytes) -> str:
+    client = boto3.client("s3")
+    etl_bucket = read_terraform_output("sds_etl.value.bucket")
+    return client.put_object(Bucket=etl_bucket, Key=key, Body=body)
 
 
 @pytest.mark.integration
@@ -206,3 +227,88 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
 
     assert product_count == accredited_system_count == 5670
     assert endpoint_count == message_handling_system_count == 154506
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "worker_data",
+    [
+        {
+            WorkerKey.EXTRACT: "\n".join([GOOD_SDS_RECORD, ANOTHER_GOOD_SDS_RECORD]),
+            WorkerKey.TRANSFORM: pkl_dumps_lz4(deque()),
+            WorkerKey.LOAD: pkl_dumps_lz4(deque()),
+        }
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "state_machine_input",
+    [
+        StateMachineInput.bulk(changelog_number=123),
+    ],
+    indirect=True,
+)
+def test_end_to_end_changelog_delete(
+    repository: MockDeviceRepository, worker_data, state_machine_input
+):
+    """Note that the start of this test is the same as test_end_to_end, and then makes changes"""
+    extract_data = get_object(key=WorkerKey.EXTRACT)
+    transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
+    load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+
+    assert len(extract_data) == 0
+    assert len(transform_data) == 0
+    assert len(load_data) == 0
+    assert len(list(repository.all_devices())) == len(
+        worker_data[WorkerKey.EXTRACT].split("\n\n")
+    )
+
+    # Now execute a changelog initial state in the ETL
+    put_object(key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000428682512)
+    response = execute_state_machine(
+        state_machine_input=StateMachineInput.update(
+            changelog_number_start=124, changelog_number_end=125
+        )
+    )
+    assert response["status"] == "SUCCEEDED"
+
+    # Verify that the device with unique id 000428682512 is now "inactive"
+    (device,) = repository.read_by_index(
+        questionnaire_id="spine_device/1",
+        question_name="unique_identifier",
+        value="000428682512",
+    )
+    assert device.status == DeviceStatus.INACTIVE
+
+    # Verify that the other device is still "active"
+    (device,) = repository.read_by_index(
+        questionnaire_id="spine_device/1",
+        question_name="unique_identifier",
+        value="000842065542",
+    )
+    assert device.status == DeviceStatus.ACTIVE
+
+    # Execute another changelog initial state in the ETL
+    put_object(key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000842065542)
+    response = execute_state_machine(
+        state_machine_input=StateMachineInput.update(
+            changelog_number_start=124, changelog_number_end=125
+        )
+    )
+    assert response["status"] == "SUCCEEDED"
+
+    # Verify that the device with unique id 000428682512 is still "inactive"
+    (device,) = repository.read_by_index(
+        questionnaire_id="spine_device/1",
+        question_name="unique_identifier",
+        value="000428682512",
+    )
+    assert device.status == DeviceStatus.INACTIVE
+
+    # Verify that the other device is now "inactive"
+    (device,) = repository.read_by_index(
+        questionnaire_id="spine_device/1",
+        question_name="unique_identifier",
+        value="000842065542",
+    )
+    assert device.status == DeviceStatus.INACTIVE

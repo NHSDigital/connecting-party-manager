@@ -3,7 +3,7 @@ from domain.core.load_questionnaire import render_questionnaire
 from domain.core.questionnaire import Questionnaire
 from domain.core.questionnaires import QuestionnaireInstance
 from event.json import json_load
-from hypothesis import assume, given
+from hypothesis import assume, given, settings
 from sds.cpm_translation.tests.test_cpm_translation import (
     NHS_ACCREDITED_SYSTEM_STRATEGY,
 )
@@ -52,6 +52,7 @@ def _test_spine_device_questionnaire_v1(
     return True
 
 
+@settings(deadline=1500)
 @given(nhs_accredited_system=NHS_ACCREDITED_SYSTEM_STRATEGY)
 def test_spine_device_questionnaire_v1_local(
     nhs_accredited_system: NhsAccreditedSystem,

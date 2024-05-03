@@ -36,7 +36,7 @@ def test_changelog_model_against_changelog_data(test_data_paths):
     assert changelog_record.change_time == "20240116173441Z"
     assert changelog_record.change_type == "add"
     assert changelog_record.target_distinguished_name == DistinguishedName(
-        parts=(("o", "nhs"), ("ou", "Services"), ("uniqueIdentifier", "200000042019"))
+        parts=(("o", "nhs"), ("ou", "services"), ("uniqueidentifier", "200000042019"))
     )
 
 
@@ -56,14 +56,11 @@ def test_changelog_changes_are_valid_ldif(test_data_paths):
         **record,
     )
 
-    # HACK THE RECORD - FOR SOME REASON DOESN'T START WITH DN LINE?
-    changelog_record.changes = (
-        "dn: uniqueidentifier=200000042019,ou=services,o=nhs" + changelog_record.changes
-    )
-
     # Check that the change itself is valid LDIF
     nested_ldif_lines = list(
-        parse_ldif(file_opener=StringIO, path_or_data=changelog_record.changes)
+        parse_ldif(
+            file_opener=StringIO, path_or_data=changelog_record.changes_as_ldif()
+        )
     )
     assert len(nested_ldif_lines) == 1
 
