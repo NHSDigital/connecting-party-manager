@@ -155,8 +155,7 @@ jobs:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         with:
-          command: test--smoke
-          workspace: ${{ env.WORKSPACE }}
+          command: test--smoke WORKSPACE="${{ env.WORKSPACE }}" ACCOUNT="${{ env.ACCOUNT }}"
           requires-aws: true
           restore-from-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}
