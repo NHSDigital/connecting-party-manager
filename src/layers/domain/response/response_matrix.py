@@ -9,6 +9,7 @@ from .coding import CpmCoding, FhirCoding
 from .validation_errors import (
     InboundJSONDecodeError,
     InboundMissingValue,
+    InboundQueryValidationError,
     InboundValidationError,
 )
 
@@ -45,6 +46,7 @@ EXCEPTIONS_TO_FHIR_CODING = {
     AlreadyExistsError: FhirCoding.VALIDATION_ERROR,
     ItemNotFound: FhirCoding.RESOURCE_NOT_FOUND,
     StatusNotOk: FhirCoding.SERVICE_UNAVAILABLE,
+    InboundQueryValidationError: FhirCoding.VALIDATION_ERROR,
 }
 
 SUCCESS_STATUSES = set(HTTP_STATUS_TO_CPM_CODING)
