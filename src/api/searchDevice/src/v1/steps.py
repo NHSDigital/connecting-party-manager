@@ -1,37 +1,39 @@
 from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+from domain.api.query import SearchQueryParams
 from domain.core.device import Device, DeviceType
 from domain.fhir_translation.device import create_fhir_searchset_bundle
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.marshall import unmarshall_value
-from domain.response.validation_errors import validate_query_params
+from domain.response.validation_errors import InboundValidationError
 from event.step_chain import StepChain
+from pydantic import ValidationError
 
-device_type_map = {"PRODUCT": DeviceType.PRODUCT, "ENDPOINT": DeviceType.ENDPOINT}
 
-
-@validate_query_params
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    return {
-        "query_string": event.query_string_parameters["device_type"].upper(),
-        "host": event.multi_value_headers["Host"],
-    }
-
-
-def set_device_type(data, cache):
-    event_data = data[parse_event_query]
-    device_query_param = event_data.get("query_string")
-    return device_type_map.get(device_query_param, DeviceType.ENDPOINT)
+    query_params = event.query_string_parameters
+    try:
+        search_query_params = SearchQueryParams(**query_params)
+        return {
+            "query_string": search_query_params.device_type,
+            "host": event.multi_value_headers["Host"],
+        }
+    except ValidationError as exc:
+        raise InboundValidationError(
+            errors=exc.raw_errors,
+            model=exc.model,
+        )
 
 
 def read_devices_by_type(data, cache) -> List[Device]:
-    device_type = data[set_device_type]
+    event_data = data[parse_event_query]
+    device_type = event_data.get("query_string")
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.query_by_device_type(type=device_type)
+    return device_repo.query_by_device_type(type=DeviceType(device_type))
 
 
 def read_devices_by_id(data, cache) -> List[Device]:
@@ -71,7 +73,6 @@ def devices_to_fhir_bundle(data, cache) -> dict:
 
 steps = [
     parse_event_query,
-    set_device_type,
     read_devices_by_type,
     read_devices_by_id,
     devices_to_fhir_bundle,

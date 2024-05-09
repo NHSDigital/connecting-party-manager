@@ -1,11 +1,8 @@
-from enum import Enum
 from functools import wraps
 from json import JSONDecodeError
 from typing import Callable, ParamSpec, TypeVar
 
-from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from event.step_chain import StepChain
-from pydantic import BaseModel, Extra, ValidationError
+from pydantic import BaseModel, ValidationError
 
 T = TypeVar("T")
 RT = TypeVar("RT")
@@ -77,60 +74,14 @@ def mark_validation_errors_as_inbound(function: Callable[P, RT]):
     return decorator
 
 
-class DeviceType(str, Enum):
-    PRODUCT = "PRODUCT"
-    ENDPOINT = "ENDPOINT"
-
-    @classmethod
-    def _missing_(cls, value):
-        for member in cls:
-            if value.upper() == member.value:
-                return member
-
-
-class SearchQueryParams(BaseModel, extra=Extra.forbid):
-    device_type: DeviceType
-
-
-def validate_query_params(function):
-    @wraps(function)
-    def decorator(data, cache, **kwargs):
-        event = APIGatewayProxyEvent(data[StepChain.INIT])
-        query_params = event.query_string_parameters
-        try:
-            SearchQueryParams(**query_params)
-            return function(data, cache, **kwargs)
-        except ValidationError as exc:
-            raise InboundQueryValidationError(
-                errors=exc.raw_errors,
-                model=exc.model,
-            )
-
-    return decorator
-
-
 def parse_validation_error(
     validation_error: ValidationError,
 ) -> list[ValidationErrorItem]:
-    error_items = []
-    inbound = False
-    for error_item in validation_error.errors():
-        if isinstance(validation_error, InboundValidationError):
-            inbound = True
-        if isinstance(validation_error, InboundQueryValidationError):
-            error_item["msg"] = "Only 'device_type' query parameter is allowed."
-            if error_item["type"] == "type_error.enum":
-                error_item[
-                    "msg"
-                ] = "'device_type' query parameter must be one of 'product' or 'endpoint'."
-            inbound = True
-        error_items.append(error_item)
-
     return [
         ValidationErrorItem(
             model_name=validation_error.model.__name__,
-            is_inbound=inbound,
+            is_inbound=isinstance(validation_error, InboundValidationError),
             **error_item,
         )
-        for error_item in error_items
+        for error_item in validation_error.errors()
     ]
