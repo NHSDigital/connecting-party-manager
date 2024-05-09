@@ -2,7 +2,7 @@ from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.api.query import SearchQueryParams
-from domain.core.device import Device, DeviceType
+from domain.core.device import Device
 from domain.fhir_translation.device import create_fhir_searchset_bundle
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.marshall import unmarshall_value
@@ -33,7 +33,7 @@ def read_devices_by_type(data, cache) -> List[Device]:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.query_by_device_type(type=DeviceType(device_type))
+    return device_repo.query_by_device_type(type=device_type)
 
 
 def read_devices_by_id(data, cache) -> List[Device]:
