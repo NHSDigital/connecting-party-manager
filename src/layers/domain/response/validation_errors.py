@@ -41,10 +41,6 @@ class InboundJSONDecodeError(JSONDecodeError):
     pass
 
 
-class InboundQueryValidationError(ValidationError):
-    pass
-
-
 def mark_json_decode_errors_as_inbound(function: Callable[P, RT]):
     @wraps(function)
     def decorator(*args: P.args, **kwargs: P.kwargs):
