@@ -13,15 +13,17 @@ from pydantic import ValidationError
 from ..data.response import devices, endpoints
 
 
+def get_mocked_results(data, cache):
+    event = APIGatewayProxyEvent(data[StepChain.INIT])
+    query_params = event.query_string_parameters
+    device_type = query_params["device_type"]
+    return {"product": devices, "endpoint": endpoints}.get(device_type.lower(), {})
+
+
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     query_params = event.query_string_parameters
     try:
-        if "mock" in query_params:
-            device_type = query_params["device_type"]
-            return {"product": devices, "endpoint": endpoints}.get(
-                device_type.lower(), {}
-            )
         search_query_params = SearchQueryParams(**query_params)
         return {
             "query_string": search_query_params.device_type,
@@ -36,33 +38,26 @@ def parse_event_query(data, cache):
 
 def read_devices_by_type(data, cache) -> List[Device]:
     event_data = data[parse_event_query]
-    if "query_string" in event_data:
-        device_type = event_data.get("query_string")
-        device_repo = DeviceRepository(
-            table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
-        )
-        return device_repo.query_by_device_type(type=device_type)
-
-    return event_data
+    device_type = event_data.get("query_string")
+    device_repo = DeviceRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+    )
+    return device_repo.query_by_device_type(type=device_type)
 
 
 def read_devices_by_id(data, cache) -> List[Device]:
-    event_data = data[parse_event_query]
-    if "query_string" in event_data:
-        devices = data[read_devices_by_type]
-        full_devices = []
-        for device in devices.get("Items"):
-            if unmarshall_value(device.get("status", {"S": "inactive"})) == "active":
-                full_devices.append(
-                    _read_devices_by_id(
-                        device,
-                        table_name=cache["DYNAMODB_TABLE"],
-                        dynamodb_client=cache["DYNAMODB_CLIENT"],
-                    )
+    devices = data[read_devices_by_type]
+    full_devices = []
+    for device in devices.get("Items"):
+        if unmarshall_value(device.get("status", {"S": "inactive"})) == "active":
+            full_devices.append(
+                _read_devices_by_id(
+                    device,
+                    table_name=cache["DYNAMODB_TABLE"],
+                    dynamodb_client=cache["DYNAMODB_CLIENT"],
                 )
-        return full_devices
-
-    return event_data
+            )
+    return full_devices
 
 
 def _read_devices_by_id(device, table_name, dynamodb_client) -> Device:
@@ -76,16 +71,13 @@ def _read_devices_by_id(device, table_name, dynamodb_client) -> Device:
 
 def devices_to_fhir_bundle(data, cache) -> dict:
     event_data = data[parse_event_query]
-    if "query_string" in event_data:
-        device_type = event_data.get("query_string")
-        host = event_data.get("host")[0]
-        devices = data[read_devices_by_id]
-        fhir_org = create_fhir_searchset_bundle(
-            devices=devices, device_type=device_type, host=host
-        )
-        return fhir_org.dict()
-
-    return event_data
+    device_type = event_data.get("query_string")
+    host = event_data.get("host")[0]
+    devices = data[read_devices_by_id]
+    fhir_org = create_fhir_searchset_bundle(
+        devices=devices, device_type=device_type, host=host
+    )
+    return fhir_org.dict()
 
 
 steps = [
@@ -93,4 +85,8 @@ steps = [
     read_devices_by_type,
     read_devices_by_id,
     devices_to_fhir_bundle,
+]
+
+mocked_steps = [
+    get_mocked_results,
 ]

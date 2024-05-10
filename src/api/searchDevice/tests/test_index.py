@@ -708,6 +708,14 @@ def test_index_multiple_active_devices(
                 "device_type": "endpoint",
             },
         ),
+        (
+            "1",
+            {"device_type": "product"},
+        ),
+        (
+            "1",
+            {"device_type": "endpoint"},
+        ),
     ],
 )
 def test_mock_is_returned(version, device):
@@ -718,7 +726,7 @@ def test_mock_is_returned(version, device):
             "headers": {"version": version},
             "queryStringParameters": {
                 "device_type": device["device_type"],
-                "mock": "foobar",
+                "use_mock": "true",
             },
             "multiValueHeaders": {"Host": ["foo.co.uk"]},
         }
