@@ -10,6 +10,15 @@ from domain.response.validation_errors import InboundValidationError
 from event.step_chain import StepChain
 from pydantic import ValidationError
 
+from ..data.response import devices, endpoints
+
+
+def get_mocked_results(data, cache):
+    event = APIGatewayProxyEvent(data[StepChain.INIT])
+    query_params = event.query_string_parameters
+    device_type = query_params["device_type"]
+    return {"product": devices, "endpoint": endpoints}.get(device_type.lower(), {})
+
 
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
@@ -76,4 +85,8 @@ steps = [
     read_devices_by_type,
     read_devices_by_id,
     devices_to_fhir_bundle,
+]
+
+mocked_steps = [
+    get_mocked_results,
 ]

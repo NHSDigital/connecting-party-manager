@@ -14,6 +14,8 @@ from test_helpers.dynamodb import mock_table
 from test_helpers.response_assertions import _response_assertions
 from test_helpers.uuid import consistent_uuid
 
+from ..src.data.response import devices, endpoints
+
 TABLE_NAME = "hiya"
 
 
@@ -686,6 +688,68 @@ def test_index_multiple_active_devices(
         },
     }
 
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
+
+
+@pytest.mark.parametrize(
+    "version, device",
+    [
+        (
+            "1",
+            {
+                "device_type": "product",
+            },
+        ),
+        (
+            "1",
+            {
+                "device_type": "endpoint",
+            },
+        ),
+        (
+            "1",
+            {"device_type": "product"},
+        ),
+        (
+            "1",
+            {"device_type": "endpoint"},
+        ),
+    ],
+)
+def test_mock_is_returned(version, device):
+    from api.searchDevice.index import handler
+
+    result = handler(
+        event={
+            "headers": {"version": version},
+            "queryStringParameters": {
+                "device_type": device["device_type"],
+                "use_mock": "true",
+            },
+            "multiValueHeaders": {"Host": ["foo.co.uk"]},
+        }
+    )
+    result_body = json_loads(result["body"])
+    result_id = result_body.get("id")
+
+    expected_result = json.dumps(
+        {"product": devices, "endpoint": endpoints}.get(
+            device["device_type"].lower(), {}
+        )
+    )
+
+    expected = {
+        "statusCode": 200,
+        "body": expected_result,
+        "headers": {
+            "Content-Type": "application/json",
+            "Content-Length": str(len(expected_result)),
+            "Version": version,
+            "Location": None,
+        },
+    }
     _response_assertions(
         result=result, expected=expected, check_body=True, check_content_length=True
     )
