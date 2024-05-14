@@ -11,6 +11,7 @@ class AwsLambdaResponseHeaders(BaseModel):
     content_length: str = Field(alias="Content-Length", regex=r"^[1-9][0-9]*$")
     version: str = Field(alias="Version", regex=r"^(null)|([1-9][0-9]*)$")
     location: Optional[str] = Field(alias="Location")
+    host: Optional[str] = Field(alias="Host")
 
     class Config:
         allow_population_by_field_name = True
@@ -37,6 +38,7 @@ class AwsLambdaResponse(BaseModel):
             content_length=len(body),
             version="null" if version is None else version,
             location=location,
+            host="foo.co.uk",
         )
         return headers
 

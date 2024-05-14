@@ -40,6 +40,7 @@ def test__mock_requests():
             "Content-Type": "application/json",
             "Version": "1",
             "Location": None,
+            "Host": None,
         },
         "status_code": 200,
         "reason": "OK",

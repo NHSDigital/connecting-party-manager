@@ -13,5 +13,6 @@ def test_aws_lambda_response(aws_lambda_response: AwsLambdaResponse):
             "Content-Length": f"{len(aws_lambda_response.body)}",
             "Location": None,
             "Version": "null",
+            "Host": "foo.co.uk",
         },
     }

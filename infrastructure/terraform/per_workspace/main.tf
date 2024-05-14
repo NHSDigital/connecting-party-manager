@@ -109,7 +109,7 @@ module "lambdas" {
     for file in fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json") : replace(file, ".json", "") => {
       effect    = "Allow"
       actions   = jsondecode(file("${path.module}/../../../src/api/${each.key}/policies/${file}"))
-      resources = [local.permission_resource_map["${replace(file, ".json", "")}"]]
+      resources = local.permission_resource_map[replace(file, ".json", "")]
     }
   }
 }

@@ -40,7 +40,7 @@ runs:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}
+          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
     # # For debugging, uncomment the following:
     # - id: tree

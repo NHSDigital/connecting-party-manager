@@ -155,8 +155,7 @@ jobs:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         with:
-          command: test--smoke
-          workspace: ${{ env.WORKSPACE }}
+          command: test--smoke WORKSPACE="${{ env.WORKSPACE }}" ACCOUNT="${{ env.ACCOUNT }}"
           requires-aws: true
           restore-from-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}
@@ -180,7 +179,7 @@ jobs:
     steps:
       - name: Send job result to slack
         id: slack
-        uses: slackapi/slack-github-action@v1.25.0
+        uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
             {

@@ -1,8 +1,11 @@
+from typing import List
+from uuid import uuid4
+
 from domain.core.device import Device as DomainDevice
 from domain.core.product_team import ProductTeam
 from domain.fhir.r4 import Device as FhirDevice
 from domain.fhir.r4 import StrictDevice as StrictFhirDevice
-from domain.fhir.r4.cpm_model import SYSTEM
+from domain.fhir.r4.cpm_model import SYSTEM, Answer, CollectionBundle
 from domain.fhir.r4.cpm_model import Device as CpmFhirDevice
 from domain.fhir.r4.cpm_model import (
     DeviceDefinitionIdentifier,
@@ -10,8 +13,14 @@ from domain.fhir.r4.cpm_model import (
     DeviceIdentifier,
     DeviceName,
     DeviceOwnerReference,
+    Link,
     ProductTeamIdentifier,
+    QuestionAndAnswer,
 )
+from domain.fhir.r4.cpm_model import (
+    QuestionnaireResponse as CpmFhirQuestionnaireResponse,
+)
+from domain.fhir.r4.cpm_model import Reference, Resource, SearchsetBundle
 from domain.fhir_translation.parse import create_fhir_model_from_fhir_json
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
@@ -53,4 +62,74 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
         owner=DeviceOwnerReference(
             identifier=ProductTeamIdentifier(value=device.product_team_id)
         ),
+    )
+
+
+def create_fhir_model_from_questionnaire_response(
+    device: DomainDevice,
+    host,
+) -> CpmFhirQuestionnaireResponse:
+    items = []
+    for identifier, responses in device.questionnaire_responses.items():
+        for questionnaire_response in responses:
+            for ques_res in questionnaire_response.responses:
+                for question, answers in ques_res.items():
+                    answer_objects = [Answer(valueString=answer) for answer in answers]
+                    question_and_answer = QuestionAndAnswer(
+                        link_id=question, text=question, answer=answer_objects
+                    )
+                    items.append(question_and_answer)
+
+    return CpmFhirQuestionnaireResponse(
+        resourceType=CpmFhirQuestionnaireResponse.__name__,
+        # identifier="010057927542",
+        # questionnaire="https://cpm.co.uk/Questionnaire/spine_device|v1", Doesn't exist yet
+        subject=Reference(reference=f"https://{host}/Device/{device.id}"),
+        # "authored": "<dateTime>",
+        author=Reference(
+            reference=f"https://{host}/Organization/{device.product_team_id}"
+        ),
+        item=items,
+    )
+
+
+def create_fhir_collection_bundle(
+    device: DomainDevice,
+    host,
+) -> CollectionBundle:
+    fhir_device = create_fhir_model_from_device(device=device)
+    fhir_resource = Resource(
+        fullUrl=f"https://{host}/Device/{device.id}", resource=fhir_device
+    )
+    fhir_questionnaire = create_fhir_model_from_questionnaire_response(
+        device=device, host=host
+    )
+    return CollectionBundle(
+        resourceType="Bundle",
+        id=str(uuid4()),
+        total=2,
+        link=[Link(relation="self", url=f"https://{host}/Device/{device.id}")],
+        entry=[fhir_resource, fhir_questionnaire],
+    )
+
+
+def create_fhir_searchset_bundle(
+    devices: List[DomainDevice],
+    device_type,
+    host,
+) -> SearchsetBundle:
+    entries = []
+    for device in devices:
+        entries.append(create_fhir_collection_bundle(device, host))
+    return SearchsetBundle(
+        resourceType="Bundle",
+        id=str(uuid4()),
+        total=len(devices),
+        link=[
+            Link(
+                relation="self",
+                url=f"https://{host}/Device?device_type={device_type.lower()}",
+            )
+        ],
+        entry=entries,
     )
