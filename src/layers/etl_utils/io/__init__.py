@@ -1,6 +1,7 @@
 import json
 import pickle
 from collections import deque
+from datetime import datetime
 from io import BytesIO
 from typing import IO
 from uuid import UUID
@@ -17,6 +18,8 @@ class EtlEncoder(json.JSONEncoder):
         if isinstance(obj, deque):
             return list(obj)
         if isinstance(obj, UUID):
+            return str(obj)
+        if isinstance(obj, datetime):
             return str(obj)
         return json.JSONEncoder.default(self, obj)
 

@@ -45,7 +45,7 @@ The first time it will also set up your pre-commit hooks.
 
 We use [Proxygen](https://github.com/NHSDigital/proxygen-cli) to deploy our proxies and specs to APIM which we have wrapped up into a make command:
 
-- `make apigee-deploy`
+- `make apigee--deploy`
 
 This when run locally will need you to have done a local `terraform--plan` and `terraform--apply` (as it will read some details from the output files)
 

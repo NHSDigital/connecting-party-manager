@@ -1,0 +1,260 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "IamSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetPolicyVersion",
+        "iam:ListRoleTags",
+        "iam:ListPolicyTags",
+        "iam:ListRolePolicies",
+        "iam:GetRole",
+        "iam:GetPolicy",
+        "iam:ListGroupPolicies",
+        "iam:ListPolicyVersions",
+        "iam:GetGroupPolicy",
+        "iam:GetRolePolicy",
+        "iam:ListPolicies",
+        "iam:ListRoles",
+        "iam:ListGroups",
+        "iam:ListUsers",
+        "iam:ListAttachedRolePolicies"
+      ],
+      "Resource": [
+        "arn:aws:iam::${ACCOUNT_ID}:role/*",
+        "arn:aws:iam::${ACCOUNT_ID}:group/*",
+        "arn:aws:iam::${ACCOUNT_ID}:policy/*"
+      ]
+    },
+    {
+      "Sid": "IamSupportPermissionsAll",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListAccountAliases",
+        "iam:GetAccountSummary"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "DynamoDbSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeContributorInsights",
+        "dynamodb:Scan",
+        "dynamodb:ListTagsOfResource",
+        "dynamodb:Query",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:PartiQLSelect",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:DescribeContinuousBackups",
+        "dynamodb:DescribeKinesisStreamingDestination",
+        "dynamodb:DescribeTableReplicaAutoScaling",
+        "dynamodb:ListContributorInsights",
+        "dynamodb:DescribeReservedCapacityOfferings",
+        "dynamodb:ListGlobalTables",
+        "dynamodb:ListTables",
+        "dynamodb:DescribeReservedCapacity",
+        "dynamodb:ListBackups",
+        "dynamodb:ListImports",
+        "dynamodb:DescribeLimits",
+        "dynamodb:DescribeEndpoints",
+        "dynamodb:ListExports",
+        "dynamodb:ListStreams"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:*:${ACCOUNT_ID}:table/*",
+        "arn:aws:dynamodb::${ACCOUNT_ID}:global-table/*"
+      ]
+    },
+    {
+      "Sid": "CloudFormationSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:ListStackResources",
+        "cloudformation:ListStacks"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "TagSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "tag:GetResources",
+        "tag:GetTagValues",
+        "tag:GetTagKeys",
+        "tag:GetComplianceSummary",
+        "tag:DescribeReportCreation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "LambdaSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:ListAliases",
+        "lambda:ListFunctionUrlConfigs",
+        "lambda:ListTags",
+        "lambda:ListVersionsByFunction",
+        "lambda:ListLayerVersions",
+        "lambda:GetAlias",
+        "lambda:GetFunction",
+        "lambda:GetLayerVersion",
+        "lambda:GetFunctionEventInvokeConfig",
+        "lambda:ListProvisionedConcurrencyConfigs",
+        "lambda:GetFunctionUrlConfig"
+      ],
+      "Resource": [
+        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*",
+        "arn:aws:lambda:*:${ACCOUNT_ID}:layer:*:*"
+      ]
+    },
+    {
+      "Sid": "LambdaSupportAllPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:ListFunctions",
+        "lambda:ListLayers",
+        "lambda:GetAccountSettings"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "ResourceGroupSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "resource-groups:GetAccountSettings",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:GetTags",
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupConfiguration",
+        "resource-groups:ListGroupResources",
+        "resource-groups:SearchResources",
+        "resource-groups:ListGroups"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "CloudwatchSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:ListTagsForResource",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:ListMetricStreams",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:DescribeAnomalyDetectors",
+        "cloudwatch:DescribeInsightRules",
+        "cloudwatch:GetDashboard",
+        "cloudwatch:GetInsightRuleReport",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricWidgetImage",
+        "cloudwatch:GetMetricStream",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:GenerateQuery",
+        "cloudwatch:ListManagedInsightRules",
+        "cloudwatch:ListDashboards"
+      ],
+      "Resource": [
+        "arn:aws:cloudwatch:*:${ACCOUNT_ID}:alarm:*",
+        "arn:aws:cloudwatch::${ACCOUNT_ID}:dashboard/*",
+        "arn:aws:cloudwatch:*:${ACCOUNT_ID}:insight-rule/*",
+        "arn:aws:cloudwatch:*:${ACCOUNT_ID}:metric-stream/*"
+      ]
+    },
+    {
+      "Sid": "LogSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "logs:ListAnomalies",
+        "logs:GetDelivery",
+        "logs:GetDeliverySource",
+        "logs:GetLogEvents",
+        "logs:GetDeliveryDestinationPolicy",
+        "logs:GetDeliveryDestination",
+        "logs:GetLogAnomalyDetector",
+        "logs:ListTagsForResource",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:StartLiveTail",
+        "logs:StopLiveTail",
+        "logs:DescribeQueryDefinitions",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeDestinations",
+        "logs:DescribeQueries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeAccountPolicies",
+        "logs:DescribeDeliverySources",
+        "logs:StopQuery",
+        "logs:TestMetricFilter",
+        "logs:DescribeDeliveryDestinations",
+        "logs:DescribeExportTasks",
+        "logs:DescribeDeliveries",
+        "logs:GetDataProtectionPolicy",
+        "logs:GetLogRecord",
+        "logs:DescribeSubscriptionFilters",
+        "logs:StartQuery",
+        "logs:DescribeMetricFilters",
+        "logs:FilterLogEvents",
+        "logs:Unmask",
+        "logs:ListTagsForResource",
+        "logs:GetQueryResults",
+        "logs:ListTagsLogGroup",
+        "logs:DescribeLogStreams",
+        "logs:ListLogAnomalyDetectors",
+        "logs:GetLogGroupFields"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:${ACCOUNT_ID}:anomaly-detector:*",
+        "arn:aws:logs:*:${ACCOUNT_ID}:delivery:*",
+        "arn:aws:logs:*:${ACCOUNT_ID}:delivery-destination:*",
+        "arn:aws:logs:*:${ACCOUNT_ID}:delivery-source:*",
+        "arn:aws:logs:*:${ACCOUNT_ID}:destination:*",
+        "arn:aws:logs:*:${ACCOUNT_ID}:log-group:*",
+        "arn:aws:logs:*:${ACCOUNT_ID}:log-group:*:log-stream:*"
+      ]
+    },
+    {
+      "Sid": "KMSSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "kms:DescribeKey",
+        "kms:Decrypt",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:ListAliases",
+        "kms:ListResourceTags"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "APIGatewaySupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:DELETE",
+        "apigateway:GET",
+        "apigateway:PATCH",
+        "apigateway:PUT",
+        "apigateway:POST"
+      ],
+      "Resource": [
+        "arn:aws:apigateway:*::/*"
+      ]
+    }
+  ]
+}
