@@ -116,7 +116,7 @@ module "worker_transform" {
                     "dynamodb:Query"
                 ],
                 "Effect": "Allow",
-                "Resource": ["${var.table_arn}"]
+                "Resource": ["${var.table_arn}", "${var.table_arn}/*"]
             },
             {
                 "Action": [

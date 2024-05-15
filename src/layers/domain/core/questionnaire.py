@@ -210,7 +210,7 @@ class QuestionnaireResponse(BaseModel):
     """
     Validates questionnaire responses against questionnaire questions
     Responses is of the form:
-        ["question_name": ["answer_1", ..., "answer_n"]]
+        [{"question_name": ["answer_1", ..., "answer_n"]}]
 
     where n > 1 if Question.multiple is true for the Question in Questionnaire
     with the matching Question.name

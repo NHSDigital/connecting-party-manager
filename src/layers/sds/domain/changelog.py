@@ -50,13 +50,22 @@ class ChangelogRecord(SdsBaseModel):
     def validate_changes(cls, changes):
         if isinstance(changes, bytes):
             changes = changes.decode("unicode_escape")
-        return changes
+        return changes.strip("\n")
 
     def changes_as_ldif(self) -> str:
-        change_lines = [
+        distinguished_name = dict(self.target_distinguished_name.parts)
+        unique_identifier_line = (
+            f"uniqueidentifier: {distinguished_name['uniqueidentifier']}"
+        )
+        header_lines = [
             f"dn: {self.target_distinguished_name.raw}",
             f"changetype: {self.change_type}",
         ]
-        if self.change_type is not ChangeType.DELETE:
-            change_lines.append(self.changes.strip("\n"))
+        if self.change_type is not ChangeType.ADD:
+            header_lines.append(f"{OBJECT_CLASS_FIELD_NAME}: {self.change_type}")
+
+        change_lines = header_lines + list(filter(bool, self.changes.split("\n")))
+        if unique_identifier_line not in map(str.lower, change_lines):
+            change_lines.append(unique_identifier_line)
+
         return "\n".join(change_lines)

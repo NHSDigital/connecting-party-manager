@@ -1,5 +1,6 @@
 from collections import defaultdict
 from enum import StrEnum, auto
+from itertools import chain
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
@@ -24,6 +25,10 @@ class QuestionnaireNotFoundError(Exception):
 
 
 class QuestionnaireResponseNotFoundError(Exception):
+    pass
+
+
+class QuestionNotFoundError(Exception):
     pass
 
 
@@ -62,6 +67,14 @@ class DeviceKeyDeletedEvent(Event):
     key: str
 
 
+@dataclass(kw_only=True, slots=True)
+class DeviceIndexAddedEvent(Event):
+    id: str
+    questionnaire_id: str
+    question_name: str
+    value: str
+
+
 class DeviceType(StrEnum):
     """
     A Product is to be classified as being one of the following.  These terms
@@ -82,6 +95,39 @@ class DeviceType(StrEnum):
 class DeviceStatus(StrEnum):
     ACTIVE = auto()
     INACTIVE = auto()  # "soft" delete
+
+
+def _get_unique_answers(
+    questionnaire_responses: list[QuestionnaireResponse], question_name: str
+):
+    all_responses = chain.from_iterable(
+        _questionnaire_response.responses
+        for _questionnaire_response in questionnaire_responses
+    )
+    matching_responses = filter(
+        lambda response: question_name in response, all_responses
+    )
+    matching_response_answers = (
+        answer for responses in matching_responses for answer in responses.values()
+    )
+    unique_answers = set(chain.from_iterable(matching_response_answers))
+    return unique_answers
+
+
+def _get_questionnaire_responses(
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]],
+    questionnaire_id: str,
+) -> list[QuestionnaireResponse]:
+    _questionnaire_responses = questionnaire_responses.get(questionnaire_id)
+    if _questionnaire_responses is None:
+        raise QuestionnaireNotFoundError(
+            f"This device does not contain a Questionnaire with id '{questionnaire_id}'"
+        )
+    elif not _questionnaire_responses:
+        raise QuestionnaireResponseNotFoundError(
+            f"This device does not contain a QuestionnaireResponse for Questionnaire with id '{questionnaire_id}'"
+        )
+    return _questionnaire_responses
 
 
 class Device(AggregateRoot):
@@ -131,6 +177,36 @@ class Device(AggregateRoot):
             raise NotFoundError(f"This device does not contain key '{key}'") from None
         event = DeviceKeyDeletedEvent(id=self.id, key=device_key.key)
         return self.add_event(event)
+
+    def add_index(
+        self, questionnaire_id: str, question_name: str
+    ) -> list[DeviceIndexAddedEvent]:
+        questionnaire_responses = _get_questionnaire_responses(
+            questionnaire_responses=self.questionnaire_responses,
+            questionnaire_id=questionnaire_id,
+        )
+        if question_name not in questionnaire_responses[0].questionnaire.questions:
+            raise QuestionNotFoundError(
+                f"Questionnaire '{questionnaire_id}' does not "
+                f"contain question '{question_name}'"
+            )
+        unique_answers = _get_unique_answers(
+            questionnaire_responses=questionnaire_responses,
+            question_name=question_name,
+        )
+
+        events = []
+        for answer in unique_answers:
+            event = DeviceIndexAddedEvent(
+                id=self.id,
+                questionnaire_id=questionnaire_id,
+                question_name=question_name,
+                value=answer,
+            )
+            events.append(event)
+            self.add_event(event)
+
+        return events
 
     def add_questionnaire_response(
         self,
@@ -236,6 +312,7 @@ class DeviceEventDeserializer(EventDeserializer):
         DeviceUpdatedEvent,
         DeviceKeyAddedEvent,
         DeviceKeyDeletedEvent,
+        DeviceIndexAddedEvent,
         QuestionnaireResponseAddedEvent,
         QuestionnaireResponseUpdatedEvent,
         QuestionnaireResponseDeletedEvent,

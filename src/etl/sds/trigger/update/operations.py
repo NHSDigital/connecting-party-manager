@@ -97,11 +97,9 @@ def get_latest_changelog_number_from_ldap(
         ],
     )
 
-    _, (unpack_record) = record
-
-    return int(
-        unpack_record[ChangelogAttributes.LAST_CHANGELOG_NUMBER][0].decode("utf-8")
-    )
+    _, (_record) = record
+    (last_changelog_number_str,) = _record[ChangelogAttributes.LAST_CHANGELOG_NUMBER]
+    return int(last_changelog_number_str)
 
 
 def get_changelog_entries_from_ldap(

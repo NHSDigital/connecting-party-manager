@@ -1,6 +1,10 @@
 from enum import StrEnum, auto
 
-FILTER_TERMS = [("objectClass", "nhsMHS"), ("objectClass", "nhsAS")]
+FILTER_TERMS = [
+    ("objectClass", "nhsMHS"),
+    ("objectClass", "nhsAS"),
+    ("objectClass", "delete"),
+]
 
 
 class CaseInsensitiveEnum(StrEnum):
