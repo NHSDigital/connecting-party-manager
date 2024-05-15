@@ -1,4 +1,5 @@
 from itertools import chain
+from datetime import datetime
 
 import pytest
 from domain.core.device import (
@@ -58,15 +59,27 @@ def another_questionnaire_response() -> QuestionnaireResponse:
     return questionnaire.respond(responses=[{"question1": ["bye"]}])
 
 
+def test_device_created_with_datetime(device: Device):
+    assert isinstance(device.created_on, datetime)
+    assert device.deleted_on == None
+
+
 def test_device_update(device: Device):
+    device_created_on = device.created_on
     event = device.update(name="bar")
     assert device.name == "bar"
+    assert device.deleted_on == None
+    assert device.created_on == device_created_on
     assert isinstance(event, DeviceUpdatedEvent)
 
 
 def test_device_delete(device: Device):
+    device_created_on = device.created_on
+    assert device.deleted_on == None
     event = device.delete()
     assert device.status == DeviceStatus.INACTIVE
+    assert device.created_on == device_created_on
+    assert isinstance(device.deleted_on, datetime)
     assert isinstance(event, DeviceUpdatedEvent)
 
 
