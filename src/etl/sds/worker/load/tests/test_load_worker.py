@@ -128,8 +128,8 @@ def device_factory(id: int) -> Device:
         product_team_id=UUID(int=1),
         ods_code=ods_code,
     )
-    print(f"DEVICE {id}", device.dict())  # noqa:T201
     event = DeviceCreatedEvent(**device.dict())
+    print(f"EVENT {id}", event)  # noqa:T201
     device.add_event(event)
     device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
     return device
