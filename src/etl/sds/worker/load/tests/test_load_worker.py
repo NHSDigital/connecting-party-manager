@@ -1,5 +1,6 @@
 import os
 from collections import deque
+from datetime import datetime
 from itertools import chain, permutations
 from typing import Callable, Generator
 from unittest import mock
@@ -33,6 +34,7 @@ GOOD_CPM_EVENT_1 = {
         "product_team_id": str(UUID(int=1)),
         "ods_code": "ABC",
         "status": "active",
+        "created_on": datetime.utcnow(),
         "deleted_on": None,
     }
 }
@@ -44,6 +46,7 @@ GOOD_CPM_EVENT_2 = {
         "product_team_id": str(UUID(int=2)),
         "ods_code": "ABC",
         "status": "active",
+        "created_on": datetime.utcnow(),
         "deleted_on": None,
     }
 }
@@ -129,7 +132,6 @@ def device_factory(id: int) -> Device:
         ods_code=ods_code,
     )
     event = DeviceCreatedEvent(**device.dict())
-    print(f"EVENT {id}", event)  # noqa:T201
     device.add_event(event)
     device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
     return device
