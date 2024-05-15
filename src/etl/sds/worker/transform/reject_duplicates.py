@@ -19,6 +19,7 @@ def _get_duplicate_events(
         ((_, event),) = exported_event.items()
         event_id = event.get("id") or event.get("entity_id")
         device_key = event.get("key")
+
         events_by_id[event_id].append(event)
         if device_key:
             ids_by_key[device_key].append(event_id)
