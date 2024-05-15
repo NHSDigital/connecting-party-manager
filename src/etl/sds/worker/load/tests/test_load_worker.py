@@ -128,6 +128,7 @@ def device_factory(id: int) -> Device:
         product_team_id=UUID(int=1),
         ods_code=ods_code,
     )
+    print(f"DEVICE {id}", device)  # noqa:T201
     event = DeviceCreatedEvent(**device.dict())
     device.add_event(event)
     device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
@@ -203,9 +204,7 @@ def test_load_worker_bad_record(
 
     # Initial state
     bad_record_index = initial_unprocessed_data.index(BAD_CPM_EVENT)
-    print("BAD_RECORD", bad_record_index)  # noqa:T201
     n_initial_unprocessed = len(initial_unprocessed_data)
-    print("N_INITIAL", n_initial_unprocessed)  # noqa:T201
     put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(deque(initial_unprocessed_data)))
 
     n_initial_processed = 1000
@@ -222,7 +221,6 @@ def test_load_worker_bad_record(
 
     # Execute the load worker
     response = load.handler(event=None, context=None)
-    print("RESPONSE", response)  # noqa:T201
     assert response == {
         "stage_name": "load",
         "processed_records": bad_record_index,
