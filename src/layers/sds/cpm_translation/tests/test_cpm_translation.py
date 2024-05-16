@@ -21,7 +21,7 @@ from sds.cpm_translation import (
     nhs_mhs_to_cpm_device,
     translate,
 )
-from sds.cpm_translation.translations import NoDeviceFound, delete_devices
+from sds.cpm_translation.translations import delete_devices
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
@@ -233,12 +233,12 @@ def test_delete_devices_no_questionnaire(repository: DeviceRepository):
         unique_identifier="001",
     )
 
-    with pytest.raises(NoDeviceFound):
-        delete_devices(
-            deletion_request=deletion_request,
-            questionnaire_ids=["does not exist"],
-            repository=repository,
-        )
+    devices = delete_devices(
+        deletion_request=deletion_request,
+        questionnaire_ids=["does not exist"],
+        repository=repository,
+    )
+    assert len(devices) == 0
 
 
 @pytest.mark.integration
@@ -274,9 +274,9 @@ def test_delete_devices_no_matching_device(repository: DeviceRepository):
         unique_identifier="does not exist",
     )
 
-    with pytest.raises(NoDeviceFound):
-        delete_devices(
-            deletion_request=deletion_request,
-            questionnaire_ids=[_questionnaire.id],
-            repository=repository,
-        )
+    devices = delete_devices(
+        deletion_request=deletion_request,
+        questionnaire_ids=[_questionnaire.id],
+        repository=repository,
+    )
+    assert len(devices) == 0

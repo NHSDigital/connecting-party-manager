@@ -162,10 +162,6 @@ def modify_mhs_device(nhs_mhs: NhsMhs, repository: DeviceRepository):
     return device
 
 
-class NoDeviceFound(Exception):
-    pass
-
-
 def delete_devices(
     deletion_request: SdsDeletionRequest,
     questionnaire_ids: list[str],
@@ -180,10 +176,4 @@ def delete_devices(
         ):
             _device.delete()
             devices.append(_device)
-    if len(devices) == 0:
-        raise NoDeviceFound(
-            "Could not delete any devices for "
-            f"questionnaire_ids = {questionnaire_ids},"
-            f"unique_identifier = '{deletion_request.unique_identifier}'"
-        )
     return devices
