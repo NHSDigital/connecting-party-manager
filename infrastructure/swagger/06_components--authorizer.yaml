@@ -10,7 +10,7 @@ components:
         type: request
         authorizerUri: ${lambda_invoke_arn}
         authorizerCredentials: ${authoriser_iam_role}
-        identitySource: method.request.header.Authorization
+        identitySource: ""
         authorizerResultTtlInSeconds: 0
     app-level0:
       $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
