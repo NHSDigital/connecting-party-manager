@@ -35,6 +35,7 @@ GOOD_CPM_EVENT_1 = {
         "ods_code": "ABC",
         "status": "active",
         "created_on": datetime.utcnow(),
+        "updated_on": None,
         "deleted_on": None,
     }
 }
@@ -47,6 +48,7 @@ GOOD_CPM_EVENT_2 = {
         "ods_code": "ABC",
         "status": "active",
         "created_on": datetime.utcnow(),
+        "updated_on": None,
         "deleted_on": None,
     }
 }
