@@ -1,0 +1,2640 @@
+servers:
+  - url: https://sandbox.api.service.nhs.uk/connecting-party-manager/FHIR/R4
+    description: Sandbox environment.
+  - url: https://int.api.service.nhs.uk/connecting-party-manager/FHIR/R4
+    description: Integration test environment.
+  - url: https://api.service.nhs.uk/connecting-party-manager/FHIR/R4
+    description: Production environment.
+info:
+  version: 1.0.0
+  contact:
+    name: NHS Digital API Management
+    url: "https://digital.nhs.uk/developer/help-and-support"
+    email: api.management@nhs.net
+  title: Connecting Party Manager - FHIR API
+  description: |
+    ## Overview
+
+    API to configure internal systems to allow a Connecting Party to connect. A source of information about Connecting Parties (systems that connect to NHSE) that helps provide system identity attributes that ensure NHSE services know what systems they are connecting to and the legal entities they are sharing data with. This service is driven by APIs that enable self-service for activities such as certificate management and environment access. It also is a store of end-to-end onboarding/integration data and a catalogue of endpoints.
+
+    ## Who can use this API
+
+    This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development. You must demonstrate you have a valid use case as part of digital onboarding. Connecting Parties must have an appointed Clinical Safety Officer and undertake a Clinical Safety Assessment.
+
+    ## API status and roadmap
+
+    This API is in [development](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
+
+    To see our roadmap, or to suggest, comment or vote on features for this API, see our interactive [product backlog](https://nhs-digital-api-management.featureupvote.com/).
+
+    If you have any other queries, [contact us](https://digital.nhs.uk/developer/help-and-support).
+
+    ## Service level
+
+    This API is a platinum service, meaning it is operational and supported 24 hours a day, 365 days a year.
+
+    For more details, see [service levels](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#service-levels).
+
+    ## Technology
+
+    This API is [RESTful](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#basic-rest).
+
+    It conforms to the [FHIR](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#fhir) global standard for health care data exchange, specifically to [FHIR R4 (v4.0.1)](https://hl7.org/fhir/r4/), except that it does not support the [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction.
+
+    It includes some country-specific FHIR extensions, which conform to [FHIR UK Core](https://digital.nhs.uk/services/fhir-uk-core), specifically [fhir.r4.ukcore.stu1 0.5.1](https://simplifier.net/packages/fhir.r4.ukcore.stu1/0.5.1).
+
+    You do not need to know much about FHIR to use this API - FHIR APIs are just RESTful APIs that follow specific rules.
+
+    In particular:
+
+    * resource names are capitalised and singular, and use US spellings, for example `Organization` not `organisations`
+    * array names are singular, for example `entry` not `entries` for address lines
+    * data items that are country-specific and thus not included in the FHIR global base resources are usually wrapped in an `extension` object
+
+    There are [libraries and SDKs available](https://digital.nhs.uk/developer/guides-and-documentation/api-technologies-at-nhs-digital#fhir-libraries-and-sdks) to help with FHIR API integration.
+
+    ## Network access
+
+    This API is available on the internet and, indirectly, on the [Health and Social Care Network (HSCN)](https://digital.nhs.uk/services/health-and-social-care-network).
+
+    For more details see [Network access for APIs](https://digital.nhs.uk/developer/guides-and-documentation/network-access-for-apis).
+
+    ## Security and authorisation
+
+    This API uses the following access modes:
+
+    * [Application-restricted RESTful API - signed JWT authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication)
+
+    ## Errors
+
+    We use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:
+
+    * 200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action
+    * 400 to 499 if it failed because of a client error by your application
+    * 500 to 599 if it failed because of an error on our server
+
+    Errors specific to each API are shown in the Endpoints section, under Response. See our [reference guide](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#http-status-codes) for more on errors.
+
+    ## Open source
+
+    You might find the following open source resources useful:
+
+    | Resource                       | Description                                | Links                                                                    |
+    |--------------------------------|--------------------------------------------|--------------------------------------------------------------------------|
+    | Connecting Party Manager       | Source code for the core API and sandbox   | [GitHub repo](https://github.com/NHSDigital/connecting-party-manager)    |
+    | Connecting Party Manager - CI  | Source code for the Github Actions runners | [GitHub repo](https://github.com/NHSDigital/connecting-party-manager-CI) |
+
+    We currently don't have any open source client libraries or sample code for this API. If you think this would be useful, you can [upvote the suggestion on our Interactive Product Backlog](https://nhs-digital-api-management.featureupvote.com/suggestions/107439/client-libraries-and-reference-implementations).
+
+    ## Environments and testing
+
+    | Environment       | Base URL                                                                    |
+    | ----------------- | --------------------------------------------------------------------------- |
+    | Sandbox           | `https://sandbox.api.service.nhs.uk/connecting-party-manager/FHIR/R4/`      |
+    | Integration       | `https://int.api.service.nhs.uk/connecting-party-manager/consumer/FHIR/R4/` |
+    | Production        | `https://api.service.nhs.uk/connecting-party-manager/consumer/FHIR/R4/`     |
+
+    ### Sandbox and Integration environments
+
+    Our [sandbox environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#sandbox-testing):
+
+    * is for early developer testing,
+    * is open access, so does not allow you to test authorisation,
+    * includes ready-to-use test data - for details [contact us](https://digital.nhs.uk/developer/help-and-support),
+    * underpins our `Try this API` feature; see the documentation for each endpoint for more details.
+
+    Our [integration test environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing):
+
+    * is for formal integration testing,
+    * includes authorisation,
+    * includes ready-to-use test data - for details [contact us](https://digital.nhs.uk/developer/help-and-support).
+
+    For more details see [integration testing with our RESTful APIs](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing-with-our-restful-apis).
+
+    ## Onboarding
+
+    You need to get your software approved by us before it can go live with this API. We call this onboarding. The onboarding process can sometimes be quite long, so it’s worth planning well ahead.
+
+    As part of this process, you need to demonstrate that you can manage risks and that your software conforms technically with the requirements for this API.
+
+    Information on this page might impact the design of your software. For details, see [Onboarding support information](https://digital.nhs.uk/developer/api-catalogue/national-record-locator-consumer-fhir/onboarding-support-information).
+
+    To understand how our online digital onboarding process works, see [digital onboarding](https://digital.nhs.uk/developer/guides-and-documentation/digital-onboarding#using-the-digital-onboarding-portal).
+
+    <div class="nhsd-m-emphasis-box nhsd-m-emphasis-box--emphasis nhsd-!t-margin-bottom-6" aria-label="Highlighted Information">
+        <div class="nhsd-a-box nhsd-a-box--border-blue">
+            <div class="nhsd-m-emphasis-box__image-box">
+                <figure class="nhsd-a-image">
+                    <picture class="nhsd-a-image__picture">
+                        <img src="http://digital.nhs.uk/binaries/content/gallery/icons/play-circle.svg?colour=231f20" alt="" style="object-fit:fill">
+                    </picture>
+                </figure>
+            </div>
+            <div class="nhsd-m-emphasis-box__content-box">
+                <div data-uipath="website.contentblock.emphasis.content" class="nhsd-t-word-break"><p class="nhsd-t-body">To get started, sign in or create a <a href="http://onboarding.prod.api.platform.nhs.uk/">developer account</a>, then select 'product onboarding'.</p></div>
+            </div>
+        </div>
+    </div>
+
+    ## Change log
+
+    For details of how this API has changed over time, see the [change log](https://github.com/NHSDigital/connecting-party-manager/blob/main/CHANGELOG.md).
+  license:
+    name: MIT
+    url: https://github.com/NHSDigital/connecting-party-manager/blob/main/LICENCE.md
+openapi: 3.0.3
+paths:
+  /Device:
+    post:
+      summary: Create a Device resource
+      operationId: createDevice
+      responses:
+        "201":
+          description: Create Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+      requestBody:
+        $ref: "#/components/requestBodies/Device"
+      parameters:
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+    get:
+      summary: Search for Device resources
+      operationId: searchDevice
+      parameters:
+        - name: device_type
+          in: query
+          required: true
+          description: "Type of device (product or endpoint)"
+          schema:
+            type: string
+            enum:
+              - product
+              - endpoint
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+  /Device/{id}:
+    get:
+      summary: Read a Device resource
+      operationId: readDevice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          description: Read Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+  /Organization:
+    post:
+      summary: Create an Organization resource
+      operationId: createOrganization
+      responses:
+        "201":
+          description: Create Organization operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+      requestBody:
+        $ref: "#/components/requestBodies/Organization"
+      parameters:
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+  /Organization/{id}:
+    get:
+      summary: Read an Organization resource
+      operationId: readOrganization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          description: Read Organization operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+components:
+  parameters:
+    profileParam:
+      name: _profile
+      description: Profiles this resource claims to conform to
+      in: query
+      required: false
+      schema:
+        type: string
+    lastUpdatedParam:
+      name: _lastUpdated
+      description: When the resource version last changed
+      in: query
+      required: false
+      schema:
+        type: string
+    tagParam:
+      name: _tag
+      description: Tags applied to this resource
+      in: query
+      required: false
+      schema:
+        type: string
+    securityParam:
+      name: _security
+      description: Security Labels applied to this resource
+      in: query
+      required: false
+      schema:
+        type: string
+    sourceParam:
+      name: _source
+      description: Identifies where the resource comes from
+      in: query
+      required: false
+      schema:
+        type: string
+    idParam:
+      name: _id
+      description: Logical id of this artifact
+      in: query
+      required: false
+      schema:
+        type: string
+  requestBodies:
+    Device:
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/Device"
+      required: true
+    Organization:
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/Organization"
+      required: true
+  schemas:
+    Resource:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          enum:
+            - Account
+            - ActivityDefinition
+            - AdverseEvent
+            - AllergyIntolerance
+            - Appointment
+            - AppointmentResponse
+            - AuditEvent
+            - Basic
+            - Binary
+            - BiologicallyDerivedProduct
+            - BodyStructure
+            - Bundle
+            - CapabilityStatement
+            - CarePlan
+            - CareTeam
+            - CatalogEntry
+            - ChargeItem
+            - ChargeItemDefinition
+            - Claim
+            - ClaimResponse
+            - ClinicalImpression
+            - CodeSystem
+            - Communication
+            - CommunicationRequest
+            - CompartmentDefinition
+            - Composition
+            - ConceptMap
+            - Condition
+            - Consent
+            - Contract
+            - Coverage
+            - CoverageEligibilityRequest
+            - CoverageEligibilityResponse
+            - DetectedIssue
+            - Device
+            - DeviceDefinition
+            - DeviceMetric
+            - DeviceRequest
+            - DeviceUseStatement
+            - DiagnosticReport
+            - DocumentManifest
+            - DocumentReference
+            - DomainResource
+            - EffectEvidenceSynthesis
+            - Encounter
+            - Endpoint
+            - EnrollmentRequest
+            - EnrollmentResponse
+            - EpisodeOfCare
+            - EventDefinition
+            - Evidence
+            - EvidenceVariable
+            - ExampleScenario
+            - ExplanationOfBenefit
+            - FamilyMemberHistory
+            - Flag
+            - Goal
+            - GraphDefinition
+            - Group
+            - GuidanceResponse
+            - HealthcareService
+            - ImagingStudy
+            - Immunization
+            - ImmunizationEvaluation
+            - ImmunizationRecommendation
+            - ImplementationGuide
+            - InsurancePlan
+            - Invoice
+            - Library
+            - Linkage
+            - List
+            - Location
+            - Measure
+            - MeasureReport
+            - Media
+            - Medication
+            - MedicationAdministration
+            - MedicationDispense
+            - MedicationKnowledge
+            - MedicationRequest
+            - MedicationStatement
+            - MedicinalProduct
+            - MedicinalProductAuthorization
+            - MedicinalProductContraindication
+            - MedicinalProductIndication
+            - MedicinalProductIngredient
+            - MedicinalProductInteraction
+            - MedicinalProductManufactured
+            - MedicinalProductPackaged
+            - MedicinalProductPharmaceutical
+            - MedicinalProductUndesirableEffect
+            - MessageDefinition
+            - MessageHeader
+            - MolecularSequence
+            - NamingSystem
+            - NutritionOrder
+            - Observation
+            - ObservationDefinition
+            - OperationDefinition
+            - OperationOutcome
+            - Organization
+            - OrganizationAffiliation
+            - Parameters
+            - Patient
+            - PaymentNotice
+            - PaymentReconciliation
+            - Person
+            - PlanDefinition
+            - Practitioner
+            - PractitionerRole
+            - Procedure
+            - Provenance
+            - Questionnaire
+            - QuestionnaireResponse
+            - RelatedPerson
+            - RequestGroup
+            - ResearchDefinition
+            - ResearchElementDefinition
+            - ResearchStudy
+            - ResearchSubject
+            - Resource
+            - RiskAssessment
+            - RiskEvidenceSynthesis
+            - Schedule
+            - SearchParameter
+            - ServiceRequest
+            - Slot
+            - Specimen
+            - SpecimenDefinition
+            - StructureDefinition
+            - StructureMap
+            - Subscription
+            - Substance
+            - SubstanceNucleicAcid
+            - SubstancePolymer
+            - SubstanceProtein
+            - SubstanceReferenceInformation
+            - SubstanceSourceMaterial
+            - SubstanceSpecification
+            - SupplyDelivery
+            - SupplyRequest
+            - Task
+            - TerminologyCapabilities
+            - TestReport
+            - TestScript
+            - ValueSet
+            - VerificationResult
+            - VisionPrescription
+        id:
+          type: string
+          pattern: "[A-Za-z0-9\\-\\.]{1,64}"
+          description: The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.
+        meta:
+          $ref: "#/components/schemas/Meta"
+          description: The metadata about the resource. This is content that is maintained by the infrastructure. Changes to the content might not always be associated with version changes to the resource.
+        implicitRules:
+          type: string
+          pattern: \S*
+          description: A reference to a set of rules that were followed when the resource was constructed, and which must be understood when processing the content. Often, this is a reference to an implementation guide that defines the special rules along with other profiles etc.
+        language:
+          type: string
+          pattern: "[^\\s]+(\\s[^\\s]+)*"
+          description: The base language in which the resource is written.
+      required:
+        - resourceType
+    DomainResource:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            text:
+              $ref: "#/components/schemas/Narrative"
+              description: A human&ndash;readable narrative that contains a summary of the resource and can be used to represent the content of the resource to a human. The narrative need not encode all the structured data, but is required to contain sufficient detail to make it "clinically safe" for a human to just read the narrative. Resource definitions may define what content should be represented in the narrative to ensure clinical safety.
+            contained:
+              type: array
+              items:
+                $ref: "#/components/schemas/Resource"
+                description: These resources do not have an independent existence apart from the resource that contains them &ndash; they cannot be identified independently, and nor can they have their own independent transaction scope.
+            extension:
+              type: array
+              items:
+                $ref: "#/components/schemas/Extension"
+                description: May be used to represent additional information that is not part of the basic definition of the resource. To make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer can define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension.
+            modifierExtension:
+              type: array
+              items:
+                $ref: "#/components/schemas/Extension"
+                description: |-
+                  May be used to represent additional information that is not part of the basic definition of the resource and that modifies the understanding of the element that contains it and/or the understanding of the containing element's descendants. Usually modifier elements provide negation or qualification. To make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions.
+
+                  Modifier extensions SHALL NOT change the meaning of any elements on Resource or DomainResource (including cannot change the meaning of modifierExtension itself).
+    Device:
+      allOf:
+        - $ref: "#/components/schemas/DomainResource"
+        - type: object
+          properties:
+            identifier:
+              type: array
+              items:
+                $ref: "#/components/schemas/Identifier"
+                description: Unique instance identifiers assigned to a device by manufacturers other organizations or owners.
+            definition:
+              $ref: "#/components/schemas/Reference"
+              description: The reference to the definition for the device.
+            udiCarrier:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceUdiCarrier"
+                description: Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
+            status:
+              type: string
+              enum:
+                - active
+                - inactive
+                - entered-in-error
+                - unknown
+              description: Status of the Device availability.
+            statusReason:
+              type: array
+              items:
+                $ref: "#/components/schemas/CodeableConcept"
+                description: Reason for the dtatus of the Device availability.
+            distinctIdentifier:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The distinct identification string as required by regulation for a human cell, tissue, or cellular and tissue&ndash;based product.
+            manufacturer:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A name of the manufacturer.
+            manufactureDate:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: The date and time when the device was manufactured.
+            expirationDate:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: The date and time beyond which this device is no longer valid or should not be used (if applicable).
+            lotNumber:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Lot number assigned by the manufacturer.
+            serialNumber:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The serial number assigned by the organization when the device was manufactured.
+            deviceName:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceDeviceName"
+                description: This represents the manufacturer's name of the device as provided by the device, from a UDI label, or by a person describing the Device.  This typically would be used when a person provides the name(s) or when the device represents one of the names available from DeviceDefinition.
+            modelNumber:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The model number for the device.
+            partNumber:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The part number of the device.
+            type:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: |-
+                The type of deviceName.
+                UDILabelName | UserFriendlyName | PatientReportedName | ManufactureDeviceName | ModelName.
+            specialization:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceSpecialization"
+                description: The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication.
+            version:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceVersion"
+                description: The version of the standard that is used to operate and communicate.
+            property:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceProperty"
+                description: The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties.
+            patient:
+              $ref: "#/components/schemas/Reference"
+              description: Patient information, If the device is affixed to a person.
+            owner:
+              $ref: "#/components/schemas/Reference"
+              description: An organization that is responsible for the provision and ongoing maintenance of the device.
+            contact:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContactPoint"
+                description: Contact details for an organization or a particular human that is responsible for the device.
+            location:
+              $ref: "#/components/schemas/Reference"
+              description: The place where the device can be found.
+            url:
+              type: string
+              pattern: \S*
+              description: A network address on which the device may be contacted directly.
+            note:
+              type: array
+              items:
+                $ref: "#/components/schemas/Annotation"
+                description: Descriptive information, usage information or implantation information that is not captured in an existing element.
+            safety:
+              type: array
+              items:
+                $ref: "#/components/schemas/CodeableConcept"
+                description: Provides additional safety characteristics about a medical device.  For example devices containing latex.
+            parent:
+              $ref: "#/components/schemas/Reference"
+              description: The parent device.
+      example:
+        resourceType: Device
+        meta:
+          versionId: leAx-ab3l3
+          lastUpdated: "2020-11-04T11:22:43.963014-05:00"
+          source: yOjqeCo0bv
+          profile:
+            - Z7pJUfqU6t
+          security:
+            - system: 5wvbYyTKjt
+              version: wfYhQqDqvR
+              code: fsuby16DBu
+              display: XUC_83exZs
+              userSelected: true
+          tag:
+            - system: rW_khzpssy
+              version: z9LyFhRYvf
+              code: qPlH1wpJTv
+              display: wLhj3rWEFb
+              userSelected: true
+            - code: ibm/complete-mock
+        implicitRules: EY3J2qd657
+        language: en-US
+        text:
+          status: additional
+          div: <div xmlns="http://www.w3.org/1999/xhtml"></div>
+        identifier:
+          - use: temp
+            type:
+              coding:
+                - system: 2NnKDj0XAP
+                  version: kowcO4_ibR
+                  code: o_qjfWR1E4
+                  display: wYXJaKt_KP
+                  userSelected: true
+              text: jJdgrpRSLO
+            system: kYVnOGpPz1
+            value: 3VT6Q1la6l
+            period:
+              start: "2020-11-04T11:22:43.966349-05:00"
+              end: "2020-11-04T11:22:43.96665-05:00"
+        definition:
+          reference: DeviceDefinition/0iz1m36ZqT
+          type: DeviceDefinition
+          identifier:
+            use: old
+            type:
+              coding:
+                - system: OTscJIufV8
+                  version: I8wNZsOCgm
+                  code: KpiL5ZvBe5
+                  display: VKdG88p1aR
+                  userSelected: true
+              text: KuSxhlgLYM
+            system: FcXewtum1O
+            value: ft0VUZ5axC
+            period:
+              start: "2020-11-04T11:22:43.968256-05:00"
+              end: "2020-11-04T11:22:43.968431-05:00"
+          display: c7rPPL3q1K
+        udiCarrier:
+          - deviceIdentifier: 5_yGXOVzlZ
+            issuer: ctRAL2MENY
+            jurisdiction: 2XSxq5Q5y9
+            carrierAIDC: aTZfAVA=
+            carrierHRF: GwKJEb2UCd
+            entryType: card
+        status: active
+        statusReason:
+          - coding:
+              - system: MAb0Kyat4R
+                version: PUnRaXzCOB
+                code: p6bo2NaOkq
+                display: 2wb3XMKYkC
+                userSelected: true
+            text: qnlahiKNH4
+        distinctIdentifier: EtpCekS5ug
+        manufacturer: c0cXF0rkid
+        manufactureDate: "2020-11-04T11:22:43.971972-05:00"
+        expirationDate: "2020-11-04T11:22:43.972144-05:00"
+        lotNumber: GlPVAmvgfX
+        serialNumber: UW8XQT_T8f
+        deviceName:
+          - name: 8EqKlRy_yO
+            type: patient-reported-name
+        modelNumber: QbStiBsInX
+        partNumber: 0FLeLYIh9j
+        type:
+          coding:
+            - system: pVH61hMZ_7
+              version: Ym58JrWbnW
+              code: OgYEL_SpMs
+              display: wpDPKyN213
+              userSelected: true
+          text: 7QfkFIJgpQ
+        specialization:
+          - systemType:
+              coding:
+                - system: VfhTWTWEfq
+                  version: RC50TO6Cqd
+                  code: I7kYlWxkV9
+                  display: EvRlmuXclO
+                  userSelected: true
+              text: 2kVAmKpHVs
+            version: hV9MlnjJOL
+        version:
+          - type:
+              coding:
+                - system: PlURX9yHqf
+                  version: Z43HjFOG4n
+                  code: Eb6jJbeQIi
+                  display: aQqE9qlvUD
+                  userSelected: true
+              text: N4pyV2sdOJ
+            component:
+              use: usual
+              type:
+                coding:
+                  - system: 74u6CAqeKT
+                    version: E7p3ozfUut
+                    code: ii15Kf5ScQ
+                    display: oUYOGoD92f
+                    userSelected: true
+                text: OYzBklTNKx
+              system: WGx_ohb6b9
+              value: vkE_QfvSaK
+              period:
+                start: "2020-11-04T11:22:43.976086-05:00"
+                end: "2020-11-04T11:22:43.976259-05:00"
+            value: fWWMVmjtNX
+        property:
+          - type:
+              coding:
+                - system: ATwcqz7UcD
+                  version: ykvNaWcVZV
+                  code: _DBffQxSd4
+                  display: 2ApwgE3YfV
+                  userSelected: true
+              text: f8uQAjqrhp
+            valueQuantity:
+              - value: 0.5877067255449361
+                comparator: <=
+                unit: 7wLeVdJkhT
+                system: 72b4FQk2t1
+                code: 6aVpwGwaaW
+            valueCode:
+              - coding:
+                  - system: nXMhN7nH07
+                    version: CyD__CA_WP
+                    code: qpdZVSHj36
+                    display: rRQLOwfvD8
+                    userSelected: true
+                text: ZYFB2Ufe5R
+        patient:
+          reference: Patient/TqL2pL98gA
+          type: Patient
+          identifier:
+            use: secondary
+            type:
+              coding:
+                - system: P2PK0tK6V9
+                  version: OrESnC4jsJ
+                  code: QqMZU6DqG5
+                  display: XlGeotrgMG
+                  userSelected: true
+              text: xEXDseHkip
+            system: NTHRO2OZDt
+            value: eoRXk6X9Pr
+            period:
+              start: "2020-11-04T11:22:43.979104-05:00"
+              end: "2020-11-04T11:22:43.979266-05:00"
+          display: yGWttxdCia
+        owner:
+          reference: Organization/JIX1Dk6PAC
+          type: Organization
+          identifier:
+            use: usual
+            type:
+              coding:
+                - system: uaqEtS8sNB
+                  version: 1W8XBAjFAT
+                  code: iHVSugMYKD
+                  display: CCk69MgMGW
+                  userSelected: true
+              text: aEfa7a5wh3
+            system: stVF7jEeSP
+            value: jlifbu4zbx
+            period:
+              start: "2020-11-04T11:22:43.980235-05:00"
+              end: "2020-11-04T11:22:43.980404-05:00"
+          display: Nu_u2FD_dT
+        contact:
+          - system: other
+            value: JFzCk8sShT
+            use: old
+            rank: 1.917455768e+09
+            period:
+              start: "2020-11-04T11:22:43.980769-05:00"
+              end: "2020-11-04T11:22:43.980915-05:00"
+        location:
+          reference: Location/xpkwiiYA4U
+          type: Location
+          identifier:
+            use: official
+            type:
+              coding:
+                - system: pCFDnsZMjg
+                  version: weiCRuKs87
+                  code: gCmknogj7c
+                  display: JlQr_Y5Diy
+                  userSelected: true
+              text: oUQVwdjR7n
+            system: igZLLInYvJ
+            value: RXuSd3x7Kn
+            period:
+              start: "2020-11-04T11:22:43.983113-05:00"
+              end: "2020-11-04T11:22:43.983285-05:00"
+          display: bcgajGFE6f
+        url: arZRapDYp_
+        note:
+          - authorReference:
+              reference: Practitioner/2ci2Lv99EG
+              type: Practitioner
+              identifier:
+                use: secondary
+                type:
+                  coding:
+                    - system: x8D7d6u4wp
+                      version: uEjUR7XG2Q
+                      code: VgUQBAyio4
+                      display: qMDU9hbJCE
+                      userSelected: true
+                  text: bsHPggO95l
+                system: 12Y6tNgx1B
+                value: Fxafvym0mI
+                period:
+                  start: "2020-11-04T11:22:43.984583-05:00"
+                  end: "2020-11-04T11:22:43.984747-05:00"
+              display: icpyr8sCM5
+            time: "2020-11-04T11:22:43.984961-05:00"
+            text: JyDVmzuT2F
+        safety:
+          - coding:
+              - system: n24W87b8CN
+                version: McPNdd8p8E
+                code: 7UXjXlUQ1n
+                display: vDlZ4y5Rcu
+                userSelected: true
+            text: PgGlM0rU_z
+        parent:
+          reference: Device/13x_MypWi2
+          type: Device
+          identifier:
+            use: secondary
+            type:
+              coding:
+                - system: xFI4BESbB0
+                  version: ok5uyHpmCL
+                  code: ltvv_3oObD
+                  display: NE8QkVBRIW
+                  userSelected: true
+              text: uOS0kmo3ZP
+            system: aHn4gLNrsa
+            value: mjdYRXyVLu
+            period:
+              start: "2020-11-04T11:22:43.986647-05:00"
+              end: "2020-11-04T11:22:43.986859-05:00"
+          display: d49bgelgmI
+    Bundle:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            identifier:
+              $ref: "#/components/schemas/Identifier"
+              description: A persistent identifier for the bundle that won't change as a bundle is copied from server to server.
+            type:
+              type: string
+              enum:
+                - document
+                - message
+                - transaction
+                - transaction-response
+                - batch
+                - batch-response
+                - history
+                - searchset
+                - collection
+              description: Indicates the purpose of this bundle &ndash; how it is intended to be used.
+            timestamp:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))
+              description: The date/time that the bundle was assembled &ndash; i.e. when the resources were placed in the bundle.
+            total:
+              type: integer
+              format: int32
+              description: If a set of search matches, this is the total number of entries of type 'match' across all pages in the search.  It does not include search.mode = 'include' or 'outcome' entries and it does not provide a count of the number of entries in the Bundle.
+            link:
+              type: array
+              items:
+                $ref: "#/components/schemas/BundleLink"
+                description: A series of links that provide context to this bundle.
+            entry:
+              type: array
+              items:
+                $ref: "#/components/schemas/BundleEntry"
+                description: An entry in a bundle resource &ndash; will either contain a resource or information about a resource (transactions and history only).
+            signature:
+              $ref: "#/components/schemas/Signature"
+              description: Digital Signature &ndash; base64 encoded. XML&ndash;DSig or a JWT.
+          required:
+            - type
+      example:
+        resourceType: Bundle
+        meta:
+          versionId: F7bitzw1Hj
+          lastUpdated: "2020-11-04T11:22:43.502316-05:00"
+          source: JRkgOa8bwm
+          profile:
+            - i4gpGowr6Y
+          security:
+            - system: lTnQF4OV3w
+              version: hTth0i4Ivs
+              code: P6iXDX6DcV
+              display: rMonvtKiO8
+              userSelected: true
+          tag:
+            - system: 4HA_3UN6ab
+              version: FvMU1dv9n6
+              code: AjrpSN9l0q
+              display: V3cjH6t7zX
+              userSelected: true
+            - code: ibm/complete-mock
+        implicitRules: IUOLjdM2gr
+        language: en-US
+        identifier:
+          use: temp
+          type:
+            coding:
+              - system: GG7NhXNGqZ
+                version: hTXMVyhLkS
+                code: fimixp8PMa
+                display: aYmxIkjI7w
+                userSelected: true
+            text: znbNwNNzOo
+          system: zxGBnkW0WU
+          value: lpcL4XUHKZ
+          period:
+            start: "2020-11-04T11:22:43.507146-05:00"
+            end: "2020-11-04T11:22:43.507335-05:00"
+        type: document
+        timestamp: "2020-11-04T11:22:43.507779-05:00"
+        total: 8.04618139e+08
+        link:
+          - relation: 0h9oqVMQIt
+            url: N6t6uzHuIy
+        entry:
+          - link:
+              - relation: IWG3UO5Awa
+                url: MJBFG1zxnb
+            fullUrl: PKkErHU9RX
+            search:
+              mode: match
+              score: 0.7827620245063741
+            request:
+              method: DELETE
+              url: EX5t3mSMJh
+              ifNoneMatch: TXPgvN30LK
+              ifModifiedSince: "2020-11-04T11:22:43.514903-05:00"
+              ifMatch: ESkJi0jaVC
+              ifNoneExist: fuSskChKIq
+            response:
+              status: avVXy1xkRq
+              location: v0Ub50vvWL
+              etag: BmCLcXDNuX
+              lastModified: "2020-11-04T11:22:43.516375-05:00"
+        signature:
+          type:
+            - system: YievdsQnmM
+              version: 3um1GW4GVD
+              code: sNUnxWccmG
+              display: pqCTozifNV
+              userSelected: true
+          when: "2020-11-04T11:22:43.518017-05:00"
+          who:
+            reference: Practitioner/7tLbieRmnA
+            type: Practitioner
+            identifier:
+              use: secondary
+              type:
+                coding:
+                  - system: 9BzciHf_0T
+                    version: em1dSVwNdC
+                    code: LD7gU1VdIa
+                    display: l_je45PsqP
+                    userSelected: true
+                text: Kd2TxyCZR7
+              system: pACafNTDh7
+              value: _hcXO_NlZg
+              period:
+                start: "2020-11-04T11:22:43.519783-05:00"
+                end: "2020-11-04T11:22:43.520066-05:00"
+            display: l79nsD4sN6
+          onBehalfOf:
+            reference: Practitioner/LiWB2VJ2UG
+            type: Practitioner
+            identifier:
+              use: official
+              type:
+                coding:
+                  - system: 64W3kvPnCz
+                    version: 1LnrLVgWre
+                    code: oHtu3WoiKi
+                    display: gMKD8fdCjt
+                    userSelected: true
+                text: bu5V13p166
+              system: Graf7De_yt
+              value: UWJRgHe9wr
+              period:
+                start: "2020-11-04T11:22:43.544663-05:00"
+                end: "2020-11-04T11:22:43.545138-05:00"
+            display: kQ5612idGd
+          targetFormat: AQCVaUpSER
+          sigFormat: FxtGIjypV6
+          data: dUUnF3I=
+    OperationOutcome:
+      allOf:
+        - $ref: "#/components/schemas/DomainResource"
+        - type: object
+          properties:
+            issue:
+              type: array
+              items:
+                $ref: "#/components/schemas/OperationOutcomeIssue"
+                description: An error, warning, or information message that results from a system action.
+              minItems: 1
+          required:
+            - issue
+      example:
+        resourceType: OperationOutcome
+        meta:
+          versionId: q63JAUPuUM
+          lastUpdated: "2020-11-04T11:22:40.494613-05:00"
+          source: lwnaIGbKJn
+          profile:
+            - XGQPxL1j9k
+          security:
+            - system: sPgaKWp0jQ
+              version: wZHLBfjatw
+              code: DMQqy4R3E8
+              display: mmxOeLn3hG
+              userSelected: true
+          tag:
+            - system: MtLYCBYPWS
+              version: 8Ak7HZQrke
+              code: 0DRWc7UuJB
+              display: 6NXvm6cEoG
+              userSelected: true
+            - code: ibm/complete-mock
+        implicitRules: siFyYo720q
+        language: en-US
+        text:
+          status: generated
+          div: <div xmlns="http://www.w3.org/1999/xhtml"></div>
+        issue:
+          - severity: fatal
+            code: required
+            details:
+              coding:
+                - system: YAwo1XN_fv
+                  version: 9ycWn1vQBR
+                  code: Y4ci7ASL_1
+                  display: lq_CJ5bq6Z
+                  userSelected: true
+              text: aWHd4ZkhaW
+            diagnostics: yew1JE2w0X
+            location:
+              - ZDqBVS3Xgx
+            expression:
+              - yYfbNaNi8V
+    BundleEntry:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            link:
+              type: array
+              items:
+                $ref: "#/components/schemas/BundleLink"
+                description: A series of links that provide context to this entry.
+            fullUrl:
+              type: string
+              pattern: \S*
+              description: "The Absolute URL for the resource.  The fullUrl SHALL NOT disagree with the id in the resource &ndash; i.e. if the fullUrl is not a urn:uuid, the URL shall be version&ndash;independent URL consistent with the Resource.id. The fullUrl is a version independent reference to the resource. The fullUrl element SHALL have a value except that: \n* fullUrl can be empty on a POST (although it does not need to when specifying a temporary id for reference in the bundle)\n* Results from operations might involve resources that are not identified."
+            resource:
+              $ref: "#/components/schemas/Resource"
+              description: The Resource for the entry. The purpose/meaning of the resource is determined by the Bundle.type.
+            search:
+              $ref: "#/components/schemas/BundleEntrySearch"
+              description: Information about the search process that lead to the creation of this entry.
+            request:
+              $ref: "#/components/schemas/BundleEntryRequest"
+              description: Additional information about how this entry should be processed as part of a transaction or batch.  For history, it shows how the entry was processed to create the version contained in the entry.
+            response:
+              $ref: "#/components/schemas/BundleEntryResponse"
+              description: Indicates the results of processing the corresponding 'request' entry in the batch or transaction being responded to or what the results of an operation where when returning history.
+    BundleEntryResponse:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            status:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The status code returned by processing this entry. The status SHALL start with a 3 digit HTTP code (e.g. 404) and may contain the standard HTTP description associated with the status code.
+            location:
+              type: string
+              pattern: \S*
+              description: The location header created by processing this operation, populated if the operation returns a location.
+            etag:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The Etag for the resource, if the operation for the entry produced a versioned resource (see [Resource Metadata and Versioning](http.html#versioning) and [Managing Resource Contention](http.html#concurrency)).
+            lastModified:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))
+              description: The date/time that the resource was modified on the server.
+            outcome:
+              $ref: "#/components/schemas/Resource"
+              description: An OperationOutcome containing hints and warnings produced as part of processing this entry in a batch or transaction.
+          required:
+            - status
+    BundleEntryRequest:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            method:
+              type: string
+              enum:
+                - GET
+                - HEAD
+                - POST
+                - PUT
+                - DELETE
+                - PATCH
+              description: In a transaction or batch, this is the HTTP action to be executed for this entry. In a history bundle, this indicates the HTTP action that occurred.
+            url:
+              type: string
+              pattern: \S*
+              description: The URL for this entry, relative to the root (the address to which the request is posted).
+            ifNoneMatch:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: If the ETag values match, return a 304 Not Modified status. See the API documentation for ["Conditional Read"](http.html#cread).
+            ifModifiedSince:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))
+              description: Only perform the operation if the last updated date matches. See the API documentation for ["Conditional Read"](http.html#cread).
+            ifMatch:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Only perform the operation if the Etag value matches. For more information, see the API section ["Managing Resource Contention"](http.html#concurrency).
+            ifNoneExist:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Instruct the server not to perform the create if a specified resource already exists. For further information, see the API documentation for ["Conditional Create"](http.html#ccreate). This is just the query portion of the URL &ndash; what follows the "?" (not including the "?").
+          required:
+            - method
+            - url
+    BundleEntrySearch:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            mode:
+              type: string
+              enum:
+                - match
+                - include
+                - outcome
+              description: Why this entry is in the result set &ndash; whether it's included as a match or because of an _include requirement, or to convey information or warning information about the search process.
+            score:
+              type: number
+              description: When searching, the server's search ranking score for the entry.
+    BundleLink:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            relation:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A name which details the functional use for this link &ndash; see [http://www.iana.org/assignments/link&ndash;relations/link&ndash;relations.xhtml#link&ndash;relations&ndash;1](http://www.iana.org/assignments/link&ndash;relations/link&ndash;relations.xhtml#link&ndash;relations&ndash;1).
+            url:
+              type: string
+              pattern: \S*
+              description: The reference details for the link.
+          required:
+            - relation
+            - url
+    DeviceProperty:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            type:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: Code that specifies the property DeviceDefinitionPropetyCode (Extensible).
+            valueQuantity:
+              type: array
+              items:
+                $ref: "#/components/schemas/Quantity"
+                description: Property value as a quantity.
+            valueCode:
+              type: array
+              items:
+                $ref: "#/components/schemas/CodeableConcept"
+                description: Property value as a code, e.g., NTP4 (synced to NTP).
+          required:
+            - type
+    DeviceVersion:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            type:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: The type of the device version.
+            component:
+              $ref: "#/components/schemas/Identifier"
+              description: A single component of the device version.
+            value:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The version text.
+          required:
+            - value
+    DeviceSpecialization:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            systemType:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: The standard that is used to operate and communicate.
+            version:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The version of the standard that is used to operate and communicate.
+          required:
+            - systemType
+    DeviceDeviceName:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            name:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The name of the device.
+            type:
+              type: string
+              enum:
+                - udi-label-name
+                - user-friendly-name
+                - patient-reported-name
+                - manufacturer-name
+                - model-name
+                - other
+              description: |-
+                The type of deviceName.
+                UDILabelName | UserFriendlyName | PatientReportedName | ManufactureDeviceName | ModelName.
+          required:
+            - name
+            - type
+    DeviceUdiCarrier:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            deviceIdentifier:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The device identifier (DI) is a mandatory, fixed portion of a UDI that identifies the labeler and the specific version or model of a device.
+            issuer:
+              type: string
+              pattern: \S*
+              description: "Organization that is charged with issuing UDIs for devices.  For example, the US FDA issuers include :\n1) GS1: \nhttp://hl7.org/fhir/NamingSystem/gs1&ndash;di, \n2) HIBCC:\nhttp://hl7.org/fhir/NamingSystem/hibcc&ndash;dI, \n3) ICCBBA for blood containers:\nhttp://hl7.org/fhir/NamingSystem/iccbba&ndash;blood&ndash;di, \n4) ICCBA for other devices:\nhttp://hl7.org/fhir/NamingSystem/iccbba&ndash;other&ndash;di."
+            jurisdiction:
+              type: string
+              pattern: \S*
+              description: The identity of the authoritative source for UDI generation within a  jurisdiction.  All UDIs are globally unique within a single namespace with the appropriate repository uri as the system.  For example,  UDIs of devices managed in the U.S. by the FDA, the value is  http://hl7.org/fhir/NamingSystem/fda&ndash;udi.
+            carrierAIDC:
+              type: string
+              pattern: (\s*([0-9a-zA-Z\+/=]){4}\s*)+
+              description: The full UDI carrier of the Automatic Identification and Data Capture (AIDC) technology representation of the barcode string as printed on the packaging of the device &ndash; e.g., a barcode or RFID.   Because of limitations on character sets in XML and the need to round&ndash;trip JSON data through XML, AIDC Formats *SHALL* be base64 encoded.
+            carrierHRF:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The full UDI carrier as the human readable form (HRF) representation of the barcode string as printed on the packaging of the device.
+            entryType:
+              type: string
+              enum:
+                - barcode
+                - rfid
+                - manual
+                - card
+                - self-reported
+                - unknown
+              description: A coded entry to indicate how the data was entered.
+    OperationOutcomeIssue:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            severity:
+              type: string
+              enum:
+                - fatal
+                - error
+                - warning
+                - information
+              description: Indicates whether the issue indicates a variation from successful processing.
+            code:
+              type: string
+              enum:
+                - invalid
+                - structure
+                - required
+                - value
+                - invariant
+                - security
+                - login
+                - unknown
+                - expired
+                - forbidden
+                - suppressed
+                - processing
+                - not-supported
+                - duplicate
+                - multiple-matches
+                - not-found
+                - deleted
+                - too-long
+                - code-invalid
+                - extension
+                - too-costly
+                - business-rule
+                - conflict
+                - transient
+                - lock-error
+                - no-store
+                - exception
+                - timeout
+                - incomplete
+                - throttled
+                - informational
+              description: Describes the type of the issue. The system that creates an OperationOutcome SHALL choose the most applicable code from the IssueType value set, and may additional provide its own code for the error in the details element.
+            details:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: Additional details about the error. This may be a text description of the error or a system code that identifies the error.
+            diagnostics:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Additional diagnostic information about the issue.
+            location:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: "This element is deprecated because it is XML specific. It is replaced by issue.expression, which is format independent, and simpler to parse. \n\nFor resource issues, this will be a simple XPath limited to element names, repetition indicators and the default child accessor that identifies one of the elements in the resource that caused this issue to be raised.  For HTTP errors, will be \"http.\" + the parameter name."
+            expression:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: A [simple subset of FHIRPath](fhirpath.html#simple) limited to element names, repetition indicators and the default child accessor that identifies one of the elements in the resource that caused this issue to be raised.
+          required:
+            - severity
+            - code
+    Element:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: "[A-Za-z0-9\\-\\.]{1,64}"
+          description: Unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces.
+        extension:
+          type: array
+          items:
+            $ref: "#/components/schemas/Extension"
+            description: May be used to represent additional information that is not part of the basic definition of the element. To make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer can define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension.
+          example:
+            - url: http://example.com
+              valueString: text value
+    BackboneElement:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            modifierExtension:
+              type: array
+              items:
+                $ref: "#/components/schemas/Extension"
+                description: |-
+                  May be used to represent additional information that is not part of the basic definition of the element and that modifies the understanding of the element in which it is contained and/or the understanding of the containing element's descendants. Usually modifier elements provide negation or qualification. To make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer can define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions.
+
+                  Modifier extensions SHALL NOT change the meaning of any elements on Resource or DomainResource (including cannot change the meaning of modifierExtension itself).
+    Address:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            use:
+              type: string
+              enum:
+                - home
+                - work
+                - temp
+                - old
+                - billing
+              description: The purpose of this address.
+            type:
+              type: string
+              enum:
+                - postal
+                - physical
+                - both
+              description: Distinguishes between physical addresses (those you can visit) and mailing addresses (e.g. PO Boxes and care&ndash;of addresses). Most addresses are both.
+            text:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Specifies the entire address as it should be displayed e.g. on a postal label. This may be provided instead of or as well as the specific parts.
+            line:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: This component contains the house number, apartment number, street name, street direction,  P.O. Box number, delivery hints, and similar address information.
+            city:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The name of the city, town, suburb, village or other community or delivery center.
+            district:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The name of the administrative area (county).
+            state:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Sub&ndash;unit of a country with limited sovereignty in a federally organized country. A code may be used if codes are in common use (e.g. US 2 letter state codes).
+            postalCode:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A postal code designating a region defined by the postal service.
+            country:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Country &ndash; a nation as commonly understood or generally accepted.
+            period:
+              $ref: "#/components/schemas/Period"
+              description: Time period when address was/is in use.
+    Age:
+      allOf:
+        - $ref: "#/components/schemas/Quantity"
+        - type: object
+          properties: {}
+    Annotation:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            authorReference:
+              $ref: "#/components/schemas/Reference"
+              description: The individual responsible for making the annotation.
+            authorString:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The individual responsible for making the annotation.
+            time:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: Indicates when this particular annotation was made.
+            text:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The text of the annotation in markdown format.
+          required:
+            - text
+    Attachment:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            contentType:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: Identifies the type of the data in the attachment and allows a method to be chosen to interpret or render the data. Includes mime type parameters such as charset where appropriate.
+            language:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: The human language of the content. The value can be any valid value according to BCP 47.
+            data:
+              type: string
+              pattern: (\s*([0-9a-zA-Z\+/=]){4}\s*)+
+              description: The actual data of the attachment &ndash; a sequence of bytes, base64 encoded.
+            url:
+              type: string
+              pattern: \S*
+              description: A location where the data can be accessed.
+            size:
+              type: integer
+              format: int32
+              description: The number of bytes of data that make up this attachment (before base64 encoding, if that is done).
+            hash:
+              type: string
+              pattern: (\s*([0-9a-zA-Z\+/=]){4}\s*)+
+              description: The calculated hash of the data using SHA&ndash;1. Represented using base64.
+            title:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A label or set of text to display in place of the data.
+            creation:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: The date that the attachment was first created.
+    CodeableConcept:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            coding:
+              type: array
+              items:
+                $ref: "#/components/schemas/Coding"
+                description: A reference to a code defined by a terminology system.
+            text:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A human language representation of the concept as seen/selected/uttered by the user who entered the data and/or which represents the intended meaning of the user.
+    Coding:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            system:
+              type: string
+              pattern: \S*
+              description: The identification of the code system that defines the meaning of the symbol in the code.
+            version:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The version of the code system which was used when choosing this code. Note that a well&ndash;maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured, and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.
+            code:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post&ndash;coordination).
+            display:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A representation of the meaning of the code in the system, following the rules of the system.
+            userSelected:
+              type: boolean
+              description: Indicates that this coding was chosen by a user directly &ndash; e.g. off a pick list of available items (codes or displays).
+    ContactPoint:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            system:
+              type: string
+              enum:
+                - phone
+                - fax
+                - email
+                - pager
+                - url
+                - sms
+                - other
+              description: Telecommunications form for contact point &ndash; what communications system is required to make use of the contact.
+            value:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The actual contact point details, in a form that is meaningful to the designated communication system (i.e. phone number or email address).
+            use:
+              type: string
+              enum:
+                - home
+                - work
+                - temp
+                - old
+                - mobile
+              description: Identifies the purpose for the contact point.
+            rank:
+              type: integer
+              format: int32
+              description: Specifies a preferred order in which to use a set of contacts. ContactPoints with lower rank values are more preferred than those with higher rank values.
+            period:
+              $ref: "#/components/schemas/Period"
+              description: Time period when the contact point was/is in use.
+    Count:
+      allOf:
+        - $ref: "#/components/schemas/Quantity"
+        - type: object
+          properties: {}
+    Distance:
+      allOf:
+        - $ref: "#/components/schemas/Quantity"
+        - type: object
+          properties: {}
+    Duration:
+      allOf:
+        - $ref: "#/components/schemas/Quantity"
+        - type: object
+          properties: {}
+    HumanName:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            use:
+              type: string
+              enum:
+                - usual
+                - official
+                - temp
+                - nickname
+                - anonymous
+                - old
+                - maiden
+              description: Identifies the purpose for this name.
+            text:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Specifies the entire name as it should be displayed e.g. on an application UI. This may be provided instead of or as well as the specific parts.
+            family:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The part of a name that links to the genealogy. In some cultures (e.g. Eritrea) the family name of a son is the first name of his father.
+            given:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: Given name.
+            prefix:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: Part of the name that is acquired as a title due to academic, legal, employment or nobility status, etc. and that appears at the start of the name.
+            suffix:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: Part of the name that is acquired as a title due to academic, legal, employment or nobility status, etc. and that appears at the end of the name.
+            period:
+              $ref: "#/components/schemas/Period"
+              description: Indicates the period of time when this name was valid for the named person.
+    Identifier:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            use:
+              type: string
+              enum:
+                - usual
+                - official
+                - temp
+                - secondary
+                - old
+              description: The purpose of this identifier.
+            type:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: A coded type for the identifier that can be used to determine which identifier to use for a specific purpose.
+            system:
+              type: string
+              pattern: \S*
+              description: Establishes the namespace for the value &ndash; that is, a URL that describes a set values that are unique.
+            value:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The portion of the identifier typically relevant to the user and which is unique within the context of the system.
+            period:
+              $ref: "#/components/schemas/Period"
+              description: Time period during which identifier is/was valid for use.
+            assigner:
+              $ref: "#/components/schemas/Reference"
+              description: Organization that issued/manages the identifier.
+              example:
+                reference: Organization/123
+                type: Organization
+                display: The Assigning Organization
+    Money:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            value:
+              type: number
+              description: Numerical value (with implicit precision).
+            currency:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: ISO 4217 Currency Code.
+    MoneyQuantity:
+      allOf:
+        - $ref: "#/components/schemas/Quantity"
+        - type: object
+          properties: {}
+    Period:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            start:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: The start of the period. The boundary is inclusive.
+            end:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: The end of the period. If the end of the period is missing, it means no end was known or planned at the time the instance was created. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time.
+    Quantity:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            value:
+              type: number
+              description: The value of the measured amount. The value includes an implicit precision in the presentation of the value.
+            comparator:
+              type: string
+              enum:
+                - <
+                - <=
+                - ">="
+                - ">"
+              description: How the value should be understood and represented &ndash; whether the actual value is greater or less than the stated value due to measurement issues; e.g. if the comparator is "<" , then the real value is < stated value.
+            unit:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A human&ndash;readable form of the unit.
+            system:
+              type: string
+              pattern: \S*
+              description: The identification of the system that provides the coded form of the unit.
+            code:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: A computer processable form of the unit in some unit representation system.
+    Range:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            low:
+              $ref: "#/components/schemas/SimpleQuantity"
+              description: The low limit. The boundary is inclusive.
+            high:
+              $ref: "#/components/schemas/SimpleQuantity"
+              description: The high limit. The boundary is inclusive.
+    Ratio:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            numerator:
+              $ref: "#/components/schemas/Quantity"
+              description: The value of the numerator.
+            denominator:
+              $ref: "#/components/schemas/Quantity"
+              description: The value of the denominator.
+    Reference:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            reference:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.
+            type:
+              type: string
+              pattern: \S*
+              description: |-
+                The expected type of the target of the reference. If both Reference.type and Reference.reference are populated and Reference.reference is a FHIR URL, both SHALL be consistent.
+
+                The type is the Canonical URL of Resource Definition that is the type this reference refers to. References are URLs that are relative to http://hl7.org/fhir/StructureDefinition/ e.g. "Patient" is a reference to http://hl7.org/fhir/StructureDefinition/Patient. Absolute URLs are only allowed for logical models (and can only be used in references in logical models, not resources).
+            identifier:
+              $ref: "#/components/schemas/Identifier"
+              description: An identifier for the target resource. This is used when there is no way to reference the other resource directly, either because the entity it represents is not available through a FHIR server, or because there is no way for the author of the resource to convert a known identifier to an actual location. There is no requirement that a Reference.identifier point to something that is actually exposed as a FHIR instance, but it SHALL point to a business concept that would be expected to be exposed as a FHIR instance, and that instance would need to be of a FHIR resource type allowed by the reference.
+            display:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Plain text narrative that identifies the resource in addition to the resource reference.
+    SampledData:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            origin:
+              $ref: "#/components/schemas/SimpleQuantity"
+              description: The base quantity that a measured value of zero represents. In addition, this provides the units of the entire measurement series.
+            period:
+              type: number
+              description: The length of time between sampling times, measured in milliseconds.
+            factor:
+              type: number
+              description: A correction factor that is applied to the sampled data points before they are added to the origin.
+            lowerLimit:
+              type: number
+              description: The lower limit of detection of the measured points. This is needed if any of the data points have the value "L" (lower than detection limit).
+            upperLimit:
+              type: number
+              description: The upper limit of detection of the measured points. This is needed if any of the data points have the value "U" (higher than detection limit).
+            dimensions:
+              type: integer
+              format: int32
+              description: The number of sample points at each time point. If this value is greater than one, then the dimensions will be interlaced &ndash; all the sample points for a point in time will be recorded at once.
+            data:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A series of data points which are decimal values separated by a single space (character u20). The special values "E" (error), "L" (below detection limit) and "U" (above detection limit) can also be used in place of a decimal value.
+          required:
+            - origin
+            - period
+            - dimensions
+    SimpleQuantity:
+      allOf:
+        - $ref: "#/components/schemas/Quantity"
+        - type: object
+          properties: {}
+    Signature:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            type:
+              type: array
+              items:
+                $ref: "#/components/schemas/Coding"
+                description: An indication of the reason that the entity signed this document. This may be explicitly included as part of the signature information and can be used when determining accountability for various actions concerning the document.
+              minItems: 1
+            when:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))
+              description: When the digital signature was signed.
+            who:
+              $ref: "#/components/schemas/Reference"
+              description: A reference to an application&ndash;usable description of the identity that signed  (e.g. the signature used their private key).
+            onBehalfOf:
+              $ref: "#/components/schemas/Reference"
+              description: A reference to an application&ndash;usable description of the identity that is represented by the signature.
+            targetFormat:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: A mime type that indicates the technical format of the target resources signed by the signature.
+            sigFormat:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: A mime type that indicates the technical format of the signature. Important mime types are application/signature+xml for X ML DigSig, application/jose for JWS, and image/* for a graphical image of a signature, etc.
+            data:
+              type: string
+              pattern: (\s*([0-9a-zA-Z\+/=]){4}\s*)+
+              description: The base64 encoding of the Signature content. When signature is not recorded electronically this element would be empty.
+          required:
+            - type
+            - when
+            - who
+    Timing:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            event:
+              type: array
+              items:
+                type: string
+                pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+                description: Identifies specific times when the event occurs.
+            repeat:
+              $ref: "#/components/schemas/TimingRepeat"
+              description: A set of rules that describe when the event is scheduled.
+            code:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: A code for the timing schedule (or just text in code.text). Some codes such as BID are ubiquitous, but many institutions define their own additional codes. If a code is provided, the code is understood to be a complete statement of whatever is specified in the structured timing data, and either the code or the data may be used to interpret the Timing, with the exception that .repeat.bounds still applies over the code (and is not contained in the code).
+    TimingRepeat:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            boundsDuration:
+              $ref: "#/components/schemas/Duration"
+              description: Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.
+            boundsRange:
+              $ref: "#/components/schemas/Range"
+              description: Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.
+            boundsPeriod:
+              $ref: "#/components/schemas/Period"
+              description: Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.
+            count:
+              type: integer
+              format: int32
+              description: A total count of the desired number of repetitions across the duration of the entire timing specification. If countMax is present, this element indicates the lower bound of the allowed range of count values.
+            countMax:
+              type: integer
+              format: int32
+              description: If present, indicates that the count is a range &ndash; so to perform the action between [count] and [countMax] times.
+            duration:
+              type: number
+              description: How long this thing happens for when it happens. If durationMax is present, this element indicates the lower bound of the allowed range of the duration.
+            durationMax:
+              type: number
+              description: If present, indicates that the duration is a range &ndash; so to perform the action between [duration] and [durationMax] time length.
+            durationUnit:
+              type: string
+              enum:
+                - s
+                - min
+                - h
+                - d
+                - wk
+                - mo
+                - a
+              description: The units of time for the duration, in UCUM units.
+            frequency:
+              type: integer
+              format: int32
+              description: The number of times to repeat the action within the specified period. If frequencyMax is present, this element indicates the lower bound of the allowed range of the frequency.
+            frequencyMax:
+              type: integer
+              format: int32
+              description: If present, indicates that the frequency is a range &ndash; so to repeat between [frequency] and [frequencyMax] times within the period or period range.
+            period:
+              type: number
+              description: Indicates the duration of time over which repetitions are to occur; e.g. to express "3 times per day", 3 would be the frequency and "1 day" would be the period. If periodMax is present, this element indicates the lower bound of the allowed range of the period length.
+            periodMax:
+              type: number
+              description: If present, indicates that the period is a range from [period] to [periodMax], allowing expressing concepts such as "do this once every 3&ndash;5 days.
+            periodUnit:
+              type: string
+              enum:
+                - s
+                - min
+                - h
+                - d
+                - wk
+                - mo
+                - a
+              description: The units of time for the period in UCUM units.
+            dayOfWeek:
+              type: array
+              items:
+                type: string
+                enum:
+                  - mon
+                  - tue
+                  - wed
+                  - thu
+                  - fri
+                  - sat
+                  - sun
+                description: If one or more days of week is provided, then the action happens only on the specified day(s).
+            timeOfDay:
+              type: array
+              items:
+                type: string
+                pattern: ([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?
+                description: Specified time of day for action to take place.
+            when:
+              type: array
+              items:
+                type: string
+                enum:
+                  - MORN
+                  - MORN.early
+                  - MORN.late
+                  - NOON
+                  - AFT
+                  - AFT.early
+                  - AFT.late
+                  - EVE
+                  - EVE.early
+                  - EVE.late
+                  - NIGHT
+                  - PHS
+                  - HS
+                  - WAKE
+                  - C
+                  - CM
+                  - CD
+                  - CV
+                  - AC
+                  - ACM
+                  - ACD
+                  - ACV
+                  - PC
+                  - PCM
+                  - PCD
+                  - PCV
+                description: An approximate time period during the day, potentially linked to an event of daily living that indicates when the action should occur.
+            offset:
+              type: integer
+              format: int32
+              description: The number of minutes from the event. If the event code does not indicate whether the minutes is before or after the event, then the offset is assumed to be after the event.
+    ContactDetail:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            name:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: The name of an individual to contact.
+            telecom:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContactPoint"
+                description: The contact details for the individual (if a name was provided) or the organization.
+    RelatedArtifact:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - documentation
+                - justification
+                - citation
+                - predecessor
+                - successor
+                - derived-from
+                - depends-on
+                - composed-of
+              description: The type of relationship to the related artifact.
+            label:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A short label that can be used to reference the citation from elsewhere in the containing artifact, such as a footnote index.
+            display:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A brief description of the document or knowledge resource being referenced, suitable for display to a consumer.
+            citation:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A bibliographic citation for the related artifact. This text SHOULD be formatted according to an accepted citation format.
+            url:
+              type: string
+              pattern: \S*
+              description: A url for the artifact that can be followed to access the actual content.
+            document:
+              $ref: "#/components/schemas/Attachment"
+              description: The document being referenced, represented as an attachment. This is exclusive with the resource element.
+            resource:
+              type: string
+              pattern: \S*
+              description: The related resource, such as a library, value set, profile, or other knowledge resource.
+          required:
+            - type
+    UsageContext:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            code:
+              $ref: "#/components/schemas/Coding"
+              description: A code that identifies the type of context being specified by this usage context.
+            valueCodeableConcept:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: A value that defines the context specified in this context of use. The interpretation of the value is defined by the code.
+            valueQuantity:
+              $ref: "#/components/schemas/Quantity"
+              description: A value that defines the context specified in this context of use. The interpretation of the value is defined by the code.
+            valueRange:
+              $ref: "#/components/schemas/Range"
+              description: A value that defines the context specified in this context of use. The interpretation of the value is defined by the code.
+            valueReference:
+              $ref: "#/components/schemas/Reference"
+              description: A value that defines the context specified in this context of use. The interpretation of the value is defined by the code.
+          required:
+            - code
+    Meta:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            versionId:
+              type: string
+              pattern: "[A-Za-z0-9\\-\\.]{1,64}"
+              description: The version specific identifier, as it appears in the version portion of the URL. This value changes when the resource is created, updated, or deleted.
+            lastUpdated:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))
+              description: When the resource last changed &ndash; e.g. when the version changed.
+            source:
+              type: string
+              pattern: \S*
+              description: A uri that identifies the source system of the resource. This provides a minimal amount of [Provenance](provenance.html#) information that can be used to track or differentiate the source of information in the resource. The source may identify another FHIR server, document, message, database, etc.
+            profile:
+              type: array
+              items:
+                type: string
+                pattern: \S*
+                description: A list of profiles (references to [StructureDefinition](structuredefinition.html#) resources) that this resource claims to conform to. The URL is a reference to [StructureDefinition.url](structuredefinition&ndash;definitions.html#StructureDefinition.url).
+            security:
+              type: array
+              items:
+                $ref: "#/components/schemas/Coding"
+                description: Security labels applied to this resource. These tags connect specific resources to the overall security policy and infrastructure.
+            tag:
+              type: array
+              items:
+                $ref: "#/components/schemas/Coding"
+                description: Tags applied to this resource. Tags are intended to be used to identify and relate resources to process and workflow, and applications are not required to consider the tags when interpreting the meaning of a resource.
+    Narrative:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - generated
+                - extensions
+                - additional
+                - empty
+              description: The status of the narrative &ndash; whether it's entirely generated (from just the defined data or the extensions too), or whether a human authored it and it may contain additional data.
+            div:
+              type: string
+              description: The actual narrative content, a stripped down version of XHTML.
+          required:
+            - status
+            - div
+    Extension:
+      allOf:
+        - $ref: "#/components/schemas/Element"
+        - type: object
+          properties:
+            url:
+              type: string
+              pattern: \S*
+              description: Source of the definition for the extension code &ndash; a logical name or a URL.
+            valueBase64Binary:
+              type: string
+              pattern: (\s*([0-9a-zA-Z\+/=]){4}\s*)+
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueBoolean:
+              type: boolean
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueCanonical:
+              type: string
+              pattern: \S*
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueCode:
+              type: string
+              pattern: "[^\\s]+(\\s[^\\s]+)*"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueDate:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueDateTime:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueDecimal:
+              type: number
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueId:
+              type: string
+              pattern: "[A-Za-z0-9\\-\\.]{1,64}"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueInstant:
+              type: string
+              pattern: ([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueInteger:
+              type: integer
+              format: int32
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueMarkdown:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueOid:
+              type: string
+              pattern: urn:oid:[0-2](\.(0|[1-9][0-9]*))+
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valuePositiveInt:
+              type: integer
+              format: int32
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueString:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueTime:
+              type: string
+              pattern: ([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueUnsignedInt:
+              type: integer
+              format: int32
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueUri:
+              type: string
+              pattern: \S*
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueUrl:
+              type: string
+              pattern: \S*
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueUuid:
+              type: string
+              pattern: urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueAddress:
+              $ref: "#/components/schemas/Address"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueAge:
+              $ref: "#/components/schemas/Age"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueAnnotation:
+              $ref: "#/components/schemas/Annotation"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueAttachment:
+              $ref: "#/components/schemas/Attachment"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueCodeableConcept:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueCoding:
+              $ref: "#/components/schemas/Coding"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueContactPoint:
+              $ref: "#/components/schemas/ContactPoint"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueCount:
+              $ref: "#/components/schemas/Count"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueDistance:
+              $ref: "#/components/schemas/Distance"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueDuration:
+              $ref: "#/components/schemas/Duration"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueHumanName:
+              $ref: "#/components/schemas/HumanName"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueIdentifier:
+              $ref: "#/components/schemas/Identifier"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueMoney:
+              $ref: "#/components/schemas/Money"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valuePeriod:
+              $ref: "#/components/schemas/Period"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueQuantity:
+              $ref: "#/components/schemas/Quantity"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueRange:
+              $ref: "#/components/schemas/Range"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueRatio:
+              $ref: "#/components/schemas/Ratio"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueReference:
+              $ref: "#/components/schemas/Reference"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueSampledData:
+              $ref: "#/components/schemas/SampledData"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueSignature:
+              $ref: "#/components/schemas/Signature"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueTiming:
+              $ref: "#/components/schemas/Timing"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueContactDetail:
+              $ref: "#/components/schemas/ContactDetail"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueRelatedArtifact:
+              $ref: "#/components/schemas/RelatedArtifact"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueUsageContext:
+              $ref: "#/components/schemas/UsageContext"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+            valueMeta:
+              $ref: "#/components/schemas/Meta"
+              description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
+          required:
+            - url
+    Organization:
+      allOf:
+        - $ref: "#/components/schemas/DomainResource"
+        - type: object
+          properties:
+            identifier:
+              type: array
+              items:
+                $ref: "#/components/schemas/Identifier"
+                description: Identifier for the organization that is used to identify the organization across multiple disparate systems.
+            active:
+              type: boolean
+              description: Whether the organization's record is still in active use.
+            type:
+              type: array
+              items:
+                $ref: "#/components/schemas/CodeableConcept"
+                description: The kind(s) of organization that this is.
+            name:
+              type: string
+              pattern: "[ \\r\\n\\t\\S]+"
+              description: A name associated with the organization.
+            alias:
+              type: array
+              items:
+                type: string
+                pattern: "[ \\r\\n\\t\\S]+"
+                description: A list of alternate names that the organization is known as, or was known as in the past.
+            telecom:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContactPoint"
+                description: A contact detail for the organization.
+            address:
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
+                description: An address for the organization.
+            partOf:
+              $ref: "#/components/schemas/Reference"
+              description: The organization of which this organization forms a part.
+            contact:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrganizationContact"
+                description: Contact for the organization for a certain purpose.
+            endpoint:
+              type: array
+              items:
+                $ref: "#/components/schemas/Reference"
+                description: Technical endpoints providing access to services operated for the organization.
+      example:
+        resourceType: Organization
+        meta:
+          versionId: MkhCKF3NPs
+          lastUpdated: "2020-11-04T11:22:55.495627-05:00"
+          source: zrGPPE8DJH
+          profile:
+            - z3pU0zspXr
+          security:
+            - system: oC2Jc7y4Zf
+              version: EQHqJLdyML
+              code: zBvY_yWgVY
+              display: GsL8gnlzvu
+              userSelected: true
+          tag:
+            - system: aNNTmndRB8
+              version: E7tloLtD33
+              code: kMOXjB2zxk
+              display: 9ugg6ChWzh
+              userSelected: true
+            - code: ibm/complete-mock
+        implicitRules: 011v9tCoKf
+        language: en-US
+        text:
+          status: additional
+          div: <div xmlns="http://www.w3.org/1999/xhtml"></div>
+        identifier:
+          - use: old
+            type:
+              coding:
+                - system: 1SUEu2dRCO
+                  version: SqWkXr_J9k
+                  code: 9aTcdpFSZ8
+                  display: weo1p1jIrt
+                  userSelected: true
+              text: b_lOMGm6ta
+            system: XxeSGme8g0
+            value: EVVScECcrs
+            period:
+              start: "2020-11-04T11:22:55.498156-05:00"
+              end: "2020-11-04T11:22:55.498323-05:00"
+        active: true
+        type:
+          - coding:
+              - system: GJz7DeJAID
+                version: SoNWcpaGaO
+                code: VqNBaGgdd8
+                display: D_01X4Yhro
+                userSelected: true
+            text: _da3dnjC1g
+        name: _Yghclpf6e
+        alias:
+          - v6TGkG3UzA
+        telecom:
+          - system: fax
+            value: XUXar8gIJw
+            use: old
+            rank: 6.04214668e+08
+            period:
+              start: "2020-11-04T11:22:55.500697-05:00"
+              end: "2020-11-04T11:22:55.500991-05:00"
+        address:
+          - use: billing
+            type: postal
+            text: KRPWrCLw0J
+            line:
+              - Y0UGna670q
+            city: T9ymhEJMWe
+            district: CsINuTto0Y
+            state: _5_y00xVnB
+            postalCode: JPMLnjxKN8
+            country: 1xSh_aRALw
+            period:
+              start: "2020-11-04T11:22:55.503025-05:00"
+              end: "2020-11-04T11:22:55.503358-05:00"
+        partOf:
+          reference: Organization/sBzEw2QIM9
+          type: Organization
+          identifier:
+            use: official
+            type:
+              coding:
+                - system: 3lk1UxUrO1
+                  version: gxRtW6o8rV
+                  code: N1PckpnwPx
+                  display: ZWYPZB4ypF
+                  userSelected: true
+              text: wGMie0kDM0
+            system: 4Acfpp1Qus
+            value: sTkfzvUNRc
+            period:
+              start: "2020-11-04T11:22:55.505211-05:00"
+              end: "2020-11-04T11:22:55.505435-05:00"
+          display: fi35hwOFFC
+        contact:
+          - purpose:
+              coding:
+                - system: gXJWNpvPYH
+                  version: ixSX6ZizQU
+                  code: iYvO1m8ZdT
+                  display: 7xT105543A
+                  userSelected: true
+              text: xka69Q61Dz
+            name:
+              use: usual
+              text: DfxDNX8On5
+              family: ozZugaAElu
+              given:
+                - v_ww8YMzVs
+              prefix:
+                - _hBm2j1wTY
+              suffix:
+                - DgzwLOgfj_
+              period:
+                start: "2020-11-04T11:22:55.507967-05:00"
+                end: "2020-11-04T11:22:55.508327-05:00"
+            telecom:
+              - system: email
+                value: HE9t3cWC8v
+                use: work
+                rank: 1.386494584e+09
+                period:
+                  start: "2020-11-04T11:22:55.508975-05:00"
+                  end: "2020-11-04T11:22:55.50928-05:00"
+            address:
+              use: billing
+              type: both
+              text: hy6FvAwKUf
+              line:
+                - y8f7C2_rKu
+              city: PAj0k3xx6m
+              district: ETBhWSq3V3
+              state: 78AvjHfIfy
+              postalCode: 3NGE0wSbNy
+              country: PT_vsjai4f
+              period:
+                start: "2020-11-04T11:22:55.510249-05:00"
+                end: "2020-11-04T11:22:55.510429-05:00"
+        endpoint:
+          - reference: Endpoint/IQlLQrnkp9
+            type: Endpoint
+            identifier:
+              use: secondary
+              type:
+                coding:
+                  - system: bflJysEUwb
+                    version: wXmVSZF3xN
+                    code: uLMS2MG468
+                    display: 7iCeHMVBnr
+                    userSelected: true
+                text: vkMjQ4BX4w
+              system: h5wLHJqvsB
+              value: 1GAC_uwdo4
+              period:
+                start: "2020-11-04T11:22:55.511516-05:00"
+                end: "2020-11-04T11:22:55.511804-05:00"
+            display: pcy6U9Fxm0
+    OrganizationContact:
+      allOf:
+        - $ref: "#/components/schemas/BackboneElement"
+        - type: object
+          properties:
+            purpose:
+              $ref: "#/components/schemas/CodeableConcept"
+              description: Indicates a purpose for which the contact can be reached.
+            name:
+              $ref: "#/components/schemas/HumanName"
+              description: A name associated with the contact.
+            telecom:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContactPoint"
+                description: A contact detail (e.g. a telephone number or an email address) by which the party may be contacted.
+            address:
+              $ref: "#/components/schemas/Address"
+              description: Visiting or postal addresses for the contact.
+    Version:
+      type: string
+      pattern: "^[1-9][0-9]+$"
+    RequestId:
+      type: string
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+      example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
+    CorrelationId:
+      type: string
+      example: 11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA
+  securitySchemes:
+    app-level0:
+      $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
+  responses: {}
