@@ -61,10 +61,11 @@ class ChangelogRecord(SdsBaseModel):
             f"dn: {self.target_distinguished_name.raw}",
             f"changetype: {self.change_type}",
         ]
-        if self.change_type is not ChangeType.ADD:
-            header_lines.append(f"{OBJECT_CLASS_FIELD_NAME}: {self.change_type}")
-
         change_lines = header_lines + list(filter(bool, self.changes.split("\n")))
+
+        if self.change_type is not ChangeType.ADD:
+            change_lines.append(f"{OBJECT_CLASS_FIELD_NAME}: {self.change_type}")
+
         if unique_identifier_line not in map(str.lower, change_lines):
             change_lines.append(unique_identifier_line)
 

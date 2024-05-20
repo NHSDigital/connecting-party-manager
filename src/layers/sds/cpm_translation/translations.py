@@ -1,5 +1,6 @@
+from functools import partial
+from itertools import filterfalse
 from typing import Generator
-from uuid import UUID
 
 from domain.core.device import Device, DeviceType
 from domain.core.device_key import DeviceKeyType
@@ -11,27 +12,12 @@ from domain.repository.device_repository import DeviceRepository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
+from sds.domain.sds_modification_request import SdsModificationRequest
 
-DEFAULT_PRODUCT_TEAM = {
-    "id": UUID(int=0x12345678123456781234567812345678),
-    "name": "ROOT",
-}
-EXCEPTIONAL_ODS_CODES = {
-    "696B001",
-    "TESTEBS1",
-    "TESTLSP0",
-    "TESTLSP1",
-    "TESTLSP3",
-    "TMSAsync1",
-    "TMSAsync2",
-    "TMSAsync3",
-    "TMSAsync4",
-    "TMSAsync5",
-    "TMSAsync6",
-    "TMSEbs2",
-}
-
-DEFAULT_ORGANISATION = "CDEF"
+from .constants import DEFAULT_ORGANISATION, DEFAULT_PRODUCT_TEAM, EXCEPTIONAL_ODS_CODES
+from .modify.modify_device import update_device_metadata
+from .modify.modify_key import NotAnSdsKey, get_modify_key_function
+from .utils import update_in_list_of_dict
 
 
 def accredited_system_ids(
@@ -48,14 +34,6 @@ def scoped_party_key(nhs_mhs: NhsMhs) -> str:
     interaction_id = nhs_mhs.nhs_mhs_svc_ia.strip()
     ods_code = nhs_mhs.nhs_id_code
     return DEVICE_KEY_SEPARATOR.join((ods_code, party_key, interaction_id))
-
-
-def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
-    for item in obj:
-        if key in item:
-            item[key] = value
-            return
-    obj.append({key: value})
 
 
 def create_product_team(ods_code: str) -> ProductTeam:
@@ -110,18 +88,6 @@ def nhs_accredited_system_to_cpm_devices(
         yield _device
 
 
-def modify_accredited_system_devices(
-    nhs_accredited_system: NhsAccreditedSystem, repository: DeviceRepository
-) -> Generator[Device, None, None]:
-    for (
-        _,
-        accredited_system_id,
-    ) in accredited_system_ids(nhs_accredited_system):
-        device = repository.read_by_key(key=accredited_system_id)
-        device.update(something="foo")
-        yield device
-
-
 def nhs_mhs_to_cpm_device(
     nhs_mhs: NhsMhs,
     questionnaire: Questionnaire,
@@ -156,10 +122,65 @@ def nhs_mhs_to_cpm_device(
     return device
 
 
-def modify_mhs_device(nhs_mhs: NhsMhs, repository: DeviceRepository):
-    device = repository.read_by_key(key=scoped_party_key(nhs_mhs))
-    device.update(something="foo")
-    return device
+class NoDeviceFound(Exception):
+    pass
+
+
+def read_devices_by_unique_identifier(
+    questionnaire_ids: list[str], repository: DeviceRepository, value: str
+) -> Generator[Device, None, None]:
+    for questionnaire_id in questionnaire_ids:
+        for device in repository.read_by_index(
+            questionnaire_id=questionnaire_id,
+            question_name="unique_identifier",
+            value=value,
+        ):
+            if device.is_active():
+                yield device
+
+
+def modify_devices(
+    modification_request: SdsModificationRequest,
+    questionnaire_ids: list[str],
+    repository: DeviceRepository,
+) -> Generator[Device, None, None]:
+    devices = list(
+        read_devices_by_unique_identifier(
+            questionnaire_ids=questionnaire_ids,
+            repository=repository,
+            value=modification_request.unique_identifier,
+        )
+    )
+    # Only apply modifications if there are devices to modify
+    modifications = modification_request.modifications if devices else []
+
+    _devices = devices
+    for modification_type, field, new_values in modifications:
+        device_type = _devices[0].type
+        model = NhsAccreditedSystem if device_type is DeviceType.PRODUCT else NhsMhs
+        field_name = model.get_field_name_for_alias(alias=field)
+
+        try:
+            modify_key = get_modify_key_function(
+                model=model,
+                field_name=field_name,
+                modification_type=modification_type,
+            )
+            _devices += list(
+                modify_key(devices=_devices, field_name=field_name, value=new_values)
+            )
+        except NotAnSdsKey:
+            update_metadata = partial(
+                update_device_metadata,
+                model=model,
+                modification_type=modification_type,
+                field_alias=field,
+                new_values=new_values,
+            )
+            _active_devices = list(filter(Device.is_active, _devices))
+            _inactive_devices = list(filterfalse(Device.is_active, _devices))
+            _devices = [*map(update_metadata, _active_devices), *_inactive_devices]
+    yield from _devices
 
 
 def delete_devices(
@@ -168,12 +189,11 @@ def delete_devices(
     repository: DeviceRepository,
 ) -> list[Device]:
     devices = []
-    for questionnaire_id in questionnaire_ids:
-        for _device in repository.read_by_index(
-            questionnaire_id=questionnaire_id,
-            question_name="unique_identifier",
-            value=deletion_request.unique_identifier,
-        ):
-            _device.delete()
-            devices.append(_device)
+    for _device in read_devices_by_unique_identifier(
+        questionnaire_ids=questionnaire_ids,
+        repository=repository,
+        value=deletion_request.unique_identifier,
+    ):
+        _device.delete()
+        devices.append(_device)
     return devices

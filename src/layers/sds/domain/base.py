@@ -1,4 +1,4 @@
-from typing import ClassVar, Literal
+from typing import ClassVar, Literal, Self
 
 import orjson
 from etl_utils.ldif.model import DistinguishedName
@@ -30,7 +30,8 @@ def _strip_excluded_values_from_object_class(
     values: dict,
     excluded_object_class_values=EXCLUDED_OBJECT_CLASS_VALUES,
 ) -> dict:
-    object_class = values.get(OBJECT_CLASS_FIELD_NAME)
+    _object_class = values.get(OBJECT_CLASS_FIELD_NAME)
+    object_class = set(_object_class) if _object_class else _object_class
     if object_class:
         values[OBJECT_CLASS_FIELD_NAME] = object_class - excluded_object_class_values
     return values
@@ -52,7 +53,7 @@ def _unpack_sets(cls: "SdsBaseModel", values: dict) -> dict:
 
 
 def _generate_distinguished_name(cls: "SdsBaseModel", values: dict) -> dict:
-    _distinguished_name: DistinguishedName = values.pop("_distinguished_name")
+    _distinguished_name: DistinguishedName = values.pop("_distinguished_name", None)
     if _distinguished_name is not None:
         values["distinguished_name"] = dict(_distinguished_name.parts)
     return values
@@ -98,6 +99,27 @@ class SdsBaseModel(BaseModel):
             for model_field in cls.__fields__.values()
         }
 
+    @classmethod
+    def get_field_name_for_alias(cls, alias) -> str:
+        try:
+            (field_name,) = (
+                field_name
+                for field_name, model_field in cls.__fields__.items()
+                if model_field.alias == alias
+            )
+        except ValueError:
+            raise ValueError(f"No field with alias '{alias}' found")
+        return field_name
+
+    @classmethod
+    def get_alias_for_field_name(cls, field) -> str:
+        (field_name,) = (
+            model_field.alias
+            for field_name, model_field in cls.__fields__.items()
+            if field_name == field
+        )
+        return field_name
+
     @root_validator(pre=True)
     def preprocess_inputs(cls, values):
         for transform in (
@@ -112,3 +134,23 @@ class SdsBaseModel(BaseModel):
     def as_questionnaire_response_responses(self) -> list[dict[str, list]]:
         data = orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
         return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]
+
+    @classmethod
+    def force_optional(cls) -> type[Self]:
+        _model = type(f"{cls.__name__}-subclass", (cls,), {})
+        for field in _model.__fields__.values():
+            field.required = False
+        return _model
+
+    @classmethod
+    def parse_and_validate_field(cls, field: str, value: list | set):
+        _model = cls.force_optional()
+        field_alias = cls.get_alias_for_field_name(field=field)
+        _value = set(value) if isinstance(value, list) else value
+        instance = _model(**{field_alias: _value})
+        parsed_value = getattr(instance, field)
+        return parsed_value
+
+    @classmethod
+    def is_mandatory_field(cls, field: str):
+        return cls.__fields__[field].required
