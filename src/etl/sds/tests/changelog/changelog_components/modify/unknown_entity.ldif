@@ -1,0 +1,8 @@
+dn: uniqueIdentifier=1234,ou=Services,o=nhs
+changeType: modify
+add: foo
+foo: 123
+-
+objectClass: modify
+objectClass: top
+uniqueIdentifier: 1234
