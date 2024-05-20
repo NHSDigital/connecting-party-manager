@@ -38,7 +38,7 @@ dn: ou=test,dc=example,dc=com
 changetype: delete
 """
 
-# Same as the above with comments and hyphens removed, and all keys lower cased
+# Same as the above with comments but all keys lower cased
 DUMPED_SAMPLE_LDIF = """dn: dc=com,dc=example,ou=test
 changetype: add
 objectclass: organizationalUnit
@@ -46,13 +46,16 @@ objectclass: top
 ou: test
 
 dn: dc=com,dc=example,ou=test
-add: description
 changetype: modify
-delete: seeAlso
+add: description
 description: First description value
 description: Second description value
+-
+replace: postalcode
 postalcode: 12345
-replace: postalCode
+-
+delete: seealso
+-
 
 dn: dc=com,dc=example,ou=test
 changetype: delete
@@ -74,6 +77,7 @@ delete: seeAlso
 -
 """
 
+
 PARSED_SAMPLE_LDIF = [
     (
         DistinguishedName(parts=(("dc", "com"), ("dc", "example"), ("ou", "test"))),
@@ -86,12 +90,24 @@ PARSED_SAMPLE_LDIF = [
     (
         DistinguishedName(parts=(("dc", "com"), ("dc", "example"), ("ou", "test"))),
         {
-            "add": {"description"},
             "changetype": {"modify"},
-            "delete": {"seeAlso"},
-            "description": {"First description value", "Second description value"},
-            "postalcode": {"12345"},
-            "replace": {"postalCode"},
+            "modifications": [
+                (
+                    "add",
+                    "description",
+                    {"First description value", "Second description value"},
+                ),
+                (
+                    "replace",
+                    "postalcode",
+                    {"12345"},
+                ),
+                (
+                    "delete",
+                    "seealso",
+                    set(),
+                ),
+            ],
         },
     ),
     (
@@ -101,6 +117,135 @@ PARSED_SAMPLE_LDIF = [
         },
     ),
 ]
+
+SAMPLE_LDIF_DATA_ADD = """
+# Modify an entry
+dn: ou=test,dc=example,dc=com
+changetype: add
+description: First description value
+description: Second description value
+"""
+
+PARSED_LDIF_DATA_ADD = (
+    DistinguishedName(parts=(("dc", "com"), ("dc", "example"), ("ou", "test"))),
+    {
+        "changetype": {"add"},
+        "description": {"First description value", "Second description value"},
+    },
+)
+
+
+SAMPLE_LDIF_DATA_DELETE = """
+# Modify an entry
+dn: ou=test,dc=example,dc=com
+changetype: delete
+description: First description value
+"""
+
+PARSED_LDIF_DATA_DELETE = (
+    DistinguishedName(parts=(("dc", "com"), ("dc", "example"), ("ou", "test"))),
+    {
+        "changetype": {"delete"},
+        "description": {"First description value"},
+    },
+)
+
+
+SAMPLE_LDIF_DATA_COMPLEX_MODIFY = """
+# Modify an entry
+dn: ou=test,dc=example,dc=com
+changetype: modify
+add: description
+description: First description value
+description: Second description value
+-
+add: shoeSize
+shoeSize: 123
+-
+add: description
+description: Third description value
+description: Fourth description value
+-
+replace: postalCode
+postalCode: 12345
+-
+delete: seeAlso
+-
+replace: postalCode
+postalCode: 45678
+postalCode: 54321
+-
+"""
+
+
+PARSED_LDIF_DATA_COMPLEX_MODIFY = (
+    DistinguishedName(parts=(("dc", "com"), ("dc", "example"), ("ou", "test"))),
+    {
+        "changetype": {"modify"},
+        "modifications": [
+            (
+                "add",
+                "description",
+                {"First description value", "Second description value"},
+            ),
+            (
+                "add",
+                "shoesize",
+                {"123"},
+            ),
+            (
+                "add",
+                "description",
+                {"Third description value", "Fourth description value"},
+            ),
+            (
+                "replace",
+                "postalcode",
+                {"12345"},
+            ),
+            (
+                "delete",
+                "seealso",
+                set(),
+            ),
+            (
+                "replace",
+                "postalcode",
+                {"45678", "54321"},
+            ),
+        ],
+    },
+)
+
+
+UPDATE_TRIGGER_LDIF_MODIFY_EXAMPLE = """
+dn: uniqueIdentifier=000173655515,ou=Services,o=nhs
+changeType: modify
+add: nhsAsClient
+nhsAsClient: AAA
+-
+objectClass: modify
+objectClass: top
+uniqueIdentifier: 000173655515
+"""
+
+PARSED_UPDATE_TRIGGER_LDIF_MODIFY = (
+    DistinguishedName(
+        parts=(("o", "nhs"), ("ou", "services"), ("uniqueidentifier", "000173655515"))
+    ),
+    {
+        "changetype": {"modify"},
+        "modifications": [
+            (
+                "add",
+                "nhsasclient",
+                {"AAA"},
+            )
+        ],
+        "objectclass": {"modify", "top"},
+        "uniqueidentifier": {"000173655515"},
+    },
+)
 
 
 @pytest.mark.parametrize(
@@ -153,7 +298,8 @@ def test_dumped_ldif_same_as_initial():
 def test_ldif_dump():
     io = BytesIO()
     ldif_dump(fp=io, obj=PARSED_SAMPLE_LDIF)
-    assert io.getvalue().decode() == DUMPED_SAMPLE_LDIF
+    data = io.getvalue().decode()
+    assert data == DUMPED_SAMPLE_LDIF
 
 
 @mock.patch(
@@ -174,3 +320,46 @@ def test_filter_ldif_from_s3_by_property(mocked_open):
     assert modify_record in parse_ldif(
         file_opener=StringIO, path_or_data=SAMPLE_LDIF_DATA
     )
+
+
+@pytest.mark.parametrize(
+    ["raw_ldif", "parsed_ldif"],
+    [
+        (SAMPLE_LDIF_DATA_COMPLEX_MODIFY, PARSED_LDIF_DATA_COMPLEX_MODIFY),
+        (SAMPLE_LDIF_DATA_DELETE, PARSED_LDIF_DATA_DELETE),
+        (SAMPLE_LDIF_DATA_ADD, PARSED_LDIF_DATA_ADD),
+        (UPDATE_TRIGGER_LDIF_MODIFY_EXAMPLE, PARSED_UPDATE_TRIGGER_LDIF_MODIFY),
+    ],
+)
+def test_parse_ldif_changes(raw_ldif, parsed_ldif):
+    ((dn, record),) = parse_ldif(file_opener=StringIO, path_or_data=raw_ldif)
+    _dn, _record = parsed_ldif
+    assert dn == _dn
+    assert record == _record
+
+
+def test_parse_ldif_multiple_changes():
+    raw_ldif = "\n\n".join(
+        (
+            SAMPLE_LDIF_DATA_COMPLEX_MODIFY,
+            SAMPLE_LDIF_DATA_DELETE,
+            SAMPLE_LDIF_DATA_ADD,
+            SAMPLE_LDIF_DATA_ADD,
+            SAMPLE_LDIF_DATA_DELETE,
+            SAMPLE_LDIF_DATA_COMPLEX_MODIFY,
+        )
+    )
+    expected_parsed_ldif = [
+        PARSED_LDIF_DATA_COMPLEX_MODIFY,
+        PARSED_LDIF_DATA_DELETE,
+        PARSED_LDIF_DATA_ADD,
+        PARSED_LDIF_DATA_ADD,
+        PARSED_LDIF_DATA_DELETE,
+        PARSED_LDIF_DATA_COMPLEX_MODIFY,
+    ]
+
+    records = [
+        record for _, record in parse_ldif(file_opener=StringIO, path_or_data=raw_ldif)
+    ]
+    expected_records = [record for _, record in expected_parsed_ldif]
+    assert records == expected_records

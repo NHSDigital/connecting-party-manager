@@ -21,9 +21,12 @@ def _decode_record(record: dict[str, list[bytes]]) -> dict[str, set[str]]:
     decoded_record = {}
     for field_name, field_items in record.items():
         non_empty_items = filter(bool, field_items)
-        decoded_items = set(map(bytes.decode, non_empty_items))
-        if decoded_items:
-            decoded_record[field_name.lower()] = decoded_items
+        if field_name != "modifications":
+            decoded_items = set(map(bytes.decode, non_empty_items))
+            if decoded_items:
+                decoded_record[field_name.lower()] = decoded_items
+        else:
+            decoded_record[field_name.lower()] = list(non_empty_items)
     return decoded_record
 
 
@@ -40,7 +43,11 @@ def parse_ldif(
 
 def _encode_record(record: dict[str, set[str]]) -> dict[str, list[bytes]]:
     return {
-        field_name: sorted(item.encode() for item in field_items)
+        field_name: (
+            sorted(item.encode() for item in field_items)
+            if field_name != "modifications"
+            else field_items
+        )
         for field_name, field_items in record.items()
     }
 
