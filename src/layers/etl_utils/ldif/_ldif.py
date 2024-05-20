@@ -1,9 +1,10 @@
 """
 Downloaded, pruned and modified from https://raw.githubusercontent.com/python-ldap/python-ldap/main/Lib/ldif.py
 
-The only modifications were (search this file for '**We modified this**'):
+The only modifications were:
     * yield records in parse(), rather than append.
     * lowercase all attribute names
+    * implement a method for parsing and extracting ldif modify
 Other than that, unnecessary features were removed.
 """
 
@@ -31,6 +32,7 @@ safe_string_re = re.compile(SAFE_STRING_PATTERN)
 
 CHANGE_TYPES = {"add", "delete", "modify"}  # ,'modrdn'
 MODIFICATION_OPERATIONS = {"add", "delete", "replace"}
+PARSED_MODIFICATION_KEY = "modifications"  # **We added this**
 
 
 def is_dn(s):
@@ -255,7 +257,7 @@ class LDIFParser:
     def _parse_modify(self):
         modifications = defaultdict(list)
         modifications["changetype"].append(b"modify")
-        modifications["modifications"] = []
+        modifications[PARSED_MODIFICATION_KEY] = []
 
         k, v = self._next_key_and_value()
         # Loop for reading the list of modifications
@@ -277,7 +279,7 @@ class LDIFParser:
                 new_values.add(v.decode())
                 k, v = self._next_key_and_value()
 
-            modifications["modifications"].append(
+            modifications[PARSED_MODIFICATION_KEY].append(
                 (modification_operation, attribute_name, new_values)
             )
 
@@ -406,7 +408,7 @@ class LDIFWriter:
             dictionary holding an entry
         """
         for attr_type, values in sorted(entry.items()):
-            if attr_type == "modifications":
+            if attr_type == PARSED_MODIFICATION_KEY:
                 for modification_operation, attribute_name, new_values in values:
                     self._unfold_lines(f"{modification_operation}: {attribute_name}")
                     for v in sorted(new_values):
