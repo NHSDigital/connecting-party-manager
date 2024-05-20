@@ -4,16 +4,18 @@ FILTER_TERMS = [
     ("objectClass", "nhsMHS"),
     ("objectClass", "nhsAS"),
     ("objectClass", "delete"),
+    ("objectClass", "modify"),
 ]
 
 
 class CaseInsensitiveEnum(StrEnum):
     @classmethod
     def _missing_(cls, value):
-        value = value.lower()
-        for member in cls:
-            if member == value:
-                return member
+        if isinstance(value, str):
+            value = value.lower()
+            for member in cls:
+                if member == value:
+                    return member
         return None
 
 
@@ -71,3 +73,9 @@ class OrganizationalUnitNhs(CaseInsensitiveEnum):
 
 class ChangelogCommonName(CaseInsensitiveEnum):
     CHANGELOG = auto()
+
+
+class ModificationType(CaseInsensitiveEnum):
+    ADD = auto()
+    REPLACE = auto()
+    DELETE = auto()

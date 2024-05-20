@@ -25,7 +25,7 @@ from domain.core.questionnaire import (
 from event.json import json_loads
 
 from .errors import ItemNotFound
-from .keys import TableKeys, strip_key_prefix
+from .keys import KEY_SEPARATOR, TableKeys, strip_key_prefix
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
 from .transaction import ConditionExpression, TransactionStatement, TransactItem
@@ -244,6 +244,13 @@ class DeviceRepository(Repository[Device]):
 
         (device,) = TableKeys.DEVICE.filter(items, key="sk")
         keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
+        _indexes = TableKeys.DEVICE_INDEX.filter(items, key="sk")
+        indexes = {
+            (questionnaire_id, question): value
+            for _, questionnaire_id, question, value in map(
+                lambda idx: idx["sk"].split(KEY_SEPARATOR), _indexes
+            )
+        }
 
         questionnaires = {}
         for id_, data in TableKeys.QUESTIONNAIRE.filter_and_group(items, key="sk"):
@@ -264,5 +271,6 @@ class DeviceRepository(Repository[Device]):
         return Device(
             keys={id_: DeviceKey(**data) for id_, data in keys},
             questionnaire_responses=questionnaire_responses,
+            indexes=indexes,
             **device,
         )

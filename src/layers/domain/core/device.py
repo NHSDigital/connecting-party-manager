@@ -153,6 +153,7 @@ class Device(AggregateRoot):
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list), exclude=True
     )
+    indexes: dict[tuple[str, str], str] = Field(default_factory=dict, exclude=True)
 
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         device_data = self._update(data=kwargs)
@@ -205,7 +206,7 @@ class Device(AggregateRoot):
             )
             events.append(event)
             self.add_event(event)
-
+            self.indexes[(questionnaire_id, question_name)] = answer
         return events
 
     def add_questionnaire_response(
@@ -304,6 +305,9 @@ class Device(AggregateRoot):
             questionnaire_response_index=questionnaire_response_index,
         )
         return self.add_event(event)
+
+    def is_active(self):
+        return self.status is DeviceStatus.ACTIVE
 
 
 class DeviceEventDeserializer(EventDeserializer):
