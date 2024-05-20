@@ -12,6 +12,11 @@ class WorkerEnvironment(BaseEnvironment):
 
 
 @dataclass
+class WorkerEvent:
+    max_records: int = field(default=None)
+
+
+@dataclass
 class WorkerResponse:
     """The response of an ETL worker lambda"""
 

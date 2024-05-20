@@ -11,7 +11,7 @@ from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
-from etl_utils.worker.model import WorkerActionResponse
+from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
@@ -39,7 +39,7 @@ REPOSITORY = DeviceRepository(
 
 
 def transform(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str
+    s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
 ) -> WorkerActionResponse:
     with smart_open(s3_path=s3_input_path, s3_client=s3_client) as f:
         unprocessed_records: deque[dict] = pkl_load_lz4(f)
@@ -69,6 +69,7 @@ def transform(
             _trust=True,
             repository=REPOSITORY,
         ),
+        max_records=max_records,
     )
 
     if exception is None:
@@ -84,6 +85,7 @@ def transform(
 
 
 def handler(event: dict, context):
+    max_records = WorkerEvent(**event).max_records
     response = execute_step_chain(
         action=transform,
         s3_client=S3_CLIENT,
@@ -91,5 +93,6 @@ def handler(event: dict, context):
         s3_output_path=ENVIRONMENT.s3_path(WorkerKey.LOAD),
         unprocessed_dumper=pkl_dump_lz4,
         processed_dumper=pkl_dump_lz4,
+        max_records=max_records,
     )
     return asdict(response)
