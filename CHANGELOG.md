@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-05-15
+- [PI-336] Changelog deletes
+- Dependabot (pydantic)
+
 ## 2024-05-02
 - [PI-341] Prod permissions
 - [PI-268] Search for a device

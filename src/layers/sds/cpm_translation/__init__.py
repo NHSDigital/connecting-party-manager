@@ -4,24 +4,16 @@ from domain.core.aggregate_root import ExportedEventsTypeDef
 from domain.core.device import Device
 from domain.core.questionnaire import Questionnaire
 from domain.repository.device_repository import DeviceRepository
-from sds.domain.constants import ChangeType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
+from sds.domain.parse import UnknownSdsModel
+from sds.domain.sds_deletion_request import SdsDeletionRequest
 
 from .translations import (
-    delete_accredited_system_devices,
-    delete_mhs_device,
-    modify_accredited_system_devices,
-    modify_mhs_device,
+    delete_devices,
     nhs_accredited_system_to_cpm_devices,
     nhs_mhs_to_cpm_device,
 )
-
-ACCREDITED_SYSTEM_TRANSLATIONS = {
-    ChangeType.ADD: nhs_accredited_system_to_cpm_devices,
-    ChangeType.MODIFY: modify_accredited_system_devices,
-    ChangeType.DELETE: delete_accredited_system_devices,
-}
 
 BAD_UNIQUE_IDENTIFIERS = {
     "31af51067f47f1244d38",  # pragma: allowlist secret
@@ -39,22 +31,6 @@ def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
     obj.append({key: value})
 
 
-MESSAGE_HANDLING_SYSTEM_TRANSLATIONS = {
-    ChangeType.ADD: lambda **kwargs: [nhs_mhs_to_cpm_device(**kwargs)],
-    ChangeType.MODIFY: lambda **kwargs: [modify_mhs_device(**kwargs)],
-    ChangeType.DELETE: lambda **kwargs: [delete_mhs_device(**kwargs)],
-}
-
-
-def _parse_object_class(object_class: str) -> str:
-    for _object_class in (NhsMhs.OBJECT_CLASS, NhsAccreditedSystem.OBJECT_CLASS):
-        if object_class.lower() == _object_class:
-            return _object_class
-    raise NotImplementedError(
-        f"No method implemented that translates objects of type '{_object_class}'"
-    )
-
-
 def translate(
     obj: dict[str, str],
     spine_device_questionnaire: Questionnaire,
@@ -67,28 +43,38 @@ def translate(
     if obj.get("unique_identifier") in BAD_UNIQUE_IDENTIFIERS:
         return []
 
-    object_class = _parse_object_class(obj["object_class"])
-
+    object_class = obj["object_class"].lower()
     if object_class == NhsAccreditedSystem.OBJECT_CLASS:
-        instance = NhsAccreditedSystem.construct(**obj)
-        translate_kwargs = dict(
-            nhs_accredited_system=instance,
+        nhs_accredited_system = NhsAccreditedSystem.construct(**obj)
+        devices = nhs_accredited_system_to_cpm_devices(
+            nhs_accredited_system=nhs_accredited_system,
             questionnaire=spine_device_questionnaire,
             _questionnaire=_spine_device_questionnaire,
             _trust=_trust,
+        )
+    elif object_class == NhsMhs.OBJECT_CLASS:
+        nhs_mhs = NhsMhs.construct(**obj)
+        devices = [
+            nhs_mhs_to_cpm_device(
+                nhs_mhs=nhs_mhs,
+                questionnaire=spine_endpoint_questionnaire,
+                _questionnaire=_spine_endpoint_questionnaire,
+                _trust=_trust,
+            )
+        ]
+    elif object_class == SdsDeletionRequest.OBJECT_CLASS:
+        deletion_request = SdsDeletionRequest.construct(**obj)
+        devices = delete_devices(
+            deletion_request=deletion_request,
+            questionnaire_ids=[
+                spine_endpoint_questionnaire.id,
+                spine_device_questionnaire.id,
+            ],
             repository=repository,
         )
-        translations = ACCREDITED_SYSTEM_TRANSLATIONS
     else:
-        instance = NhsMhs.construct(**obj)
-        translate_kwargs = dict(
-            nhs_mhs=instance,
-            questionnaire=spine_endpoint_questionnaire,
-            _questionnaire=_spine_endpoint_questionnaire,
-            _trust=_trust,
-            repository=repository,
+        raise UnknownSdsModel(
+            f"No translation available for models with object class '{object_class}'"
         )
-        translations = MESSAGE_HANDLING_SYSTEM_TRANSLATIONS
 
-    devices = translations[instance.change_type](**translate_kwargs)
     return list(chain.from_iterable(map(Device.export_events, devices)))

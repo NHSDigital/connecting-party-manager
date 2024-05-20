@@ -10,6 +10,7 @@ from domain.core.validation import DEVICE_KEY_SEPARATOR
 from domain.repository.device_repository import DeviceRepository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
+from sds.domain.sds_deletion_request import SdsDeletionRequest
 
 DEFAULT_PRODUCT_TEAM = {
     "id": UUID(int=0x12345678123456781234567812345678),
@@ -71,7 +72,6 @@ def nhs_accredited_system_to_cpm_devices(
     questionnaire: Questionnaire,
     _questionnaire: dict,
     _trust: bool = False,
-    **extra
 ) -> Generator[Device, None, None]:
     unique_identifier = nhs_accredited_system.unique_identifier
     product_name = nhs_accredited_system.nhs_product_name or unique_identifier
@@ -104,11 +104,14 @@ def nhs_accredited_system_to_cpm_devices(
             _questionnaire=_questionnaire,
             _trust=True,
         )
+        _device.add_index(
+            questionnaire_id=questionnaire.id, question_name="unique_identifier"
+        )
         yield _device
 
 
 def modify_accredited_system_devices(
-    nhs_accredited_system: NhsAccreditedSystem, repository: DeviceRepository, **extra
+    nhs_accredited_system: NhsAccreditedSystem, repository: DeviceRepository
 ) -> Generator[Device, None, None]:
     for (
         _,
@@ -119,24 +122,11 @@ def modify_accredited_system_devices(
         yield device
 
 
-def delete_accredited_system_devices(
-    nhs_accredited_system: NhsAccreditedSystem, repository: DeviceRepository, **extra
-):
-    for (
-        _,
-        accredited_system_id,
-    ) in accredited_system_ids(nhs_accredited_system):
-        device = repository.read_by_key(key=accredited_system_id)
-        device.delete()
-        yield device
-
-
 def nhs_mhs_to_cpm_device(
     nhs_mhs: NhsMhs,
     questionnaire: Questionnaire,
     _questionnaire: dict,
     _trust: bool = False,
-    **extra
 ) -> Device:
     ods_code = nhs_mhs.nhs_id_code
     _scoped_party_key = scoped_party_key(nhs_mhs)
@@ -160,16 +150,30 @@ def nhs_mhs_to_cpm_device(
         _questionnaire=_questionnaire,
         _trust=True,
     )
+    device.add_index(
+        questionnaire_id=questionnaire.id, question_name="unique_identifier"
+    )
     return device
 
 
-def modify_mhs_device(nhs_mhs: NhsMhs, repository: DeviceRepository, **extra):
+def modify_mhs_device(nhs_mhs: NhsMhs, repository: DeviceRepository):
     device = repository.read_by_key(key=scoped_party_key(nhs_mhs))
     device.update(something="foo")
     return device
 
 
-def delete_mhs_device(nhs_mhs: NhsMhs, repository: DeviceRepository, **extra):
-    device = repository.read_by_key(key=scoped_party_key(nhs_mhs))
-    device.delete()
-    return device
+def delete_devices(
+    deletion_request: SdsDeletionRequest,
+    questionnaire_ids: list[str],
+    repository: DeviceRepository,
+) -> list[Device]:
+    devices = []
+    for questionnaire_id in questionnaire_ids:
+        for _device in repository.read_by_index(
+            questionnaire_id=questionnaire_id,
+            question_name="unique_identifier",
+            value=deletion_request.unique_identifier,
+        ):
+            _device.delete()
+            devices.append(_device)
+    return devices

@@ -1,6 +1,9 @@
+from itertools import chain
+
 import pytest
 from domain.core.device import (
     Device,
+    DeviceIndexAddedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
     DeviceStatus,
@@ -8,6 +11,9 @@ from domain.core.device import (
     DeviceUpdatedEvent,
     QuestionnaireNotFoundError,
     QuestionnaireResponseNotFoundError,
+    QuestionNotFoundError,
+    _get_questionnaire_responses,
+    _get_unique_answers,
 )
 from domain.core.device_key import DeviceKey, DeviceKeyType
 from domain.core.error import NotFoundError
@@ -169,3 +175,99 @@ def test_device_delete_questionnaire_response_key_error(device: Device):
         device.delete_questionnaire_response(
             questionnaire_id="bar/1", questionnaire_response_index=0
         )
+
+
+def test__get_unique_answers():
+    questionnaire = Questionnaire(name="foo", version=1)
+    questionnaire.add_question(name="question1", multiple=True)
+    questionnaire_response_1 = questionnaire.respond(
+        [
+            {"question1": ["foo"]},
+            {"question1": ["bar"]},
+            {"question1": ["foo"]},
+        ]
+    )
+
+    questionnaire_response_2 = questionnaire.respond(
+        [
+            {"question1": ["baz", "BAR"]},
+            {"question1": ["foo"]},
+        ]
+    )
+
+    questionnaire_response_3 = questionnaire.respond(
+        [
+            {"question1": ["FOO"]},
+            {"question1": ["bar"]},
+            {"question1": ["foo"]},
+        ]
+    )
+
+    unique_answers = _get_unique_answers(
+        questionnaire_responses=[
+            questionnaire_response_1,
+            questionnaire_response_2,
+            questionnaire_response_3,
+        ],
+        question_name="question1",
+    )
+
+    assert unique_answers == {"foo", "bar", "FOO", "BAR", "baz"}
+
+
+def test__get_questionnaire_responses():
+    questionnaire = Questionnaire(name="foo", version=1)
+    questionnaire.add_question(name="question1")
+    questionnaire_response = questionnaire.respond([{"question1": ["foo"]}])
+    questionnaire_responses = [questionnaire_response]
+    assert (
+        _get_questionnaire_responses(
+            questionnaire_responses={questionnaire.id: questionnaire_responses},
+            questionnaire_id=questionnaire.id,
+        )
+        == questionnaire_responses
+    )
+
+
+def test_device_add_index(device: Device):
+    questionnaire = Questionnaire(name="foo", version=1)
+    questionnaire.add_question(name="question1", multiple=True)
+
+    N_QUESTIONNAIRE_RESPONSES = 123
+    N_UNIQUE_ANSWERS = 7
+
+    answers = [["a", "b", "c"], ["d"], ["e", "f", "g"], ["a"], ["b", "c"]]
+    assert len(set(chain.from_iterable(answers))) == N_UNIQUE_ANSWERS
+
+    for _ in range(N_QUESTIONNAIRE_RESPONSES):
+        for _answers in answers:
+            questionnaire_response = questionnaire.respond(
+                responses=[{"question1": _answers}]
+            )
+            device.add_questionnaire_response(
+                questionnaire_response=questionnaire_response
+            )
+
+    events = device.add_index(questionnaire_id="foo/1", question_name="question1")
+    assert len(events) == N_UNIQUE_ANSWERS
+    assert all(isinstance(event, DeviceIndexAddedEvent) for event in events)
+
+
+def test_device_add_index_no_such_questionnaire(device: Device):
+    with pytest.raises(QuestionnaireNotFoundError):
+        device.add_index(questionnaire_id="foo/1", question_name="question1")
+
+
+def test_device_add_index_no_such_questionnaire_response(device: Device):
+    device.questionnaire_responses["foo/1"] = []
+    with pytest.raises(QuestionnaireResponseNotFoundError):
+        device.add_index(questionnaire_id="foo/1", question_name="question1")
+
+
+def test_device_add_index_no_such_question(device: Device):
+    questionnaire = Questionnaire(name="foo", version=1)
+    questionnaire_response = questionnaire.respond(responses=[])
+    device.add_questionnaire_response(questionnaire_response=questionnaire_response)
+
+    with pytest.raises(QuestionNotFoundError):
+        device.add_index(questionnaire_id="foo/1", question_name="question1")
