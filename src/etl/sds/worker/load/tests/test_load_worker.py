@@ -163,13 +163,79 @@ def test_load_worker_pass(
         repository.write(device)
 
     # Execute the load worker
-    response = load.handler(event=None, context=None)
+    response = load.handler(event={}, context=None)
     assert response == {
         "stage_name": "load",
         "processed_records": 2 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
+
+    # Final state
+    final_unprocessed_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+    final_processed_data: list[Device] = list(repository.all_devices())
+
+    initial_ids = sorted(
+        device.id for device in _initial_unprocessed_data + initial_processed_data
+    )
+    final_processed_ids = sorted(device.id for device in final_processed_data)
+
+    # Confirm that everything has now been processed, and that there is no
+    # unprocessed data left in the bucket
+    assert final_processed_ids == initial_ids
+    assert final_unprocessed_data == deque([])
+
+
+@pytest.mark.parametrize(
+    ("n_initial_unprocessed", "n_initial_processed"),
+    [(0, 10), (5, 5), (10, 0)],
+    ids=["processed-only", "partly-processed", "unprocessed-only"],
+)
+def test_load_worker_pass_max_records(
+    n_initial_unprocessed: int,
+    n_initial_processed: int,
+    put_object: Callable[[str], None],
+    get_object: Callable[[str], bytes],
+    repository: MockDeviceRepository,
+):
+    MAX_RECORDS = 7
+
+    from etl.sds.worker.load import load
+
+    # Initial state
+    _initial_unprocessed_data = [
+        device_factory(id=i + 1) for i in range(n_initial_unprocessed)
+    ]
+    initial_unprocessed_data = deque()
+    for device in _initial_unprocessed_data:
+        initial_unprocessed_data += device.export_events()
+
+    initial_processed_data = [
+        device_factory(id=(i + 1) * 1000) for i in range(n_initial_processed)
+    ]
+
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_unprocessed_data))
+    for device in initial_processed_data:
+        repository.write(device)
+
+    n_unprocessed_records = len(initial_unprocessed_data)
+    while n_unprocessed_records > 0:
+        n_processed_records_expected = min(n_unprocessed_records, MAX_RECORDS)
+        n_unprocessed_records_expected = (
+            n_unprocessed_records - n_processed_records_expected
+        )
+
+        # Execute the load worker
+        response = load.handler(event={"max_records": MAX_RECORDS}, context=None)
+        assert response == {
+            "stage_name": "load",
+            # 2 x because above device_factory creates 2 events per device
+            "processed_records": n_processed_records_expected,
+            "unprocessed_records": n_unprocessed_records_expected,
+            "error_message": None,
+        }
+
+        n_unprocessed_records = response["unprocessed_records"]
 
     # Final state
     final_unprocessed_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
@@ -217,18 +283,20 @@ def test_load_worker_bad_record(
     )
 
     # Execute the load worker
-    response = load.handler(event=None, context=None)
+    response = load.handler(event={}, context=None)
+    response["error_message"] = response["error_message"].split("\n")[:6]
     assert response == {
         "stage_name": "load",
         "processed_records": bad_record_index,
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
-        "error_message": (
-            "The following errors were encountered\n"
-            "  -- Error 1 (ValueError) --\n"
-            f"  Failed to parse record {bad_record_index}\n"
-            "  {}\n"
-            "  not enough values to unpack (expected 1, got 0)"
-        ),
+        "error_message": [
+            "The following errors were encountered",
+            "  -- Error 1 (ValueError) --",
+            f"  Failed to parse record {bad_record_index}",
+            "  {}",
+            "  not enough values to unpack (expected 1, got 0)",
+            "Traceback (most recent call last):",
+        ],
     }
 
     # Final state

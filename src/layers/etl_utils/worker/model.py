@@ -11,9 +11,9 @@ class WorkerEnvironment(BaseEnvironment):
         return f"s3://{self.ETL_BUCKET}/{key}"
 
 
-@dataclass
 class WorkerEvent:
-    max_records: int = field(default=None)
+    def __init__(self, max_records: int = None, **kwargs):
+        self.max_records = max_records
 
 
 @dataclass
