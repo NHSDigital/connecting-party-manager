@@ -57,7 +57,7 @@ class DeviceUpdatedEvent(Event):
     ods_code: str
     status: "DeviceStatus"
     created_on: str
-    updated_on: Optional[str] = None
+    updated_on: str
     deleted_on: Optional[str] = None
 
 
