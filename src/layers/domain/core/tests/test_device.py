@@ -1,5 +1,5 @@
-from itertools import chain
 from datetime import datetime
+from itertools import chain
 
 import pytest
 from domain.core.device import (
