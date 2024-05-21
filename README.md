@@ -298,4 +298,8 @@ In this repository there is a folder that contains the most recent Public facing
 
 `docs/public_swagger/swagger.yaml`
 
+We also have a confluence page
+
+`https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Swagger+Docs`
+
 In time we will also have our spec uploaded to bloomreach via proxygen
