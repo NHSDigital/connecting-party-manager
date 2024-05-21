@@ -245,12 +245,12 @@ class DeviceRepository(Repository[Device]):
         (device,) = TableKeys.DEVICE.filter(items, key="sk")
         keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
         _indexes = TableKeys.DEVICE_INDEX.filter(items, key="sk")
-        indexes = {
-            (questionnaire_id, question): value
+        indexes = set(
+            (questionnaire_id, question, value)
             for _, questionnaire_id, question, value in map(
                 lambda idx: idx["sk"].split(KEY_SEPARATOR), _indexes
             )
-        }
+        )
 
         questionnaires = {}
         for id_, data in TableKeys.QUESTIONNAIRE.filter_and_group(items, key="sk"):

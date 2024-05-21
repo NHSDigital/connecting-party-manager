@@ -252,6 +252,10 @@ def test_device_add_index(device: Device):
     assert len(events) == N_UNIQUE_ANSWERS
     assert all(isinstance(event, DeviceIndexAddedEvent) for event in events)
 
+    for answer in ["a", "b", "c", "d", "e", "f", "g"]:
+        assert (questionnaire.id, "question1", answer) in device.indexes
+    assert (questionnaire.id, "question1", "foo") not in device.indexes
+
 
 def test_device_add_index_no_such_questionnaire(device: Device):
     with pytest.raises(QuestionnaireNotFoundError):

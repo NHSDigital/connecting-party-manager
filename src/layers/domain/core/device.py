@@ -153,7 +153,7 @@ class Device(AggregateRoot):
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list), exclude=True
     )
-    indexes: dict[tuple[str, str], str] = Field(default_factory=dict, exclude=True)
+    indexes: set[tuple[str, str, str]] = Field(default_factory=set, exclude=True)
 
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         device_data = self._update(data=kwargs)
@@ -206,7 +206,7 @@ class Device(AggregateRoot):
             )
             events.append(event)
             self.add_event(event)
-            self.indexes[(questionnaire_id, question_name)] = answer
+            self.indexes.add((questionnaire_id, question_name, answer))
         return events
 
     def add_questionnaire_response(

@@ -65,6 +65,7 @@ def test__device_repository__query_by_index__find_right_shoes(
         questionnaire_id="shoe/1", question_name="foot", value="R"
     )
     assert device.id == device_right_shoe_size_123.id
+    assert device.indexes == device_right_shoe_size_123.indexes
 
 
 @pytest.mark.integration
@@ -80,6 +81,7 @@ def test__device_repository__query_by_index__find_left_shoes(
         questionnaire_id="shoe/1", question_name="foot", value="L"
     )
     assert device.id == device_left_shoe_size_123.id
+    assert device.indexes == device_left_shoe_size_123.indexes
 
 
 @pytest.mark.integration
@@ -98,6 +100,10 @@ def test__device_repository__query_by_index__find_shoes_by_size_int(
         device_left_shoe_size_123.id,
         device_right_shoe_size_123.id,
     }
+    assert {*device_2.indexes, *device_1.indexes} == {
+        *device_left_shoe_size_123.indexes,
+        *device_right_shoe_size_123.indexes,
+    }
 
 
 @pytest.mark.integration
@@ -115,6 +121,10 @@ def test__device_repository__query_by_index__find_shoes_by_size_str(
     assert {device_1.id, device_2.id} == {
         device_left_shoe_size_123.id,
         device_right_shoe_size_123.id,
+    }
+    assert {*device_2.indexes, *device_1.indexes} == {
+        *device_left_shoe_size_123.indexes,
+        *device_right_shoe_size_123.indexes,
     }
 
 
