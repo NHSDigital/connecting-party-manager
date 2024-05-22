@@ -87,12 +87,19 @@ function generate_proxy(){
         echo "proxy name must not contain '--'"
         exit 1
     fi
+
     # 2. Since we will prefix with 'connecting-party-manager-'
     # we cannot start with a hyphen either
     if [[ ${_workspace_name} == -* ]];
     then
         echo "proxy name must start with '-'"
         exit 1
+    fi
+
+    #3. Apigee services expect int-sandbox to be sandbox to match
+    if [[ ${_workspace_name} == "int-sandbox" ]];
+    then
+        _workspace_name="sandbox"
     fi
 
     # Download the pem file if it does not exist
