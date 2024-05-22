@@ -1,37 +1,41 @@
 from domain.core.device import Device
-from pydantic import ValidationError
+from domain.core.questionnaire import QuestionnaireResponse
 from sds.domain.constants import ModificationType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 
-from .utils import InvalidModificationRequest, new_questionnaire_response_from_template
+from ..utils import update_in_list_of_dict
 
 
-class MandatoryFieldError(Exception):
+class DeletionErrorBase(Exception):
     def __init__(self, field):
-        super().__init__(f"Field '{field}' cannot be null")
+        super().__init__(f"Field '{field}' cannot be deleted")
 
 
-class NoValuesToRemove(Exception):
-    pass
+class CannotDeleteMandatoryField(DeletionErrorBase):
+    ...
 
 
-def _unique_list(*items):
-    return list(set(items))
+class NothingToDelete(DeletionErrorBase):
+    ...
 
 
-def _parse_and_validate_field(
-    model: type[NhsAccreditedSystem] | type[NhsMhs], field: str, value
-) -> list:
-    try:
-        parsed_value = model.parse_and_validate_field(field=field, value=value)
-    except ValidationError:
-        raise InvalidModificationRequest(field)
+def _as_questionnaire_response_answer(item):
+    """Questionnaire response answers must be in list form, even if they are a single item"""
+    if isinstance(item, (set, list)):
+        return list(item)
+    return [item]
 
-    if isinstance(parsed_value, (set, list)):
-        return list(parsed_value)
-    else:
-        return [parsed_value]
+
+def new_questionnaire_response_from_template(
+    questionnaire_response: QuestionnaireResponse, field_to_update: str, value
+) -> QuestionnaireResponse:
+    answer = _as_questionnaire_response_answer(value)
+    update_in_list_of_dict(
+        obj=questionnaire_response.responses, key=field_to_update, value=answer
+    )
+    non_empty_responses = list(filter(bool, questionnaire_response.responses))
+    return questionnaire_response.questionnaire.respond(non_empty_responses)
 
 
 def update_device_metadata(
@@ -46,27 +50,25 @@ def update_device_metadata(
     _current_values = questionnaire_response.get_response(question_name=field_name)
 
     if modification_type == ModificationType.ADD:
-        _updated_values = _unique_list(*_current_values, *new_values)
-        parsed_values = _parse_and_validate_field(
-            model=model, field=field_name, value=_updated_values
+        _updated_unique_values = list(set(*_current_values, *new_values))
+        parsed_values = model.parse_and_validate_field(
+            model=model, field=field_name, value=_updated_unique_values
         )
     elif modification_type == ModificationType.REPLACE:
-        parsed_values = _parse_and_validate_field(
+        parsed_values = model.parse_and_validate_field(
             model=model, field=field_name, value=new_values
         )
     elif modification_type == ModificationType.DELETE:
         if model.is_mandatory_field(field_name):
-            raise MandatoryFieldError(field_name)
+            raise CannotDeleteMandatoryField(field_name)
         if not _current_values:
-            raise InvalidModificationRequest(
-                field_name, "This device has no such data to delete"
-            )
+            raise NothingToDelete(field_name)
         parsed_values = []
 
     new_questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=questionnaire_response,
         field_to_update=field_name,
-        new_values=parsed_values,
+        value=parsed_values,
     )
     device.update_questionnaire_response(
         questionnaire_response_index=0,

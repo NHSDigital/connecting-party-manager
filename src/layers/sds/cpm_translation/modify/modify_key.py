@@ -1,3 +1,4 @@
+from dataclasses import astuple
 from typing import Callable, Generator
 
 from domain.core.device import Device
@@ -7,22 +8,22 @@ from domain.core.validation import DEVICE_KEY_SEPARATOR
 from sds.cpm_translation.utils import get_in_list_of_dict
 from sds.domain.constants import ModificationType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
-from sds.domain.nhs_mhs import NhsMhs
+from sds.domain.nhs_mhs import MessageHandlingSystemKey, NhsMhs
 
-from ..constants import DEFAULT_PRODUCT_TEAM
-from .utils import InvalidModificationRequest, new_questionnaire_response_from_template
-
-
-class NotAnSdsKey(Exception):
-    pass
+from ..constants import DEFAULT_PRODUCT_TEAM, UNIQUE_IDENTIFIER
+from .modify_device import new_questionnaire_response_from_template
 
 
 class AccreditedSystemAlreadyExists(Exception):
-    def __init__(self, ods_code):
-        super().__init__(f"Accredited System with ODS code '{ods_code}' already exists")
+    ...
 
 
-MHS_KEY_FIELDS = ["nhs_id_code", "nhs_mhs_party_key", "nhs_mhs_svc_ia"]
+class NotAnSdsKey(Exception):
+    ...
+
+
+class InvalidModificationRequest(Exception):
+    ...
 
 
 def get_modify_key_function(
@@ -30,45 +31,21 @@ def get_modify_key_function(
     modification_type: ModificationType,
     field_name: str,
 ) -> Callable[[list[Device], str, any], Generator[Device, None, None]]:
-    match (model, modification_type, field_name):
-        case (
-            NhsAccreditedSystem,
-            ModificationType.ADD,
-            "nhs_as_client",
-        ):
+    """Returns a function which yields deleted and created Devices"""
+    if not model.is_key_field(field_name):
+        raise NotAnSdsKey(field_name)
+
+    match (model, modification_type):
+        case (NhsAccreditedSystem, ModificationType.ADD):
             return new_accredited_system
-        case (
-            NhsAccreditedSystem,
-            ModificationType.REPLACE,
-            "nhs_as_client",
-        ):
+        case (NhsAccreditedSystem, ModificationType.REPLACE):
             return replace_accredited_systems
-        case (
-            NhsAccreditedSystem,
-            ModificationType.DELETE,
-            "nhs_as_client",
-        ):
-            raise InvalidModificationRequest(field_name)
-        case (
-            NhsMhs,
-            ModificationType.ADD,
-            "nhs_mhs_party_key" | "nhs_mhs_svc_ia" | "nhs_id_code",
-        ):
-            raise InvalidModificationRequest(field_name)
-        case (
-            NhsMhs,
-            ModificationType.REPLACE,
-            "nhs_mhs_party_key" | "nhs_mhs_svc_ia" | "nhs_id_code",
-        ):
+        case (NhsMhs, ModificationType.REPLACE):
             return replace_msg_handling_system
-        case (
-            NhsMhs,
-            ModificationType.DELETE,
-            "nhs_mhs_party_key" | "nhs_mhs_svc_ia" | "nhs_id_code",
-        ):
-            raise InvalidModificationRequest(field_name)
         case _:
-            raise NotAnSdsKey
+            raise InvalidModificationRequest(
+                f"Forbidden to {modification_type} {model.__name__}.{field_name}",
+            )
 
 
 def new_accredited_system(
@@ -80,24 +57,30 @@ def new_accredited_system(
 
     current_ods_codes = {device.ods_code for device in devices}
     if ods_code in current_ods_codes:
-        raise AccreditedSystemAlreadyExists(ods_code)
+        raise AccreditedSystemAlreadyExists(
+            f"Accredited System with ODS code '{ods_code}' already exists"
+        )
 
-    device = devices[0]
+    template_device = devices[0]
     (
         (questionnaire_id, (questionnaire_response,)),
-    ) = device.questionnaire_responses.items()
+    ) = template_device.questionnaire_responses.items()
     new_questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=questionnaire_response,
         field_to_update=field_name,
         new_values=[ods_code],
     )
-    unique_identifier = device.indexes[(questionnaire_id, "unique_identifier")]
+    unique_identifier = template_device.indexes[(questionnaire_id, UNIQUE_IDENTIFIER)]
     new_accredited_system_id = DEVICE_KEY_SEPARATOR.join((ods_code, unique_identifier))
 
     product_team = ProductTeam(
-        id=device.product_team_id, ods_code=ods_code, name=DEFAULT_PRODUCT_TEAM["name"]
+        id=template_device.product_team_id,
+        ods_code=ods_code,
+        name=DEFAULT_PRODUCT_TEAM["name"],
     )
-    new_device = product_team.create_device(name=device.name, type=device.type)
+    new_device = product_team.create_device(
+        name=template_device.name, type=template_device.type
+    )
     new_device.add_questionnaire_response(
         questionnaire_response=new_questionnaire_response
     )
@@ -105,8 +88,10 @@ def new_accredited_system(
         type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=new_accredited_system_id
     )
     new_device.add_index(
-        questionnaire_id=questionnaire_id, question_name="unique_identifier"
+        questionnaire_id=questionnaire_id, question_name=UNIQUE_IDENTIFIER
     )
+    # "yield" to match the pattern of the functions returned by 'get_modify_key_function'
+    # which may in general yield multiple deleted / added Devices
     yield new_device
 
 
@@ -129,12 +114,15 @@ def replace_accredited_systems(
         )
 
 
-def _get_msg_handling_system_scoped_key_parts(
-    responses: list[dict],
-) -> Generator[str, None, None]:
-    for key_field in MHS_KEY_FIELDS:
-        (_value,) = get_in_list_of_dict(obj=responses, key=key_field)
-        yield _value.strip()
+def _get_msg_handling_system_key(responses: list[dict]) -> MessageHandlingSystemKey:
+    """Construct the MHS scoped party key from questionnaire responses"""
+    return MessageHandlingSystemKey(
+        **{
+            key: values[0]
+            for key in NhsMhs.key_fields()
+            for values in get_in_list_of_dict(obj=responses, key=key)
+        }
+    )
 
 
 def replace_msg_handling_system(
@@ -148,30 +136,26 @@ def replace_msg_handling_system(
         (questionnaire_id, (_questionnaire_response,)),
     ) = device.questionnaire_responses.items()
     new_value = NhsMhs.parse_and_validate_field(field=field_name, value=value)
-    new_questionnaire_response = new_questionnaire_response_from_template(
+    questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=_questionnaire_response,
         field_to_update=field_name,
-        new_values=[new_value],
+        new_values=new_value,
     )
-    key_parts = _get_msg_handling_system_scoped_key_parts(
+    msg_handling_system_key = _get_msg_handling_system_key(
         responses=_questionnaire_response.responses
     )
-    new_scoped_party_key = DEVICE_KEY_SEPARATOR.join(key_parts)
-    (ods_code,) = get_in_list_of_dict(
-        obj=_questionnaire_response.responses, key="nhs_id_code"
-    )
-
+    new_scoped_party_key = DEVICE_KEY_SEPARATOR.join(astuple(msg_handling_system_key))
     product_team = ProductTeam(
-        id=device.product_team_id, ods_code=ods_code, name=DEFAULT_PRODUCT_TEAM["name"]
+        id=device.product_team_id,
+        ods_code=msg_handling_system_key.nhs_id_code,
+        name=DEFAULT_PRODUCT_TEAM["name"],
     )
     new_device = product_team.create_device(name=device.name, type=device.type)
-    new_device.add_questionnaire_response(
-        questionnaire_response=new_questionnaire_response
-    )
+    new_device.add_questionnaire_response(questionnaire_response=questionnaire_response)
     new_device.add_key(
         type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID, key=new_scoped_party_key
     )
     new_device.add_index(
-        questionnaire_id=questionnaire_id, question_name="unique_identifier"
+        questionnaire_id=questionnaire_id, question_name=UNIQUE_IDENTIFIER
     )
     yield new_device

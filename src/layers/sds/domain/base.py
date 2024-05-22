@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import ClassVar, Literal, Self
 
 import orjson
@@ -30,10 +31,9 @@ def _strip_excluded_values_from_object_class(
     values: dict,
     excluded_object_class_values=EXCLUDED_OBJECT_CLASS_VALUES,
 ) -> dict:
-    _object_class = values.get(OBJECT_CLASS_FIELD_NAME)
-    object_class = set(_object_class) if _object_class else _object_class
-    if object_class:
-        values[OBJECT_CLASS_FIELD_NAME] = object_class - excluded_object_class_values
+    obj_class = values.get(OBJECT_CLASS_FIELD_NAME)
+    if obj_class:
+        values[OBJECT_CLASS_FIELD_NAME] = set(obj_class) - excluded_object_class_values
     return values
 
 
@@ -113,12 +113,15 @@ class SdsBaseModel(BaseModel):
 
     @classmethod
     def get_alias_for_field_name(cls, field) -> str:
-        (field_name,) = (
-            model_field.alias
-            for field_name, model_field in cls.__fields__.items()
-            if field_name == field
-        )
-        return field_name
+        try:
+            (alias,) = (
+                model_field.alias
+                for field_name, model_field in cls.__fields__.items()
+                if field_name == field
+            )
+        except ValueError:
+            raise ValueError(f"No alias for field '{field}' found")
+        return alias
 
     @root_validator(pre=True)
     def preprocess_inputs(cls, values):
@@ -154,3 +157,11 @@ class SdsBaseModel(BaseModel):
     @classmethod
     def is_mandatory_field(cls, field: str):
         return cls.__fields__[field].required
+
+    @abstractmethod
+    @classmethod
+    def key_fields(cls) -> tuple[str, ...]:
+        raise NotImplementedError()
+
+    def is_key_field(cls, field):
+        return field in cls.key_fields()

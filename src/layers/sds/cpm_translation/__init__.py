@@ -19,14 +19,6 @@ from .translations import (
 )
 
 
-def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
-    for item in obj:
-        if key in item:
-            item[key] = value
-            return
-    obj.append({key: value})
-
-
 def translate(
     obj: dict[str, str],
     spine_device_questionnaire: Questionnaire,
@@ -82,4 +74,5 @@ def translate(
         raise UnknownSdsModel(
             f"No translation available for models with object class '{object_class}'"
         )
+
     return list(chain.from_iterable(map(Device.export_events, devices)))

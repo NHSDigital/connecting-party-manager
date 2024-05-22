@@ -10,11 +10,16 @@ from domain.core.root import Root
 from domain.core.validation import DEVICE_KEY_SEPARATOR
 from domain.repository.device_repository import DeviceRepository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
-from sds.domain.nhs_mhs import NhsMhs
+from sds.domain.nhs_mhs import MHS_SCOPED_PARTY_KEY_FIELDS, NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 from sds.domain.sds_modification_request import SdsModificationRequest
 
-from .constants import DEFAULT_ORGANISATION, DEFAULT_PRODUCT_TEAM, EXCEPTIONAL_ODS_CODES
+from .constants import (
+    DEFAULT_ORGANISATION,
+    DEFAULT_PRODUCT_TEAM,
+    EXCEPTIONAL_ODS_CODES,
+    UNIQUE_IDENTIFIER,
+)
 from .modify.modify_device import update_device_metadata
 from .modify.modify_key import NotAnSdsKey, get_modify_key_function
 from .utils import update_in_list_of_dict
@@ -30,10 +35,9 @@ def accredited_system_ids(
 
 
 def scoped_party_key(nhs_mhs: NhsMhs) -> str:
-    party_key = nhs_mhs.nhs_mhs_party_key.strip()
-    interaction_id = nhs_mhs.nhs_mhs_svc_ia.strip()
-    ods_code = nhs_mhs.nhs_id_code
-    return DEVICE_KEY_SEPARATOR.join((ods_code, party_key, interaction_id))
+    return DEVICE_KEY_SEPARATOR.join(
+        getattr(nhs_mhs, key) for key in MHS_SCOPED_PARTY_KEY_FIELDS
+    )
 
 
 def create_product_team(ods_code: str) -> ProductTeam:
@@ -83,7 +87,7 @@ def nhs_accredited_system_to_cpm_devices(
             _trust=True,
         )
         _device.add_index(
-            questionnaire_id=questionnaire.id, question_name="unique_identifier"
+            questionnaire_id=questionnaire.id, question_name=UNIQUE_IDENTIFIER
         )
         yield _device
 
@@ -116,9 +120,7 @@ def nhs_mhs_to_cpm_device(
         _questionnaire=_questionnaire,
         _trust=True,
     )
-    device.add_index(
-        questionnaire_id=questionnaire.id, question_name="unique_identifier"
-    )
+    device.add_index(questionnaire_id=questionnaire.id, question_name=UNIQUE_IDENTIFIER)
     return device
 
 
@@ -132,7 +134,7 @@ def read_devices_by_unique_identifier(
     for questionnaire_id in questionnaire_ids:
         for device in repository.read_by_index(
             questionnaire_id=questionnaire_id,
-            question_name="unique_identifier",
+            question_name=UNIQUE_IDENTIFIER,
             value=value,
         ):
             if device.is_active():

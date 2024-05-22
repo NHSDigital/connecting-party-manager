@@ -5,6 +5,8 @@ from pydantic import Field
 from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
 from .organizational_unit import OrganizationalUnitDistinguishedName
 
+ACCREDITED_SYSTEM_KEY_FIELDS = ("nhs_id_code",)
+
 
 class NhsAccreditedSystem(SdsBaseModel):
     distinguished_name: OrganizationalUnitDistinguishedName = Field(exclude=True)
@@ -29,3 +31,7 @@ class NhsAccreditedSystem(SdsBaseModel):
     nhs_temp_uid: Optional[str] = Field(alias="nhstempuid")
     description: Optional[str] = Field(alias="description")
     nhs_as_category_bag: Optional[set[str]] = Field(alias="nhsascategorybag")
+
+    @classmethod
+    def key_fields(cls) -> tuple[str, ...]:
+        return ACCREDITED_SYSTEM_KEY_FIELDS
