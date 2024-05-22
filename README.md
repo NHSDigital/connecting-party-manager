@@ -289,3 +289,17 @@ and
 ```
 make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210
 ```
+
+### Documentation
+
+We have several locations for the Swagger to keep things as visible as possible
+
+In this repository there is a folder that contains the most recent Public facing swagger.yaml
+
+`docs/public_swagger/swagger.yaml`
+
+We also have a confluence page
+
+`https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Swagger+Docs`
+
+In time we will also have our spec uploaded to bloomreach via proxygen
