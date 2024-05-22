@@ -1,6 +1,6 @@
 # Changelog
 
-## 2024-05-20a
+## 2024-05-20-a
 - [PI-373] authoriser fix
 - [PI-172] spec in confluence and github
 - [PI-275] fix connections between SDS FHIR and CPM
