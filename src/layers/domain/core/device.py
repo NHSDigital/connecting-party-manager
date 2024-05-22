@@ -1,6 +1,7 @@
 from collections import defaultdict
 from enum import StrEnum, auto
 from itertools import chain
+from typing import Any
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
@@ -153,7 +154,7 @@ class Device(AggregateRoot):
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list), exclude=True
     )
-    indexes: set[tuple[str, str, str]] = Field(default_factory=set, exclude=True)
+    indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
 
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         device_data = self._update(data=kwargs)
