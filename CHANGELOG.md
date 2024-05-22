@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-05-20a
+- [PI-373] authoriser fix
+- [PI-172] spec in confluence and github
+- [PI-275] fix connections between SDS FHIR and CPM
+
 ## 2024-05-15
 - [PI-336] Changelog deletes
 - Dependabot (pydantic)
