@@ -126,6 +126,48 @@ def _test_device_updated(
     return True
 
 
+def _test_devices_updated(
+    old_device: Device,
+    new_devices: list[Device],
+    expected_ods_codes,
+    questionnaire_id,
+):
+    for ods_code, new_device in zip(
+        expected_ods_codes,
+        sorted(new_devices, key=lambda d: expected_ods_codes.index(d.ods_code)),
+    ):
+        return _test_device_updated(
+            old_device=old_device,
+            new_device=new_device,
+            questionnaire_id=questionnaire_id,
+            expected_ods_code=ods_code,
+        )
+    return True
+
+
+def _test_deleted_devices(
+    devices: list[Device],
+    old_devices: list[Device],
+    modified_devices: list[Device],
+    n_expected_new_devices,
+    questionnaire_id,
+    expected_ods_codes,
+):
+    assert all(d.status is DeviceStatus.INACTIVE for d in old_devices)
+
+    # Test that new devices are active
+    new_devices = modified_devices[-n_expected_new_devices:]
+    assert len(new_devices) == n_expected_new_devices
+    assert all(d.status is DeviceStatus.ACTIVE for d in new_devices)
+
+    assert _test_devices_updated(
+        old_device=devices[0],
+        new_devices=new_devices,
+        questionnaire_id=questionnaire_id,
+        expected_ods_codes=expected_ods_codes,
+    )
+
+
 @settings(deadline=3000)
 @given(nhs_accredited_system=NHS_ACCREDITED_SYSTEM_STRATEGY)
 def test_new_accredited_system(nhs_accredited_system):
@@ -190,16 +232,12 @@ def test_replace_accredited_systems_no_deletes(nhs_accredited_system):
     new_devices = modified_devices[-n_expected_new_devices:]
     assert len(new_devices) == n_expected_new_devices
 
-    for ods_code, new_device in zip(
-        new_ods_codes,
-        sorted(new_devices, key=lambda d: new_ods_codes.index(d.ods_code)),
-    ):
-        _test_device_updated(
-            old_device=devices[0],
-            new_device=new_device,
-            questionnaire_id=questionnaire.id,
-            expected_ods_code=ods_code,
-        )
+    assert _test_devices_updated(
+        old_device=devices[0],
+        new_devices=new_devices,
+        questionnaire_id=questionnaire.id,
+        expected_ods_codes=new_ods_codes,
+    )
 
 
 @settings(deadline=3000)
@@ -228,24 +266,14 @@ def test_replace_accredited_systems_with_old_devices_deleted(nhs_accredited_syst
     )
     # Test that old devices are inactive
     old_devices = modified_devices[:-n_expected_new_devices]
-    assert old_devices == devices
-    assert all(d.status is DeviceStatus.INACTIVE for d in old_devices)
-
-    # Test that new devices are active
-    new_devices = modified_devices[-n_expected_new_devices:]
-    assert len(new_devices) == n_expected_new_devices
-    assert all(d.status is DeviceStatus.ACTIVE for d in new_devices)
-
-    for ods_code, new_device in zip(
-        new_ods_codes,
-        sorted(new_devices, key=lambda d: new_ods_codes.index(d.ods_code)),
-    ):
-        _test_device_updated(
-            old_device=devices[0],
-            new_device=new_device,
-            questionnaire_id=questionnaire.id,
-            expected_ods_code=ods_code,
-        )
+    _test_deleted_devices(
+        devices=devices,
+        old_devices=old_devices,
+        modified_devices=modified_devices,
+        n_expected_new_devices=n_expected_new_devices,
+        questionnaire_id=questionnaire.id,
+        expected_ods_codes=new_ods_codes,
+    )
 
 
 @settings(deadline=3000)
@@ -281,23 +309,14 @@ def test_replace_accredited_systems_with_some_devices_deleted(nhs_accredited_sys
     # Test that all old devices other than the first are inactive
     old_devices = modified_devices[1:-n_expected_new_devices]
     assert [first_old_device] + old_devices == devices
-    assert all(d.status is DeviceStatus.INACTIVE for d in old_devices)
-
-    # Test that new devices are active
-    new_devices = modified_devices[-n_expected_new_devices:]
-    assert len(new_devices) == n_expected_new_devices
-    assert all(d.status is DeviceStatus.ACTIVE for d in new_devices)
-
-    for ods_code, new_device in zip(
-        new_ods_codes,
-        sorted(new_devices, key=lambda d: new_ods_codes.index(d.ods_code)),
-    ):
-        _test_device_updated(
-            old_device=devices[0],
-            new_device=new_device,
-            questionnaire_id=questionnaire.id,
-            expected_ods_code=ods_code,
-        )
+    _test_deleted_devices(
+        devices=devices,
+        old_devices=old_devices,
+        modified_devices=modified_devices,
+        n_expected_new_devices=n_expected_new_devices,
+        questionnaire_id=questionnaire.id,
+        expected_ods_codes=new_ods_codes,
+    )
 
 
 @settings(deadline=3000)
@@ -328,6 +347,21 @@ def test__get_msg_handling_system_key(nhs_mhs: NhsMhs):
     )
 
 
+def _test_mhs_devices(
+    new_device: Device,
+    deleted_device: Device,
+    old_device: Device,
+    expected_ods_code: str,
+):
+    assert deleted_device is old_device
+    assert deleted_device.status is DeviceStatus.INACTIVE
+    assert new_device.product_team_id == old_device.product_team_id
+    assert new_device.ods_code == expected_ods_code
+    assert new_device.name == old_device.name
+    assert new_device.indexes == old_device.indexes
+    return True
+
+
 @settings(deadline=3000)
 @given(nhs_mhs=NHS_MHS_STRATEGY)
 def test_replace_msg_handling_system_nhs_id_code(nhs_mhs: NhsMhs):
@@ -343,13 +377,12 @@ def test_replace_msg_handling_system_nhs_id_code(nhs_mhs: NhsMhs):
     deleted_device, new_device = replace_msg_handling_system(
         devices=[old_device], field_name="nhs_id_code", value="foo"
     )
-
-    assert deleted_device is old_device
-    assert deleted_device.status is DeviceStatus.INACTIVE
-    assert new_device.product_team_id == old_device.product_team_id
-    assert new_device.ods_code == "foo"
-    assert new_device.name == old_device.name
-    assert new_device.indexes == old_device.indexes
+    assert _test_mhs_devices(
+        new_device=new_device,
+        deleted_device=deleted_device,
+        old_device=old_device,
+        expected_ods_code="foo",
+    )
 
     ((_, device_key),) = old_device.keys.items()
     ((new_key_name, new_device_key),) = new_device.keys.items()
@@ -381,13 +414,12 @@ def test_replace_msg_handling_system_nhs_mhs_party_key(nhs_mhs: NhsMhs):
     deleted_device, new_device = replace_msg_handling_system(
         devices=[old_device], field_name="nhs_mhs_party_key", value="foo-0"
     )
-
-    assert deleted_device is old_device
-    assert deleted_device.status is DeviceStatus.INACTIVE
-    assert new_device.product_team_id == old_device.product_team_id
-    assert new_device.ods_code == old_device.ods_code
-    assert new_device.name == old_device.name
-    assert new_device.indexes == old_device.indexes
+    assert _test_mhs_devices(
+        new_device=new_device,
+        deleted_device=deleted_device,
+        old_device=old_device,
+        expected_ods_code=old_device.ods_code,
+    )
 
     ((_, device_key),) = old_device.keys.items()
     ((new_key_name, new_device_key),) = new_device.keys.items()
@@ -419,13 +451,12 @@ def test_replace_msg_handling_system_nhs_mhs_svc_ia(nhs_mhs: NhsMhs):
     deleted_device, new_device = replace_msg_handling_system(
         devices=[old_device], field_name="nhs_mhs_svc_ia", value="foo"
     )
-
-    assert deleted_device is old_device
-    assert deleted_device.status is DeviceStatus.INACTIVE
-    assert new_device.product_team_id == old_device.product_team_id
-    assert new_device.ods_code == old_device.ods_code
-    assert new_device.name == old_device.name
-    assert new_device.indexes == old_device.indexes
+    assert _test_mhs_devices(
+        new_device=new_device,
+        deleted_device=deleted_device,
+        old_device=old_device,
+        expected_ods_code=old_device.ods_code,
+    )
 
     ((_, device_key),) = old_device.keys.items()
     ((new_key_name, new_device_key),) = new_device.keys.items()
