@@ -93,6 +93,8 @@ def new_accredited_system(
     )
     # "yield" to match the pattern of the functions returned by 'get_modify_key_function'
     # which may in general yield multiple deleted / added Devices
+    for device in devices:
+        yield device
     yield new_device
 
 
@@ -110,9 +112,10 @@ def replace_accredited_systems(
         yield device
 
     for new_ods_code in final_ods_codes - current_ods_codes:
-        yield from new_accredited_system(
+        *_, new_device = new_accredited_system(
             devices=devices, field_name=field_name, value=[new_ods_code]
         )
+        yield new_device
 
 
 def _get_msg_handling_system_key(responses: list[dict]) -> MessageHandlingSystemKey:

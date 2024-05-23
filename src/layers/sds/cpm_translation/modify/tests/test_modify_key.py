@@ -140,13 +140,16 @@ def test_new_accredited_system(nhs_accredited_system):
         )
     )
 
-    (new_device,) = new_accredited_system(
-        devices=devices, field_name="nhs_as_client", value=["foo"]
+    updated_devices = list(
+        new_accredited_system(
+            devices=devices, field_name="nhs_as_client", value=["foo"]
+        )
     )
+    assert devices == updated_devices[:-1]
 
     _test_device_updated(
         old_device=devices[0],
-        new_device=new_device,
+        new_device=updated_devices[-1],
         questionnaire_id=questionnaire.id,
         expected_ods_code="foo",
     )
@@ -187,7 +190,10 @@ def test_replace_accredited_systems_no_deletes(nhs_accredited_system):
     new_devices = modified_devices[-n_expected_new_devices:]
     assert len(new_devices) == n_expected_new_devices
 
-    for ods_code, new_device in zip(new_ods_codes, new_devices):
+    for ods_code, new_device in zip(
+        new_ods_codes,
+        sorted(new_devices, key=lambda d: new_ods_codes.index(d.ods_code)),
+    ):
         _test_device_updated(
             old_device=devices[0],
             new_device=new_device,

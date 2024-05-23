@@ -169,7 +169,7 @@ class SdsBaseModel(BaseModel):
 
     @classmethod
     def parse_and_validate_field(cls, field: str, value: list | set):
-        _parse_and_validate_field(cls=cls, field=field, value=value)
+        return _parse_and_validate_field(cls=cls, field=field, value=value)
 
     @classmethod
     def is_mandatory_field(cls, field: str):

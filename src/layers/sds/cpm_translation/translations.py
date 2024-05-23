@@ -164,7 +164,7 @@ def modify_devices(
                 field_name=field_name,
                 modification_type=modification_type,
             )
-            _devices += list(
+            _devices = list(
                 modify_key(devices=_devices, field_name=field_name, value=new_values)
             )
         except NotAnSdsKey:
