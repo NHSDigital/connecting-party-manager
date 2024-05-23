@@ -107,3 +107,8 @@ _update_policy "NHSSupportPolicy" "support" "NHSDevelopmentRole"
 # Create the NHSIntegrationPolicy that will be used for CI Test access
 #
 _update_policy "NHSIntegrationPolicy" "integration-test" "NHSTestCIRole"
+
+#
+# Create the NHSSmokePolicy that will be used for Smoke Test access
+#
+_update_policy "NHSSmokePolicy" "smoke-test" "NHSSmokeTestRole"
