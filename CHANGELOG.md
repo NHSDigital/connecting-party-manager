@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-05-23
+- [PI-320] Add created_on, updated_on and deleted_on fields to a Device
+
 ## 2024-05-20-a
 - [PI-373] authoriser fix
 - [PI-172] spec in confluence and github
