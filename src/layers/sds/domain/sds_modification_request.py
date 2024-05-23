@@ -6,12 +6,12 @@ from sds.domain.constants import ModificationType
 from sds.domain.organizational_unit import OrganizationalUnitDistinguishedName
 
 
-class ImmutableFieldError(Exception):
+class ImmutableFieldError(ValueError):
     pass
 
 
 IMMUTABLE_SDS_FIELDS = {
-    "unique_identifier",
+    "uniqueidentifier",
 }
 
 

@@ -1,5 +1,4 @@
-from abc import abstractmethod
-from typing import ClassVar, Literal, Self
+from typing import ClassVar, Literal
 
 import orjson
 from etl_utils.ldif.model import DistinguishedName
@@ -21,6 +20,10 @@ EXCLUDED_OBJECT_CLASS_VALUES = (
 SET_ALIAS_NAME = f"{set[str]}"
 
 
+class AliasLookupError(Exception):
+    ...
+
+
 def _field_is_a_set(cls: "SdsBaseModel", field_name) -> bool:
     field = cls.alias_fields().get(field_name)
     return field is not None and str(field.outer_type_) == SET_ALIAS_NAME
@@ -31,9 +34,11 @@ def _strip_excluded_values_from_object_class(
     values: dict,
     excluded_object_class_values=EXCLUDED_OBJECT_CLASS_VALUES,
 ) -> dict:
-    obj_class = values.get(OBJECT_CLASS_FIELD_NAME)
-    if obj_class:
-        values[OBJECT_CLASS_FIELD_NAME] = set(obj_class) - excluded_object_class_values
+    object_class = values.get(OBJECT_CLASS_FIELD_NAME)
+    if object_class:
+        values[OBJECT_CLASS_FIELD_NAME] = (
+            set(object_class) - excluded_object_class_values
+        )
     return values
 
 
@@ -66,6 +71,50 @@ def _validate_object_class(cls: "SdsBaseModel", values: dict) -> dict:
             f"'{OBJECT_CLASS_FIELD_NAME}' (value '{object_class}') must equal {cls.OBJECT_CLASS}"
         )
     return values
+
+
+def _get_field_name_for_alias(cls: BaseModel, alias):
+    try:
+        (field_name,) = (
+            field_name
+            for field_name, model_field in cls.__fields__.items()
+            if model_field.alias == alias
+        )
+    except ValueError:
+        raise AliasLookupError(f"No field with alias '{alias}' found")
+    return field_name
+
+
+def _get_alias_for_field_name(cls: BaseModel, field):
+    try:
+        (alias,) = (
+            model_field.alias
+            for field_name, model_field in cls.__fields__.items()
+            if field_name == field
+        )
+    except ValueError:
+        raise AliasLookupError(f"No alias for field '{field}' found")
+    return alias
+
+
+def _force_optional(cls: BaseModel):
+    """
+    Takes a copy of the input pydantic model class and forces
+    all fields to be optional. Useful for validating individual fields.
+    """
+    _model: BaseModel = type(f"{cls.__name__}-subclass", (cls,), {})
+    for field in _model.__fields__.values():
+        field.required = False
+    return _model
+
+
+def _parse_and_validate_field(cls: "SdsBaseModel", field, value):
+    _model = _force_optional(cls)
+    field_alias = _get_alias_for_field_name(cls=cls, field=field)
+    _value = set(value) if isinstance(value, list) else value
+    instance = _model(**{field_alias: _value})
+    parsed_value = getattr(instance, field)
+    return parsed_value
 
 
 def _is_iterable(obj):
@@ -101,27 +150,7 @@ class SdsBaseModel(BaseModel):
 
     @classmethod
     def get_field_name_for_alias(cls, alias) -> str:
-        try:
-            (field_name,) = (
-                field_name
-                for field_name, model_field in cls.__fields__.items()
-                if model_field.alias == alias
-            )
-        except ValueError:
-            raise ValueError(f"No field with alias '{alias}' found")
-        return field_name
-
-    @classmethod
-    def get_alias_for_field_name(cls, field) -> str:
-        try:
-            (alias,) = (
-                model_field.alias
-                for field_name, model_field in cls.__fields__.items()
-                if field_name == field
-            )
-        except ValueError:
-            raise ValueError(f"No alias for field '{field}' found")
-        return alias
+        return _get_field_name_for_alias(cls=cls, alias=alias)
 
     @root_validator(pre=True)
     def preprocess_inputs(cls, values):
@@ -139,29 +168,17 @@ class SdsBaseModel(BaseModel):
         return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]
 
     @classmethod
-    def force_optional(cls) -> type[Self]:
-        _model = type(f"{cls.__name__}-subclass", (cls,), {})
-        for field in _model.__fields__.values():
-            field.required = False
-        return _model
-
-    @classmethod
     def parse_and_validate_field(cls, field: str, value: list | set):
-        _model = cls.force_optional()
-        field_alias = cls.get_alias_for_field_name(field=field)
-        _value = set(value) if isinstance(value, list) else value
-        instance = _model(**{field_alias: _value})
-        parsed_value = getattr(instance, field)
-        return parsed_value
+        _parse_and_validate_field(cls=cls, field=field, value=value)
 
     @classmethod
     def is_mandatory_field(cls, field: str):
         return cls.__fields__[field].required
 
-    @abstractmethod
     @classmethod
     def key_fields(cls) -> tuple[str, ...]:
         raise NotImplementedError()
 
+    @classmethod
     def is_key_field(cls, field):
         return field in cls.key_fields()

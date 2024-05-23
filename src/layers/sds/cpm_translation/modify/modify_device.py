@@ -45,29 +45,30 @@ def update_device_metadata(
     field_alias: str,
     new_values: list,
 ) -> Device:
-    field_name = model.get_field_name_for_alias(alias=field_alias)
+    field = model.get_field_name_for_alias(alias=field_alias)
     ((questionnaire_response,),) = device.questionnaire_responses.values()
-    _current_values = questionnaire_response.get_response(question_name=field_name)
+    _current_values = questionnaire_response.get_response(question_name=field)
 
     if modification_type == ModificationType.ADD:
-        _updated_unique_values = list(set(*_current_values, *new_values))
+        _unique_values = {*_current_values, *new_values}
         parsed_values = model.parse_and_validate_field(
-            model=model, field=field_name, value=_updated_unique_values
+            field=field, value=_unique_values
         )
     elif modification_type == ModificationType.REPLACE:
+        _unique_values = set(new_values)
         parsed_values = model.parse_and_validate_field(
-            model=model, field=field_name, value=new_values
+            field=field, value=_unique_values
         )
     elif modification_type == ModificationType.DELETE:
-        if model.is_mandatory_field(field_name):
-            raise CannotDeleteMandatoryField(field_name)
+        if model.is_mandatory_field(field):
+            raise CannotDeleteMandatoryField(field)
         if not _current_values:
-            raise NothingToDelete(field_name)
+            raise NothingToDelete(field)
         parsed_values = []
 
     new_questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=questionnaire_response,
-        field_to_update=field_name,
+        field_to_update=field,
         value=parsed_values,
     )
     device.update_questionnaire_response(

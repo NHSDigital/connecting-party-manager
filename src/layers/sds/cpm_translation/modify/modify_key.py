@@ -1,6 +1,7 @@
 from dataclasses import astuple
 from typing import Callable, Generator
 
+import sds.domain
 from domain.core.device import Device
 from domain.core.device_key import DeviceKeyType
 from domain.core.product_team import ProductTeam
@@ -36,11 +37,11 @@ def get_modify_key_function(
         raise NotAnSdsKey(field_name)
 
     match (model, modification_type):
-        case (NhsAccreditedSystem, ModificationType.ADD):
+        case (sds.domain.NhsAccreditedSystem, ModificationType.ADD):
             return new_accredited_system
-        case (NhsAccreditedSystem, ModificationType.REPLACE):
+        case (sds.domain.NhsAccreditedSystem, ModificationType.REPLACE):
             return replace_accredited_systems
-        case (NhsMhs, ModificationType.REPLACE):
+        case (sds.domain.NhsMhs, ModificationType.REPLACE):
             return replace_msg_handling_system
         case _:
             raise InvalidModificationRequest(
@@ -61,26 +62,26 @@ def new_accredited_system(
             f"Accredited System with ODS code '{ods_code}' already exists"
         )
 
-    template_device = devices[0]
+    _device = devices[0]
     (
         (questionnaire_id, (questionnaire_response,)),
-    ) = template_device.questionnaire_responses.items()
+    ) = _device.questionnaire_responses.items()
     new_questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=questionnaire_response,
         field_to_update=field_name,
-        new_values=[ods_code],
+        value=ods_code,
     )
-    unique_identifier = template_device.indexes[(questionnaire_id, UNIQUE_IDENTIFIER)]
+    (unique_identifier,) = get_in_list_of_dict(
+        obj=questionnaire_response.responses, key=UNIQUE_IDENTIFIER
+    )
     new_accredited_system_id = DEVICE_KEY_SEPARATOR.join((ods_code, unique_identifier))
 
     product_team = ProductTeam(
-        id=template_device.product_team_id,
+        id=_device.product_team_id,
         ods_code=ods_code,
         name=DEFAULT_PRODUCT_TEAM["name"],
     )
-    new_device = product_team.create_device(
-        name=template_device.name, type=template_device.type
-    )
+    new_device = product_team.create_device(name=_device.name, type=_device.type)
     new_device.add_questionnaire_response(
         questionnaire_response=new_questionnaire_response
     )
@@ -118,7 +119,7 @@ def _get_msg_handling_system_key(responses: list[dict]) -> MessageHandlingSystem
     """Construct the MHS scoped party key from questionnaire responses"""
     return MessageHandlingSystemKey(
         **{
-            key: values[0]
+            key: values
             for key in NhsMhs.key_fields()
             for values in get_in_list_of_dict(obj=responses, key=key)
         }
@@ -139,7 +140,7 @@ def replace_msg_handling_system(
     questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=_questionnaire_response,
         field_to_update=field_name,
-        new_values=new_value,
+        value=new_value,
     )
     msg_handling_system_key = _get_msg_handling_system_key(
         responses=_questionnaire_response.responses

@@ -5,7 +5,7 @@ from pydantic import Field
 from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
 from .organizational_unit import OrganizationalUnitDistinguishedName
 
-ACCREDITED_SYSTEM_KEY_FIELDS = ("nhs_id_code",)
+ACCREDITED_SYSTEM_KEY_FIELDS = ("nhs_as_client",)
 
 
 class NhsAccreditedSystem(SdsBaseModel):

@@ -10,7 +10,7 @@ from domain.core.root import Root
 from domain.core.validation import DEVICE_KEY_SEPARATOR
 from domain.repository.device_repository import DeviceRepository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
-from sds.domain.nhs_mhs import MHS_SCOPED_PARTY_KEY_FIELDS, NhsMhs
+from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 from sds.domain.sds_modification_request import SdsModificationRequest
 
@@ -36,7 +36,7 @@ def accredited_system_ids(
 
 def scoped_party_key(nhs_mhs: NhsMhs) -> str:
     return DEVICE_KEY_SEPARATOR.join(
-        getattr(nhs_mhs, key) for key in MHS_SCOPED_PARTY_KEY_FIELDS
+        getattr(nhs_mhs, key) for key in NhsMhs.key_fields()
     )
 
 
@@ -122,10 +122,6 @@ def nhs_mhs_to_cpm_device(
     )
     device.add_index(questionnaire_id=questionnaire.id, question_name=UNIQUE_IDENTIFIER)
     return device
-
-
-class NoDeviceFound(Exception):
-    pass
 
 
 def read_devices_by_unique_identifier(

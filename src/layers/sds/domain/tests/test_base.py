@@ -1,13 +1,19 @@
-from typing import ClassVar, Literal
+from contextlib import nullcontext as does_not_raise
+from typing import ClassVar, Literal, Optional
 
 import pytest
 from etl_utils.ldif.model import DistinguishedName
-from pydantic import Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 from sds.domain.base import (
     OBJECT_CLASS_FIELD_NAME,
+    AliasLookupError,
     SdsBaseModel,
     _field_is_a_set,
+    _force_optional,
     _generate_distinguished_name,
+    _get_alias_for_field_name,
+    _get_field_name_for_alias,
+    _parse_and_validate_field,
     _strip_excluded_values_from_object_class,
     _unpack_sets,
     _validate_object_class,
@@ -67,6 +73,11 @@ def test__generate_distinguished_name():
     }
 
 
+def test__generate_distinguished_name_when_not_provided():
+    _values = _generate_distinguished_name(cls=None, values={"foo": "bar"})
+    assert _values == {"foo": "bar"}
+
+
 @pytest.mark.parametrize("object_class", ("foo", "FOO", "FoO"))
 def test__validate_object_class(object_class):
     class MyModel(SdsBaseModel):
@@ -106,3 +117,83 @@ def test_no_extras():
     with pytest.raises(ValidationError) as exc:
         MyModel(_distinguished_name=None, extra_field="not allowed")
     assert "extra fields not permitted" in exc.value.json()
+
+
+class MyAliasModel(BaseModel):
+    foo: str = Field(alias="bar")
+
+
+@pytest.mark.parametrize(
+    ["function", "input_string", "expected_output", "raises"],
+    [
+        (_get_field_name_for_alias, "bar", "foo", does_not_raise()),
+        (_get_alias_for_field_name, "foo", "bar", does_not_raise()),
+        (_get_field_name_for_alias, "foo", None, pytest.raises(AliasLookupError)),
+        (_get_alias_for_field_name, "bar", None, pytest.raises(AliasLookupError)),
+    ],
+)
+def test_get_field_name_for_alias(function, input_string, expected_output, raises):
+    with raises:
+        assert function(MyAliasModel, input_string) == expected_output
+
+
+def test_force_optional():
+    MyOptionalAliasModel = _force_optional(MyAliasModel)
+    assert MyOptionalAliasModel is not MyAliasModel
+    assert MyOptionalAliasModel.__fields__.keys() == MyAliasModel.__fields__.keys()
+    with does_not_raise():
+        MyOptionalAliasModel(bar=123)  # alias still works
+        MyOptionalAliasModel()  # allowed to skip mandatory fields
+    with pytest.raises(ValidationError):
+        MyOptionalAliasModel(bar={})  # validation still works
+
+
+@pytest.mark.parametrize(
+    ["field", "value", "raises"],
+    [
+        ("my_field", "hi", does_not_raise()),
+        ("myField", None, pytest.raises(AliasLookupError)),
+        ("my_field", {}, pytest.raises(ValidationError)),
+    ],
+)
+def test__parse_and_validate_field(field, value, raises):
+    class MyModel(SdsBaseModel):
+        my_field: str = Field(alias="myField")
+        other_field: str
+
+    with raises:
+        _parse_and_validate_field(MyModel, field=field, value=value)
+
+
+@pytest.mark.parametrize(
+    ["field", "is_mandatory"],
+    [
+        ("my_field", True),
+        ("other_field", False),
+    ],
+)
+def test__parse_and_validate_field(field, is_mandatory):
+    class MyModel(SdsBaseModel):
+        my_field: str = Field(alias="myField")
+        other_field: Optional[str]
+
+    assert MyModel.is_mandatory_field(field) is is_mandatory
+
+
+@pytest.mark.parametrize(
+    ["field", "is_key_field"],
+    [
+        ("my_field", True),
+        ("other_field", False),
+    ],
+)
+def test_key_fields(field, is_key_field):
+    class MyModel(SdsBaseModel):
+        my_field: str = Field(alias="myField")
+        other_field: Optional[str]
+
+        @classmethod
+        def key_fields(cls) -> tuple[str, ...]:
+            return ("my_field",)
+
+    assert MyModel.is_key_field(field) is is_key_field

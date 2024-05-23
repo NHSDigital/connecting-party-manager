@@ -21,6 +21,9 @@ class MessageHandlingSystemKey:
     nhs_mhs_svc_ia: str
 
 
+KEY_FIELDS = tuple(MessageHandlingSystemKey.__dataclass_fields__.keys())
+
+
 class NhsMhs(SdsBaseModel):
     distinguished_name: OrganizationalUnitDistinguishedName = Field(exclude=True)
 
@@ -67,4 +70,4 @@ class NhsMhs(SdsBaseModel):
 
     @classmethod
     def key_fields(cls) -> tuple[str, ...]:
-        return tuple(MessageHandlingSystemKey.__dataclass_fields__.keys())
+        return KEY_FIELDS
