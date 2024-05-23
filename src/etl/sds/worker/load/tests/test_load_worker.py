@@ -1,5 +1,6 @@
 import os
 from collections import deque
+from datetime import datetime
 from itertools import chain, permutations
 from typing import Callable, Generator
 from unittest import mock
@@ -33,6 +34,9 @@ GOOD_CPM_EVENT_1 = {
         "product_team_id": str(UUID(int=1)),
         "ods_code": "ABC",
         "status": "active",
+        "created_on": datetime.utcnow(),
+        "updated_on": None,
+        "deleted_on": None,
     }
 }
 GOOD_CPM_EVENT_2 = {
@@ -43,6 +47,9 @@ GOOD_CPM_EVENT_2 = {
         "product_team_id": str(UUID(int=2)),
         "ods_code": "ABC",
         "status": "active",
+        "created_on": datetime.utcnow(),
+        "updated_on": None,
+        "deleted_on": None,
     }
 }
 

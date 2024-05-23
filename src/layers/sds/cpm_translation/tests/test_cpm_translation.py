@@ -1,3 +1,4 @@
+from datetime import datetime
 from itertools import chain
 from string import ascii_letters, digits
 from typing import Generator
@@ -212,7 +213,14 @@ def test_delete_devices(repository: DeviceRepository):
         product_team_id=_device_1.product_team_id,
         ods_code=_device_1.ods_code,
         status=DeviceStatus.INACTIVE,
+        created_on=_device_1.created_on,
+        updated_on=event_1.updated_on,
+        deleted_on=event_1.deleted_on,
     )
+    assert isinstance(event_1.updated_on, datetime)
+    assert isinstance(event_1.deleted_on, datetime)
+    assert event_1.deleted_on == event_1.updated_on
+
     assert event_2 == DeviceUpdatedEvent(
         id=_device_2.id,
         name=_device_2.name,
@@ -220,7 +228,13 @@ def test_delete_devices(repository: DeviceRepository):
         product_team_id=_device_2.product_team_id,
         ods_code=_device_2.ods_code,
         status=DeviceStatus.INACTIVE,
+        created_on=_device_2.created_on,
+        updated_on=event_2.updated_on,
+        deleted_on=event_2.deleted_on,
     )
+    assert isinstance(event_2.updated_on, datetime)
+    assert isinstance(event_2.deleted_on, datetime)
+    assert event_2.deleted_on == event_2.updated_on
 
 
 @pytest.mark.integration

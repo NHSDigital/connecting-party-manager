@@ -12,7 +12,7 @@ class Nested:
 @pytest.mark.parametrize(
     "value,expected",
     [
-        [None, {"Null": True}],
+        [None, {"NULL": True}],
         ["foo", {"S": "foo"}],
         [123, {"N": "123"}],
         [True, {"BOOL": True}],
@@ -29,7 +29,7 @@ class Nested:
             ],
             {
                 "L": [
-                    {"Null": True},
+                    {"NULL": True},
                     {"N": "1"},
                     {"N": "2.0"},
                     {"S": "3"},
@@ -51,7 +51,7 @@ class Nested:
             },
             {
                 "M": {
-                    "none": {"Null": True},
+                    "none": {"NULL": True},
                     "bool": {"BOOL": False},
                     "int": {"N": "1"},
                     "float": {"N": "2"},
@@ -71,7 +71,7 @@ def test_marshall_value(value, expected):
 @pytest.mark.parametrize(
     "value,expected",
     [
-        [{"Null": True}, None],
+        [{"NULL": True}, None],
         [{"BOOL": False}, False],
         [{"BOOL": True}, True],
         [{"N": "0"}, 0.0],
@@ -79,7 +79,7 @@ def test_marshall_value(value, expected):
         [{"N": "1.2"}, 1.2],
         [{"S": "x"}, "x"],
         [{"L": []}, []],
-        [{"L": [{"Null": True}]}, [None]],
+        [{"L": [{"NULL": True}]}, [None]],
         [{"M": {}}, {}],
         [{"M": {"foo": {"BOOL": False}, "bar": {"N": "1"}}}, {"foo": False, "bar": 1}],
     ],
