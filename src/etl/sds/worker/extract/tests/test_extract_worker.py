@@ -8,6 +8,7 @@ import pytest
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
+from etl_utils.worker.model import WorkerEnvironment
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -81,6 +82,7 @@ def mock_s3_client():
     ):
         from etl.sds.worker.extract import extract
 
+        extract.ENVIRONMENT = WorkerEnvironment.build()
         extract.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
         yield extract.S3_CLIENT
 

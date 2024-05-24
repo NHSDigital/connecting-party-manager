@@ -10,6 +10,7 @@ from unittest import mock
 import boto3
 import pytest
 from etl_utils.io import pkl_dumps_lz4
+from etl_utils.worker.model import WorkerEnvironment
 from moto import mock_aws
 from mypy_boto3_dynamodb import DynamoDBClient
 from mypy_boto3_s3 import S3Client
@@ -82,6 +83,7 @@ def extract_handler(scenario: Scenario, s3_client: S3Client):
     ):
         from etl.sds.worker.extract import extract
 
+        extract.ENVIRONMENT = WorkerEnvironment.build()
         extract.S3_CLIENT = s3_client
         yield extract.handler
 
