@@ -36,7 +36,10 @@ def accredited_system_ids(
 
 def scoped_party_key(nhs_mhs: NhsMhs) -> str:
     return DEVICE_KEY_SEPARATOR.join(
-        getattr(nhs_mhs, key) for key in NhsMhs.key_fields()
+        map(
+            str.strip,
+            (getattr(nhs_mhs, key) for key in NhsMhs.key_fields()),
+        )
     )
 
 
