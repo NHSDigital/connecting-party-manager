@@ -10,8 +10,9 @@ from event.aws.client import dynamodb_client as get_dynamodb_client
 from mypy_boto3_s3 import S3Client
 
 from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from test_helpers.terraform import read_terraform_output
 
-from .conftest import ETL_BUCKET, TABLE_NAME, parametrize_over_scenarios
+from .conftest import ETL_BUCKET, parametrize_over_scenarios
 from .utils import Handler, Scenario, convert_list_likes, device_as_json_dict
 
 
@@ -112,7 +113,8 @@ def test_transform_and_load(
     ), f"{n_expected_errors} errors were expected but none were raised"
 
     dynamodb_client = get_dynamodb_client()
-    repo = MockDeviceRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    repo = MockDeviceRepository(table_name=table_name, dynamodb_client=dynamodb_client)
     devices = list(map(device_as_json_dict, repo.all_devices()))
     assert len(devices) == len(scenario.load_output), devices
 

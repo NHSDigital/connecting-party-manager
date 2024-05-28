@@ -22,7 +22,7 @@ from .utils import Scenario
 
 SCENARIO_PATHS = list((Path(__file__).parent.glob("scenarios/*/*")))
 
-TABLE_NAME = "nhse-cpm--a4081ca6--table"
+TABLE_NAME = "my-table"
 ETL_BUCKET = "etl-bucket"
 
 
