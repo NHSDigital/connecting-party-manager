@@ -1,6 +1,8 @@
 from collections import defaultdict
+from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
+from typing import Optional
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
@@ -40,6 +42,9 @@ class DeviceCreatedEvent(Event):
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
+    created_on: str
+    updated_on: Optional[str] = None
+    deleted_on: Optional[str] = None
     _trust: bool = field(alias="_trust", default=False)
 
 
@@ -51,6 +56,9 @@ class DeviceUpdatedEvent(Event):
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
+    created_on: str
+    updated_on: str
+    deleted_on: Optional[str] = None
 
 
 @dataclass(kw_only=True, slots=True)
@@ -149,18 +157,28 @@ class Device(AggregateRoot):
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
+    created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
+    updated_on: Optional[datetime] = Field(default=None)
+    deleted_on: Optional[datetime] = Field(default=None)
     keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list), exclude=True
     )
 
     def update(self, **kwargs) -> DeviceUpdatedEvent:
+        if "updated_on" not in kwargs:
+            kwargs["updated_on"] = datetime.utcnow()
         device_data = self._update(data=kwargs)
         event = DeviceUpdatedEvent(**device_data)
         return self.add_event(event)
 
     def delete(self) -> DeviceUpdatedEvent:
-        return self.update(status=DeviceStatus.INACTIVE)
+        deletion_datetime = datetime.utcnow()
+        return self.update(
+            status=DeviceStatus.INACTIVE,
+            updated_on=deletion_datetime,
+            deleted_on=deletion_datetime,
+        )
 
     def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
         if key in self.keys:

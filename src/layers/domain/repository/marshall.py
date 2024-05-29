@@ -3,7 +3,7 @@ from typing import Any
 from .errors import UnableToUnmarshall
 
 MARSHALL_FUNCTION_BY_TYPE = {
-    type(None): (lambda _: {"Null": True}),
+    type(None): (lambda _: {"NULL": True}),
     bool: (lambda x: {"BOOL": x}),
     int: (lambda x: {"N": str(x)}),
     float: (lambda x: {"N": str(x)}),
@@ -28,7 +28,7 @@ def _unmarshall_mapping(mapping: dict[str, dict[str, Any]]) -> dict[str, Any]:
 def unmarshall_value(record: dict[str, str | dict | list]):
     ((_type_name, value),) = record.items()
     match _type_name:
-        case "Null":
+        case "NULL":
             return None
         case "S":
             return str(value)
