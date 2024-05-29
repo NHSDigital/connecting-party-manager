@@ -61,9 +61,7 @@ step_decorators = [*logging_step_decorators]
 
 
 def handler(event, context=None):
-    redact_fields = {"data.INIT.headers.apikey"}
-
-    setup_logger(service_name=__file__, redacted_fields=redact_fields)
+    setup_logger(service_name=__file__)
 
     step_chain = StepChain(
         step_chain=[authenticate_apikey], step_decorators=step_decorators
