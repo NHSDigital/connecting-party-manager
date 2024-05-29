@@ -84,8 +84,11 @@ def log_on_failure(request: FixtureRequest, log_capture):
 
 @fixture(autouse=True)
 def aws_session_(request: FixtureRequest):
-    if is_integration(request) or is_smoke(request):
+    if is_integration(request):
         with aws_session():
+            yield
+    elif is_smoke(request):
+        with aws_session(role_name="NHSSmokeTestRole"):
             yield
     else:
         yield

@@ -38,7 +38,7 @@ if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --r
   MGMT_ACCOUNT_ID=$(aws secretsmanager get-secret-value --secret-id "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" --query 'SecretString' --output text)
 
   #
-  # Create the NHSDeploymentRole that will be used for deployment and CI/CD
+  # Create the NHSDeploymentRole that will be used for deployment and CI/CD in All Deployment environments
   #
   aws iam get-role --role-name "NHSDeploymentRole" &> /dev/null
   if [ $? != 0 ]; then
@@ -50,6 +50,21 @@ if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --r
       --region "${AWS_REGION_NAME}" \
       || exit 1
   fi
+
+  #
+  # Create the NHSSmokeTestRole that will be used for smoke tests in All Deployment environments
+  #
+    aws iam get-role --role-name "NHSSmokeTestRole" &> /dev/null
+    if [ $? != 0 ]; then
+      tf_assume_role_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/role-trust-policy.json)
+
+      aws iam create-role \
+        --role-name "NHSSmokeTestRole" \
+        --assume-role-policy-document "${tf_assume_role_policy}" \
+        --region "${AWS_REGION_NAME}" \
+        || exit 1
+    fi
+
   #
   # Create the NHSDevelopmentRole that will be used for deployment from local environments
   #
