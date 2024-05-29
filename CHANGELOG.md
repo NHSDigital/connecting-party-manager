@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-05-29
+- [PI-344] Added smoke test role
+
 ## 2024-05-23
 - [PI-320] Add created_on, updated_on and deleted_on fields to a Device
 
