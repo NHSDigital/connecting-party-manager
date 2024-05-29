@@ -5,6 +5,7 @@ from etl_utils.trigger.model import StateMachineInputType
 from etl_utils.trigger.notify import notify
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
+from event.logging.logger import setup_logger
 from event.step_chain import StepChain
 
 from .steps import steps
@@ -33,6 +34,7 @@ CACHE = {
 
 @event_source(data_class=S3Event)
 def handler(event: S3Event, context):
+    setup_logger(service_name=__file__)
     step_chain = StepChain(step_chain=steps, step_decorators=[log_action])
     step_chain.run(init=(event.bucket_name, event.object_key), cache=CACHE)
     return notify(
