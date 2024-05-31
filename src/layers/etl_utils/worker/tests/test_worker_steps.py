@@ -22,6 +22,7 @@ class MyException(Exception):
 BUCKET_NAME = "my-bucket"
 S3_INPUT_PATH = f"s3://{BUCKET_NAME}/an_input_path"
 S3_OUTPUT_PATH = f"s3://{BUCKET_NAME}/an_output_path"
+MAX_RECORDS = 123
 
 
 def test_execute_action_pass():
@@ -30,7 +31,14 @@ def test_execute_action_pass():
 
     action_response = execute_action(
         data={
-            StepChain.INIT: (action, "a_client", S3_INPUT_PATH, S3_OUTPUT_PATH, {}),
+            StepChain.INIT: (
+                action,
+                "a_client",
+                S3_INPUT_PATH,
+                S3_OUTPUT_PATH,
+                MAX_RECORDS,
+                {},
+            ),
         },
         cache=None,
     )
@@ -39,6 +47,7 @@ def test_execute_action_pass():
         "s3_client": "a_client",
         "s3_input_path": S3_INPUT_PATH,
         "s3_output_path": S3_OUTPUT_PATH,
+        "max_records": MAX_RECORDS,
     }
 
 
@@ -51,7 +60,14 @@ def test_execute_action_fail():
     with pytest.raises(MyException):
         execute_action(
             data={
-                StepChain.INIT: (action, "a_client", S3_INPUT_PATH, S3_OUTPUT_PATH, {}),
+                StepChain.INIT: (
+                    action,
+                    "a_client",
+                    S3_INPUT_PATH,
+                    S3_OUTPUT_PATH,
+                    MAX_RECORDS,
+                    {},
+                ),
             },
             cache=None,
         )

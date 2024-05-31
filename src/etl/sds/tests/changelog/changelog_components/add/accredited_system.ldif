@@ -1,0 +1,16 @@
+dn: uniqueIdentifier=000173655515,ou=Services,o=nhs
+changeType: add
+objectClass: nhsAS
+objectClass: top
+nhsApproverURP: uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs
+nhsAsClient: K83015
+nhsAsSvcIA: urn:nhs:names:services:pdsquery:QUQI_IN010000UK14
+nhsDateApproved: 20091016133823
+nhsDateRequested: 20091016133757
+nhsIDCode: K83015
+nhsMHSPartyKey: K83015-806782
+nhsProductKey: 6216
+nhsProductName: TPP SystmOne
+nhsRequestorURP: uniqueIdentifier=203171972540,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs
+nhsTempUid: 10312
+uniqueIdentifier: 000173655515

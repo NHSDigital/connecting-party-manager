@@ -244,6 +244,11 @@ class DeviceRepository(Repository[Device]):
 
         (device,) = TableKeys.DEVICE.filter(items, key="sk")
         keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
+        _indexes = TableKeys.DEVICE_INDEX.filter(items, key="sk")
+        indexes = set(
+            (idx["questionnaire_id"], idx["question_name"], idx["value"])
+            for idx in _indexes
+        )
 
         questionnaires = {}
         for id_, data in TableKeys.QUESTIONNAIRE.filter_and_group(items, key="sk"):
@@ -264,5 +269,6 @@ class DeviceRepository(Repository[Device]):
         return Device(
             keys={id_: DeviceKey(**data) for id_, data in keys},
             questionnaire_responses=questionnaire_responses,
+            indexes=indexes,
             **device,
         )

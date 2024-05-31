@@ -1,0 +1,22 @@
+from etl.sds.tests.changelog.utils import (
+    ADD_ACCREDITED_SYSTEM,
+    DELETE_ACCREDITED_SYSTEM,
+    _Scenario,
+    create_modify_ldif,
+)
+
+_ADD_NHS_AS_CLIENT = create_modify_ldif(
+    "add/nhs_as_client.ldif", device_type="accredited_system"
+)
+_REPLACE_NHS_AS_SVC_IA = create_modify_ldif(
+    "replace/nhs_as_svc_ia.ldif", device_type="accredited_system"
+)
+SCENARIO = _Scenario(
+    file_path=__file__,
+    extract_input=[
+        ADD_ACCREDITED_SYSTEM,
+        _ADD_NHS_AS_CLIENT,
+        DELETE_ACCREDITED_SYSTEM,
+        _REPLACE_NHS_AS_SVC_IA,
+    ],
+)

@@ -1,0 +1,5 @@
+The following errors were encountered
+  -- Error 1 (AccreditedSystemAlreadyExists) --
+  Failed to parse record 0
+  {'object_class': 'modify', 'change_type': 'modify', 'modifications': [['add', 'nhsasclient', ['K83015']]], 'unique_identifier': '000173655515'}
+  Accredited System with ODS code 'K83015' already exists

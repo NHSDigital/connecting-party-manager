@@ -18,6 +18,8 @@ stringifies an ExceptionGroup in the form:
 >        inner-oops
 """
 
+from traceback import TracebackException
+
 INDENTATION = "  "
 
 
@@ -40,7 +42,8 @@ def _render_nested_exception(exception: Exception, nested_index: list[int]):
     message = render_exception(exception=exception, nested_index=nested_index)
     error_index = ".".join(map(str, nested_index))
     prefix = f"-- Error {error_index} ({type(exception).__name__}) --\n"
-    return f"{indentation}{prefix}{message}"
+    _traceback = "".join(TracebackException.from_exception(exception).format())
+    return f"{indentation}{prefix}{message}\n{_traceback}\n"
 
 
 def _render_exception_group(

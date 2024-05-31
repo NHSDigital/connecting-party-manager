@@ -11,6 +11,11 @@ class WorkerEnvironment(BaseEnvironment):
         return f"s3://{self.ETL_BUCKET}/{key}"
 
 
+class WorkerEvent:
+    def __init__(self, max_records: int = None, **kwargs):
+        self.max_records = max_records
+
+
 @dataclass
 class WorkerResponse:
     """The response of an ETL worker lambda"""

@@ -233,10 +233,10 @@ def test_parse_changelog_changes_with_modify():
         result
         == """dn: o=nhs,ou=services,uniqueidentifier=200000002202
 changetype: modify
-objectclass: modify
 replace: nhsAsSvcIA
 nhsAsSvcIA: urn:nhs:names:services:cpisquery:MCCI_IN010000UK13
 nhsAsSvcIA: urn:nhs:names:services:cpisquery:QUPC_IN000006GB01
+objectclass: modify
 uniqueidentifier: 200000002202"""
     )
 

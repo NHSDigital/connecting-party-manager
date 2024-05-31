@@ -10,7 +10,7 @@ from etl_utils.io import EtlEncoder, pkl_dump_lz4, pkl_load_lz4
 from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property, ldif_dump, parse_ldif
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
-from etl_utils.worker.model import WorkerActionResponse, WorkerEnvironment
+from etl_utils.worker.model import WorkerActionResponse, WorkerEnvironment, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.json import json_loads
 from nhs_context_logging import log_action
@@ -38,7 +38,7 @@ def _read(s3_client: "S3Client", s3_input_path: str) -> deque[dict]:
 
 
 def extract(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str
+    s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
 ) -> WorkerActionResponse:
     unprocessed_records = _read(s3_client=s3_client, s3_input_path=s3_input_path)
 
@@ -52,6 +52,7 @@ def extract(
         record_serializer=lambda dn_and_record: json_loads(
             json.dumps(dn_and_record[1], cls=EtlEncoder)
         ),
+        max_records=max_records,
     )
 
     return WorkerActionResponse(
@@ -64,6 +65,7 @@ def extract(
 
 
 def handler(event, context):
+    max_records = WorkerEvent(**event).max_records
     response = execute_step_chain(
         action=extract,
         s3_client=S3_CLIENT,
@@ -71,5 +73,6 @@ def handler(event, context):
         s3_output_path=ENVIRONMENT.s3_path(WorkerKey.TRANSFORM),
         unprocessed_dumper=ldif_dump,
         processed_dumper=pkl_dump_lz4,
+        max_records=max_records,
     )
     return asdict(response)

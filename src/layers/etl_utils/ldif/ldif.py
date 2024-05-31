@@ -6,7 +6,7 @@ from typing import IO, TYPE_CHECKING, Callable, Generator
 from etl_utils.ldif.model import DistinguishedName
 from smart_open import open as _smart_open
 
-from ._ldif import LDIFParser, LDIFWriter
+from ._ldif import PARSED_MODIFICATION_KEY, LDIFParser, LDIFWriter
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
@@ -21,7 +21,16 @@ def _decode_record(record: dict[str, list[bytes]]) -> dict[str, set[str]]:
     decoded_record = {}
     for field_name, field_items in record.items():
         non_empty_items = filter(bool, field_items)
-        decoded_items = set(map(bytes.decode, non_empty_items))
+
+        # "modification" items are not arrays of strings, instead they are
+        # tuples of complex objects and therefore can neither be decoded
+        # nor hashed (ie can't use 'set')
+        decoded_items = (
+            set(map(bytes.decode, non_empty_items))
+            if field_name != PARSED_MODIFICATION_KEY
+            else list(non_empty_items)
+        )
+
         if decoded_items:
             decoded_record[field_name.lower()] = decoded_items
     return decoded_record
@@ -40,7 +49,11 @@ def parse_ldif(
 
 def _encode_record(record: dict[str, set[str]]) -> dict[str, list[bytes]]:
     return {
-        field_name: sorted(item.encode() for item in field_items)
+        field_name: (
+            sorted(item.encode() for item in field_items)
+            if field_name != PARSED_MODIFICATION_KEY
+            else field_items
+        )
         for field_name, field_items in record.items()
     }
 

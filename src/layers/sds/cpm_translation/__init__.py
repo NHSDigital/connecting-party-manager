@@ -8,27 +8,15 @@ from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.parse import UnknownSdsModel
 from sds.domain.sds_deletion_request import SdsDeletionRequest
+from sds.domain.sds_modification_request import SdsModificationRequest
 
+from .constants import BAD_UNIQUE_IDENTIFIERS
 from .translations import (
     delete_devices,
+    modify_devices,
     nhs_accredited_system_to_cpm_devices,
     nhs_mhs_to_cpm_device,
 )
-
-BAD_UNIQUE_IDENTIFIERS = {
-    "31af51067f47f1244d38",  # pragma: allowlist secret
-    "a83e1431f26461894465",  # pragma: allowlist secret
-    "S2202584A2577603",
-    "S100049A300185",
-}
-
-
-def update_in_list_of_dict(obj: list[dict[str, str]], key, value):
-    for item in obj:
-        if key in item:
-            item[key] = value
-            return
-    obj.append({key: value})
 
 
 def translate(
@@ -66,6 +54,16 @@ def translate(
         deletion_request = SdsDeletionRequest.construct(**obj)
         devices = delete_devices(
             deletion_request=deletion_request,
+            questionnaire_ids=[
+                spine_endpoint_questionnaire.id,
+                spine_device_questionnaire.id,
+            ],
+            repository=repository,
+        )
+    elif object_class == SdsModificationRequest.OBJECT_CLASS:
+        modification_request = SdsModificationRequest.construct(**obj)
+        devices = modify_devices(
+            modification_request=modification_request,
             questionnaire_ids=[
                 spine_endpoint_questionnaire.id,
                 spine_device_questionnaire.id,
