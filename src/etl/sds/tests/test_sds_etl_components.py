@@ -57,9 +57,7 @@ def s3_client():
 
 @pytest.fixture
 def state_machine_input(request: pytest.FixtureRequest):
-    execute_state_machine(
-        state_machine_input=request.param, client=step_functions_client()
-    )
+    execute_state_machine(state_machine_input=request.param)
     return request.param
 
 
@@ -82,8 +80,9 @@ def repository():
 
 
 def execute_state_machine(
-    state_machine_input: StateMachineInput, client
+    state_machine_input: StateMachineInput,
 ) -> StartSyncExecutionOutputTypeDef:
+    client = step_functions_client()
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     name = state_machine_input.name
     execution_response = client.start_execution(
@@ -180,6 +179,7 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
 def test_end_to_end(
     repository: MockDeviceRepository, worker_data, s3_client, state_machine_input
 ):
+    execute_state_machine(state_machine_input, client=step_functions_client)
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
     load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
