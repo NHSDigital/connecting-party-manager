@@ -28,7 +28,6 @@ from test_helpers.terraform import read_terraform_output
 # Configure the boto3 retry settings
 config = Config(retries={"max_attempts": 10, "mode": "standard"})
 
-
 # Note that unique identifier "000428682512" is the identifier of 'GOOD_SDS_RECORD'
 DELETION_REQUEST_000428682512 = """
 dn: o=nhs,ou=Services,uniqueIdentifier=000428682512
@@ -57,17 +56,15 @@ def s3_client():
 
 @pytest.fixture
 def state_machine_input(request: pytest.FixtureRequest):
-    execute_state_machine(state_machine_input=request.param)
     return request.param
 
 
 @pytest.fixture
-def worker_data(request: pytest.FixtureRequest):
-    client = boto3.client("s3")
+def worker_data(request: pytest.FixtureRequest, s3_client):
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
 
     for key, data in request.param.items():
-        client.put_object(Bucket=etl_bucket, Key=key, Body=data)
+        s3_client.put_object(Bucket=etl_bucket, Key=key, Body=data)
     return request.param
 
 
@@ -80,9 +77,8 @@ def repository():
 
 
 def execute_state_machine(
-    state_machine_input: StateMachineInput,
+    state_machine_input: StateMachineInput, client
 ) -> StartSyncExecutionOutputTypeDef:
-    client = step_functions_client()
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     name = state_machine_input.name
     execution_response = client.start_execution(
@@ -152,7 +148,13 @@ def put_object(s3_client, key: WorkerKey, body: bytes) -> str:
     [StateMachineInput.update(changelog_number_start=1, changelog_number_end=1)],
     indirect=True,
 )
-def test_changelog_number_update(worker_data, state_machine_input: StateMachineInput):
+def test_changelog_number_update(
+    worker_data,
+    state_machine_input: StateMachineInput,
+    step_functions_client,
+    s3_client,
+):
+    execute_state_machine(state_machine_input, client=step_functions_client)
     changelog_number_from_s3 = get_changelog_number_from_s3(s3_client)
     assert changelog_number_from_s3 == state_machine_input.changelog_number_end
 
@@ -177,9 +179,12 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
     indirect=True,
 )
 def test_end_to_end(
-    repository: MockDeviceRepository, worker_data, s3_client, state_machine_input
+    repository: MockDeviceRepository,
+    worker_data,
+    s3_client,
+    state_machine_input,
+    step_functions_client,
 ):
-    execute_state_machine(state_machine_input, client=step_functions_client)
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
     load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
@@ -194,7 +199,9 @@ def test_end_to_end(
 
 @long_running
 @pytest.mark.integration
-def test_end_to_end_bulk_trigger(repository: MockDeviceRepository, s3_client):
+def test_end_to_end_bulk_trigger(
+    repository: MockDeviceRepository, step_functions_client, s3_client
+):
     bucket = read_terraform_output("sds_etl.value.bucket")
     test_data_bucket = read_terraform_output("test_data_bucket.value")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
