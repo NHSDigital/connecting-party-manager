@@ -4,6 +4,7 @@ from collections import deque
 
 import boto3
 import pytest
+from botocore.config import Config
 from domain.core.device import DeviceStatus, DeviceType
 from domain.core.device_key import DeviceKeyType
 from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
@@ -24,6 +25,10 @@ from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.pytest_skips import long_running
 from test_helpers.terraform import read_terraform_output
 
+# Configure the boto3 retry settings
+config = Config(retries={"max_attempts": 10, "mode": "standard"})
+
+
 # Note that unique identifier "000428682512" is the identifier of 'GOOD_SDS_RECORD'
 DELETION_REQUEST_000428682512 = """
 dn: o=nhs,ou=Services,uniqueIdentifier=000428682512
@@ -38,6 +43,16 @@ changetype: delete
 objectclass: delete
 uniqueidentifier: 000842065542
 """
+
+
+@pytest.fixture
+def step_functions_client():
+    return boto3.client("stepfunctions", config=config)
+
+
+@pytest.fixture
+def s3_client():
+    return boto3.client("s3")
 
 
 @pytest.fixture
@@ -65,9 +80,8 @@ def repository():
 
 
 def execute_state_machine(
-    state_machine_input: StateMachineInput,
+    state_machine_input: StateMachineInput, client
 ) -> StartSyncExecutionOutputTypeDef:
-    client = boto3.client("stepfunctions")
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     name = state_machine_input.name
     execution_response = client.start_execution(
@@ -102,25 +116,22 @@ def execute_state_machine(
     return response
 
 
-def get_changelog_number_from_s3() -> str:
-    client = boto3.client("s3")
+def get_changelog_number_from_s3(s3_client) -> str:
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     changelog_key = read_terraform_output("sds_etl.value.changelog_key")
-    response = client.get_object(Bucket=etl_bucket, Key=changelog_key)
+    response = s3_client.get_object(Bucket=etl_bucket, Key=changelog_key)
     return json_loads(response["Body"].read())
 
 
-def get_object(key: WorkerKey) -> str:
-    client = boto3.client("s3")
+def get_object(s3_client, key: WorkerKey) -> str:
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
-    response = client.get_object(Bucket=etl_bucket, Key=key)
+    response = s3_client.get_object(Bucket=etl_bucket, Key=key)
     return response["Body"].read()
 
 
-def put_object(key: WorkerKey, body: bytes) -> str:
-    client = boto3.client("s3")
+def put_object(s3_client, key: WorkerKey, body: bytes) -> str:
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
-    return client.put_object(Bucket=etl_bucket, Key=key, Body=body)
+    return s3_client.put_object(Bucket=etl_bucket, Key=key, Body=body)
 
 
 @pytest.mark.integration
@@ -141,7 +152,7 @@ def put_object(key: WorkerKey, body: bytes) -> str:
     indirect=True,
 )
 def test_changelog_number_update(worker_data, state_machine_input: StateMachineInput):
-    changelog_number_from_s3 = get_changelog_number_from_s3()
+    changelog_number_from_s3 = get_changelog_number_from_s3(s3_client)
     assert changelog_number_from_s3 == state_machine_input.changelog_number_end
 
 
@@ -164,10 +175,10 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
     ],
     indirect=True,
 )
-def test_end_to_end(repository: MockDeviceRepository, worker_data, state_machine_input):
-    extract_data = get_object(key=WorkerKey.EXTRACT)
-    transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
-    load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+def test_end_to_end(repository: MockDeviceRepository, worker_data, s3_client):
+    extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
+    transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
+    load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
 
     assert len(extract_data) == 0
     assert len(transform_data) == 0
@@ -179,8 +190,7 @@ def test_end_to_end(repository: MockDeviceRepository, worker_data, state_machine
 
 @long_running
 @pytest.mark.integration
-def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
-    s3_client = boto3.client("s3")
+def test_end_to_end_bulk_trigger(repository: MockDeviceRepository, s3_client):
     bucket = read_terraform_output("sds_etl.value.bucket")
     test_data_bucket = read_terraform_output("test_data_bucket.value")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
@@ -208,14 +218,14 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
         },
     )
 
-    extract_data = get_object(key=WorkerKey.EXTRACT)
-    transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
-    load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+    extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
+    transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
+    load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
     while len(extract_data) + len(transform_data) + len(load_data) > 0:
         time.sleep(15)
-        extract_data = get_object(key=WorkerKey.EXTRACT)
-        transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
-        load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+        extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
+        transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
+        load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
 
     product_count = repository.count(by=DeviceType.PRODUCT)
     endpoint_count = repository.count(by=DeviceType.ENDPOINT)
@@ -249,12 +259,12 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository):
     indirect=True,
 )
 def test_end_to_end_changelog_delete(
-    repository: MockDeviceRepository, worker_data, state_machine_input
+    repository: MockDeviceRepository, worker_data, step_functions_client, s3_client
 ):
     """Note that the start of this test is the same as test_end_to_end, and then makes changes"""
-    extract_data = get_object(key=WorkerKey.EXTRACT)
-    transform_data = pkl_loads_lz4(get_object(key=WorkerKey.TRANSFORM))
-    load_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
+    extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
+    transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
+    load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
 
     assert len(extract_data) == 0
     assert len(transform_data) == 0
@@ -264,11 +274,12 @@ def test_end_to_end_changelog_delete(
     )
 
     # Now execute a changelog initial state in the ETL
-    put_object(key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000428682512)
+    put_object(s3_client, key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000428682512)
     response = execute_state_machine(
         state_machine_input=StateMachineInput.update(
             changelog_number_start=124, changelog_number_end=125
-        )
+        ),
+        client=step_functions_client,
     )
     assert response["status"] == "SUCCEEDED"
 
@@ -289,11 +300,12 @@ def test_end_to_end_changelog_delete(
     assert device.status == DeviceStatus.ACTIVE
 
     # Execute another changelog initial state in the ETL
-    put_object(key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000842065542)
+    put_object(s3_client, key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000842065542)
     response = execute_state_machine(
         state_machine_input=StateMachineInput.update(
             changelog_number_start=124, changelog_number_end=125
-        )
+        ),
+        client=step_functions_client,
     )
     assert response["status"] == "SUCCEEDED"
 
