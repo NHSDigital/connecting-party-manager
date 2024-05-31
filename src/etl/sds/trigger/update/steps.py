@@ -1,4 +1,3 @@
-import base64
 from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
@@ -55,11 +54,7 @@ def _prepare_ldap_client(data, cache: Cache):
         cert_file=str(cache["cert_file"]),
         key_file=str(cache["key_file"]),
         ldap_changelog_user=cache["ldap_changelog_user"],
-        ldap_changelog_password=str(
-            base64.b64decode(cache["ldap_changelog_password"].encode("utf-8")).decode(
-                "utf-8"
-            )
-        ),
+        ldap_changelog_password=cache["ldap_changelog_password"],
     )
 
 
