@@ -185,6 +185,8 @@ def test_end_to_end(
     state_machine_input,
     step_functions_client,
 ):
+    execute_state_machine(state_machine_input, client=step_functions_client)
+
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
     load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
@@ -277,6 +279,8 @@ def test_end_to_end_changelog_delete(
     state_machine_input,
 ):
     """Note that the start of this test is the same as test_end_to_end, and then makes changes"""
+    execute_state_machine(state_machine_input, client=step_functions_client)
+
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
     load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
