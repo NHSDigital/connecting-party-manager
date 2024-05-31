@@ -51,22 +51,35 @@ function _update_policy() {
     done
   else
     for role in "${role_names[@]}"; do
-      attached_policies=$(aws iam list-attached-role-policies --role-name "${role}" --region "${AWS_REGION_NAME}")
-      if [[ ! $attached_policies == *"\"PolicyName\": \"${policy_name}\""* ]]; then
-        if [ "${role}" == "NHSDevelopmentRole" ]; then
-          if ! _validate_current_account "PROD"; then
+      if ! _validate_current_account "PROD"; then
+        attached_policies=$(aws iam list-attached-role-policies --role-name "${role}" --region "${AWS_REGION_NAME}")
+        if [[ ! $attached_policies == *"\"PolicyName\": \"${policy_name}\""* ]]; then
+          if [ "${role}" == "NHSDevelopmentRole" ]; then
+            if ! _validate_current_account "PROD"; then
+              aws iam attach-role-policy \
+                --role-name "${role}" \
+                --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
+                --region "${AWS_REGION_NAME}" \
+                || exit 1
+            fi
+          else
             aws iam attach-role-policy \
               --role-name "${role}" \
               --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
               --region "${AWS_REGION_NAME}" \
               || exit 1
           fi
-        else
-          aws iam attach-role-policy \
-            --role-name "${role}" \
-            --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
-            --region "${AWS_REGION_NAME}" \
-            || exit 1
+        fi
+      else
+        if [ "${role}" == "NHSSmokeTestRole" ]; then
+          attached_policies=$(aws iam list-attached-role-policies --role-name "${role}" --region "${AWS_REGION_NAME}")
+          if [[ ! $attached_policies == *"\"PolicyName\": \"${policy_name}\""* ]]; then
+            aws iam attach-role-policy \
+              --role-name "${role}" \
+              --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
+              --region "${AWS_REGION_NAME}" \
+              || exit 1
+          fi
         fi
       fi
     done
@@ -107,3 +120,8 @@ _update_policy "NHSSupportPolicy" "support" "NHSDevelopmentRole"
 # Create the NHSIntegrationPolicy that will be used for CI Test access
 #
 _update_policy "NHSIntegrationPolicy" "integration-test" "NHSTestCIRole"
+
+#
+# Create the NHSSmokePolicy that will be used for Smoke Test access
+#
+_update_policy "NHSSmokePolicy" "smoke-test" "NHSSmokeTestRole"

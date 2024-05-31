@@ -153,10 +153,13 @@ We have several roles that we currently handle outside of terraform as its neede
 - NHSDeploymentRole
 - NHSDevelopmentRole
 - NHSTestCIRole
+- NHSSmokeTestRole
 
 To update any of the roles used for SSO then you need to do the following command which should prompt you to log in via SSO:
 
 `make manage--non-mgmt-policies MGMT_ACCOUNT_ID=<ID> SSO_PROFILE="dev-admin"`
+&
+`make manage--non-mgmt-test-policies MGMT_ACCOUNT_ID=<ID> SSO_PROFILE="dev-admin"`
 
 Where:
 
