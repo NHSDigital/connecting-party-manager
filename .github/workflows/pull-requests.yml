@@ -26,6 +26,16 @@ jobs:
         with:
           command: workflow--check--branch-name
 
+  workflow--check--rebased-on-main:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/make/
+        with:
+          command: workflow--check--rebased-on-main
+
   parse-secrets:
     runs-on: [self-hosted, ci]
     needs: [workflow--check--branch-name]
