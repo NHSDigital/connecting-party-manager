@@ -175,7 +175,9 @@ def test_changelog_number_update(worker_data, state_machine_input: StateMachineI
     ],
     indirect=True,
 )
-def test_end_to_end(repository: MockDeviceRepository, worker_data, s3_client):
+def test_end_to_end(
+    repository: MockDeviceRepository, worker_data, s3_client, state_machine_input
+):
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
     load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
@@ -259,7 +261,11 @@ def test_end_to_end_bulk_trigger(repository: MockDeviceRepository, s3_client):
     indirect=True,
 )
 def test_end_to_end_changelog_delete(
-    repository: MockDeviceRepository, worker_data, step_functions_client, s3_client
+    repository: MockDeviceRepository,
+    worker_data,
+    step_functions_client,
+    s3_client,
+    state_machine_input,
 ):
     """Note that the start of this test is the same as test_end_to_end, and then makes changes"""
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
