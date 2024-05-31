@@ -57,7 +57,9 @@ def s3_client():
 
 @pytest.fixture
 def state_machine_input(request: pytest.FixtureRequest):
-    execute_state_machine(state_machine_input=request.param)
+    execute_state_machine(
+        state_machine_input=request.param, client=step_functions_client()
+    )
     return request.param
 
 
