@@ -1,4 +1,3 @@
-import base64
 from pathlib import Path
 
 import boto3
@@ -6,6 +5,8 @@ from etl_utils.trigger.logger import log_action
 from etl_utils.trigger.model import StateMachineInputType
 from etl_utils.trigger.notify import notify
 from event.environment import BaseEnvironment
+from event.logging.constants import LDAP_REDACTED_FIELDS
+from event.logging.logger import setup_logger
 from event.step_chain import StepChain
 
 from .steps import steps
@@ -38,11 +39,7 @@ CACHE = {
     "etl_bucket": ENVIRONMENT.ETL_BUCKET,
     "ldap_host": ENVIRONMENT.LDAP_HOST,
     "ldap_changelog_user": ENVIRONMENT.LDAP_CHANGELOG_USER,
-    "ldap_changelog_password": str(
-        base64.b64encode(ENVIRONMENT.LDAP_CHANGELOG_PASSWORD.encode("utf-8")).decode(
-            "utf-8"
-        )
-    ),
+    "ldap_changelog_password": ENVIRONMENT.LDAP_CHANGELOG_PASSWORD,
 }
 
 
@@ -51,6 +48,8 @@ def handler(event={}, context=None):
         import ldap
 
         CACHE["ldap"] = ldap
+
+    setup_logger(service_name=__file__, redacted_fields=LDAP_REDACTED_FIELDS)
 
     step_chain = StepChain(step_chain=steps, step_decorators=[log_action])
     step_chain.run(cache=CACHE)

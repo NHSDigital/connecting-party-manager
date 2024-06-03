@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-05-31
+- [PI-342] Add redacted-fields to context loggers
+- [PI-376] Check releases fully rebased on main
+
 ## 2024-05-29
 - [PI-344] Added smoke test role
 

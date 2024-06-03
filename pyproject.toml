@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.05.29"
+version = "2024.05.31"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -41,7 +41,7 @@ parse = "^1.19.1"
 pytest-mock = "^3.12.0"
 datamodel-code-generator = "^0.25.1"
 pyyaml = "^6.0.1"
-proxygen-cli = "^2.1.5"
+proxygen-cli = "^2.1.14"
 moto = "^5.0.1"
 boto3-stubs = { extras = [
     "dynamodb",
