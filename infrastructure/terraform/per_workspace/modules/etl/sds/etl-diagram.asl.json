@@ -13,7 +13,7 @@
               "Type": "Choice",
               "Choices": [
                 {
-                  "Variable": "$.changelog-number",
+                  "Variable": "$.changelog_number_end",
                   "IsPresent": true,
                   "Next": "write-changelog-number"
                 }
@@ -24,7 +24,7 @@
               "Type": "Task",
               "End": true,
               "Parameters": {
-                "Body.$": "$.changelog-number",
+                "Body.$": "$.changelog_number_end",
                 "Bucket": "${etl_bucket}",
                 "Key": "${changelog_key}"
               },
@@ -37,25 +37,29 @@
           }
         },
         {
-          "StartAt": "parse-init",
+          "StartAt": "parse-etl-type",
           "States": {
-            "parse-init": {
+            "parse-etl-type": {
               "Type": "Choice",
               "Choices": [
                 {
-                  "Variable": "$.init",
-                  "StringEquals": "extract",
-                  "Next": "extract"
+                  "Variable": "$.etl_type",
+                  "StringEquals": "bulk",
+                  "Next": "extract-bulk"
+                },
+                {
+                  "Variable": "$.etl_type",
+                  "StringEquals": "update",
+                  "Next": "extract-update"
                 }
-              ],
-              "Default": "invalid-init-value"
+              ]
             },
-            "extract": {
+            "extract-bulk": {
               "Type": "Task",
               "Resource": "arn:aws:states:::lambda:invoke",
               "OutputPath": "$.Payload",
               "Parameters": {
-                "Payload.$": "$",
+                "Payload": {},
                 "FunctionName": "${extract_worker_arn}:$LATEST"
               },
               "Retry": [
@@ -71,25 +75,27 @@
                   "BackoffRate": 2
                 }
               ],
-              "Next": "extract-result"
+              "Next": "extract-bulk-result"
             },
-            "extract-result": {
+            "extract-bulk-result": {
               "Type": "Choice",
               "Choices": [
                 {
                   "Variable": "$.error_message",
                   "IsNull": true,
-                  "Next": "transform"
+                  "Next": "transform-bulk"
                 }
               ],
-              "Default": "worker-failed"
+              "Default": "etl-stopped"
             },
-            "transform": {
+            "transform-bulk": {
               "Type": "Task",
               "Resource": "arn:aws:states:::lambda:invoke",
               "OutputPath": "$.Payload",
               "Parameters": {
-                "Payload.$": "$",
+                "Payload": {
+                  "trust": true
+                },
                 "FunctionName": "${transform_worker_arn}:$LATEST"
               },
               "Retry": [
@@ -105,25 +111,27 @@
                   "BackoffRate": 2
                 }
               ],
-              "Next": "transform-result"
+              "Next": "transform-bulk-result"
             },
-            "transform-result": {
+            "transform-bulk-result": {
               "Type": "Choice",
               "Choices": [
                 {
                   "Variable": "$.error_message",
                   "IsNull": true,
-                  "Next": "load"
+                  "Next": "load-bulk"
                 }
               ],
-              "Default": "worker-failed"
+              "Default": "etl-stopped"
             },
-            "load": {
+            "load-bulk": {
               "Type": "Task",
               "Resource": "arn:aws:states:::lambda:invoke",
               "OutputPath": "$.Payload",
               "Parameters": {
-                "Payload.$": "$",
+                "Payload": {
+                  "max_records": "${bulk_load_chunksize}"
+                },
                 "FunctionName": "${load_worker_arn}:$LATEST"
               },
               "Retry": [
@@ -139,18 +147,11 @@
                   "BackoffRate": 2
                 }
               ],
-              "Next": "load-result"
+              "Next": "load-bulk-result"
             },
-            "load-result": {
+            "load-bulk-result": {
               "Type": "Choice",
               "Choices": [
-                {
-                  "Not": {
-                    "Variable": "$.error_message",
-                    "IsNull": true
-                  },
-                  "Next": "worker-failed"
-                },
                 {
                   "And": [
                     {
@@ -164,23 +165,90 @@
                       }
                     }
                   ],
-                  "Next": "load"
+                  "Next": "load-bulk"
                 }
               ],
-              "Default": "load-successful"
+              "Default": "etl-stopped"
             },
-            "load-successful": {
+            "extract-update": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload": {},
+                "FunctionName": "${extract_worker_arn}:$LATEST"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 1,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "Next": "extract-update-result"
+            },
+            "extract-update-result": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.error_message",
+                  "IsNull": true,
+                  "Next": "etl-update"
+                }
+              ],
+              "Default": "etl-stopped"
+            },
+            "etl-update": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::states:startExecution.sync:2",
+              "Parameters": {
+                "StateMachineArn": "${etl_update_state_machine_arn}",
+                "Input": {
+                  "StatePayload": {},
+                  "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
+                }
+              },
+              "OutputPath": "$.Output",
+              "Next": "etl-update-result"
+            },
+            "etl-update-result": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Or": [
+                    {
+                      "Not": {
+                        "Variable": "$.error_message",
+                        "IsNull": true
+                      }
+                    },
+                    {
+                      "And": [
+                        {
+                          "Variable": "$.processed_records",
+                          "NumericEquals": 0
+                        },
+                        {
+                          "Variable": "$.unprocessed_records",
+                          "NumericEquals": 0
+                        }
+                      ]
+                    }
+                  ],
+                  "Next": "etl-stopped"
+                }
+              ],
+              "Default": "etl-update"
+            },
+            "etl-stopped": {
               "Type": "Pass",
               "End": true
-            },
-            "worker-failed": {
-              "Type": "Pass",
-              "End": true
-            },
-            "invalid-init-value": {
-              "Type": "Fail",
-              "Error": "InvalidInitValue",
-              "Cause": "Invalid Value of Init"
             }
           }
         }

@@ -195,9 +195,83 @@ resource "aws_cloudwatch_log_group" "step_function" {
   name = "/aws/vendedlogs/states/${var.workspace_prefix}--${local.etl_name}"
 }
 
+module "update_transform_and_load_step_function" {
+  source  = "terraform-aws-modules/step-functions/aws"
+  version = "4.2.0"
+
+  type                              = "STANDARD"
+  name                              = "${var.workspace_prefix}--${local.etl_name}--update-transform-and-load"
+  use_existing_cloudwatch_log_group = true
+  cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
+
+  definition = templatefile(
+    "${path.module}/etl-diagram--update-transform-and-load.asl.json",
+    {
+      transform_worker_arn = module.worker_transform.arn
+      load_worker_arn      = module.worker_load.arn
+      etl_bucket           = module.bucket.s3_bucket_id
+    }
+  )
+
+  service_integrations = {
+    lambda = {
+      lambda = [
+        module.worker_transform.arn,
+        module.worker_load.arn,
+      ]
+    }
+  }
+
+  attach_policy_json = true
+  policy_json        = <<-EOT
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+            "Action": "lambda:InvokeFunction",
+            "Effect": "Allow",
+            "Resource": [
+              "${module.worker_transform.arn}:*",
+              "${module.worker_load.arn}:*"
+            ]
+          },
+          {
+            "Action": [
+                "s3:PutObject",
+                "s3:AbortMultipartUpload",
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:PutObjectVersionTagging"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              "${module.bucket.s3_bucket_arn}",
+              "${module.bucket.s3_bucket_arn}/*"
+            ]
+          }
+      ]
+    }
+  EOT
+
+  logging_configuration = {
+    log_destination        = "${aws_cloudwatch_log_group.step_function.arn}:*"
+    include_execution_data = true
+    level                  = "ALL"
+  }
+
+  tags = {
+    Name = "${var.workspace_prefix}--${local.etl_name}--update-transform-and-load"
+  }
+
+  depends_on = [aws_cloudwatch_log_group.step_function]
+}
+
+
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
-  version = "4.1.0"
+  version = "4.2.0"
 
   type                              = "STANDARD"
   name                              = "${var.workspace_prefix}--${local.etl_name}"
@@ -205,14 +279,16 @@ module "step_function" {
   cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
 
   definition = templatefile(
-    "${path.module}/step-function.asl.json",
+    "${path.module}/etl-diagram.asl.json",
     {
-      extract_worker_arn   = module.worker_extract.arn
-      transform_worker_arn = module.worker_transform.arn
-      load_worker_arn      = module.worker_load.arn
-      notify_arn           = module.notify.arn
-      etl_bucket           = module.bucket.s3_bucket_id
-      changelog_key        = var.changelog_key
+      extract_worker_arn           = module.worker_extract.arn
+      transform_worker_arn         = module.worker_transform.arn
+      load_worker_arn              = module.worker_load.arn
+      notify_arn                   = module.notify.arn
+      etl_bucket                   = module.bucket.s3_bucket_id
+      changelog_key                = var.changelog_key
+      bulk_load_chunksize          = var.bulk_load_chunksize
+      etl_update_state_machine_arn = module.update_transform_and_load_step_function.state_machine_arn
     }
   )
 
@@ -224,6 +300,16 @@ module "step_function" {
         module.worker_load.arn,
         module.notify.arn
       ]
+    }
+
+    stepfunction_Sync = {
+      stepfunction          = [module.update_transform_and_load_step_function.state_machine_arn]
+      stepfunction_Wildcard = ["${replace(module.update_transform_and_load_step_function.state_machine_arn, "stateMachine", "execution")}:*"]
+      events                = true
+    }
+
+    stepfunction = {
+      stepfunction = [module.update_transform_and_load_step_function.state_machine_arn]
     }
   }
 
@@ -241,6 +327,13 @@ module "step_function" {
               "${module.worker_load.arn}:*",
               "${module.notify.arn}:*"
             ]
+          },
+          {
+            "Action" : [
+              "states:StartExecution"
+            ],
+            "Effect" : "Allow",
+            "Resource" : ["${module.update_transform_and_load_step_function.state_machine_arn}"]
           },
           {
             "Action": [
@@ -272,7 +365,7 @@ module "step_function" {
     Name = "${var.workspace_prefix}--${local.etl_name}"
   }
 
-  depends_on = [aws_cloudwatch_log_group.step_function]
+  depends_on = [aws_cloudwatch_log_group.step_function, module.update_transform_and_load_step_function]
 }
 
 
@@ -397,10 +490,11 @@ module "trigger_update" {
 }
 
 module "schedule_trigger_update" {
-  source              = "./schedule/"
-  lambda_arn          = module.trigger_update.lambda_function.lambda_function_arn
-  lambda_name         = module.trigger_update.lambda_function.lambda_function_name
-  schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
+  source      = "./schedule/"
+  lambda_arn  = module.trigger_update.lambda_function.lambda_function_arn
+  lambda_name = module.trigger_update.lambda_function.lambda_function_name
+  # schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
+  schedule_expression = var.is_persistent ? "cron(0 0 1 1 ? 2000)" : "rate(1 day)" # cron(0 0 1 1 ? 2000) means "never"
 }
 
 module "bulk_trigger_notification" {

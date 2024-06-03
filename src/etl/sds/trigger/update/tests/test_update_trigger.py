@@ -4,7 +4,7 @@ from unittest import mock
 
 import boto3
 import pytest
-from etl_utils.constants import CHANGELOG_NUMBER
+from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from moto import mock_aws
 
 from etl.sds.trigger.update.steps import _start_execution
@@ -165,14 +165,14 @@ def test_update(change_result):
         # Verify the history file was created
         etl_history_response = s3_client.get_object(
             Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key=f"history/changelog/{int(LATEST_CHANGELOG_NUMBER)}/input--extract/unprocessed",
+            Key=f"history/update/{int(LATEST_CHANGELOG_NUMBER)}/{WorkerKey.EXTRACT}",
         )
         assert etl_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
 
         # Verify the ETL input file was created
         etl_input_response = s3_client.get_object(
             Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key="input--extract/unprocessed",
+            Key=WorkerKey.EXTRACT,
         )
         assert etl_input_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
 

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Generator
 
 import pytest
@@ -22,8 +23,16 @@ def get_first_key(device: dict[str, dict[str, str]]):
 
 
 def sort_devices(devices: list[dict]):
+    devices_without_dates = []
+    for device in devices:
+        _device = deepcopy(device)
+        _device.pop("created_on", None)
+        _device.pop("deleted_on", None)
+        _device.pop("updated_on", None)
+        devices_without_dates.append(_device)
+
     sorted_devices = sorted(
-        devices,
+        devices_without_dates,
         key=lambda device: (
             device.get("name"),
             device.get("ods_code"),
@@ -77,7 +86,9 @@ def test_extract(scenario: Scenario, extract_handler: Handler, s3_client: S3Clie
 def run_transform_and_load(transform_handler: Handler, load_handler: Handler):
     unprocessed_transform_records = None
     while unprocessed_transform_records is None or unprocessed_transform_records > 0:
-        transform_response = transform_handler(event={"max_records": 1}, context=None)
+        transform_response = transform_handler(
+            event={"max_records": 1, "trust": False}, context=None
+        )
         error_message = transform_response.get("error_message")
         if error_message:
             raise EtlError(error_message)
@@ -102,6 +113,8 @@ def test_transform_and_load(
             transform_handler=transform_handler, load_handler=load_handler
         )
     except EtlError as error:
+        if not scenario.expected_errors:
+            raise
         (expected_error_snippet,) = scenario.expected_errors
         try:
             assert expected_error_snippet in str(error)

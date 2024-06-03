@@ -39,7 +39,11 @@ REPOSITORY = DeviceRepository(
 
 
 def transform(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
+    s3_client: "S3Client",
+    s3_input_path: str,
+    s3_output_path: str,
+    max_records: int,
+    trust: bool,
 ) -> WorkerActionResponse:
     with smart_open(s3_path=s3_input_path, s3_client=s3_client) as f:
         unprocessed_records: deque[dict] = pkl_load_lz4(f)
@@ -66,13 +70,13 @@ def transform(
             _spine_device_questionnaire=_spine_device_questionnaire,
             spine_endpoint_questionnaire=spine_endpoint_questionnaire,
             _spine_endpoint_questionnaire=_spine_endpoint_questionnaire,
-            _trust=True,
+            _trust=trust,
             repository=REPOSITORY,
         ),
         max_records=max_records,
     )
 
-    if exception is None:
+    if trust and exception is None:
         reject_duplicate_keys(exported_events=processed_records)
 
     return WorkerActionResponse(
@@ -85,7 +89,7 @@ def transform(
 
 
 def handler(event: dict, context):
-    max_records = WorkerEvent(**event).max_records
+    _event = WorkerEvent(**event)
     response = execute_step_chain(
         action=transform,
         s3_client=S3_CLIENT,
@@ -93,6 +97,7 @@ def handler(event: dict, context):
         s3_output_path=ENVIRONMENT.s3_path(WorkerKey.LOAD),
         unprocessed_dumper=pkl_dump_lz4,
         processed_dumper=pkl_dump_lz4,
-        max_records=max_records,
+        max_records=_event.max_records,
+        trust=_event.trust,
     )
     return asdict(response)

@@ -2,7 +2,7 @@ from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
-from etl_utils.constants import LDIF_RECORD_DELIMITER
+from etl_utils.constants import LDIF_RECORD_DELIMITER, WorkerKey
 from etl_utils.ldap_typing import LdapModuleProtocol
 from etl_utils.trigger.model import StateMachineInput
 from etl_utils.trigger.operations import start_execution, validate_state_keys_are_empty
@@ -115,10 +115,9 @@ def _parse_and_join_changelog_changes(data, cache):
 
 def _put_to_state_machine(data, cache: Cache):
     changes = data[_parse_and_join_changelog_changes]
-    state_machine_input: StateMachineInput = data[_create_state_machine_input]
 
     return cache["s3_client"].put_object(
-        Bucket=cache["etl_bucket"], Key=state_machine_input.init, Body=changes
+        Bucket=cache["etl_bucket"], Key=WorkerKey.EXTRACT, Body=changes
     )
 
 
@@ -134,10 +133,11 @@ def _start_execution(data, cache):
 def _put_to_history(data, cache: Cache):
     latest_changelog_number = data[_get_latest_changelog_number_from_ldap]
     changes = data[_parse_and_join_changelog_changes]
-    state_machine_input = data[_create_state_machine_input]
+    state_machine_input: StateMachineInput = data[_create_state_machine_input]
+
     return cache["s3_client"].put_object(
         Bucket=cache["etl_bucket"],
-        Key=f"history/changelog/{latest_changelog_number}/{state_machine_input.init}",
+        Key=f"history/{state_machine_input.etl_type}/{latest_changelog_number}/{WorkerKey.EXTRACT}",
         Body=changes,
     )
 

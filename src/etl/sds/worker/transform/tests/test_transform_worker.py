@@ -236,7 +236,8 @@ def test_transform_worker_pass_duplicate_fail(
     put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
 
     # Execute the transform worker
-    response = transform.handler(event={}, context=None)
+    response = transform.handler(event={"trust": True}, context=None)
+
     response["error_message"] = re.sub(
         r"'RVL:000428682512'\n(.+)\n",
         r"'RVL:000428682512'\nREDACTED\n",

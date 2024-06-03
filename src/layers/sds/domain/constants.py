@@ -1,5 +1,8 @@
 from enum import StrEnum, auto
 
+REPLACE_UNIQUE_IDENTIFIER = "replace: uniqueidentifier\nuniqueidentifier:"
+
+
 FILTER_TERMS = [
     ("objectClass", "nhsMHS"),
     ("objectClass", "nhsAS"),
