@@ -20,6 +20,10 @@ inputs:
     description: "[Optional] save to cache?"
     required: false
     default: "false"
+  restore-third-party-cache:
+    description: "[Optional] restore third party cache"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -28,11 +32,12 @@ runs:
       shell: bash
 
     - name: Restore from the cache
-      if: ${{ inputs.restore-from-cache == 'true' }}
+      if: ${{ inputs.restore-from-cache == 'true' || inputs.restore-third-party-cache == 'true' }}
       uses: ./.github/actions/components/caching/
       with:
         save-or-restore: "restore"
         cache-suffix: ${{ inputs.cache-suffix }}
+        restore-third-party-cache: ${{ inputs.restore-third-party-cache }}
 
     - name: Configure AWS Credentials
       id: configure-aws-credentials
