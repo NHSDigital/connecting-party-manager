@@ -290,7 +290,7 @@ make etl--clear-state WORKSPACE=dev
 and
 
 ```
-make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210
+make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210 egg
 ```
 
 ### Documentation
