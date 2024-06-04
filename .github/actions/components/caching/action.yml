@@ -21,6 +21,7 @@ inputs:
       .tool-versions
       poetry.lock
       src
+      !src/layers/third_party
       infrastructure
       !**/.terraform/modules/**/*
   third-party-cache-paths:
@@ -28,6 +29,7 @@ inputs:
     required: false
     default: |
       .venv
+      src/layers/third_party
       pyproject.toml
   restore-third-party-cache:
     description: Separate cache for common library builds
