@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-06-04
+- [PI-322] State machine lambda error messages truncated
+- [PI-346] Update now includes modify changes, plus testing suite
+- [PI-347] Updates implemented sequentially
+
 ## 2024-05-31
 - [PI-342] Add redacted-fields to context loggers
 - [PI-376] Check releases fully rebased on main
