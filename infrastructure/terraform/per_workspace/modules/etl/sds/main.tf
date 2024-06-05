@@ -218,23 +218,19 @@ module "update_transform_and_load_step_function" {
       lambda = [
         module.worker_transform.arn,
         module.worker_load.arn,
+        "${module.worker_transform.arn}:*",
+        "${module.worker_load.arn}:*"
       ]
     }
   }
+
+
 
   attach_policy_json = true
   policy_json        = <<-EOT
     {
       "Version": "2012-10-17",
       "Statement": [
-          {
-            "Action": "lambda:InvokeFunction",
-            "Effect": "Allow",
-            "Resource": [
-              "${module.worker_transform.arn}:*",
-              "${module.worker_load.arn}:*"
-            ]
-          },
           {
             "Action": [
                 "s3:PutObject",
@@ -254,6 +250,8 @@ module "update_transform_and_load_step_function" {
       ]
     }
   EOT
+
+
 
   logging_configuration = {
     log_destination        = "${aws_cloudwatch_log_group.step_function.arn}:*"
@@ -268,16 +266,10 @@ module "update_transform_and_load_step_function" {
   depends_on = [aws_cloudwatch_log_group.step_function]
 }
 
-
-module "step_function" {
-  source  = "terraform-aws-modules/step-functions/aws"
-  version = "4.2.0"
-
-  type                              = "STANDARD"
-  name                              = "${var.workspace_prefix}--${local.etl_name}"
-  use_existing_cloudwatch_log_group = true
-  cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
-
+resource "aws_sfn_state_machine" "state_machine" {
+  name     = "${var.workspace_prefix}--${local.etl_name}"
+  type     = "STANDARD"
+  role_arn = aws_iam_role.step_function.arn
   definition = templatefile(
     "${path.module}/etl-diagram.asl.json",
     {
@@ -291,81 +283,17 @@ module "step_function" {
       etl_update_state_machine_arn = module.update_transform_and_load_step_function.state_machine_arn
     }
   )
-
-  service_integrations = {
-    lambda = {
-      lambda = [
-        module.worker_extract.arn,
-        module.worker_transform.arn,
-        module.worker_load.arn,
-        module.notify.arn
-      ]
-    }
-
-    stepfunction_Sync = {
-      stepfunction          = [module.update_transform_and_load_step_function.state_machine_arn]
-      stepfunction_Wildcard = ["${replace(module.update_transform_and_load_step_function.state_machine_arn, "stateMachine", "execution")}:*"]
-      events                = true
-    }
-
-    stepfunction = {
-      stepfunction = [module.update_transform_and_load_step_function.state_machine_arn]
-    }
-  }
-
-  attach_policy_json = true
-  policy_json        = <<-EOT
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-            "Action": "lambda:InvokeFunction",
-            "Effect": "Allow",
-            "Resource": [
-              "${module.worker_extract.arn}:*",
-              "${module.worker_transform.arn}:*",
-              "${module.worker_load.arn}:*",
-              "${module.notify.arn}:*"
-            ]
-          },
-          {
-            "Action" : [
-              "states:StartExecution"
-            ],
-            "Effect" : "Allow",
-            "Resource" : ["${module.update_transform_and_load_step_function.state_machine_arn}"]
-          },
-          {
-            "Action": [
-                "s3:PutObject",
-                "s3:AbortMultipartUpload",
-                "s3:GetBucketLocation",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-                "s3:PutObjectVersionTagging"
-            ],
-            "Effect": "Allow",
-            "Resource": [
-              "${module.bucket.s3_bucket_arn}",
-              "${module.bucket.s3_bucket_arn}/*"
-            ]
-          }
-      ]
-    }
-  EOT
-
-  logging_configuration = {
+  logging_configuration {
     log_destination        = "${aws_cloudwatch_log_group.step_function.arn}:*"
     include_execution_data = true
     level                  = "ALL"
   }
 
+
   tags = {
     Name = "${var.workspace_prefix}--${local.etl_name}"
   }
-
-  depends_on = [aws_cloudwatch_log_group.step_function, module.update_transform_and_load_step_function]
+  depends_on = [aws_cloudwatch_log_group.step_function, module.update_transform_and_load_step_function, aws_iam_role.step_function]
 }
 
 
@@ -382,7 +310,7 @@ module "trigger_bulk" {
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn
-  state_machine_arn     = module.step_function.state_machine_arn
+  state_machine_arn     = aws_sfn_state_machine.state_machine.arn
   table_arn             = var.table_arn
   environment_variables = {
     TABLE_NAME = var.table_name
@@ -432,7 +360,7 @@ module "trigger_update" {
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn
-  state_machine_arn     = module.step_function.state_machine_arn
+  state_machine_arn     = aws_sfn_state_machine.state_machine.arn
   table_arn             = var.table_arn
   allowed_triggers      = {}
   environment_variables = {
