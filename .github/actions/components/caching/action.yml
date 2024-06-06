@@ -16,12 +16,12 @@ inputs:
         * Makefile "prerequisites" (e.g. pyproject.toml)
     required: false
     default: |
+      .venv
       .timestamp
       .downloads
       .tool-versions
       poetry.lock
       src
-      !src/layers/third_party
       infrastructure
       !**/.terraform/modules/**/*
   third-party-cache-paths:
