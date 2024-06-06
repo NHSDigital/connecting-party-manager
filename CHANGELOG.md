@@ -4,6 +4,7 @@
 - [PI-322] State machine lambda error messages truncated
 - [PI-346] Update now includes modify changes, plus testing suite
 - [PI-347] Updates implemented sequentially
+- [PI-358] Disable SDS ETL update timer on persistent environments
 
 ## 2024-05-31
 - [PI-342] Add redacted-fields to context loggers
