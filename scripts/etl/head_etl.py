@@ -70,7 +70,7 @@ def main(workspace):
             fp=f,
             obj={
                 "changelog_number": changelog_number,
-                "extract": extract_head,
+                "extract": extract_head.decode(),
                 "transform": transform_head,
                 "load": load_head,
             },
