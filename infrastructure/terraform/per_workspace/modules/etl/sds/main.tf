@@ -1,8 +1,10 @@
 module "bucket" {
-  source        = "terraform-aws-modules/s3-bucket/aws"
-  version       = "3.15.2"
-  bucket        = "${lower(var.workspace_prefix)}--${local.etl_name}--etl"
-  force_destroy = true
+  source                                = "terraform-aws-modules/s3-bucket/aws"
+  version                               = "3.15.2"
+  bucket                                = "${lower(var.workspace_prefix)}--${local.etl_name}--etl"
+  attach_deny_insecure_transport_policy = true
+  attach_access_log_delivery_policy     = true
+  force_destroy                         = true
   versioning = {
     enabled = true
   }
