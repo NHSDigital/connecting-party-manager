@@ -32,11 +32,27 @@ module "iam__api-gateway-to-cloudwatch" {
   project = local.project
 }
 
+module "bucket_access_logs" {
+  source                                = "terraform-aws-modules/s3-bucket/aws"
+  version                               = "3.15.2"
+  bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--s3-access-logs"
+  attach_deny_insecure_transport_policy = true
+  attach_access_log_delivery_policy     = true
+  force_destroy                         = true
+  versioning = {
+    enabled = true
+  }
+  tags = {
+    Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--s3-access-logs"
+  }
+}
+
 module "bucket" {
-  source        = "terraform-aws-modules/s3-bucket/aws"
-  version       = "3.15.2"
-  bucket        = "${local.project}--${replace(terraform.workspace, "_", "-")}--test-data"
-  force_destroy = true
+  source                                = "terraform-aws-modules/s3-bucket/aws"
+  version                               = "3.15.2"
+  bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--test-data"
+  attach_deny_insecure_transport_policy = true
+  force_destroy                         = true
   versioning = {
     enabled = true
   }
@@ -46,10 +62,12 @@ module "bucket" {
 }
 
 module "truststore_bucket" {
-  source        = "terraform-aws-modules/s3-bucket/aws"
-  version       = "3.15.2"
-  bucket        = "${local.project}--${replace(terraform.workspace, "_", "-")}--truststore"
-  force_destroy = true
+  source                                = "terraform-aws-modules/s3-bucket/aws"
+  version                               = "3.15.2"
+  bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--truststore"
+  attach_deny_insecure_transport_policy = true
+  attach_access_log_delivery_policy     = true
+  force_destroy                         = true
   versioning = {
     enabled = true
   }
@@ -57,6 +75,14 @@ module "truststore_bucket" {
     Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--truststore"
   }
 }
+
+resource "aws_s3_bucket_logging" "truststore_to_access_logs" {
+  bucket = module.truststore_bucket.s3_bucket_id
+
+  target_bucket = module.bucket_access_logs.s3_bucket_id
+  target_prefix = "truststore/log/"
+}
+
 
 module "vpc" {
   source      = "../modules/vpc"

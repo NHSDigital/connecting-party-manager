@@ -184,3 +184,26 @@ resource "aws_vpc_endpoint_security_group_association" "notify_lambda" {
   vpc_endpoint_id   = aws_vpc_endpoint.notify_lambda.id
   security_group_id = aws_security_group.sds-ldap.id
 }
+
+resource "aws_vpc_endpoint" "sqs" {
+  vpc_id              = aws_vpc.lambda-connectivity.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.eu-west-2.sqs"
+  private_dns_enabled = true
+
+  tags = {
+    Name        = "${var.prefix}-sqs-vpc-endpoint-${var.environment}"
+    Environment = var.environment
+  }
+}
+
+resource "aws_vpc_endpoint_subnet_association" "sqs" {
+  count           = var.subnet_count.private
+  vpc_endpoint_id = aws_vpc_endpoint.sqs.id
+  subnet_id       = element(aws_subnet.lambda-connectivity-private, count.index).id
+}
+
+resource "aws_vpc_endpoint_security_group_association" "sqs" {
+  vpc_endpoint_id   = aws_vpc_endpoint.sqs.id
+  security_group_id = aws_security_group.sds-ldap.id
+}
