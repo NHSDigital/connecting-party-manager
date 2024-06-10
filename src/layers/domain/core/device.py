@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
@@ -66,6 +66,7 @@ class DeviceKeyAddedEvent(Event):
     id: str
     key: str
     type: DeviceKeyType
+    device: "Device"
     _trust: bool = field(alias="_trust", default=False)
 
 
@@ -166,6 +167,23 @@ class Device(AggregateRoot):
     )
     indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
 
+    def device_to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "type": self.type,
+            "status": self.status,
+            "product_team_id": str(self.product_team_id),
+            "ods_code": self.ods_code,
+            "created_on": self.created_on.isoformat(),
+            "updated_on": self.updated_on.isoformat() if self.updated_on else None,
+            "deleted_on": self.deleted_on.isoformat() if self.deleted_on else None,
+            "keys": self.keys if self.keys else None,
+            "questionnaire_responses": self.questionnaire_responses
+            if self.questionnaire_responses
+            else None,
+        }
+
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         if "updated_on" not in kwargs:
             kwargs["updated_on"] = datetime.utcnow()
@@ -186,7 +204,9 @@ class Device(AggregateRoot):
             raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
         device_key = DeviceKey(key=key, type=type)
         self.keys[key] = device_key
-        event = DeviceKeyAddedEvent(id=self.id, _trust=_trust, **device_key.dict())
+        event = DeviceKeyAddedEvent(
+            id=self.id, _trust=_trust, **device_key.dict(), device=self.device_to_dict()
+        )
         return self.add_event(event)
 
     def delete_key(self, key: str) -> DeviceKeyDeletedEvent:
