@@ -38,9 +38,13 @@ DUMMY_DISTINGUISHED_NAME = DistinguishedName(
 EXPECTED_EVENTS = [
     "device_created_event",
     "device_key_added_event",
+    "device_updated_event",
     "questionnaire_instance_event",
+    "device_updated_event",
     "questionnaire_response_added_event",
+    "device_updated_event",
     "device_index_added_event",
+    "device_updated_event",
 ]
 
 

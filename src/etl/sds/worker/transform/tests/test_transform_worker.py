@@ -108,8 +108,9 @@ def test_transform_worker_pass_dupe_check_mock(
         response = transform.handler(event={}, context=None)
     assert response == {
         "stage_name": "transform",
-        # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
-        "processed_records": n_initial_processed + 5 * n_initial_unprocessed,
+        # 9 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created,
+        # all of which are accompanied by a DeviceUpdatedEvent, plus one DeviceCreatedEvent
+        "processed_records": n_initial_processed + 9 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -122,7 +123,7 @@ def test_transform_worker_pass_dupe_check_mock(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + 5 * n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 9 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -147,8 +148,9 @@ def test_transform_worker_pass_no_dupes(
 
     assert response == {
         "stage_name": "transform",
-        # 2 x initial unprocessed because a key event is also created
-        "processed_records": n_initial_processed + 5 * n_initial_unprocessed,
+        # 9 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created,
+        # all of which are accompanied by a DeviceUpdatedEvent, plus one DeviceCreatedEvent
+        "processed_records": n_initial_processed + 9 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -161,7 +163,7 @@ def test_transform_worker_pass_no_dupes(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + 5 * n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 9 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -189,8 +191,9 @@ def test_transform_worker_pass_no_dupes_max_records(
         n_unprocessed_records_expected = (
             n_unprocessed_records - n_newly_processed_records_expected
         )
-        # 5 x initial unprocessed because 5 events are created for each input record
-        n_total_processed_records_expected += 5 * n_newly_processed_records_expected
+        # 9 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created,
+        # all of which are accompanied by a DeviceUpdatedEvent, plus one DeviceCreatedEvent
+        n_total_processed_records_expected += 9 * n_newly_processed_records_expected
 
         # Execute the transform worker
         with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
@@ -214,7 +217,7 @@ def test_transform_worker_pass_no_dupes_max_records(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + 5 * n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 9 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -301,8 +304,9 @@ def test_transform_worker_bad_record(
 
     assert response == {
         "stage_name": "transform",
-        # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
-        "processed_records": n_initial_processed + (5 * bad_record_index),
+        # 9 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created,
+        # all of which are accompanied by a DeviceUpdatedEvent, plus one DeviceCreatedEvent
+        "processed_records": n_initial_processed + (9 * bad_record_index),
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
         "error_message": [
             "The following errors were encountered",
@@ -323,8 +327,9 @@ def test_transform_worker_bad_record(
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
     assert n_final_unprocessed > 0
-    # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
-    assert n_final_processed == n_initial_processed + (5 * bad_record_index)
+    # 9 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created,
+    # all of which are accompanied by a DeviceUpdatedEvent, plus one DeviceCreatedEvent
+    assert n_final_processed == n_initial_processed + (9 * bad_record_index)
     assert n_final_unprocessed == n_initial_unprocessed - bad_record_index
 
 

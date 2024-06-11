@@ -26,6 +26,22 @@ def batched(iterable: T, n: int) -> Generator[T, None, None]:
         piece = list(islice(i, n))
 
 
+def _split_transactions_by_key(
+    transact_items: list[TransactItem], n_max: int
+) -> Generator[list[TransactItem], None, None]:
+    buffer, keys = [], set()
+    for transact_item in transact_items:
+        transaction_statement = transact_item.Put or transact_item.Delete
+        item = transaction_statement.Key or transaction_statement.Item
+        key = (item["pk"]["S"], item["sk"]["S"])
+        if key in keys:
+            yield from batched(buffer, n=n_max)
+            buffer, keys = [], set()
+        buffer.append(transact_item)
+        keys.add(key)
+    yield from batched(buffer, n=n_max)
+
+
 class Repository(Generic[ModelType]):
     def __init__(self, table_name, model: type[ModelType], dynamodb_client):
         self.table_name = table_name
@@ -39,11 +55,12 @@ class Repository(Generic[ModelType]):
             return handler(event=event)
 
         responses = []
-        for events in batched(entity.events, n=batch_size):
-            transact_items = list(map(generate_transaction_statements, events))
-            transaction = Transaction(TransactItems=transact_items)
-
-            with handle_client_errors(commands=transact_items):
+        transact_items = map(generate_transaction_statements, entity.events)
+        for _transact_items in _split_transactions_by_key(
+            transact_items, n_max=batch_size
+        ):
+            transaction = Transaction(TransactItems=_transact_items)
+            with handle_client_errors(commands=_transact_items):
                 _response = self.client.transact_write_items(
                     **transaction.dict(exclude_none=True)
                 )

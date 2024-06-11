@@ -42,6 +42,6 @@ class ProductTeam(AggregateRoot):
             ods_code=self.ods_code,
         )
         device_created_event = DeviceCreatedEvent(**device.dict(), _trust=_trust)
-        device.add_event(device_created_event)
-        self.add_event(device_created_event)
+        super(Device, device).add_event(device_created_event)
+        super().add_event(device_created_event)
         return device
