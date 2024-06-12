@@ -173,7 +173,7 @@ def test_load_worker_pass(
     response = load.handler(event={}, context=None)
     assert response == {
         "stage_name": "load",
-        "processed_records": 4 * n_initial_unprocessed,
+        "processed_records": 2 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }

@@ -1,5 +1,5 @@
 import pytest
-from domain.core.device import Device, DeviceType, DeviceUpdatedEvent
+from domain.core.device import Device, DeviceType
 from domain.core.questionnaire import (
     Questionnaire,
     QuestionnaireResponse,
@@ -198,10 +198,9 @@ def test_update_device_metadata(
     )
 
     assert _device is device
-    assert len(_device.events) == len(events_before) + 2
+    assert len(_device.events) == len(events_before) + 1
     assert all(event in _device.events for event in events_before)
-    assert isinstance(_device.events[-1], DeviceUpdatedEvent)
-    assert isinstance(_device.events[-2], QuestionnaireResponseUpdatedEvent)
+    assert isinstance(_device.events[-1], QuestionnaireResponseUpdatedEvent)
 
     device_metadata = _device.questionnaire_responses[
         questionnaire_response.questionnaire.id

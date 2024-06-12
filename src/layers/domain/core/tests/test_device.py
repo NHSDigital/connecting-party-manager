@@ -293,19 +293,3 @@ def test_device_add_index_no_such_question(device: Device):
 
     with pytest.raises(QuestionNotFoundError):
         device.add_index(questionnaire_id="foo/1", question_name="question1")
-
-
-def test_device_add_event(device: Device):
-    created_on_before = device.created_on
-    assert isinstance(device.created_on, datetime)
-    assert device.updated_on is None
-    assert device.deleted_on is None
-
-    device.add_event("an_event")
-
-    assert isinstance(device.created_on, datetime)
-    assert isinstance(device.updated_on, datetime)
-    assert device.deleted_on is None
-
-    assert device.created_on == created_on_before
-    assert device.updated_on > device.created_on

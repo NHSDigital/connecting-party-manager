@@ -1,6 +1,5 @@
 from collections import defaultdict
-from datetime import UTC
-from datetime import datetime as DateTime
+from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
 from typing import Any, Optional
@@ -158,35 +157,24 @@ class Device(AggregateRoot):
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
-    created_on: DateTime = Field(
-        default_factory=lambda: DateTime.now(UTC), immutable=True
-    )
-    updated_on: Optional[DateTime] = Field(default=None)
-    deleted_on: Optional[DateTime] = Field(default=None)
+    created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
+    updated_on: Optional[datetime] = Field(default=None)
+    deleted_on: Optional[datetime] = Field(default=None)
     keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list), exclude=True
     )
     indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
 
-    def add_event(self, event: Event) -> Event:
-        """
-        Override the base add_event to ensure that the 'updated_on' timestamp
-        is always updated when events (other than DeviceUpdatedEvent) occur.
-        """
-        _event = super().add_event(event=event)
-        self.update()
-        return _event
-
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         if "updated_on" not in kwargs:
-            kwargs["updated_on"] = DateTime.now(UTC)
+            kwargs["updated_on"] = datetime.utcnow()
         device_data = self._update(data=kwargs)
         event = DeviceUpdatedEvent(**device_data)
-        return super().add_event(event)
+        return self.add_event(event)
 
     def delete(self) -> DeviceUpdatedEvent:
-        deletion_datetime = DateTime.now(UTC)
+        deletion_datetime = datetime.utcnow()
         return self.update(
             status=DeviceStatus.INACTIVE,
             updated_on=deletion_datetime,
