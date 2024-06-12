@@ -48,7 +48,6 @@ class Repository(Generic[ModelType]):
                 if not isinstance(transact_items, list):
                     transact_items = [transact_items]
 
-                # print("transact_items", transact_items)
                 transaction = Transaction(TransactItems=transact_items)
 
                 with handle_client_errors(commands=transact_items):

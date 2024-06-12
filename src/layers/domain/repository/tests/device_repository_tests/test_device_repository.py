@@ -21,13 +21,13 @@ def device() -> Device:
 @pytest.mark.integration
 def test__device_repository_read_by_id(device: Device, repository: DeviceRepository):
     repository.write(device)
-    assert repository.read_by_id(device.id) == device
+    assert repository.read(id_or_key=device.id) == device
 
 
 @pytest.mark.integration
-def test__device_repository_query_by_key(device: Device, repository: DeviceRepository):
+def test__device_repository_read_by_key(device: Device, repository: DeviceRepository):
     repository.write(device)
-    assert repository.query_by_key(DEVICE_KEY) == device
+    assert repository.read(id_or_key=DEVICE_KEY) == device
 
 
 @pytest.mark.integration
@@ -40,17 +40,17 @@ def test__device_repository_already_exists(device, repository: DeviceRepository)
 @pytest.mark.integration
 def test__device_repository__device_does_not_exist(repository: DeviceRepository):
     with pytest.raises(ItemNotFound):
-        repository.read_by_id("123")
+        repository.read(id_or_key="123")
 
 
 def test__device_repository_local(device: Device, repository: DeviceRepository):
     repository.write(device)
-    assert repository.read_by_id(device.id) == device
+    assert repository.read(id_or_key=device.id) == device
 
 
 def test__device_repository__device_does_not_exist_local(repository: DeviceRepository):
     with pytest.raises(ItemNotFound):
-        repository.read_by_id("123")
+        repository.read(id_or_key="123")
 
 
 @pytest.mark.integration
@@ -59,11 +59,11 @@ def test__device_repository__update(device: Device, repository: DeviceRepository
     repository.write(device)
 
     # Retrieve the model and treat this as the initial state
-    intermediate_device = repository.read_by_id(id=device.id)
+    intermediate_device = repository.read(id_or_key=device.id)
     intermediate_device.update(name="foo-bar")
     repository.write(intermediate_device)
 
-    final_device = repository.read_by_id(device.id)
+    final_device = repository.read(id_or_key=device.id)
     assert final_device.name == "foo-bar"
 
 
@@ -73,9 +73,9 @@ def test__device_repository__delete(device: Device, repository: DeviceRepository
     repository.write(device)
 
     # Retrieve the model and treat this as the initial state
-    intermediate_device = repository.read_by_id(id=device.id)
+    intermediate_device = repository.read(id_or_key=device.id)
     intermediate_device.delete()
     repository.write(intermediate_device)
 
-    final_device = repository.read_by_id(device.id)
+    final_device = repository.read(id_or_key=device.id)
     assert final_device.status is DeviceStatus.INACTIVE

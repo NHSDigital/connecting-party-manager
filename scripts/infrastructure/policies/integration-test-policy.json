@@ -11,7 +11,8 @@
         "dynamodb:Query",
         "dynamodb:UpdateItem",
         "dynamodb:GetItem",
-        "dynamodb:ListTables"
+        "dynamodb:ListTables",
+        "dynamodb:BatchGetItem"
       ],
       "Resource": ["arn:aws:dynamodb:*:${ACCOUNT_ID}:table/*"]
     },

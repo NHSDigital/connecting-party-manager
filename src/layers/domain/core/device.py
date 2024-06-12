@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
-from typing import Any, Dict, Optional
+from typing import Optional
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
@@ -16,7 +16,7 @@ from domain.core.questionnaire import (
 from pydantic import Field
 
 from .aggregate_root import AggregateRoot
-from .device_key import DeviceKey, DeviceKeyType
+from .device_key import DeviceKeyType
 from .error import DuplicateError, NotFoundError
 from .event import Event, EventDeserializer
 from .validation import DEVICE_NAME_REGEX
@@ -54,6 +54,7 @@ class DeviceUpdatedEvent(Event):
     name: str
     type: "DeviceType"
     product_team_id: UUID
+    keys: dict[str, DeviceKeyType]
     ods_code: str
     status: "DeviceStatus"
     created_on: str
@@ -65,15 +66,14 @@ class DeviceUpdatedEvent(Event):
 class DeviceKeyAddedEvent(Event):
     id: str
     key: str
-    type: DeviceKeyType
-    device: "Device"
-    _trust: bool = field(alias="_trust", default=False)
+    key_type: DeviceKeyType
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyDeletedEvent(Event):
     id: str
     key: str
+    keys: dict[str, DeviceKeyType]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -161,34 +161,17 @@ class Device(AggregateRoot):
     created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
-    keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
+    keys: dict[str, DeviceKeyType] = Field(default_factory=dict, exclude=True)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list), exclude=True
     )
     indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
 
-    def device_to_dict(self) -> Dict[str, Any]:
-        return {
-            "id": str(self.id),
-            "name": self.name,
-            "type": self.type,
-            "status": self.status,
-            "product_team_id": str(self.product_team_id),
-            "ods_code": self.ods_code,
-            "created_on": self.created_on.isoformat(),
-            "updated_on": self.updated_on.isoformat() if self.updated_on else None,
-            "deleted_on": self.deleted_on.isoformat() if self.deleted_on else None,
-            "keys": self.keys if self.keys else None,
-            "questionnaire_responses": self.questionnaire_responses
-            if self.questionnaire_responses
-            else None,
-        }
-
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         if "updated_on" not in kwargs:
             kwargs["updated_on"] = datetime.utcnow()
         device_data = self._update(data=kwargs)
-        event = DeviceUpdatedEvent(**device_data)
+        event = DeviceUpdatedEvent(keys=self.keys, **device_data)
         return self.add_event(event)
 
     def delete(self) -> DeviceUpdatedEvent:
@@ -202,19 +185,22 @@ class Device(AggregateRoot):
     def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
         if key in self.keys:
             raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        device_key = DeviceKey(key=key, type=type)
-        self.keys[key] = device_key
-        event = DeviceKeyAddedEvent(
-            id=self.id, _trust=_trust, **device_key.dict(), device=self.device_to_dict()
-        )
+        self.keys[key] = type
+        event = DeviceKeyAddedEvent(id=self.id, key=key, key_type=type)
         return self.add_event(event)
 
     def delete_key(self, key: str) -> DeviceKeyDeletedEvent:
+        # Remove the key from the keys
+        # Delete that key from all relevant device keys dict
         try:
             device_key = self.keys.pop(key)
         except KeyError:
             raise NotFoundError(f"This device does not contain key '{key}'") from None
-        event = DeviceKeyDeletedEvent(id=self.id, key=device_key.key)
+        deletion_datetime = datetime.utcnow()
+
+        self.updated_on = deletion_datetime
+
+        event = DeviceKeyDeletedEvent(id=self.id, key=key)
         return self.add_event(event)
 
     def add_index(

@@ -74,10 +74,11 @@ def test__device_repository__delete_key(
     repository.write(device_with_asid)
 
     # Retrieve the model and treat this as the initial state
-    intermediate_device = repository.read(id=device_with_asid.id)
+    intermediate_device = repository.read(id_or_key=device_with_asid.id)
+
     intermediate_device.delete_key(key="ABC:1234567890")
     repository.write(intermediate_device)
 
-    assert repository.read(device_with_asid.id).keys == {
+    assert repository.read(id_or_key=device_with_asid.id).keys == {
         "P.WWW-XXX": DeviceKey(type=DeviceKeyType.PRODUCT_ID, key="P.WWW-XXX")
     }
