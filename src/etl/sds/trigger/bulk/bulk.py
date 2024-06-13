@@ -15,6 +15,7 @@ class BulkTriggerEnvironment(BaseEnvironment):
     STATE_MACHINE_ARN: str
     NOTIFY_LAMBDA_ARN: str
     TABLE_NAME: str
+    SQS_QUEUE_URL: str
 
 
 S3_CLIENT = boto3.client("s3")
@@ -29,6 +30,7 @@ CACHE = {
     "step_functions_client": STEP_FUNCTIONS_CLIENT,
     "state_machine_arn": ENVIRONMENT.STATE_MACHINE_ARN,
     "table_name": ENVIRONMENT.TABLE_NAME,
+    "sqs_queue_url": ENVIRONMENT.SQS_QUEUE_URL,
 }
 
 

@@ -1,4 +1,4 @@
-from datetime import datetime as dt
+import datetime
 from enum import StrEnum, auto
 from typing import Self
 
@@ -9,7 +9,7 @@ BAD_CHARACTERS = [" ", ":"]
 
 
 def _create_timestamp() -> str:
-    return dt.now().isoformat()
+    return datetime.datetime.now().isoformat()
 
 
 class StateMachineInputType(StrEnum):

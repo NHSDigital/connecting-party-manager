@@ -1,13 +1,20 @@
+module "sqs" {
+  source = "terraform-aws-modules/sqs/aws"
 
+  name = "${var.workspace_prefix}--${var.etl_name}--${var.executor_name}-sqs"
 
+  fifo_queue                 = true
+  visibility_timeout_seconds = 120
+
+}
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
-  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}"
-  description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.trigger_name}) trigger lambda function"
-  handler       = "etl.sds.trigger.${var.trigger_name}.${var.trigger_name}.handler"
+  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.executor_name}"
+  description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.executor_name}) executor lambda function"
+  handler       = "etl.sds.executor.${var.executor_name}.${var.executor_name}.handler"
   runtime       = var.python_version
   timeout       = 120
 
@@ -15,6 +22,17 @@ module "lambda_function" {
     create = "5m"
     update = "5m"
     delete = "5m"
+  }
+
+  event_source_mapping = {
+    sqs = {
+      event_source_arn        = module.sqs.queue_arn
+      function_response_types = ["ReportBatchItemFailures"]
+      batch_size              = 1
+      scaling_config = {
+        maximum_concurrency = 2
+      }
+    }
   }
 
   create_current_version_allowed_triggers = false
@@ -28,16 +46,13 @@ module "lambda_function" {
   )
 
   create_package         = false
-  local_existing_package = "${path.root}/../../../src/etl/sds/trigger/${var.trigger_name}/dist/${var.trigger_name}.zip"
+  local_existing_package = "${path.root}/../../../src/etl/sds/executor/${var.executor_name}/dist/${var.executor_name}.zip"
 
   tags = {
-    Name = "${var.workspace_prefix}--${var.etl_name}--${var.trigger_name}"
+    Name = "${var.workspace_prefix}--${var.etl_name}--${var.executor_name}"
   }
 
   layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn, var.sds_layer_arn]
-
-  vpc_subnet_ids         = var.vpc_subnet_ids
-  vpc_security_group_ids = var.vpc_security_group_ids
 
   trusted_entities = [
     {
@@ -60,17 +75,28 @@ module "lambda_function" {
           "s3:GetObject",
           "s3:ListBucket",
           "s3:ListBucketMultipartUploads",
-          "s3:PutObjectVersionTagging"
+          "s3:PutObjectVersionTagging",
+          "s3:DeleteObject"
         ],
         "Effect" : "Allow",
         "Resource" : ["${var.etl_bucket_arn}", "${var.etl_bucket_arn}/*"]
       },
       {
         "Action" : [
-          "s3:DeleteObject"
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
         ],
         "Effect" : "Allow",
-        "Resource" : ["${var.etl_bucket_arn}/bulk-trigger/*ldif"]
+        "Resource" : ["${module.sqs.queue_arn}"]
+      },
+      {
+        "Action" : [
+          "states:StartExecution",
+          "states:DescribeExecution"
+        ],
+        "Effect" : "Allow",
+        "Resource" : ["${var.state_machine_arn}"]
       },
       {
         "Action" : [
@@ -79,34 +105,6 @@ module "lambda_function" {
         "Effect" : "Allow",
         "Resource" : ["${var.notify_lambda_arn}"]
       },
-      {
-        "Action" : [
-          "dynamodb:Scan"
-        ],
-        "Effect" : "Allow",
-        "Resource" : ["${var.table_arn}"]
-      },
-      {
-        "Action" : [
-          "kms:Decrypt"
-        ],
-        "Effect" : "Allow",
-        "Resource" : ["*"]
-      },
-      {
-        "Action" : [
-          "states:StartExecution"
-        ],
-        "Effect" : "Allow",
-        "Resource" : ["${var.state_machine_arn}"]
-      },
-      {
-        "Action" : [
-          "sqs:SendMessage"
-        ],
-        "Effect" : "Allow",
-        "Resource" : ["${var.sqs_queue_arn}"]
-      }
     ], var.extra_policies)
   })
 }

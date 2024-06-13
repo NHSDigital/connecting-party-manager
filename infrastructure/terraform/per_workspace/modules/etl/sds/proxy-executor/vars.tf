@@ -7,7 +7,7 @@ variable "etl_name" {
   type = string
 }
 
-variable "trigger_name" {
+variable "executor_name" {
   type = string
 }
 
@@ -51,20 +51,9 @@ variable "table_arn" {
 
 }
 
-variable "vpc_subnet_ids" {
-  default = null
-}
-
-variable "vpc_security_group_ids" {
-  default = null
-}
 variable "extra_policies" {
   default = []
 }
 
 variable "environment_variables" {
-}
-
-variable "sqs_queue_arn" {
-
 }
