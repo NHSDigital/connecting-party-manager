@@ -36,14 +36,12 @@ class Repository(Generic[ModelType]):
         def generate_transaction_statements(event):
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
-            # print("handler_name", handler_name)
             return handler(event=event)
 
         responses = []
         for events in batched(entity.events, n=batch_size):
             for event in events:
                 transact_items = generate_transaction_statements(event)
-
                 #  either a list or a single
                 if not isinstance(transact_items, list):
                     transact_items = [transact_items]

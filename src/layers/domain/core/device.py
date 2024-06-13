@@ -41,6 +41,8 @@ class DeviceCreatedEvent(Event):
     type: "DeviceType"
     product_team_id: UUID
     ods_code: str
+    keys: dict[str, DeviceKeyType]
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     status: "DeviceStatus"
     created_on: str
     updated_on: Optional[str] = None
@@ -55,6 +57,7 @@ class DeviceUpdatedEvent(Event):
     type: "DeviceType"
     product_team_id: UUID
     keys: dict[str, DeviceKeyType]
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     ods_code: str
     status: "DeviceStatus"
     created_on: str
@@ -73,7 +76,7 @@ class DeviceKeyAddedEvent(Event):
 class DeviceKeyDeletedEvent(Event):
     id: str
     key: str
-    keys: dict[str, DeviceKeyType]
+    remaining_keys: dict[str, DeviceKeyType]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -161,9 +164,9 @@ class Device(AggregateRoot):
     created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
-    keys: dict[str, DeviceKeyType] = Field(default_factory=dict, exclude=True)
+    keys: dict[str, DeviceKeyType] = Field(default_factory=dict)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
-        default_factory=lambda: defaultdict(list), exclude=True
+        default_factory=lambda: defaultdict(list)
     )
     indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
 
@@ -171,7 +174,7 @@ class Device(AggregateRoot):
         if "updated_on" not in kwargs:
             kwargs["updated_on"] = datetime.utcnow()
         device_data = self._update(data=kwargs)
-        event = DeviceUpdatedEvent(keys=self.keys, **device_data)
+        event = DeviceUpdatedEvent(**device_data)
         return self.add_event(event)
 
     def delete(self) -> DeviceUpdatedEvent:
@@ -193,45 +196,42 @@ class Device(AggregateRoot):
         # Remove the key from the keys
         # Delete that key from all relevant device keys dict
         try:
-            device_key = self.keys.pop(key)
+            self.keys.pop(key)
         except KeyError:
             raise NotFoundError(f"This device does not contain key '{key}'") from None
-        deletion_datetime = datetime.utcnow()
 
-        self.updated_on = deletion_datetime
-
-        event = DeviceKeyDeletedEvent(id=self.id, key=key)
+        event = DeviceKeyDeletedEvent(id=self.id, key=key, remaining_keys=self.keys)
         return self.add_event(event)
 
-    def add_index(
-        self, questionnaire_id: str, question_name: str
-    ) -> list[DeviceIndexAddedEvent]:
-        questionnaire_responses = _get_questionnaire_responses(
-            questionnaire_responses=self.questionnaire_responses,
-            questionnaire_id=questionnaire_id,
-        )
-        if question_name not in questionnaire_responses[0].questionnaire.questions:
-            raise QuestionNotFoundError(
-                f"Questionnaire '{questionnaire_id}' does not "
-                f"contain question '{question_name}'"
-            )
-        unique_answers = _get_unique_answers(
-            questionnaire_responses=questionnaire_responses,
-            question_name=question_name,
-        )
+    # def add_index(
+    #     self, questionnaire_id: str, question_name: str
+    # ) -> list[DeviceIndexAddedEvent]:
+    #     questionnaire_responses = _get_questionnaire_responses(
+    #         questionnaire_responses=self.questionnaire_responses,
+    #         questionnaire_id=questionnaire_id,
+    #     )
+    #     if question_name not in questionnaire_responses[0].questionnaire.questions:
+    #         raise QuestionNotFoundError(
+    #             f"Questionnaire '{questionnaire_id}' does not "
+    #             f"contain question '{question_name}'"
+    #         )
+    #     unique_answers = _get_unique_answers(
+    #         questionnaire_responses=questionnaire_responses,
+    #         question_name=question_name,
+    #     )
 
-        events = []
-        for answer in unique_answers:
-            event = DeviceIndexAddedEvent(
-                id=self.id,
-                questionnaire_id=questionnaire_id,
-                question_name=question_name,
-                value=answer,
-            )
-            events.append(event)
-            self.add_event(event)
-            self.indexes.add((questionnaire_id, question_name, answer))
-        return events
+    #     events = []
+    #     for answer in unique_answers:
+    #         event = DeviceIndexAddedEvent(
+    #             id=self.id,
+    #             questionnaire_id=questionnaire_id,
+    #             question_name=question_name,
+    #             value=answer,
+    #         )
+    #         events.append(event)
+    #         self.add_event(event)
+
+    #     return events
 
     def add_questionnaire_response(
         self,

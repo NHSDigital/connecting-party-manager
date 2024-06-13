@@ -6,7 +6,6 @@ KEY_SEPARATOR = "#"
 
 class TableKeys(StrEnum):
     DEVICE = "D"
-    DEVICE_KEY = "DK"
     DEVICE_TYPE = "DT"
     DEVICE_KEY_TYPE = "DKT"
     DEVICE_INDEX = "DI"

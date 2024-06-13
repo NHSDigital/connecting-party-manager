@@ -11,13 +11,8 @@ from domain.core.device import (
     DeviceKeyDeletedEvent,
     DeviceUpdatedEvent,
 )
-from domain.core.error import NotFoundError
 
-from .errors import ItemNotFound
-from .marshall import marshall, marshall_value, unmarshall
-from .repository import Repository
-from .transaction import ConditionExpression, TransactionStatement, TransactItem
-
+# from domain.core.error import NotFoundError
 # from domain.core.load_questionnaire import render_question
 # from domain.core.questionnaire import (
 #     Questionnaire,
@@ -27,6 +22,13 @@ from .transaction import ConditionExpression, TransactionStatement, TransactItem
 #     QuestionnaireResponseDeletedEvent,
 #     QuestionnaireResponseUpdatedEvent,
 # )
+from domain.repository.keys import TableKeys
+
+from .errors import ItemNotFound
+from .marshall import marshall, marshall_value, unmarshall
+from .repository import Repository
+from .transaction import ConditionExpression, TransactionStatement, TransactItem
+
 # from event.json import json_loads
 
 
@@ -66,11 +68,18 @@ class DeviceRepository(Repository[Device]):
         )
 
     def _batch_get_items(self, keys, id):
-        list_of_keys = [{"pk": id, "sk": id}]
+        list_of_keys = []
         for key in keys:
-            list_of_keys.append({"pk": key, "sk": key})
-            list_of_keys.append({"pk": id, "sk": key})
+            list_of_keys.append(
+                {"pk": TableKeys.DEVICE.key(key), "sk": TableKeys.DEVICE.key(key)}
+            )
+            list_of_keys.append(
+                {"pk": TableKeys.DEVICE.key(id), "sk": TableKeys.DEVICE.key(key)}
+            )
 
+        list_of_keys.append(
+            {"pk": TableKeys.DEVICE.key(id), "sk": TableKeys.DEVICE.key(id)}
+        )
         request_items = {
             self.table_name: {
                 "Keys": [
@@ -80,13 +89,13 @@ class DeviceRepository(Repository[Device]):
         }
         responses = self.client.batch_get_item(RequestItems=request_items)
         all_devices = responses.get("Responses", {}).get(self.table_name, [])
-
         yield from map(unmarshall, all_devices)
 
-    def _update_all_devices_by_id_and_key(
+    def _transact_items_to_update_all_devices_by_id_and_key(
         self, id, keys, updated_fields: dict
     ) -> List[TransactItem]:
         # Read all items by device ID
+
         all_devices_to_update = self._batch_get_items(keys=keys, id=id)
 
         transact_items = []
@@ -95,6 +104,7 @@ class DeviceRepository(Repository[Device]):
             expression_attribute_names,
             expression_attribute_values,
         ) = _generate_update_expression(updates=updated_fields)
+
         for device in all_devices_to_update:
             transact_item = TransactItem(
                 Update=TransactionStatement(
@@ -115,38 +125,31 @@ class DeviceRepository(Repository[Device]):
         return transact_items
 
     def _get_existing_keys_and_update_device_with_new_key(
-        self, event: DeviceKeyAddedEvent, device_id, new_device_key
+        self, event: DeviceKeyAddedEvent
     ):
-        device_by_id = self.read(id_or_key=device_id).dict()
-        existing_device_keys = deepcopy(device_by_id.get("keys", {}))
+        device_by_id = self.read_by_id(id=event.id).dict()
 
+        existing_device_keys = deepcopy(device_by_id.get("keys", {}))
         #  Make a copy of the device to avoid side effects and update keys
         updated_device = deepcopy(device_by_id)
         updated_device_keys = updated_device.get("keys", {})
-        updated_device_keys[new_device_key] = event.key_type
+        updated_device_keys[event.key] = event.key_type
         updated_device["keys"] = updated_device_keys
 
         return existing_device_keys, updated_device
 
     def _get_existing_keys_and_remove_key_from_device(
-        self, event: DeviceKeyDeletedEvent, device_id, device_key_to_delete
+        self, device_id, device_key_to_delete
     ):
-        device_by_id = self.read(id_or_key=device_id).dict()
-        existing_device_keys = deepcopy(device_by_id.get("keys", {}))
+        device_by_id = self.read_by_id(id=device_id).dict()
 
         #  Make a copy of the device to avoid side effects and update keys
         updated_device = deepcopy(device_by_id)
-        updated_device_keys = updated_device.get("keys", {})
-        try:
-            updated_device_keys.pop(device_key_to_delete)
-        except KeyError:
-            raise NotFoundError(
-                f"This device does not contain key '{device_key_to_delete}'"
-            ) from None
-
+        updated_device_keys: dict = updated_device["keys"]
+        updated_device_keys.pop(device_key_to_delete)
         updated_device["keys"] = updated_device_keys
 
-        return existing_device_keys, updated_device
+        return updated_device
 
     def handle_DeviceCreatedEvent(
         self,
@@ -154,8 +157,8 @@ class DeviceRepository(Repository[Device]):
         condition_expression=ConditionExpression.MUST_NOT_EXIST,
     ) -> TransactItem:
         # Initial device is sorted by its own id
-        pk = str(event.id)
-        sk = str(event.id)
+        device_id_pk = TableKeys.DEVICE.key(event.id)
+        device_id_sk = TableKeys.DEVICE.key(event.id)
 
         event_data = asdict(event)
         _condition_expression = (
@@ -166,7 +169,7 @@ class DeviceRepository(Repository[Device]):
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=pk, sk=sk, **event_data),
+                Item=marshall(pk=device_id_pk, sk=device_id_sk, **event_data),
                 **_condition_expression,
             )
         )
@@ -177,7 +180,7 @@ class DeviceRepository(Repository[Device]):
         device_id = event.id
         updated_device = asdict(event)
 
-        transaction_items = self._update_all_devices_by_id_and_key(
+        transaction_items = self._transact_items_to_update_all_devices_by_id_and_key(
             id=device_id,
             keys=device_keys,
             updated_fields=updated_device,
@@ -203,11 +206,9 @@ class DeviceRepository(Repository[Device]):
         (
             existing_device_keys,
             updated_device,
-        ) = self._get_existing_keys_and_update_device_with_new_key(
-            event, device_id, new_device_key
-        )
+        ) = self._get_existing_keys_and_update_device_with_new_key(event=event)
 
-        transaction_items = self._update_all_devices_by_id_and_key(
+        transaction_items = self._transact_items_to_update_all_devices_by_id_and_key(
             id=device_id,
             keys=existing_device_keys,
             updated_fields={"keys": updated_device["keys"]},
@@ -216,14 +217,22 @@ class DeviceRepository(Repository[Device]):
         create_device_by_id_and_key = TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=device_id, sk=new_device_key, **updated_device),
+                Item=marshall(
+                    pk=TableKeys.DEVICE.key(device_id),
+                    sk=TableKeys.DEVICE.key(new_device_key),
+                    **updated_device,
+                ),
                 **condition_expression,
             )
         )
         create_device_by_key = TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=new_device_key, sk=new_device_key, **updated_device),
+                Item=marshall(
+                    pk=TableKeys.DEVICE.key(new_device_key),
+                    sk=TableKeys.DEVICE.key(new_device_key),
+                    **updated_device,
+                ),
                 **condition_expression,
             )
         )
@@ -236,31 +245,46 @@ class DeviceRepository(Repository[Device]):
     ) -> TransactItem:
         device_id = str(event.id)
         device_key_to_delete = str(event.key)
+        remaining_keys = event.remaining_keys
 
-        (
-            existing_device_keys,
-            updated_device,
-        ) = self._get_existing_keys_and_update_device_with_new_key(
-            event, device_id, new_device_key
+        updated_device = self._get_existing_keys_and_remove_key_from_device(
+            device_id=device_id, device_key_to_delete=device_key_to_delete
         )
 
-        transaction_items = self._update_all_devices_by_id_and_key(
+        transaction_items = self._transact_items_to_update_all_devices_by_id_and_key(
             id=device_id,
-            keys=existing_device_keys,
-            updated_device=updated_device,
+            keys=remaining_keys,
+            updated_fields={"keys": updated_device["keys"]},
         )
 
-        return TransactItem(
+        delete_device_by_id_and_key = TransactItem(
             Delete=TransactionStatement(
                 TableName=self.table_name,
-                Key=marshall(pk=pk, sk=sk),
+                Key=marshall(
+                    pk=TableKeys.DEVICE.key(device_id),
+                    sk=TableKeys.DEVICE.key(device_key_to_delete),
+                ),
+                ConditionExpression=ConditionExpression.MUST_EXIST,
+            )
+        )
+        delete_device_by_key = TransactItem(
+            Delete=TransactionStatement(
+                TableName=self.table_name,
+                Key=marshall(
+                    pk=TableKeys.DEVICE.key(device_key_to_delete),
+                    sk=TableKeys.DEVICE.key(device_key_to_delete),
+                ),
                 ConditionExpression=ConditionExpression.MUST_EXIST,
             )
         )
 
-    def read(self, id_or_key) -> Device:
-        pk = str(id_or_key)
-        sk = str(id_or_key)
+        transaction_items.append(delete_device_by_id_and_key)
+        transaction_items.append(delete_device_by_key)
+        return transaction_items
+
+    def read_by_id(self, id) -> Device:
+        pk = TableKeys.DEVICE.key(id)
+        sk = TableKeys.DEVICE.key(id)
 
         args = {"TableName": self.table_name, "Key": {"pk": {"S": pk}, "sk": {"S": sk}}}
 
@@ -274,17 +298,21 @@ class DeviceRepository(Repository[Device]):
             **device,
         )
 
-    # def query_by_key_type(self, key_type, **kwargs) -> "QueryOutputTypeDef":
-    #     pk_2 = TableKeys.DEVICE_KEY_TYPE.key(key_type)
-    #     args = {
-    #         "TableName": self.table_name,
-    #         "IndexName": "idx_gsi_2",
-    #         "KeyConditionExpression": "pk_2 = :pk_2",
-    #         "ExpressionAttributeValues": {":pk_2": marshall_value(pk_2)},
-    #     }
-    #     results = self.client.query(**args, **kwargs)
-    #     results = map(unmarshall, results["Items"])
-    #     return device
+    def read_by_key(self, key) -> Device:
+        pk = TableKeys.DEVICE.key(key)
+        sk = TableKeys.DEVICE.key(key)
+
+        args = {"TableName": self.table_name, "Key": {"pk": {"S": pk}, "sk": {"S": sk}}}
+
+        result = self.client.get_item(**args)
+        item = result.get("Item")
+        if not item:
+            raise ItemNotFound(id)
+
+        device = unmarshall(item)
+        return Device(
+            **device,
+        )
 
     # def handle_QuestionnaireInstanceEvent(self, event: QuestionnaireInstanceEvent):
     #     pk = TableKeys.DEVICE.key(event.entity_id)
@@ -304,7 +332,7 @@ class DeviceRepository(Repository[Device]):
     #     condition_expression=ConditionExpression.MUST_NOT_EXIST,
     # ) -> TransactItem:
     #     pk = TableKeys.DEVICE.key(event.entity_id)
-    #     sk = TableKeys.QUESTIONNAIRE_RESPONSE.key(
+    #     sk = TableKeys.DEVICE.key(
     #         event.questionnaire_id, event.questionnaire_response_index
     #     )
     #     event_data = asdict(event)
@@ -342,110 +370,4 @@ class DeviceRepository(Repository[Device]):
     #             Key=marshall(pk=pk, sk=sk),
     #             ConditionExpression=ConditionExpression.MUST_EXIST,
     #         )
-    #     )
-
-    # def handle_DeviceIndexAddedEvent(self, event: DeviceIndexAddedEvent):
-    #     pk = TableKeys.DEVICE.key(event.id)
-    #     sk = TableKeys.DEVICE_INDEX.key(
-    #         event.questionnaire_id, event.question_name, event.value
-    #     )
-    #     event_data = asdict(event)
-    #     condition_expression = (
-    #         {"ConditionExpression": ConditionExpression.MUST_NOT_EXIST}
-    #         if event_data.get("_trust", False) is False
-    #         else {}
-    #     )
-    #     return TransactItem(
-    #         Put=TransactionStatement(
-    #             TableName=self.table_name,
-    #             Item=marshall(pk=pk, sk=sk, pk_1=sk, sk_1=pk, **asdict(event)),
-    #             **condition_expression,
-    #         )
-    #     )
-
-    # def query_by_key_type(self, key_type, **kwargs) -> "QueryOutputTypeDef":
-    #     pk_2 = TableKeys.DEVICE_KEY_TYPE.key(key_type)
-    #     args = {
-    #         "TableName": self.table_name,
-    #         "IndexName": "idx_gsi_2",
-    #         "KeyConditionExpression": "pk_2 = :pk_2",
-    #         "ExpressionAttributeValues": {":pk_2": marshall_value(pk_2)},
-    #     }
-    #     return self.client.query(**args, **kwargs)
-
-    # def query_by_device_type(self, type: DeviceType, **kwargs) -> "QueryOutputTypeDef":
-    #     pk_1 = TableKeys.DEVICE_TYPE.key(type)
-    #     args = {
-    #         "TableName": self.table_name,
-    #         "IndexName": "idx_gsi_1",
-    #         "KeyConditionExpression": "pk_1 = :pk_1",
-    #         "ExpressionAttributeValues": {
-    #             ":pk_1": marshall_value(pk_1),
-    #         },
-    #     }
-    #     return self.client.query(**args, **kwargs)
-
-    # def read_by_index(self, questionnaire_id: str, question_name: str, value: str):
-    #     pk_1 = TableKeys.DEVICE_INDEX.key(questionnaire_id, question_name, value)
-    #     result = self.client.query(
-    #         TableName=self.table_name,
-    #         IndexName="idx_gsi_1",
-    #         KeyConditionExpression="pk_1 = :pk_1",
-    #         ExpressionAttributeValues={
-    #             ":pk_1": marshall_value(pk_1),
-    #         },
-    #     )
-    #     items = (unmarshall(i) for i in result["Items"])
-    #     return [self.read(strip_key_prefix(item["pk"])) for item in items]
-
-    # def read_by_key(self, key) -> Device:
-    #     pk_1 = TableKeys.DEVICE_KEY.key(key)
-    #     args = {
-    #         "TableName": self.table_name,
-    #         "IndexName": "idx_gsi_1",
-    #         "KeyConditionExpression": "pk_1 = :pk_1 AND sk_1 = :pk_1",
-    #         "ExpressionAttributeValues": {":pk_1": marshall_value(pk_1)},
-    #     }
-    #     result = self.client.query(**args)
-    #     items = [unmarshall(i) for i in result["Items"]]
-    #     if len(items) == 0:
-    #         raise ItemNotFound(key)
-    #     (item,) = items
-    #     return self.read(strip_key_prefix(item["pk"]))
-
-    # def read(self, id) -> Device:
-    #     pk = TableKeys.DEVICE.key(id)
-    #     args = {
-    #         "TableName": self.table_name,
-    #         "KeyConditionExpression": "pk = :pk",
-    #         "ExpressionAttributeValues": {":pk": marshall_value(pk)},
-    #     }
-    #     result = self.client.query(**args)
-    #     items = [unmarshall(i) for i in result["Items"]]
-    #     if len(items) == 0:
-    #         raise ItemNotFound(id)
-
-    #     (device,) = TableKeys.DEVICE.filter(items, key="sk")
-    #     keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
-
-    #     questionnaires = {}
-    #     for id_, data in TableKeys.QUESTIONNAIRE.filter_and_group(items, key="sk"):
-    #         data["questions"] = {
-    #             question_name: render_question(question)
-    #             for question_name, question in json_loads(data["questions"]).items()
-    #         }
-    #         questionnaires[id_] = Questionnaire(**data)
-
-    #     questionnaire_responses = defaultdict(list)
-    #     for qr in TableKeys.QUESTIONNAIRE_RESPONSE.filter(items, key="sk"):
-    #         qid = qr["questionnaire_id"]
-    #         _questionnaire_response = QuestionnaireResponse(
-    #             questionnaire=questionnaires[qid], responses=json_loads(qr["responses"])
-    #         )
-    #         questionnaire_responses[qid].append(_questionnaire_response)
-
-    #     return Device(
-    #         keys={id_: DeviceKey(**data) for id_, data in keys},
-    #         questionnaire_responses=questionnaire_responses,
-    #         **device,
     #     )
