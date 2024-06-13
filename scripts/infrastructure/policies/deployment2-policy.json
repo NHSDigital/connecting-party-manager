@@ -103,6 +103,8 @@
         "s3:GetBucketVersioning",
         "s3:GetAccelerateConfiguration",
         "s3:GetBucketRequestPayment",
+        "s3:PutBucketPolicy",
+        "s3:PutBucketLogging",
         "s3:GetBucketLogging",
         "s3:GetLifecycleConfiguration",
         "s3:GetReplicationConfiguration",
@@ -142,6 +144,40 @@
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*"
+      ]
+    },
+    {
+      "Sid": "SQSPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:createqueue",
+        "sqs:tagqueue",
+        "sqs:setqueueattributes",
+        "sqs:getqueueattributes",
+        "sqs:listqueuetags",
+        "sqs:deletequeue"
+      ],
+      "Resource": ["arn:aws:sqs:eu-west-2:${ACCOUNT_ID}:*-sqs*"]
+    },
+    {
+      "Sid": "EventSourceMappingPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateEventSourceMapping",
+        "lambda:GetEventSourceMapping"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "EventSourceMappingPermissions2",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetEventSourceMapping",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:UpdateEventSourceMapping"
+      ],
+      "Resource": [
+        "arn:aws:lambda:eu-west-2:${ACCOUNT_ID}:event-source-mapping:*"
       ]
     }
   ]

@@ -1,15 +1,10 @@
-from pathlib import Path
-
 import boto3
 from etl_utils.trigger.logger import log_action
-from etl_utils.trigger.model import StateMachineInputType
 from etl_utils.trigger.notify import notify
 from event.environment import BaseEnvironment
-from event.logging.constants import LDAP_REDACTED_FIELDS
-from event.logging.logger import setup_logger
 from event.step_chain import StepChain
 
-from .steps import steps
+from .steps import _process_sqs_message, steps
 
 
 class ChangelogTriggerEnvironment(BaseEnvironment):
@@ -21,7 +16,6 @@ class ChangelogTriggerEnvironment(BaseEnvironment):
     ETL_BUCKET: str
     LDAP_CHANGELOG_USER: str
     LDAP_CHANGELOG_PASSWORD: str
-    SQS_QUEUE_URL: str
 
 
 S3_CLIENT = boto3.client("s3")
@@ -34,30 +28,37 @@ CACHE = {
     "s3_client": S3_CLIENT,
     "step_functions_client": STEP_FUNCTIONS_CLIENT,
     "state_machine_arn": ENVIRONMENT.STATE_MACHINE_ARN,
-    "truststore_bucket": ENVIRONMENT.TRUSTSTORE_BUCKET,
-    "cert_file": Path(f"/tmp/{ENVIRONMENT.CPM_FQDN}.crt"),
-    "key_file": Path(f"/tmp/{ENVIRONMENT.CPM_FQDN}.key"),
     "etl_bucket": ENVIRONMENT.ETL_BUCKET,
-    "ldap_host": ENVIRONMENT.LDAP_HOST,
-    "ldap_changelog_user": ENVIRONMENT.LDAP_CHANGELOG_USER,
-    "ldap_changelog_password": ENVIRONMENT.LDAP_CHANGELOG_PASSWORD,
-    "sqs_queue_url": ENVIRONMENT.SQS_QUEUE_URL,
 }
 
 
-def handler(event={}, context=None):
-    if "ldap" not in CACHE:
-        import ldap
+def handler(event=dict, context=None):
+    for message in event["Records"]:
+        process_message(message)
 
-        CACHE["ldap"] = ldap
+    return None  # Message removed from sqs queue
 
-    setup_logger(service_name=__file__, redacted_fields=LDAP_REDACTED_FIELDS)
 
+def process_message(message):
     step_chain = StepChain(step_chain=steps, step_decorators=[log_action])
-    step_chain.run(cache=CACHE)
-    return notify(
+    step_chain.run(cache=CACHE, init=message)
+
+    trigger_type = "null"
+    result = step_chain.data[_process_sqs_message]
+
+    if isinstance(result, tuple):
+        state_machine_input, state_machine_name = result
+        if not isinstance(state_machine_input, Exception):
+            trigger_type = state_machine_input.type
+    else:
+        # If the result is not a tuple, it must be an Exception
+        state_machine_input = result
+
+    response = notify(
         lambda_client=LAMBDA_CLIENT,
         function_name=ENVIRONMENT.NOTIFY_LAMBDA_ARN,
         result=step_chain.result,
-        trigger_type=StateMachineInputType.UPDATE,
+        trigger_type=trigger_type,
     )
+
+    return response

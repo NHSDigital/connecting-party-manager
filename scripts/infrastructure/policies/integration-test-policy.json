@@ -28,6 +28,12 @@
       "Resource": ["arn:aws:s3:::*/*"]
     },
     {
+      "Sid": "S3IntegrationPermissionsBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::*"]
+    },
+    {
       "Sid": "S3IntegrationDeletePermissions",
       "Effect": "Allow",
       "Action": ["s3:DeleteObject"],
@@ -57,6 +63,12 @@
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*"
       ]
+    },
+    {
+      "Sid": "SqsPermissions",
+      "Effect": "Allow",
+      "Action": ["sqs:sendmessage"],
+      "Resource": ["arn:aws:sqs:eu-west-2:${ACCOUNT_ID}:*-sqs*"]
     }
   ]
 }

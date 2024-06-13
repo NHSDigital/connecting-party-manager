@@ -212,6 +212,8 @@ module "update_transform_and_load_step_function" {
       transform_worker_arn = module.worker_transform.arn
       load_worker_arn      = module.worker_load.arn
       etl_bucket           = module.bucket.s3_bucket_id
+      changelog_key        = var.changelog_key
+      etl_state_lock_key   = var.etl_state_lock_key
     }
   )
 
@@ -241,7 +243,8 @@ module "update_transform_and_load_step_function" {
                 "s3:GetObject",
                 "s3:ListBucket",
                 "s3:ListBucketMultipartUploads",
-                "s3:PutObjectVersionTagging"
+                "s3:PutObjectVersionTagging",
+                "s3:DeleteObject"
             ],
             "Effect": "Allow",
             "Resource": [
@@ -314,8 +317,10 @@ module "trigger_bulk" {
   notify_lambda_arn     = module.notify.arn
   state_machine_arn     = aws_sfn_state_machine.state_machine.arn
   table_arn             = var.table_arn
+  sqs_queue_arn         = module.proxy_lambda_executor.sqs_queue_arn
   environment_variables = {
-    TABLE_NAME = var.table_name
+    TABLE_NAME    = var.table_name
+    SQS_QUEUE_URL = module.proxy_lambda_executor.sqs_queue_url
   }
   allowed_triggers = {
     "${replace(var.workspace_prefix, "_", "-")}--AllowExecutionFromS3--${local.etl_name}--bulk" = {
@@ -364,6 +369,7 @@ module "trigger_update" {
   notify_lambda_arn     = module.notify.arn
   state_machine_arn     = aws_sfn_state_machine.state_machine.arn
   table_arn             = var.table_arn
+  sqs_queue_arn         = module.proxy_lambda_executor.sqs_queue_arn
   allowed_triggers      = {}
   environment_variables = {
     # prepend '/opt/python' (the root path of the layer) to LD_LIBRARY_PATH so that
@@ -377,6 +383,7 @@ module "trigger_update" {
     LDAP_CHANGELOG_USER     = data.aws_secretsmanager_secret_version.ldap_changelog_user.secret_string
     LDAP_CHANGELOG_PASSWORD = data.aws_secretsmanager_secret_version.ldap_changelog_password.secret_string
     ETL_BUCKET              = module.bucket.s3_bucket_id
+    SQS_QUEUE_URL           = module.proxy_lambda_executor.sqs_queue_url
   }
 
   vpc_subnet_ids         = data.aws_subnets.lambda-connectivity-private.ids
@@ -433,4 +440,37 @@ module "bulk_trigger_notification" {
   source_bucket = module.bucket
   filter_prefix = "${local.bulk_trigger_prefix}/"
   filter_suffix = ".ldif"
+}
+
+module "proxy_lambda_executor" {
+  source = "./proxy-executor/"
+
+  executor_name         = "input"
+  etl_name              = local.etl_name
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_sds_update_layer_arn
+  sds_layer_arn         = var.sds_layer_arn
+  etl_bucket_arn        = module.bucket.s3_bucket_arn
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  notify_lambda_arn     = module.notify.arn
+  state_machine_arn     = module.step_function.state_machine_arn
+  table_arn             = var.table_arn
+  allowed_triggers      = {}
+  environment_variables = {
+    # prepend '/opt/python' (the root path of the layer) to LD_LIBRARY_PATH so that
+    # all compiled dependencies can find each other. Note: this is a hack - and
+    # may result in version mismatches between system libs on the lambda. The stable
+    # alternative is to run or deploy the service from a container.
+    LD_LIBRARY_PATH         = "/opt/python:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+    TRUSTSTORE_BUCKET       = var.truststore_bucket.id
+    CPM_FQDN                = "cpm.thirdparty.nhs.uk"
+    LDAP_HOST               = data.aws_secretsmanager_secret_version.ldap_host.secret_string
+    LDAP_CHANGELOG_USER     = data.aws_secretsmanager_secret_version.ldap_changelog_user.secret_string
+    LDAP_CHANGELOG_PASSWORD = data.aws_secretsmanager_secret_version.ldap_changelog_password.secret_string
+    ETL_BUCKET              = module.bucket.s3_bucket_id
+
+  }
+  extra_policies = []
 }
