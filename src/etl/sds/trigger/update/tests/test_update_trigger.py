@@ -172,19 +172,18 @@ def test_update(change_result):
         # Verify the history file was created
         etl_history_response = s3_client.get_object(
             Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key=f"history/update.EXTRACT.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
+            Key=f"history/update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
         )
         assert etl_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
 
         # Verify message was published to queue
         expected_sqs_message = json.dumps(
             {
-                "init": "input--extract/unprocessed",
                 "changelog_number_start": decoded_current_changelog_number,
                 "changelog_number_end": decoded_latest_changelog_number,
-                "type": "update",
+                "etl_type": "update",
                 "timestamp": "foo",
-                "name": f"update.EXTRACT.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
+                "name": f"update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
             }
         )
         sqs_messages = queue.receive_messages()

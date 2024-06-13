@@ -13,7 +13,7 @@ from botocore.exceptions import ClientError
 from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
-from etl_utils.trigger.model import _create_timestamp
+from etl_utils.trigger.model import StateMachineInputType, _create_timestamp
 from etl_utils.trigger.operations import StateFileNotEmpty
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
@@ -37,21 +37,20 @@ MOCKED_INPUT_TRIGGER_ENVIRONMENT = {
 
 CHANGELOG_NUMBER_START = 546512
 CHANGELOG_NUMBER_END = 548916
-STATE_MACHINE_INPUT_TYPE_UPDATE = "update"
-STATE_MACHINE_INPUT_TYPE_BULK = "bulk"
-UPDATE_HISTORY_FILE = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo"
-BULK_HISTORY_FILE = f"history/{STATE_MACHINE_INPUT_TYPE_BULK}.EXTRACT.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo"
+STATE_MACHINE_INPUT_TYPE_UPDATE = StateMachineInputType.UPDATE
+STATE_MACHINE_INPUT_TYPE_BULK = StateMachineInputType.BULK
+UPDATE_HISTORY_FILE = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo"
+BULK_HISTORY_FILE = f"history/{STATE_MACHINE_INPUT_TYPE_BULK}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo"
 ETL_BUCKET = MOCKED_INPUT_TRIGGER_ENVIRONMENT["ETL_BUCKET"]
 
 
 VALID_SQS_UPDATE_MESSAGE_BODY = json.dumps(
     {
-        "init": "input--extract/unprocessed",
         "changelog_number_start": CHANGELOG_NUMBER_START,
         "changelog_number_end": CHANGELOG_NUMBER_END,
-        "type": STATE_MACHINE_INPUT_TYPE_UPDATE,
+        "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
         "timestamp": "foo",
-        "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
+        "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
     }
 )
 VALID_SQS_UPDATE_EVENT = {
@@ -81,12 +80,11 @@ VALID_SQS_UPDATE_EVENT = {
 
 VALID_SQS_BULK_MESSAGE_BODY = json.dumps(
     {
-        "init": "input--extract/unprocessed",
         "changelog_number_start": 0,
         "changelog_number_end": CHANGELOG_NUMBER_END,
-        "type": STATE_MACHINE_INPUT_TYPE_BULK,
+        "etl_type": STATE_MACHINE_INPUT_TYPE_BULK,
         "timestamp": "foo",
-        "name": f"{STATE_MACHINE_INPUT_TYPE_BULK}.EXTRACT.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
+        "name": f"{STATE_MACHINE_INPUT_TYPE_BULK}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
     }
 )
 VALID_SQS_BULK_EVENT = {
@@ -393,8 +391,8 @@ def test_input_trigger_update_success():
     sqs_queue_url = read_terraform_output("sds_etl.value.proxy_executer.sqs_queue_url")
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     timestamp = _create_timestamp().replace(":", ".")
-    intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
-    execution_arn = f"{state_machine_arn}:{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}".replace(
+    intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    execution_arn = f"{state_machine_arn}:{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}".replace(
         "stateMachine", "execution"
     )
 
@@ -454,12 +452,11 @@ def test_input_trigger_update_success():
         QueueUrl=f"{sqs_queue_url}",
         MessageBody=json.dumps(
             {
-                "init": "input--extract/unprocessed",
                 "changelog_number_start": UPDATE_CHANGELOG_NUMBER_START,
                 "changelog_number_end": UPDATE_CHANGELOG_NUMBER_END,
-                "type": STATE_MACHINE_INPUT_TYPE_UPDATE,
+                "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
                 "timestamp": f"{timestamp}",
-                "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}",
+                "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}",
             }
         ),
         MessageDeduplicationId=str(uuid.uuid4()),
@@ -498,7 +495,7 @@ def test_input_trigger_update_rejected():
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     sqs_queue_url = read_terraform_output("sds_etl.value.proxy_executer.sqs_queue_url")
     timestamp = _create_timestamp().replace(":", ".")
-    intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
 
     # Set some questions
     s3_client = boto3.client("s3")
@@ -536,12 +533,11 @@ def test_input_trigger_update_rejected():
         QueueUrl=f"{sqs_queue_url}",
         MessageBody=json.dumps(
             {
-                "init": "input--extract/unprocessed",
                 "changelog_number_start": UPDATE_CHANGELOG_NUMBER_START,
                 "changelog_number_end": UPDATE_CHANGELOG_NUMBER_END,
-                "type": STATE_MACHINE_INPUT_TYPE_UPDATE,
+                "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
                 "timestamp": f"{timestamp}",
-                "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.EXTRACT.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}",
+                "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}",
             }
         ),
         MessageDeduplicationId=str(uuid.uuid4()),

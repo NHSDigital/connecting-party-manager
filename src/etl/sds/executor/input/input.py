@@ -49,7 +49,7 @@ def process_message(message):
     if isinstance(result, tuple):
         state_machine_input, state_machine_name = result
         if not isinstance(state_machine_input, Exception):
-            trigger_type = state_machine_input.type
+            trigger_type = state_machine_input.etl_type
     else:
         # If the result is not a tuple, it must be an Exception
         state_machine_input = result
