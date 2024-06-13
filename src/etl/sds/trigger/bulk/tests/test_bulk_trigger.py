@@ -65,7 +65,7 @@ def test_bulk_trigger():
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
     initial_trigger_key = f"{bulk_trigger_prefix}/{TEST_DATA_NAME}"
-    history_key_prefix = f"history/bulk.EXTRACT"
+    history_key_prefix = f"history/bulk"
     table_name = read_terraform_output("dynamodb_table_name.value")
 
     client = dynamodb_client()

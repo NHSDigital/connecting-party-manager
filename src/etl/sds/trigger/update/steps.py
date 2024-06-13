@@ -128,7 +128,7 @@ def _publish_message_to_sqs_queue(data, cache: Cache):
     message_body = {
         "changelog_number_start": state_machine_input.changelog_number_start,
         "changelog_number_end": state_machine_input.changelog_number_end,
-        "type": state_machine_input.etl_type.value,
+        "etl_type": state_machine_input.etl_type.value,
         "timestamp": state_machine_input.timestamp,
         "name": state_machine_input.name,
     }

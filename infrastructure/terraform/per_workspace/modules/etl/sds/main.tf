@@ -284,6 +284,7 @@ resource "aws_sfn_state_machine" "state_machine" {
       changelog_key                = var.changelog_key
       bulk_load_chunksize          = var.bulk_load_chunksize
       etl_update_state_machine_arn = module.update_transform_and_load_step_function.state_machine_arn
+      etl_state_lock_key           = var.etl_state_lock_key
     }
   )
   logging_configuration {
@@ -453,7 +454,7 @@ module "proxy_lambda_executor" {
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
   notify_lambda_arn     = module.notify.arn
-  state_machine_arn     = module.step_function.state_machine_arn
+  state_machine_arn     = aws_sfn_state_machine.state_machine.arn
   table_arn             = var.table_arn
   allowed_triggers      = {}
   environment_variables = {
