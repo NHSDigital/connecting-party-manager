@@ -7,21 +7,16 @@ from event.step_chain import StepChain
 from .steps import _process_sqs_message, steps
 
 
-class ChangelogTriggerEnvironment(BaseEnvironment):
+class EtlStateLockEnvironment(BaseEnvironment):
     STATE_MACHINE_ARN: str
     NOTIFY_LAMBDA_ARN: str
-    TRUSTSTORE_BUCKET: str
-    CPM_FQDN: str
-    LDAP_HOST: str
     ETL_BUCKET: str
-    LDAP_CHANGELOG_USER: str
-    LDAP_CHANGELOG_PASSWORD: str
 
 
 S3_CLIENT = boto3.client("s3")
 STEP_FUNCTIONS_CLIENT = boto3.client("stepfunctions")
 LAMBDA_CLIENT = boto3.client("lambda")
-ENVIRONMENT = ChangelogTriggerEnvironment.build()
+ENVIRONMENT = EtlStateLockEnvironment.build()
 
 
 CACHE = {
@@ -36,7 +31,8 @@ def handler(event=dict, context=None):
     for message in event["Records"]:
         process_message(message)
 
-    return None  # Message removed from sqs queue
+    return None  # Returning None is crucial because it indicates a successful processing of the message to the SQS service.
+    # If this return value is changed, the SQS service might interpret it as a failure, causing the message to be retried or stuck in the queue.
 
 
 def process_message(message):

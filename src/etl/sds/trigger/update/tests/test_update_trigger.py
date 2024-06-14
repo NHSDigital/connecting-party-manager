@@ -179,9 +179,9 @@ def test_update(change_result):
         # Verify message was published to queue
         expected_sqs_message = json.dumps(
             {
+                "etl_type": "update",
                 "changelog_number_start": decoded_current_changelog_number,
                 "changelog_number_end": decoded_latest_changelog_number,
-                "etl_type": "update",
                 "timestamp": "foo",
                 "name": f"update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
             }

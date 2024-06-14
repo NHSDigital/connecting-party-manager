@@ -22,6 +22,6 @@ output "etl_state_lock_key" {
   value = var.etl_state_lock_key
 }
 
-output "proxy_executer" {
-  value = module.proxy_lambda_executor
+output "etl_state_lock_enforcer" {
+  value = module.etl_state_lock_enforcer
 }

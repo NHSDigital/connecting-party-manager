@@ -1,10 +1,8 @@
-import json
 import uuid
 from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
-import boto3
 from etl_utils.constants import LDIF_RECORD_DELIMITER
 from etl_utils.ldap_typing import LdapModuleProtocol
 from etl_utils.trigger.model import StateMachineInput
@@ -20,13 +18,12 @@ from .operations import (
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
-    from mypy_boto3_stepfunctions import SFNClient
+    from mypy_boto3_sqs import SQSClient
 
 
 class Cache(TypedDict):
     s3_client: "S3Client"
-    step_functions_client: "SFNClient"
-    state_machine_arn: str
+    sqs_client: "SQSClient"
     truststore_bucket: str
     ldap: LdapModuleProtocol
     ldap_host: str
@@ -121,25 +118,14 @@ def _put_changes_to_intermediate_history_file(data, cache: Cache):
 
 
 def _publish_message_to_sqs_queue(data, cache: Cache):
-    sqs_client = boto3.client("sqs")
-
-    # Convert the state_machine_input to JSON
     state_machine_input: StateMachineInput = data[_create_state_machine_input]
-    message_body = {
-        "changelog_number_start": state_machine_input.changelog_number_start,
-        "changelog_number_end": state_machine_input.changelog_number_end,
-        "etl_type": state_machine_input.etl_type.value,
-        "timestamp": state_machine_input.timestamp,
-        "name": state_machine_input.name,
-    }
-    message_body_json = json.dumps(message_body)
-
+    message_body = state_machine_input.json_with_name()
     message_deduplication_id = str(uuid.uuid4())
 
     # Send the message to the SQS queue
-    sqs_client.send_message(
+    cache["sqs_client"].send_message(
         QueueUrl=cache["sqs_queue_url"],
-        MessageBody=message_body_json,
+        MessageBody=message_body,
         MessageGroupId="state_machine_group",
         MessageDeduplicationId=message_deduplication_id,
     )

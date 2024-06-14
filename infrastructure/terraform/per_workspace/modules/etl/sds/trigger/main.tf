@@ -21,7 +21,6 @@ module "lambda_function" {
   allowed_triggers                        = var.allowed_triggers
 
   environment_variables = merge({
-    STATE_MACHINE_ARN = var.state_machine_arn
     NOTIFY_LAMBDA_ARN = var.notify_lambda_arn
     },
     var.environment_variables
@@ -92,13 +91,6 @@ module "lambda_function" {
         ],
         "Effect" : "Allow",
         "Resource" : ["*"]
-      },
-      {
-        "Action" : [
-          "states:StartExecution"
-        ],
-        "Effect" : "Allow",
-        "Resource" : ["${var.state_machine_arn}"]
       },
       {
         "Action" : [

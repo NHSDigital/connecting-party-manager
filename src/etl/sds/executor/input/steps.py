@@ -25,7 +25,6 @@ class Cache(TypedDict):
     s3_client: "S3Client"
     step_functions_client: "SFNClient"
     state_machine_arn: str
-    truststore_bucket: str
     ldap: LdapModuleProtocol
     ldap_host: str
     cert_file: Path
