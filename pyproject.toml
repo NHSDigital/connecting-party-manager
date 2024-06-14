@@ -66,9 +66,11 @@ optional = true
 python-ldap = "^3.4.4"
 lz4 = "^4.3.3"
 
-
 [tool.poetry.group.sds.dependencies]
 lz4 = "^4.3.3"
+
+[tool.poetry.group.ci.dependencies]
+pygithub = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core"]
