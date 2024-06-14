@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-06-14
+- [PI-179] Improve Slack messaging for deployments
+- [PI-385] PENTEST - reject HTTP and enable access logs on S3 buckets
+
 ## 2024-06-04
 - [PI-322] State machine lambda error messages truncated
 - [PI-346] Update now includes modify changes, plus testing suite
