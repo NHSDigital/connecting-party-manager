@@ -47,7 +47,7 @@ def process_message(message):
     result = step_chain.data[_process_sqs_message]
 
     if isinstance(result, tuple):
-        state_machine_input, state_machine_name = result
+        state_machine_input, _ = result
         if not isinstance(state_machine_input, Exception):
             trigger_type = state_machine_input.etl_type
     else:

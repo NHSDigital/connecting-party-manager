@@ -52,7 +52,7 @@ def _validate_state_keys_are_empty(data, cache: Cache):
 
 
 def _check_etl_lock(data, cache: Cache):
-    state_machine_input, state_machine_name = data[_process_sqs_message]
+    _, state_machine_name = data[_process_sqs_message]
 
     s3_client = cache["s3_client"]
     etl_bucket = cache["etl_bucket"]
@@ -70,7 +70,7 @@ def _check_etl_lock(data, cache: Cache):
 
 
 def _put_to_state_machine(data, cache: Cache):
-    state_machine_input, state_machine_name = data[_process_sqs_message]
+    _, state_machine_name = data[_process_sqs_message]
     s3_client = cache["s3_client"]
     etl_bucket = cache["etl_bucket"]
 
