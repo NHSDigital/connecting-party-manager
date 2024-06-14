@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
