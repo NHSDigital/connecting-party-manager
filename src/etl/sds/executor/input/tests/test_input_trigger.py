@@ -39,7 +39,7 @@ MOCKED_INPUT_TRIGGER_ENVIRONMENT = {
     "LDAP_HOST": "ldap-host",
     "ETL_BUCKET": "etl-bucket",
     "LDAP_CHANGELOG_USER": "user",
-    "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret,
+    "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret
     "SQS_QUEUE_URL": "sqs-queue",
 }
 
