@@ -13,13 +13,21 @@ from botocore.exceptions import ClientError
 from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
-from etl_utils.trigger.model import StateMachineInputType, _create_timestamp
+from etl_utils.trigger.model import _create_timestamp
 from etl_utils.trigger.operations import StateFileNotEmpty
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 from mypy_boto3_stepfunctions import SFNClient
 
 from etl.sds.executor.input.steps import _start_execution
+from test_helpers.sample_sqs_messages import (
+    BULK_HISTORY_FILE,
+    INVALID_BODY_JSON_EVENT,
+    STATE_MACHINE_INPUT_TYPE_UPDATE,
+    UPDATE_HISTORY_FILE,
+    VALID_SQS_BULK_EVENT,
+    VALID_SQS_UPDATE_EVENT,
+)
 from test_helpers.terraform import read_terraform_output
 
 MOCKED_INPUT_TRIGGER_ENVIRONMENT = {
@@ -35,134 +43,7 @@ MOCKED_INPUT_TRIGGER_ENVIRONMENT = {
     "SQS_QUEUE_URL": "sqs-queue",
 }
 
-CHANGELOG_NUMBER_START = 546512
-CHANGELOG_NUMBER_END = 548916
-STATE_MACHINE_INPUT_TYPE_UPDATE = StateMachineInputType.UPDATE
-STATE_MACHINE_INPUT_TYPE_BULK = StateMachineInputType.BULK
-UPDATE_HISTORY_FILE = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo"
-BULK_HISTORY_FILE = f"history/{STATE_MACHINE_INPUT_TYPE_BULK}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo"
 ETL_BUCKET = MOCKED_INPUT_TRIGGER_ENVIRONMENT["ETL_BUCKET"]
-
-
-VALID_SQS_UPDATE_MESSAGE_BODY = json.dumps(
-    {
-        "changelog_number_start": CHANGELOG_NUMBER_START,
-        "changelog_number_end": CHANGELOG_NUMBER_END,
-        "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
-        "timestamp": "foo",
-        "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
-    }
-)
-VALID_SQS_UPDATE_EVENT = {
-    "Records": [
-        {
-            "messageId": "9eec100f-ee88-487a-80a7-3df7e40b780a",
-            "receiptHandle": "xxx",
-            "body": VALID_SQS_UPDATE_MESSAGE_BODY,
-            "attributes": {
-                "ApproximateReceiveCount": "1",
-                "AWSTraceHeader": "Root=1-66605ea1-2906755913c79d1e09ac123c;Parent=2ead4ea5436a13b6;Sampled=0;Lineage=81989ed2:0",
-                "SentTimestamp": "1717591754739",
-                "SequenceNumber": "18886447562922735616",
-                "MessageGroupId": "state_machine_group",
-                "SenderId": "test",
-                "MessageDeduplicationId": "155cca91-bd65-41a4-a335-922cde2edff9",
-                "ApproximateFirstReceiveTimestamp": "1717591754739",
-            },
-            "messageAttributes": {},
-            "md5OfBody": "xxx",
-            "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:eu-west-2:*:nhse-cpm--megtest--sds--input-sqs.fifo",
-            "awsRegion": "eu-west-2",
-        }
-    ]
-}
-
-VALID_SQS_BULK_MESSAGE_BODY = json.dumps(
-    {
-        "changelog_number_start": 0,
-        "changelog_number_end": CHANGELOG_NUMBER_END,
-        "etl_type": STATE_MACHINE_INPUT_TYPE_BULK,
-        "timestamp": "foo",
-        "name": f"{STATE_MACHINE_INPUT_TYPE_BULK}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
-    }
-)
-VALID_SQS_BULK_EVENT = {
-    "Records": [
-        {
-            "messageId": "9eec100f-ee88-487a-80a7-3df7e40b780a",
-            "receiptHandle": "xxx",
-            "body": VALID_SQS_BULK_MESSAGE_BODY,
-            "attributes": {
-                "ApproximateReceiveCount": "1",
-                "AWSTraceHeader": "Root=1-66605ea1-2906755913c79d1e09ac123c;Parent=2ead4ea5436a13b6;Sampled=0;Lineage=81989ed2:0",
-                "SentTimestamp": "1717591754739",
-                "SequenceNumber": "18886447562922735616",
-                "MessageGroupId": "state_machine_group",
-                "SenderId": "test",
-                "MessageDeduplicationId": "155cca91-bd65-41a4-a335-922cde2edff9",
-                "ApproximateFirstReceiveTimestamp": "1717591754739",
-            },
-            "messageAttributes": {},
-            "md5OfBody": "xxx",
-            "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:eu-west-2:*:nhse-cpm--megtest--sds--input-sqs.fifo",
-            "awsRegion": "eu-west-2",
-        }
-    ]
-}
-
-INVALID_BODY_FIELD_SQS_MESSAGE = json.dumps({"invalid field": "value"})
-INVALID_BODY_FIELD_EVENT = {
-    "Records": [
-        {
-            "messageId": "9eec100f-ee88-487a-80a7-3df7e40b780a",
-            "receiptHandle": "xxx",
-            "body": INVALID_BODY_FIELD_SQS_MESSAGE,
-            "attributes": {
-                "ApproximateReceiveCount": "1",
-                "AWSTraceHeader": "Root=1-66605ea1-2906755913c79d1e09ac123c;Parent=2ead4ea5436a13b6;Sampled=0;Lineage=81989ed2:0",
-                "SentTimestamp": "1717591754739",
-                "SequenceNumber": "18886447562922735616",
-                "MessageGroupId": "state_machine_group",
-                "SenderId": "test",
-                "MessageDeduplicationId": "155cca91-bd65-41a4-a335-922cde2edff9",
-                "ApproximateFirstReceiveTimestamp": "1717591754739",
-            },
-            "messageAttributes": {},
-            "md5OfBody": "xxx",
-            "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:eu-west-2:*:nhse-cpm--megtest--sds--input-sqs.fifo",
-            "awsRegion": "eu-west-2",
-        }
-    ]
-}
-
-INVALID_BODY_JSON_SQS_MESSAGE = '{invalid_json: "value"}'
-INVALID_BODY_JSON_EVENT = {
-    "Records": [
-        {
-            "messageId": "9eec100f-ee88-487a-80a7-3df7e40b780a",
-            "receiptHandle": "xxx",
-            "body": INVALID_BODY_JSON_SQS_MESSAGE,
-            "attributes": {
-                "ApproximateReceiveCount": "1",
-                "AWSTraceHeader": "Root=1-66605ea1-2906755913c79d1e09ac123c;Parent=2ead4ea5436a13b6;Sampled=0;Lineage=81989ed2:0",
-                "SentTimestamp": "1717591754739",
-                "SequenceNumber": "18886447562922735616",
-                "MessageGroupId": "state_machine_group",
-                "SenderId": "test",
-                "MessageDeduplicationId": "155cca91-bd65-41a4-a335-922cde2edff9",
-                "ApproximateFirstReceiveTimestamp": "1717591754739",
-            },
-            "messageAttributes": {},
-            "md5OfBody": "xxx",
-            "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:eu-west-2:*:nhse-cpm--megtest--sds--input-sqs.fifo",
-            "awsRegion": "eu-west-2",
-        }
-    ]
-}
 
 
 @pytest.mark.parametrize(
@@ -193,7 +74,7 @@ def test_input_state_lock_does_not_exist(message, history_file):
         # Mock the cache contents
         input.CACHE["s3_client"] = s3_client
 
-        # Remove start execution, since it's meaningless
+        # Remove start execution, since it's meaningless for unit tests
         if _start_execution in input.steps:
             idx = input.steps.index(_start_execution)
             input.steps.pop(idx)
@@ -326,11 +207,6 @@ def test_input_failure_invalid_json_message(message):
         # Mock the cache contents
         input.CACHE["s3_client"] = s3_client
 
-        # Remove start execution, since it's meaningless
-        if _start_execution in input.steps:
-            idx = input.steps.index(_start_execution)
-            input.steps.pop(idx)
-
         # Don't execute the notify lambda
         input.notify = lambda lambda_client, function_name, result, trigger_type: result
 
@@ -426,7 +302,6 @@ def test_input_trigger_update_success():
             execution_arn=execution_arn, question=lambda x: x == "SUCCEEDED"
         )
     )
-
     was_etl_state_lock_removed = lambda: not ask_s3(key=ETL_STATE_LOCK)
 
     # Clear/set the initial state
@@ -437,7 +312,6 @@ def test_input_trigger_update_success():
     s3_client.put_object(
         Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
     )
-
     s3_client.put_object(
         Bucket=etl_bucket,
         Key=CHANGELOG_NUMBER,
@@ -448,7 +322,7 @@ def test_input_trigger_update_success():
 
     # Trigger the input lambda by sending message to queue
     sqs_client = boto3.client("sqs")
-    response = sqs_client.send_message(
+    sqs_client.send_message(
         QueueUrl=f"{sqs_queue_url}",
         MessageBody=json.dumps(
             {
@@ -518,7 +392,6 @@ def test_input_trigger_update_rejected():
     s3_client.put_object(
         Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
     )
-
     s3_client.put_object(
         Bucket=etl_bucket,
         Key=CHANGELOG_NUMBER,
@@ -529,7 +402,7 @@ def test_input_trigger_update_rejected():
 
     # Trigger the input lambda by sending message to queue
     sqs_client = boto3.client("sqs")
-    response = sqs_client.send_message(
+    sqs_client.send_message(
         QueueUrl=f"{sqs_queue_url}",
         MessageBody=json.dumps(
             {

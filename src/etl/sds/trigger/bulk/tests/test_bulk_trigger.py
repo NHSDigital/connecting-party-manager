@@ -110,11 +110,9 @@ def test_bulk_trigger():
         Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
     )
     s3_client.delete_object(Bucket=etl_bucket, Key=initial_trigger_key)
-
     history_files = s3_client.list_objects(Bucket=etl_bucket, Prefix=history_key_prefix)
     for item in history_files.get("Contents", []):
         s3_client.delete_object(Bucket=etl_bucket, Key=item["Key"])
-
     s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
     s3_client.delete_object(Bucket=etl_bucket, Key=ETL_STATE_LOCK)
     clear_dynamodb_table(client=client, table_name=table_name)
