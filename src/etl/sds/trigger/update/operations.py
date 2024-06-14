@@ -7,7 +7,7 @@ from etl_utils.constants import (
     CHANGELOG_NUMBER,
     FILTERED_OUT,
     LDAP_FILTER_ALL,
-    SDS_ORGANISATIONAL_UNIT_PEOPLE,
+    UNSUPPORTED_ORGANISATIONAL_UNITS,
     ChangelogAttributes,
 )
 from etl_utils.ldap_typing import LdapClientProtocol, LdapModuleProtocol
@@ -102,6 +102,11 @@ def get_latest_changelog_number_from_ldap(
     return int(last_changelog_number_str)
 
 
+def _filter_unsupported_organisational_units(record: dict[str, list[str]]):
+    target_dn = record["targetDN"][0].lower()
+    return any(ou in target_dn for ou in UNSUPPORTED_ORGANISATIONAL_UNITS)
+
+
 def get_changelog_entries_from_ldap(
     ldap_client: LdapClientProtocol,
     ldap: LdapModuleProtocol,
@@ -117,10 +122,7 @@ def get_changelog_entries_from_ldap(
             base=CHANGELOG_BASE,
             scope=ldap.SCOPE_ONELEVEL,
             filterstr=f"(changenumber={changelog_number})",
-            filter_function=(
-                lambda record: SDS_ORGANISATIONAL_UNIT_PEOPLE
-                in record["targetDN"][0].lower()
-            ),
+            filter_function=_filter_unsupported_organisational_units,
         )
         if record != FILTERED_OUT:
             changelog_records.append(record)

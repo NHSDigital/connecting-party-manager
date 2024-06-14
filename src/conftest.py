@@ -11,12 +11,16 @@ from nhs_context_logging.fixtures import (  # noqa: F401
     log_capture_global_fixture as log_capture_global,
 )
 from nhs_context_logging.formatters import json_serializer
-from pytest import Config, FixtureRequest, Item, fixture
+from pytest import Config, FixtureRequest, Item, Parser, fixture
 
 from test_helpers.aws_session import aws_session
 from test_helpers.constants import PROJECT_ROOT
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.terraform import read_terraform_output
+
+
+def pytest_addoption(parser: Parser):
+    parser.addoption("--suppress-logs", action="store", default=False)
 
 
 def is_integration(request: FixtureRequest) -> bool:
@@ -65,8 +69,13 @@ def pytest_collection_modifyitems(items: list[Item], config: Config):
 
 
 @fixture(autouse=True)
-def log_on_failure(request: FixtureRequest, log_capture):
+def log_on_failure(pytestconfig: Config, request: FixtureRequest, log_capture):
     setup_logger(request.node.name)
+
+    if pytestconfig.getoption("suppress_logs") is not False:
+        from nhs_context_logging import app_logger
+
+        app_logger.log = lambda *args, **kwargs: None
 
     exception = None
     try:
@@ -76,7 +85,8 @@ def log_on_failure(request: FixtureRequest, log_capture):
 
     std_out, std_err = log_capture
     for log in (*std_out, *std_err):
-        print(json.dumps(log, indent=2, default=json_serializer))  # noqa: T201
+        if pytestconfig.getoption("suppress_logs") is False:
+            print(json.dumps(log, indent=2, default=json_serializer))  # noqa: T201
 
     if isinstance(exception, Exception):
         raise exception

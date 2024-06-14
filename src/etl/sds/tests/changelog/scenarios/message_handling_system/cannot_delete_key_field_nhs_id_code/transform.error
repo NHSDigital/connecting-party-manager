@@ -1,0 +1,5 @@
+The following errors were encountered
+  -- Error 1 (InvalidModificationRequest) --
+  Failed to parse record 0
+  {'change_type': 'modify', 'modifications': [['delete', 'nhsidcode', []]], 'object_class': 'modify', 'unique_identifier': '00000a84594b2ef34279'}
+  Forbidden to delete NhsMhs.nhs_id_code

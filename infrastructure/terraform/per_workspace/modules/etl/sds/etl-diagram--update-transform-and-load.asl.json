@@ -1,0 +1,91 @@
+{
+  "Comment": "SDS ETL - Sequential Transform and Load for updates",
+  "TimeoutSeconds": 60,
+  "StartAt": "load",
+  "States": {
+    "load": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${load_worker_arn}:$LATEST",
+        "Payload": {
+          "max_records": "1"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "load-result"
+    },
+    "load-result": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Not": {
+            "Variable": "$.error_message",
+            "IsNull": true
+          },
+          "Next": "etl-stopped"
+        },
+        {
+          "And": [
+            {
+              "Variable": "$.error_message",
+              "IsNull": true
+            },
+            {
+              "Not": {
+                "Variable": "$.unprocessed_records",
+                "NumericEquals": 0
+              }
+            }
+          ],
+          "Next": "load"
+        }
+      ],
+      "Default": "transform"
+    },
+    "transform": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${transform_worker_arn}:$LATEST",
+        "Payload": {
+          "max_records": "1",
+          "trust": false
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "etl-stopped"
+    },
+
+    "etl-stopped": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

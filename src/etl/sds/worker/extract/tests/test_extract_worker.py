@@ -8,6 +8,7 @@ import pytest
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
+from etl_utils.worker.model import WorkerEnvironment
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
@@ -81,6 +82,7 @@ def mock_s3_client():
     ):
         from etl.sds.worker.extract import extract
 
+        extract.ENVIRONMENT = WorkerEnvironment.build()
         extract.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
         yield extract.S3_CLIENT
 
@@ -127,13 +129,70 @@ def test_extract_worker_pass(
     put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_processed_data))
 
     # Execute the extract worker
-    response = extract.handler(event=None, context=None)
+    response = extract.handler(event={}, context=None)
     assert response == {
         "stage_name": "extract",
         "processed_records": 10,
         "unprocessed_records": 0,
         "error_message": None,
     }
+
+    # Final state
+    final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT).decode()
+    final_processed_data: str = get_object(key=WorkerKey.TRANSFORM)
+    n_final_unprocessed = len(_split_ldif(final_unprocessed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
+
+    # Confirm that everything has now been processed, and that there is no
+    # unprocessed data left in the bucket
+    assert n_final_processed == n_initial_unprocessed + n_initial_processed
+    assert n_final_unprocessed == 0
+
+
+@pytest.mark.parametrize("max_records", range(1, 10))
+@pytest.mark.parametrize(
+    ("initial_unprocessed_data", "initial_processed_data"),
+    [
+        ("", [PROCESSED_SDS_RECORD] * 10),
+        ("\n".join([GOOD_SDS_RECORD] * 5), [PROCESSED_SDS_RECORD] * 5),
+        ("\n".join([GOOD_SDS_RECORD] * 10), []),
+    ],
+    ids=["processed-only", "partly-processed", "unprocessed-only"],
+)
+def test_extract_worker_pass_max_records(
+    initial_unprocessed_data: str,
+    initial_processed_data: str,
+    max_records: int,
+    put_object: Callable[[str], None],
+    get_object: Callable[[str], bytes],
+):
+    from etl.sds.worker.extract import extract
+
+    # Initial state
+    n_initial_unprocessed = len(_split_ldif(initial_unprocessed_data))
+    n_initial_processed = len(initial_processed_data)
+    put_object(key=WorkerKey.EXTRACT, body=initial_unprocessed_data)
+    put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_processed_data))
+
+    n_total_processed_records_expected = n_initial_processed
+    n_unprocessed_records = n_initial_unprocessed
+    while n_unprocessed_records > 0:
+        n_newly_processed_records_expected = min(n_unprocessed_records, max_records)
+        n_unprocessed_records_expected = (
+            n_unprocessed_records - n_newly_processed_records_expected
+        )
+        n_total_processed_records_expected += n_newly_processed_records_expected
+
+        # Execute the extract worker
+        response = extract.handler(event={"max_records": max_records}, context=None)
+        assert response == {
+            "stage_name": "extract",
+            "processed_records": n_total_processed_records_expected,
+            "unprocessed_records": n_unprocessed_records_expected,
+            "error_message": None,
+        }
+
+        n_unprocessed_records = response["unprocessed_records"]
 
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.EXTRACT).decode()
@@ -169,36 +228,39 @@ def test_extract_worker_bad_record(
     put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
 
     # Execute the extract worker
-    response = extract.handler(event=None, context=None)
+    response = extract.handler(event={}, context=None)
+    response["error_message"] = response["error_message"].split("\n")[:24]
+
     assert response == {
         "stage_name": "extract",
         "processed_records": n_initial_processed + bad_record_index,
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
-        "error_message": (
-            "The following errors were encountered\n"
-            "  -- Error 1 (ValidationError) --\n"
-            f"  Failed to parse record {bad_record_index}\n"
-            "  {'objectclass': ['nhsAS', 'top']}\n"
-            "  9 validation errors for NhsAccreditedSystem\n"
-            "  uniqueidentifier\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsapproverurp\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsdateapproved\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsrequestorurp\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsdaterequested\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsidcode\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsmhspartykey\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsproductkey\n"
-            "    field required (type=value_error.missing)\n"
-            "  nhsassvcia\n"
-            "    field required (type=value_error.missing)"
-        ),
+        "error_message": [
+            "The following errors were encountered",
+            "  -- Error 1 (ValidationError) --",
+            f"  Failed to parse record {bad_record_index}",
+            "  {'objectclass': ['nhsAS', 'top']}",
+            "  9 validation errors for NhsAccreditedSystem",
+            "  uniqueidentifier",
+            "    field required (type=value_error.missing)",
+            "  nhsapproverurp",
+            "    field required (type=value_error.missing)",
+            "  nhsdateapproved",
+            "    field required (type=value_error.missing)",
+            "  nhsrequestorurp",
+            "    field required (type=value_error.missing)",
+            "  nhsdaterequested",
+            "    field required (type=value_error.missing)",
+            "  nhsidcode",
+            "    field required (type=value_error.missing)",
+            "  nhsmhspartykey",
+            "    field required (type=value_error.missing)",
+            "  nhsproductkey",
+            "    field required (type=value_error.missing)",
+            "  nhsassvcia",
+            "    field required (type=value_error.missing)",
+            "Traceback (most recent call last):",
+        ],
     }
 
     # Final state
@@ -234,24 +296,25 @@ def test_extract_worker_fatal_record(
     put_object(key=WorkerKey.TRANSFORM, body=initial_processed_data)
 
     # Execute the extract worker
-    response = extract.handler(event=None, context=None)
+    response = extract.handler(event={}, context=None)
 
     # The line number in the error changes for each example, so
     # substitute it for the value 'NUMBER'
-    response["error_message"] = re.sub(
+    subbed_error_message = re.sub(
         r"Line \d{1,2}", "Line NUMBER", response["error_message"]
     )
+    response["error_message"] = subbed_error_message.split("\n")[:4]
 
     assert response == {
         "stage_name": "extract",
         "processed_records": None,
         "unprocessed_records": None,
-        "error_message": (
-            "The following errors were encountered\n"
-            "  -- Error 1 (ValueError) --\n"
-            '  Line NUMBER: First line of record does not start with "dn:": '
-            "'objectclass'"
-        ),
+        "error_message": [
+            "The following errors were encountered",
+            "  -- Error 1 (ValueError) --",
+            "  Line NUMBER: First line of record does not start with \"dn:\": 'objectclass'",
+            "Traceback (most recent call last):",
+        ],
     }
 
     # Final state

@@ -12,12 +12,15 @@ if TYPE_CHECKING:
 
 
 def execute_action(data: dict, cache: dict) -> WorkerActionResponse:
-    action, s3_client, s3_input_path, s3_output_path, kwargs = data[StepChain.INIT]
+    action, s3_client, s3_input_path, s3_output_path, max_records, kwargs = data[
+        StepChain.INIT
+    ]
     return action(
         s3_client=s3_client,
         s3_input_path=s3_input_path,
         s3_output_path=s3_output_path,
-        **kwargs
+        max_records=max_records,
+        **kwargs,
     )
 
 

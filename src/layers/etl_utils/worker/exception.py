@@ -18,7 +18,10 @@ stringifies an ExceptionGroup in the form:
 >        inner-oops
 """
 
+from traceback import TracebackException
+
 INDENTATION = "  "
+TRUNCATION_DEPTH = 2000
 
 
 def _render_exception(exception: Exception) -> str:
@@ -40,7 +43,15 @@ def _render_nested_exception(exception: Exception, nested_index: list[int]):
     message = render_exception(exception=exception, nested_index=nested_index)
     error_index = ".".join(map(str, nested_index))
     prefix = f"-- Error {error_index} ({type(exception).__name__}) --\n"
-    return f"{indentation}{prefix}{message}"
+    _traceback = "".join(TracebackException.from_exception(exception).format())
+
+    if len(message) > TRUNCATION_DEPTH:
+        message = message[:TRUNCATION_DEPTH]
+
+    if len(_traceback) > TRUNCATION_DEPTH:
+        _traceback = _traceback[:TRUNCATION_DEPTH]
+
+    return f"{indentation}{prefix}{message}\n{_traceback}\n"
 
 
 def _render_exception_group(

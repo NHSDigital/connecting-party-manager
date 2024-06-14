@@ -79,6 +79,13 @@ def repository():
 def execute_state_machine(
     state_machine_input: StateMachineInput, client
 ) -> StartSyncExecutionOutputTypeDef:
+    config = Config(
+        retries={
+            "max_attempts": 10,  # Increase the number of max attempts
+            "mode": "standard",  # Standard retry mode
+        }
+    )
+    client = boto3.client("stepfunctions", config=config)
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     name = state_machine_input.name
     execution_response = client.start_execution(
@@ -266,9 +273,7 @@ def test_end_to_end_bulk_trigger(
 )
 @pytest.mark.parametrize(
     "state_machine_input",
-    [
-        StateMachineInput.bulk(changelog_number=123),
-    ],
+    [StateMachineInput.bulk(changelog_number=123)],
     indirect=True,
 )
 def test_end_to_end_changelog_delete(

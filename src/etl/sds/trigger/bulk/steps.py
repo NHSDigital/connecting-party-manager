@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
+from etl_utils.constants import WorkerKey
 from etl_utils.trigger.model import StateMachineInput
 from etl_utils.trigger.operations import start_execution, validate_state_keys_are_empty
 from event.step_chain import StepChain
@@ -46,19 +47,19 @@ def _create_state_machine_input(data, cache):
 
 def _copy_to_state_machine(data, cache: Cache):
     source_bucket, source_key = data[StepChain.INIT]
-    state_machine_input: StateMachineInput = data[_create_state_machine_input]
     return cache["s3_client"].copy_object(
         Bucket=source_bucket,
-        Key=state_machine_input.init,
+        Key=WorkerKey.EXTRACT,
         CopySource=f"{source_bucket}/{source_key}",
     )
 
 
 def _copy_to_history(data, cache: Cache):
     source_bucket, source_key = data[StepChain.INIT]
+    state_machine_input: StateMachineInput = data[_create_state_machine_input]
     return cache["s3_client"].copy_object(
         Bucket=source_bucket,
-        Key=f"history/{source_key}",
+        Key=f"history/{state_machine_input.etl_type}/{source_key}",
         CopySource=f"{source_bucket}/{source_key}",
     )
 

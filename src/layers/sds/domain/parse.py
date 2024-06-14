@@ -1,6 +1,7 @@
 from etl_utils.ldif.model import DistinguishedName
 from sds.domain.nhs_mhs_cp import NhsMhsCp
 from sds.domain.sds_deletion_request import SdsDeletionRequest
+from sds.domain.sds_modification_request import SdsModificationRequest
 
 from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
 from .nhs_accredited_system import NhsAccreditedSystem
@@ -22,6 +23,7 @@ MODELS = (
     NhsMhs,
     NhsMhsCp,
     SdsDeletionRequest,
+    SdsModificationRequest,
 )
 
 EMPTY_SET = set()

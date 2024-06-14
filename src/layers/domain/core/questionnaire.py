@@ -249,6 +249,13 @@ class QuestionnaireResponse(BaseModel):
             validate_response_against_question(question=question, answers=answers)
         return response
 
+    def get_response(self, question_name) -> list:
+        for response in self.responses:
+            value = response.get(question_name)
+            if value is not None:
+                return value
+        return []
+
 
 def validate_mandatory_questions_answered(
     questionnaire_name: str,

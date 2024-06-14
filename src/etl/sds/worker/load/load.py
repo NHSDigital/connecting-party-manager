@@ -10,7 +10,7 @@ from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
-from etl_utils.worker.model import WorkerActionResponse
+from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
@@ -36,7 +36,7 @@ MAX_RECORDS = 150_000
 
 
 def load(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str
+    s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
 ) -> WorkerActionResponse:
     with smart_open(s3_path=s3_input_path, s3_client=s3_client) as f:
         unprocessed_records: deque[dict] = pkl_load_lz4(f)
@@ -46,7 +46,7 @@ def load(
         unprocessed_records=unprocessed_records,
         processed_records=processed_records,
         action=lambda record: DeviceEventDeserializer.parse(exported_event=record),
-        max_records=MAX_RECORDS,
+        max_records=max_records,
     )
 
     return WorkerActionResponse(
@@ -57,7 +57,8 @@ def load(
     )
 
 
-def handler(event, context):
+def handler(event: dict, context):
+    max_records = WorkerEvent(**event).max_records or MAX_RECORDS
     response = execute_step_chain(
         action=load,
         s3_client=S3_CLIENT,
@@ -65,5 +66,6 @@ def handler(event, context):
         s3_output_path=None,
         unprocessed_dumper=pkl_dump_lz4,
         processed_dumper=lambda events: REPOSITORY.write(AggregateRoot(events=events)),
+        max_records=max_records,
     )
     return asdict(response)

@@ -9,6 +9,9 @@ variable "domain_layer" {}
 variable "changelog_key" {
   default = "changelog-number"
 }
+variable "bulk_load_chunksize" {
+  default = 10000
+}
 variable "table_name" {}
 variable "table_arn" {}
 variable "is_persistent" {}

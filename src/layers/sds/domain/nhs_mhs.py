@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import ClassVar, Literal, Optional
 
 from pydantic import Field
@@ -11,6 +12,16 @@ from sds.domain.constants import (
 
 from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
 from .organizational_unit import OrganizationalUnitDistinguishedName
+
+
+@dataclass
+class MessageHandlingSystemKey:
+    nhs_id_code: str
+    nhs_mhs_party_key: str
+    nhs_mhs_svc_ia: str
+
+
+KEY_FIELDS = tuple(MessageHandlingSystemKey.__dataclass_fields__.keys())
 
 
 class NhsMhs(SdsBaseModel):
@@ -56,3 +67,7 @@ class NhsMhs(SdsBaseModel):
     nhs_mhs_retries: Optional[int | Literal[""]] = Field(alias="nhsmhsretries")
     nhs_mhs_retry_interval: Optional[str] = Field(alias="nhsmhsretryinterval")
     nhs_mhs_service_description: Optional[str] = Field(alias="nhsmhsservicedescription")
+
+    @classmethod
+    def key_fields(cls) -> tuple[str, ...]:
+        return KEY_FIELDS

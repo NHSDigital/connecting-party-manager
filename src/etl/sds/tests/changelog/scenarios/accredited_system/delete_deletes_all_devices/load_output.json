@@ -1,0 +1,98 @@
+[
+  {
+    "keys": {
+      "K83015:000173655515": {
+        "key": "K83015:000173655515",
+        "type": "accredited_system_id"
+      }
+    },
+    "name": "TPP SystmOne",
+    "ods_code": "K83015",
+    "product_team_id": "12345678-1234-5678-1234-567812345678",
+    "questionnaire_responses": {
+      "spine_device/1": [
+        {
+          "responses": [
+            { "object_class": ["nhsAS"] },
+            { "unique_identifier": ["000173655515"] },
+            {
+              "nhs_approver_urp": [
+                "uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs"
+              ]
+            },
+
+            { "nhs_date_approved": ["20091016133823"] },
+            {
+              "nhs_requestor_urp": [
+                "uniqueIdentifier=203171972540,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs"
+              ]
+            },
+
+            { "nhs_date_requested": ["20091016133757"] },
+            { "nhs_id_code": ["K83015"] },
+            { "nhs_mhs_party_key": ["K83015-806782"] },
+            { "nhs_product_key": ["6216"] },
+            { "nhs_product_name": ["TPP SystmOne"] },
+            { "nhs_as_client": ["K83015"] },
+            {
+              "nhs_as_svc_ia": [
+                "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+              ]
+            },
+            { "nhs_temp_uid": ["10312"] }
+          ]
+        }
+      ]
+    },
+    "status": "inactive",
+    "type": "product"
+  },
+  {
+    "keys": {
+      "AAA:000173655515": {
+        "key": "AAA:000173655515",
+        "type": "accredited_system_id"
+      }
+    },
+    "name": "TPP SystmOne",
+    "ods_code": "AAA",
+    "product_team_id": "12345678-1234-5678-1234-567812345678",
+    "questionnaire_responses": {
+      "spine_device/1": [
+        {
+          "responses": [
+            { "object_class": ["nhsAS"] },
+            { "unique_identifier": ["000173655515"] },
+            {
+              "nhs_approver_urp": [
+                "uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs"
+              ]
+            },
+
+            { "nhs_date_approved": ["20091016133823"] },
+            {
+              "nhs_requestor_urp": [
+                "uniqueIdentifier=203171972540,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs"
+              ]
+            },
+
+            { "nhs_date_requested": ["20091016133757"] },
+            { "nhs_id_code": ["K83015"] },
+            { "nhs_mhs_party_key": ["K83015-806782"] },
+            { "nhs_product_key": ["6216"] },
+            { "nhs_product_name": ["TPP SystmOne"] },
+            { "nhs_as_client": ["AAA"] },
+            {
+              "nhs_as_svc_ia": [
+                "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+              ]
+            },
+            { "nhs_temp_uid": ["10312"] }
+          ]
+        }
+      ]
+    },
+    "status": "inactive",
+    "type": "product"
+  }
+]

@@ -1,7 +1,9 @@
 import json
 from collections import defaultdict
-from typing import DefaultDict, Generator
+from itertools import chain
+from typing import Generator
 
+from domain.core.device import DeviceKeyAddedEvent
 from domain.core.event import ExportedEventsTypeDef
 from etl_utils.io import EtlEncoder
 
@@ -13,25 +15,26 @@ class DuplicateSdsKey(Exception):
 def _get_duplicate_events(
     exported_events: ExportedEventsTypeDef,
 ) -> Generator[tuple[str, list[list[dict]]], None, None]:
-    ids_by_key: DefaultDict[str, list[str]] = defaultdict(list)
-    events_by_id: DefaultDict[str, list[dict]] = defaultdict(list)
+    device_ids_by_device_key = defaultdict(set)
+    events_by_id = defaultdict(list)
+
     for exported_event in exported_events:
-        ((_, event),) = exported_event.items()
-        event_id = event.get("id") or event.get("entity_id")
-        device_key = event.get("key")
-
-        events_by_id[event_id].append(event)
-        if device_key:
-            ids_by_key[device_key].append(event_id)
-
-    for device_key, event_ids in ids_by_key.items():
-        if len(event_ids) == 1:
+        ((event_name, event),) = exported_event.items()
+        if event_name != DeviceKeyAddedEvent.public_name:
             continue
 
-        yield (
-            device_key,
-            list(events_by_id[_event_id] for _event_id in event_ids),
+        device_id = event["id"]
+        device_key = event["key"]
+        device_ids_by_device_key[device_key].add(device_id)
+        events_by_id[device_id].append(event)
+
+    for device_key, event_ids in device_ids_by_device_key.items():
+        if len(event_ids) == 1:
+            continue
+        events_for_this_key = chain.from_iterable(
+            events_by_id[_event_id] for _event_id in event_ids
         )
+        yield (device_key, list(events_for_this_key))
 
 
 def reject_duplicate_keys(exported_events: ExportedEventsTypeDef):
@@ -39,7 +42,7 @@ def reject_duplicate_keys(exported_events: ExportedEventsTypeDef):
         "\n".join(
             (
                 f"Duplicates found for device key '{device_key}'",
-                *(json.dumps(duplicates[0], cls=EtlEncoder),),
+                *(json.dumps(duplicates, cls=EtlEncoder),),
                 "===============",
             )
         )

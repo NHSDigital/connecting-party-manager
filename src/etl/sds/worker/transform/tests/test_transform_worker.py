@@ -143,7 +143,7 @@ def test_transform_worker_pass_no_dupes(
 
     # Execute the transform worker
     with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
-        response = transform.handler(event=None, context=None)
+        response = transform.handler(event={}, context=None)
 
     assert response == {
         "stage_name": "transform",
@@ -152,6 +152,59 @@ def test_transform_worker_pass_no_dupes(
         "unprocessed_records": 0,
         "error_message": None,
     }
+
+    # Final state
+    final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
+    final_processed_data: str = get_object(key=WorkerKey.LOAD)
+    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
+    n_final_processed = len(pkl_loads_lz4(final_processed_data))
+
+    # Confirm that everything has now been processed, and that there is no
+    # unprocessed data left in the bucket
+    assert n_final_processed == n_initial_processed + 5 * n_initial_unprocessed
+    assert n_final_unprocessed == 0
+
+
+@pytest.mark.parametrize("max_records", range(1, 10))
+def test_transform_worker_pass_no_dupes_max_records(
+    put_object: Callable[[str], None],
+    get_object: Callable[[str], bytes],
+    max_records: int,
+):
+    from etl.sds.worker.transform import transform
+
+    initial_unprocessed_data = deque([GOOD_SDS_RECORD_AS_JSON] * 10)
+    initial_processed_data = deque([])
+
+    # Initial state
+    n_initial_unprocessed = len(initial_unprocessed_data)
+    n_initial_processed = len(initial_processed_data)
+    put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_unprocessed_data))
+    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
+
+    n_total_processed_records_expected = 0
+    n_unprocessed_records = n_initial_unprocessed
+    while n_unprocessed_records > 0:
+        n_newly_processed_records_expected = min(n_unprocessed_records, max_records)
+        n_unprocessed_records_expected = (
+            n_unprocessed_records - n_newly_processed_records_expected
+        )
+        # 5 x initial unprocessed because 5 events are created for each input record
+        n_total_processed_records_expected += 5 * n_newly_processed_records_expected
+
+        # Execute the transform worker
+        with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
+            response = transform.handler(
+                event={"max_records": max_records}, context=None
+            )
+        assert response == {
+            "stage_name": "transform",
+            "processed_records": n_total_processed_records_expected,
+            "unprocessed_records": n_unprocessed_records_expected,
+            "error_message": None,
+        }
+
+        n_unprocessed_records = response["unprocessed_records"]
 
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
@@ -183,23 +236,25 @@ def test_transform_worker_pass_duplicate_fail(
     put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
 
     # Execute the transform worker
-    response = transform.handler(event=None, context=None)
+    response = transform.handler(event={"trust": True}, context=None)
+
     response["error_message"] = re.sub(
         r"'RVL:000428682512'\n(.+)\n",
         r"'RVL:000428682512'\nREDACTED\n",
         response["error_message"],
-    )
+    ).split("\n")[:6]
     assert response == {
         "stage_name": "transform",
         "processed_records": None,
         "unprocessed_records": None,
-        "error_message": (
-            "The following errors were encountered\n"
-            "  -- Error 1 (DuplicateSdsKey) --\n"
-            "  Duplicates found for device key 'RVL:000428682512'\n"
-            "REDACTED\n"
-            "  ==============="
-        ),
+        "error_message": [
+            "The following errors were encountered",
+            "  -- Error 1 (DuplicateSdsKey) --",
+            "  Duplicates found for device key 'RVL:000428682512'",
+            "REDACTED",
+            "  ===============",
+            "Traceback (most recent call last):",
+        ],
     }
 
     # Final state
@@ -241,18 +296,22 @@ def test_transform_worker_bad_record(
     # Execute the transform worker
     with mock.patch("etl.sds.worker.transform.transform.reject_duplicate_keys"):
         response = transform.handler(event={}, context=None)
+
+    response["error_message"] = response["error_message"].split("\n")[:6]
+
     assert response == {
         "stage_name": "transform",
         # 5 x initial unprocessed because a key event + 2 questionnaire events + 1 index event are also created
         "processed_records": n_initial_processed + (5 * bad_record_index),
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
-        "error_message": (
-            "The following errors were encountered\n"
-            "  -- Error 1 (KeyError) --\n"
-            f"  Failed to parse record {bad_record_index}\n"
-            "  {}\n"
-            "  'object_class'"
-        ),
+        "error_message": [
+            "The following errors were encountered",
+            "  -- Error 1 (KeyError) --",
+            f"  Failed to parse record {bad_record_index}",
+            "  {}",
+            "  'object_class'",
+            "Traceback (most recent call last):",
+        ],
     }
 
     # Final state
@@ -291,16 +350,17 @@ def test_transform_worker_fatal_record(
     response["error_message"] = re.sub(
         r"Line \d{1,2}", "Line NUMBER", response["error_message"]
     )
+    response["error_message"] = response["error_message"].split("\n")[:3]
 
     assert response == {
         "stage_name": "transform",
         "processed_records": None,
         "unprocessed_records": None,
-        "error_message": (
-            "The following errors were encountered\n"
-            "  -- Error 1 (RuntimeError) --\n"
-            "  LZ4F_decompress failed with code: ERROR_frameType_unknown"
-        ),
+        "error_message": [
+            "The following errors were encountered",
+            "  -- Error 1 (RuntimeError) --",
+            "  LZ4F_decompress failed with code: ERROR_frameType_unknown",
+        ],
     }
 
     # Final state

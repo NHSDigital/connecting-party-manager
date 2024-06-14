@@ -1,9 +1,10 @@
 """
 Downloaded, pruned and modified from https://raw.githubusercontent.com/python-ldap/python-ldap/main/Lib/ldif.py
 
-The only modifications were (search this file for '**We modified this**'):
+The only modifications were:
     * yield records in parse(), rather than append.
     * lowercase all attribute names
+    * implement a method for parsing and extracting ldif modify
 Other than that, unnecessary features were removed.
 """
 
@@ -11,6 +12,7 @@ __version__ = "3.4.4"
 
 import re
 from base64 import b64decode, b64encode
+from collections import defaultdict
 from typing import IO
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -28,7 +30,9 @@ SAFE_STRING_PATTERN = b"(^(\000|\n|\r| |:|<)|[\000\n\r\200-\377]+|[ ]+$)"  # NOS
 safe_string_re = re.compile(SAFE_STRING_PATTERN)
 
 
-CHANGE_TYPES = ["add", "delete", "modify", "modrdn"]
+CHANGE_TYPES = {"add", "delete", "modify"}  # ,'modrdn'
+MODIFICATION_OPERATIONS = {"add", "delete", "replace"}
+PARSED_MODIFICATION_KEY = "modifications"  # **We added this**
 
 
 def is_dn(s):
@@ -145,7 +149,15 @@ class LDIFParser:
         self._last_line = next_line
         return "".join(unfolded_lines)
 
-    def _next_key_and_value(self):
+    def _next_key_and_value(self, raise_on_eof=False):
+        try:
+            return self.__next_key_and_value()
+        except EOFError:
+            if raise_on_eof:
+                raise
+            return None, None
+
+    def __next_key_and_value(self):
         """
         Parse a single attribute type and value pair from one or
         more lines of LDIF data
@@ -191,7 +203,7 @@ class LDIFParser:
             # All values should be valid ascii; we support UTF-8 as a
             # non-official, backwards compatibility layer.
             attr_value = unfolded_line[colon_pos + 1 :].encode("utf-8")
-        return attr_type.lower(), attr_value  # ** We modified this**
+        return attr_type.lower(), attr_value
 
     def _consume_empty_lines(self):
         """
@@ -200,73 +212,115 @@ class LDIFParser:
 
         Returns non-empty key-value-tuple.
         """
-        # Local symbol for better performance
-        next_key_and_value = self._next_key_and_value
-        # Consume empty lines
-        try:
-            k, v = next_key_and_value()
-            while k is None and v is None:
-                k, v = next_key_and_value()
-        except EOFError:
-            k, v = None, None
+        k, v = self._next_key_and_value()
+        while k is None and v is None:
+            try:
+                k, v = self._next_key_and_value(raise_on_eof=True)
+            except EOFError:
+                break
         return k, v
+
+    def _parse_header(self):
+        # Consume empty lines
+        k, v = self._consume_empty_lines()
+        # Consume 'version' line
+        if k == "version":
+            self.version = int(v.decode("ascii"))
+            k, v = self._consume_empty_lines()
+        return k, v
+
+    def _parse_dn(self, k: str, v: bytes):
+        if k != "dn":
+            raise ValueError(
+                'Line %d: First line of record does not start with "dn:": %s'
+                % (self.line_counter, repr(k))
+            )
+        # Value of a 'dn' field *has* to be valid UTF-8
+        # k is text, v is bytes.
+        v = v.decode("utf-8")
+        if not is_dn(v):
+            raise ValueError(
+                "Line %d: Not a valid string-representation for dn: %s."
+                % (self.line_counter, repr(v))
+            )
+        return v
+
+    def _parse_changetype(self, k, v):
+        if k == "changetype":
+            # v is still bytes, spec says it should be valid utf-8; decode it.
+            v = v.decode("utf-8")
+            if not v in CHANGE_TYPES:
+                raise ValueError("Invalid changetype: %s" % repr(v))
+            return v
+        return None
+
+    def _parse_modify(self):
+        modifications = defaultdict(list)
+        modifications["changetype"].append(b"modify")
+        modifications[PARSED_MODIFICATION_KEY] = []
+
+        k, v = self._next_key_and_value()
+        # Loop for reading the list of modifications
+        while k != None:
+            # Extract attribute mod-operation (add, delete, replace)
+            if k not in MODIFICATION_OPERATIONS:
+                modifications[k].append(v)
+                k, v = self._next_key_and_value()
+                continue
+            modification_operation = k
+
+            # we now have the attribute name to be modified
+            # v is still bytes, spec says it should be valid utf-8; decode it.
+            v = v.decode("utf-8")
+            attribute_name = v.lower()
+            new_values = set()
+            k, v = self._next_key_and_value()
+            while k == attribute_name:
+                new_values.add(v.decode())
+                k, v = self._next_key_and_value()
+
+            modifications[PARSED_MODIFICATION_KEY].append(
+                (modification_operation, attribute_name, new_values)
+            )
+
+            if k == "-":  # skip hyphens
+                k, v = self._next_key_and_value()
+        return modifications
+
+    def _parse_entry(self, k, v):
+        entry = defaultdict(list)
+
+        # Loop for reading the attributes
+        while k != None:
+            # Add the attribute to the entry if not ignored attribute
+            if not k.lower() in self._ignored_attr_types:
+                entry[k].append(v)
+            k, v = self._next_key_and_value()
+        return entry
 
     def parse(self):
         """
         Continuously read and parse LDIF entry records
         """
-        # Local symbol for better performance
-        next_key_and_value = self._next_key_and_value
-
-        try:
-            # Consume empty lines
-            k, v = self._consume_empty_lines()
-            # Consume 'version' line
-            if k == "version":
-                self.version = int(v.decode("ascii"))
-                k, v = self._consume_empty_lines()
-        except EOFError:
-            return
+        k, v = self._parse_header()
 
         # Loop for processing whole records
         while k != None and (
             not self._max_entries or self.records_read < self._max_entries
         ):
             # Consume first line which must start with "dn: "
-            if k != "dn":
-                raise ValueError(
-                    'Line %d: First line of record does not start with "dn:": %s'
-                    % (self.line_counter, repr(k))
-                )
-            # Value of a 'dn' field *has* to be valid UTF-8
-            # k is text, v is bytes.
-            v = v.decode("utf-8")
-            if not is_dn(v):
-                raise ValueError(
-                    "Line %d: Not a valid string-representation for dn: %s."
-                    % (self.line_counter, repr(v))
-                )
-            dn = v
-            entry = {}
+            dn = self._parse_dn(k, v)
             # Consume second line of record
-            k, v = next_key_and_value()
+            k, v = self._next_key_and_value()
 
-            # Loop for reading the attributes
-            while k != None:
-                # Add the attribute to the entry if not ignored attribute
-                if not k.lower() in self._ignored_attr_types:
-                    try:
-                        entry[k].append(v)
-                    except KeyError:
-                        entry[k] = [v]
-                # Read the next line within the record
-                try:
-                    k, v = next_key_and_value()
-                except EOFError:
-                    k, v = None, None
+            # Determine changetype first
+            changetype = self._parse_changetype(k, v)
+            if changetype == "modify":
+                entry = self._parse_modify()
+            else:
+                entry = self._parse_entry(k, v)
+            yield (dn, entry)
 
-            yield (dn, entry)  # ** We modified this**
-            self.records_read = self.records_read + 1
             # Consume empty separator line(s)
             k, v = self._consume_empty_lines()
         return
@@ -354,8 +408,16 @@ class LDIFWriter:
             dictionary holding an entry
         """
         for attr_type, values in sorted(entry.items()):
-            for attr_value in values:
-                self._unparseAttrTypeandValue(attr_type, attr_value)
+            if attr_type == PARSED_MODIFICATION_KEY:
+                for modification_operation, attribute_name, new_values in values:
+                    self._unfold_lines(f"{modification_operation}: {attribute_name}")
+                    for v in sorted(new_values):
+                        self._unfold_lines(f"{attribute_name}: {v}")
+                    self._unfold_lines("-")
+
+            else:
+                for attr_value in values:
+                    self._unparseAttrTypeandValue(attr_type, attr_value)
 
     def unparse(self, dn: str, record):
         """
