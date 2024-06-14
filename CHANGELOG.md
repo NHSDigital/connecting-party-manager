@@ -3,6 +3,7 @@
 ## 2024-06-14
 - [PI-179] Improve Slack messaging for deployments
 - [PI-385] PENTEST - reject HTTP and enable access logs on S3 buckets
+- [Dependabot] bump nhs-context-logging requirement from ^0.5.1 to ^0.6.1
 
 ## 2024-06-04
 - [PI-322] State machine lambda error messages truncated
