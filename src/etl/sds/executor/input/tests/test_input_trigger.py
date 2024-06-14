@@ -264,7 +264,9 @@ def _ask_step_functions(
 def test_input_trigger_update_success():
     # Where the state is located
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
-    sqs_queue_url = read_terraform_output("sds_etl.value.proxy_executer.sqs_queue_url")
+    sqs_queue_url = read_terraform_output(
+        "sds_etl.value.etl_state_lock_enforcer.sqs_queue_url"
+    )
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     timestamp = _create_timestamp().replace(":", ".")
     intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
@@ -367,7 +369,9 @@ def test_input_trigger_update_success():
 def test_input_trigger_update_rejected():
     # Where the state is located
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
-    sqs_queue_url = read_terraform_output("sds_etl.value.proxy_executer.sqs_queue_url")
+    sqs_queue_url = read_terraform_output(
+        "sds_etl.value.etl_state_lock_enforcer.sqs_queue_url"
+    )
     timestamp = _create_timestamp().replace(":", ".")
     intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
 

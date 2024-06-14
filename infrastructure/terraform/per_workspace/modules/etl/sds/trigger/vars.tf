@@ -15,10 +15,6 @@ variable "python_version" {
   type = string
 }
 
-variable "state_machine_arn" {
-  type = string
-}
-
 variable "notify_lambda_arn" {
   type = string
 }

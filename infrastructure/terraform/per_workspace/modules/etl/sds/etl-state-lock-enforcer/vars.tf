@@ -43,12 +43,7 @@ variable "sds_layer_arn" {
   type = string
 }
 
-
 variable "allowed_triggers" {
-}
-
-variable "table_arn" {
-
 }
 
 variable "extra_policies" {

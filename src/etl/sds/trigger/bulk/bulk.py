@@ -12,7 +12,6 @@ from .steps import steps
 
 
 class BulkTriggerEnvironment(BaseEnvironment):
-    STATE_MACHINE_ARN: str
     NOTIFY_LAMBDA_ARN: str
     TABLE_NAME: str
     SQS_QUEUE_URL: str
@@ -20,15 +19,14 @@ class BulkTriggerEnvironment(BaseEnvironment):
 
 S3_CLIENT = boto3.client("s3")
 DYNAMODB_CLIENT = dynamodb_client()
-STEP_FUNCTIONS_CLIENT = boto3.client("stepfunctions")
 LAMBDA_CLIENT = boto3.client("lambda")
+SQS_CLIENT = boto3.client("sqs")
 ENVIRONMENT = BulkTriggerEnvironment.build()
 
 CACHE = {
     "s3_client": S3_CLIENT,
     "dynamodb_client": DYNAMODB_CLIENT,
-    "step_functions_client": STEP_FUNCTIONS_CLIENT,
-    "state_machine_arn": ENVIRONMENT.STATE_MACHINE_ARN,
+    "sqs_client": SQS_CLIENT,
     "table_name": ENVIRONMENT.TABLE_NAME,
     "sqs_queue_url": ENVIRONMENT.SQS_QUEUE_URL,
 }
