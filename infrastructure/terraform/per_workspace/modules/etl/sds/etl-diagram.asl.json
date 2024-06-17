@@ -1,6 +1,6 @@
 {
   "Comment": "SDS ETL",
-  "TimeoutSeconds": 5400,
+  "TimeoutSeconds": 21600,
   "StartAt": "root",
   "States": {
     "root": {
