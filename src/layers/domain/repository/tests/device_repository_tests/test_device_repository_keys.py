@@ -1,5 +1,6 @@
 import pytest
 from domain.core.device import Device, DeviceKeyType, DeviceType
+from domain.core.device_key import DeviceKey
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
 
@@ -49,8 +50,10 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     repository.write(second_device)
 
     assert repository.read_by_id(id=device.id).keys == {
-        "P.WWW-XXX": DeviceKeyType.PRODUCT_ID,
-        "ABC:1234567890": DeviceKeyType.ACCREDITED_SYSTEM_ID,
+        "P.WWW-XXX": DeviceKey(type=DeviceKeyType.PRODUCT_ID, key="P.WWW-XXX"),
+        "ABC:1234567890": DeviceKey(
+            type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key="ABC:1234567890"
+        ),
     }
 
 
@@ -68,5 +71,5 @@ def test__device_repository__delete_key(
     repository.write(intermediate_device)
 
     assert repository.read_by_id(id=device_with_asid.id).keys == {
-        "P.WWW-XXX": DeviceKeyType.PRODUCT_ID
+        "P.WWW-XXX": DeviceKey(type=DeviceKeyType.PRODUCT_ID, key="P.WWW-XXX")
     }

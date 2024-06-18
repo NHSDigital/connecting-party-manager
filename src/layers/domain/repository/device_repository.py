@@ -22,6 +22,7 @@ from domain.core.device import (
 #     QuestionnaireResponseDeletedEvent,
 #     QuestionnaireResponseUpdatedEvent,
 # )
+from domain.core.device_key import DeviceKey
 from domain.repository.keys import TableKeys
 
 from .errors import ItemNotFound
@@ -133,9 +134,9 @@ class DeviceRepository(Repository[Device]):
         #  Make a copy of the device to avoid side effects and update keys
         updated_device = deepcopy(device_by_id)
         updated_device_keys = updated_device.get("keys", {})
-        updated_device_keys[event.key] = event.key_type
+        device_key = DeviceKey(key=event.key, type=event.key_type).dict()
+        updated_device_keys[event.key] = device_key
         updated_device["keys"] = updated_device_keys
-
         return existing_device_keys, updated_device
 
     def _get_existing_keys_and_remove_key_from_device(
@@ -166,10 +167,14 @@ class DeviceRepository(Repository[Device]):
             if event_data.get("_trust", False) is False
             else {}
         )
+
+        # Setting Root = True is how we deduplicate the records in Opensearch
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(pk=device_id_pk, sk=device_id_sk, **event_data),
+                Item=marshall(
+                    pk=device_id_pk, sk=device_id_sk, root=True, **event_data
+                ),
                 **_condition_expression,
             )
         )
@@ -195,7 +200,6 @@ class DeviceRepository(Repository[Device]):
         new_device_key = str(event.key)
 
         event_data = asdict(event)
-
         condition_expression = (
             {"ConditionExpression": ConditionExpression.MUST_NOT_EXIST}
             if event_data.get("_trust", False) is False
@@ -294,6 +298,7 @@ class DeviceRepository(Repository[Device]):
             raise ItemNotFound(id)
 
         device = unmarshall(item)
+        device2 = Device(**device)
         return Device(
             **device,
         )

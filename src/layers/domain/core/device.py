@@ -16,7 +16,7 @@ from domain.core.questionnaire import (
 from pydantic import Field
 
 from .aggregate_root import AggregateRoot
-from .device_key import DeviceKeyType
+from .device_key import DeviceKey, DeviceKeyType
 from .error import DuplicateError, NotFoundError
 from .event import Event, EventDeserializer
 from .validation import DEVICE_NAME_REGEX
@@ -41,7 +41,7 @@ class DeviceCreatedEvent(Event):
     type: "DeviceType"
     product_team_id: UUID
     ods_code: str
-    keys: dict[str, DeviceKeyType]
+    keys: dict[str, DeviceKey]
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     status: "DeviceStatus"
     created_on: str
@@ -56,7 +56,7 @@ class DeviceUpdatedEvent(Event):
     name: str
     type: "DeviceType"
     product_team_id: UUID
-    keys: dict[str, DeviceKeyType]
+    keys: dict[str, DeviceKey]
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     ods_code: str
     status: "DeviceStatus"
@@ -164,7 +164,7 @@ class Device(AggregateRoot):
     created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
-    keys: dict[str, DeviceKeyType] = Field(default_factory=dict)
+    keys: dict[str, DeviceKey] = Field(default_factory=dict)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list)
     )
@@ -185,10 +185,11 @@ class Device(AggregateRoot):
             deleted_on=deletion_datetime,
         )
 
-    def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
+    def add_key(self, type: str, key: str) -> DeviceKeyAddedEvent:
         if key in self.keys:
             raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        self.keys[key] = type
+        device_key = DeviceKey(key=key, type=type)
+        self.keys[key] = device_key
         event = DeviceKeyAddedEvent(id=self.id, key=key, key_type=type)
         return self.add_event(event)
 
@@ -202,36 +203,6 @@ class Device(AggregateRoot):
 
         event = DeviceKeyDeletedEvent(id=self.id, key=key, remaining_keys=self.keys)
         return self.add_event(event)
-
-    # def add_index(
-    #     self, questionnaire_id: str, question_name: str
-    # ) -> list[DeviceIndexAddedEvent]:
-    #     questionnaire_responses = _get_questionnaire_responses(
-    #         questionnaire_responses=self.questionnaire_responses,
-    #         questionnaire_id=questionnaire_id,
-    #     )
-    #     if question_name not in questionnaire_responses[0].questionnaire.questions:
-    #         raise QuestionNotFoundError(
-    #             f"Questionnaire '{questionnaire_id}' does not "
-    #             f"contain question '{question_name}'"
-    #         )
-    #     unique_answers = _get_unique_answers(
-    #         questionnaire_responses=questionnaire_responses,
-    #         question_name=question_name,
-    #     )
-
-    #     events = []
-    #     for answer in unique_answers:
-    #         event = DeviceIndexAddedEvent(
-    #             id=self.id,
-    #             questionnaire_id=questionnaire_id,
-    #             question_name=question_name,
-    #             value=answer,
-    #         )
-    #         events.append(event)
-    #         self.add_event(event)
-
-    #     return events
 
     def add_questionnaire_response(
         self,
