@@ -7,10 +7,6 @@ variable "etl_name" {
   type = string
 }
 
-variable "executor_name" {
-  type = string
-}
-
 variable "python_version" {
   type = string
 }

@@ -1,8 +1,6 @@
-from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
 from etl_utils.constants import ETL_STATE_LOCK, WorkerKey
-from etl_utils.ldap_typing import LdapModuleProtocol
 from etl_utils.trigger.model import StateMachineInput
 from etl_utils.trigger.operations import start_execution, validate_state_keys_are_empty
 from event.json import json_loads
@@ -25,10 +23,6 @@ class Cache(TypedDict):
     s3_client: "S3Client"
     step_functions_client: "SFNClient"
     state_machine_arn: str
-    ldap: LdapModuleProtocol
-    ldap_host: str
-    cert_file: Path
-    key_file: Path
     etl_bucket: str
     etl_extract_input_key: str
 
