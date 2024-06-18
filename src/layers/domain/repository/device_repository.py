@@ -68,14 +68,14 @@ class DeviceRepository(Repository[Device]):
             table_name=table_name, model=Device, dynamodb_client=dynamodb_client
         )
 
-    def _batch_get_items(self, keys, id):
+    def _batch_get_items(self, keys: list[DeviceKey], id):
         list_of_keys = []
-        for key in keys:
+        for device_key in keys:
             list_of_keys.append(
-                {"pk": TableKeys.DEVICE.key(key), "sk": TableKeys.DEVICE.key(key)}
-            )
-            list_of_keys.append(
-                {"pk": TableKeys.DEVICE.key(id), "sk": TableKeys.DEVICE.key(key)}
+                {
+                    "pk": TableKeys.DEVICE.key(device_key["key"]),
+                    "sk": TableKeys.DEVICE.key(device_key["key"]),
+                }
             )
 
         list_of_keys.append(
@@ -93,7 +93,7 @@ class DeviceRepository(Repository[Device]):
         yield from map(unmarshall, all_devices)
 
     def _transact_items_to_update_all_devices_by_id_and_key(
-        self, id, keys, updated_fields: dict
+        self, id: str, keys: list[DeviceKey], updated_fields: dict
     ) -> List[TransactItem]:
         # Read all items by device ID
 
@@ -130,13 +130,17 @@ class DeviceRepository(Repository[Device]):
     ):
         device_by_id = self.read_by_id(id=event.id).dict()
 
+        #  Make a copy of the device and keys to avoid side effects and update keys
         existing_device_keys = deepcopy(device_by_id.get("keys", {}))
-        #  Make a copy of the device to avoid side effects and update keys
         updated_device = deepcopy(device_by_id)
-        updated_device_keys = updated_device.get("keys", {})
+
+        updated_device_keys: list = updated_device.get("keys", {})
         device_key = DeviceKey(key=event.key, type=event.key_type).dict()
-        updated_device_keys[event.key] = device_key
+
+        updated_device_keys.append(device_key)
+
         updated_device["keys"] = updated_device_keys
+
         return existing_device_keys, updated_device
 
     def _get_existing_keys_and_remove_key_from_device(
@@ -218,17 +222,6 @@ class DeviceRepository(Repository[Device]):
             updated_fields={"keys": updated_device["keys"]},
         )
 
-        create_device_by_id_and_key = TransactItem(
-            Put=TransactionStatement(
-                TableName=self.table_name,
-                Item=marshall(
-                    pk=TableKeys.DEVICE.key(device_id),
-                    sk=TableKeys.DEVICE.key(new_device_key),
-                    **updated_device,
-                ),
-                **condition_expression,
-            )
-        )
         create_device_by_key = TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
@@ -240,7 +233,6 @@ class DeviceRepository(Repository[Device]):
                 **condition_expression,
             )
         )
-        transaction_items.append(create_device_by_id_and_key)
         transaction_items.append(create_device_by_key)
         return transaction_items
 
@@ -298,7 +290,6 @@ class DeviceRepository(Repository[Device]):
             raise ItemNotFound(id)
 
         device = unmarshall(item)
-        device2 = Device(**device)
         return Device(
             **device,
         )

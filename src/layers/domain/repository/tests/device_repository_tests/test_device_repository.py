@@ -22,7 +22,7 @@ def device() -> Device:
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
     device = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
-    device.add_key(key=DEVICE_KEY, type=DeviceKeyType.PRODUCT_ID)
+    device.add_key(key=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     return device
 
 

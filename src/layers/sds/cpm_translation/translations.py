@@ -80,7 +80,7 @@ def nhs_accredited_system_to_cpm_devices(
             name=product_name, type=DeviceType.PRODUCT, _trust=_trust
         )
         _device.add_key(
-            type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
+            key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
             key=accredited_system_id,
             _trust=_trust,
         )
@@ -114,7 +114,7 @@ def nhs_mhs_to_cpm_device(
         name=product_name, type=DeviceType.ENDPOINT, _trust=_trust
     )
     device.add_key(
-        type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
+        key_type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
         key=_scoped_party_key,
         _trust=_trust,
     )

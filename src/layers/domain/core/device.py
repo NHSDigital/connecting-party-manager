@@ -41,7 +41,7 @@ class DeviceCreatedEvent(Event):
     type: "DeviceType"
     product_team_id: UUID
     ods_code: str
-    keys: dict[str, DeviceKey]
+    keys: list[DeviceKey]
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     status: "DeviceStatus"
     created_on: str
@@ -56,7 +56,7 @@ class DeviceUpdatedEvent(Event):
     name: str
     type: "DeviceType"
     product_team_id: UUID
-    keys: dict[str, DeviceKey]
+    keys: list[DeviceKey]
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     ods_code: str
     status: "DeviceStatus"
@@ -76,7 +76,7 @@ class DeviceKeyAddedEvent(Event):
 class DeviceKeyDeletedEvent(Event):
     id: str
     key: str
-    remaining_keys: dict[str, DeviceKeyType]
+    remaining_keys: list[DeviceKey]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -164,7 +164,7 @@ class Device(AggregateRoot):
     created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
-    keys: dict[str, DeviceKey] = Field(default_factory=dict)
+    keys: list[DeviceKey] = Field(default_factory=list)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(list)
     )
@@ -185,12 +185,18 @@ class Device(AggregateRoot):
             deleted_on=deletion_datetime,
         )
 
-    def add_key(self, type: str, key: str) -> DeviceKeyAddedEvent:
-        if key in self.keys:
-            raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        device_key = DeviceKey(key=key, type=type)
-        self.keys[key] = device_key
-        event = DeviceKeyAddedEvent(id=self.id, key=key, key_type=type)
+    def add_key(self, key_type: str, key: str) -> DeviceKeyAddedEvent:
+        existing_keys = {
+            (_device_key.key, _device_key.type) for _device_key in self.keys
+        }
+        if (key, type) in existing_keys:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate keys: ({type}) '{key}'"
+            )
+
+        device_key = DeviceKey(key=key, type=key_type)
+        self.keys.append(device_key)
+        event = DeviceKeyAddedEvent(id=self.id, key=key, key_type=key_type)
         return self.add_event(event)
 
     def delete_key(self, key: str) -> DeviceKeyDeletedEvent:

@@ -44,7 +44,7 @@ def create_domain_device_from_fhir_device(
         type=fhir_device.definition.identifier.value,
     )
     for identifier in fhir_device.identifier:
-        device.add_key(type=identifier.key_type, key=identifier.value)
+        device.add_key(key_type=identifier.key_type, key=identifier.value)
     return device
 
 

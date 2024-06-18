@@ -135,7 +135,7 @@ def device_factory(id: int) -> Device:
     )
     event = DeviceCreatedEvent(**device.dict())
     device.add_event(event)
-    device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
+    device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
     return device
 
 
