@@ -38,8 +38,7 @@ module "bucket_access_logs" {
   bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--s3-access-logs"
   attach_deny_insecure_transport_policy = true
   attach_access_log_delivery_policy     = true
-
-  force_destroy = true
+  force_destroy                         = true
   versioning = {
     enabled = true
   }
