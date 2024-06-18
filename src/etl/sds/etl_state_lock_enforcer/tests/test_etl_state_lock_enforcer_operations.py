@@ -7,7 +7,7 @@ import pytest
 from etl_utils.constants import ETL_STATE_LOCK
 from moto import mock_aws
 
-from etl.sds.executor.input.operations import etl_state_lock_doesnt_exist_in_s3
+from etl.sds.etl_state_lock_enforcer.operations import etl_state_lock_doesnt_exist_in_s3
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client

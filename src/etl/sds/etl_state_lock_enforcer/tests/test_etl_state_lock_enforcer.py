@@ -19,7 +19,7 @@ from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 from mypy_boto3_stepfunctions import SFNClient
 
-from etl.sds.executor.input.steps import _start_execution
+from etl.sds.etl_state_lock_enforcer.steps import _start_execution
 from test_helpers.sample_sqs_messages import (
     BULK_HISTORY_FILE,
     INVALID_BODY_JSON_EVENT,
@@ -30,20 +30,15 @@ from test_helpers.sample_sqs_messages import (
 )
 from test_helpers.terraform import read_terraform_output
 
-MOCKED_INPUT_TRIGGER_ENVIRONMENT = {
+MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT = {
     "AWS_DEFAULT_REGION": "us-east-1",
     "STATE_MACHINE_ARN": "state-machine",
     "NOTIFY_LAMBDA_ARN": "notify-lambda",
-    "TRUSTSTORE_BUCKET": "truststore",
-    "CPM_FQDN": "cpm-fqdn",
-    "LDAP_HOST": "ldap-host",
     "ETL_BUCKET": "etl-bucket",
-    "LDAP_CHANGELOG_USER": "user",
-    "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret
     "SQS_QUEUE_URL": "sqs-queue",
 }
 
-ETL_BUCKET = MOCKED_INPUT_TRIGGER_ENVIRONMENT["ETL_BUCKET"]
+ETL_BUCKET = MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT["ETL_BUCKET"]
 
 
 @pytest.mark.parametrize(
@@ -54,9 +49,9 @@ ETL_BUCKET = MOCKED_INPUT_TRIGGER_ENVIRONMENT["ETL_BUCKET"]
     ],
     indirect=False,
 )
-def test_input_state_lock_does_not_exist(message, history_file):
+def test_etl_state_lock_enforcer_state_lock_does_not_exist(message, history_file):
     with mock_aws(), mock.patch.dict(
-        os.environ, MOCKED_INPUT_TRIGGER_ENVIRONMENT, clear=True
+        os.environ, MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT, clear=True
     ), mock.patch("etl_utils.trigger.model.datetime") as mocked_datetime:
         mocked_datetime.datetime.now().isoformat.return_value = "foo"
         s3_client = boto3.client("s3")
@@ -69,21 +64,23 @@ def test_input_state_lock_does_not_exist(message, history_file):
             Body="test",
         )
 
-        from etl.sds.executor.input import input
+        from etl.sds.etl_state_lock_enforcer import etl_state_lock_enforcer
 
         # Mock the cache contents
-        input.CACHE["s3_client"] = s3_client
+        etl_state_lock_enforcer.CACHE["s3_client"] = s3_client
 
         # Remove start execution, since it's meaningless for unit tests
-        if _start_execution in input.steps:
-            idx = input.steps.index(_start_execution)
-            input.steps.pop(idx)
+        if _start_execution in etl_state_lock_enforcer.steps:
+            idx = etl_state_lock_enforcer.steps.index(_start_execution)
+            etl_state_lock_enforcer.steps.pop(idx)
 
         # Don't execute the notify lambda
-        input.notify = lambda lambda_client, function_name, result, trigger_type: result
+        etl_state_lock_enforcer.notify = (
+            lambda lambda_client, function_name, result, trigger_type: result
+        )
 
-        # Execute input lambda
-        response = input.handler(event=message)
+        # Execute etl_state_lock_enforcer lambda
+        response = etl_state_lock_enforcer.handler(event=message)
 
         # Assert state_lock_file created
         etl_state_lock_file = s3_client.get_object(
@@ -107,9 +104,9 @@ def test_input_state_lock_does_not_exist(message, history_file):
     ],
     indirect=False,
 )
-def test_input_state_lock_exist(message, history_file):
+def test_etl_state_lock_enforcer_state_lock_exist(message, history_file):
     with mock_aws(), mock.patch.dict(
-        os.environ, MOCKED_INPUT_TRIGGER_ENVIRONMENT, clear=True
+        os.environ, MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT, clear=True
     ), mock.patch("etl_utils.trigger.model.datetime") as mocked_datetime:
         mocked_datetime.datetime.now().isoformat.return_value = "foo"
         s3_client = boto3.client("s3")
@@ -128,16 +125,18 @@ def test_input_state_lock_exist(message, history_file):
             Body="test-lock",
         )
 
-        from etl.sds.executor.input import input
+        from etl.sds.etl_state_lock_enforcer import etl_state_lock_enforcer
 
         # Mock the cache contents
-        input.CACHE["s3_client"] = s3_client
+        etl_state_lock_enforcer.CACHE["s3_client"] = s3_client
 
         # Don't execute the notify lambda
-        input.notify = lambda lambda_client, function_name, result, trigger_type: result
+        etl_state_lock_enforcer.notify = (
+            lambda lambda_client, function_name, result, trigger_type: result
+        )
 
-        # Execute input lambda
-        input.handler(event=message)
+        # Execute etl_state_lock_enforcer lambda
+        etl_state_lock_enforcer.handler(event=message)
 
         # Assert history file deleted
         with pytest.raises(ClientError):
@@ -152,9 +151,9 @@ def test_input_state_lock_exist(message, history_file):
     "message",
     [VALID_SQS_UPDATE_EVENT, VALID_SQS_BULK_EVENT],
 )
-def test_input_failure_state_file_not_empty(message):
+def test_etl_state_lock_enforcer_failure_state_file_not_empty(message):
     with mock_aws(), mock.patch.dict(
-        os.environ, MOCKED_INPUT_TRIGGER_ENVIRONMENT, clear=True
+        os.environ, MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT, clear=True
     ), mock.patch("etl_utils.trigger.model.datetime") as mocked_datetime:
         mocked_datetime.datetime.now().isoformat.return_value = "foo"
         s3_client = boto3.client("s3")
@@ -177,16 +176,18 @@ def test_input_failure_state_file_not_empty(message):
             Body="test",
         )
 
-        from etl.sds.executor.input import input
+        from etl.sds.etl_state_lock_enforcer import etl_state_lock_enforcer
 
         # Mock the cache contents
-        input.CACHE["s3_client"] = s3_client
+        etl_state_lock_enforcer.CACHE["s3_client"] = s3_client
 
         # Don't execute the notify lambda
-        input.notify = lambda lambda_client, function_name, result, trigger_type: result
+        etl_state_lock_enforcer.notify = (
+            lambda lambda_client, function_name, result, trigger_type: result
+        )
 
-        # Execute input lambda
-        result = input.process_message(message=message["Records"][0])
+        # Execute etl_state_lock_enforcer lambda
+        result = etl_state_lock_enforcer.process_message(message=message["Records"][0])
 
         assert isinstance(result, StateFileNotEmpty)
 
@@ -195,23 +196,25 @@ def test_input_failure_state_file_not_empty(message):
     "message",
     [INVALID_BODY_JSON_EVENT],
 )
-def test_input_failure_invalid_json_message(message):
+def test_etl_state_lock_enforcer_failure_invalid_json_message(message):
     with mock_aws(), mock.patch.dict(
-        os.environ, MOCKED_INPUT_TRIGGER_ENVIRONMENT, clear=True
+        os.environ, MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT, clear=True
     ), mock.patch("etl_utils.trigger.model.datetime") as mocked_datetime:
         mocked_datetime.datetime.now().isoformat.return_value = "foo"
         s3_client = boto3.client("s3")
 
-        from etl.sds.executor.input import input
+        from etl.sds.etl_state_lock_enforcer import etl_state_lock_enforcer
 
         # Mock the cache contents
-        input.CACHE["s3_client"] = s3_client
+        etl_state_lock_enforcer.CACHE["s3_client"] = s3_client
 
         # Don't execute the notify lambda
-        input.notify = lambda lambda_client, function_name, result, trigger_type: result
+        etl_state_lock_enforcer.notify = (
+            lambda lambda_client, function_name, result, trigger_type: result
+        )
 
-        # Execute input lambda
-        result = input.process_message(message=message["Records"][0])
+        # Execute etl_state_lock_enforcer lambda
+        result = etl_state_lock_enforcer.process_message(message=message["Records"][0])
 
         assert isinstance(result, json.decoder.JSONDecodeError)
 
@@ -261,7 +264,7 @@ def _ask_step_functions(
 
 @pytest.mark.timeout(30)
 @pytest.mark.integration
-def test_input_trigger_update_success():
+def test_etl_state_lock_enforcer_trigger_update_success():
     # Where the state is located
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     sqs_queue_url = read_terraform_output(
@@ -322,7 +325,7 @@ def test_input_trigger_update_success():
     s3_client.put_object(Bucket=etl_bucket, Key=intermediate_history_file, Body=b"")
     s3_client.delete_object(Bucket=etl_bucket, Key=ETL_STATE_LOCK)
 
-    # Trigger the input lambda by sending message to queue
+    # Trigger the etl_state_lock_enforcer lambda by sending message to queue
     sqs_client = boto3.client("sqs")
     sqs_client.send_message(
         QueueUrl=f"{sqs_queue_url}",
@@ -366,7 +369,7 @@ def test_input_trigger_update_success():
 
 @pytest.mark.timeout(30)
 @pytest.mark.integration
-def test_input_trigger_update_rejected():
+def test_etl_state_lock_enforcer_trigger_update_rejected():
     # Where the state is located
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     sqs_queue_url = read_terraform_output(
@@ -404,7 +407,7 @@ def test_input_trigger_update_rejected():
     s3_client.put_object(Bucket=etl_bucket, Key=intermediate_history_file, Body=b"")
     s3_client.put_object(Bucket=etl_bucket, Key=ETL_STATE_LOCK, Body="locked")
 
-    # Trigger the input lambda by sending message to queue
+    # Trigger the etl_state_lock_enforcer lambda by sending message to queue
     sqs_client = boto3.client("sqs")
     sqs_client.send_message(
         QueueUrl=f"{sqs_queue_url}",

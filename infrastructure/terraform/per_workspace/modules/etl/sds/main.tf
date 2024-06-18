@@ -442,7 +442,6 @@ module "bulk_trigger_notification" {
 module "etl_state_lock_enforcer" {
   source = "./etl-state-lock-enforcer/"
 
-  executor_name         = "input"
   etl_name              = local.etl_name
   workspace_prefix      = var.workspace_prefix
   python_version        = var.python_version

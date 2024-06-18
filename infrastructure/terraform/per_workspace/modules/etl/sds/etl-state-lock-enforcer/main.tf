@@ -1,7 +1,7 @@
 module "sqs" {
   source = "terraform-aws-modules/sqs/aws"
 
-  name = "${var.workspace_prefix}--${var.etl_name}--${var.executor_name}-sqs"
+  name = "${var.workspace_prefix}--${var.etl_name}--${local.etl_state_lock_enforcer_name}-sqs"
 
   fifo_queue                 = true
   visibility_timeout_seconds = 120
@@ -12,9 +12,9 @@ module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
-  function_name = "${var.workspace_prefix}--${var.etl_name}--${var.executor_name}"
-  description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.executor_name}) executor lambda function"
-  handler       = "etl.sds.executor.${var.executor_name}.${var.executor_name}.handler"
+  function_name = "${var.workspace_prefix}--${var.etl_name}--${local.etl_state_lock_enforcer_name}"
+  description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${local.etl_state_lock_enforcer_name}) etl_state_lock_enforcer lambda function"
+  handler       = "etl.sds.${local.etl_state_lock_enforcer_name}.${local.etl_state_lock_enforcer_name}.handler"
   runtime       = var.python_version
   timeout       = 120
 
@@ -46,10 +46,10 @@ module "lambda_function" {
   )
 
   create_package         = false
-  local_existing_package = "${path.root}/../../../src/etl/sds/executor/${var.executor_name}/dist/${var.executor_name}.zip"
+  local_existing_package = "${path.root}/../../../src/etl/sds/${local.etl_state_lock_enforcer_name}/dist/${local.etl_state_lock_enforcer_name}.zip"
 
   tags = {
-    Name = "${var.workspace_prefix}--${var.etl_name}--${var.executor_name}"
+    Name = "${var.workspace_prefix}--${var.etl_name}--${local.etl_state_lock_enforcer_name}"
   }
 
   layers = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn, var.sds_layer_arn]
