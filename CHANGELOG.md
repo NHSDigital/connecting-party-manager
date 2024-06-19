@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-06-19-a
+- [PI-207] ETL state lock
+
 ## 2024-06-14
 - [PI-179] Improve Slack messaging for deployments
 - [PI-385] PENTEST - reject HTTP and enable access logs on S3 buckets
