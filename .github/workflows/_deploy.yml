@@ -24,7 +24,6 @@ env:
   WORKSPACE: ${{ inputs.workspace }}
   CACHE_NAME: ${{ inputs.workspace }}-${{ inputs.account }}-${{ inputs.scope }}
   SCOPE: ${{ inputs.scope }}
-  # SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
 
 jobs:
@@ -74,9 +73,6 @@ jobs:
     needs: [get-branch-from-workflow-file, build]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: init
@@ -91,9 +87,6 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--init]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: plan
@@ -109,9 +102,6 @@ jobs:
     environment: ${{ inputs.account }}
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: apply
@@ -126,9 +116,6 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--apply]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         if: ${{ env.SCOPE == 'per_workspace'}}
         with:
@@ -150,9 +137,6 @@ jobs:
     needs: [get-branch-from-workflow-file, apigee--deploy]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         with:
           command: test--smoke WORKSPACE="${{ env.WORKSPACE }}" ACCOUNT="${{ env.ACCOUNT }}"
@@ -177,16 +161,24 @@ jobs:
     runs-on: [self-hosted, ci]
 
     steps:
+      - name: Catch failed steps
+        id: catch-failed-step
+        uses: ./.github/actions/catch-failed-step
       - name: Send job result to slack
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
             {
+              "action_url": "${{ format('{0}/{1}/actions/runs/{2}/attempts/{3}', github.server_url, github.repository, github.run_id, github.run_attempt) }}",
+              "attempt": ${{ github.run_attempt }},
               "account": "${{ env.ACCOUNT }}",
-              "environment": "${{ env.WORKSPACE }}",
-              "result": "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
-              "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}"
+              "workspace": "${{ env.WORKSPACE }}",
+              "caller": "${{ github.triggering_actor }}",
+              "scope": "${{ env.SCOPE }}",
+              "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}",
+              "result":  "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
+              "result_detail": "${{ needs.set-success.outputs.success && 'None' || steps.catch-failed-step.outputs.failed-step-name }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.DEPLOY_ENV_SLACK_HOOK_URL }}

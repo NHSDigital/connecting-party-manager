@@ -1,0 +1,5 @@
+name: "Catch failed step"
+description: "Catches the name of the final failed step in the current workflow"
+runs:
+  using: "docker"
+  image: "Dockerfile"

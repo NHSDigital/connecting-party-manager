@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.06.04"
+version = "2024.06.14"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -66,9 +66,11 @@ optional = true
 python-ldap = "^3.4.4"
 lz4 = "^4.3.3"
 
-
 [tool.poetry.group.sds.dependencies]
 lz4 = "^4.3.3"
+
+[tool.poetry.group.ci.dependencies]
+pygithub = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core"]
