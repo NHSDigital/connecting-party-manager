@@ -1,4 +1,5 @@
-from datetime import datetime as dt
+import datetime
+import json
 from enum import StrEnum, auto
 from typing import Self
 
@@ -9,7 +10,7 @@ BAD_CHARACTERS = [" ", ":"]
 
 
 def _create_timestamp() -> str:
-    return dt.now().isoformat()
+    return datetime.datetime.now().isoformat()
 
 
 class StateMachineInputType(StrEnum):
@@ -52,3 +53,8 @@ class StateMachineInput(BaseModel):
         for char in BAD_CHARACTERS:
             state_machine_name = state_machine_name.replace(char, NAME_SEPARATOR)
         return state_machine_name
+
+    def json_with_name(self) -> str:
+        data = self.dict()
+        data["name"] = self.name
+        return json.dumps(data)
