@@ -16,7 +16,6 @@ NOT_FOUND_CODE = "NoSuchKey"
 class StateFileNotEmpty(Exception):
     def __init__(self, bucket, key, content):
         super().__init__(
-            self,
             f"Expected empty data '{content}' in s3://{bucket}/{key}",
         )
 
@@ -25,10 +24,11 @@ def start_execution(
     step_functions_client: "SFNClient",
     state_machine_arn: str,
     state_machine_input: StateMachineInput,
+    state_machine_name: str,
 ):
     return step_functions_client.start_execution(
         stateMachineArn=state_machine_arn,
-        name=state_machine_input.name,
+        name=state_machine_name,
         input=json.dumps(state_machine_input.dict()),
     )
 

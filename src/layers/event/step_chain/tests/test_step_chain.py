@@ -38,8 +38,10 @@ def test_step_chain_with_error():
     class MyException(Exception):
         pass
 
+    my_exception = MyException()
+
     def a(data, cache):
-        raise MyException
+        raise my_exception
 
     def b(data, cache):
         return {"a's result": data[a]}
@@ -48,7 +50,9 @@ def test_step_chain_with_error():
     step_chain.run(cache=cache, init={"event": None})
 
     assert isinstance(step_chain.result, MyException)
-    assert step_chain.data == FrozenDict({StepChain.INIT: {"event": None}})
+    assert step_chain.data == FrozenDict(
+        {StepChain.INIT: {"event": None}, a: my_exception}
+    )
 
 
 def test_step_chain_with_decorators():

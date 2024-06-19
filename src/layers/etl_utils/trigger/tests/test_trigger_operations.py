@@ -56,6 +56,7 @@ def test_start_execution(state_machine_input: StateMachineInput):
             step_functions_client=step_functions_client,
             state_machine_arn=create_response["stateMachineArn"],
             state_machine_input=state_machine_input,
+            state_machine_name=state_machine_input.name,
         )
         execution_state = step_functions_client.describe_execution(
             executionArn=execution_response["executionArn"],
