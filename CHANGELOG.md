@@ -2,6 +2,7 @@
 
 ## 2024-06-19-a
 - [PI-207] ETL state lock
+- [PI-318] caching improvements
 
 ## 2024-06-14
 - [PI-179] Improve Slack messaging for deployments
