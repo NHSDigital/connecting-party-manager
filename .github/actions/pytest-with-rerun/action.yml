@@ -15,9 +15,12 @@ runs:
       with:
         command: test--${{ inputs.test-type }}
         requires-aws: ${{ inputs.requires-aws }}
+        restore-from-cache: "false"
+        restore-third-party-cache: "true"
 
     - uses: ./.github/actions/make/
       with:
         command: test--${{ inputs.test-type }}--rerun PYTEST_FLAGS="--suppress-no-test-exit-code"
         requires-aws: ${{ inputs.requires-aws }}
         restore-from-cache: "false"
+        restore-third-party-cache: "true"
