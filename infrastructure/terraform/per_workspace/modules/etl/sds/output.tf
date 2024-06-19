@@ -17,3 +17,11 @@ output "bulk_trigger_prefix" {
 output "notify_lambda_arn" {
   value = module.notify.arn
 }
+
+output "etl_state_lock_key" {
+  value = var.etl_state_lock_key
+}
+
+output "etl_state_lock_enforcer" {
+  value = module.etl_state_lock_enforcer
+}
