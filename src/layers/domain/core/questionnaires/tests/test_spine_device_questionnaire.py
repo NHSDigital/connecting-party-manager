@@ -10,6 +10,8 @@ from sds.cpm_translation.tests.test_cpm_translation import (
 from sds.cpm_translation.translations import update_in_list_of_dict
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 
+from etl.sds.tests.constants import EtlTestDataPath
+
 
 @pytest.fixture
 def spine_device_questionnaire_v1() -> Questionnaire:
@@ -68,7 +70,7 @@ def test_spine_device_questionnaire_v1_local(
     )
 
 
-@pytest.mark.s3("sds/etl/bulk/1701246-fix-18032023.json")
+@pytest.mark.s3(EtlTestDataPath.FULL_JSON)
 def test_spine_device_questionnaire_v1_integration(
     spine_device_questionnaire_v1: Questionnaire, test_data_paths
 ):

@@ -8,11 +8,11 @@ from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property, parse_ldif
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.nhs_mhs_action import NhsMhsAction
-from sds.domain.nhs_mhs_cp import NhsMhsCp
 from sds.domain.nhs_mhs_service import NhsMhsService
 from sds.domain.organizational_unit import OrganizationalUnit
 from sds.domain.parse import parse_sds_record
 
+from etl.sds.tests.constants import EtlTestDataPath
 from test_helpers.pytest_skips import memory_intensive
 from test_helpers.terraform import read_terraform_output
 
@@ -20,7 +20,7 @@ BULK_SKIPS = [245315]
 BULK_FILTER_SKIPS = [64320]
 
 
-@pytest.mark.s3("sds/etl/bulk/1701246-mini.ldif")
+@pytest.mark.s3(EtlTestDataPath.MINI_LDIF)
 def test_bulk_data_is_valid_sds_mini(test_data_paths):
     (ldif_path,) = test_data_paths
 
@@ -48,7 +48,7 @@ def test_bulk_data_is_valid_sds_mini(test_data_paths):
 
 
 @memory_intensive
-@pytest.mark.s3("sds/etl/bulk/1701246.ldif")
+@pytest.mark.s3(EtlTestDataPath.FULL_LDIF)
 def test_bulk_data_is_valid_sds_full(test_data_paths):
     (ldif_path,) = test_data_paths
 
@@ -71,12 +71,8 @@ def test_bulk_data_is_valid_sds_full(test_data_paths):
         index += 1
 
     assert Counter(processed_records) == {
-        NhsMhs: 155574,
-        NhsMhsAction: 155046,
-        NhsMhsService: 26177,
-        NhsAccreditedSystem: 5666,
-        NhsMhsCp: 253,
-        OrganizationalUnit: 1,
+        NhsMhs: 154506,
+        NhsAccreditedSystem: 5631,
     }
 
 
@@ -86,7 +82,7 @@ def test_filter_ldif_from_s3_by_property_mini():
 
     filtered_ldif = filter_ldif_from_s3_by_property(
         s3_client=boto3.client("s3"),
-        s3_path=f"s3://{test_data_bucket}/sds/etl/bulk/1701246-mini.ldif",
+        s3_path=f"s3://{test_data_bucket}/{EtlTestDataPath.MINI_LDIF}",
         filter_terms=[("objectClass", "nhsMHS"), ("objectClass", "nhsAS")],
     )
 
@@ -123,7 +119,7 @@ def test_filter_ldif_from_s3_by_property_full():
 
     filtered_ldif = filter_ldif_from_s3_by_property(
         s3_client=boto3.client("s3"),
-        s3_path=f"s3://{test_data_bucket}/sds/etl/bulk/1701246.ldif",
+        s3_path=f"s3://{test_data_bucket}/{EtlTestDataPath.FULL_LDIF}",
         filter_terms=[("objectClass", "nhsMHS"), ("objectClass", "nhsAS")],
     )
 
@@ -148,6 +144,6 @@ def test_filter_ldif_from_s3_by_property_full():
         index += 1
 
     assert Counter(processed_records) == {
-        NhsMhs: 155574,
-        NhsAccreditedSystem: 5666,
+        NhsMhs: 154505,
+        NhsAccreditedSystem: 5631,
     }
