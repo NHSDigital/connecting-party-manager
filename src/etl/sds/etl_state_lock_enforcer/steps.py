@@ -1,6 +1,11 @@
 from typing import TYPE_CHECKING, TypedDict
 
-from etl_utils.constants import ETL_STATE_LOCK, WorkerKey
+from etl_utils.constants import (
+    ETL_QUEUE_HISTORY,
+    ETL_STATE_LOCK,
+    ETL_STATE_MACHINE_HISTORY,
+    WorkerKey,
+)
 from etl_utils.trigger.model import StateMachineInput
 from etl_utils.trigger.operations import start_execution, validate_state_keys_are_empty
 from event.json import json_loads
@@ -51,6 +56,12 @@ def _check_etl_lock(data, cache: Cache):
     etl_bucket = cache["etl_bucket"]
 
     if etl_state_lock_doesnt_exist_in_s3(s3_client=s3_client, bucket=etl_bucket):
+        # Copy state machine input from intermediate queue history and aquire state lock
+        s3_client.copy_object(
+            Bucket=cache["etl_bucket"],
+            Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
+            CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
+        )
         return s3_client.put_object(
             Bucket=cache["etl_bucket"],
             Key=ETL_STATE_LOCK,
@@ -58,7 +69,6 @@ def _check_etl_lock(data, cache: Cache):
         )
 
     else:
-        s3_client.delete_object(Bucket=etl_bucket, Key=f"history/{state_machine_name}")
         raise StateLockExistsError("ETL state lock already exists.")
 
 
@@ -70,7 +80,7 @@ def _put_to_state_machine(data, cache: Cache):
     return s3_client.copy_object(
         Bucket=etl_bucket,
         Key=WorkerKey.EXTRACT,
-        CopySource=f'{cache["etl_bucket"]}/history/{state_machine_name}',
+        CopySource=f'{cache["etl_bucket"]}/etl_state_machine_history/{state_machine_name}',
     )
 
 

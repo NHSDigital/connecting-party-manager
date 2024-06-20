@@ -8,7 +8,13 @@ import boto3
 import pytest
 from botocore.exceptions import ClientError
 from domain.core.device import DeviceType
-from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
+from etl_utils.constants import (
+    CHANGELOG_NUMBER,
+    ETL_QUEUE_HISTORY,
+    ETL_STATE_LOCK,
+    ETL_STATE_MACHINE_HISTORY,
+    WorkerKey,
+)
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.aws.client import dynamodb_client
@@ -65,7 +71,8 @@ def test_bulk_trigger():
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
     initial_trigger_key = f"{bulk_trigger_prefix}/{TEST_DATA_NAME}"
-    history_key_prefix = f"history/bulk"
+    queue_history_key_prefix = f"{ETL_QUEUE_HISTORY}/bulk"
+    state_machine_history_key_prefix = f"{ETL_STATE_MACHINE_HISTORY}/bulk"
     table_name = read_terraform_output("dynamodb_table_name.value")
 
     client = dynamodb_client()
@@ -77,8 +84,13 @@ def test_bulk_trigger():
     ask_s3_prefix = partial(_ask_s3_prefix, s3_client=s3_client, bucket=etl_bucket)
 
     was_trigger_key_deleted = lambda: not ask_s3(key=initial_trigger_key)
-    was_trigger_key_moved_to_history = lambda: ask_s3_prefix(
-        key_prefix=history_key_prefix, question=lambda x: x == GOOD_SDS_RECORD.encode()
+    was_queue_history_created = lambda: ask_s3_prefix(
+        key_prefix=queue_history_key_prefix,
+        question=lambda x: x == GOOD_SDS_RECORD.encode(),
+    )
+    was_state_machine_history_created = lambda: ask_s3_prefix(
+        key_prefix=state_machine_history_key_prefix,
+        question=lambda x: x == GOOD_SDS_RECORD.encode(),
     )
     was_changelog_number_updated = lambda: ask_s3(
         key=CHANGELOG_NUMBER,
@@ -110,8 +122,15 @@ def test_bulk_trigger():
         Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=pkl_dumps_lz4(EMPTY_JSON_DATA)
     )
     s3_client.delete_object(Bucket=etl_bucket, Key=initial_trigger_key)
-    history_files = s3_client.list_objects(Bucket=etl_bucket, Prefix=history_key_prefix)
-    for item in history_files.get("Contents", []):
+    queue_history_files = s3_client.list_objects(
+        Bucket=etl_bucket, Prefix=queue_history_key_prefix
+    )
+    for item in queue_history_files.get("Contents", []):
+        s3_client.delete_object(Bucket=etl_bucket, Key=item["Key"])
+    state_machine_history_files = s3_client.list_objects(
+        Bucket=etl_bucket, Prefix=state_machine_history_key_prefix
+    )
+    for item in state_machine_history_files.get("Contents", []):
         s3_client.delete_object(Bucket=etl_bucket, Key=item["Key"])
     s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
     s3_client.delete_object(Bucket=etl_bucket, Key=ETL_STATE_LOCK)
@@ -123,14 +142,16 @@ def test_bulk_trigger():
     )
 
     trigger_key_deleted = False
-    trigger_key_moved_to_history = False
+    queue_history_created = False
+    state_machine_history_created = False
     changelog_number_updated = False
     state_machine_successful = False
     etl_state_lock_removed = False
     while not all(
         (
             trigger_key_deleted,
-            trigger_key_moved_to_history,
+            queue_history_created,
+            state_machine_history_created,
             changelog_number_updated,
             state_machine_successful,
             etl_state_lock_removed,
@@ -138,8 +159,9 @@ def test_bulk_trigger():
     ):
         time.sleep(5)
         trigger_key_deleted = trigger_key_deleted or was_trigger_key_deleted()
-        trigger_key_moved_to_history = (
-            trigger_key_moved_to_history or was_trigger_key_moved_to_history()
+        queue_history_created = queue_history_created or was_queue_history_created()
+        state_machine_history_created = (
+            state_machine_history_created or was_state_machine_history_created()
         )
         changelog_number_updated = (
             changelog_number_updated or was_changelog_number_updated()
@@ -151,7 +173,8 @@ def test_bulk_trigger():
 
     # Confirm the final state
     assert trigger_key_deleted
-    assert trigger_key_moved_to_history
+    assert queue_history_created
+    assert state_machine_history_created
     assert changelog_number_updated
     assert state_machine_successful
     assert etl_state_lock_removed

@@ -2,6 +2,7 @@ import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
+from etl_utils.constants import ETL_QUEUE_HISTORY
 from etl_utils.trigger.model import StateMachineInput
 from event.step_chain import StepChain
 
@@ -45,7 +46,7 @@ def _copy_to_intermediate_history_file(data, cache: Cache):
     state_machine_input: StateMachineInput = data[_create_state_machine_input]
     return cache["s3_client"].copy_object(
         Bucket=source_bucket,
-        Key=f"history/{state_machine_input.name}",
+        Key=f"{ETL_QUEUE_HISTORY}/{state_machine_input.name}",
         CopySource=f"{source_bucket}/{source_key}",
     )
 

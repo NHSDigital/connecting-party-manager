@@ -5,7 +5,7 @@ from unittest import mock
 
 import boto3
 import pytest
-from etl_utils.constants import CHANGELOG_NUMBER
+from etl_utils.constants import CHANGELOG_NUMBER, ETL_QUEUE_HISTORY
 from moto import mock_aws
 
 MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
@@ -169,12 +169,14 @@ def test_update(change_result):
         decoded_current_changelog_number = int(CURRENT_CHANGELOG_NUMBER.decode())
         decoded_latest_changelog_number = int(LATEST_CHANGELOG_NUMBER.decode())
 
-        # Verify the history file was created
-        etl_history_response = s3_client.get_object(
+        # Verify the intermediate queue history file was created
+        etl_queue_history_response = s3_client.get_object(
             Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key=f"history/update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
+            Key=f"{ETL_QUEUE_HISTORY}/update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
         )
-        assert etl_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
+        assert (
+            etl_queue_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
+        )
 
         # Verify message was published to queue
         expected_sqs_message = json.dumps(
