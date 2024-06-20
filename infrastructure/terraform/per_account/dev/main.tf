@@ -70,3 +70,8 @@ module "vpc" {
 resource "aws_route53_zone" "dev-ns" {
   name = "api.cpm.dev.national.nhs.uk"
 }
+
+module "opensearch" {
+  source = "../modules/opensearch"
+  name   = "${local.project}--${replace(terraform.workspace, "_", "-")}--os"
+}
