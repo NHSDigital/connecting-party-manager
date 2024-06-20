@@ -10,7 +10,13 @@ from unittest import mock
 import boto3
 import pytest
 from botocore.exceptions import ClientError
-from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
+from etl_utils.constants import (
+    CHANGELOG_NUMBER,
+    ETL_QUEUE_HISTORY,
+    ETL_STATE_LOCK,
+    ETL_STATE_MACHINE_HISTORY,
+    WorkerKey,
+)
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from etl_utils.trigger.model import _create_timestamp
@@ -284,8 +290,8 @@ def test_etl_state_lock_enforcer_trigger_update_success():
     )
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     timestamp = _create_timestamp().replace(":", ".")
-    intermediate_queue_history_file = f"etl_queue_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
-    state_machine_history_file = f"etl_state_machine_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    intermediate_queue_history_file = f"{ETL_QUEUE_HISTORY}/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    state_machine_history_file = f"{ETL_STATE_MACHINE_HISTORY}/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
     execution_arn = f"{state_machine_arn}:{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}".replace(
         "stateMachine", "execution"
     )
@@ -401,8 +407,8 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
         "sds_etl.value.etl_state_lock_enforcer.sqs_queue_url"
     )
     timestamp = _create_timestamp().replace(":", ".")
-    intermediate_queue_history_file = f"etl_queue_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
-    state_machine_history_file = f"etl_state_machine_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    intermediate_queue_history_file = f"{ETL_QUEUE_HISTORY}/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    state_machine_history_file = f"{ETL_STATE_MACHINE_HISTORY}/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
 
     # Set some questions
     s3_client = boto3.client("s3")

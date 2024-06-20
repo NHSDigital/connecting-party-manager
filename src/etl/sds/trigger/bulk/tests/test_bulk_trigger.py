@@ -8,7 +8,13 @@ import boto3
 import pytest
 from botocore.exceptions import ClientError
 from domain.core.device import DeviceType
-from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
+from etl_utils.constants import (
+    CHANGELOG_NUMBER,
+    ETL_QUEUE_HISTORY,
+    ETL_STATE_LOCK,
+    ETL_STATE_MACHINE_HISTORY,
+    WorkerKey,
+)
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.aws.client import dynamodb_client
@@ -65,8 +71,8 @@ def test_bulk_trigger():
     etl_bucket = read_terraform_output("sds_etl.value.bucket")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
     initial_trigger_key = f"{bulk_trigger_prefix}/{TEST_DATA_NAME}"
-    queue_history_key_prefix = "etl_queue_history/bulk"
-    state_machine_history_key_prefix = "etl_state_machine_history/bulk"
+    queue_history_key_prefix = f"{ETL_QUEUE_HISTORY}/bulk"
+    state_machine_history_key_prefix = f"{ETL_STATE_MACHINE_HISTORY}/bulk"
     table_name = read_terraform_output("dynamodb_table_name.value")
 
     client = dynamodb_client()

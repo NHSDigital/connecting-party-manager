@@ -1,6 +1,11 @@
 from typing import TYPE_CHECKING, TypedDict
 
-from etl_utils.constants import ETL_STATE_LOCK, WorkerKey
+from etl_utils.constants import (
+    ETL_QUEUE_HISTORY,
+    ETL_STATE_LOCK,
+    ETL_STATE_MACHINE_HISTORY,
+    WorkerKey,
+)
 from etl_utils.trigger.model import StateMachineInput
 from etl_utils.trigger.operations import start_execution, validate_state_keys_are_empty
 from event.json import json_loads
@@ -54,8 +59,8 @@ def _check_etl_lock(data, cache: Cache):
         # Copy state machine input from intermediate queue history and aquire state lock
         s3_client.copy_object(
             Bucket=cache["etl_bucket"],
-            Key=f"etl_state_machine_history/{state_machine_name}",
-            CopySource=f'{cache["etl_bucket"]}/etl_queue_history/{state_machine_name}',
+            Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
+            CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
         )
         return s3_client.put_object(
             Bucket=cache["etl_bucket"],

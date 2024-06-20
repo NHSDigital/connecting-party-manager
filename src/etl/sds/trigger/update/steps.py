@@ -3,7 +3,7 @@ from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
-from etl_utils.constants import LDIF_RECORD_DELIMITER
+from etl_utils.constants import ETL_QUEUE_HISTORY, LDIF_RECORD_DELIMITER
 from etl_utils.ldap_typing import LdapModuleProtocol
 from etl_utils.trigger.model import StateMachineInput
 
@@ -112,7 +112,7 @@ def _put_changes_to_intermediate_history_file(data, cache: Cache):
 
     return cache["s3_client"].put_object(
         Bucket=cache["etl_bucket"],
-        Key=f"etl_queue_history/{state_machine_input.name}",
+        Key=f"{ETL_QUEUE_HISTORY}/{state_machine_input.name}",
         Body=changes,
     )
 
