@@ -21,10 +21,12 @@ from mypy_boto3_stepfunctions import SFNClient
 
 from etl.sds.etl_state_lock_enforcer.steps import _start_execution
 from test_helpers.sample_sqs_messages import (
-    BULK_HISTORY_FILE,
     INVALID_BODY_JSON_EVENT,
+    QUEUE_BULK_HISTORY_FILE,
+    QUEUE_UPDATE_HISTORY_FILE,
+    STATE_MACHINE_BULK_HISTORY_FILE,
     STATE_MACHINE_INPUT_TYPE_UPDATE,
-    UPDATE_HISTORY_FILE,
+    STATE_MACHINE_UPDATE_HISTORY_FILE,
     VALID_SQS_BULK_EVENT,
     VALID_SQS_UPDATE_EVENT,
 )
@@ -44,8 +46,8 @@ ETL_BUCKET = MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT["ETL_BUCKET"]
 @pytest.mark.parametrize(
     ("message", "history_file"),
     [
-        (VALID_SQS_UPDATE_EVENT, UPDATE_HISTORY_FILE),
-        (VALID_SQS_BULK_EVENT, BULK_HISTORY_FILE),
+        (VALID_SQS_UPDATE_EVENT, QUEUE_UPDATE_HISTORY_FILE),
+        (VALID_SQS_BULK_EVENT, QUEUE_BULK_HISTORY_FILE),
     ],
     indirect=False,
 )
@@ -97,25 +99,35 @@ def test_etl_state_lock_enforcer_state_lock_does_not_exist(message, history_file
 
 
 @pytest.mark.parametrize(
-    ("message", "history_file"),
+    ("message", "queue_history_file", "state_machine_history_file"),
     [
-        (VALID_SQS_UPDATE_EVENT, UPDATE_HISTORY_FILE),
-        (VALID_SQS_BULK_EVENT, BULK_HISTORY_FILE),
+        (
+            VALID_SQS_UPDATE_EVENT,
+            QUEUE_UPDATE_HISTORY_FILE,
+            STATE_MACHINE_UPDATE_HISTORY_FILE,
+        ),
+        (
+            VALID_SQS_BULK_EVENT,
+            QUEUE_BULK_HISTORY_FILE,
+            STATE_MACHINE_BULK_HISTORY_FILE,
+        ),
     ],
     indirect=False,
 )
-def test_etl_state_lock_enforcer_state_lock_exist(message, history_file):
+def test_etl_state_lock_enforcer_state_lock_exist(
+    message, queue_history_file, state_machine_history_file
+):
     with mock_aws(), mock.patch.dict(
         os.environ, MOCKED_ETL_STATE_LOCK_ENFORCER_ENVIRONMENT, clear=True
     ), mock.patch("etl_utils.trigger.model.datetime") as mocked_datetime:
         mocked_datetime.datetime.now().isoformat.return_value = "foo"
         s3_client = boto3.client("s3")
 
-        # Create history file & state lock
+        # Create intermediate history file & state lock
         s3_client.create_bucket(Bucket=ETL_BUCKET)
         s3_client.put_object(
             Bucket=ETL_BUCKET,
-            Key=f"{history_file}",
+            Key=f"{queue_history_file}",
             Body="test-changes",
         )
 
@@ -140,7 +152,7 @@ def test_etl_state_lock_enforcer_state_lock_exist(message, history_file):
 
         # Assert history file deleted
         with pytest.raises(ClientError):
-            s3_client.get_object(Bucket=ETL_BUCKET, Key=f"{history_file}")
+            s3_client.get_object(Bucket=ETL_BUCKET, Key=f"{state_machine_history_file}")
 
         # Assert state lock still active
         s3_client.get_object(Bucket=ETL_BUCKET, Key=ETL_STATE_LOCK)
@@ -272,7 +284,8 @@ def test_etl_state_lock_enforcer_trigger_update_success():
     )
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     timestamp = _create_timestamp().replace(":", ".")
-    intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    intermediate_queue_history_file = f"etl_queue_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    state_machine_history_file = f"etl_state_machine_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
     execution_arn = f"{state_machine_arn}:{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}".replace(
         "stateMachine", "execution"
     )
@@ -289,6 +302,9 @@ def test_etl_state_lock_enforcer_trigger_update_success():
     was_changelog_number_updated = lambda: ask_s3(
         key=CHANGELOG_NUMBER,
         question=lambda x: str(UPDATE_CHANGELOG_NUMBER_END).encode("utf-8"),
+    )
+    was_state_machine_history_file_created = lambda: ask_s3(
+        key=state_machine_history_file
     )
     was_state_machine_successful = (
         lambda: ask_s3(
@@ -322,7 +338,9 @@ def test_etl_state_lock_enforcer_trigger_update_success():
         Key=CHANGELOG_NUMBER,
         Body=str(UPDATE_CHANGELOG_NUMBER_START).encode("utf-8"),
     )
-    s3_client.put_object(Bucket=etl_bucket, Key=intermediate_history_file, Body=b"")
+    s3_client.put_object(
+        Bucket=etl_bucket, Key=intermediate_queue_history_file, Body=b""
+    )
     s3_client.delete_object(Bucket=etl_bucket, Key=ETL_STATE_LOCK)
 
     # Trigger the etl_state_lock_enforcer lambda by sending message to queue
@@ -343,11 +361,13 @@ def test_etl_state_lock_enforcer_trigger_update_success():
     )
 
     changelog_number_updated = False
+    state_machine_history_file_created = False
     state_machine_successful = False
     etl_state_lock_removed = False
     while not all(
         (
             changelog_number_updated,
+            state_machine_history_file_created,
             state_machine_successful,
             etl_state_lock_removed,
         )
@@ -356,6 +376,10 @@ def test_etl_state_lock_enforcer_trigger_update_success():
         changelog_number_updated = (
             changelog_number_updated or was_changelog_number_updated()
         )
+        state_machine_history_file_created = (
+            state_machine_history_file_created
+            or was_state_machine_history_file_created()
+        )
         state_machine_successful = (
             state_machine_successful or was_state_machine_successful()
         )
@@ -363,6 +387,7 @@ def test_etl_state_lock_enforcer_trigger_update_success():
 
     # Confirm the final state
     assert changelog_number_updated
+    assert state_machine_history_file_created
     assert state_machine_successful
     assert etl_state_lock_removed
 
@@ -376,7 +401,8 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
         "sds_etl.value.etl_state_lock_enforcer.sqs_queue_url"
     )
     timestamp = _create_timestamp().replace(":", ".")
-    intermediate_history_file = f"history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    intermediate_queue_history_file = f"etl_queue_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
+    state_machine_history_file = f"etl_state_machine_history/{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}"
 
     # Set some questions
     s3_client = boto3.client("s3")
@@ -387,8 +413,8 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
         question=lambda x: str(UPDATE_CHANGELOG_NUMBER_START).encode("utf-8"),
     )
     was_etl_state_lock_not_removed = lambda: ask_s3(key=ETL_STATE_LOCK)
-    was_intermediate_history_file_deleted = lambda: not ask_s3(
-        key=intermediate_history_file
+    was_state_machine_history_file_not_created = lambda: not ask_s3(
+        key=state_machine_history_file
     )
 
     # Clear/set the initial state
@@ -404,7 +430,9 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
         Key=CHANGELOG_NUMBER,
         Body=str(UPDATE_CHANGELOG_NUMBER_START).encode("utf-8"),
     )
-    s3_client.put_object(Bucket=etl_bucket, Key=intermediate_history_file, Body=b"")
+    s3_client.put_object(
+        Bucket=etl_bucket, Key=intermediate_queue_history_file, Body=b""
+    )
     s3_client.put_object(Bucket=etl_bucket, Key=ETL_STATE_LOCK, Body="locked")
 
     # Trigger the etl_state_lock_enforcer lambda by sending message to queue
@@ -426,12 +454,12 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
 
     changelog_number_not_updated = False
     etl_state_lock_not_removed = False
-    intermediate_history_file_deleted = False
+    state_machine_history_file_not_created = False
     while not all(
         (
             changelog_number_not_updated,
             etl_state_lock_not_removed,
-            intermediate_history_file_deleted,
+            state_machine_history_file_not_created,
         )
     ):
         time.sleep(5)
@@ -441,11 +469,12 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
         etl_state_lock_not_removed = (
             etl_state_lock_not_removed or was_etl_state_lock_not_removed()
         )
-        intermediate_history_file_deleted = (
-            intermediate_history_file_deleted or was_intermediate_history_file_deleted()
+        state_machine_history_file_not_created = (
+            state_machine_history_file_not_created
+            or was_state_machine_history_file_not_created()
         )
 
     # Confirm the final state
     assert changelog_number_not_updated
     assert etl_state_lock_not_removed
-    assert intermediate_history_file_deleted
+    assert state_machine_history_file_not_created

@@ -112,7 +112,7 @@ def _put_changes_to_intermediate_history_file(data, cache: Cache):
 
     return cache["s3_client"].put_object(
         Bucket=cache["etl_bucket"],
-        Key=f"history/{state_machine_input.name}",
+        Key=f"etl_queue_history/{state_machine_input.name}",
         Body=changes,
     )
 

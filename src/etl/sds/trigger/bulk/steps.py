@@ -45,7 +45,7 @@ def _copy_to_intermediate_history_file(data, cache: Cache):
     state_machine_input: StateMachineInput = data[_create_state_machine_input]
     return cache["s3_client"].copy_object(
         Bucket=source_bucket,
-        Key=f"history/{state_machine_input.name}",
+        Key=f"etl_queue_history/{state_machine_input.name}",
         CopySource=f"{source_bucket}/{source_key}",
     )
 

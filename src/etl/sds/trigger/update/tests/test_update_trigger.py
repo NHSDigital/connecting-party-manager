@@ -169,10 +169,10 @@ def test_update(change_result):
         decoded_current_changelog_number = int(CURRENT_CHANGELOG_NUMBER.decode())
         decoded_latest_changelog_number = int(LATEST_CHANGELOG_NUMBER.decode())
 
-        # Verify the history file was created
+        # Verify the intermediate queue history file was created
         etl_history_response = s3_client.get_object(
             Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key=f"history/update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
+            Key=f"etl_queue_history/update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
         )
         assert etl_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
 
