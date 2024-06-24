@@ -43,12 +43,6 @@ def _process_sqs_message(data, cache: Cache):
     return state_machine_input, state_machine_name
 
 
-def _validate_state_keys_are_empty(data, cache: Cache):
-    return validate_state_keys_are_empty(
-        s3_client=cache["s3_client"], bucket=cache["etl_bucket"]
-    )
-
-
 def _check_etl_lock(data, cache: Cache):
     _, state_machine_name = data[_process_sqs_message]
 
@@ -70,6 +64,12 @@ def _check_etl_lock(data, cache: Cache):
 
     else:
         raise StateLockExistsError("ETL state lock already exists.")
+
+
+def _validate_state_keys_are_empty(data, cache: Cache):
+    return validate_state_keys_are_empty(
+        s3_client=cache["s3_client"], bucket=cache["etl_bucket"]
+    )
 
 
 def _put_to_state_machine(data, cache: Cache):
@@ -96,8 +96,8 @@ def _start_execution(data, cache):
 
 steps = [
     _process_sqs_message,
-    _validate_state_keys_are_empty,
     _check_etl_lock,
+    _validate_state_keys_are_empty,
     _put_to_state_machine,
     _start_execution,
 ]

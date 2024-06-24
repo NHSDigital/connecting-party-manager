@@ -25,7 +25,7 @@ from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 from mypy_boto3_stepfunctions import SFNClient
 
-from etl.sds.etl_state_lock_enforcer.steps import _start_execution
+from etl.sds.etl_state_lock_enforcer.steps import _check_etl_lock, _start_execution
 from test_helpers.sample_sqs_messages import (
     INVALID_BODY_JSON_EVENT,
     QUEUE_BULK_HISTORY_FILE,
@@ -202,6 +202,11 @@ def test_etl_state_lock_enforcer_failure_state_file_not_empty(message):
         etl_state_lock_enforcer.notify = (
             lambda lambda_client, function_name, result, trigger_type: result
         )
+
+        # Remove _check_etl_lock, as we want to test the step afterwards
+        if _check_etl_lock in etl_state_lock_enforcer.steps:
+            idx = etl_state_lock_enforcer.steps.index(_check_etl_lock)
+            etl_state_lock_enforcer.steps.pop(idx)
 
         # Execute etl_state_lock_enforcer lambda
         result = etl_state_lock_enforcer.process_message(message=message["Records"][0])
