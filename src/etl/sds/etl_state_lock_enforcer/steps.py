@@ -50,12 +50,7 @@ def _check_etl_lock(data, cache: Cache):
     etl_bucket = cache["etl_bucket"]
 
     if etl_state_lock_doesnt_exist_in_s3(s3_client=s3_client, bucket=etl_bucket):
-        # Copy state machine input from intermediate queue history and aquire state lock
-        s3_client.copy_object(
-            Bucket=cache["etl_bucket"],
-            Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
-            CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
-        )
+        # Aquire state lock
         return s3_client.put_object(
             Bucket=cache["etl_bucket"],
             Key=ETL_STATE_LOCK,
@@ -76,6 +71,13 @@ def _put_to_state_machine(data, cache: Cache):
     _, state_machine_name = data[_process_sqs_message]
     s3_client = cache["s3_client"]
     etl_bucket = cache["etl_bucket"]
+
+    # Update state machine history file
+    s3_client.copy_object(
+        Bucket=cache["etl_bucket"],
+        Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
+        CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
+    )
 
     return s3_client.copy_object(
         Bucket=etl_bucket,
