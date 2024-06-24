@@ -96,9 +96,10 @@ resource "aws_route53_zone" "prod-ns" {
 }
 
 module "snapshot_bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.2"
-  bucket  = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
+  source                                = "terraform-aws-modules/s3-bucket/aws"
+  version                               = "3.15.2"
+  bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
+  attach_deny_insecure_transport_policy = true
   versioning = {
     enabled = true
   }
