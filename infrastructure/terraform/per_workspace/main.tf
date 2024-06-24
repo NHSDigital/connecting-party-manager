@@ -65,6 +65,13 @@ module "table" {
   ]
 }
 
+module "search" {
+  source       = "./modules/search"
+  name         = "${local.project}--${replace(terraform.workspace, "_", "-")}--os"
+  database_arn = module.table.dynamodb_table_arn
+  account_id   = var.assume_account
+}
+
 module "layers" {
   for_each       = toset(var.layers)
   source         = "./modules/api_worker/api_layer"

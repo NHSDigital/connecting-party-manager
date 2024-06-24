@@ -1,0 +1,93 @@
+# version: "2"
+# dynamodb-pipeline:
+#   source:
+#     dynamodb:
+#       acknowledgments: true
+#       tables:
+#         # REQUIRED: Supply the DynamoDB table ARN and whether export or stream processing is needed, or both
+#         - table_arn: "arn:aws:dynamodb:eu-west-2:660842439611:table/nhse-cpm--b5548ea4--table"
+#           # Remove the stream block if only export is needed
+#           stream:
+#             start_position: "LATEST"
+#           export:
+#             # REQUIRED for export: Specify the name of an existing S3 bucket for DynamoDB to write export data files to
+#             s3_bucket: "nhse-cpm-b5548ea4--os-bucket"
+#             # Specify the region of the S3 bucket
+#             s3_region: "eu-west-2"
+#             # Optionally set the name of a prefix that DynamoDB export data files are written to in the bucket.
+#             s3_prefix: "ddb-to-opensearch-export/"
+#       aws:
+#         # REQUIRED: Provide the role to assume that has the necessary permissions to DynamoDB, OpenSearch, and S3.
+#         sts_role_arn: "arn:aws:iam::660842439611:role/nhse-cpm--b5548ea4--os-pl-role"
+#         # Provide the region to use for aws credentials
+#         region: "eu-west-2"
+#   sink:
+#     - opensearch:
+#         # REQUIRED: Provide an AWS OpenSearch endpoint
+#         hosts:
+#           [
+#             "https://search-nhse-cpm--b5548ea4--os-dom-2jhbfagllswct3hx5bokv7swiq.eu-west-2.es.amazonaws.com",
+#           ]
+#         index: "table-index"
+#         index_type: custom
+#         document_id: '${getMetadata("primary_key")}'
+#         action: '${getMetadata("opensearch_action")}'
+#         document_version: '${getMetadata("document_version")}'
+#         document_version_type: "external"
+#         aws:
+#           # REQUIRED: Provide a Role ARN with access to the domain. This role should have a trust relationship with osis-pipelines.amazonaws.com
+#           sts_role_arn: "arn:aws:iam::660842439611:role/nhse-cpm--b5548ea4--os-pl-role"
+#           # Provide the region of the domain.
+#           region: "eu-west-2"
+#           # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection
+#           serverless: false
+#           # serverless_options:
+#           # Specify a name here to create or update network policy for the serverless collection
+#           # network_policy_name: "network-policy-name"
+
+version: "2"
+dynamodb-pipeline:
+  source:
+    dynamodb:
+      acknowledgments: true
+      tables:
+        # REQUIRED: Supply the DynamoDB table ARN and whether export or stream processing is needed, or both
+        - table_arn: "arn:aws:dynamodb:eu-west-2:660842439611:table/nhse-cpm--b5548ea4--table"
+          # Remove the stream block if only export is needed
+          stream:
+            start_position: "LATEST"
+          export:
+            # REQUIRED for export: Specify the name of an existing S3 bucket for DynamoDB to write export data files to
+            s3_bucket: "nhse-cpm-b5548ea4--os-bucket"
+            # Specify the region of the S3 bucket
+            s3_region: "eu-west-2"
+            # Optionally set the name of a prefix that DynamoDB export data files are written to in the bucket.
+            s3_prefix: "ddb-to-opensearch-export/"
+      aws:
+        # REQUIRED: Provide the role to assume that has the necessary permissions to DynamoDB, OpenSearch, and S3.
+        sts_role_arn: "arn:aws:iam::660842439611:role/delete-me-dynamo-opensearch-role"
+        # Provide the region to use for aws credentials
+        region: "eu-west-2"
+  sink:
+    - opensearch:
+        # REQUIRED: Provide an AWS OpenSearch endpoint
+        hosts:
+          [
+            "https://search-delete-me-domain-qmlkzqoc6ljeiml6yc3fxu6eny.aos.eu-west-2.on.aws",
+          ]
+        index: "table-index"
+        index_type: custom
+        document_id: '${getMetadata("primary_key")}'
+        action: '${getMetadata("opensearch_action")}'
+        document_version: '${getMetadata("document_version")}'
+        document_version_type: "external"
+        aws:
+          # REQUIRED: Provide a Role ARN with access to the domain. This role should have a trust relationship with osis-pipelines.amazonaws.com
+          sts_role_arn: "arn:aws:iam::660842439611:role/delete-me-dynamo-opensearch-role"
+          # Provide the region of the domain.
+          region: "eu-west-2"
+          # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection
+          serverless: false
+          # serverless_options:
+          # Specify a name here to create or update network policy for the serverless collection
+          # network_policy_name: "network-policy-name"
