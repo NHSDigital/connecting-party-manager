@@ -75,7 +75,7 @@ function _terraform() {
         ;;
         #----------------
         "apply")
-            _terraform_apply "$workspace" "$plan_file" "$TERRAFORM_ARGS"
+            _terraform_apply "$workspace" "$plan_file" "$TERRAFORM_ARGS" "$TERRAFORM_EXCLUDE"
         ;;
         #----------------
         "destroy")
@@ -138,11 +138,12 @@ function _terraform_plan() {
 function _terraform_apply() {
     local workspace=$1
     local plan_file=$2
-    local args=${@:3}
-    echo "$TERRAFORM_EXCLUDE"
+    local args=$3
+    local exclude=${@:4}
+    echo "Excluding $exclude"
     terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-    terraform state list | grep -v "$TERRAFORM_EXCLUDE" | awk '{print "-target="$1}' > targets.txt
+    terraform state list | grep -v "$exclude" | awk '{print "-target="$1}' > targets.txt
     terraform apply $(cat targets.txt) $args "$plan_file" || return 1
     terraform output -json > output.json || return 1
 }
