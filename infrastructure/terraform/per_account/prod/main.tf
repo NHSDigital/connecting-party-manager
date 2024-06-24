@@ -94,3 +94,15 @@ module "vpc" {
 resource "aws_route53_zone" "prod-ns" {
   name = "api.cpm.national.nhs.uk"
 }
+
+module "snapshot_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "3.15.2"
+  bucket  = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
+  versioning = {
+    enabled = true
+  }
+  tags = {
+    Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
+  }
+}
