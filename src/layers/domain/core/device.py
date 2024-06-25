@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
@@ -36,6 +37,22 @@ class QuestionNotFoundError(Exception):
 
 @dataclass(kw_only=True, slots=True)
 class DeviceCreatedEvent(Event):
+    id: str
+    name: str
+    type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    keys: list[DeviceKey]
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    status: "DeviceStatus"
+    created_on: str
+    updated_on: Optional[str] = None
+    deleted_on: Optional[str] = None
+    _trust: bool = field(alias="_trust", default=False)
+
+
+@dataclass(kw_only=True, slots=True)
+class DeviceStateEvent(Event):
     id: str
     name: str
     type: "DeviceType"
@@ -185,28 +202,33 @@ class Device(AggregateRoot):
             deleted_on=deletion_datetime,
         )
 
+    def state(self):
+        device = deepcopy(self)  # deep copy?
+        device.events = [DeviceStateEvent(**device.dict())]
+        return device
+
     def add_key(self, key_type: str, key: str) -> DeviceKeyAddedEvent:
         existing_keys = {
-            (_device_key.key, _device_key.type) for _device_key in self.keys
+            (_device_key.key, _device_key.device_type) for _device_key in self.keys
         }
-        if (key, type) in existing_keys:
+        if (key, key_type) in existing_keys:
             raise DuplicateError(
-                f"It is forbidden to supply duplicate keys: ({type}) '{key}'"
+                f"It is forbidden to supply duplicate keys: ({key_type}) '{key}'"
             )
 
-        device_key = DeviceKey(key=key, type=key_type)
+        device_key = DeviceKey(key=key, device_type=key_type)
         self.keys.append(device_key)
         event = DeviceKeyAddedEvent(id=self.id, key=key, key_type=key_type)
         return self.add_event(event)
 
     def delete_key(self, key: str) -> DeviceKeyDeletedEvent:
-        # Remove the key from the keys
-        # Delete that key from all relevant device keys dict
-        try:
-            self.keys.pop(key)
-        except KeyError:
+        device_key = next(
+            (device_key for device_key in self.keys if device_key.key == key), None
+        )
+        if device_key is None:
             raise NotFoundError(f"This device does not contain key '{key}'") from None
 
+        self.keys.remove(device_key)
         event = DeviceKeyDeletedEvent(id=self.id, key=key, remaining_keys=self.keys)
         return self.add_event(event)
 

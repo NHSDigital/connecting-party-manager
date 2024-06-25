@@ -82,15 +82,11 @@ def nhs_accredited_system_to_cpm_devices(
         _device.add_key(
             key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
             key=accredited_system_id,
-            _trust=_trust,
         )
         _device.add_questionnaire_response(
             questionnaire_response=_questionnaire_response,
             _questionnaire=_questionnaire,
             _trust=True,
-        )
-        _device.add_index(
-            questionnaire_id=questionnaire.id, question_name=UNIQUE_IDENTIFIER
         )
         yield _device
 

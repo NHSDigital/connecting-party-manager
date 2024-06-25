@@ -1,10 +1,8 @@
 from datetime import datetime
-from itertools import chain
 
 import pytest
 from domain.core.device import (
     Device,
-    DeviceIndexAddedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
     DeviceStatus,
@@ -12,7 +10,6 @@ from domain.core.device import (
     DeviceUpdatedEvent,
     QuestionnaireNotFoundError,
     QuestionnaireResponseNotFoundError,
-    QuestionNotFoundError,
     _get_questionnaire_responses,
     _get_unique_answers,
 )
@@ -90,16 +87,16 @@ def test_device_delete(device: Device):
 
 def test_device_add_key(device: Device):
     event = device.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
-    assert device.keys == {
-        "P.XXX-YYY": DeviceKey(type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
-    }
+    assert device.keys == [
+        DeviceKey(device_type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
+    ]
     assert isinstance(event, DeviceKeyAddedEvent)
 
 
 def test_device_delete_key(device: Device):
     device.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
     event = device.delete_key(key="P.XXX-YYY")
-    assert device.keys == {}
+    assert device.keys == []
     assert isinstance(event, DeviceKeyDeletedEvent)
 
 
@@ -245,51 +242,3 @@ def test__get_questionnaire_responses():
         )
         == questionnaire_responses
     )
-
-
-def test_device_add_index(device: Device):
-    questionnaire = Questionnaire(name="foo", version=1)
-    questionnaire.add_question(name="question1", multiple=True)
-
-    N_QUESTIONNAIRE_RESPONSES = 123
-    N_UNIQUE_ANSWERS = 7
-
-    answers = [["a", "b", "c"], ["d"], ["e", "f", "g"], ["a"], ["b", "c"]]
-    assert len(set(chain.from_iterable(answers))) == N_UNIQUE_ANSWERS
-
-    for _ in range(N_QUESTIONNAIRE_RESPONSES):
-        for _answers in answers:
-            questionnaire_response = questionnaire.respond(
-                responses=[{"question1": _answers}]
-            )
-            device.add_questionnaire_response(
-                questionnaire_response=questionnaire_response
-            )
-
-    events = device.add_index(questionnaire_id="foo/1", question_name="question1")
-    assert len(events) == N_UNIQUE_ANSWERS
-    assert all(isinstance(event, DeviceIndexAddedEvent) for event in events)
-
-    for answer in ["a", "b", "c", "d", "e", "f", "g"]:
-        assert (questionnaire.id, "question1", answer) in device.indexes
-    assert (questionnaire.id, "question1", "foo") not in device.indexes
-
-
-def test_device_add_index_no_such_questionnaire(device: Device):
-    with pytest.raises(QuestionnaireNotFoundError):
-        device.add_index(questionnaire_id="foo/1", question_name="question1")
-
-
-def test_device_add_index_no_such_questionnaire_response(device: Device):
-    device.questionnaire_responses["foo/1"] = []
-    with pytest.raises(QuestionnaireResponseNotFoundError):
-        device.add_index(questionnaire_id="foo/1", question_name="question1")
-
-
-def test_device_add_index_no_such_question(device: Device):
-    questionnaire = Questionnaire(name="foo", version=1)
-    questionnaire_response = questionnaire.respond(responses=[])
-    device.add_questionnaire_response(questionnaire_response=questionnaire_response)
-
-    with pytest.raises(QuestionNotFoundError):
-        device.add_index(questionnaire_id="foo/1", question_name="question1")

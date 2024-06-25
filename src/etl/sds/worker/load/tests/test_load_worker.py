@@ -182,9 +182,15 @@ def test_load_worker_pass(
     final_unprocessed_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
     final_processed_data: list[Device] = list(repository.all_devices())
 
-    initial_ids = sorted(
+    # TODO discuss this, we create a key device and device and this looks a bit naff
+    initial_device_ids = [
         device.id for device in _initial_unprocessed_data + initial_processed_data
-    )
+    ]
+    initial_key_ids = [
+        device.id for device in _initial_unprocessed_data + initial_processed_data
+    ]
+
+    initial_ids = sorted(initial_device_ids + initial_key_ids)
     final_processed_ids = sorted(device.id for device in final_processed_data)
 
     # Confirm that everything has now been processed, and that there is no
@@ -248,9 +254,16 @@ def test_load_worker_pass_max_records(
     final_unprocessed_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
     final_processed_data: list[Device] = list(repository.all_devices())
 
-    initial_ids = sorted(
+    # TODO discuss this, we create a key device and device and this looks a bit naff
+    initial_device_ids = [
         device.id for device in _initial_unprocessed_data + initial_processed_data
-    )
+    ]
+    initial_key_ids = [
+        device.id for device in _initial_unprocessed_data + initial_processed_data
+    ]
+
+    initial_ids = sorted(initial_device_ids + initial_key_ids)
+
     final_processed_ids = sorted(device.id for device in final_processed_data)
 
     # Confirm that everything has now been processed, and that there is no

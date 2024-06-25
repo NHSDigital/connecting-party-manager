@@ -56,8 +56,8 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
             identifier=DeviceDefinitionIdentifier(value=device.type)
         ),
         identifier=[
-            DeviceIdentifier(system=f"{SYSTEM}/{key.type}", value=key.key)
-            for key in device.keys.values()
+            DeviceIdentifier(system=f"{SYSTEM}/{key.device_type}", value=key.key)
+            for key in device.keys
         ],
         owner=DeviceOwnerReference(
             identifier=ProductTeamIdentifier(value=device.product_team_id)

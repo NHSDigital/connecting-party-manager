@@ -9,6 +9,7 @@ from domain.core.device import (
     DeviceCreatedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
+    DeviceStateEvent,
     DeviceUpdatedEvent,
 )
 
@@ -135,7 +136,7 @@ class DeviceRepository(Repository[Device]):
         updated_device = deepcopy(device_by_id)
 
         updated_device_keys: list = updated_device.get("keys", {})
-        device_key = DeviceKey(key=event.key, type=event.key_type).dict()
+        device_key = DeviceKey(key=event.key, device_type=event.key_type).dict()
 
         updated_device_keys.append(device_key)
 
@@ -183,12 +184,13 @@ class DeviceRepository(Repository[Device]):
             )
         )
 
-    def handle_DeviceUpdatedEvent(self, event: DeviceUpdatedEvent) -> TransactItem:
+    def handle_DeviceUpdatedEvent(
+        self, event: DeviceUpdatedEvent
+    ) -> list[TransactItem]:
         # updating the existing device with the new event
         device_keys = event.keys
         device_id = event.id
         updated_device = asdict(event)
-
         transaction_items = self._transact_items_to_update_all_devices_by_id_and_key(
             id=device_id,
             keys=device_keys,
@@ -196,6 +198,49 @@ class DeviceRepository(Repository[Device]):
         )
 
         return transaction_items
+
+    def handle_DeviceStateEvent(self, event: DeviceStateEvent) -> List[TransactItem]:
+        device_state = asdict(event)
+        transaction_items = []
+        device_created_event = DeviceCreatedEvent(**device_state)
+        transaction_items.append(self.handle_DeviceCreatedEvent(device_created_event))
+
+        for device_key in device_state["keys"]:
+            key_type = device_key["type"]
+            key_value = device_key["key"]
+            device_key_added_event = DeviceKeyAddedEvent(
+                id=device_state["id"], key=key_value, key_type=key_type
+            )
+            transaction_items.append(
+                self._bulk_device_key_added(
+                    event=device_key_added_event, device=device_state
+                )
+            )
+
+        return transaction_items
+
+    def _bulk_device_key_added(
+        self, event: DeviceKeyAddedEvent, device: dict
+    ) -> TransactItem:
+        new_device_key = str(event.key)
+        condition_expression = (
+            {"ConditionExpression": ConditionExpression.MUST_NOT_EXIST}
+            if device.get("_trust", False) is False
+            else {}
+        )
+
+        create_device_by_key = TransactItem(
+            Put=TransactionStatement(
+                TableName=self.table_name,
+                Item=marshall(
+                    pk=TableKeys.DEVICE.key(new_device_key),
+                    sk=TableKeys.DEVICE.key(new_device_key),
+                    **device,
+                ),
+                **condition_expression,
+            )
+        )
+        return create_device_by_key
 
     def handle_DeviceKeyAddedEvent(
         self, event: DeviceKeyAddedEvent
@@ -238,7 +283,7 @@ class DeviceRepository(Repository[Device]):
 
     def handle_DeviceKeyDeletedEvent(
         self, event: DeviceKeyDeletedEvent
-    ) -> TransactItem:
+    ) -> list[TransactItem]:
         device_id = str(event.id)
         device_key_to_delete = str(event.key)
         remaining_keys = event.remaining_keys
@@ -253,16 +298,6 @@ class DeviceRepository(Repository[Device]):
             updated_fields={"keys": updated_device["keys"]},
         )
 
-        delete_device_by_id_and_key = TransactItem(
-            Delete=TransactionStatement(
-                TableName=self.table_name,
-                Key=marshall(
-                    pk=TableKeys.DEVICE.key(device_id),
-                    sk=TableKeys.DEVICE.key(device_key_to_delete),
-                ),
-                ConditionExpression=ConditionExpression.MUST_EXIST,
-            )
-        )
         delete_device_by_key = TransactItem(
             Delete=TransactionStatement(
                 TableName=self.table_name,
@@ -274,7 +309,6 @@ class DeviceRepository(Repository[Device]):
             )
         )
 
-        transaction_items.append(delete_device_by_id_and_key)
         transaction_items.append(delete_device_by_key)
         return transaction_items
 

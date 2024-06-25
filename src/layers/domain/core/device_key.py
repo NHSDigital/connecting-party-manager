@@ -31,13 +31,13 @@ class DeviceKey(BaseModel):
     A Device Key is a secondary way of indexing / retrieving Devices
     """
 
-    type: DeviceKeyType
+    device_type: DeviceKeyType
     key: str
 
     @validator("key", check_fields=True)
     def validate_key(key: str, values: dict):
-        type: DeviceKeyType = values.get("type")
-        return validate_key(key=key, type=type)
+        device_type: DeviceKeyType = values.get("type")
+        return validate_key(key=key, type=device_type)
 
 
 def validate_key(key: str, type: DeviceKeyType):
