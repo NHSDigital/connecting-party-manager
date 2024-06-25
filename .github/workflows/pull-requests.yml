@@ -71,7 +71,6 @@ jobs:
           command: build
           save-to-cache: "true"
           restore-from-cache: "false"
-          restore-third-party-cache: "true"
 
   build-base:
     runs-on: [self-hosted, ci]
@@ -85,7 +84,6 @@ jobs:
           command: build
           save-to-cache: "true"
           restore-from-cache: "false"
-          restore-third-party-cache: "true"
           cache-suffix: ${{ env.BASE_CACHE_SUFFIX }}
 
   workflow--codebase-checks:
@@ -98,7 +96,6 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: workflow--codebase-checks
-          restore-third-party-cache: "true"
 
   test--unit:
     needs: [build-head]
@@ -124,7 +121,6 @@ jobs:
       - uses: ./.github/actions/make/
         with:
           command: test--feature--local
-          restore-third-party-cache: "true"
 
   terraform-base-build:
     needs: [create-workspace-name, build-base, parse-secrets]
@@ -185,7 +181,6 @@ jobs:
           command: apigee--deploy
           save-to-cache: "false"
           restore-from-cache: "true"
-          restore-third-party-cache: "true"
           requires-aws: true
 
   test--integration:
@@ -229,7 +224,6 @@ jobs:
         with:
           command: test--feature--integration
           requires-aws: true
-          restore-third-party-cache: "true"
 
   test--smoke:
     needs:
