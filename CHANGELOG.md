@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-06-25
+- [PI-371] Prepare manual snapshots
+- [PI-290] Rename and document SDS Bulk test data
+
 ## 2024-06-19
 - [PI-207] Etl state lock lambda
 - [PI-318] Seperate cache
