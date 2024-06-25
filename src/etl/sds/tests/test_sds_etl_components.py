@@ -16,6 +16,7 @@ from event.aws.client import dynamodb_client
 from event.json import json_loads
 from mypy_boto3_stepfunctions.type_defs import StartSyncExecutionOutputTypeDef
 
+from etl.sds.tests.constants import BULK_TEST_CHANGELOG_NUMBER, EtlTestDataPath
 from etl.sds.worker.extract.tests.test_extract_worker import (
     ANOTHER_GOOD_SDS_RECORD,
     GOOD_SDS_RECORD,
@@ -206,6 +207,14 @@ def test_end_to_end(
     )
 
 
+def _wait_until_empty(get_data_fn, sleep_time_seconds=15):
+    time.sleep(sleep_time_seconds)
+    data = get_data_fn()
+    while len(data) > 0:
+        time.sleep(sleep_time_seconds)
+        data = get_data_fn()
+
+
 @long_running
 @pytest.mark.integration
 def test_end_to_end_bulk_trigger(
@@ -214,7 +223,7 @@ def test_end_to_end_bulk_trigger(
     bucket = read_terraform_output("sds_etl.value.bucket")
     test_data_bucket = read_terraform_output("test_data_bucket.value")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
-    initial_trigger_key = f"{bulk_trigger_prefix}/1701246.ldif"
+    initial_trigger_key = f"{bulk_trigger_prefix}/{BULK_TEST_CHANGELOG_NUMBER}.ldif"
 
     # Clear/set the initial state
     s3_client.put_object(Bucket=bucket, Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF_DATA)
@@ -232,20 +241,18 @@ def test_end_to_end_bulk_trigger(
     s3_client.copy_object(
         Bucket=bucket,
         Key=initial_trigger_key,
-        CopySource={
-            "Bucket": test_data_bucket,
-            "Key": "sds/etl/bulk/1701246-fix-18032023.ldif",
-        },
+        CopySource={"Bucket": test_data_bucket, "Key": EtlTestDataPath.FULL_LDIF},
     )
 
-    extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
-    transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
-    load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
-    while len(extract_data) + len(transform_data) + len(load_data) > 0:
-        time.sleep(15)
-        extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
-        transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
-        load_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD))
+    _wait_until_empty(
+        lambda: get_object(s3_client, key=WorkerKey.EXTRACT),
+    )
+    _wait_until_empty(
+        lambda: pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM)),
+    )
+    _wait_until_empty(
+        lambda: pkl_loads_lz4(get_object(s3_client, key=WorkerKey.LOAD)),
+    )
 
     product_count = repository.count(by=DeviceType.PRODUCT)
     endpoint_count = repository.count(by=DeviceType.ENDPOINT)
