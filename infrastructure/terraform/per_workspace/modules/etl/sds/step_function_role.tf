@@ -44,7 +44,8 @@ locals {
         "s3:GetObject",
         "s3:ListBucket",
         "s3:ListBucketMultipartUploads",
-        "s3:PutObjectVersionTagging"
+        "s3:PutObjectVersionTagging",
+        "s3:DeleteObject"
       ]
       resources = [
         "${module.bucket.s3_bucket_arn}",

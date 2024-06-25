@@ -8,6 +8,9 @@ FILTERED_OUT = "FILTERED-OUT"
 EMPTY_LDIF = ""
 EMPTY_ARRAY = deque()
 LDIF_RECORD_DELIMITER = "\n\n"
+ETL_STATE_LOCK = "ETL_STATE_LOCK"
+ETL_QUEUE_HISTORY = "etl_queue_history"
+ETL_STATE_MACHINE_HISTORY = "etl_state_machine_history"
 
 UNSUPPORTED_ORGANISATIONAL_UNITS = {
     b"ou=people",

@@ -59,6 +59,7 @@ jobs:
         with:
           command: build
           save-to-cache: "true"
+          restore-third-party-cache: "true"
           restore-from-cache: "false"
           cache-suffix: ${{ env.CACHE_NAME }}
       - if: ${{ env.SCOPE != 'per_workspace'}}
@@ -109,6 +110,7 @@ jobs:
           workspace: ${{ env.WORKSPACE }}
           scope: ${{ env.SCOPE }}
           restore-from-cache: "true"
+          restore-third-party-cache: "true"
           save-to-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}
 

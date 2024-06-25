@@ -13,7 +13,6 @@ from .steps import steps
 
 
 class ChangelogTriggerEnvironment(BaseEnvironment):
-    STATE_MACHINE_ARN: str
     NOTIFY_LAMBDA_ARN: str
     TRUSTSTORE_BUCKET: str
     CPM_FQDN: str
@@ -21,18 +20,18 @@ class ChangelogTriggerEnvironment(BaseEnvironment):
     ETL_BUCKET: str
     LDAP_CHANGELOG_USER: str
     LDAP_CHANGELOG_PASSWORD: str
+    SQS_QUEUE_URL: str
 
 
 S3_CLIENT = boto3.client("s3")
-STEP_FUNCTIONS_CLIENT = boto3.client("stepfunctions")
 LAMBDA_CLIENT = boto3.client("lambda")
+SQS_CLIENT = boto3.client("sqs")
 ENVIRONMENT = ChangelogTriggerEnvironment.build()
 
 
 CACHE = {
     "s3_client": S3_CLIENT,
-    "step_functions_client": STEP_FUNCTIONS_CLIENT,
-    "state_machine_arn": ENVIRONMENT.STATE_MACHINE_ARN,
+    "sqs_client": SQS_CLIENT,
     "truststore_bucket": ENVIRONMENT.TRUSTSTORE_BUCKET,
     "cert_file": Path(f"/tmp/{ENVIRONMENT.CPM_FQDN}.crt"),
     "key_file": Path(f"/tmp/{ENVIRONMENT.CPM_FQDN}.key"),
@@ -40,6 +39,7 @@ CACHE = {
     "ldap_host": ENVIRONMENT.LDAP_HOST,
     "ldap_changelog_user": ENVIRONMENT.LDAP_CHANGELOG_USER,
     "ldap_changelog_password": ENVIRONMENT.LDAP_CHANGELOG_PASSWORD,
+    "sqs_queue_url": ENVIRONMENT.SQS_QUEUE_URL,
 }
 
 

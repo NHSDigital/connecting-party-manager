@@ -63,9 +63,10 @@ class StepChain:
                 result = step(data=data, cache=cache)
             except Exception as exception:
                 result = exception
-                break
             naked_step = self.naked_step_lookup[step]  # unwrap decorators off the step
             data = FrozenDict({**data, naked_step: result})
+            if isinstance(result, Exception):
+                break
 
         self.data = data
         self.result = result

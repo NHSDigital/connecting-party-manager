@@ -1,13 +1,12 @@
+import json
 import os
 from json import JSONDecodeError
 from unittest import mock
 
 import boto3
 import pytest
-from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.constants import CHANGELOG_NUMBER, ETL_QUEUE_HISTORY
 from moto import mock_aws
-
-from etl.sds.trigger.update.steps import _start_execution
 
 MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
     "AWS_DEFAULT_REGION": "us-east-1",
@@ -19,6 +18,7 @@ MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
     "ETL_BUCKET": "etl-bucket",
     "LDAP_CHANGELOG_USER": "user",
     "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret
+    "SQS_QUEUE_URL": "sqs-queue.fifo",
 }
 
 ALLOWED_EXCEPTIONS = (JSONDecodeError,)
@@ -110,7 +110,8 @@ def test_update(change_result):
 
     with mock_aws(), mock.patch.dict(
         os.environ, MOCKED_UPDATE_TRIGGER_ENVIRONMENT, clear=True
-    ):
+    ), mock.patch("etl_utils.trigger.model.datetime") as mocked_datetime:
+        mocked_datetime.datetime.now().isoformat.return_value = "foo"
         s3_client = boto3.client("s3")
 
         # Create truststore contents
@@ -136,17 +137,20 @@ def test_update(change_result):
             Body=CURRENT_CHANGELOG_NUMBER,
         )
 
+        # mock sqs queue
+        sqs = boto3.resource("sqs")
+        queue = sqs.create_queue(
+            QueueName=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["SQS_QUEUE_URL"],
+            Attributes={"FifoQueue": "true"},
+        )
+
         from etl.sds.trigger.update import update
 
         # Mock the cache contents
         update.CACHE["s3_client"] = s3_client
+        update.CACHE["sqs_queue_url"] = queue.url
         update.CACHE["ldap"] = mocked_ldap
         update.CACHE["ldap_client"] = mocked_ldap_client
-
-        # Remove start execution, since it's meaningless
-        if _start_execution in update.steps:
-            idx = update.steps.index(_start_execution)
-            update.steps.pop(idx)
 
         # Don't execute the notify lambda
         update.notify = (
@@ -162,18 +166,31 @@ def test_update(change_result):
         )
         assert changelog_number_response["Body"].read() == CURRENT_CHANGELOG_NUMBER
 
-        # Verify the history file was created
-        etl_history_response = s3_client.get_object(
-            Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key=f"history/update/{int(LATEST_CHANGELOG_NUMBER)}/{WorkerKey.EXTRACT}",
-        )
-        assert etl_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
+        decoded_current_changelog_number = int(CURRENT_CHANGELOG_NUMBER.decode())
+        decoded_latest_changelog_number = int(LATEST_CHANGELOG_NUMBER.decode())
 
-        # Verify the ETL input file was created
-        etl_input_response = s3_client.get_object(
+        # Verify the intermediate queue history file was created
+        etl_queue_history_response = s3_client.get_object(
             Bucket=MOCKED_UPDATE_TRIGGER_ENVIRONMENT["ETL_BUCKET"],
-            Key=WorkerKey.EXTRACT,
+            Key=f"{ETL_QUEUE_HISTORY}/update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
         )
-        assert etl_input_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
+        assert (
+            etl_queue_history_response["Body"].read().lower() == CHANGE_AS_LDIF.lower()
+        )
+
+        # Verify message was published to queue
+        expected_sqs_message = json.dumps(
+            {
+                "etl_type": "update",
+                "changelog_number_start": decoded_current_changelog_number,
+                "changelog_number_end": decoded_latest_changelog_number,
+                "timestamp": "foo",
+                "name": f"update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
+            }
+        )
+        sqs_messages = queue.receive_messages()
+        assert (
+            sqs_messages[0].body == expected_sqs_message
+        ), "SQS message does not match expected"
 
     assert not isinstance(response, Exception), response

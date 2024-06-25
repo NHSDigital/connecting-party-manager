@@ -287,7 +287,16 @@
           "Next": "fail"
         }
       ],
-      "Default": "success"
+      "Default": "delete-state-lock"
+    },
+    "delete-state-lock": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket": "${etl_bucket}",
+        "Key": "${etl_state_lock_key}"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Next": "success"
     },
     "fail": {
       "Type": "Fail"

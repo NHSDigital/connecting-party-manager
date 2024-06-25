@@ -1,11 +1,11 @@
+import uuid
 from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
-from etl_utils.constants import LDIF_RECORD_DELIMITER, WorkerKey
+from etl_utils.constants import ETL_QUEUE_HISTORY, LDIF_RECORD_DELIMITER
 from etl_utils.ldap_typing import LdapModuleProtocol
 from etl_utils.trigger.model import StateMachineInput
-from etl_utils.trigger.operations import start_execution, validate_state_keys_are_empty
 
 from .operations import (
     get_certs_from_s3_truststore,
@@ -18,13 +18,12 @@ from .operations import (
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
-    from mypy_boto3_stepfunctions import SFNClient
+    from mypy_boto3_sqs import SQSClient
 
 
 class Cache(TypedDict):
     s3_client: "S3Client"
-    step_functions_client: "SFNClient"
-    state_machine_arn: str
+    sqs_client: "SQSClient"
     truststore_bucket: str
     ldap: LdapModuleProtocol
     ldap_host: str
@@ -89,12 +88,6 @@ def _create_state_machine_input(data, cache):
     )
 
 
-def _validate_state_keys_are_empty(data, cache: Cache):
-    return validate_state_keys_are_empty(
-        s3_client=cache["s3_client"], bucket=cache["etl_bucket"]
-    )
-
-
 def _get_changelog_entries_from_ldap(data, cache: Cache):
     current_changelog_number = data[_get_current_changelog_number_from_s3]
     latest_changelog_number = data[_get_latest_changelog_number_from_ldap]
@@ -113,32 +106,28 @@ def _parse_and_join_changelog_changes(data, cache):
     return LDIF_RECORD_DELIMITER.join(changes_ldif)
 
 
-def _put_to_state_machine(data, cache: Cache):
-    changes = data[_parse_and_join_changelog_changes]
-
-    return cache["s3_client"].put_object(
-        Bucket=cache["etl_bucket"], Key=WorkerKey.EXTRACT, Body=changes
-    )
-
-
-def _start_execution(data, cache):
-    state_machine_input = data[_create_state_machine_input]
-    return start_execution(
-        step_functions_client=cache["step_functions_client"],
-        state_machine_arn=cache["state_machine_arn"],
-        state_machine_input=state_machine_input,
-    )
-
-
-def _put_to_history(data, cache: Cache):
-    latest_changelog_number = data[_get_latest_changelog_number_from_ldap]
+def _put_changes_to_intermediate_history_file(data, cache: Cache):
     changes = data[_parse_and_join_changelog_changes]
     state_machine_input: StateMachineInput = data[_create_state_machine_input]
 
     return cache["s3_client"].put_object(
         Bucket=cache["etl_bucket"],
-        Key=f"history/{state_machine_input.etl_type}/{latest_changelog_number}/{WorkerKey.EXTRACT}",
+        Key=f"{ETL_QUEUE_HISTORY}/{state_machine_input.name}",
         Body=changes,
+    )
+
+
+def _publish_message_to_sqs_queue(data, cache: Cache):
+    state_machine_input: StateMachineInput = data[_create_state_machine_input]
+    message_body = state_machine_input.json_with_name()
+    message_deduplication_id = str(uuid.uuid4())
+
+    # Send the message to the SQS queue
+    cache["sqs_client"].send_message(
+        QueueUrl=cache["sqs_queue_url"],
+        MessageBody=message_body,
+        MessageGroupId="state_machine_group",
+        MessageDeduplicationId=message_deduplication_id,
     )
 
 
@@ -148,10 +137,8 @@ steps = [
     _get_current_changelog_number_from_s3,
     _get_latest_changelog_number_from_ldap,
     _create_state_machine_input,
-    _validate_state_keys_are_empty,
     _get_changelog_entries_from_ldap,
     _parse_and_join_changelog_changes,
-    _put_to_state_machine,
-    _put_to_history,
-    _start_execution,
+    _put_changes_to_intermediate_history_file,
+    _publish_message_to_sqs_queue,
 ]
