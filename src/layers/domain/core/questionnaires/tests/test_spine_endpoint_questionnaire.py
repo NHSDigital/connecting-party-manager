@@ -7,6 +7,8 @@ from hypothesis import given, settings
 from sds.cpm_translation.tests.test_cpm_translation import NHS_MHS_STRATEGY
 from sds.domain.nhs_mhs import NhsMhs
 
+from etl.sds.tests.constants import EtlTestDataPath
+
 
 @pytest.fixture
 def spine_endpoint_questionnaire_v1() -> Questionnaire:
@@ -49,7 +51,7 @@ def test_spine_endpoint_questionnaire_v1_local(nhs_mhs: NhsMhs):
     )
 
 
-@pytest.mark.s3("sds/etl/bulk/1701246-fix-18032023.json")
+@pytest.mark.s3(EtlTestDataPath.FULL_JSON)
 def test_spine_endpoint_questionnaire_v1_integration(
     spine_endpoint_questionnaire_v1: Questionnaire, test_data_paths
 ):

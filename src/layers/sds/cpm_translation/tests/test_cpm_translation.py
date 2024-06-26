@@ -27,6 +27,7 @@ from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 
+from etl.sds.tests.constants import EtlTestDataPath
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 
@@ -126,7 +127,7 @@ def test_nhs_accredited_system_to_cpm_devices(
     assert i > 0
 
 
-@pytest.mark.s3("sds/etl/bulk/1701246-fix-18032023.json")
+@pytest.mark.s3(EtlTestDataPath.FULL_JSON)
 def test_translate_bulk(test_data_paths):
     (path,) = test_data_paths
     with open(path) as f:

@@ -20,20 +20,11 @@ inputs:
       .timestamp
       .downloads
       .tool-versions
+      pyproject.toml
       poetry.lock
       src
       infrastructure
       !**/.terraform/modules/**/*
-  third-party-cache-paths:
-    description: Separate cache for common library builds
-    required: false
-    default: |
-      .venv
-      src/layers/third_party
-      pyproject.toml
-  restore-third-party-cache:
-    description: Separate cache for common library builds
-    required: false
 
 runs:
   using: "composite"
@@ -51,15 +42,6 @@ runs:
         restore-keys: |
           ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
-    - if: ${{ inputs.restore-third-party-cache == 'true'}}
-      id: restore-third-party-cache
-      uses: actions/cache/restore@v3
-      with:
-        path: ${{ inputs.third-party-cache-paths }}
-        key: ${{ hashFiles( 'pyproject.toml' ) }}
-        restore-keys: |
-          ${{ hashFiles( 'pyproject.toml' ) }}
-
     # # For debugging, uncomment the following:
     # - id: tree
     #   shell: bash
@@ -71,10 +53,3 @@ runs:
       with:
         path: ${{ inputs.paths-to-cache }}
         key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
-
-    - if: ${{ inputs.save-or-restore == 'save' && steps.restore-third-party-cache.outputs.cache-hit != 'true'}}
-      id: save-third-party-cache
-      uses: actions/cache/save@v3
-      with:
-        path: ${{ inputs.third-party-cache-paths }}
-        key: ${{ hashFiles( 'pyproject.toml' ) }}
