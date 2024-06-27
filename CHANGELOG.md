@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-06-27
+- [PI-319] Rename lambda connectivity module
+- [PI-208] ETL notify lambda and slack hook
+
 ## 2024-06-25
 - [PI-371] Prepare manual snapshots
 - [PI-290] Rename and document SDS Bulk test data
