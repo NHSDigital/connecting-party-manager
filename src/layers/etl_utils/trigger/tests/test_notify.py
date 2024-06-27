@@ -1,18 +1,23 @@
 import json
+import os
 from io import StringIO
+from unittest import mock
 from unittest.mock import Mock
 
 import pytest
 from etl_utils.trigger.notify import notify
 from event.json import json_loads
 
-from etl.notify.notify import handler
+from etl.notify.tests.test_notify_lambda import EXAMPLE_DOT_COM
 
 FUNCTION_NAME = "my-function"
 
 
 def mocked_lambda(FunctionName, Payload):
-    result = handler(event=json_loads(Payload))
+    with mock.patch.dict(os.environ, {"SLACK_WEBHOOK_URL": EXAMPLE_DOT_COM}):
+        from etl.notify.notify import handler
+
+        result = handler(event=json_loads(Payload))
     return {"Payload": StringIO(json.dumps(result))}
 
 

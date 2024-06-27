@@ -1,3 +1,13 @@
+data "aws_secretsmanager_secret" "slack_webhook_url" {
+  name  = "${terraform.workspace}--etl-notify-slack-webhook-url"
+  count = contains(["dev", "ref", "int", "qa", "prod"], terraform.workspace) ? 1 : 0
+}
+
+data "aws_secretsmanager_secret_version" "slack_webhook_url" {
+  count     = length((data.aws_secretsmanager_secret.slack_webhook_url))
+  secret_id = data.aws_secretsmanager_secret.slack_webhook_url.*.id[0]
+}
+
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
@@ -22,9 +32,15 @@ module "lambda_function" {
     }
   }
 
-
   create_package         = false
   local_existing_package = "${path.root}/../../../src/etl/notify/dist/notify.zip"
+  layers                 = [var.etl_layer_arn, var.event_layer_arn, var.third_party_layer_arn]
+
+  environment_variables = {
+    SLACK_WEBHOOK_URL = concat(data.aws_secretsmanager_secret_version.slack_webhook_url.*.secret_string, ["http://example.com"])[0]
+    WORKSPACE         = terraform.workspace
+    ENVIRONMENT       = var.environment
+  }
 
   tags = {
     Name = "${var.workspace_prefix}--${var.etl_name}--notify"

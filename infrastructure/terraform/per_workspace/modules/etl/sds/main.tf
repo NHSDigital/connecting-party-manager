@@ -187,10 +187,14 @@ module "worker_load" {
 module "notify" {
   source = "./notify/"
 
-  etl_name         = local.etl_name
-  assume_account   = var.assume_account
-  workspace_prefix = var.workspace_prefix
-  python_version   = var.python_version
+  etl_name              = local.etl_name
+  assume_account        = var.assume_account
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_core_layer_arn
+  environment           = var.environment
 }
 
 resource "aws_cloudwatch_log_group" "step_function" {
