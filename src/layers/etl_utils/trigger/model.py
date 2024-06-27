@@ -1,5 +1,6 @@
 import datetime
 import json
+from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import Self
 
@@ -16,6 +17,14 @@ def _create_timestamp() -> str:
 class StateMachineInputType(StrEnum):
     BULK = auto()
     UPDATE = auto()
+
+
+@dataclass
+class TriggerResponse:
+    """The response of an ETL trigger lambda"""
+
+    message: str
+    error_message: None | str
 
 
 class StateMachineInput(BaseModel):
