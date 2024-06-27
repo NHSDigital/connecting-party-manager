@@ -82,19 +82,6 @@
       "Resource": ["arn:aws:apigateway:*::/*"]
     },
     {
-      "Sid": "CloudWatchPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:DeleteLogGroup",
-        "logs:DescribeLogGroups",
-        "logs:ListTagsLogGroup",
-        "logs:TagResource",
-        "logs:UntagResource"
-      ],
-      "Resource": ["arn:aws:logs:*:${ACCOUNT_ID}:log-group:*"]
-    },
-    {
       "Sid": "CloudFormationPermissions",
       "Effect": "Allow",
       "Action": [
@@ -175,7 +162,8 @@
         "ec2:CreateVpcEndpoint",
         "ec2:DescribeVpcEndpoints",
         "ec2:DescribePrefixLists",
-        "ec2:DescribeRouteTables"
+        "ec2:DescribeRouteTables",
+        "ec2:DisassociateRouteTable"
       ],
       "Resource": ["*"]
     },
