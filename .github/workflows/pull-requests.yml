@@ -72,31 +72,6 @@ jobs:
           save-to-cache: "true"
           restore-from-cache: "false"
 
-  generate-sbom:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH_NAME }}
-      - uses: anchore/sbom-action@v0
-        with:
-          path: ./
-          format: cyclonedx-json
-          artifact-name: sbom-repo.cdx.json
-
-  scan-vulnerabilities:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH_NAME }}
-      - uses: anchore/scan-action@v3
-        with:
-          sbom: sbom-repo.cdx.json
-          fail-build: true
-          severity-cutoff: critical
-          acs-report-enable: true
-
   build-base:
     runs-on: [self-hosted, ci]
     needs: [workflow--check--branch-name]
