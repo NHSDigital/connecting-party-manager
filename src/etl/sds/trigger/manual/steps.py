@@ -1,5 +1,5 @@
 # from pathlib import Path
-# from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
 # from etl_utils.constants import WorkerKey
 # from etl_utils.trigger.model import StateMachineInput
@@ -8,10 +8,10 @@
 
 # from .operations import validate_database_is_empty, validate_no_changelog_number
 
-# if TYPE_CHECKING:
-#     from mypy_boto3_dynamodb import DynamoDBClient
-#     from mypy_boto3_s3 import S3Client
-#     from mypy_boto3_stepfunctions import SFNClient
+if TYPE_CHECKING:
+    from mypy_boto3_dynamodb import DynamoDBClient
+    from mypy_boto3_s3 import S3Client
+    from mypy_boto3_stepfunctions import SFNClient
 
 
 class Cache(TypedDict):
@@ -41,12 +41,13 @@ class Cache(TypedDict):
 
 
 def _get_latest_state_machine_run(data, cache):
-    SFNClient.list_map_runs()
+    runs = SFNClient.list_map_runs()
+    # print(runs)
 
 
-def _create_state_machine_input(data, cache):
-    _, source_key = data[StepChain.INIT]
-    return StateMachineInput.bulk(changelog_number=Path(source_key).stem)
+# def _create_state_machine_input(data, cache):
+#     _, source_key = data[StepChain.INIT]
+#     return StateMachineInput.bulk(changelog_number=Path(source_key).stem)
 
 
 # def _copy_to_state_machine(data, cache: Cache):
@@ -73,13 +74,13 @@ def _create_state_machine_input(data, cache):
 #     return cache["s3_client"].delete_object(Bucket=source_bucket, Key=source_key)
 
 
-def _start_execution(data, cache):
-    state_machine_input: StateMachineInput = data[_create_state_machine_input]
-    return start_execution(
-        step_functions_client=cache["step_functions_client"],
-        state_machine_arn=cache["state_machine_arn"],
-        state_machine_input=state_machine_input,
-    )
+# def _start_execution(data, cache):
+#     state_machine_input: StateMachineInput = data[_create_state_machine_input]
+#     return start_execution(
+#         step_functions_client=cache["step_functions_client"],
+#         state_machine_arn=cache["state_machine_arn"],
+#         state_machine_input=state_machine_input,
+#     )
 
 
 steps = [
@@ -90,5 +91,6 @@ steps = [
     # _copy_to_state_machine,
     # _copy_to_history,
     # _delete_object,
-    _start_execution,
+    # _start_execution,
+    _get_latest_state_machine_run
 ]
