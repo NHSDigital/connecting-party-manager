@@ -201,23 +201,22 @@ resource "aws_cloudwatch_log_group" "step_function" {
   name = "/aws/vendedlogs/states/${var.workspace_prefix}--${local.etl_name}"
 }
 
-module "update_transform_and_load_step_function" {
+module "bulk_transform_and_load_step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
   version = "4.2.0"
 
   type                              = "STANDARD"
-  name                              = "${var.workspace_prefix}--${local.etl_name}--update-transform-and-load"
+  name                              = "${var.workspace_prefix}--${local.etl_name}--bulk-transform-and-load"
   use_existing_cloudwatch_log_group = true
   cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
 
   definition = templatefile(
-    "${path.module}/etl-diagram--update-transform-and-load.asl.json",
+    "${path.module}/etl-diagram--bulk-transform-and-load.asl.json",
     {
-      transform_worker_arn = module.worker_transform.arn
-      load_worker_arn      = module.worker_load.arn
-      etl_bucket           = module.bucket.s3_bucket_id
-      changelog_key        = var.changelog_key
-      etl_state_lock_key   = var.etl_state_lock_key
+      transform_worker_arn     = module.worker_transform.arn
+      load_worker_arn          = module.worker_load.arn
+      bulk_transform_chunksize = var.bulk_transform_chunksize
+      bulk_load_chunksize      = var.bulk_load_chunksize
     }
   )
 
@@ -232,35 +231,47 @@ module "update_transform_and_load_step_function" {
     }
   }
 
+  logging_configuration = {
+    log_destination        = "${aws_cloudwatch_log_group.step_function.arn}:*"
+    include_execution_data = true
+    level                  = "ALL"
+  }
+
+  tags = {
+    Name = "${var.workspace_prefix}--${local.etl_name}--bulk-transform-and-load"
+  }
+
+  depends_on = [aws_cloudwatch_log_group.step_function]
+}
 
 
-  attach_policy_json = true
-  policy_json        = <<-EOT
+module "update_transform_and_load_step_function" {
+  source  = "terraform-aws-modules/step-functions/aws"
+  version = "4.2.0"
+
+  type                              = "STANDARD"
+  name                              = "${var.workspace_prefix}--${local.etl_name}--update-transform-and-load"
+  use_existing_cloudwatch_log_group = true
+  cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
+
+  definition = templatefile(
+    "${path.module}/etl-diagram--update-transform-and-load.asl.json",
     {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-            "Action": [
-                "s3:PutObject",
-                "s3:AbortMultipartUpload",
-                "s3:GetBucketLocation",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-                "s3:PutObjectVersionTagging",
-                "s3:DeleteObject"
-            ],
-            "Effect": "Allow",
-            "Resource": [
-              "${module.bucket.s3_bucket_arn}",
-              "${module.bucket.s3_bucket_arn}/*"
-            ]
-          }
+      transform_worker_arn = module.worker_transform.arn
+      load_worker_arn      = module.worker_load.arn
+    }
+  )
+
+  service_integrations = {
+    lambda = {
+      lambda = [
+        module.worker_transform.arn,
+        module.worker_load.arn,
+        "${module.worker_transform.arn}:*",
+        "${module.worker_load.arn}:*"
       ]
     }
-  EOT
-
-
+  }
 
   logging_configuration = {
     log_destination        = "${aws_cloudwatch_log_group.step_function.arn}:*"
@@ -290,6 +301,7 @@ resource "aws_sfn_state_machine" "state_machine" {
       changelog_key                = var.changelog_key
       bulk_load_chunksize          = var.bulk_load_chunksize
       etl_update_state_machine_arn = module.update_transform_and_load_step_function.state_machine_arn
+      etl_bulk_state_machine_arn   = module.bulk_transform_and_load_step_function.state_machine_arn
       etl_state_lock_key           = var.etl_state_lock_key
     }
   )
