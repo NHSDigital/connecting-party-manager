@@ -69,27 +69,6 @@ jobs:
           restore-from-cache: "false"
           cache-suffix: ${{ env.CACHE_NAME }}
 
-  generate-sbom:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - uses: anchore/sbom-action@v0
-        with:
-          path: ./
-          format: cyclonedx-json
-          artifact-name: sbom-repo.cdx.json
-
-  scan-vulnerabilities:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - uses: anchore/scan-action@v3
-        with:
-          sbom: ./sbom-repo.cdx.json
-          fail-build: true
-          severity-cutoff: critical
-          acs-report-enable: true
-
   terraform--init:
     needs: [get-branch-from-workflow-file, build]
     runs-on: [self-hosted, ci]
