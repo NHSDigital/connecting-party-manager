@@ -81,7 +81,7 @@ def is_valid_ods_code(ods_code: str) -> bool:
     response = requests.get(url=url)
     status_code = HTTPStatus(response.status_code)
 
-    if status_code is HTTPStatus.OK:
+    if status_code == HTTPStatus.OK:
         return True
     if HTTPStatus.BAD_REQUEST <= status_code < HTTPStatus.INTERNAL_SERVER_ERROR:
         return False
