@@ -78,18 +78,11 @@ def repository():
 
 
 def execute_state_machine(
-    state_machine_input: StateMachineInput, client
+    state_machine_input: StateMachineInput, step_functions_client
 ) -> StartSyncExecutionOutputTypeDef:
-    config = Config(
-        retries={
-            "max_attempts": 10,  # Increase the number of max attempts
-            "mode": "standard",  # Standard retry mode
-        }
-    )
-    client = boto3.client("stepfunctions", config=config)
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     name = state_machine_input.name
-    execution_response = client.start_execution(
+    execution_response = step_functions_client.start_execution(
         stateMachineArn=state_machine_arn,
         name=name,
         input=json.dumps(state_machine_input.dict()),
@@ -97,7 +90,7 @@ def execute_state_machine(
 
     status = "RUNNING"
     while status == "RUNNING":
-        response = client.describe_execution(
+        response = step_functions_client.describe_execution(
             executionArn=execution_response["executionArn"]
         )
         status = response["status"]
@@ -141,28 +134,14 @@ def put_object(s3_client, key: WorkerKey, body: bytes) -> str:
 
 @pytest.mark.integration
 @pytest.mark.parametrize(
-    "worker_data",
-    [
-        {
-            WorkerKey.EXTRACT: "",
-            WorkerKey.TRANSFORM: pkl_dumps_lz4(deque()),
-            WorkerKey.LOAD: pkl_dumps_lz4(deque()),
-        }
-    ],  # empty
-    indirect=True,
-)
-@pytest.mark.parametrize(
     "state_machine_input",
     [StateMachineInput.update(changelog_number_start=1, changelog_number_end=1)],
     indirect=True,
 )
 def test_changelog_number_update(
-    worker_data,
-    state_machine_input: StateMachineInput,
-    step_functions_client,
-    s3_client,
+    state_machine_input: StateMachineInput, step_functions_client, s3_client
 ):
-    execute_state_machine(state_machine_input, client=step_functions_client)
+    execute_state_machine(state_machine_input, step_functions_client)
     changelog_number_from_s3 = get_changelog_number_from_s3(s3_client)
     assert changelog_number_from_s3 == state_machine_input.changelog_number_end
 
@@ -193,7 +172,7 @@ def test_end_to_end(
     state_machine_input,
     step_functions_client,
 ):
-    execute_state_machine(state_machine_input, client=step_functions_client)
+    execute_state_machine(state_machine_input, step_functions_client)
 
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
@@ -217,9 +196,7 @@ def _wait_until_empty(get_data_fn, sleep_time_seconds=15):
 
 @long_running
 @pytest.mark.integration
-def test_end_to_end_bulk_trigger(
-    repository: MockDeviceRepository, step_functions_client, s3_client
-):
+def test_end_to_end_bulk_trigger(repository: MockDeviceRepository, s3_client):
     bucket = read_terraform_output("sds_etl.value.bucket")
     test_data_bucket = read_terraform_output("test_data_bucket.value")
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
@@ -291,7 +268,7 @@ def test_end_to_end_changelog_delete(
     state_machine_input,
 ):
     """Note that the start of this test is the same as test_end_to_end, and then makes changes"""
-    execute_state_machine(state_machine_input, client=step_functions_client)
+    execute_state_machine(state_machine_input, step_functions_client)
 
     extract_data = get_object(s3_client, key=WorkerKey.EXTRACT)
     transform_data = pkl_loads_lz4(get_object(s3_client, key=WorkerKey.TRANSFORM))
@@ -310,7 +287,7 @@ def test_end_to_end_changelog_delete(
         state_machine_input=StateMachineInput.update(
             changelog_number_start=124, changelog_number_end=125
         ),
-        client=step_functions_client,
+        step_functions_client=step_functions_client,
     )
     assert response["status"] == "SUCCEEDED"
 
@@ -336,7 +313,7 @@ def test_end_to_end_changelog_delete(
         state_machine_input=StateMachineInput.update(
             changelog_number_start=124, changelog_number_end=125
         ),
-        client=step_functions_client,
+        step_functions_client=step_functions_client,
     )
     assert response["status"] == "SUCCEEDED"
 
