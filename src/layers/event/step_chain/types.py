@@ -17,6 +17,12 @@ class FrozenDict(Mapping):
     def __getitem__(self, key):
         return self._d[key]
 
+    def __setitem__(self, key, value):
+        raise TypeError(f"{self.__class__.__name__} object is immutable")
+
+    def __delitem__(self, key):
+        raise TypeError(f"{self.__class__.__name__} object is immutable")
+
     def __str__(self):
         return str(self._d)
 
