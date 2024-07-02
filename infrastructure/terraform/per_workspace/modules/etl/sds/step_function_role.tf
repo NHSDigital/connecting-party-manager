@@ -23,12 +23,15 @@ locals {
 
     step_function_start = {
       actions   = ["states:StartExecution", "states:StartSyncExecution"]
-      resources = [module.update_transform_and_load_step_function.state_machine_arn]
+      resources = [module.update_transform_and_load_step_function.state_machine_arn, module.bulk_transform_and_load_step_function.state_machine_arn]
     }
 
     step_function_stop = {
-      actions   = ["states:DescribeExecution", "states:StopExecution"]
-      resources = ["${replace(module.update_transform_and_load_step_function.state_machine_arn, "stateMachine", "execution")}:*"]
+      actions = ["states:DescribeExecution", "states:StopExecution"]
+      resources = [
+        "${replace(module.update_transform_and_load_step_function.state_machine_arn, "stateMachine", "execution")}:*",
+        "${replace(module.bulk_transform_and_load_step_function.state_machine_arn, "stateMachine", "execution")}:*"
+      ]
     }
 
     step_function_event_polling = {
@@ -68,7 +71,7 @@ locals {
     }
   }
 
-  depends_on = [module.bucket, module.update_transform_and_load_step_function]
+  depends_on = [module.bucket, module.update_transform_and_load_step_function, module.bulk_transform_and_load_step_function]
 }
 
 data "aws_iam_policy_document" "assume_role" {
