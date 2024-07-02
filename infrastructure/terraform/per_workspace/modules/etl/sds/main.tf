@@ -187,10 +187,14 @@ module "worker_load" {
 module "notify" {
   source = "./notify/"
 
-  etl_name         = local.etl_name
-  assume_account   = var.assume_account
-  workspace_prefix = var.workspace_prefix
-  python_version   = var.python_version
+  etl_name              = local.etl_name
+  assume_account        = var.assume_account
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_core_layer_arn
+  environment           = var.environment
 }
 
 resource "aws_cloudwatch_log_group" "step_function" {
@@ -330,17 +334,17 @@ module "trigger_bulk" {
   }
 }
 
-data "aws_subnets" "lambda-connectivity-private" {
+data "aws_subnets" "sds-etl-hscn-private" {
   filter {
     name   = "tag:Name"
-    values = ["${local.project}-lambda-connectivity-private-${var.environment}"]
+    values = ["${local.project}-sds-etl-hscn-private-${var.environment}"]
   }
 }
 
 data "aws_security_groups" "sds-ldap" {
   filter {
     name   = "tag:Name"
-    values = ["${local.project}-sds-ldap-${var.environment}"]
+    values = ["${local.project}-sds-hscn-ldap-${var.environment}"]
   }
 }
 
@@ -385,7 +389,7 @@ module "trigger_update" {
     SQS_QUEUE_URL           = module.etl_state_lock_enforcer.sqs_queue_url
   }
 
-  vpc_subnet_ids         = data.aws_subnets.lambda-connectivity-private.ids
+  vpc_subnet_ids         = data.aws_subnets.sds-etl-hscn-private.ids
   vpc_security_group_ids = data.aws_security_groups.sds-ldap.ids
   extra_policies = [
     {

@@ -54,3 +54,7 @@ resource "aws_secretsmanager_secret" "ldap-changelog-user" {
 resource "aws_secretsmanager_secret" "ldap-changelog-password" {
   name = "${terraform.workspace}-ldap-changelog-password"
 }
+
+resource "aws_secretsmanager_secret" "etl_notify_slack_webhook_url" {
+  name = "${terraform.workspace}--etl-notify-slack-webhook-url"
+}

@@ -13,3 +13,17 @@ variable "python_version" {
 variable "assume_account" {
   type = string
 }
+variable "event_layer_arn" {
+  type = string
+}
+variable "etl_layer_arn" {
+  type = string
+}
+
+variable "third_party_layer_arn" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
