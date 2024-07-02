@@ -70,7 +70,9 @@ def test_group_by_key():
 
 
 def test_strip_key_prefix():
-    strip_key_prefix("P#123#456") == "123#456"
+    result = strip_key_prefix("P#123#456")
+    expected = "123#456"
+    assert result == expected
 
 
 def test_remove_keys():
