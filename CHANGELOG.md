@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-07-02
+- [PI-443] Run entire sds bulk transform/load in batches of 250k to save lambda memory and improve CPU time
+
 ## 2024-06-27
 - [PI-319] Rename lambda connectivity module
 - [PI-208] ETL notify lambda and slack hook
