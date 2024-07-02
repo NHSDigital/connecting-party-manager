@@ -12,6 +12,10 @@ variable "changelog_key" {
 variable "bulk_load_chunksize" {
   default = 10000
 }
+variable "bulk_transform_chunksize" {
+  default = 250000
+}
+
 variable "etl_state_lock_key" {
   default = "ETL_STATE_LOCK"
 }
