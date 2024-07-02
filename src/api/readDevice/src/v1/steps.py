@@ -7,11 +7,11 @@ from event.step_chain import StepChain
 
 def read_device(data, cache) -> Device:
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    id = event.path_parameters["id"]
+    device_id = event.path_parameters["id"]
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.read(id=id)
+    return device_repo.read_by_id(id=device_id)
 
 
 def device_to_fhir_org(data, cache) -> dict:

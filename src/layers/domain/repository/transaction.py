@@ -29,11 +29,15 @@ class TransactionStatement(BaseModel):
     Item: Optional[dict] = Field(default=None)
     Key: Optional[dict] = Field(default=None)
     ConditionExpression: Optional["ConditionExpression"] = Field(default=None)
+    UpdateExpression: Optional[str] = Field(default=None)
+    ExpressionAttributeNames: Optional[dict] = Field(default=None)
+    ExpressionAttributeValues: Optional[dict] = Field(default=None)
 
 
 class TransactItem(BaseModel):
     Put: Optional[TransactionStatement] = None
     Delete: Optional[TransactionStatement] = None
+    Update: Optional[TransactionStatement] = None
 
 
 class Transaction(BaseModel):
