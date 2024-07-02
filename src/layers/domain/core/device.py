@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import StrEnum, auto
 from itertools import chain
 from typing import Any, Optional
@@ -168,13 +168,13 @@ class Device(AggregateRoot):
 
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         if "updated_on" not in kwargs:
-            kwargs["updated_on"] = datetime.utcnow()
+            kwargs["updated_on"] = datetime.now(timezone.utc)
         device_data = self._update(data=kwargs)
         event = DeviceUpdatedEvent(**device_data)
         return self.add_event(event)
 
     def delete(self) -> DeviceUpdatedEvent:
-        deletion_datetime = datetime.utcnow()
+        deletion_datetime = datetime.now(timezone.utc)
         return self.update(
             status=DeviceStatus.INACTIVE,
             updated_on=deletion_datetime,
