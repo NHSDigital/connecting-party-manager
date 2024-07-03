@@ -77,35 +77,37 @@ def _get_latest_changelog_number_from_ldap(data, cache: Cache):
             f"is ahead of the latest changelog {latest_changelog_number} "
             "number available on SDS"
         )
-    return latest_changelog_number
-
-
-def _create_state_machine_input(data, cache):
-    current_changelog_number = data[_get_current_changelog_number_from_s3]
-    latest_changelog_number = data[_get_latest_changelog_number_from_ldap]
-    return StateMachineInput.update(
-        changelog_number_start=current_changelog_number,
-        changelog_number_end=latest_changelog_number,
-    )
+    return latest_changelog_number  # needed?
 
 
 def _get_changelog_entries_from_ldap(data, cache: Cache):
     current_changelog_number = data[_get_current_changelog_number_from_s3]
     latest_changelog_number = data[_get_latest_changelog_number_from_ldap]
     ldap_client = data[_prepare_ldap_client]
-    return get_changelog_entries_from_ldap(
+    changelog_records, latest_changelog_number = get_changelog_entries_from_ldap(
         ldap_client=ldap_client,
         ldap=cache["ldap"],
         current_changelog_number=current_changelog_number,
         latest_changelog_number=latest_changelog_number,
         changenumber_batch=cache["changenumber_batch"],
     )
+    return changelog_records, latest_changelog_number
 
 
 def _parse_and_join_changelog_changes(data, cache):
-    changelog_records: list[tuple[str, dict]] = data[_get_changelog_entries_from_ldap]
+    changelog_records, _ = data[_get_changelog_entries_from_ldap]
+    changelog_records: list[tuple[str, dict]] = changelog_records
     changes_ldif = starmap(parse_changelog_changes, changelog_records)
     return LDIF_RECORD_DELIMITER.join(changes_ldif)
+
+
+def _create_state_machine_input(data, cache):
+    current_changelog_number = data[_get_current_changelog_number_from_s3]
+    _, latest_changelog_number = data[_get_changelog_entries_from_ldap]
+    return StateMachineInput.update(
+        changelog_number_start=current_changelog_number,
+        changelog_number_end=latest_changelog_number,
+    )  # needs to get changelog_number_end from elsewhere
 
 
 def _put_changes_to_intermediate_history_file(data, cache: Cache):
@@ -138,9 +140,9 @@ steps = [
     _prepare_ldap_client,
     _get_current_changelog_number_from_s3,
     _get_latest_changelog_number_from_ldap,
-    _create_state_machine_input,
     _get_changelog_entries_from_ldap,
     _parse_and_join_changelog_changes,
+    _create_state_machine_input,
     _put_changes_to_intermediate_history_file,
     _publish_message_to_sqs_queue,
 ]

@@ -113,12 +113,13 @@ def get_changelog_entries_from_ldap(
     current_changelog_number: int,
     latest_changelog_number: int,
     changenumber_batch: int,
-) -> list[tuple[str, dict]]:
+) -> tuple[list[tuple[str, dict]], int]:
     changelog_records = []
     for i, changelog_number in enumerate(
         range(current_changelog_number + 1, latest_changelog_number + 1)
     ):
         if i == changenumber_batch:
+            latest_changelog_number = current_changelog_number + changenumber_batch
             break
         _, (record,) = _ldap_search(
             ldap_client=ldap_client,
@@ -130,7 +131,7 @@ def get_changelog_entries_from_ldap(
         if record != FILTERED_OUT:
             changelog_records.append(record)
 
-    return changelog_records
+    return changelog_records, latest_changelog_number
 
 
 def _normalise_value(v: list[bytes]) -> set:
