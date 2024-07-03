@@ -111,6 +111,40 @@ def test_get_changelog_entries_from_ldap_with_add():
     assert len(ldif_collection) == 13
 
 
+def test_get_changelog_entries_from_ldap_changenumber_batch_smaller_than_changes():
+    mock_ldap_client = mock.Mock()
+    mock_ldap_client.result.return_value = (
+        101,
+        [
+            [
+                "changenumber=537576,cn=changelog,o=nhs",
+                {
+                    "objectClass": [
+                        b"top",
+                        b"changeLogEntry",
+                        b"nhsExternalChangelogEntry",
+                    ],
+                    "changeNumber": [b"537576"],
+                    "changes": [
+                        b"\nobjectClass: nhsas\nobjectClass: top\nnhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nnhsAsClient: 8KH75\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:location\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:metadata-1\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:organization\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:patient\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:read:practitioner\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:location\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:organization\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:patient\nnhsAsSvcIA: urn:nhs:names:services:gpconnect:fhir:rest:search:practitioner\nnhsDateApproved: 20240417121611\nnhsDateRequested: 20240417121533\nnhsIDCode: 8KH75\nnhsMHSPartyKey: 8KH75-823852\nnhsProductKey: 12041\nnhsProductName: CareLineLive\nnhsProductVersion: 2024.4.1\nnhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs\nuniqueIdentifier: 200000002217"
+                    ],
+                    "changeTime": [b"20240417111615Z"],
+                    "changeType": [b"add"],
+                    "targetDN": [b"uniqueIdentifier=200000002217,ou=Services,o=nhs"],
+                },
+            ]
+        ],
+    )
+    ldif_collection = get_changelog_entries_from_ldap(
+        ldap_client=mock_ldap_client,
+        ldap=Mock(),
+        current_changelog_number=12,
+        latest_changelog_number=25,
+        changenumber_batch=5,
+    )
+    assert len(ldif_collection) == 5
+
+
 def test_get_changelog_entries_from_ldap_with_modify():
     mock_ldap_client = mock.Mock()
     mock_ldap_client.result.return_value = (
