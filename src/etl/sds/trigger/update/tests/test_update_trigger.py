@@ -19,6 +19,7 @@ MOCKED_UPDATE_TRIGGER_ENVIRONMENT = {
     "LDAP_CHANGELOG_USER": "user",
     "LDAP_CHANGELOG_PASSWORD": "eggs",  # pragma: allowlist secret
     "SQS_QUEUE_URL": "sqs-queue.fifo",
+    "CHANGENUMBER_BATCH": "5000",
 }
 
 ALLOWED_EXCEPTIONS = (JSONDecodeError,)

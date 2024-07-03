@@ -106,6 +106,7 @@ def test_get_changelog_entries_from_ldap_with_add():
         ldap=Mock(),
         current_changelog_number=12,
         latest_changelog_number=25,
+        changenumber_batch=20,
     )
     assert len(ldif_collection) == 13
 
@@ -139,6 +140,7 @@ def test_get_changelog_entries_from_ldap_with_modify():
         ldap=Mock(),
         current_changelog_number=12,
         latest_changelog_number=25,
+        changenumber_batch=20,
     )
     assert len(ldif_collection) == 13
 
@@ -171,6 +173,7 @@ def test_get_changelog_entries_from_ldap_with_delete():
         ldap=Mock(),
         current_changelog_number=12,
         latest_changelog_number=25,
+        changenumber_batch=20,
     )
     assert len(ldif_collection) == 13
 
@@ -191,6 +194,7 @@ def test_get_changelog_entries_from_ldap_no_changes():
         ldap=Mock(),
         current_changelog_number=12,
         latest_changelog_number=12,
+        changenumber_batch=20,
     )
     assert len(ldif_collection) == 0
 
