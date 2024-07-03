@@ -21,6 +21,7 @@ class ChangelogTriggerEnvironment(BaseEnvironment):
     LDAP_CHANGELOG_USER: str
     LDAP_CHANGELOG_PASSWORD: str
     SQS_QUEUE_URL: str
+    CHANGENUMBER_BATCH: int
 
 
 S3_CLIENT = boto3.client("s3")
@@ -40,6 +41,7 @@ CACHE = {
     "ldap_changelog_user": ENVIRONMENT.LDAP_CHANGELOG_USER,
     "ldap_changelog_password": ENVIRONMENT.LDAP_CHANGELOG_PASSWORD,
     "sqs_queue_url": ENVIRONMENT.SQS_QUEUE_URL,
+    "changenumber_batch": ENVIRONMENT.CHANGENUMBER_BATCH,
 }
 
 
