@@ -83,92 +83,52 @@
                 {
                   "Variable": "$.error_message",
                   "IsNull": true,
-                  "Next": "transform-bulk"
+                  "Next": "etl-bulk"
                 }
               ],
               "Default": "etl-stopped"
             },
-            "transform-bulk": {
+            "etl-bulk": {
               "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "OutputPath": "$.Payload",
+              "Resource": "arn:aws:states:::states:startExecution.sync:2",
               "Parameters": {
-                "Payload": {
-                  "trust": true
-                },
-                "FunctionName": "${transform_worker_arn}:$LATEST"
-              },
-              "Retry": [
-                {
-                  "ErrorEquals": [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  "IntervalSeconds": 1,
-                  "MaxAttempts": 3,
-                  "BackoffRate": 2
+                "StateMachineArn": "${etl_bulk_state_machine_arn}",
+                "Input": {
+                  "StatePayload": {},
+                  "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$": "$$.Execution.Id"
                 }
-              ],
-              "Next": "transform-bulk-result"
+              },
+              "OutputPath": "$.Output",
+              "Next": "etl-bulk-result"
             },
-            "transform-bulk-result": {
+            "etl-bulk-result": {
               "Type": "Choice",
               "Choices": [
                 {
-                  "Variable": "$.error_message",
-                  "IsNull": true,
-                  "Next": "load-bulk"
-                }
-              ],
-              "Default": "etl-stopped"
-            },
-            "load-bulk": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "OutputPath": "$.Payload",
-              "Parameters": {
-                "Payload": {
-                  "max_records": "${bulk_load_chunksize}"
-                },
-                "FunctionName": "${load_worker_arn}:$LATEST"
-              },
-              "Retry": [
-                {
-                  "ErrorEquals": [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  "IntervalSeconds": 1,
-                  "MaxAttempts": 3,
-                  "BackoffRate": 2
-                }
-              ],
-              "Next": "load-bulk-result"
-            },
-            "load-bulk-result": {
-              "Type": "Choice",
-              "Choices": [
-                {
-                  "And": [
-                    {
-                      "Variable": "$.error_message",
-                      "IsNull": true
-                    },
+                  "Or": [
                     {
                       "Not": {
-                        "Variable": "$.unprocessed_records",
-                        "NumericEquals": 0
+                        "Variable": "$.error_message",
+                        "IsNull": true
                       }
+                    },
+                    {
+                      "And": [
+                        {
+                          "Variable": "$.processed_records",
+                          "NumericEquals": 0
+                        },
+                        {
+                          "Variable": "$.unprocessed_records",
+                          "NumericEquals": 0
+                        }
+                      ]
                     }
                   ],
-                  "Next": "load-bulk"
+                  "Next": "etl-stopped"
                 }
               ],
-              "Default": "etl-stopped"
+              "Default": "etl-bulk"
             },
             "extract-update": {
               "Type": "Task",

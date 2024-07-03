@@ -1,0 +1,97 @@
+{
+  "Comment": "SDS ETL - Transform and Load for bulk",
+  "TimeoutSeconds": 10800,
+  "StartAt": "load",
+  "States": {
+    "load": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${load_worker_arn}:$LATEST",
+        "Payload": {
+          "max_records": "${bulk_load_chunksize}",
+          "trust": false
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "load-result"
+    },
+    "load-result": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.error_message",
+              "IsNull": true
+            },
+            {
+              "Not": {
+                "Variable": "$.unprocessed_records",
+                "NumericEquals": 0
+              }
+            }
+          ],
+          "Next": "load"
+        },
+        {
+          "And": [
+            {
+              "Variable": "$.error_message",
+              "IsNull": true
+            },
+            {
+              "Variable": "$.unprocessed_records",
+              "NumericEquals": 0
+            }
+          ],
+          "Next": "transform"
+        }
+      ],
+      "Default": "etl-stopped"
+    },
+    "transform": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${transform_worker_arn}:$LATEST",
+        "Payload": {
+          "max_records": "${bulk_transform_chunksize}",
+          "trust": false
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "etl-stopped"
+    },
+    "etl-stopped": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
