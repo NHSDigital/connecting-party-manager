@@ -31,6 +31,7 @@ class Cache(TypedDict):
     key_file: Path
     etl_bucket: str
     etl_extract_input_key: str
+    changenumber_batch: int
 
 
 class CorruptChangelogNumber(Exception):
@@ -97,6 +98,7 @@ def _get_changelog_entries_from_ldap(data, cache: Cache):
         ldap=cache["ldap"],
         current_changelog_number=current_changelog_number,
         latest_changelog_number=latest_changelog_number,
+        changenumber_batch=cache["changenumber_batch"],
     )
 
 

@@ -112,11 +112,14 @@ def get_changelog_entries_from_ldap(
     ldap: LdapModuleProtocol,
     current_changelog_number: int,
     latest_changelog_number: int,
+    changenumber_batch: int,
 ) -> list[tuple[str, dict]]:
     changelog_records = []
-    for changelog_number in range(
-        current_changelog_number + 1, latest_changelog_number + 1
+    for i, changelog_number in enumerate(
+        range(current_changelog_number + 1, latest_changelog_number + 1)
     ):
+        if i == changenumber_batch:
+            break
         _, (record,) = _ldap_search(
             ldap_client=ldap_client,
             base=CHANGELOG_BASE,
