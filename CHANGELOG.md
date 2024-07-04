@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-07-03
+- [PI-449] Batch up changelog changes
+
 ## 2024-07-02
 - [PI-443] Run entire sds bulk transform/load in batches of 250k to save lambda memory and improve CPU time
 

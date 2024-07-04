@@ -26,3 +26,6 @@ variable "truststore_bucket" {}
 variable "environment" {
 
 }
+variable "changenumber_batch" {
+  default = 5000
+}

@@ -399,6 +399,7 @@ module "trigger_update" {
     LDAP_CHANGELOG_PASSWORD = data.aws_secretsmanager_secret_version.ldap_changelog_password.secret_string
     ETL_BUCKET              = module.bucket.s3_bucket_id
     SQS_QUEUE_URL           = module.etl_state_lock_enforcer.sqs_queue_url
+    CHANGENUMBER_BATCH      = var.changenumber_batch
   }
 
   vpc_subnet_ids         = data.aws_subnets.sds-etl-hscn-private.ids
