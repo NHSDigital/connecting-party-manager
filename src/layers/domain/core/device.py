@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 from datetime import datetime
 from enum import StrEnum, auto
 from itertools import chain
@@ -41,6 +42,24 @@ class DeviceCreatedEvent(Event):
     type: "DeviceType"
     product_team_id: UUID
     ods_code: str
+    keys: list[DeviceKey]
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    status: "DeviceStatus"
+    created_on: str
+    updated_on: Optional[str] = None
+    deleted_on: Optional[str] = None
+    _trust: bool = field(alias="_trust", default=False)
+
+
+@dataclass(kw_only=True, slots=True)
+class DeviceStateEvent(Event):
+    id: str
+    name: str
+    type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    keys: list[DeviceKey]
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     status: "DeviceStatus"
     created_on: str
     updated_on: Optional[str] = None
@@ -54,6 +73,8 @@ class DeviceUpdatedEvent(Event):
     name: str
     type: "DeviceType"
     product_team_id: UUID
+    keys: list[DeviceKey]
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     ods_code: str
     status: "DeviceStatus"
     created_on: str
@@ -65,14 +86,14 @@ class DeviceUpdatedEvent(Event):
 class DeviceKeyAddedEvent(Event):
     id: str
     key: str
-    type: DeviceKeyType
-    _trust: bool = field(alias="_trust", default=False)
+    key_type: DeviceKeyType
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyDeletedEvent(Event):
     id: str
     key: str
+    remaining_keys: list[DeviceKey]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -160,9 +181,9 @@ class Device(AggregateRoot):
     created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
-    keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
+    keys: list[DeviceKey] = Field(default_factory=list)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
-        default_factory=lambda: defaultdict(list), exclude=True
+        default_factory=lambda: defaultdict(list)
     )
     indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
 
@@ -181,51 +202,35 @@ class Device(AggregateRoot):
             deleted_on=deletion_datetime,
         )
 
-    def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
-        if key in self.keys:
-            raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        device_key = DeviceKey(key=key, type=type)
-        self.keys[key] = device_key
-        event = DeviceKeyAddedEvent(id=self.id, _trust=_trust, **device_key.dict())
+    def state(self):
+        device = deepcopy(self)  # deep copy?
+        device.events = [DeviceStateEvent(**device.dict())]
+        return device
+
+    def add_key(self, key_type: str, key: str) -> DeviceKeyAddedEvent:
+        existing_keys = {
+            (_device_key.key, _device_key.device_type) for _device_key in self.keys
+        }
+        if (key, key_type) in existing_keys:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate keys: ({key_type}) '{key}'"
+            )
+
+        device_key = DeviceKey(key=key, device_type=key_type)
+        self.keys.append(device_key)
+        event = DeviceKeyAddedEvent(id=self.id, key=key, key_type=key_type)
         return self.add_event(event)
 
     def delete_key(self, key: str) -> DeviceKeyDeletedEvent:
-        try:
-            device_key = self.keys.pop(key)
-        except KeyError:
+        device_key = next(
+            (device_key for device_key in self.keys if device_key.key == key), None
+        )
+        if device_key is None:
             raise NotFoundError(f"This device does not contain key '{key}'") from None
-        event = DeviceKeyDeletedEvent(id=self.id, key=device_key.key)
+
+        self.keys.remove(device_key)
+        event = DeviceKeyDeletedEvent(id=self.id, key=key, remaining_keys=self.keys)
         return self.add_event(event)
-
-    def add_index(
-        self, questionnaire_id: str, question_name: str
-    ) -> list[DeviceIndexAddedEvent]:
-        questionnaire_responses = _get_questionnaire_responses(
-            questionnaire_responses=self.questionnaire_responses,
-            questionnaire_id=questionnaire_id,
-        )
-        if question_name not in questionnaire_responses[0].questionnaire.questions:
-            raise QuestionNotFoundError(
-                f"Questionnaire '{questionnaire_id}' does not "
-                f"contain question '{question_name}'"
-            )
-        unique_answers = _get_unique_answers(
-            questionnaire_responses=questionnaire_responses,
-            question_name=question_name,
-        )
-
-        events = []
-        for answer in unique_answers:
-            event = DeviceIndexAddedEvent(
-                id=self.id,
-                questionnaire_id=questionnaire_id,
-                question_name=question_name,
-                value=answer,
-            )
-            events.append(event)
-            self.add_event(event)
-            self.indexes.add((questionnaire_id, question_name, answer))
-        return events
 
     def add_questionnaire_response(
         self,

@@ -18,15 +18,15 @@ def _device_events():
 
     exported_events = []
     device_1 = product_team.create_device(name="device", type=DeviceType.PRODUCT)
-    device_1.add_key(type=DeviceKeyType.PRODUCT_ID, key="P.346-346")
+    device_1.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.346-346")
     exported_events += device_1.export_events()
 
     device_2 = product_team.create_device(name="device", type=DeviceType.PRODUCT)
-    device_2.add_key(type=DeviceKeyType.PRODUCT_ID, key="P.ACD-CDE")
+    device_2.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.ACD-CDE")
     exported_events += device_2.export_events()
 
     device_3 = product_team.create_device(name="device", type=DeviceType.PRODUCT)
-    device_3.add_key(type=DeviceKeyType.PRODUCT_ID, key="P.AAA-XXX")
+    device_3.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.AAA-XXX")
     exported_events += device_3.export_events()
 
     return exported_events

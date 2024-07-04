@@ -1,5 +1,5 @@
 import sys
-from itertools import islice
+from itertools import chain, islice
 from typing import TYPE_CHECKING, Generator, Generic, TypeVar
 
 from domain.core.aggregate_root import AggregateRoot
@@ -33,16 +33,44 @@ class Repository(Generic[ModelType]):
         self.client: "DynamoDBClient" = dynamodb_client
 
     def write(self, entity: ModelType, batch_size=BATCH_SIZE):
-        def generate_transaction_statements(event) -> TransactItem:
+        def generate_transaction_statements(event):
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
             return handler(event=event)
 
         responses = []
-        for events in batched(entity.events, n=batch_size):
-            transact_items = list(map(generate_transaction_statements, events))
+        for event in entity.events:
+            transact_items = generate_transaction_statements(event)
+            #  either a list or a single
+            if not isinstance(transact_items, list):
+                transact_items = [transact_items]
+
             transaction = Transaction(TransactItems=transact_items)
 
+            with handle_client_errors(commands=transact_items):
+                _response = self.client.transact_write_items(
+                    **transaction.dict(exclude_none=True)
+                )
+                responses.append(_response)
+        return responses
+
+    # Explicitly for large bulk uploads of data, will see little day to day use
+    def write_bulk(self, entities: list[ModelType], batch_size=BATCH_SIZE):
+        def generate_transaction_statements(event) -> list[TransactItem]:
+            handler_name = f"handle_{type(event).__name__}"
+            handler = getattr(self, handler_name)
+            result: TransactItem | list[TransactItem] = handler(event=event)
+            if not isinstance(result, list):
+                result = [result]
+            return result
+
+        responses = []
+        all_events = chain.from_iterable(entity.events for entity in entities)
+        transact_items = chain.from_iterable(
+            map(generate_transaction_statements, all_events)
+        )
+        for _transact_items in batched(transact_items, n=batch_size):
+            transaction = Transaction(TransactItems=_transact_items)
             with handle_client_errors(commands=transact_items):
                 _response = self.client.transact_write_items(
                     **transaction.dict(exclude_none=True)
