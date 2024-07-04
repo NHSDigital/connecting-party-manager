@@ -7,9 +7,6 @@ import pytest
 from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property, parse_ldif
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
-from sds.domain.nhs_mhs_action import NhsMhsAction
-from sds.domain.nhs_mhs_service import NhsMhsService
-from sds.domain.organizational_unit import OrganizationalUnit
 from sds.domain.parse import parse_sds_record
 
 from etl.sds.tests.constants import EtlTestDataPath
@@ -39,11 +36,8 @@ def test_bulk_data_is_valid_sds_mini(test_data_paths):
             unprocessed_records.popleft()
 
     assert Counter(processed_records) == {
-        NhsMhsAction: 1660,
         NhsMhs: 1655,
-        NhsMhsService: 297,
         NhsAccreditedSystem: 252,
-        OrganizationalUnit: 1,
     }
 
 
