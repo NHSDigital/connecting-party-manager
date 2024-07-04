@@ -42,7 +42,7 @@ def test_bulk_data_is_valid_sds_mini(test_data_paths):
         NhsMhsAction: 1660,
         NhsMhs: 1655,
         NhsMhsService: 297,
-        NhsAccreditedSystem: 254,
+        NhsAccreditedSystem: 252,
         OrganizationalUnit: 1,
     }
 
