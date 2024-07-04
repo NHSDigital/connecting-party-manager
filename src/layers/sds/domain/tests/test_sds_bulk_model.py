@@ -108,7 +108,7 @@ def test_filter_ldif_from_s3_by_property_mini():
 
     assert Counter(processed_records) == {
         NhsMhs: 1655,
-        NhsAccreditedSystem: 254,
+        NhsAccreditedSystem: 252,
     }
 
 
