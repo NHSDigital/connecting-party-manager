@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-07-05
+- [PI-435] REDLINE Repo changes
+- [PI-360] Deployment of changelog
+
 ## 2024-07-03
 - [PI-449] Batch up changelog changes
 
