@@ -49,6 +49,10 @@ def update_device_metadata(
     ((questionnaire_response,),) = device.questionnaire_responses.values()
     _current_values = questionnaire_response.get_response(question_name=field)
 
+    # Replacing with an empty value is another method of deleting
+    if modification_type == ModificationType.REPLACE and len(new_values) == 0:
+        modification_type = ModificationType.DELETE
+
     if modification_type == ModificationType.ADD:
         _unique_values = {*_current_values, *new_values}
         parsed_values = model.parse_and_validate_field(
