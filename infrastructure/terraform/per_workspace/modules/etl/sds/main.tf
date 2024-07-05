@@ -443,11 +443,10 @@ module "trigger_update" {
 }
 
 module "schedule_trigger_update" {
-  source      = "./schedule/"
-  lambda_arn  = module.trigger_update.lambda_function.lambda_function_arn
-  lambda_name = module.trigger_update.lambda_function.lambda_function_name
-  # schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
-  schedule_expression = var.is_persistent ? "cron(0 0 1 1 ? 2000)" : "rate(1 day)" # cron(0 0 1 1 ? 2000) means "never"
+  source              = "./schedule/"
+  lambda_arn          = module.trigger_update.lambda_function.lambda_function_arn
+  lambda_name         = module.trigger_update.lambda_function.lambda_function_name
+  schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
 }
 
 module "bulk_trigger_notification" {
