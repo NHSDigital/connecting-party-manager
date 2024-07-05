@@ -22,6 +22,7 @@ from traceback import TracebackException
 
 INDENTATION = "  "
 TRUNCATION_DEPTH = 2000
+TRUNCATED = "[TRUNCATED]\n"
 
 
 def _render_exception(exception: Exception) -> str:
@@ -31,7 +32,9 @@ def _render_exception(exception: Exception) -> str:
     return f"{notes}{exception}"
 
 
-def _render_nested_exception(exception: Exception, nested_index: list[int]):
+def _render_nested_exception(
+    exception: Exception, nested_index: list[int], truncation_depth: int
+):
     """
     Renders an exception that is part of a group, noting that the
     exception itself may also be a group.
@@ -40,42 +43,58 @@ def _render_nested_exception(exception: Exception, nested_index: list[int]):
     (e.g. 2.2.1 is provided in the form [2,2,1])
     """
     indentation = INDENTATION * len(nested_index)
-    message = render_exception(exception=exception, nested_index=nested_index)
+    message = render_exception(
+        exception=exception,
+        nested_index=nested_index,
+        truncation_depth=truncation_depth,
+    )
     error_index = ".".join(map(str, nested_index))
     prefix = f"-- Error {error_index} ({type(exception).__name__}) --\n"
-    _traceback = "".join(TracebackException.from_exception(exception).format())
 
-    if len(message) > TRUNCATION_DEPTH:
-        message = message[:TRUNCATION_DEPTH]
-
-    if len(_traceback) > TRUNCATION_DEPTH:
-        _traceback = _traceback[:TRUNCATION_DEPTH]
-
-    return f"{indentation}{prefix}{message}\n{_traceback}\n"
+    return f"{indentation}{prefix}{message}"
 
 
 def _render_exception_group(
-    exception_group: ExceptionGroup, nested_index: list[int] = None
+    exception_group: ExceptionGroup,
+    truncation_depth: int,
+    nested_index: list[int] = None,
 ) -> str:
     """Concatenates an exception group message to its rendered exceptions"""
     formatted_exceptions = "\n".join(
         _render_nested_exception(
             exception=exception,
             nested_index=(nested_index + [i]) if nested_index else [i],
+            truncation_depth=truncation_depth,
         )
         for i, exception in enumerate(exception_group.exceptions, start=1)
     )
     return f"{exception_group.message}\n{formatted_exceptions}"
 
 
-def render_exception(exception: ExceptionGroup | Exception, nested_index=None) -> str:
+def render_exception(
+    exception: ExceptionGroup | Exception,
+    nested_index=None,
+    truncation_depth=TRUNCATION_DEPTH,
+) -> str:
     """Fully and recursively stringifies an Exception or ExceptionGroup"""
 
     nested_index = nested_index if nested_index else []
     indentation = INDENTATION * len(nested_index)
     formatted_exception = (
-        _render_exception_group(exception_group=exception, nested_index=nested_index)
+        _render_exception_group(
+            exception_group=exception,
+            nested_index=nested_index,
+            truncation_depth=truncation_depth,
+        )
         if isinstance(exception, ExceptionGroup)
         else _render_exception(exception=exception).replace("\n", f"\n{indentation}")
     )
-    return f"{indentation}{formatted_exception}"
+
+    _traceback = "".join(TracebackException.from_exception(exception).format())
+    if truncation_depth is not None and len(formatted_exception) > truncation_depth:
+        formatted_exception = formatted_exception[:truncation_depth] + TRUNCATED
+
+    if truncation_depth is not None and len(_traceback) > truncation_depth:
+        _traceback = _traceback[:truncation_depth] + TRUNCATED
+
+    return f"{indentation}{formatted_exception}\n{_traceback}\n"
