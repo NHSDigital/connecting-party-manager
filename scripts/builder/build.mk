@@ -39,3 +39,9 @@ build: $(BUILD_TIMESTAMP) ## Complete project install and build artifacts for de
 $(BUILD_TIMESTAMP): $(BUILD_DEPENDENCIES)
 	@find $(CURDIR) -name make.py | xargs -I % bash -c 'poetry run python %'
 	touch $(BUILD_TIMESTAMP)
+
+generate--sbom: build
+	syft ./ -o cyclonedx-json@1.5=cpm.cdx.json
+
+validate--sbom: generate--sbom
+	grype sbom:./cpm.cdx.json --fail-on CRITICAL

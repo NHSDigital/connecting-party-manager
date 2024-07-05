@@ -80,3 +80,4 @@ openapi
 src/layers/domain/fhir/r4/*models.py
 postman-collection.json
 token_cache.json
+cpm.cdx.json
