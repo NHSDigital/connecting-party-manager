@@ -316,7 +316,7 @@ As a stop gap for now - you should download Syft and Grype to your machine (ASDF
 `brew tap anchore/grype`
 `brew install grype`
 
-To run the SBOM commands thyere are some make commands that currently handle this:
+To run the SBOM commands there are some make commands that currently handle this:
 
 `make generate--sbom`
 `make validate--sbom`
