@@ -306,3 +306,17 @@ We also have a confluence page
 `https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Swagger+Docs`
 
 In time we will also have our spec uploaded to bloomreach via proxygen
+
+## SBOM (Service Bill of Materials)
+
+As a stop gap for now - you should download Syft and Grype to your machine (ASDF doesnt do grype for some reason)
+
+`brew install syft`
+
+`brew tap anchore/grype`
+`brew install grype`
+
+To run the SBOM commands there are some make commands that currently handle this:
+
+`make generate--sbom`
+`make validate--sbom`
