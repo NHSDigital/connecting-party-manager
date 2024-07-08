@@ -49,6 +49,11 @@ def _render_response(
     )
 
 
+@log_action(log_result=True)
+def log_exception(exception: Exception):
+    return render_exception(exception=exception, truncation_depth=None)
+
+
 def execute_step_chain(
     action: FunctionType,
     s3_client,
@@ -66,12 +71,17 @@ def execute_step_chain(
     action_chain.run(
         init=(action, s3_client, s3_input_path, s3_output_path, max_records, kwargs)
     )
+    if isinstance(action_chain.result, Exception):
+        log_exception(action_chain.result)
 
     # Save the action chain results if there were no unhandled (fatal) exceptions
     count_unprocessed_records = None
     count_processed_records = None
     save_chain_response = None
     if isinstance(action_chain.result, WorkerActionResponse):
+        if isinstance(action_chain.result.exception, Exception):
+            log_exception(action_chain.result.exception)
+
         count_unprocessed_records = len(action_chain.result.unprocessed_records)
         count_processed_records = len(action_chain.result.processed_records)
 
@@ -83,6 +93,9 @@ def execute_step_chain(
             init=(action_chain.result, s3_client, unprocessed_dumper, processed_dumper)
         )
         save_chain_response = save_chain.result
+
+        if isinstance(save_chain.result, Exception):
+            log_exception(save_chain.result)
 
     # Summarise the outcome of action_chain and step_chain
     return _render_response(
