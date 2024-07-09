@@ -137,7 +137,8 @@ jobs:
     needs: [get-branch-from-workflow-file, apigee--deploy]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: ./.github/actions/make/
+      - if: ${{ env.ACCOUNT != 'mgmt'}}
+        uses: ./.github/actions/make/
         with:
           command: test--smoke WORKSPACE="${{ env.WORKSPACE }}" ACCOUNT="${{ env.ACCOUNT }}"
           requires-aws: true
