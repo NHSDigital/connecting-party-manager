@@ -12,6 +12,7 @@
 2. [Tests](#tests)
 3. [Workflow](#workflow)
 4. [FHIR, Swagger and FHIR Pydantic models](#fhir-swagger-and-fhir-pydantic-models)
+5. [ETL](#etl)
 
 ---
 
@@ -268,6 +269,26 @@ make terraform--unlock TERRAFORM_ARGS=<lock_id>
 ```
 
 ## ETL
+
+### Debugging the state after changelog errors
+
+In order to get the latest head state of the ETL, do either (for your developer workspace)
+
+```
+make etl--head-state--developer
+```
+
+or for a persistent workspace (`dev`, `prod`, etc):
+
+```
+make etl--head-state--persistent-workspace WORKSPACE=<workspace_name>
+```
+
+For the developer operation, the script will automatically activate via SSO, however for the persistent-workspace
+operation you will need to export credentials by navigating yourself to the SSO login page and exporting the
+credentials for the workspace into your terminal.
+
+### Clearing the state (don't take this lightly, intended for first time bulk upload only)
 
 Before running the bulk trigger, you need to clear the initial ETL state, do:
 
