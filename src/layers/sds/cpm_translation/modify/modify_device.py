@@ -51,7 +51,7 @@ def update_device_metadata(
 
     # Replacing with an empty value is another method of deleting
     if modification_type == ModificationType.REPLACE and len(new_values) == 0:
-        modification_type = ModificationType.DELETE
+        modification_type = ModificationType.REPLACE_WITH_EMPTY
 
     if modification_type == ModificationType.ADD:
         _unique_values = {*_current_values, *new_values}
@@ -68,6 +68,10 @@ def update_device_metadata(
             raise CannotDeleteMandatoryField(field)
         if not _current_values:
             raise NothingToDelete(field)
+        parsed_values = []
+    elif modification_type == ModificationType.REPLACE_WITH_EMPTY:
+        if model.is_mandatory_field(field):
+            raise CannotDeleteMandatoryField(field)
         parsed_values = []
 
     new_questionnaire_response = new_questionnaire_response_from_template(
