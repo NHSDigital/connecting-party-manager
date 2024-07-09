@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-07-08
+- [PI-451] Improves ETL logging, may fix [PI-450] by allowing ldif deletions by replacing with empty value
+- [PI-437] Sonarcloud improvements
+
 ## 2024-07-05
 - [PI-435] REDLINE Repo changes
 - [PI-360] Deployment of changelog

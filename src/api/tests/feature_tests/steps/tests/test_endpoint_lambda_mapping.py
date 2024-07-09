@@ -46,11 +46,11 @@ def test_parse_path_create_device():
 
         endpoint_lambda_mapping = get_endpoint_lambda_mapping()
 
-    parse_api_path(
+    assert parse_api_path(
         method="POST",
-        path="Organization",
+        path="Device",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == {}, {}, api.createDevice.index.handler
+    ) == ({}, {}, api.createDevice.index)
 
 
 def test_parse_path_read_device():
@@ -59,11 +59,11 @@ def test_parse_path_read_device():
 
         endpoint_lambda_mapping = get_endpoint_lambda_mapping()
 
-    parse_api_path(
+    assert parse_api_path(
         method="GET",
-        path="Organization/123",
+        path="Device/123",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == {"id": "123"}, {}, api.readDevice.index.handler
+    ) == ({"id": "123"}, {}, api.readDevice.index)
 
 
 def test_parse_path_create_product_team():
@@ -72,11 +72,11 @@ def test_parse_path_create_product_team():
 
         endpoint_lambda_mapping = get_endpoint_lambda_mapping()
 
-    parse_api_path(
+    assert parse_api_path(
         method="POST",
         path="Organization",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == {}, {}, api.createProductTeam.index.handler
+    ) == ({}, {}, api.createProductTeam.index)
 
 
 def test_parse_path_read_product_team():
@@ -85,11 +85,11 @@ def test_parse_path_read_product_team():
 
         endpoint_lambda_mapping = get_endpoint_lambda_mapping()
 
-    parse_api_path(
+    assert parse_api_path(
         method="GET",
         path="Organization/123",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == {"id": "123"}, {}, api.readProductTeam.index.handler
+    ) == ({"id": "123"}, {}, api.readProductTeam.index)
 
 
 def test_parse_path_error():
