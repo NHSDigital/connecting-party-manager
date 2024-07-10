@@ -81,4 +81,5 @@ class ChangelogCommonName(CaseInsensitiveEnum):
 class ModificationType(CaseInsensitiveEnum):
     ADD = auto()
     REPLACE = auto()
+    REPLACE_WITH_EMPTY = auto()
     DELETE = auto()

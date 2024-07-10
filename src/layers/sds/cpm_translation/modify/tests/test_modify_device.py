@@ -223,6 +223,15 @@ def test_update_device_metadata_delete_mandatory_field(device):
             new_values=[],
         )
 
+    with pytest.raises(CannotDeleteMandatoryField):
+        update_device_metadata(
+            device=device,
+            model=_MyModel,
+            modification_type=ModificationType.REPLACE_WITH_EMPTY,
+            field_alias="foo",
+            new_values=[],
+        )
+
 
 def test_update_device_metadata_delete_field_that_doesnt_exist(device):
     with pytest.raises(NothingToDelete):
