@@ -38,8 +38,8 @@ Now you will want to SSH onto the master node using the pem file you downloaded 
 
 `ssh -i path/to/locust-key.pem ubuntu@<MASTER_NODE_IP>`
 
-Once you have gained access run the following command
-
+Once you have gained access run the following commands
+`aws s3 cp s3://nhse-cpm--mgmt--locust-file/locustfile.py .`
 `locust -f locustfile.py --master --host=<base url for endpoint> --apikey=<Apigee app API key for the host>`
 
 An example for --host would be `https://internal-dev.api.service.nhs.uk/cpm-dev`
@@ -50,6 +50,7 @@ This should then tail the master log in your terminal, keep this one open
 
 Its the same process as step 5 except you need to go onto each worker node and start them with the following command
 
+`aws s3 cp s3://nhse-cpm--mgmt--locust-file/locustfile.py .`
 `locust -f locustfile.py --worker --host=<base url for endpoint> --apikey=<Apigee app API key for the host> --master-host=<IP of master node>`
 
 Probably worth having a terminal open for each one - or you can run them --headless
