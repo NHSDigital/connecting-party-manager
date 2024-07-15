@@ -446,7 +446,7 @@ module "schedule_trigger_update" {
   source              = "./schedule/"
   lambda_arn          = module.trigger_update.lambda_function.lambda_function_arn
   lambda_name         = module.trigger_update.lambda_function.lambda_function_name
-  schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
+  schedule_expression = contains(["qa", "prod"], var.environment) ? "rate(15 minutes)" : "cron(0 0 1 1 ? 2000)" # changelog schedule only active for qa & prod
 }
 
 module "bulk_trigger_notification" {
