@@ -41,6 +41,7 @@ def _create_state_machine_input(data, cache):
         return StateMachineInput.update(
             changelog_number_start=current_changelog_number,
             changelog_number_end=latest_changelog_number,
+            manual_retry=True,
         )
     return StateMachineInput.bulk(
         changelog_number=Path(latest_changelog_number).stem, manual_retry=True
