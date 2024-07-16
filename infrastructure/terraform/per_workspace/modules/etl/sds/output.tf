@@ -25,3 +25,7 @@ output "etl_state_lock_key" {
 output "etl_state_lock_enforcer" {
   value = module.etl_state_lock_enforcer
 }
+
+output "manual_trigger_arn" {
+  value = module.trigger_manual.arn
+}

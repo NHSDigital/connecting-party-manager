@@ -482,3 +482,25 @@ module "etl_state_lock_enforcer" {
   }
   extra_policies = []
 }
+
+module "trigger_manual" {
+  source = "./trigger/"
+
+  trigger_name          = "manual"
+  etl_name              = local.etl_name
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_core_layer_arn
+  sds_layer_arn         = var.sds_layer_arn
+  etl_bucket_arn        = module.bucket.s3_bucket_arn
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  notify_lambda_arn     = module.notify.arn
+  table_arn             = var.table_arn
+  environment_variables = {
+    SQS_QUEUE_URL = module.etl_state_lock_enforcer.sqs_queue_url
+    ETL_BUCKET    = module.bucket.s3_bucket_id
+  }
+  allowed_triggers = {}
+  sqs_queue_arn    = module.etl_state_lock_enforcer.sqs_queue_arn
+}

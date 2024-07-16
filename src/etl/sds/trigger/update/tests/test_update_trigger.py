@@ -186,6 +186,7 @@ def test_update(change_result):
                 "changelog_number_start": decoded_current_changelog_number,
                 "changelog_number_end": decoded_latest_changelog_number,
                 "timestamp": "foo",
+                "manual_retry": False,
                 "name": f"update.{decoded_current_changelog_number}.{decoded_latest_changelog_number}.foo",
             }
         )

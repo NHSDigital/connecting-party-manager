@@ -364,6 +364,7 @@ def test_etl_state_lock_enforcer_trigger_update_success():
                 "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
                 "timestamp": f"{timestamp}",
                 "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}",
+                "manual_retry": False,
             }
         ),
         MessageDeduplicationId=str(uuid.uuid4()),
@@ -456,6 +457,7 @@ def test_etl_state_lock_enforcer_trigger_update_rejected():
                 "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
                 "timestamp": f"{timestamp}",
                 "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{UPDATE_CHANGELOG_NUMBER_START}.{UPDATE_CHANGELOG_NUMBER_END}.{timestamp}",
+                "manual_retry": False,
             }
         ),
         MessageDeduplicationId=str(uuid.uuid4()),
