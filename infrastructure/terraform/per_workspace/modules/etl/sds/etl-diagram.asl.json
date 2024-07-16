@@ -7,8 +7,23 @@
       "Type": "Parallel",
       "Branches": [
         {
-          "StartAt": "parse-changelog-number",
+          "StartAt": "manual-retry-changelog",
           "States": {
+            "manual-retry-changelog": {
+              "Type": "Choice",
+              "Choices": [
+                {
+                  "Variable": "$.manual_retry",
+                  "BooleanEquals": true,
+                  "Next": "manual-retry-state"
+                }
+              ],
+              "Default": "parse-changelog-number"
+            },
+            "manual-retry-state": {
+              "Type": "Pass",
+              "End": true
+            },
             "parse-changelog-number": {
               "Type": "Choice",
               "Choices": [

@@ -24,6 +24,7 @@ CACHE = {
     "step_functions_client": STEP_FUNCTIONS_CLIENT,
     "state_machine_arn": ENVIRONMENT.STATE_MACHINE_ARN,
     "etl_bucket": ENVIRONMENT.ETL_BUCKET,
+    "manual_retry_state": False,
 }
 
 
@@ -41,7 +42,6 @@ def process_message(message):
 
     trigger_type = "null"
     result = step_chain.data[_process_sqs_message]
-
     if isinstance(result, tuple):
         state_machine_input, _ = result
         if not isinstance(state_machine_input, Exception):

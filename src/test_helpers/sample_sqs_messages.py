@@ -19,6 +19,7 @@ VALID_SQS_UPDATE_MESSAGE_BODY = json.dumps(
         "etl_type": STATE_MACHINE_INPUT_TYPE_UPDATE,
         "timestamp": "foo",
         "name": f"{STATE_MACHINE_INPUT_TYPE_UPDATE}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
+        "manual_retry": False,
     }
 )
 VALID_SQS_UPDATE_EVENT = {
@@ -53,6 +54,7 @@ VALID_SQS_BULK_MESSAGE_BODY = json.dumps(
         "etl_type": STATE_MACHINE_INPUT_TYPE_BULK,
         "timestamp": "foo",
         "name": f"{STATE_MACHINE_INPUT_TYPE_BULK}.{CHANGELOG_NUMBER_START}.{CHANGELOG_NUMBER_END}.foo",
+        "manual_retry": False,
     }
 )
 VALID_SQS_BULK_EVENT = {
