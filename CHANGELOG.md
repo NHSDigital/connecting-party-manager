@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-07-15
+- [PI-457] Run update sub-ETL on loop
+- [PI-214] ETL debugger fix
+
 ## 2024-07-09
 - [PI-450] ETL translation error
 
