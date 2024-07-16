@@ -6,6 +6,10 @@ from typing import Any, Optional
 from uuid import UUID, uuid4
 
 from attr import dataclass, field
+from domain.core.aggregate_root import AggregateRoot
+from domain.core.device_key import DeviceKey, DeviceKeyType
+from domain.core.error import DuplicateError, NotFoundError
+from domain.core.event import Event, EventDeserializer
 from domain.core.questionnaire import (
     QuestionnaireInstanceEvent,
     QuestionnaireResponse,
@@ -13,13 +17,8 @@ from domain.core.questionnaire import (
     QuestionnaireResponseDeletedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
+from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field
-
-from .aggregate_root import AggregateRoot
-from .device_key import DeviceKey, DeviceKeyType
-from .error import DuplicateError, NotFoundError
-from .event import Event, EventDeserializer
-from .validation import DEVICE_NAME_REGEX
 
 
 class QuestionnaireNotFoundError(Exception):
