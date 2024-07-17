@@ -10,7 +10,7 @@ from domain.response.validation_errors import InboundValidationError
 from event.step_chain import StepChain
 from pydantic import ValidationError
 
-from ..data.response import devices, endpoints
+from ..data.response_v2 import devices, endpoints
 
 
 def get_mocked_results(data, cache):
@@ -26,7 +26,7 @@ def parse_event_query(data, cache):
     try:
         search_query_params = SearchQueryParams(**query_params)
         return {
-            "query_string": search_query_params.device_type,
+            "query_string": search_query_params,
             "host": event.multi_value_headers["Host"],
         }
     except ValidationError as exc:
@@ -34,6 +34,10 @@ def parse_event_query(data, cache):
             errors=exc.raw_errors,
             model=exc.model,
         )
+
+
+def query_devices(data, cache) -> List[Device]:
+    pass
 
 
 def read_devices_by_type(data, cache) -> List[Device]:
