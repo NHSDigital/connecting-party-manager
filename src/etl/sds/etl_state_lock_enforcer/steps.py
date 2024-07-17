@@ -120,7 +120,7 @@ steps = [
     _process_sqs_message,
     _check_etl_lock,
     _validate_state_keys_are_empty,
-    _put_to_state_extract,
     _put_to_state_machine_history,
+    _put_to_state_extract,
     _start_execution,
 ]
