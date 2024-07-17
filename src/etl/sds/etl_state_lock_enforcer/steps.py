@@ -72,24 +72,37 @@ def _validate_state_keys_are_empty(data, cache: Cache):
         )
 
 
-def _put_to_state_machine(data, cache: Cache):
+def _put_to_state_extract(data, cache: Cache):
     manual_retry_state = cache["manual_retry_state"]
     if not manual_retry_state:
         _, state_machine_name = data[_process_sqs_message]
         s3_client = cache["s3_client"]
         etl_bucket = cache["etl_bucket"]
 
-        # Update state machine history file
-        s3_client.copy_object(
-            Bucket=cache["etl_bucket"],
-            Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
-            CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
-        )
-
         return s3_client.copy_object(
             Bucket=etl_bucket,
             Key=WorkerKey.EXTRACT,
             CopySource=f'{cache["etl_bucket"]}/{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}',
+        )
+
+
+def _put_to_state_machine_history(data, cache: Cache):
+    manual_retry_state = cache["manual_retry_state"]
+    _, state_machine_name = data[_process_sqs_message]
+    s3_client = cache["s3_client"]
+    etl_bucket = cache["etl_bucket"]
+    if not manual_retry_state:
+        # Update state machine history file
+        return s3_client.copy_object(
+            Bucket=cache["etl_bucket"],
+            Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
+            CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
+        )
+    else:
+        return s3_client.put_object(
+            Bucket=cache["etl_bucket"],
+            Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
+            Body="retry",
         )
 
 
@@ -107,6 +120,7 @@ steps = [
     _process_sqs_message,
     _check_etl_lock,
     _validate_state_keys_are_empty,
-    _put_to_state_machine,
+    _put_to_state_extract,
+    _put_to_state_machine_history,
     _start_execution,
 ]

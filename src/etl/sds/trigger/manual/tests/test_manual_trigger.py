@@ -59,6 +59,16 @@ def test_manual_trigger(history_object):
     time.sleep(2)
     expected = history_object.split(".")
     expected_prefix = ".".join(expected[:3])
+
+    queue_history_files = s3_client.list_objects(
+        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
+    )
+    item_count = 0
+    for item in queue_history_files.get("Contents", []):
+        item_count = item_count + 1
+        assert expected_prefix in item["Key"]
+    assert item_count == 2
+
     stepfunctions_client = boto3.client("stepfunctions")
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     executions = stepfunctions_client.list_executions(
