@@ -310,7 +310,6 @@ def test_index(version, device):
             "entry": [],
         }
     )
-
     if device["status"] == "active":
         result_collection_id = result_body["entry"][0]["id"]
         result_collection_url = result_body["entry"][0]["link"][0]["url"]

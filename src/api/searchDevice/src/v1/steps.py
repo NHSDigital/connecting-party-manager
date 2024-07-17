@@ -16,7 +16,9 @@ from ..data.response_v2 import devices, endpoints
 def get_mocked_results(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     query_params = event.query_string_parameters
-    device_type = query_params["device_type"]
+    search_query_params = SearchQueryParams(**query_params)
+    params = search_query_params.get_non_null_params()
+    device_type = params["device_type"]
     return {"product": devices, "endpoint": endpoints}.get(device_type.lower(), {})
 
 
@@ -25,8 +27,9 @@ def parse_event_query(data, cache):
     query_params = event.query_string_parameters
     try:
         search_query_params = SearchQueryParams(**query_params)
+        params = search_query_params.get_non_null_params()
         return {
-            "query_string": search_query_params,
+            "query_string": params,
             "host": event.multi_value_headers["Host"],
         }
     except ValidationError as exc:
@@ -42,7 +45,8 @@ def query_devices(data, cache) -> List[Device]:
 
 def read_devices_by_type(data, cache) -> List[Device]:
     event_data = data[parse_event_query]
-    device_type = event_data.get("query_string")
+    query_params = event_data.get("query_string")
+    device_type = query_params.get("device_type")
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
