@@ -13,6 +13,7 @@ class ManualTriggerEnvironment(BaseEnvironment):
     SQS_QUEUE_URL: str
     NOTIFY_LAMBDA_ARN: str
     ETL_BUCKET: str
+    STATE_MACHINE_ARN: str
 
 
 S3_CLIENT = boto3.client("s3")
