@@ -18,6 +18,7 @@ class ManualTriggerEnvironment(BaseEnvironment):
 S3_CLIENT = boto3.client("s3")
 LAMBDA_CLIENT = boto3.client("lambda")
 SQS_CLIENT = boto3.client("sqs")
+SF_CLIENT = boto3.client("stepfunctions")
 ENVIRONMENT = ManualTriggerEnvironment.build()
 
 CACHE = {
@@ -25,6 +26,8 @@ CACHE = {
     "etl_bucket": ENVIRONMENT.ETL_BUCKET,
     "sqs_client": SQS_CLIENT,
     "sqs_queue_url": ENVIRONMENT.SQS_QUEUE_URL,
+    "sf_client": SF_CLIENT,
+    "state_machine_arn": ENVIRONMENT.STATE_MACHINE_ARN,
     "manual_retry_state": True,
 }
 

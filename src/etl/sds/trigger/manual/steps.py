@@ -6,6 +6,8 @@ from etl_utils.constants import ETL_STATE_MACHINE_HISTORY
 from etl_utils.trigger.model import StateMachineInput
 from event.step_chain import StepChain
 
+from test_helpers.terraform import read_terraform_output
+
 from .operations import validate_bucket_contents
 
 if TYPE_CHECKING:
@@ -13,10 +15,27 @@ if TYPE_CHECKING:
     from mypy_boto3_sqs import SQSClient
 
 
+class ExecutionRunningError(Exception):
+    """Custom exception for existing ETL execution Running."""
+
+    pass
+
+
 class Cache(TypedDict):
     s3_client: "S3Client"
     sqs_client: "SQSClient"
+    sf_client: "SFClient"
+    state_machine_arn: str
     etl_bucket: str
+
+
+def _check_execution_running(data, cache):
+    state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
+    executions = cache["sf_client"].list_executions(
+        stateMachineArn=cache["state_machine_arn"], maxResults=1, statusFilter="RUNNING"
+    )
+    if not executions["executions"]:
+        raise ExecutionRunningError("An execution is Running.")
 
 
 def _find_last_execution(data, cache):
@@ -66,6 +85,7 @@ def _publish_message_to_sqs_queue(data, cache: Cache):
 
 
 steps = [
+    _check_execution_running,
     _find_last_execution,
     _set_etl_type,
     _create_state_machine_input,
