@@ -136,10 +136,3 @@ class CPMUser(HttpUser):
     #         url=url_path,
     #         headers=_get_headers(version=API_VERSION, apikey=apikey)
     #     )
-
-
-# --host=https://930f3820.api.cpm.dev.national.nhs.uk/production
-# --apikey=valueofapikey
-# --version=1
-
-# locust -f {apigee_api.py} --headless --users=1 https://930f3820.api.cpm.dev.national.nhs.uk/production --apikey=hello --version=1
