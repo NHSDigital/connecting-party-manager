@@ -498,8 +498,9 @@ module "trigger_manual" {
   notify_lambda_arn     = module.notify.arn
   table_arn             = var.table_arn
   environment_variables = {
-    SQS_QUEUE_URL = module.etl_state_lock_enforcer.sqs_queue_url
-    ETL_BUCKET    = module.bucket.s3_bucket_id
+    SQS_QUEUE_URL     = module.etl_state_lock_enforcer.sqs_queue_url
+    ETL_BUCKET        = module.bucket.s3_bucket_id
+    STATE_MACHINE_ARN = aws_sfn_state_machine.state_machine.arn
   }
   allowed_triggers = {}
   sqs_queue_arn    = module.etl_state_lock_enforcer.sqs_queue_arn
