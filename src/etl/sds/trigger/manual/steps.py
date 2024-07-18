@@ -19,6 +19,12 @@ class ExecutionRunningError(Exception):
     pass
 
 
+class StateMachineError(Exception):
+    """Custom exception for problem getting executions."""
+
+    pass
+
+
 class Cache(TypedDict):
     s3_client: "S3Client"
     sqs_client: "SQSClient"
@@ -28,15 +34,20 @@ class Cache(TypedDict):
 
 
 def _check_execution_running(data, cache):
-    executions = cache["sf_client"].list_executions(
-        stateMachineArn=cache["state_machine_arn"], maxResults=1, statusFilter="RUNNING"
-    )
-    if not executions["executions"]:
-        raise ExecutionRunningError("An execution is Running.")
+    _, _, state_machine_arn = data[StepChain.INIT]
+    sf_client = cache["sf_client"]
+    try:
+        executions = sf_client.list_executions(
+            stateMachineArn=state_machine_arn, maxResults=1, statusFilter="RUNNING"
+        )
+        if executions["executions"]:
+            raise ExecutionRunningError("An execution is Running.")
+    except:
+        return True
 
 
 def _find_last_execution(data, cache):
-    etl_bucket, _ = data[StepChain.INIT]
+    etl_bucket, _, _ = data[StepChain.INIT]
     response = validate_bucket_contents(
         s3_client=cache["s3_client"], etl_bucket=etl_bucket
     )

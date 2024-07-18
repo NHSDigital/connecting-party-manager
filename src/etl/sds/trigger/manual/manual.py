@@ -6,7 +6,7 @@ from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
 from event.step_chain import StepChain
 
-from .steps import steps
+from .steps import _publish_message_to_sqs_queue, steps
 
 
 class ManualTriggerEnvironment(BaseEnvironment):
@@ -38,14 +38,15 @@ def handler(event, context):
     setup_logger(service_name=__file__)
     step_chain = StepChain(step_chain=steps, step_decorators=[log_action])
     step_chain.run(
-        init=(ENVIRONMENT.ETL_BUCKET, manual_retry),
+        init=(ENVIRONMENT.ETL_BUCKET, manual_retry, ENVIRONMENT.STATE_MACHINE_ARN),
         cache=CACHE,
     )
-    etl_type = step_chain.result
+    etl_type = step_chain.data[_publish_message_to_sqs_queue]
     if etl_type.upper() == "BULK":
         trigger_type = StateMachineInputType.BULK
     if etl_type.upper() == "UPDATE":
         trigger_type = StateMachineInputType.UPDATE
+
     return notify(
         lambda_client=LAMBDA_CLIENT,
         function_name=ENVIRONMENT.NOTIFY_LAMBDA_ARN,
