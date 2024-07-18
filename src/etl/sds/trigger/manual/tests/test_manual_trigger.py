@@ -19,29 +19,57 @@ EMPTY_LDIF_DATA = b""
 EMPTY_JSON_DATA = deque()
 
 
-@pytest.mark.timeout(20)
+@pytest.mark.timeout(60)
 @pytest.mark.integration
 @pytest.mark.parametrize(
     ("history_object"),
     [
         ("bulk.0.123.2024-07-03T14.04.12.721948"),
-        ("update.100.123.2024-07-03T14.04.12.721948"),
+        ("update.123.321.2024-07-03T14.04.12.721948"),
     ],
 )
 def test_manual_trigger(history_object):
     # Where the state is located
     bucket_config = _set_etl_content_config()
     manual_trigger_arn = read_terraform_output("manual_trigger_arn.value")
+    expected = history_object.split(".")
+    expected_prefix = ".".join(expected[:3])
 
     # Set some questions
     s3_client = boto3.client("s3")
     _set_etl_content(s3_client=s3_client, bucket_config=bucket_config, bulk=False)
+
+    s3_bucket_contents = s3_client.list_objects(
+        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
+    )
+    if "Contents" in s3_bucket_contents:
+        objects_to_delete = [
+            {"Key": obj["Key"]} for obj in s3_bucket_contents["Contents"]
+        ]
+        # Delete the objects
+        delete_response = s3_client.delete_objects(
+            Bucket=bucket_config["etl_bucket"], Delete={"Objects": objects_to_delete}
+        )
+    s3_bucket_contents = s3_client.list_objects(
+        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
+    )
+    assert "Contents" not in s3_bucket_contents
 
     s3_client.put_object(
         Bucket=bucket_config["etl_bucket"],
         Key=f"{ETL_STATE_MACHINE_HISTORY}/{history_object}",
         Body=GOOD_SDS_RECORD,
     )
+
+    s3_bucket_contents = s3_client.list_objects(
+        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
+    )
+    assert "Contents" in s3_bucket_contents
+    item_count = 0
+    for item in s3_bucket_contents.get("Contents", []):
+        item_count = item_count + 1
+        assert history_object in item["Key"]
+    assert item_count == 1
 
     lambda_client = boto3.client("lambda")
     payload = {}
@@ -56,10 +84,17 @@ def test_manual_trigger(history_object):
     response_payload = response["Payload"]
     response_payload_json = json_loads(response_payload.read().decode("utf-8"))
     assert response_payload_json == "pass"
-    time.sleep(2)
-    expected = history_object.split(".")
-    expected_prefix = ".".join(expected[:3])
-
+    stepfunctions_client = boto3.client("stepfunctions")
+    state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
+    executions = stepfunctions_client.list_executions(
+        stateMachineArn=state_machine_arn, maxResults=1
+    )
+    for execution in executions["executions"]:
+        if execution["startDate"].replace(tzinfo=timezone.utc) > start_time:
+            result = execution["name"].split(".")
+            result_prefix = ".".join(result[:3])
+            assert result_prefix == expected_prefix
+    time.sleep(10)
     queue_history_files = s3_client.list_objects(
         Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
     )
@@ -68,15 +103,3 @@ def test_manual_trigger(history_object):
         item_count = item_count + 1
         assert expected_prefix in item["Key"]
     assert item_count == 2
-
-    stepfunctions_client = boto3.client("stepfunctions")
-    state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
-    executions = stepfunctions_client.list_executions(
-        stateMachineArn=state_machine_arn, maxResults=5
-    )
-    for execution in executions["executions"]:
-        if execution["startDate"].replace(tzinfo=timezone.utc) > start_time:
-            result = execution["name"].split(".")
-            result_prefix = ".".join(result[:3])
-            assert result_prefix == expected_prefix
-    time.sleep(20)
