@@ -16,7 +16,7 @@ It will replace whatever is in there so make sure you check with the team before
 
 ## 3. Start the Ec2 instances
 
-Navigate to this folder and do the following
+Navigate to the `infrastructure/terraform/locust` folder and do the following
 
 - Go to the SSO console and copy the MGMT key details (the section that gives you a bunch of export values)
 - Paste that into your terminal window
