@@ -94,13 +94,13 @@ def _put_to_state_machine_history(data, cache: Cache):
     if not manual_retry_state:
         # Update state machine history file
         return s3_client.copy_object(
-            Bucket=cache["etl_bucket"],
+            Bucket=etl_bucket,
             Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
-            CopySource=f'{cache["etl_bucket"]}/{ETL_QUEUE_HISTORY}/{state_machine_name}',
+            CopySource=f"{etl_bucket}/{ETL_QUEUE_HISTORY}/{state_machine_name}",
         )
     else:
         return s3_client.put_object(
-            Bucket=cache["etl_bucket"],
+            Bucket=etl_bucket,
             Key=f"{ETL_STATE_MACHINE_HISTORY}/{state_machine_name}",
             Body="retry",
         )
