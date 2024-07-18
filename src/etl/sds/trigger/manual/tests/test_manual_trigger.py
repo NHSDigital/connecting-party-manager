@@ -47,7 +47,7 @@ def test_manual_trigger(history_object):
             {"Key": obj["Key"]} for obj in s3_bucket_contents["Contents"]
         ]
         # Delete the objects
-        delete_response = s3_client.delete_objects(
+        s3_client.delete_objects(
             Bucket=bucket_config["etl_bucket"], Delete={"Objects": objects_to_delete}
         )
     s3_bucket_contents = s3_client.list_objects(
