@@ -6,8 +6,6 @@ from etl_utils.constants import ETL_STATE_MACHINE_HISTORY
 from etl_utils.trigger.model import StateMachineInput
 from event.step_chain import StepChain
 
-from test_helpers.terraform import read_terraform_output
-
 from .operations import validate_bucket_contents
 
 if TYPE_CHECKING:
