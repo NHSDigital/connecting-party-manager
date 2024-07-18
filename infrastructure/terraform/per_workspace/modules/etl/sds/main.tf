@@ -504,4 +504,13 @@ module "trigger_manual" {
   }
   allowed_triggers = {}
   sqs_queue_arn    = module.etl_state_lock_enforcer.sqs_queue_arn
+  extra_policies = [
+    {
+      "Action" : [
+        "states:ListExecutions"
+      ],
+      "Effect" : "Allow",
+      "Resource" : [aws_sfn_state_machine.state_machine.arn]
+    }
+  ]
 }

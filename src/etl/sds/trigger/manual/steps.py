@@ -19,12 +19,6 @@ class ExecutionRunningError(Exception):
     pass
 
 
-class StateMachineError(Exception):
-    """Custom exception for problem getting executions."""
-
-    pass
-
-
 class Cache(TypedDict):
     s3_client: "S3Client"
     sqs_client: "SQSClient"
@@ -36,14 +30,11 @@ class Cache(TypedDict):
 def _check_execution_running(data, cache):
     _, _, state_machine_arn = data[StepChain.INIT]
     sf_client = cache["sf_client"]
-    try:
-        executions = sf_client.list_executions(
-            stateMachineArn=state_machine_arn, maxResults=1, statusFilter="RUNNING"
-        )
-        if executions["executions"]:
-            raise ExecutionRunningError("An execution is Running.")
-    except:
-        return True
+    executions = sf_client.list_executions(
+        stateMachineArn=state_machine_arn, maxResults=1, statusFilter="RUNNING"
+    )
+    if executions["executions"]:
+        raise ExecutionRunningError("An execution is Running.")
 
 
 def _find_last_execution(data, cache):
@@ -77,7 +68,7 @@ def _create_state_machine_input(data, cache):
 
 def _publish_message_to_sqs_queue(data, cache: Cache):
     state_machine_input: StateMachineInput = data[_create_state_machine_input]
-    etl_exc, _, _ = data[_set_etl_type]
+    etl_exc, current_changelog_number, latest_changelog_number = data[_set_etl_type]
     message_body = state_machine_input.json_with_name()
     message_deduplication_id = str(uuid.uuid4())
 
@@ -89,7 +80,7 @@ def _publish_message_to_sqs_queue(data, cache: Cache):
         MessageDeduplicationId=message_deduplication_id,
     )
 
-    return etl_exc
+    return etl_exc, current_changelog_number, latest_changelog_number
 
 
 steps = [

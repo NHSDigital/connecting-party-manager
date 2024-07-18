@@ -41,11 +41,18 @@ def handler(event, context):
         init=(ENVIRONMENT.ETL_BUCKET, manual_retry, ENVIRONMENT.STATE_MACHINE_ARN),
         cache=CACHE,
     )
-    etl_type = step_chain.data[_publish_message_to_sqs_queue]
-    if etl_type.upper() == "BULK":
-        trigger_type = StateMachineInputType.BULK
-    if etl_type.upper() == "UPDATE":
-        trigger_type = StateMachineInputType.UPDATE
+    trigger_type = "null"
+    result = step_chain.data[_publish_message_to_sqs_queue]
+    if isinstance(result, tuple):
+        etl_type, _, _ = result
+        if not isinstance(etl_type, Exception):
+            if etl_type.upper() == "BULK":
+                trigger_type = StateMachineInputType.BULK
+            if etl_type.upper() == "UPDATE":
+                trigger_type = StateMachineInputType.UPDATE
+        else:
+            # If the result is not a str, it must be an Exception
+            trigger_type = result
 
     return notify(
         lambda_client=LAMBDA_CLIENT,
