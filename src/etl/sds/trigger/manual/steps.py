@@ -28,7 +28,6 @@ class Cache(TypedDict):
 
 
 def _check_execution_running(data, cache):
-    state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
     executions = cache["sf_client"].list_executions(
         stateMachineArn=cache["state_machine_arn"], maxResults=1, statusFilter="RUNNING"
     )
