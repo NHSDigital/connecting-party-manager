@@ -1,3 +1,5 @@
+import logging
+
 import boto3
 from etl_utils.trigger.logger import log_action
 from etl_utils.trigger.model import StateMachineInputType
@@ -7,6 +9,12 @@ from event.logging.logger import setup_logger
 from event.step_chain import StepChain
 
 from .steps import _publish_message_to_sqs_queue, steps
+
+
+class ExecutionRunningError(Exception):
+    """Custom exception for existing ETL execution Running."""
+
+    pass
 
 
 class ManualTriggerEnvironment(BaseEnvironment):
@@ -37,26 +45,27 @@ def handler(event, context):
     manual_retry = True
     setup_logger(service_name=__file__)
     step_chain = StepChain(step_chain=steps, step_decorators=[log_action])
-    step_chain.run(
-        init=(ENVIRONMENT.ETL_BUCKET, manual_retry, ENVIRONMENT.STATE_MACHINE_ARN),
-        cache=CACHE,
-    )
-    trigger_type = "null"
-    result = step_chain.data[_publish_message_to_sqs_queue]
-    if isinstance(result, tuple):
-        etl_type, _, _ = result
-        if not isinstance(etl_type, Exception):
-            if etl_type.upper() == "BULK":
+    try:
+        step_chain.run(
+            init=(ENVIRONMENT.ETL_BUCKET, manual_retry, ENVIRONMENT.STATE_MACHINE_ARN),
+            cache=CACHE,
+        )
+        trigger_type = "null"
+        result = step_chain.data[_publish_message_to_sqs_queue]
+        if result:
+            if result.upper() == "BULK":
                 trigger_type = StateMachineInputType.BULK
-            if etl_type.upper() == "UPDATE":
+            if result.upper() == "UPDATE":
                 trigger_type = StateMachineInputType.UPDATE
         else:
-            # If the result is not a str, it must be an Exception
-            trigger_type = result
+            raise ExecutionRunningError("An execution is Running.")
 
-    return notify(
-        lambda_client=LAMBDA_CLIENT,
-        function_name=ENVIRONMENT.NOTIFY_LAMBDA_ARN,
-        result=step_chain.result,
-        trigger_type=trigger_type,
-    )
+        return notify(
+            lambda_client=LAMBDA_CLIENT,
+            function_name=ENVIRONMENT.NOTIFY_LAMBDA_ARN,
+            result=step_chain.result,
+            trigger_type=trigger_type,
+        )
+    except ExecutionRunningError as e:
+        logging.error(f"ExecutionRunningError: {e}")
+        return {"statusCode": 500, "body": f"Error: {str(e)}"}
