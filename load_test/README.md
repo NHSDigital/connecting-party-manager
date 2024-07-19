@@ -16,13 +16,13 @@ It will replace whatever is in there so make sure you check with the team before
 
 ## 3. Start the Ec2 instances
 
-Navigate to this folder and do the following
+Navigate to the `infrastructure/terraform/locust` folder and do the following
 
 - Go to the SSO console and copy the MGMT key details (the section that gives you a bunch of export values)
 - Paste that into your terminal window
-- Run terraform init
-- Run terraform plan - this should show 4 resources atm as the default number of workers is 3, if you want to change this number go to vars.tf and adjust the number
-- Run terraform apply
+- Run `terraform init`
+- Run `terraform plan` - this should show 4 resources atm as the default number of workers is 3, if you want to change this number go to vars.tf and adjust the number
+- Run `terraform apply`
 - Make note of the master IP
 
 ## 4. Add your IP to the security group
@@ -31,7 +31,7 @@ There is a Security Group that sits in the MGMT infrastructure that you will nee
 
 To do this naviagate to security groups and locate the Locust group
 
-Add a new ingress rule and set it to port 22 or SSH and then in the field with the magnifying glass there will be an option for "My IP" select that and save it
+Add a new ingress rule and set it to port 22 or SSH. In the field with the magnifying glass there may be an option for "My IP", if there is select that and save it, if not add your IP manually and save.
 
 ## 5. Start the master node
 
@@ -77,3 +77,5 @@ This then lets you change any of the above variables and the number of users etc
 DO NOT FORGET TO DESTROY THE RESOURCES
 
 In the terminal where you were running the terraform
+
+- Run `terraform destroy`
