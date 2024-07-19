@@ -10,9 +10,10 @@ class SearchQueryParams(BaseModel, extra=Extra.forbid):
     interaction_id: Optional[str] = None
     manufacturing_organization: Optional[str] = None
     party_key: Optional[str] = None
+    use_mock: Optional[str] = None
 
     @validator("device_type")
-    def validate_device_type(cls, device_type: str):
+    def validate_device_type(device_type: str):
         return device_type.lower()
 
     def get_non_null_params(self):

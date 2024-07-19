@@ -79,7 +79,8 @@ def _read_devices_by_id(device, table_name, dynamodb_client) -> Device:
 
 def devices_to_fhir_bundle(data, cache) -> dict:
     event_data = data[parse_event_query]
-    device_type = event_data.get("query_string")
+    query_params = event_data.get("query_string")
+    device_type = query_params.get("device_type")
     host = event_data.get("host")[0]
     devices = data[read_devices_by_id]
     fhir_org = create_fhir_searchset_bundle(
