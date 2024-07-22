@@ -10,5 +10,6 @@ locals {
   # e.g. api.cpm.dev.national.nhs.uk
   zone = var.domain
 
-  domain = "${terraform.workspace}.${var.domain}"
+  domain              = "${terraform.workspace}.${var.domain}"
+  etl_snapshot_bucket = contains(["int", "prod"], var.environment) ? "${local.project}--${replace(var.environment, "_", "-")}--snapshot" : "snapshot_not_required"
 }

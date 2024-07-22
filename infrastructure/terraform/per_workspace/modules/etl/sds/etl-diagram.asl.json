@@ -262,7 +262,38 @@
           "Next": "fail"
         }
       ],
-      "Default": "delete-state-lock"
+      "Default": "set-snapshot-bucket"
+    },
+    "set-snapshot-bucket": {
+      "Type": "Pass",
+      "Next": "check-snapshot-bucket",
+      "Result": {
+        "snapshot_bucket": "${etl_snapshot_bucket}"
+      }
+    },
+    "check-snapshot-bucket": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.snapshot_bucket",
+          "StringEquals": "snapshot_not_required",
+          "Next": "skip-export"
+        }
+      ],
+      "Default": "export-dynamodb-to-s3"
+    },
+    "export-dynamodb-to-s3": {
+      "Type": "Task",
+      "Parameters": {
+        "S3Bucket": "${etl_snapshot_bucket}",
+        "TableArn": "${table_arn}"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:exportTableToPointInTime",
+      "Next": "delete-state-lock"
+    },
+    "skip-export": {
+      "Type": "Pass",
+      "Next": "delete-state-lock"
     },
     "delete-state-lock": {
       "Type": "Task",
