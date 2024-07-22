@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export AWS_PAGER=""
+
 function _destroy_lambdas() {
     local workspace=$1
     SUBSTRING="--$workspace--"
@@ -208,13 +210,25 @@ function _delete_s3_buckets() {
     for bucket in $buckets; do
         echo "Deleting objects in S3 bucket: $bucket"
         # List all objects (including versions) in the bucket
-        objects=$(aws s3api list-object-versions --bucket "$bucket" --output json | jq -r '.Versions[] | {Key: .Key, VersionId: .VersionId}')
+        # Fetch object versions
+        objects=$(aws s3api list-object-versions --bucket "$bucket" --output json)
+        num_objects=$(echo "$objects" | jq '.Versions | length')
+        echo "Number of objects: $num_objects"
+        if [ "$num_objects" -gt 0 ]; then
+            echo "Processing $num_objects objects..."
 
-        # Loop through each object and delete it
-        if [ "$objects" != "[]" ]; then
-            echo "$objects" | jq -c '.[]' | while read -r object; do
-                aws s3api delete-object --bucket "$bucket" --key "$(echo "$object" | jq -r '.Key')"
+            # Loop through each object in the Versions array
+            echo "$objects" | jq -r '.Versions[] | select(.Key != null and .Key != "" and .VersionId != null) | @json' | while IFS= read -r object; do
+                key=$(echo "$object" | jq -r '.Key')
+                versionId=$(echo "$object" | jq -r '.VersionId')
+
+                #echo "Object: $object"
+                echo "Deleting Key: $key"
+                #echo "VersionId: $versionId"
+                aws s3api delete-object --bucket "$bucket" --key "$key" --version-id "$versionId"
             done
+        else
+            echo "No objects to delete or no versions found."
         fi
 
         # Delete all non-current versions
