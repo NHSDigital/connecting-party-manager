@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-07-16
+- [PI-206] Complete "retry" trigger
+- [PI-456] Turn off changelog in dev, ref & int
+
 ## 2024-07-15
 - [PI-457] Run update sub-ETL on loop
 - [PI-214] ETL debugger fix

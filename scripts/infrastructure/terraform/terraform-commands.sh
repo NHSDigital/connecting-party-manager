@@ -110,7 +110,6 @@ function _terraform_plan() {
     terraform workspace select default
     terraform init || return 1
     terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-
     if [[ "${scope}" = "per_workspace" ]]; then
         terraform plan $args \
             -out="$plan_file" \

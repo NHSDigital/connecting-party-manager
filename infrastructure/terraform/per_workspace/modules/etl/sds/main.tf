@@ -446,7 +446,7 @@ module "schedule_trigger_update" {
   source              = "./schedule/"
   lambda_arn          = module.trigger_update.lambda_function.lambda_function_arn
   lambda_name         = module.trigger_update.lambda_function.lambda_function_name
-  schedule_expression = var.is_persistent ? "rate(15 minutes)" : "rate(1 day)"
+  schedule_expression = contains(["qa", "prod"], var.environment) ? "rate(15 minutes)" : "cron(0 0 1 1 ? 2000)" # changelog schedule only active for qa & prod
 }
 
 module "bulk_trigger_notification" {
@@ -481,4 +481,36 @@ module "etl_state_lock_enforcer" {
 
   }
   extra_policies = []
+}
+
+module "trigger_manual" {
+  source = "./trigger/"
+
+  trigger_name          = "manual"
+  etl_name              = local.etl_name
+  workspace_prefix      = var.workspace_prefix
+  python_version        = var.python_version
+  event_layer_arn       = var.event_layer_arn
+  third_party_layer_arn = var.third_party_core_layer_arn
+  sds_layer_arn         = var.sds_layer_arn
+  etl_bucket_arn        = module.bucket.s3_bucket_arn
+  etl_layer_arn         = module.etl_layer.lambda_layer_arn
+  notify_lambda_arn     = module.notify.arn
+  table_arn             = var.table_arn
+  environment_variables = {
+    SQS_QUEUE_URL     = module.etl_state_lock_enforcer.sqs_queue_url
+    ETL_BUCKET        = module.bucket.s3_bucket_id
+    STATE_MACHINE_ARN = aws_sfn_state_machine.state_machine.arn
+  }
+  allowed_triggers = {}
+  sqs_queue_arn    = module.etl_state_lock_enforcer.sqs_queue_arn
+  extra_policies = [
+    {
+      "Action" : [
+        "states:ListExecutions"
+      ],
+      "Effect" : "Allow",
+      "Resource" : [aws_sfn_state_machine.state_machine.arn]
+    }
+  ]
 }

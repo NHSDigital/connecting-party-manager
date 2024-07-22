@@ -32,21 +32,29 @@ class StateMachineInput(BaseModel):
     changelog_number_start: int
     changelog_number_end: int
     timestamp: str = Field(default_factory=_create_timestamp)
+    manual_retry: bool = Field(default=False)
 
     @classmethod
-    def bulk(cls, changelog_number: int) -> Self:
+    def bulk(cls, changelog_number: int, manual_retry: bool = False) -> Self:
         return cls(
             etl_type=StateMachineInputType.BULK,
             changelog_number_start=0,
             changelog_number_end=changelog_number,
+            manual_retry=manual_retry,
         )
 
     @classmethod
-    def update(cls, changelog_number_start: int, changelog_number_end: int) -> Self:
+    def update(
+        cls,
+        changelog_number_start: int,
+        changelog_number_end: int,
+        manual_retry: bool = False,
+    ) -> Self:
         return cls(
             etl_type=StateMachineInputType.UPDATE,
             changelog_number_start=changelog_number_start,
             changelog_number_end=changelog_number_end,
+            manual_retry=manual_retry,
         )
 
     @property

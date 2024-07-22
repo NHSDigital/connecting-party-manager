@@ -42,7 +42,11 @@
     {
       "Sid": "StepFunctionIntegrationPermissions",
       "Effect": "Allow",
-      "Action": ["states:StartExecution", "states:DescribeExecution"],
+      "Action": [
+        "states:StartExecution",
+        "states:DescribeExecution",
+        "states:ListExecutions"
+      ],
       "Resource": [
         "arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*",
         "arn:aws:states:*:${ACCOUNT_ID}:execution:*"
@@ -52,7 +56,10 @@
       "Sid": "LambdaIntegrationPermissions",
       "Effect": "Allow",
       "Action": ["lambda:InvokeFunction"],
-      "Resource": ["arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--notify"]
+      "Resource": [
+        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--notify",
+        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--manual"
+      ]
     },
     {
       "Sid": "ApigeeSecretsIntegrationPermissions",
