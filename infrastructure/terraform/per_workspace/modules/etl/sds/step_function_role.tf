@@ -48,11 +48,14 @@ locals {
         "s3:ListBucket",
         "s3:ListBucketMultipartUploads",
         "s3:PutObjectVersionTagging",
-        "s3:DeleteObject"
+        "s3:DeleteObject",
+        "s3:PutBucketPolicy"
       ]
       resources = [
         "${module.bucket.s3_bucket_arn}",
-        "${module.bucket.s3_bucket_arn}/*"
+        "${module.bucket.s3_bucket_arn}/*",
+        "arn:aws:s3:::${var.etl_snapshot_bucket}/*",
+        "arn:aws:s3:::${var.etl_snapshot_bucket}"
       ]
     }
 
@@ -68,6 +71,19 @@ locals {
         "logs:DescribeLogGroups",
       ]
       resources = ["*"]
+    }
+
+    dynamodb = {
+      actions   = ["dynamodb:ExportTableToPointInTime"]
+      resources = ["arn:aws:dynamodb:eu-west-2:${var.assume_account}:table/${var.table_name}"]
+    }
+
+    kms = {
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ]
+      resources = [data.aws_kms_key.dynamodb_kms_key.arn]
     }
   }
 
@@ -104,6 +120,10 @@ data "aws_iam_policy_document" "service" {
       resources = each.value.resources
     }
   }
+}
+
+data "aws_kms_key" "dynamodb_kms_key" {
+  key_id = "alias/${var.table_name}"
 }
 
 resource "aws_iam_policy" "service" {

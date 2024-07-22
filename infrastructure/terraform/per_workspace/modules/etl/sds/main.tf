@@ -303,6 +303,8 @@ resource "aws_sfn_state_machine" "state_machine" {
       etl_update_state_machine_arn = module.update_transform_and_load_step_function.state_machine_arn
       etl_bulk_state_machine_arn   = module.bulk_transform_and_load_step_function.state_machine_arn
       etl_state_lock_key           = var.etl_state_lock_key
+      etl_snapshot_bucket          = var.etl_snapshot_bucket
+      table_arn                    = var.table_arn
     }
   )
   logging_configuration {

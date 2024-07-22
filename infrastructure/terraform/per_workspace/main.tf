@@ -192,5 +192,6 @@ module "sds_etl" {
   table_arn                        = module.table.dynamodb_table_arn
   is_persistent                    = var.workspace_type == "PERSISTENT"
   truststore_bucket                = data.aws_s3_bucket.truststore_bucket
+  etl_snapshot_bucket              = local.etl_snapshot_bucket
   environment                      = var.environment
 }

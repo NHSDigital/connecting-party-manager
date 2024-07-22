@@ -105,10 +105,37 @@ module "snapshot_bucket" {
   version                               = "3.15.2"
   bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
   attach_deny_insecure_transport_policy = true
+  attach_access_log_delivery_policy     = true
   versioning = {
     enabled = true
   }
   tags = {
     Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
   }
+}
+
+data "aws_s3_bucket_policy" "existing_policy" {
+  bucket = module.snapshot_bucket.s3_bucket_id
+}
+
+resource "aws_s3_bucket_policy" "snapshot_bucket_policy" {
+  bucket = module.snapshot_bucket.s3_bucket_id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = concat(
+      jsondecode(data.aws_s3_bucket_policy.existing_policy.policy)["Statement"], [
+        {
+          Sid       = "AllowDynamoDBExport",
+          Effect    = "Allow",
+          Principal = { Service = "dynamodb.amazonaws.com" },
+          Action = [
+            "s3:PutObject",
+            "s3:AbortMultipartUpload",
+            "s3:ListMultipartUploadParts"
+          ],
+          Resource = "${module.snapshot_bucket.s3_bucket_arn}/*"
+        }
+    ])
+  })
 }

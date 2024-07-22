@@ -146,8 +146,6 @@
         "s3:PutBucketOwnershipControls",
         "s3:PutBucketPublicAccessBlock",
         "s3:PutBucketAcl",
-        "s3:PutBucketPolicy",
-        "s3:PutBucketLogging",
         "s3:DeleteBucketPolicy",
         "s3:DeleteBucket",
         "s3:DeleteObject",
