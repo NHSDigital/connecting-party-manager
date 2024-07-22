@@ -145,7 +145,8 @@
         "events:DeleteRule",
         "events:PutTargets",
         "events:ListTargetsByRule",
-        "events:RemoveTargets"
+        "events:RemoveTargets",
+        "events:DisableRule"
       ],
       "Resource": ["*"]
     },
