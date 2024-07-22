@@ -147,6 +147,11 @@ We have some automated behaviour for destroying our workspaces - we build off a 
 - When you run locally you can override this with the `KILL_ALL` flag which destroys the current commit too
 - Can be run adhoc with the command: `make destroy--redundant-workspaces BRANCH_NAME=mybranch DESTROY_ALL_COMMITS_ON_BRANCH=false KILL_ALL=false`
 
+#### Destroy Corrupted Workspaces
+
+- This is a way to destroy a workspace on dev if terraform is not destroying it. This is not fool-proof as there are many different "chicken and egg" scenarios to infrastructure. But it should go some way to having a destroyed environment
+- Can be run manually by using the command: `make destroy--corrupted TERRAFORM_WORKSPACE="<WORKSPACE_TO_DESTROY>" TERRAFORM_ROLE_NAME="NHSDeploymentRole"`
+
 ## Updating Roles
 
 We have several roles that we currently handle outside of terraform as its needed to deploy the terraform:
