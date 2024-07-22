@@ -103,11 +103,9 @@ resource "aws_route53_zone" "int-ns" {
 }
 
 module "snapshot_bucket" {
-  source                                = "terraform-aws-modules/s3-bucket/aws"
-  version                               = "3.15.2"
-  bucket                                = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
-  attach_deny_insecure_transport_policy = true
-  attach_access_log_delivery_policy     = true
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "3.15.2"
+  bucket  = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
   versioning = {
     enabled = true
   }
@@ -116,28 +114,58 @@ module "snapshot_bucket" {
   }
 }
 
-data "aws_s3_bucket_policy" "existing_policy" {
-  bucket = module.snapshot_bucket.s3_bucket_id
-}
-
 resource "aws_s3_bucket_policy" "snapshot_bucket_policy" {
   bucket = module.snapshot_bucket.s3_bucket_id
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = concat(
-      jsondecode(data.aws_s3_bucket_policy.existing_policy.policy)["Statement"], [
-        {
-          Sid       = "AllowDynamoDBExport",
-          Effect    = "Allow",
-          Principal = { Service = "dynamodb.amazonaws.com" },
-          Action = [
-            "s3:PutObject",
-            "s3:AbortMultipartUpload",
-            "s3:ListMultipartUploadParts"
-          ],
-          Resource = "${module.snapshot_bucket.s3_bucket_arn}/*"
+    Statement = [
+      {
+        Sid    = "AWSAccessLogDeliveryWrite",
+        Effect = "Allow",
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        },
+        Action   = "s3:PutObject",
+        Resource = "${module.snapshot_bucket.s3_bucket_arn}/*"
+      },
+      {
+        Sid    = "AWSAccessLogDeliveryAclCheck",
+        Effect = "Allow",
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        },
+        Action   = "s3:GetBucketAcl",
+        Resource = "${module.snapshot_bucket.s3_bucket_arn}"
+      },
+      {
+        Sid       = "denyInsecureTransport",
+        Effect    = "Deny",
+        Principal = "*",
+        Action    = "s3:*",
+        Resource = [
+          "${module.snapshot_bucket.s3_bucket_arn}",
+          "${module.snapshot_bucket.s3_bucket_arn}/*"
+        ],
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
         }
-    ])
+      },
+      {
+        Sid    = "AllowDynamoDBExport",
+        Effect = "Allow",
+        Principal = {
+          Service = "dynamodb.amazonaws.com"
+        },
+        Action = [
+          "s3:PutObject",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts"
+        ],
+        Resource = "${module.snapshot_bucket.s3_bucket_arn}/*"
+      }
+    ]
   })
 }

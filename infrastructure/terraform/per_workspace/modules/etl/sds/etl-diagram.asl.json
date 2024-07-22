@@ -286,6 +286,7 @@
       "Type": "Task",
       "Parameters": {
         "S3Bucket": "${etl_snapshot_bucket}",
+        "S3Prefix.$": "$$.Execution.Name",
         "TableArn": "${table_arn}"
       },
       "Resource": "arn:aws:states:::aws-sdk:dynamodb:exportTableToPointInTime",
