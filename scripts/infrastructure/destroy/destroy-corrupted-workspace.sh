@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source ./scripts/infrastructure/destroy/destroy-workspace-utils.sh
 source ./scripts/infrastructure/terraform/terraform-constants.sh
 source ./scripts/infrastructure/terraform/terraform-utils.sh
 source ./scripts/infrastructure/terraform/terraform-commands.sh
@@ -45,90 +46,35 @@ function _destroy_corrupted_workspace() {
 
         local workspace
         workspace=$TERRAFORM_WORKSPACE
-        # Fetch the resources using the AWS CLI command
-        aws resourcegroupstaggingapi get-resources --tag-filters Key=Workspace,Values="$workspace" | jq -c '.ResourceTagMappingList[]' |
-        while IFS= read -r item; do
-            arn=$(jq -r '.ResourceARN' <<< "$item")
+        local cert_name
 
-            case $arn in
-                arn:aws:lambda* )
-                    echo "Deleting... : $arn"
-                    aws lambda delete-function --function-name $arn
-                    ;;
-                arn:aws:kms* )
-                    echo "Disabling... : $arn"
-                    aws kms disable-key --key-id $arn
-                    echo "Deleting... ': $arn"
-                    aws kms schedule-key-deletion --key-id $arn --pending-window-in-days 7
-                    ;;
-                arn:aws:logs* )
-                    echo "Deleting... : $arn"
-                    new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                    aws logs delete-log-group --log-group-name $new_var
-                    ;;
-                arn:aws:secretsmanager* )
-                    echo "Deleting... : $arn"
-                    aws secretsmanager delete-secret --secret-id $arn
-                    ;;
-                arn:aws:apigateway* )
-                        echo "Deleting domain-name... : $workspace"
-                        aws apigateway delete-domain-name --domain-name "$workspace.api.record-locator.dev.national.nhs.uk"
-                        echo "Deleting... : $arn"
-                        ag_id=$(echo "$arn" | awk -F'/restapis/' '{print $2}' | awk -F'/' '{print $1}')
-                        aws apigateway delete-rest-api --rest-api-id $ag_id
-                    ;;
-                arn:aws:dynamodb* )
-                    echo "Deleting... : $arn"
-                    new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                    table=$(echo "$arn" | awk -F'/' '{print $NF}')
-                    aws dynamodb delete-table --table-name $table
-                    ;;
-                arn:aws:s3* )
-                    echo "Deleting... : $arn"
-                    new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                    local versioned_objects
-                    versioned_objects=$(aws s3api list-object-versions \
-                                        --bucket "${new_var}" \
-                                        --output=json \
-                                        --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}') || return 1
-                    aws s3api delete-objects \
-                        --bucket "${new_var}" \
-                        --delete "${versioned_objects}" || echo "Ignore the previous warning - an empty bucket is a good thing"
-                    echo "Waiting for bucket contents to be deleted..." && sleep 10
-                    aws s3 rb "s3://${new_var}" --force || echo "Bucket could not be deleted at this time. You should go to the AWS Console and delete the bucket manually."
-                    ;;
-                arn:aws:ssm* )
-                    echo "Deleting... : $arn"
-                    new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                    suffix=$(echo "$arn" | awk -F'/' '{print $NF}')
-                    name=$(echo "$new_var" | awk -F'/' '{print $(NF-1)}')
-                    aws ssm delete-parameter --name $name/$suffix
-                    ;;
-                arn:aws:acm* )
-                    echo "Deleting... : $arn"
-                    aws acm delete-certificate --certificate-arn $arn
-                    ;;
-                arn:aws:firehose* )
-                    echo "Deleting... : $arn"
-                    new_var=$(echo "$arn" | awk -F':' '{print $NF}')
-                    name=$(echo "$new_var" | awk -F'/' '{print $NF}')
-                    aws firehose delete-delivery-stream --delivery-stream-name $name
-                    ;;
-                * )
-                    echo "Unknown ARN type: $arn"
-                    ;;
-            esac
-        done
+        _destroy_lambdas "$workspace"
+        _destroy_all_kms "$workspace"
+        _delete_log_groups "$workspace"
+        _delete_secrets "$workspace"
+        _delete_s3_buckets "$workspace"
+        _delete_dynamo_tables "$workspace"
+        _delete_api_gateway "$workspace"
+        _delete_ssm_parameters "$workspace"
+        _delete_firehose_delivery_streams "$workspace"
+        _delete_sqs_queues "$workspace"
+        _delete_step_functions "$workspace"
+        _delete_cloudwatch_events_rules "$workspace"
+        _delete_acm_certificates "$workspace"
+        _destroy_iam "$workspace"
+        _delete_resource_groups "$workspace"
+
     else
         # Print an error message if assume-role command fails
         echo "Error executing aws sts assume-role command"
     fi
 
-    echo "The resources have been removed from the dev environment for the ${TERRAFORM_WORKSPACE} workspace. Please now remove it from the s3 and lock table manually on MGMT."
+    echo "The resources have been removed from the dev environment for the ${TERRAFORM_WORKSPACE} workspace. Please run 'make terraform--destroy' to remove the state file from mgmt."
 
     export AWS_ACCESS_KEY_ID="$MGMT_AWS_ACCESS_KEY_ID"
     export AWS_SECRET_ACCESS_KEY="$MGMT_AWS_SECRET_ACCESS_KEY"
     export AWS_SESSION_TOKEN="$MGMT_AWS_SESSION_TOKEN"
+
 }
 
 _destroy_corrupted_workspace

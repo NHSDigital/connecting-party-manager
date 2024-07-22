@@ -19,6 +19,10 @@ destroy--expired: aws--login ## Destroy any workspaces that have gone past their
 	bash $(PATH_TO_INFRASTRUCTURE)/destroy/destroy-expired-workspaces.sh $(ENVIRONMENT)
 
 destroy--corrupted: aws--login ## Destroy any workspaces that cannot be detroyed with terraform.
+	@if [ -z "$(TERRAFORM_WORKSPACE)" ] || [ -z "$(TERRAFORM_ROLE_NAME)" ]; then \
+		echo "Error: Both TERRAFORM_WORKSPACE and TERRAFORM_ROLE_NAME must be provided."; \
+		exit 1; \
+	fi
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
