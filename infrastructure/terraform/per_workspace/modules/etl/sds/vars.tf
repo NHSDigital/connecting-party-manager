@@ -23,6 +23,7 @@ variable "table_name" {}
 variable "table_arn" {}
 variable "is_persistent" {}
 variable "truststore_bucket" {}
+variable "etl_snapshot_bucket" {}
 variable "environment" {
 
 }

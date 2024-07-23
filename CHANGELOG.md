@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-07-22
+- [PI-357] Automatic snapshots of ETL
+- [PI-454] Delete corrupted workspace variable check
+
 ## 2024-07-16
 - [PI-206] Complete "retry" trigger
 - [PI-456] Turn off changelog in dev, ref & int

@@ -114,12 +114,6 @@
       ]
     },
     {
-      "Sid": "S3GlobalPermissions",
-      "Effect": "Allow",
-      "Action": ["s3:ListAllMyBuckets"],
-      "Resource": ["*"]
-    },
-    {
       "Sid": "S3BucketPermissions",
       "Effect": "Allow",
       "Action": [
@@ -146,8 +140,6 @@
         "s3:PutBucketOwnershipControls",
         "s3:PutBucketPublicAccessBlock",
         "s3:PutBucketAcl",
-        "s3:PutBucketPolicy",
-        "s3:PutBucketLogging",
         "s3:DeleteBucketPolicy",
         "s3:DeleteBucket",
         "s3:DeleteObject",
@@ -189,7 +181,9 @@
         "sqs:setqueueattributes",
         "sqs:getqueueattributes",
         "sqs:listqueuetags",
-        "sqs:deletequeue"
+        "sqs:deletequeue",
+        "sqs:PurgeQueue",
+        "sqs:GetQueueUrl"
       ],
       "Resource": ["arn:aws:sqs:eu-west-2:${ACCOUNT_ID}:*-sqs*"]
     },
@@ -245,6 +239,26 @@
         "osis:StopPipeline"
       ],
       "Resource": ["arn:aws:osis:*:${ACCOUNT_ID}:pipeline/*"]
+    },
+    {
+      "Sid": "GlobalPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListAllMyBuckets",
+        "secretsmanager:ListSecrets",
+        "lambda:ListFunctions",
+        "ssm:DescribeParameters",
+        "dynamodb:ListTables",
+        "firehose:ListDeliveryStreams",
+        "sqs:listqueues",
+        "states:ListStateMachines",
+        "events:ListRules",
+        "acm:ListCertificates",
+        "resource-groups:ListGroups",
+        "lambda:ListEventSourceMappings",
+        "iam:ListRoles"
+      ],
+      "Resource": ["*"]
     }
   ]
 }
