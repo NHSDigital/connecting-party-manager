@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-07-23
+- [PI-362] SPIKE - Write load test code
+
 ## 2024-07-22
 - [PI-357] Automatic snapshots of ETL
 - [PI-454] Delete corrupted workspace variable check
