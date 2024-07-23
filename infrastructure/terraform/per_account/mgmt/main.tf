@@ -31,3 +31,9 @@ module "route53" {
   source    = "./modules/route53"
   workspace = terraform.workspace
 }
+
+module "locust_vpc" {
+  source      = "./modules/locust-vpc"
+  environment = terraform.workspace
+  prefix      = "${local.project}--${replace(terraform.workspace, "_", "-")}"
+}
