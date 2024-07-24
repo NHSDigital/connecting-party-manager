@@ -20,7 +20,7 @@ Feature: Create Device - success scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device of type "<type>"               |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | <type>                                   |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
@@ -46,7 +46,7 @@ Feature: Create Device - success scenarios
       | resourceType                 | Device                                   |
       | id                           | << ignore >>                             |
       | deviceName.0.name            | My Device of type "<type>"               |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | <type>                                   |
       | identifier.0.system          | connecting-party-manager/product_id      |

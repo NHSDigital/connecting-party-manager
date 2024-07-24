@@ -41,10 +41,10 @@ def create_domain_device_from_fhir_device(
     (device_name,) = fhir_device.deviceName
     device = product_team.create_device(
         name=device_name.name,
-        type=fhir_device.definition.identifier.value,
+        device_type=fhir_device.definition.identifier.value,
     )
     for identifier in fhir_device.identifier:
-        device.add_key(type=identifier.key_type, key=identifier.value)
+        device.add_key(key_type=identifier.key_type, key=identifier.value)
     return device
 
 
@@ -53,10 +53,10 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
         resourceType=CpmFhirDevice.__name__,
         deviceName=[DeviceName(name=device.name)],
         definition=DeviceDefinitionReference(
-            identifier=DeviceDefinitionIdentifier(value=device.type)
+            identifier=DeviceDefinitionIdentifier(value=device.device_type)
         ),
         identifier=[
-            DeviceIdentifier(system=f"{SYSTEM}/{key.type}", value=key.key)
+            DeviceIdentifier(system=f"{SYSTEM}/{key.key_type}", value=key.key)
             for key in device.keys.values()
         ],
         owner=DeviceOwnerReference(

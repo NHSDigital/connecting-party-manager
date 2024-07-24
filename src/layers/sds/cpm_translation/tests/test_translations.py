@@ -39,7 +39,9 @@ def test_modify_devices(
         def new_device(self) -> Device:
             org = Root.create_ods_organisation(ods_code="foo")
             product_team = org.create_product_team(id=uuid4(), name="foo")
-            device = product_team.create_device(name="foo", type=DeviceType.PRODUCT)
+            device = product_team.create_device(
+                name="foo", device_type=DeviceType.PRODUCT
+            )
             self.devices.append(device)
             return device
 

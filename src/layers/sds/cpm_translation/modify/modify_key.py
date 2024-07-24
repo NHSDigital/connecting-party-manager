@@ -81,12 +81,14 @@ def new_accredited_system(
         ods_code=ods_code,
         name=DEFAULT_PRODUCT_TEAM["name"],
     )
-    new_device = product_team.create_device(name=_device.name, type=_device.type)
+    new_device = product_team.create_device(
+        name=_device.name, device_type=_device.device_type
+    )
     new_device.add_questionnaire_response(
         questionnaire_response=new_questionnaire_response
     )
     new_device.add_key(
-        type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=new_accredited_system_id
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=new_accredited_system_id
     )
     new_device.add_index(
         questionnaire_id=questionnaire_id, question_name=UNIQUE_IDENTIFIER
@@ -154,10 +156,12 @@ def replace_msg_handling_system(
         ods_code=msg_handling_system_key.nhs_id_code,
         name=DEFAULT_PRODUCT_TEAM["name"],
     )
-    new_device = product_team.create_device(name=device.name, type=device.type)
+    new_device = product_team.create_device(
+        name=device.name, device_type=device.device_type
+    )
     new_device.add_questionnaire_response(questionnaire_response=questionnaire_response)
     new_device.add_key(
-        type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID, key=new_scoped_party_key
+        key_type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID, key=new_scoped_party_key
     )
     new_device.add_index(
         questionnaire_id=questionnaire_id, question_name=UNIQUE_IDENTIFIER

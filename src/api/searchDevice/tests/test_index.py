@@ -30,10 +30,10 @@ def _create_org():
 def _create_device(device, product_team):
     cpmdevice = product_team.create_device(
         name=device["device_name"],
-        type=device["device_type"],
+        device_type=device["device_type"],
         status=DeviceStatus(device["status"]),
     )
-    cpmdevice.add_key(DeviceKeyType.PRODUCT_ID, device["device_key"])
+    cpmdevice.add_key(key_type=DeviceKeyType.PRODUCT_ID, key=device["device_key"])
 
     questionnaire = Questionnaire(name=f"spine_{device['device_name']}", version=1)
     questionnaire.add_question(

@@ -74,7 +74,7 @@ def device(questionnaire_response):
     product_team = org.create_product_team(
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
-    _device = product_team.create_device(name="foo", type=DeviceType.PRODUCT)
+    _device = product_team.create_device(name="foo", device_type=DeviceType.PRODUCT)
     _device.add_questionnaire_response(questionnaire_response=questionnaire_response)
     return _device
 

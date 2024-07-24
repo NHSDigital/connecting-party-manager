@@ -31,20 +31,20 @@ class DeviceKey(BaseModel):
     A Device Key is a secondary way of indexing / retrieving Devices
     """
 
-    type: DeviceKeyType
+    key_type: DeviceKeyType
     key: str
 
     @validator("key", check_fields=True)
     def validate_key(key: str, values: dict):
-        type: DeviceKeyType = values.get("type")
-        return validate_key(key=key, type=type)
+        key_type: DeviceKeyType = values.get("type")
+        return validate_key(key=key, key_type=key_type)
 
 
-def validate_key(key: str, type: DeviceKeyType):
-    if type and type.pattern.match(key) is None:
+def validate_key(key: str, key_type: DeviceKeyType):
+    if key_type and key_type.pattern.match(key) is None:
         raise InvalidDeviceKeyError(
             f"Key '{key}' does not match the expected "
-            f"pattern '{type.pattern.pattern}' associated with "
-            f"key type '{type}'"
+            f"pattern '{key_type.pattern.pattern}' associated with "
+            f"key type '{key_type}'"
         )
     return key

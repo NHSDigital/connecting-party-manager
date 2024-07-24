@@ -42,7 +42,7 @@ def read_devices_by_type(data, cache) -> List[Device]:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.query_by_device_type(type=device_type)
+    return device_repo.query_by_device_type(device_type=device_type)
 
 
 def read_devices_by_id(data, cache) -> List[Device]:

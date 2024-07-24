@@ -38,7 +38,7 @@ class QuestionNotFoundError(Exception):
 class DeviceCreatedEvent(Event):
     id: str
     name: str
-    type: "DeviceType"
+    device_type: "DeviceType"
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
@@ -46,13 +46,15 @@ class DeviceCreatedEvent(Event):
     updated_on: Optional[str] = None
     deleted_on: Optional[str] = None
     _trust: bool = field(alias="_trust", default=False)
+    # keys: list[DeviceKey]
+    # questionnaire_responses: dict[str, list[QuestionnaireResponse]]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceUpdatedEvent(Event):
     id: str
     name: str
-    type: "DeviceType"
+    device_type: "DeviceType"
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
@@ -65,7 +67,7 @@ class DeviceUpdatedEvent(Event):
 class DeviceKeyAddedEvent(Event):
     id: str
     key: str
-    type: DeviceKeyType
+    key_type: DeviceKeyType
     _trust: bool = field(alias="_trust", default=False)
 
 
@@ -153,7 +155,7 @@ class Device(AggregateRoot):
 
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
-    type: DeviceType = Field(immutable=True)
+    device_type: DeviceType = Field(immutable=True)
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
@@ -181,10 +183,10 @@ class Device(AggregateRoot):
             deleted_on=deletion_datetime,
         )
 
-    def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
+    def add_key(self, key_type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
         if key in self.keys:
             raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        device_key = DeviceKey(key=key, type=type)
+        device_key = DeviceKey(key=key, key_type=key_type)
         self.keys[key] = device_key
         event = DeviceKeyAddedEvent(id=self.id, _trust=_trust, **device_key.dict())
         return self.add_event(event)

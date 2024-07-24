@@ -31,7 +31,7 @@ def device_right_shoe_size_123(
     shoe_response = shoe_questionnaire.respond(
         responses=[{"foot": ["R"]}, {"shoe-size": [123]}],
     )
-    device = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
+    device = product_team.create_device(name="Device-1", device_type=DeviceType.PRODUCT)
     device.add_questionnaire_response(questionnaire_response=shoe_response)
     device.add_index(questionnaire_id=shoe_questionnaire.id, question_name="foot")
     device.add_index(questionnaire_id=shoe_questionnaire.id, question_name="shoe-size")
@@ -45,7 +45,7 @@ def device_left_shoe_size_123(
     shoe_response = shoe_questionnaire.respond(
         responses=[{"foot": ["L"]}, {"shoe-size": [123]}],
     )
-    device = product_team.create_device(name="Device-2", type=DeviceType.PRODUCT)
+    device = product_team.create_device(name="Device-2", device_type=DeviceType.PRODUCT)
     device.add_questionnaire_response(questionnaire_response=shoe_response)
     device.add_index(questionnaire_id=shoe_questionnaire.id, question_name="foot")
     device.add_index(questionnaire_id=shoe_questionnaire.id, question_name="shoe-size")

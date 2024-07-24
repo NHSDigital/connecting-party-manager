@@ -34,7 +34,7 @@ def device():
         name="Foo",
         ods_code="ABC123",
         product_team_id="18934119-5780-4d28-b9be-0e6dff3908ba",
-        type=DeviceType.PRODUCT,
+        device_type=DeviceType.PRODUCT,
     )
 
 
@@ -89,15 +89,15 @@ def test_device_delete(device: Device):
 
 
 def test_device_add_key(device: Device):
-    event = device.add_key(type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
+    event = device.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
     assert device.keys == {
-        "P.XXX-YYY": DeviceKey(type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
+        "P.XXX-YYY": DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
     }
     assert isinstance(event, DeviceKeyAddedEvent)
 
 
 def test_device_delete_key(device: Device):
-    device.add_key(type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
+    device.add_key(key_type=DeviceKeyType.PRODUCT_ID, key="P.XXX-YYY")
     event = device.delete_key(key="P.XXX-YYY")
     assert device.keys == {}
     assert isinstance(event, DeviceKeyDeletedEvent)

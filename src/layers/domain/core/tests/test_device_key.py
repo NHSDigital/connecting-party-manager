@@ -11,7 +11,7 @@ GOOD_ID_EXAMPLES = {
 
 @pytest.mark.parametrize(["type", "key"], GOOD_ID_EXAMPLES.items())
 def test_validate_key_pass(key, type):
-    assert validate_key(key=key, type=DeviceKeyType(type)) == key
+    assert validate_key(key=key, key_type=DeviceKeyType(type)) == key
 
 
 @pytest.mark.parametrize("type", GOOD_ID_EXAMPLES.keys())
@@ -21,7 +21,7 @@ def test_validate_key_fail(key, type):
         pytest.skip("Already covered in 'test_validate_key_pass'")
 
     with pytest.raises(InvalidDeviceKeyError):
-        validate_key(key=key, type=DeviceKeyType(type))
+        validate_key(key=key, key_type=DeviceKeyType(type))
 
 
 @pytest.mark.parametrize("type", GOOD_ID_EXAMPLES.keys())
@@ -35,4 +35,4 @@ def test_validate_key_fail(key, type):
 )
 def test_validate_key_fail_other(key, type):
     with pytest.raises(InvalidDeviceKeyError):
-        validate_key(key=key, type=DeviceKeyType(type))
+        validate_key(key=key, key_type=DeviceKeyType(type))

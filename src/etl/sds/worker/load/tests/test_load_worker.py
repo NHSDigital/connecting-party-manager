@@ -65,7 +65,7 @@ class MockDeviceRepository(DeviceRepository):
         query = lambda kwargs: (
             self.query_by_key_type(key_type=by, Select="COUNT", **kwargs)
             if isinstance(by, DeviceKeyType)
-            else self.query_by_device_type(type=by, Select="COUNT", **kwargs)
+            else self.query_by_device_type(device_type=by, Select="COUNT", **kwargs)
         )
         count = 0
         scanning = True
@@ -129,13 +129,13 @@ def device_factory(id: int) -> Device:
     device = Device(
         id=UUID(int=id),
         name=f"device-{id}",
-        type=DeviceType.PRODUCT,
+        device_type=DeviceType.PRODUCT,
         product_team_id=UUID(int=1),
         ods_code=ods_code,
     )
     event = DeviceCreatedEvent(**device.dict())
     device.add_event(event)
-    device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
+    device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
     return device
 
 

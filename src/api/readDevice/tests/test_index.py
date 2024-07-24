@@ -27,8 +27,8 @@ def test_index(version):
     product_team = org.create_product_team(
         id=consistent_uuid(1), name="product-team-name"
     )
-    device = product_team.create_device(name="device-name", type="product")
-    device.add_key(DeviceKeyType.PRODUCT_ID, device_key)
+    device = product_team.create_device(name="device-name", device_type="product")
+    device.add_key(key_type=DeviceKeyType.PRODUCT_ID, key=device_key)
 
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
         os.environ,

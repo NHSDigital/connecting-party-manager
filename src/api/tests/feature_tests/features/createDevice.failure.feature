@@ -20,7 +20,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device of type "product"              |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
@@ -54,7 +54,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | invalid_type                             |
       | deviceName.0.name            | My Device of type "product"              |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | owner.identifier             | connecting-party-manager/product-team-id |
@@ -95,7 +95,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device 🚀                             |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
@@ -130,7 +130,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device                                |
-      | deviceName.0.type            | not_a_type                               |
+      | deviceName.0.device_type     | not_a_type                               |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
@@ -146,7 +146,7 @@ Feature: Create Device - failure scenarios
       | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
       | issue.0.details.coding.0.display | Validation error                                                    |
       | issue.0.diagnostics              | string does not match regex "^user-friendly-name$"                  |
-      | issue.0.expression.0             | Device.deviceName.0.type                                            |
+      | issue.0.expression.0             | Device.deviceName.0.device_type                                     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
@@ -165,7 +165,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device                                |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | not_a_type                               |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
@@ -200,7 +200,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device                                |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | not_a_key_type                           |
@@ -237,7 +237,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device                                |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
@@ -274,7 +274,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                         |
       | resourceType                 | Device                                        |
       | deviceName.0.name            | My Device of type "product"                   |
-      | deviceName.0.type            | user-friendly-name                            |
+      | deviceName.0.device_type     | user-friendly-name                            |
       | definition.identifier.system | connecting-party-manager/device-type          |
       | definition.identifier.value  | product                                       |
       | identifier.0.system          | connecting-party-manager/accredited_system_id |
@@ -313,7 +313,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device of type "product"              |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | identifier.0.system          | connecting-party-manager/product_id      |
@@ -371,7 +371,7 @@ Feature: Create Device - failure scenarios
       | path                         | value                                    |
       | resourceType                 | Device                                   |
       | deviceName.0.name            | My Device of type "product"              |
-      | deviceName.0.type            | user-friendly-name                       |
+      | deviceName.0.device_type     | user-friendly-name                       |
       | definition.identifier.system | connecting-party-manager/device-type     |
       | definition.identifier.value  | product                                  |
       | owner.identifier.system      | connecting-party-manager/product-team-id |

@@ -3,7 +3,7 @@
     "keys": {
       "K83015:000173655515": {
         "key": "K83015:000173655515",
-        "type": "accredited_system_id"
+        "key_type": "accredited_system_id"
       }
     },
     "name": "TPP SystmOne",
@@ -63,13 +63,13 @@
       ]
     },
     "status": "active",
-    "type": "product"
+    "device_type": "product"
   },
   {
     "keys": {
       "AAA:000173655515": {
         "key": "AAA:000173655515",
-        "type": "accredited_system_id"
+        "key_type": "accredited_system_id"
       }
     },
     "name": "TPP SystmOne",
@@ -129,6 +129,6 @@
       ]
     },
     "status": "active",
-    "type": "product"
+    "device_type": "product"
   }
 ]

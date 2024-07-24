@@ -30,13 +30,13 @@ class ProductTeam(AggregateRoot):
     def create_device(
         self,
         name: str,
-        type: DeviceType,
+        device_type: DeviceType,
         status: DeviceStatus = DeviceStatus.ACTIVE,
         _trust=False,
     ) -> Device:
         device = Device(
             name=name,
-            type=type,
+            device_type=device_type,
             status=status,
             product_team_id=self.id,
             ods_code=self.ods_code,

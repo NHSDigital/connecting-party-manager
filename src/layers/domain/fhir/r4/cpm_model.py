@@ -98,7 +98,7 @@ class Device(BaseModel):
     @validator("identifier", each_item=True)
     def validate_key(identifier: DeviceIdentifier):
         if identifier and isinstance(identifier, DeviceIdentifier):
-            validate_key(key=identifier.value, type=identifier.key_type)
+            validate_key(key=identifier.value, key_type=identifier.key_type)
         return identifier
 
     @validator("identifier")

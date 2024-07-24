@@ -50,7 +50,7 @@ class DeviceRepository(Repository[Device]):
         condition_expression=ConditionExpression.MUST_NOT_EXIST,
     ) -> TransactItem:
         pk = TableKeys.DEVICE.key(event.id)
-        pk_1 = TableKeys.DEVICE_TYPE.key(event.type)
+        pk_1 = TableKeys.DEVICE_TYPE.key(event.device_type)
         event_data = asdict(event)
         _condition_expression = (
             {"ConditionExpression": condition_expression}
@@ -73,7 +73,7 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceKeyAddedEvent(self, event: DeviceKeyAddedEvent):
         pk = TableKeys.DEVICE.key(event.id)
         sk = TableKeys.DEVICE_KEY.key(event.key)
-        pk_2 = TableKeys.DEVICE_KEY_TYPE.key(event.type)
+        pk_2 = TableKeys.DEVICE_KEY_TYPE.key(event.key_type)
         event_data = asdict(event)
         condition_expression = (
             {"ConditionExpression": ConditionExpression.MUST_NOT_EXIST}
@@ -190,8 +190,10 @@ class DeviceRepository(Repository[Device]):
         }
         return self.client.query(**args, **kwargs)
 
-    def query_by_device_type(self, type: DeviceType, **kwargs) -> "QueryOutputTypeDef":
-        pk_1 = TableKeys.DEVICE_TYPE.key(type)
+    def query_by_device_type(
+        self, device_type: DeviceType, **kwargs
+    ) -> "QueryOutputTypeDef":
+        pk_1 = TableKeys.DEVICE_TYPE.key(device_type)
         args = {
             "TableName": self.table_name,
             "IndexName": "idx_gsi_1",

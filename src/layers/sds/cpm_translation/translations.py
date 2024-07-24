@@ -77,10 +77,10 @@ def nhs_accredited_system_to_cpm_devices(
         _organisation = Root.create_ods_organisation(ods_code=ods_code)
         _product_team = _organisation.create_product_team(**DEFAULT_PRODUCT_TEAM)
         _device = _product_team.create_device(
-            name=product_name, type=DeviceType.PRODUCT, _trust=_trust
+            name=product_name, device_type=DeviceType.PRODUCT, _trust=_trust
         )
         _device.add_key(
-            type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
+            key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
             key=accredited_system_id,
             _trust=_trust,
         )
@@ -111,10 +111,10 @@ def nhs_mhs_to_cpm_device(
 
     product_team = create_product_team(ods_code=ods_code)
     device = product_team.create_device(
-        name=product_name, type=DeviceType.ENDPOINT, _trust=_trust
+        name=product_name, device_type=DeviceType.ENDPOINT, _trust=_trust
     )
     device.add_key(
-        type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
+        key_type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
         key=_scoped_party_key,
         _trust=_trust,
     )
@@ -157,7 +157,7 @@ def modify_devices(
 
     _devices = devices
     for modification_type, field, new_values in modifications:
-        device_type = _devices[0].type
+        device_type = _devices[0].device_type
         model = NhsAccreditedSystem if device_type is DeviceType.PRODUCT else NhsMhs
         field_name = model.get_field_name_for_alias(alias=field)
 

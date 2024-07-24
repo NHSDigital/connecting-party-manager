@@ -38,7 +38,7 @@ def device() -> Device:
     product_team = org.create_product_team(
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
-    device = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
+    device = product_team.create_device(name="Device-1", device_type=DeviceType.PRODUCT)
     device.add_questionnaire_response(questionnaire_response=shoe_response_1)
     device.add_questionnaire_response(questionnaire_response=shoe_response_2)
     device.add_questionnaire_response(questionnaire_response=health_response)

@@ -176,14 +176,18 @@ def test_delete_devices(repository: DeviceRepository):
     _questionnaire_response = _questionnaire.respond(
         responses=[{"unique_identifier": ["001"]}]
     )
-    _device_1 = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
+    _device_1 = product_team.create_device(
+        name="Device-1", device_type=DeviceType.PRODUCT
+    )
     _device_1.add_questionnaire_response(questionnaire_response=_questionnaire_response)
     _device_1.add_index(
         questionnaire_id=_questionnaire.id, question_name="unique_identifier"
     )
     repository.write(_device_1)
 
-    _device_2 = product_team.create_device(name="Device-2", type=DeviceType.PRODUCT)
+    _device_2 = product_team.create_device(
+        name="Device-2", device_type=DeviceType.PRODUCT
+    )
     _device_2.add_questionnaire_response(questionnaire_response=_questionnaire_response)
     _device_2.add_index(
         questionnaire_id=_questionnaire.id, question_name="unique_identifier"
@@ -210,7 +214,7 @@ def test_delete_devices(repository: DeviceRepository):
     assert event_1 == DeviceUpdatedEvent(
         id=_device_1.id,
         name=_device_1.name,
-        type=_device_1.type,
+        device_type=_device_1.device_type,
         product_team_id=_device_1.product_team_id,
         ods_code=_device_1.ods_code,
         status=DeviceStatus.INACTIVE,
@@ -225,7 +229,7 @@ def test_delete_devices(repository: DeviceRepository):
     assert event_2 == DeviceUpdatedEvent(
         id=_device_2.id,
         name=_device_2.name,
-        type=_device_2.type,
+        device_type=_device_2.device_type,
         product_team_id=_device_2.product_team_id,
         ods_code=_device_2.ods_code,
         status=DeviceStatus.INACTIVE,
@@ -270,7 +274,9 @@ def test_delete_devices_no_matching_device(repository: DeviceRepository):
     _questionnaire_response = _questionnaire.respond(
         responses=[{"unique_identifier": ["001"]}]
     )
-    _device = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
+    _device = product_team.create_device(
+        name="Device-1", device_type=DeviceType.PRODUCT
+    )
     _device.add_questionnaire_response(questionnaire_response=_questionnaire_response)
     _device.add_index(
         questionnaire_id=_questionnaire.id, question_name="unique_identifier"

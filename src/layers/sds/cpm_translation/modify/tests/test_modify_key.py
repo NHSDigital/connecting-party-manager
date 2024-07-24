@@ -116,7 +116,7 @@ def _test_device_updated(
 
     expected_new_key_name = f"{expected_ods_code}:{key_name.split(':')[1]}"
     assert expected_new_key_name == new_key_name
-    assert new_device_key.type is device_key.type
+    assert new_device_key.key_type is device_key.key_type
     assert new_device_key.key == expected_new_key_name
 
     new_responses = new_device.questionnaire_responses[questionnaire_id][0].responses
@@ -395,7 +395,7 @@ def test_replace_msg_handling_system_nhs_id_code(nhs_mhs: NhsMhs):
         ("foo", old_mhs_key.nhs_mhs_party_key, old_mhs_key.nhs_mhs_svc_ia)
     )
     assert expected_new_key_name == new_key_name
-    assert new_device_key.type is device_key.type
+    assert new_device_key.key_type is device_key.key_type
     assert new_device_key.key == expected_new_key_name
 
 
@@ -432,7 +432,7 @@ def test_replace_msg_handling_system_nhs_mhs_party_key(nhs_mhs: NhsMhs):
         (old_mhs_key.nhs_id_code, "foo-0", old_mhs_key.nhs_mhs_svc_ia)
     )
     assert expected_new_key_name == new_key_name
-    assert new_device_key.type is device_key.type
+    assert new_device_key.key_type is device_key.key_type
     assert new_device_key.key == expected_new_key_name
 
 
@@ -469,5 +469,5 @@ def test_replace_msg_handling_system_nhs_mhs_svc_ia(nhs_mhs: NhsMhs):
         (old_mhs_key.nhs_id_code, old_mhs_key.nhs_mhs_party_key, "foo")
     )
     assert expected_new_key_name == new_key_name
-    assert new_device_key.type is device_key.type
+    assert new_device_key.key_type is device_key.key_type
     assert new_device_key.key == expected_new_key_name
