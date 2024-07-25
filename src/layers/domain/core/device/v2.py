@@ -38,7 +38,7 @@ class QuestionNotFoundError(Exception):
 class DeviceCreatedEvent(Event):
     id: str
     name: str
-    type: "DeviceType"
+    device_type: "DeviceType"
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
@@ -54,7 +54,7 @@ class DeviceCreatedEvent(Event):
 class DeviceUpdatedEvent(Event):
     id: str
     name: str
-    type: "DeviceType"
+    device_type: "DeviceType"
     product_team_id: UUID
     ods_code: str
     status: "DeviceStatus"
@@ -182,7 +182,7 @@ class Device(AggregateRoot):
 
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
-    type: DeviceType = Field(immutable=True)
+    device_type: DeviceType = Field(immutable=True)
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
