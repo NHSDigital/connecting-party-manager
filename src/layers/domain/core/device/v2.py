@@ -1,6 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import StrEnum, auto
 from functools import wraps
 from typing import Callable, Optional, ParamSpec, TypeVar
@@ -12,8 +12,8 @@ from domain.core.base import BaseModel
 from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
-from domain.core.questionnaire import Questionnaire as _Questionnaire
-from domain.core.questionnaire import QuestionnaireResponse as _QuestionnaireResponse
+from domain.core.questionnaire.v2 import QuestionnaireResponse
+from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field
 
@@ -84,23 +84,6 @@ class DeviceKeyDeletedEvent(Event):
 class DeviceTagAddedEvent(Event):
     id: str
     tag: str
-
-
-def _now():
-    return datetime.now(timezone.utc)
-
-
-class QuestionnaireResponse(_QuestionnaireResponse):
-    """Placeholder for QuestionnaireResponse v2"""
-
-    created_on: datetime = Field(default_factory=_now)
-
-
-class Questionnaire(_Questionnaire):
-    """Placeholder for Questionnaire v2"""
-
-    def respond(self, responses: list[dict[str, list]]):
-        return QuestionnaireResponse(questionnaire=self, responses=responses)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -186,7 +169,7 @@ class Device(AggregateRoot):
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
-    created_on: datetime = Field(default_factory=_now, immutable=True)
+    created_on: datetime = Field(default_factory=now, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
     keys: list[DeviceKey] = Field(default_factory=list)
@@ -198,13 +181,13 @@ class Device(AggregateRoot):
     @event
     def update(self, **kwargs) -> DeviceUpdatedEvent:
         if "updated_on" not in kwargs:
-            kwargs["updated_on"] = _now()
+            kwargs["updated_on"] = now()
         device_data = self._update(data=kwargs)
         return DeviceUpdatedEvent(**device_data)
 
     @event
     def delete(self) -> DeviceUpdatedEvent:
-        deletion_datetime = _now()
+        deletion_datetime = now()
         return self.update(
             status=DeviceStatus.INACTIVE,
             updated_on=deletion_datetime,

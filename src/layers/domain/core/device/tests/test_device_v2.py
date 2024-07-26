@@ -10,7 +10,6 @@ from domain.core.device.v2 import (
     DeviceType,
     DeviceUpdatedEvent,
     DuplicateQuestionnaireResponse,
-    Questionnaire,
     QuestionnaireNotFoundError,
     QuestionnaireResponse,
     QuestionnaireResponseAddedEvent,
@@ -19,6 +18,7 @@ from domain.core.device.v2 import (
 )
 from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
 from domain.core.error import NotFoundError
+from domain.core.questionnaire.v2 import Questionnaire
 
 
 @pytest.fixture
