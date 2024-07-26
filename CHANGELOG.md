@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-07-26
+- [PI-444] Domain v2
+
 ## 2024-07-23
 - [PI-362] SPIKE - Write load test code
 
