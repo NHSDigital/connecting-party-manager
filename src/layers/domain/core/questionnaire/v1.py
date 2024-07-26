@@ -5,12 +5,11 @@ from typing import Self
 
 import orjson
 from attr import dataclass, field
+from domain.core.base import BaseModel
+from domain.core.error import DuplicateError, InvalidResponseError
+from domain.core.event import Event
+from domain.core.validation import ENTITY_NAME_REGEX
 from pydantic import Field, validator
-
-from .base import BaseModel
-from .error import DuplicateError, InvalidResponseError
-from .event import Event
-from .validation import ENTITY_NAME_REGEX
 
 
 class CaseInsensitiveString(str):
