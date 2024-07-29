@@ -17,7 +17,7 @@ from domain.core.device.v2 import (
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
-from domain.core.error import NotFoundError
+from domain.core.error import DuplicateError, NotFoundError
 from domain.core.questionnaire.v2 import Questionnaire
 
 
@@ -184,14 +184,15 @@ def test_device_add_tag(device_v2: Device):
     event = device_v2.add_tag(foo="first", bar="second")
     assert isinstance(event, DeviceTagAddedEvent)
     assert [tag.value for tag in device_v2.tags] == [
-        "<<foo##first>>##<<bar##second>>",
+        "<<bar##second>>##<<foo##first>>",
     ]
 
     device_v2.add_tag(foo="first", bar="second", baz="third")
-    device_v2.add_tag(bar="second", foo="first")
+
+    with pytest.raises(DuplicateError):
+        device_v2.add_tag(bar="second", foo="first")
 
     assert [tag.value for tag in device_v2.tags] == [
-        "<<foo##first>>##<<bar##second>>",
-        "<<foo##first>>##<<bar##second>>##<<baz##third>>",
         "<<bar##second>>##<<foo##first>>",
+        "<<bar##second>>##<<baz##third>>##<<foo##first>>",
     ]

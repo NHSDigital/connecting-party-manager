@@ -15,7 +15,12 @@ from domain.core.event import Event, EventDeserializer
 from domain.core.questionnaire.v2 import QuestionnaireResponse
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
-from pydantic import Field
+from pydantic import Field, validator
+
+TAG_SEPARATOR = "##"
+TAG_COMPONENT_SEPARATOR = "##"
+TAG_COMPONENT_CONTAINER_LEFT = "<<"
+TAG_COMPONENT_CONTAINER_RIGHT = ">>"
 
 
 class QuestionnaireNotFoundError(Exception):
@@ -131,9 +136,16 @@ class DeviceStatus(StrEnum):
 class DeviceTag(BaseModel):
     components: list[tuple[str, str]]
 
+    @validator("components")
+    def sort_components(cls, components: list[tuple[str, str]]):
+        return list(sorted(components, key=lambda elements: elements[0]))
+
     @property
     def value(self):
-        return "##".join(f"<<{key}##{value}>>" for key, value in self.components)
+        return TAG_SEPARATOR.join(
+            f"{TAG_COMPONENT_CONTAINER_LEFT}{key}{TAG_COMPONENT_SEPARATOR}{value}{TAG_COMPONENT_CONTAINER_RIGHT}"
+            for key, value in self.components
+        )
 
 
 RT = TypeVar("RT")
@@ -216,8 +228,12 @@ class Device(AggregateRoot):
 
     @event
     def add_tag(self, **kwargs):
-        tag_components = list(map(tuple, kwargs.items()))
-        device_tag = DeviceTag(components=tag_components)
+        components = list(map(tuple, kwargs.items()))
+        device_tag = DeviceTag(components=components)
+        if device_tag in self.tags:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
+            )
         self.tags.append(device_tag)
         return DeviceTagAddedEvent(id=self.id, tag=device_tag.value)
 
