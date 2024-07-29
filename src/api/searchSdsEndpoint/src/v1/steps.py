@@ -1,7 +1,7 @@
 from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.api.query import SearchQueryParams
+from domain.api.query import SearchSDSEndpointQueryParams
 from domain.core.device import Device
 
 # from domain.fhir_translation.device import create_fhir_searchset_bundle
@@ -12,23 +12,22 @@ from domain.response.validation_errors import InboundValidationError
 from event.step_chain import StepChain
 from pydantic import ValidationError
 
-from ..data.response_v2 import devices, endpoints
+from ..data.response_v2 import endpoints
 
 
 def get_mocked_results(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     query_params = event.query_string_parameters
-    search_query_params = SearchQueryParams(**query_params)
+    search_query_params = SearchSDSEndpointQueryParams(**query_params)
     params = search_query_params.get_non_null_params()
-    device_type = params["device_type"]
-    return {"product": devices, "endpoint": endpoints}.get(device_type.lower(), {})
+    return endpoints.get(device_type.lower(), {})
 
 
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     query_params = event.query_string_parameters
     try:
-        search_query_params = SearchQueryParams(**query_params)
+        search_query_params = SearchSDSEndpointQueryParams(**query_params)
         params = search_query_params.get_non_null_params()
         return {
             "query_string": params,
@@ -41,7 +40,7 @@ def parse_event_query(data, cache):
         )
 
 
-def query_devices(data, cache) -> List[Device]:
+def query_endpoints(data, cache) -> List[Device]:
     event_data = data[parse_event_query]
     query_params = event_data.get("query_string")
     device_repo = DeviceRepository
@@ -97,7 +96,7 @@ def query_devices(data, cache) -> List[Device]:
 
 steps = [
     parse_event_query,
-    query_devices,
+    query_endpoints,
     # read_devices_by_type,
     # read_devices_by_id,
     # devices_to_fhir_bundle,

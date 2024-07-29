@@ -169,7 +169,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /SearchSdsDevice:
+  /searchSdsDevice:
     get:
       operationId: searchsdsdevice
       parameters:
@@ -216,7 +216,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /SearchSdsEndpoint:
+  /searchSdsEndpoint:
     get:
       operationId: searchsdsendpoint
       parameters:
