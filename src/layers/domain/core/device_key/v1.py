@@ -1,11 +1,10 @@
 import re
 from enum import StrEnum, auto
 
+from domain.core.base import BaseModel
 from domain.core.error import InvalidDeviceKeyError
+from domain.core.validation import CpmId, SdsId
 from pydantic import validator
-
-from .base import BaseModel
-from .validation import CpmId, SdsId
 
 
 class DeviceKeyType(StrEnum):

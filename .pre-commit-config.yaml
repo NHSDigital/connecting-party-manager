@@ -37,7 +37,7 @@ repos:
           - flake8-print
         args:
           - "--select=T201,F401,F402,F403"
-          - "--exclude=.git,__pycache__,dist,.venv,scripts,scripts/changelog/changelog_precommit.py"
+          - "--exclude=.git,__pycache__,dist,.venv,scripts,scripts/changelog/changelog_precommit.py,src/layers/domain/core/device/__init__.py,src/layers/domain/core/device_key/__init__.py"
 
   # Flake8 for asserts (error code S101)
   - repo: https://github.com/pycqa/flake8
