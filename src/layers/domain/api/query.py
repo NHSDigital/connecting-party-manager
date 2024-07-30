@@ -31,13 +31,16 @@ class SearchSDSEndpointQueryParams(BaseModel, extra=Extra.forbid):
 
     @root_validator
     def check_filters(cls, values):
-        non_empty_count = sum(
-            1 for key, value in values if key != "use_mock" and value and value != 0
-        )
-        if non_empty_count < 2:
+        count = 2
+        if "use_mock" in values:
+            count = 3
+
+        non_empty_count = sum(1 for value in values if value and value != 0)
+        if non_empty_count < count:
             raise ValidationError(
                 "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
             )
+        return values
 
     def get_non_null_params(self):
         return self.dict(exclude_none=True)

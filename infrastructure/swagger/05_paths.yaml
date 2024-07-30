@@ -172,6 +172,7 @@ paths:
   /searchSdsDevice:
     get:
       operationId: searchsdsdevice
+      summary: searchSdsDevice endpoint for APIGEE integration
       parameters:
         - name: nhs_as_client
           in: query
@@ -207,6 +208,12 @@ paths:
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -219,6 +226,7 @@ paths:
   /searchSdsEndpoint:
     get:
       operationId: searchsdsendpoint
+      summary: searchSdsEndpoint endpoint for APIGEE integration
       parameters:
         - name: nhs_id_code
           in: query
@@ -248,6 +256,12 @@ paths:
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:

@@ -11,5 +11,3 @@
 
 Organization: [create, read]
 Device: [create, read, search]
-searchSdsDevice: [search]
-searchSdsEndpoint: [search]
