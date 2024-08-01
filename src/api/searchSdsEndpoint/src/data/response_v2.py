@@ -51,7 +51,11 @@ devices = [
                         },
                         {"nhs_mhs_fqdn": ["systmonespine1.tpp.nme.ncrs.nhs.uk"]},
                         {"nhs_mhs_in": ["fhir:rest:read:location-1"]},
-                        {"nhs_mhs_ip_address": ["20.146.248.152"]},
+                        {
+                            "nhs_mhs_ip_address": [
+                                "20.146.248.152"  # pragma: allowlist secret
+                            ]
+                        },
                         {"nhs_mhs_is_authenticated": ["none"]},
                         {"nhs_mhs_manufacturer_org": ["YGA"]},
                         {"nhs_mhs_party_key": ["D81631-827817"]},
@@ -134,7 +138,11 @@ endpoints = [
                         },
                         {"nhs_mhs_fqdn": ["systmonespine1.tpp.nme.ncrs.nhs.uk"]},
                         {"nhs_mhs_in": ["fhir:rest:read:location-1"]},
-                        {"nhs_mhs_ip_address": ["20.146.248.152"]},
+                        {
+                            "nhs_mhs_ip_address": [
+                                "20.146.248.152"  # pragma: allowlist secret
+                            ]
+                        },
                         {"nhs_mhs_is_authenticated": ["none"]},
                         {"nhs_mhs_manufacturer_org": ["YGA"]},
                         {"nhs_mhs_party_key": ["D81631-827817"]},
