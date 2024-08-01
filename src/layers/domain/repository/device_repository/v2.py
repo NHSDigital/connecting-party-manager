@@ -27,10 +27,13 @@ class DeviceRepository(Repository[Device]):
                 if tags["nhs_as_client"] == "RTX":
                     return device_RTX_result
         else:
-            if tags["nhs_id_code"] != "5NR" and tags["nhs_id_code"] != "RTX":
-                return no_endpoint_results
+            if "nhs_id_code" in tags:
+                if tags["nhs_id_code"] != "5NR" and tags["nhs_id_code"] != "RTX":
+                    return no_endpoint_results
+                else:
+                    if tags["nhs_id_code"] == "5NR":
+                        return endpoint_5NR_result
+                    if tags["nhs_id_code"] == "RTX":
+                        return endpoint_RTX_result
             else:
-                if tags["nhs_id_code"] == "5NR":
-                    return endpoint_5NR_result
-                if tags["nhs_id_code"] == "RTX":
-                    return endpoint_RTX_result
+                return endpoint_RTX_result
