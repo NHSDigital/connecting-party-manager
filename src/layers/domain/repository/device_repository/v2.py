@@ -36,4 +36,4 @@ class DeviceRepository(Repository[Device]):
                     if tags["nhs_id_code"] == "RTX":
                         return endpoint_RTX_result
             else:
-                return endpoint_RTX_result
+                return no_endpoint_results
