@@ -1,0 +1,20 @@
+---
+components:
+  parameters:
+    HeaderVersion:
+      in: header
+      name: version
+      schema:
+        $ref: "#/components/schemas/HeaderVersion"
+
+    HeaderRequestId:
+      in: header
+      name: x-request-id
+      schema:
+        $ref: "#/components/schemas/HeaderRequestId"
+
+    HeaderCorrelationId:
+      in: header
+      name: x-correlation-id
+      schema:
+        $ref: "#/components/schemas/HeaderCorrelationId"

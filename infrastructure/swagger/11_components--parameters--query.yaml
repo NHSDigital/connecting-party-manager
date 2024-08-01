@@ -1,0 +1,16 @@
+---
+components:
+  parameters:
+    QueryOffset:
+      in: query
+      name: offset
+      schema:
+        type: integer
+      description: The number of items to skip before starting to collect the result set
+
+    QueryLimit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+      description: The numbers of items to return

@@ -1,4 +1,3 @@
----
 x-definitions:
   ApiGatewayIntegration:
     type: object
@@ -11,160 +10,161 @@ x-definitions:
       passthroughBehavior: when_no_match
       contentHandling: CONVERT_TO_TEXT
 
-  RequestHeaders:
-    - &RequestHeaderVersion
-      in: header
-      name: version
-      schema:
-        $ref: "#/components/schemas/Version"
-    - &RequestHeaderRequestId
-      in: header
-      name: x-request-id
-      schema:
-        $ref: "#/components/schemas/RequestId"
-    - &RequestHeaderCorrelationId
-      in: header
-      name: x-correlation-id
-      schema:
-        $ref: "#/components/schemas/CorrelationId"
-    - headers: &RequestHeaders
-        parameters:
-          - *RequestHeaderVersion
-          - *RequestHeaderRequestId
-          - *RequestHeaderCorrelationId
-
-  SuccessResponses:
-    "201": &Response201
-      content:
-        application/fhir+json:
-          schema:
-            $ref: "#/components/schemas/OperationOutcome"
-
-  ErrorResponses:
-    "4XX": &Response4XX
-      description: "Client Error"
-      content:
-        application/fhir+json:
-          schema:
-            $ref: "#/components/schemas/OperationOutcome"
-
 paths:
   /_status:
     get:
-      summary: _status endpoint for APIGEE integration
       operationId: status
+      summary: _status endpoint for APIGEE integration
       responses:
         "200":
           $ref: "#/components/responses/StatusOK"
         "4XX":
-          <<: *Response4XX
-      <<: *RequestHeaders
+          $ref: "#/components/responses/ClientError"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
+
+  /product-teams:
+    post:
+      operationId: createProductTeam
+      summary: Create a product team matching the given payload (excluding 'id')
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductTeam"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "201":
+          $ref: "#/components/responses/ProductTeam"
+        "4XX":
+          $ref: "#/components/responses/ClientError"
       security:
         - ${authoriser_name}: []
         - app-level0: []
-
-  /Organization:
-    post:
-      responses:
-        "201":
-          <<: *Response201
-        "4XX":
-          <<: *Response4XX
-      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createProductTeam}
+
+  /product-teams/{id}:
+    get:
+      operationId: getProductTeam
+      summary: Retrieve a product team by 'id'
+      parameters:
+        - $ref: "#/components/parameters/PathId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductTeam"
+        "4XX":
+          $ref: "#/components/responses/ClientError"
       security:
         - ${authoriser_name}: []
         - app-level0: []
-
-  /Organization/{id}:
-    get:
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
-      responses:
-        "4XX":
-          <<: *Response4XX
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}
+
+  /devices:
+    post:
+      operationId: createDevice
+      summary: Create a device matching the given payload (excluding 'id')
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Device"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "201":
+          $ref: "#/components/responses/Device"
+        "4XX":
+          $ref: "#/components/responses/ClientError"
       security:
         - ${authoriser_name}: []
         - app-level0: []
-
-  /Device:
-    post:
-      responses:
-        "201":
-          <<: *Response201
-        "4XX":
-          <<: *Response4XX
-      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createDevice}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
-    get:
-      parameters:
-        - name: device_type
-          in: query
-          required: true
-          description: "Type of device (product or endpoint)"
-          schema:
-            type: string
-            enum:
-              - product
-              - endpoint
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
-      responses:
-        "4XX":
-          <<: *Response4XX
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_searchDevice}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
 
-  /Device/{id}:
+  /devices/{id}:
     get:
+      operationId: getDevice
+      summary: Retrieve a device by 'id' or any of its keys
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/PathId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
+        "200":
+          $ref: "#/components/responses/Device"
         "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/ClientError"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readDevice}
+
+  /devices/search/sds-endpoints:
+    get:
+      operationId: searchSdsEndpoint
+      summary: Search for 'SDS Endpoint' devices by query parameters
+      parameters:
+        - $ref: "#/components/parameters/QueryOffset"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeviceArray"
+        "4XX":
+          $ref: "#/components/responses/ClientError"
       security:
         - ${authoriser_name}: []
         - app-level0: []
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchSdsEndpoint}
+
+  /devices/search/sds-devices:
+    get:
+      operationId: searchSdsDevice
+      summary: Search for 'SDS Device' devices by query parameters
+      parameters:
+        - $ref: "#/components/parameters/QueryOffset"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeviceArray"
+        "4XX":
+          $ref: "#/components/responses/ClientError"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchSdsDevices}

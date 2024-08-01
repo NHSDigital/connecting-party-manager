@@ -1,0 +1,15 @@
+---
+components:
+  schemas:
+    ClientError:
+      type: object
+      properties:
+        status_code:
+          description: HTTP status code of this response
+          type: integer
+        coding:
+          description: Connecting Party Manager coding for this error
+          type: string
+        message:
+          description: The error message
+          type: string

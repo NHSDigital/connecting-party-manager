@@ -1,0 +1,53 @@
+x-definitions:
+  ResponseHeaders:
+    type: object
+    headers: &ResponseHeaders
+      X-Correlation-Id:
+        schema:
+          $ref: "#/components/schemas/HeaderCorrelationId"
+      X-Request-Id:
+        schema:
+          $ref: "#/components/schemas/HeaderRequestId"
+
+components:
+  responses:
+    StatusOK:
+      description: API is operational
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StatusOK"
+      headers:
+        merge <<: *ResponseHeaders
+    ProductTeam:
+      description: A product team that has been created or requested
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductTeam"
+      headers:
+        <<: *ResponseHeaders
+    Device:
+      description: A device that has been created or requested
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceReadOnly"
+      headers:
+        <<: *ResponseHeaders
+    DeviceArray:
+      description: A device that has been created or requested
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DeviceReadOnly"
+      headers:
+        <<: *ResponseHeaders
+    ClientError:
+      description: "Client Error"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/ClientError"

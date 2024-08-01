@@ -1,15 +1,14 @@
----
 components:
   schemas:
-    Version:
+    HeaderVersion:
       type: string
       pattern: "^[1-9][0-9]+$"
 
-    RequestId:
+    HeaderRequestId:
       type: string
       pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
       example: 60E0B220-8136-4CA5-AE46-1D97EF59D068
 
-    CorrelationId:
+    HeaderCorrelationId:
       type: string
       example: 11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA

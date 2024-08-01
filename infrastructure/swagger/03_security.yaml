@@ -1,3 +1,2 @@
----
 security:
   - ${authoriser_name}: []

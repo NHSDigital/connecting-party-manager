@@ -3,12 +3,10 @@ set -e
 PATH_TO_SWAGGER_INFRA=${PWD}/infrastructure/swagger
 PATH_TO_SWAGGER_DIST=${PATH_TO_SWAGGER_INFRA}/dist
 PATH_TO_SWAGGER_BUILD=${PATH_TO_SWAGGER_DIST}/build
-PATH_TO_SWAGGER_FHIR_BASE=${PATH_TO_SWAGGER_DIST}/fhir-base
 PATH_TO_SWAGGER_AWS=${PATH_TO_SWAGGER_DIST}/aws
 PATH_TO_SWAGGER_PUBLIC=${PATH_TO_SWAGGER_DIST}/public
 PATH_TO_SWAGGER_APIGEE=${PATH_TO_SWAGGER_DIST}/apigee
 
-_00_FHIR_MERGE_FILE=${PATH_TO_SWAGGER_BUILD}/_00_fhir_merge.yaml
 _01_COMPONENT_MERGE_FILE=${PATH_TO_SWAGGER_BUILD}/_01_component_merge.yaml
 _02_CLEAN_FILE=${PATH_TO_SWAGGER_BUILD}/_02_clean.yaml
 
@@ -26,18 +24,13 @@ function validate_yaml {
 
 function merge_base() {
     mkdir -p ${PATH_TO_SWAGGER_BUILD}
-    _00_fhir_merge && _01_component_merge && _02_clean
+    _01_component_merge && _02_clean
 }
 
-function _00_fhir_merge(){
-    yq eval-all '. as $item ireduce ({}; . * $item)' --output-format=yaml ${PATH_TO_SWAGGER_FHIR_BASE}/*json > ${_00_FHIR_MERGE_FILE}
-    ### GET LIST OF ALL PARAMS STARTING WITH UNDERSCORE AND THEN REMOVE REFS TO THEM
-    validate_yaml ${_00_FHIR_MERGE_FILE}
-}
 
 function _01_component_merge(){
     swagger_files=$(find ${PATH_TO_SWAGGER_INFRA}/*yaml | sort -g)
-    yq eval-all '. as $item ireduce ({}; . * $item)' ${PATH_TO_SWAGGER_INFRA}/00_base.yaml ${_00_FHIR_MERGE_FILE} ${swagger_files} > ${_01_COMPONENT_MERGE_FILE}
+    yq eval-all '. as $item ireduce ({}; . * $item)' ${PATH_TO_SWAGGER_INFRA}/00_base.yaml ${swagger_files} > ${_01_COMPONENT_MERGE_FILE}
     validate_yaml ${_01_COMPONENT_MERGE_FILE}
 }
 

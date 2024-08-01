@@ -1,1 +1,149 @@
----
+components:
+  schemas:
+    StatusOK:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+            - OK
+          example: OK
+
+    ProductTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: My Connecting Service
+        ods_code:
+          type: string
+          example: AAA
+
+    Device:
+      type: object
+      properties:
+        name:
+          type: string
+          example: My Connecting Device
+        device_type:
+          $ref: "#/components/schemas/DeviceType"
+        product_team_id:
+          type: string
+          format: uuid
+
+    DeviceReadOnly:
+      allOf:
+        - $ref: "#/components/schemas/Device"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/Status"
+            ods_code:
+              type: string
+              example: AAA
+            created_on:
+              type: string
+              format: date-time
+              example: "2014-01-01:01"
+            updated_on:
+              type: string
+              format: date-time
+              example: "2014-01-01:01"
+            deleted_on:
+              type: string
+              format: date-time
+              example: "2014-01-01:01"
+            keys:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceKey"
+            tags:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeviceTag"
+            questionnaire_responses:
+              type: object
+              additionalProperties:
+                example:
+                  {
+                    "MyQuestionnaire/1":
+                      [
+                        {
+                          "questionnaire_id": "MyQuestionnaire/1",
+                          "status": "active",
+                          "answers": [{ "My Question": ["My Answer"] }],
+                          "created_on": "2014-01-01:01",
+                        },
+                      ],
+                  }
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestionnaireResponse"
+
+    DeviceKey:
+      type: object
+      properties:
+        key_type:
+          type: string
+        key_value:
+          type: string
+      example: { "key_type": "asid", "key_value": "123456" }
+
+    DeviceTag:
+      type: object
+      properties:
+        components:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+            minItems: 2
+            maxItems: 2
+          example: [["ods_code", "AAA"]]
+
+    DeviceType:
+      type: string
+      enum:
+        - product
+        - endpoint
+      example: product
+
+    Status:
+      type: string
+      enum:
+        - active
+        - inactive
+      example: active
+
+    QuestionnaireResponse:
+      type: object
+      example:
+        {
+          "questionnaire_id": "MyQuestionnaire/1",
+          "status": "active",
+          "answers": [{ "My Question": ["My Answer"] }],
+          "created_on": "2014-01-01:01",
+        }
+      properties:
+        questionnaire_id:
+          type: string
+          example: MyQuestionnaire
+        status:
+          $ref: "#/components/schemas/Status"
+        answers:
+          type: array
+          items:
+            type: string
+            example: "My Answer"
+          minItems: 1
+        created_on:
+          type: string
+          format: date-time
+          example: "2014-01-01:01"

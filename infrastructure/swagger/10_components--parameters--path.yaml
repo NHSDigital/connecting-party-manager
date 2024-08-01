@@ -1,1 +1,10 @@
 ---
+components:
+  parameters:
+    PathId:
+      name: id
+      in: path
+      required: true
+      description: logical identifier
+      schema:
+        type: string

@@ -1,5 +1,3 @@
----
-openapi: 3.0.3
 x-nhsd-apim:
   temporary: ${ terraform_output("workspace_type.value") != "PERSISTENT" }
   access:
