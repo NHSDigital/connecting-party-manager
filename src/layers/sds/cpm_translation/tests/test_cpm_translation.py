@@ -5,9 +5,9 @@ from typing import Generator
 
 import pytest
 from domain.core.device import DeviceStatus, DeviceType, DeviceUpdatedEvent
-from domain.core.load_questionnaire import render_questionnaire
 from domain.core.questionnaire import Questionnaire
-from domain.core.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.load_questionnaire import render_questionnaire
+from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from domain.core.root import Root
 from domain.core.validation import ODS_CODE_REGEX, SdsId
 from domain.repository.device_repository import DeviceRepository

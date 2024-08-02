@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from domain.core import questionnaire_validation_custom_rules
+from domain.core.questionnaire import custom_rules
 from event.json import json_load
 
-from .questionnaire import ALLOWED_QUESTION_TYPES, Questionnaire
+from . import ALLOWED_QUESTION_TYPES, Questionnaire
 
 PATH_TO_HERE = Path(__file__).parent
 
@@ -23,10 +23,7 @@ def convert_answer_type_names_to_python_types(answer_types):
 
 
 def convert_rule_names_to_rule_functions(validation_rules):
-    return [
-        getattr(questionnaire_validation_custom_rules, rule)
-        for rule in validation_rules
-    ]
+    return [getattr(custom_rules, rule) for rule in validation_rules]
 
 
 def render_question(question):

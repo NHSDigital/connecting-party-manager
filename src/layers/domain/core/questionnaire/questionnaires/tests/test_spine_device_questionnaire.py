@@ -1,7 +1,7 @@
 import pytest
-from domain.core.load_questionnaire import render_questionnaire
 from domain.core.questionnaire import Questionnaire
-from domain.core.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.load_questionnaire import render_questionnaire
+from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from event.json import json_load
 from hypothesis import assume, given, settings
 from sds.cpm_translation.tests.test_cpm_translation import (

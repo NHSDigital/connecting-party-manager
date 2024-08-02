@@ -3,8 +3,11 @@ from itertools import islice
 from typing import TYPE_CHECKING, Generator, Generic, TypeVar
 
 from domain.core.aggregate_root import AggregateRoot
-
-from .transaction import Transaction, TransactItem, handle_client_errors
+from domain.repository.transaction import (
+    Transaction,
+    TransactItem,
+    handle_client_errors,
+)
 
 if TYPE_CHECKING:
     from mypy_boto3_dynamodb import DynamoDBClient

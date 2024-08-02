@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 from attr import dataclass, field
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.device_key import DeviceKey, DeviceKeyType
+from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
 from domain.core.questionnaire import (
@@ -99,9 +100,7 @@ class DeviceType(StrEnum):
     # API = auto()
 
 
-class DeviceStatus(StrEnum):
-    ACTIVE = auto()
-    INACTIVE = auto()  # "soft" delete
+DeviceStatus = Status
 
 
 def _get_unique_answers(

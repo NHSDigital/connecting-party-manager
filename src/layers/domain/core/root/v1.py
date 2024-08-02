@@ -1,5 +1,5 @@
-from .ods_organisation import OdsOrganisation
-from .questionnaire import Questionnaire
+from domain.core.ods_organisation import OdsOrganisation
+from domain.core.questionnaire import Questionnaire
 
 
 class Root:
