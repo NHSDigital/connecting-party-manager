@@ -1,5 +1,4 @@
 from domain.core.ods_organisation import OdsOrganisation
-from domain.core.questionnaire import Questionnaire
 
 
 class Root:
@@ -12,7 +11,3 @@ class Root:
     @staticmethod
     def create_ods_organisation(ods_code: str) -> OdsOrganisation:
         return OdsOrganisation(ods_code=ods_code)
-
-    @staticmethod
-    def create_questionnaire(id: str, name: str) -> Questionnaire:
-        return Questionnaire(id=id, name=name)
