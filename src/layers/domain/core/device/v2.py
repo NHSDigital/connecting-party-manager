@@ -99,8 +99,19 @@ class DeviceKeyDeletedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class DeviceTagAddedEvent(Event):
+    new_tag: "DeviceTag"
     id: str
-    tag: str
+    name: str
+    device_type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str
+    deleted_on: Optional[str] = None
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -153,6 +164,9 @@ class DeviceTag(BaseModel):
             f"{TAG_COMPONENT_CONTAINER_LEFT}{key}{TAG_COMPONENT_SEPARATOR}{value}{TAG_COMPONENT_CONTAINER_RIGHT}"
             for key, value in self.components
         )
+
+    def __hash__(self):
+        return hash(tuple(self.components))
 
 
 RT = TypeVar("RT")
@@ -235,7 +249,7 @@ class Device(AggregateRoot):
             deleted_key=device_key,
             id=self.id,
             keys=[k.dict() for k in self.keys],
-            tags=self.tags,
+            tags=[t.dict() for t in self.tags],
         )
 
     @event
@@ -247,7 +261,7 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
             )
         self.tags.append(device_tag)
-        return DeviceTagAddedEvent(id=self.id, tag=device_tag.value)
+        return DeviceTagAddedEvent(new_tag=device_tag, **self.dict())
 
     @event
     def add_questionnaire_response(

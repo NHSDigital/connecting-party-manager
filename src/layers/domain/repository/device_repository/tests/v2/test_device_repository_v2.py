@@ -1,5 +1,6 @@
 import pytest
 from domain.core.device.v2 import Device as DeviceV2
+from domain.core.device.v2 import DeviceTag
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
 from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
@@ -46,12 +47,17 @@ def test__device_primary_keys():
         device_keys=[
             DeviceKeyV2(key_type=DeviceKeyType.PRODUCT_ID, key_value=DEVICE_KEY)
         ],
+        device_tags=[DeviceTag(components=[("foo", "bar")])],
     )
     assert primary_keys == [
         {"pk": {"S": "D#123"}, "sk": {"S": "D#123"}},
         {
             "pk": {"S": f"D#product_id#P.WWW-XXX"},
             "sk": {"S": f"D#product_id#P.WWW-XXX"},
+        },
+        {
+            "pk": {"S": f"DT#<<foo##bar>>"},
+            "sk": {"S": f"D#123"},
         },
     ]
 

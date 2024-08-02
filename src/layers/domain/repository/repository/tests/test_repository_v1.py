@@ -11,6 +11,7 @@ from .model import (
     MyModel,
     MyOtherEventAdd,
     MyRepositoryMixin,
+    _NotFoundError,
 )
 
 
