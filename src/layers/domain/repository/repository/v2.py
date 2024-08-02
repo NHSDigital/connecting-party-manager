@@ -59,7 +59,6 @@ class Repository(Generic[ModelType]):
             transact_items, batch_size
         ):
             transaction = Transaction(TransactItems=transact_item_chunk)
-
             with handle_client_errors(commands=transact_item_chunk):
                 _response = self.client.transact_write_items(
                     **transaction.dict(exclude_none=True)

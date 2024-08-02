@@ -1,7 +1,10 @@
 from datetime import datetime
+from typing import Optional
 
+from attr import dataclass
 from domain.core.enum import Status
 from domain.core.error import InvalidResponseError
+from domain.core.event import Event
 from domain.core.timestamp import now
 from pydantic import BaseModel, Field, validator
 
@@ -10,6 +13,14 @@ from .v1 import (
     validate_mandatory_questions_answered,
     validate_response_against_question,
 )
+
+
+@dataclass(kw_only=True, slots=True)
+class QuestionnaireResponseUpdatedEvent(Event):
+    entity_id: str
+    entity_keys: list
+    entity_tags: list
+    questionnaire_responses: list["QuestionnaireResponse"]
 
 
 class Questionnaire(QuestionnaireV1):
@@ -29,7 +40,7 @@ class QuestionnaireResponse(BaseModel):
     with the matching Question.name
     """
 
-    questionnaire: Questionnaire
+    questionnaire: Optional[Questionnaire] = Field(exclude=True, default=None)
     questionnaire_id: str
     answers: list[dict[str, list]]
     created_on: datetime = Field(default_factory=now)
@@ -40,6 +51,8 @@ class QuestionnaireResponse(BaseModel):
         answers: list[dict[str, list]], values: dict[str, Questionnaire]
     ):
         questionnaire = values.get("questionnaire")
+        if questionnaire is None:
+            return answers
         validate_mandatory_questions_answered(
             questionnaire_name=questionnaire.name,
             mandatory_questions=(
@@ -54,6 +67,8 @@ class QuestionnaireResponse(BaseModel):
     @validator("answers", each_item=True)
     def validate_responses(answer: dict[str, list], values: dict[str, Questionnaire]):
         questionnaire = values.get("questionnaire")
+        if questionnaire is None:
+            return answer
         ((question_name, answers),) = answer.items()
         if questionnaire is not None:
             questionnaire_name = questionnaire.name

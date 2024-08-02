@@ -24,7 +24,7 @@ class TableKeyAction:
         )
 
 
-class TableKeys(StrEnum, TableKeyAction):
+class TableKeys(TableKeyAction, StrEnum):
     DEVICE = "D"
     DEVICE_KEY = "DK"
     DEVICE_TYPE = "DT"

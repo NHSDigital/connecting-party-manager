@@ -12,6 +12,7 @@ from domain.core.device.v2 import (
     DeviceUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey
+from domain.core.questionnaire.v2 import QuestionnaireResponseUpdatedEvent
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v2 import TableKey
 from domain.repository.marshall import marshall, marshall_value, unmarshall
@@ -70,7 +71,7 @@ def _device_primary_keys(
     return [root_primary_key] + device_key_primary_keys + device_tag_primary_keys
 
 
-def handle_update_device(
+def update_device_indexes(
     table_name: str, id: str, keys: list[DeviceKey], tags: list[DeviceTag], data: dict
 ) -> list[TransactItem]:
     primary_keys = _device_primary_keys(
@@ -89,7 +90,7 @@ def handle_update_device(
     return transact_items
 
 
-def handle_create_device(
+def create_device_index(
     table_name: str,
     pk_key_parts: tuple[str],
     device_data: dict,
@@ -109,7 +110,7 @@ def handle_create_device(
     )
 
 
-def handle_delete_device(table_name: str, key_parts: tuple[str]) -> TransactItem:
+def delete_device_index(table_name: str, key_parts: tuple[str]) -> TransactItem:
     key = TableKey.DEVICE.key(*key_parts)
     return TransactItem(
         Delete=TransactionStatement(
@@ -127,7 +128,7 @@ class DeviceRepository(Repository[Device]):
         )
 
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent) -> TransactItem:
-        return handle_create_device(
+        return create_device_index(
             table_name=self.table_name,
             pk_key_parts=(event.id,),
             device_data=asdict(event),
@@ -139,7 +140,7 @@ class DeviceRepository(Repository[Device]):
     ) -> list[TransactItem]:
         keys = {DeviceKey(**key) for key in event.keys}
         tags = {DeviceTag(**tag) for tag in event.tags}
-        return handle_update_device(
+        return update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=keys,
@@ -153,7 +154,7 @@ class DeviceRepository(Repository[Device]):
         # Create a copy of the Device indexed against the new key
         device_data = asdict(event)
         device_data.pop("new_key")
-        create_transaction = handle_create_device(
+        create_transaction = create_device_index(
             table_name=self.table_name,
             pk_key_parts=event.new_key.parts,
             device_data=device_data,
@@ -162,7 +163,7 @@ class DeviceRepository(Repository[Device]):
         device_tags = {DeviceTag(**tag) for tag in event.tags}
         device_keys = {DeviceKey(**key) for key in event.keys}
         device_keys_before_update = device_keys - {event.new_key}
-        update_transactions = handle_update_device(
+        update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys_before_update,
@@ -175,14 +176,14 @@ class DeviceRepository(Repository[Device]):
         self, event: DeviceKeyDeletedEvent
     ) -> list[TransactItem]:
         # Delete the copy of the Device indexed against the deleted key
-        delete_transaction = handle_delete_device(
+        delete_transaction = delete_device_index(
             table_name=self.table_name, key_parts=event.deleted_key.parts
         )
         # Update the value of "keys" on all other copies of this Device
         device_tags = {DeviceTag(**tag) for tag in event.tags}
         device_keys = {DeviceKey(**key) for key in event.keys}
         device_keys_before_update = device_keys - {event.deleted_key}
-        update_transactions = handle_update_device(
+        update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys_before_update,
@@ -197,7 +198,7 @@ class DeviceRepository(Repository[Device]):
         # Create a copy of the Device indexed against the new tag
         device_data = asdict(event)
         device_data.pop("new_tag")
-        create_transaction = handle_create_device(
+        create_transaction = create_device_index(
             table_name=self.table_name,
             pk_key_parts=(event.new_tag.value,),
             sk_key_parts=(event.id,),
@@ -208,7 +209,7 @@ class DeviceRepository(Repository[Device]):
         device_keys = {DeviceKey(**key) for key in event.keys}
         device_tags = {DeviceTag(**tag) for tag in event.tags}
         device_tags_before_update = device_tags - {event.new_tag}
-        update_transactions = handle_update_device(
+        update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys,
@@ -216,6 +217,19 @@ class DeviceRepository(Repository[Device]):
             data={"tags": event.tags},
         )
         return [create_transaction] + update_transactions
+
+    def handle_QuestionnaireResponseUpdatedEvent(
+        self, event: QuestionnaireResponseUpdatedEvent
+    ):
+        device_keys = {DeviceKey(**key) for key in event.entity_keys}
+        device_tags = {DeviceTag(**tag) for tag in event.entity_tags}
+        return update_device_indexes(
+            table_name=self.table_name,
+            id=event.entity_id,
+            keys=device_keys,
+            tags=device_tags,
+            data={"questionnaire_responses": event.questionnaire_responses},
+        )
 
     def read(self, *key_parts: str) -> Device:
         """

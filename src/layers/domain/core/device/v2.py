@@ -13,7 +13,10 @@ from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
-from domain.core.questionnaire.v2 import QuestionnaireResponse
+from domain.core.questionnaire.v2 import (
+    QuestionnaireResponse,
+    QuestionnaireResponseUpdatedEvent,
+)
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field, validator
@@ -112,26 +115,6 @@ class DeviceTagAddedEvent(Event):
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
-
-
-@dataclass(kw_only=True, slots=True)
-class QuestionnaireResponseAddedEvent(Event):
-    """Placeholder for QuestionnaireResponse v2"""
-
-    entity_id: str
-    questionnaire_id: str
-    created_on: str
-    responses: list[dict[str, list]]
-
-
-@dataclass(kw_only=True, slots=True)
-class QuestionnaireResponseUpdatedEvent(Event):
-    """Placeholder for QuestionnaireResponse v2"""
-
-    entity_id: str
-    questionnaire_id: str
-    created_on: str
-    responses: list[dict[str, list]]
 
 
 class DeviceType(StrEnum):
@@ -266,7 +249,7 @@ class Device(AggregateRoot):
     @event
     def add_questionnaire_response(
         self, questionnaire_response: QuestionnaireResponse
-    ) -> QuestionnaireResponseAddedEvent:
+    ) -> QuestionnaireResponseUpdatedEvent:
         questionnaire_id = questionnaire_response.questionnaire.id
         questionnaire_responses = self.questionnaire_responses[questionnaire_id]
 
@@ -281,13 +264,17 @@ class Device(AggregateRoot):
             questionnaire_response.created_on
         ] = questionnaire_response
 
-        questionnaire_response_event = QuestionnaireResponseAddedEvent(
+        return QuestionnaireResponseUpdatedEvent(
             entity_id=self.id,
-            questionnaire_id=questionnaire_id,
-            created_on=questionnaire_response.created_on.isoformat(timespec="seconds"),
-            responses=questionnaire_response.answers,
+            entity_keys=[k.dict() for k in self.keys],
+            entity_tags=[t.dict() for t in self.tags],
+            questionnaire_responses={
+                qid: {
+                    created_on.isoformat(): qr.dict() for created_on, qr in _qr.items()
+                }
+                for qid, _qr in self.questionnaire_responses.items()
+            },
         )
-        return questionnaire_response_event
 
     @event
     def update_questionnaire_response(
@@ -312,9 +299,14 @@ class Device(AggregateRoot):
 
         return QuestionnaireResponseUpdatedEvent(
             entity_id=self.id,
-            questionnaire_id=questionnaire_id,
-            created_on=created_on,
-            responses=questionnaire_response.answers,
+            entity_keys=[k.dict() for k in self.keys],
+            entity_tags=[t.dict() for t in self.tags],
+            questionnaire_responses={
+                qid: {
+                    created_on.isoformat(): qr.dict() for created_on, qr in _qr.items()
+                }
+                for qid, _qr in self.questionnaire_responses.items()
+            },
         )
 
     def state(self):
@@ -332,6 +324,5 @@ class DeviceEventDeserializer(EventDeserializer):
         DeviceKeyAddedEvent,
         DeviceKeyDeletedEvent,
         DeviceTagAddedEvent,
-        QuestionnaireResponseAddedEvent,
         QuestionnaireResponseUpdatedEvent,
     )

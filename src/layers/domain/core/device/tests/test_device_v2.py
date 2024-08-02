@@ -10,7 +10,6 @@ from domain.core.device.v2 import (
     DeviceUpdatedEvent,
     DuplicateQuestionnaireResponse,
     QuestionnaireNotFoundError,
-    QuestionnaireResponseAddedEvent,
     QuestionnaireResponseNotFoundError,
     QuestionnaireResponseUpdatedEvent,
 )
@@ -115,7 +114,7 @@ def test_device_add_questionnaire_response(
     assert device_v2.questionnaire_responses == {
         "foo/2": {created_on_1: questionnaire_response}
     }
-    assert isinstance(event, QuestionnaireResponseAddedEvent)
+    assert isinstance(event, QuestionnaireResponseUpdatedEvent)
 
     event_2 = device_v2.add_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
@@ -127,7 +126,7 @@ def test_device_add_questionnaire_response(
             created_on_2: another_good_questionnaire_response,
         }
     }
-    assert isinstance(event_2, QuestionnaireResponseAddedEvent)
+    assert isinstance(event_2, QuestionnaireResponseUpdatedEvent)
 
 
 def test_device_cannot_add_same_questionnaire_response_twice(
