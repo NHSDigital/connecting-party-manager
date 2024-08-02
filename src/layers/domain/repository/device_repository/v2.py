@@ -36,4 +36,10 @@ class DeviceRepository(Repository[Device]):
                     if tags["nhs_id_code"] == "RTX":
                         return endpoint_RTX_result
             else:
-                return no_endpoint_results
+                if "nhs_mhs_party_key" in tags:
+                    if tags["nhs_mhs_party_key"] == "D81631-827817":
+                        return endpoint_RTX_result
+                    else:
+                        return no_endpoint_results
+                else:
+                    return no_endpoint_results
