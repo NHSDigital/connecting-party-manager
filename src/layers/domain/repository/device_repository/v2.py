@@ -17,7 +17,7 @@ class DeviceRepository(Repository[Device]):
             table_name=table_name, model=Device, dynamodb_client=dynamodb_client
         )
 
-    def query_by_tag(self, tags, **kwargs):
+    def query_by_tag_mock(self, tags, **kwargs):
         if "nhs_as_client" in tags:
             if tags["nhs_as_client"] != "5NR" and tags["nhs_as_client"] != "RTX":
                 return no_device_results
