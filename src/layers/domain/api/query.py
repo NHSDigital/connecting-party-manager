@@ -17,7 +17,6 @@ class SearchSDSDeviceQueryParams(BaseModel, extra=Extra.forbid):
     nhs_as_svc_ia: str
     nhs_mhs_manufacturer_org: Optional[str] = None
     nhs_mhs_party_key: Optional[str] = None
-    use_mock: Optional[str] = None
 
     def get_non_null_params(self):
         return self.dict(exclude_none=True)
@@ -27,14 +26,10 @@ class SearchSDSEndpointQueryParams(BaseModel, extra=Extra.forbid):
     nhs_id_code: Optional[str] = None
     nhs_mhs_svc_ia: Optional[str] = None
     nhs_mhs_party_key: Optional[str] = None
-    use_mock: Optional[str] = None
 
     @root_validator
     def check_filters(cls, values):
         count = 2
-        if "use_mock" in values and values["use_mock"] is not None:
-            count = 3
-
         non_empty_count = sum(
             1 for value in values.values() if value is not None and value != 0
         )

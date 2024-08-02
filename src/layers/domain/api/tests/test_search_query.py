@@ -28,7 +28,6 @@ from pydantic import ValidationError
                 "nhs_mhs_party_key": "foo",
             }
         ),
-        ({"nhs_as_client": "foo", "nhs_as_svc_ia": "foo", "use_mock": "true"}),
     ],
 )
 def test_device_query_accepted(params):
@@ -72,7 +71,6 @@ def test_device_query_invalid(params):
         ({"nhs_id_code": "foo", "nhs_mhs_svc_ia": "foo", "nhs_mhs_party_key": "foo"}),
         ({"nhs_id_code": "foo", "nhs_mhs_party_key": "foo"}),
         ({"nhs_mhs_svc_ia": "foo", "nhs_mhs_party_key": "foo"}),
-        ({"nhs_id_code": "foo", "nhs_mhs_svc_ia": "foo", "use_mock": "true"}),
     ],
 )
 def test_endpoint_query_accepted(params):
