@@ -237,7 +237,9 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate keys: '{key_type}':'{key_value}'"
             )
         self.keys.append(device_key)
-        return DeviceKeyAddedEvent(new_key=device_key, **self.dict())
+        device_data = self.dict()
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceKeyAddedEvent(new_key=device_key, **device_data)
 
     @event
     def delete_key(self, key_type: str, key_value: str) -> DeviceKeyDeletedEvent:
@@ -263,7 +265,9 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
             )
         self.tags.append(device_tag)
-        return DeviceTagAddedEvent(new_tag=device_tag, **self.dict())
+        device_data = self.dict()
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceTagAddedEvent(new_tag=device_tag, **device_data)
 
     @event
     def add_questionnaire_response(
