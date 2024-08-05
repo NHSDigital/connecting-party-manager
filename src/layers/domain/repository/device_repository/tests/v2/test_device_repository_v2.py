@@ -130,10 +130,15 @@ def test__device_repository__update(device: DeviceV2, repository: DeviceReposito
     # Retrieve the model and treat this as the initial state
     intermediate_device = repository.read(device.id)
     intermediate_device.update(name="foo-bar")
+
     repository.write(intermediate_device)
 
     final_device = repository.read(device.id)
+
     assert final_device.name == "foo-bar"
+
+    assert final_device.created_on == device.created_on
+    assert final_device.updated_on > device.updated_on
 
 
 @pytest.mark.integration
@@ -147,6 +152,9 @@ def test__device_repository__delete(device: DeviceV2, repository: DeviceReposito
 
     final_device = repository.read(device.id)
     assert final_device.status is Status.INACTIVE
+
+    assert final_device.created_on == device.created_on
+    assert final_device.updated_on > device.updated_on
 
 
 @pytest.mark.integration
@@ -162,10 +170,13 @@ def test__device_repository__add_key(device: DeviceV2, repository: DeviceReposit
     )
     repository.write(intermediate_device)
 
+    # Read the same device multiple times, indexed by key and id
+    # to verify that they're all the same
+    root_index = [(intermediate_device.id,)]
+    non_root_indexes = [k.parts for k in intermediate_device.keys]
+
     retrieved_devices = []
-    for key_parts in [(intermediate_device.id,)] + [
-        k.parts for k in intermediate_device.keys
-    ]:
+    for key_parts in root_index + non_root_indexes:
         _device = repository.read(*key_parts).dict()
         retrieved_devices.append(_device)
 
@@ -174,3 +185,6 @@ def test__device_repository__add_key(device: DeviceV2, repository: DeviceReposit
     assert len(intermediate_device.keys) == 2
     assert len(retrieved_devices) == 3
     assert [retrieved_devices[0]] * 3 == retrieved_devices
+
+    assert retrieved_devices[0]["created_on"] == device.created_on
+    assert retrieved_devices[0]["updated_on"] > device.updated_on

@@ -114,6 +114,7 @@ def test_device_add_questionnaire_response(
         questionnaire_response=questionnaire_response
     )
     created_on_1 = questionnaire_response.created_on
+    original_updated_on = device_v2.updated_on
 
     assert device_v2.questionnaire_responses == {
         "foo/2": {created_on_1: questionnaire_response}
@@ -132,6 +133,10 @@ def test_device_add_questionnaire_response(
             created_on_2: another_good_questionnaire_response,
         }
     }
+
+    assert device_v2.updated_on == event_2.updated_on
+    assert device_v2.updated_on > original_updated_on
+
     assert isinstance(event_2, QuestionnaireResponseUpdatedEvent)
     assert event_2.updated_on is not None
     assert event_2.updated_on > event.updated_on

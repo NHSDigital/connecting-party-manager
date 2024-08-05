@@ -214,6 +214,7 @@ class Device(AggregateRoot):
 
     @event
     def update(self, **kwargs) -> DeviceUpdatedEvent:
+        kwargs[UPDATED_ON] = now()
         device_data = self._update(data=kwargs)
         return DeviceUpdatedEvent(**device_data)
 

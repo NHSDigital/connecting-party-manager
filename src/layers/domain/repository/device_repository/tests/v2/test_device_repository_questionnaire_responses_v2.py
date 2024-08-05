@@ -89,3 +89,6 @@ def test__device_repository__modify_questionnaire_response_that_has_been_persist
         {"foot": ["R"]},
         {"shoe-size": [789]},
     ]
+
+    assert device_from_db.created_on == device.created_on
+    assert device_from_db.updated_on > device.updated_on
