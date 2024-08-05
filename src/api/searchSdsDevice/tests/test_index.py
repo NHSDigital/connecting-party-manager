@@ -42,17 +42,18 @@ def test_index(params, expected_body):
         },
         clear=True,
     ):
-        from api.searchSdsDevice.index import cache, handler
+        from api.searchSdsDevice.index import cache as device_cache
+        from api.searchSdsDevice.index import handler as device_handler
 
-        cache["DYNAMODB_CLIENT"] = client
-        result = handler(
+        device_cache["DYNAMODB_CLIENT"] = client
+        result = device_handler(
             event={
                 "headers": {"version": 1},
                 "queryStringParameters": params,
                 "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-    expected = {
+    expected_result = {
         "statusCode": 200,
         "body": json.dumps(expected_body),
         "headers": {
@@ -64,7 +65,10 @@ def test_index(params, expected_body):
         },
     }
     _response_assertions(
-        result=result, expected=expected, check_body=True, check_content_length=True
+        result=result,
+        expected=expected_result,
+        check_body=True,
+        check_content_length=True,
     )
 
 
