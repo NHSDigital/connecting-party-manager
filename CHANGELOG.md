@@ -5,7 +5,7 @@
 - [PI-446] Repo v2
 - [PI-285] Questionnaire Response v2
 - [PI-464] Device tags in repo
-- [PI-392] updated_on after any Device modification
+- [PI-232] updated_on after any Device modification
 - [PI-381] pentest: clean up default vpc security groups
 
 ## 2024-07-26
