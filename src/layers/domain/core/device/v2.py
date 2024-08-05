@@ -25,6 +25,8 @@ TAG_SEPARATOR = "##"
 TAG_COMPONENT_SEPARATOR = "##"
 TAG_COMPONENT_CONTAINER_LEFT = "<<"
 TAG_COMPONENT_CONTAINER_RIGHT = ">>"
+UPDATED_ON = "updated_on"
+DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
 
 
 class QuestionnaireNotFoundError(Exception):
@@ -40,6 +42,10 @@ class DuplicateQuestionnaireResponse(Exception):
 
 
 class QuestionNotFoundError(Exception):
+    pass
+
+
+class EventUpdatedError(Exception):
     pass
 
 
@@ -68,7 +74,7 @@ class DeviceUpdatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: str
+    updated_on: str = None
     deleted_on: Optional[str] = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
@@ -85,7 +91,7 @@ class DeviceKeyAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: str
+    updated_on: str = None
     deleted_on: Optional[str] = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
@@ -98,6 +104,7 @@ class DeviceKeyDeletedEvent(Event):
     id: str
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
+    updated_on: str = None
 
 
 @dataclass(kw_only=True, slots=True)
@@ -110,7 +117,7 @@ class DeviceTagAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: str
+    updated_on: str = None
     deleted_on: Optional[str] = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
@@ -156,12 +163,23 @@ RT = TypeVar("RT")
 P = ParamSpec("P")
 
 
+def _set_updated_on(device: "Device", event: "Event"):
+    if not hasattr(event, UPDATED_ON):
+        raise EventUpdatedError(
+            f"All returned events must have attribute '{UPDATED_ON}'"
+        )
+    updated_on = getattr(event, UPDATED_ON) or now()
+    setattr(event, UPDATED_ON, updated_on)
+    device.updated_on = updated_on
+
+
 def event(fn: Callable[P, RT]) -> Callable[P, RT]:
     @wraps(fn)
     def wrapper(self: "Device", *args: P.args, **kwargs: P.kwargs) -> RT:
-        event = fn(self, *args, **kwargs)
-        self.add_event(event)
-        return event
+        _event = fn(self, *args, **kwargs)
+        self.add_event(_event)
+        _set_updated_on(device=self, event=_event)
+        return _event
 
     return wrapper
 
@@ -196,19 +214,20 @@ class Device(AggregateRoot):
 
     @event
     def update(self, **kwargs) -> DeviceUpdatedEvent:
-        if "updated_on" not in kwargs:
-            kwargs["updated_on"] = now()
         device_data = self._update(data=kwargs)
         return DeviceUpdatedEvent(**device_data)
 
     @event
     def delete(self) -> DeviceUpdatedEvent:
-        deletion_datetime = now()
-        return self.update(
-            status=Status.INACTIVE,
-            updated_on=deletion_datetime,
-            deleted_on=deletion_datetime,
+        deleted_on = now()
+        device_data = self._update(
+            data=dict(
+                status=Status.INACTIVE,
+                updated_on=deleted_on,
+                deleted_on=deleted_on,
+            )
         )
+        return DeviceUpdatedEvent(**device_data)
 
     @event
     def add_key(self, key_type: str, key_value: str) -> DeviceKeyAddedEvent:

@@ -176,7 +176,10 @@ class DeviceRepository(Repository[Device]):
             id=event.id,
             keys=device_keys_before_update,
             tags=device_tags,
-            data={"keys": event.keys},
+            data={
+                "keys": event.keys,
+                "updated_on": event.updated_on,
+            },
         )
         return [create_transaction] + update_transactions
 
@@ -196,7 +199,10 @@ class DeviceRepository(Repository[Device]):
             id=event.id,
             keys=device_keys_before_update,
             tags=device_tags,
-            data={"keys": event.keys},
+            data={
+                "keys": event.keys,
+                "updated_on": event.updated_on,
+            },
         )
         return [delete_transaction] + update_transactions
 
@@ -222,7 +228,10 @@ class DeviceRepository(Repository[Device]):
             id=event.id,
             keys=device_keys,
             tags=device_tags_before_update,
-            data={"tags": event.tags},
+            data={
+                "tags": event.tags,
+                "updated_on": event.updated_on,
+            },
         )
         return [create_transaction] + update_transactions
 
@@ -236,7 +245,10 @@ class DeviceRepository(Repository[Device]):
             id=event.entity_id,
             keys=device_keys,
             tags=device_tags,
-            data={"questionnaire_responses": event.questionnaire_responses},
+            data={
+                "questionnaire_responses": event.questionnaire_responses,
+                "updated_on": event.updated_on,
+            },
         )
 
     def read(self, *key_parts: str) -> Device:

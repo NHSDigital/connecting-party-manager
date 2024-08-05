@@ -85,6 +85,8 @@ def test_device_add_key(device_v2: Device):
         DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY")
     ]
     assert isinstance(event, DeviceKeyAddedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
 
 def test_device_delete_key(device_v2: Device):
@@ -94,6 +96,8 @@ def test_device_delete_key(device_v2: Device):
     )
     assert device_v2.keys == []
     assert isinstance(event, DeviceKeyDeletedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
 
 def test_device_delete_key_fail(device_v2: Device):
@@ -115,6 +119,8 @@ def test_device_add_questionnaire_response(
         "foo/2": {created_on_1: questionnaire_response}
     }
     assert isinstance(event, QuestionnaireResponseUpdatedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
     event_2 = device_v2.add_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
@@ -127,6 +133,9 @@ def test_device_add_questionnaire_response(
         }
     }
     assert isinstance(event_2, QuestionnaireResponseUpdatedEvent)
+    assert event_2.updated_on is not None
+    assert event_2.updated_on > event.updated_on
+    assert event_2.updated_on == device_v2.updated_on
 
 
 def test_device_cannot_add_same_questionnaire_response_twice(
@@ -155,6 +164,8 @@ def test_device_update_questionnaire_response(
         "foo/2": {created_on: another_good_questionnaire_response}
     }
     assert isinstance(event, QuestionnaireResponseUpdatedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
 
 def test_device_update_questionnaire_response_mismatching_created_on_error(
@@ -179,13 +190,17 @@ def test_device_update_questionnaire_response_key_error(
 
 
 def test_device_add_tag(device_v2: Device):
-    event = device_v2.add_tag(foo="first", bar="second")
-    assert isinstance(event, DeviceTagAddedEvent)
+    event_1 = device_v2.add_tag(foo="first", bar="second")
+    assert isinstance(event_1, DeviceTagAddedEvent)
     assert [tag.value for tag in device_v2.tags] == [
         "<<bar##second>>##<<foo##first>>",
     ]
+    assert event_1.updated_on is not None
+    assert event_1.updated_on == device_v2.updated_on
 
-    device_v2.add_tag(foo="first", bar="second", baz="third")
+    event_2 = device_v2.add_tag(foo="first", bar="second", baz="third")
+    assert event_2.updated_on is not None
+    assert event_2.updated_on == device_v2.updated_on
 
     with pytest.raises(DuplicateError):
         device_v2.add_tag(bar="second", foo="first")
@@ -194,3 +209,5 @@ def test_device_add_tag(device_v2: Device):
         "<<bar##second>>##<<foo##first>>",
         "<<bar##second>>##<<baz##third>>##<<foo##first>>",
     ]
+
+    assert event_2.updated_on > event_1.updated_on
