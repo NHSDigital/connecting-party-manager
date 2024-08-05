@@ -1,26 +1,27 @@
-from typing import Generator
+from typing import Generator, TypeVar
 
-import pytest
 from domain.core.device import Device
 from domain.repository.device_repository import DeviceRepository
 from event.aws.client import dynamodb_client
-from pytest import FixtureRequest
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 
 TABLE_NAME = "my_table"
 
+T = TypeVar("T", bound=DeviceRepository)
 
-@pytest.fixture
-def repository(request: FixtureRequest) -> Generator[DeviceRepository, None, None]:
-    if request.node.get_closest_marker("integration"):
+
+def repository_fixture(
+    is_integration_test: bool, repository_class: type[T]
+) -> Generator[T, None, None]:
+    if is_integration_test:
         table_name = read_terraform_output("dynamodb_table_name.value")
         client = dynamodb_client()
-        yield DeviceRepository(table_name=table_name, dynamodb_client=client)
+        yield repository_class(table_name=table_name, dynamodb_client=client)
     else:
         with mock_table(TABLE_NAME) as client:
-            yield DeviceRepository(table_name=TABLE_NAME, dynamodb_client=client)
+            yield repository_class(table_name=TABLE_NAME, dynamodb_client=client)
 
 
 def devices_exactly_equal(device_a: Device, device_b: Device) -> bool:

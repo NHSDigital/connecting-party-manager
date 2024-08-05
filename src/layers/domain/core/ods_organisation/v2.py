@@ -1,10 +1,9 @@
 from uuid import UUID
 
+from domain.core.aggregate_root import AggregateRoot
+from domain.core.product_team.v2 import ProductTeam, ProductTeamCreatedEvent
 from domain.core.validation import ODS_CODE_REGEX
 from pydantic import Field
-
-from .aggregate_root import AggregateRoot
-from .product_team import ProductTeam, ProductTeamCreatedEvent
 
 
 class OdsOrganisation(AggregateRoot):

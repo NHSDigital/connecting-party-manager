@@ -5,20 +5,18 @@ from domain.core.device.v2 import (
     Device,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
-    DeviceStatus,
     DeviceTagAddedEvent,
     DeviceType,
     DeviceUpdatedEvent,
     DuplicateQuestionnaireResponse,
     QuestionnaireNotFoundError,
-    QuestionnaireResponse,
-    QuestionnaireResponseAddedEvent,
     QuestionnaireResponseNotFoundError,
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
+from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
-from domain.core.questionnaire.v2 import Questionnaire
+from domain.core.questionnaire.v2 import Questionnaire, QuestionnaireResponse
 
 
 @pytest.fixture
@@ -74,7 +72,7 @@ def test_device_delete(device_v2: Device):
     device_created_on = device_v2.created_on
     assert device_v2.deleted_on == None
     event = device_v2.delete()
-    assert device_v2.status == DeviceStatus.INACTIVE
+    assert device_v2.status == Status.INACTIVE
     assert device_v2.created_on == device_created_on
     assert isinstance(device_v2.deleted_on, datetime)
     assert device_v2.updated_on == device_v2.deleted_on
@@ -116,7 +114,7 @@ def test_device_add_questionnaire_response(
     assert device_v2.questionnaire_responses == {
         "foo/2": {created_on_1: questionnaire_response}
     }
-    assert isinstance(event, QuestionnaireResponseAddedEvent)
+    assert isinstance(event, QuestionnaireResponseUpdatedEvent)
 
     event_2 = device_v2.add_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
@@ -128,7 +126,7 @@ def test_device_add_questionnaire_response(
             created_on_2: another_good_questionnaire_response,
         }
     }
-    assert isinstance(event_2, QuestionnaireResponseAddedEvent)
+    assert isinstance(event_2, QuestionnaireResponseUpdatedEvent)
 
 
 def test_device_cannot_add_same_questionnaire_response_twice(

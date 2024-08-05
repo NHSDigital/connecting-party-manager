@@ -3,8 +3,7 @@ from domain.core.device import Device, DeviceType
 from domain.core.questionnaire import Questionnaire
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
-
-from .conftest import devices_exactly_equal
+from domain.repository.device_repository.tests.utils import devices_exactly_equal
 
 
 @pytest.fixture

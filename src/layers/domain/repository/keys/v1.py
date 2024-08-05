@@ -4,16 +4,7 @@ from typing import Generator
 KEY_SEPARATOR = "#"
 
 
-class TableKeys(StrEnum):
-    DEVICE = "D"
-    DEVICE_KEY = "DK"
-    DEVICE_TYPE = "DT"
-    DEVICE_KEY_TYPE = "DKT"
-    DEVICE_INDEX = "DI"
-    PRODUCT_TEAM = "PT"
-    QUESTIONNAIRE = "Q"
-    QUESTIONNAIRE_RESPONSE = "QR"
-
+class TableKeyAction:
     def key(self, *args) -> str:
         return KEY_SEPARATOR.join(map(str, (self, *args)))
 
@@ -31,6 +22,17 @@ class TableKeys(StrEnum):
             iterable=self.filter(iterable=iterable, key=key),
             key=key,
         )
+
+
+class TableKeys(TableKeyAction, StrEnum):
+    DEVICE = "D"
+    DEVICE_KEY = "DK"
+    DEVICE_TYPE = "DT"
+    DEVICE_KEY_TYPE = "DKT"
+    DEVICE_INDEX = "DI"
+    PRODUCT_TEAM = "PT"
+    QUESTIONNAIRE = "Q"
+    QUESTIONNAIRE_RESPONSE = "QR"
 
 
 def group_by_key(

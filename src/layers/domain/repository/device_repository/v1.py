@@ -13,7 +13,6 @@ from domain.core.device import (
     DeviceType,
     DeviceUpdatedEvent,
 )
-from domain.core.load_questionnaire import render_question
 from domain.core.questionnaire import (
     Questionnaire,
     QuestionnaireInstanceEvent,
@@ -22,6 +21,7 @@ from domain.core.questionnaire import (
     QuestionnaireResponseDeletedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
+from domain.core.questionnaire.load_questionnaire import render_question
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys import TableKeys, strip_key_prefix
 from domain.repository.marshall import marshall, marshall_value, unmarshall

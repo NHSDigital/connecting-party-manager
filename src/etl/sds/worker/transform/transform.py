@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 import boto3
 from domain.core.event import ExportedEventTypeDef
-from domain.core.load_questionnaire import render_questionnaire
-from domain.core.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.load_questionnaire import render_questionnaire
+from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from domain.repository.device_repository import DeviceRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4

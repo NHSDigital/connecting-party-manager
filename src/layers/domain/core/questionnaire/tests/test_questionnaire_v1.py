@@ -3,7 +3,6 @@ from types import FunctionType
 from typing import Type
 
 import pytest
-from domain.core import questionnaire_validation_custom_rules
 from domain.core.error import DuplicateError, InvalidResponseError
 from domain.core.questionnaire import (
     InvalidChoiceType,
@@ -11,6 +10,7 @@ from domain.core.questionnaire import (
     Questionnaire,
     QuestionnaireResponse,
     TooManyAnswerTypes,
+    custom_rules,
     validate_mandatory_questions_answered,
     validate_response_against_question,
 )
@@ -929,7 +929,7 @@ def test_valid_questionnaire_responses_rule_url(response: list[dict[str, list]])
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name=URL_QUESTION_NAME,
-        validation_rules={questionnaire_validation_custom_rules.url},
+        validation_rules={custom_rules.url},
     )
 
     QuestionnaireResponse(questionnaire=questionnaire, responses=response)
@@ -947,7 +947,7 @@ def test_valid_question_response_rule_url(response: list):
         answer_types={str},
         mandatory=False,
         multiple=False,
-        validation_rules={questionnaire_validation_custom_rules.url},
+        validation_rules={custom_rules.url},
         choices=set(),
     )
 
@@ -968,13 +968,13 @@ def test_valid_questionnaire_responses_rule_empty_str(response: list[dict[str, l
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name=EMPTY_STR_QUESTION_NAME,
-        validation_rules={questionnaire_validation_custom_rules.empty_str},
+        validation_rules={custom_rules.empty_str},
     )
     questionnaire.add_question(
         name=EMPTY_STR_OR_INT_QUESTION_NAME,
         answer_types={str, int},
         multiple=True,
-        validation_rules={questionnaire_validation_custom_rules.empty_str},
+        validation_rules={custom_rules.empty_str},
     )
 
     QuestionnaireResponse(questionnaire=questionnaire, responses=response)
@@ -992,7 +992,7 @@ def test_valid_question_response_rule_empty_str(response: list[dict[str, list]])
         answer_types={str},
         mandatory=False,
         multiple=False,
-        validation_rules={questionnaire_validation_custom_rules.empty_str},
+        validation_rules={custom_rules.empty_str},
         choices=set(),
     )
 
@@ -1011,7 +1011,7 @@ def test_valid_question_response_rule_empty_str_2(response: list[dict[str, list]
         answer_types={str, int},
         mandatory=False,
         multiple=True,
-        validation_rules={questionnaire_validation_custom_rules.empty_str},
+        validation_rules={custom_rules.empty_str},
         choices=set(),
     )
 
@@ -1034,11 +1034,11 @@ def test_invalid_questionnaire_response_rules_raises_error(
     questionnaire = Questionnaire(name=QUESTIONNAIRE_NAME, version=VERSION_1)
     questionnaire.add_question(
         name=URL_QUESTION_NAME,
-        validation_rules={questionnaire_validation_custom_rules.url},
+        validation_rules={custom_rules.url},
     )
     questionnaire.add_question(
         name=EMPTY_STR_QUESTION_NAME,
-        validation_rules={questionnaire_validation_custom_rules.empty_str},
+        validation_rules={custom_rules.empty_str},
     )
 
     with pytest.raises(ValidationError) as error:
@@ -1065,7 +1065,7 @@ def test_invalid_question_response_rule_url_raises_error(response: list):
         answer_types={str},
         mandatory=False,
         multiple=False,
-        validation_rules={questionnaire_validation_custom_rules.url},
+        validation_rules={custom_rules.url},
         choices=set(),
     )
 
@@ -1089,7 +1089,7 @@ def test_invalid_question_response_rule_empty_str_raises_error(response: list):
         answer_types={str, int},
         mandatory=False,
         multiple=True,
-        validation_rules={questionnaire_validation_custom_rules.empty_str},
+        validation_rules={custom_rules.empty_str},
         choices=set(),
     )
 

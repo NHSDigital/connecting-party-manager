@@ -9,10 +9,14 @@ from uuid import UUID, uuid4
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
-from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
+from domain.core.device_key.v2 import DeviceKey
+from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
-from domain.core.questionnaire.v2 import QuestionnaireResponse
+from domain.core.questionnaire.v2 import (
+    QuestionnaireResponse,
+    QuestionnaireResponseUpdatedEvent,
+)
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field, validator
@@ -46,7 +50,7 @@ class DeviceCreatedEvent(Event):
     device_type: "DeviceType"
     product_team_id: UUID
     ods_code: str
-    status: "DeviceStatus"
+    status: Status
     created_on: str
     updated_on: Optional[str] = None
     deleted_on: Optional[str] = None
@@ -62,7 +66,7 @@ class DeviceUpdatedEvent(Event):
     device_type: "DeviceType"
     product_team_id: UUID
     ods_code: str
-    status: "DeviceStatus"
+    status: Status
     created_on: str
     updated_on: str
     deleted_on: Optional[str] = None
@@ -73,42 +77,44 @@ class DeviceUpdatedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
+    new_key: DeviceKey
     id: str
-    key_value: str
-    key_type: DeviceKeyType
+    name: str
+    device_type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str
+    deleted_on: Optional[str] = None
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyDeletedEvent(Event):
+    deleted_key: DeviceKey
     id: str
-    key_value: str
-    key_type: DeviceKeyType
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceTagAddedEvent(Event):
+    new_tag: "DeviceTag"
     id: str
-    tag: str
-
-
-@dataclass(kw_only=True, slots=True)
-class QuestionnaireResponseAddedEvent(Event):
-    """Placeholder for QuestionnaireResponse v2"""
-
-    entity_id: str
-    questionnaire_id: str
+    name: str
+    device_type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: Status
     created_on: str
-    responses: list[dict[str, list]]
-
-
-@dataclass(kw_only=True, slots=True)
-class QuestionnaireResponseUpdatedEvent(Event):
-    """Placeholder for QuestionnaireResponse v2"""
-
-    entity_id: str
-    questionnaire_id: str
-    created_on: str
-    responses: list[dict[str, list]]
+    updated_on: str
+    deleted_on: Optional[str] = None
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
 class DeviceType(StrEnum):
@@ -128,11 +134,6 @@ class DeviceType(StrEnum):
     # API = auto()
 
 
-class DeviceStatus(StrEnum):
-    ACTIVE = auto()
-    INACTIVE = auto()  # "soft" delete
-
-
 class DeviceTag(BaseModel):
     components: list[tuple[str, str]]
 
@@ -146,6 +147,9 @@ class DeviceTag(BaseModel):
             f"{TAG_COMPONENT_CONTAINER_LEFT}{key}{TAG_COMPONENT_SEPARATOR}{value}{TAG_COMPONENT_CONTAINER_RIGHT}"
             for key, value in self.components
         )
+
+    def __hash__(self):
+        return hash(tuple(self.components))
 
 
 RT = TypeVar("RT")
@@ -178,7 +182,7 @@ class Device(AggregateRoot):
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     device_type: DeviceType = Field(immutable=True)
-    status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
+    status: Status = Field(default=Status.ACTIVE)
     product_team_id: UUID
     ods_code: str
     created_on: datetime = Field(default_factory=now, immutable=True)
@@ -201,7 +205,7 @@ class Device(AggregateRoot):
     def delete(self) -> DeviceUpdatedEvent:
         deletion_datetime = now()
         return self.update(
-            status=DeviceStatus.INACTIVE,
+            status=Status.INACTIVE,
             updated_on=deletion_datetime,
             deleted_on=deletion_datetime,
         )
@@ -214,7 +218,7 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate keys: '{key_type}':'{key_value}'"
             )
         self.keys.append(device_key)
-        return DeviceKeyAddedEvent(id=self.id, **device_key.dict())
+        return DeviceKeyAddedEvent(new_key=device_key, **self.dict())
 
     @event
     def delete_key(self, key_type: str, key_value: str) -> DeviceKeyDeletedEvent:
@@ -224,7 +228,12 @@ class Device(AggregateRoot):
                 f"This device does not contain key '{key_type}':'{key_value}'"
             ) from None
         self.keys.remove(device_key)
-        return DeviceKeyDeletedEvent(id=self.id, **device_key.dict())
+        return DeviceKeyDeletedEvent(
+            deleted_key=device_key,
+            id=self.id,
+            keys=[k.dict() for k in self.keys],
+            tags=[t.dict() for t in self.tags],
+        )
 
     @event
     def add_tag(self, **kwargs):
@@ -235,12 +244,12 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
             )
         self.tags.append(device_tag)
-        return DeviceTagAddedEvent(id=self.id, tag=device_tag.value)
+        return DeviceTagAddedEvent(new_tag=device_tag, **self.dict())
 
     @event
     def add_questionnaire_response(
         self, questionnaire_response: QuestionnaireResponse
-    ) -> QuestionnaireResponseAddedEvent:
+    ) -> QuestionnaireResponseUpdatedEvent:
         questionnaire_id = questionnaire_response.questionnaire.id
         questionnaire_responses = self.questionnaire_responses[questionnaire_id]
 
@@ -255,13 +264,17 @@ class Device(AggregateRoot):
             questionnaire_response.created_on
         ] = questionnaire_response
 
-        questionnaire_response_event = QuestionnaireResponseAddedEvent(
+        return QuestionnaireResponseUpdatedEvent(
             entity_id=self.id,
-            questionnaire_id=questionnaire_id,
-            created_on=questionnaire_response.created_on.isoformat(timespec="seconds"),
-            responses=questionnaire_response.responses,
+            entity_keys=[k.dict() for k in self.keys],
+            entity_tags=[t.dict() for t in self.tags],
+            questionnaire_responses={
+                qid: {
+                    created_on.isoformat(): qr.dict() for created_on, qr in _qr.items()
+                }
+                for qid, _qr in self.questionnaire_responses.items()
+            },
         )
-        return questionnaire_response_event
 
     @event
     def update_questionnaire_response(
@@ -286,9 +299,14 @@ class Device(AggregateRoot):
 
         return QuestionnaireResponseUpdatedEvent(
             entity_id=self.id,
-            questionnaire_id=questionnaire_id,
-            created_on=created_on,
-            responses=questionnaire_response.responses,
+            entity_keys=[k.dict() for k in self.keys],
+            entity_tags=[t.dict() for t in self.tags],
+            questionnaire_responses={
+                qid: {
+                    created_on.isoformat(): qr.dict() for created_on, qr in _qr.items()
+                }
+                for qid, _qr in self.questionnaire_responses.items()
+            },
         )
 
     def state(self):
@@ -296,7 +314,7 @@ class Device(AggregateRoot):
         return deepcopy(self.dict())
 
     def is_active(self):
-        return self.status is DeviceStatus.ACTIVE
+        return self.status is Status.ACTIVE
 
 
 class DeviceEventDeserializer(EventDeserializer):
@@ -306,6 +324,5 @@ class DeviceEventDeserializer(EventDeserializer):
         DeviceKeyAddedEvent,
         DeviceKeyDeletedEvent,
         DeviceTagAddedEvent,
-        QuestionnaireResponseAddedEvent,
         QuestionnaireResponseUpdatedEvent,
     )

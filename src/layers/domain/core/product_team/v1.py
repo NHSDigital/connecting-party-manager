@@ -1,12 +1,11 @@
 from uuid import UUID
 
 from attr import dataclass
+from domain.core.aggregate_root import AggregateRoot
+from domain.core.device import Device, DeviceCreatedEvent, DeviceStatus, DeviceType
+from domain.core.event import Event
+from domain.core.validation import ENTITY_NAME_REGEX
 from pydantic import Field
-
-from .aggregate_root import AggregateRoot
-from .device import Device, DeviceCreatedEvent, DeviceStatus, DeviceType
-from .event import Event
-from .validation import ENTITY_NAME_REGEX
 
 
 @dataclass(kw_only=True, slots=True)
