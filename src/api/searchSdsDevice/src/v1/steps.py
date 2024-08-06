@@ -32,7 +32,7 @@ def query_devices(data, cache) -> List[Device]:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    results = device_repo.query_by_tag(kwargs=query_params)
+    results = device_repo.query_by_tag(**query_params)
     return results
 
 
