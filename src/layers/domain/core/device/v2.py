@@ -1,11 +1,11 @@
 from collections import defaultdict
-from copy import deepcopy
 from datetime import datetime
 from enum import StrEnum, auto
 from functools import wraps
 from typing import Callable, Optional, ParamSpec, TypeVar
 from uuid import UUID, uuid4
 
+import orjson
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
@@ -208,7 +208,7 @@ class Device(AggregateRoot):
     deleted_on: Optional[datetime] = Field(default=None)
     keys: list[DeviceKey] = Field(default_factory=list)
     tags: list[DeviceTag] = Field(default_factory=list)
-    questionnaire_responses: dict[str, dict[datetime, QuestionnaireResponse]] = Field(
+    questionnaire_responses: dict[str, dict[str, QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(dict)
     )
 
@@ -238,7 +238,7 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate keys: '{key_type}':'{key_value}'"
             )
         self.keys.append(device_key)
-        device_data = self.dict()
+        device_data = self.state()
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
         return DeviceKeyAddedEvent(new_key=device_key, **device_data)
 
@@ -266,7 +266,7 @@ class Device(AggregateRoot):
                 f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
             )
         self.tags.append(device_tag)
-        device_data = self.dict()
+        device_data = self.state()
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
         return DeviceTagAddedEvent(new_tag=device_tag, **device_data)
 
@@ -277,25 +277,21 @@ class Device(AggregateRoot):
         questionnaire_id = questionnaire_response.questionnaire.id
         questionnaire_responses = self.questionnaire_responses[questionnaire_id]
 
-        if questionnaire_response.created_on in questionnaire_responses:
+        created_on_str = questionnaire_response.created_on.isoformat()
+        if created_on_str in questionnaire_responses:
             raise DuplicateQuestionnaireResponse(
                 "This Device already contains a "
-                f"response created on {questionnaire_response.created_on}"
+                f"response created on {created_on_str}"
                 f"for Questionnaire {questionnaire_id}"
             )
-
-        questionnaire_responses[
-            questionnaire_response.created_on
-        ] = questionnaire_response
+        questionnaire_responses[created_on_str] = questionnaire_response
 
         return QuestionnaireResponseUpdatedEvent(
             entity_id=self.id,
             entity_keys=[k.dict() for k in self.keys],
             entity_tags=[t.dict() for t in self.tags],
             questionnaire_responses={
-                qid: {
-                    created_on.isoformat(): qr.dict() for created_on, qr in _qr.items()
-                }
+                qid: {_created_on: qr.dict() for _created_on, qr in _qr.items()}
                 for qid, _qr in self.questionnaire_responses.items()
             },
         )
@@ -313,29 +309,28 @@ class Device(AggregateRoot):
                 f"with id '{questionnaire_id}'"
             ) from None
 
-        created_on = questionnaire_response.created_on
-        if created_on not in questionnaire_responses:
+        created_on_str = questionnaire_response.created_on.isoformat()
+        if created_on_str not in questionnaire_responses:
             raise QuestionnaireResponseNotFoundError(
                 "This device does not contain a Questionnaire with a "
-                f"response created on '{created_on}'"
+                f"response created on '{created_on_str}'"
             ) from None
-        questionnaire_responses[created_on] = questionnaire_response
+
+        questionnaire_responses[created_on_str] = questionnaire_response
 
         return QuestionnaireResponseUpdatedEvent(
             entity_id=self.id,
             entity_keys=[k.dict() for k in self.keys],
             entity_tags=[t.dict() for t in self.tags],
             questionnaire_responses={
-                qid: {
-                    created_on.isoformat(): qr.dict() for created_on, qr in _qr.items()
-                }
+                qid: {_created_on: qr.dict() for _created_on, qr in _qr.items()}
                 for qid, _qr in self.questionnaire_responses.items()
             },
         )
 
-    def state(self):
+    def state(self) -> dict:
         """Returns a deepcopy of the Device itself, useful for bulk operations rather than dealing with events"""
-        return deepcopy(self.dict())
+        return orjson.loads(self.json())
 
     def is_active(self):
         return self.status is Status.ACTIVE

@@ -113,9 +113,8 @@ def test_device_add_questionnaire_response(
     event = device_v2.add_questionnaire_response(
         questionnaire_response=questionnaire_response
     )
-    created_on_1 = questionnaire_response.created_on
+    created_on_1 = questionnaire_response.created_on.isoformat()
     original_updated_on = device_v2.updated_on
-
     assert device_v2.questionnaire_responses == {
         "foo/2": {created_on_1: questionnaire_response}
     }
@@ -126,7 +125,7 @@ def test_device_add_questionnaire_response(
     event_2 = device_v2.add_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
     )
-    created_on_2 = another_good_questionnaire_response.created_on
+    created_on_2 = another_good_questionnaire_response.created_on.isoformat()
     assert device_v2.questionnaire_responses == {
         "foo/2": {
             created_on_1: questionnaire_response,
@@ -166,7 +165,7 @@ def test_device_update_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
     )
     assert device_v2.questionnaire_responses == {
-        "foo/2": {created_on: another_good_questionnaire_response}
+        "foo/2": {created_on.isoformat(): another_good_questionnaire_response}
     }
     assert isinstance(event, QuestionnaireResponseUpdatedEvent)
     assert event.updated_on is not None

@@ -82,12 +82,12 @@ def test__device_repository__modify_questionnaire_response_that_has_been_persist
     # Update the model
     questionnaire_responses = intermediate_device.questionnaire_responses
     assert len(questionnaire_responses["shoe/1"]) == 2
-    (created_on, _) = questionnaire_responses["shoe/1"].keys()
+    (_questionnaire_response, _) = questionnaire_responses["shoe/1"].values()
 
     questionnaire_response = shoe_questionnaire.respond(
         responses=[{"foot": ["R"]}, {"shoe-size": [789]}]
     )
-    questionnaire_response.created_on = created_on
+    questionnaire_response.created_on = _questionnaire_response.created_on
 
     intermediate_device.update_questionnaire_response(
         questionnaire_response=questionnaire_response
@@ -98,7 +98,9 @@ def test__device_repository__modify_questionnaire_response_that_has_been_persist
     device_from_db = repository.read(intermediate_device.id)
     assert devices_exactly_equal(device_from_db, intermediate_device)
     assert not devices_exactly_equal(device_from_db, device)
-    assert device_from_db.questionnaire_responses["shoe/1"][created_on].answers == [
+    assert device_from_db.questionnaire_responses["shoe/1"][
+        _questionnaire_response.created_on.isoformat()
+    ].answers == [
         {"foot": ["R"]},
         {"shoe-size": [789]},
     ]
