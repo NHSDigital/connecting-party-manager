@@ -59,6 +59,19 @@ def test__device_repository__with_questionnaires(
 
 
 @pytest.mark.integration
+def test__device_repository__with_questionnaires_and_tags(
+    device: Device, repository: DeviceRepository
+):
+    """
+    This test might look specific but it previously raised a bug due
+    to model/datetime serialisation issues
+    """
+    device.add_tag(foo="bar")
+    repository.write(device)
+    assert repository.read(device.id) == device
+
+
+@pytest.mark.integration
 def test__device_repository__modify_questionnaire_response_that_has_been_persisted(
     device: Device, repository: DeviceRepository, shoe_questionnaire: Questionnaire
 ):
