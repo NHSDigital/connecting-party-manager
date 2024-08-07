@@ -1,7 +1,7 @@
 from typing import Optional
 
 from domain.core.device import DeviceType
-from pydantic import BaseModel, Extra, ValidationError, root_validator, validator
+from pydantic import BaseModel, Extra, root_validator, validator
 
 
 class SearchQueryParams(BaseModel, extra=Extra.forbid):
@@ -34,7 +34,7 @@ class SearchSDSEndpointQueryParams(BaseModel, extra=Extra.forbid):
             1 for value in values.values() if value is not None and value != 0
         )
         if non_empty_count < count:
-            raise ValidationError(
+            raise ValueError(
                 "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
             )
         return values
