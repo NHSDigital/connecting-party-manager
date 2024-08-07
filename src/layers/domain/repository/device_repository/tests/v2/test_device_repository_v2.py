@@ -150,11 +150,19 @@ def test__device_repository__delete(device: DeviceV2, repository: DeviceReposito
     intermediate_device.delete()
     repository.write(intermediate_device)
 
-    final_device = repository.read(device.id)
-    assert final_device.status is Status.INACTIVE
+    # Attempt to read the original device, expecting an ItemNotFound error
+    with pytest.raises(ItemNotFound):
+        repository.read(device.id)
 
-    assert final_device.created_on == device.created_on
-    assert final_device.updated_on > device.updated_on
+    # Read the inactive device
+    inactive_device = repository.read_inactive(device.id)
+    key_indexed_inactive_device = repository.read_inactive("product_id", DEVICE_KEY)
+
+    assert inactive_device, key_indexed_inactive_device is not None
+    assert inactive_device.status is Status.INACTIVE
+    assert inactive_device.tags == []
+    assert inactive_device.created_on == device.created_on
+    assert inactive_device.updated_on > device.updated_on
 
 
 @pytest.mark.integration

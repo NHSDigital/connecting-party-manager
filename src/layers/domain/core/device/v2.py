@@ -236,7 +236,7 @@ class Device(AggregateRoot):
         return DeviceUpdatedEvent(**device_data)
 
     @event
-    def delete(self) -> DeviceUpdatedEvent:
+    def delete(self) -> DeviceDeletedEvent:
         deleted_on = now()
         deleted_tags = self.tags
         device_data = self._update(
@@ -247,7 +247,7 @@ class Device(AggregateRoot):
                 tags=[],
             )
         )
-        return DeviceUpdatedEvent(**device_data, deleted_tags=deleted_tags)
+        return DeviceDeletedEvent(**device_data, deleted_tags=deleted_tags)
 
     @event
     def add_key(self, key_type: str, key_value: str) -> DeviceKeyAddedEvent:
