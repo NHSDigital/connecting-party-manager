@@ -85,6 +85,7 @@ def test_endpoint_query_accepted(params):
         ({"nhs_mhs_svc_ia": "foo"}),
         ({"nhs_mhs_party_key": "foo"}),
         ({"bar": "foo", "foo": "bar"}),
+        ({"nhs_mhs_manufacturer_org": "foo", "nhs_mhs_party_key": "FOO-BAR"}),
     ],
 )
 def test_endpoint_query_invalid(params):

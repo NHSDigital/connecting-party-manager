@@ -1,4 +1,3 @@
-import json
 import os
 from unittest import mock
 
@@ -7,14 +6,12 @@ from domain.core.device.v2 import DeviceType as DeviceTypeV2
 from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.questionnaire.v2 import Questionnaire
 from domain.core.root.v2 import Root
-from domain.repository.device_repository.mock_search_responses.mock_responses import (
-    device_5NR_result,
-)
 from domain.repository.device_repository.v2 import DeviceRepository
+from event.aws.client import dynamodb_client
 from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table
-from test_helpers.response_assertions import _response_assertions
+from test_helpers.terraform import read_terraform_output
 from test_helpers.uuid import consistent_uuid
 
 TABLE_NAME = "hiya"
@@ -28,7 +25,7 @@ def _create_org():
     return product_team
 
 
-def _create_device(device, product_team):
+def _create_device(device, product_team, params):
     cpmdevice = product_team.create_device(
         name=device["device_name"], device_type=DeviceTypeV2.PRODUCT
     )
@@ -42,49 +39,20 @@ def _create_device(device, product_team):
         name="nhs_as_client", answer_types=(str,), mandatory=True
     )
     response = [
-        {"nhs_as_client": ["5NR"]},
-        {
-            "nhs_as_svc_ia": [
-                "urn:nhs:names:services:mm:PORX_IN090101UK31",
-                "urn:nhs:names:services:pdsquery:QUPA_IN000009UK03",
-                "urn:nhs:names:services:mm:PORX_IN070101UK31",
-                "urn:nhs:names:services:pds:PRPA_IN000203UK03",
-                "urn:nhs:names:services:mm:PORX_IN110101UK30",
-                "urn:nhs:names:services:pdsquery:QUPA_IN000007UK01",
-                "urn:nhs:names:services:pdsquery:QUPA_IN000005UK01",
-                "urn:nhs:names:services:mmquery:PRESCRIPTIONSEARCHRESPONSE_SM01",
-                "urn:nhs:names:services:mmquery:PORX_IN000006UK99",
-                "urn:nhs:names:services:mmquery:PORX_IN999000UK01",
-                "urn:nhs:names:services:pds:PRPA_IN000202UK01",
-                "urn:oasis:names:tc:ebxml-msg:service:Acknowledgment",
-                "urn:nhs:names:services:mmquery:PORX_IN999001UK01",
-                "urn:nhs:names:services:pdsquery:QUPA_IN000008UK02",
-                "urn:nhs:names:services:mmquery:QURX_IN000005UK99",
-                "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14",
-                "urn:nhs:names:services:mmquery:ExternalPrescriptionQuery_1_0",
-                "urn:nhs:names:services:mm:PORX_IN070103UK31",
-                "urn:nhs:names:services:mm:PORX_IN080101UK31",
-                "urn:nhs:names:services:mmquery:ExternalPrescriptionSearch_1_0",
-                "urn:nhs:names:services:mm:MCCI_IN010000UK13",
-                "urn:oasis:names:tc:ebxml-msg:service:MessageError",
-                "urn:nhs:names:services:mm:PORX_IN100101UK31",
-                "urn:nhs:names:services:mm:PORX_IN510101UK31",
-                "urn:nhs:names:services:mm:PORX_IN060102UK30",
-                "urn:nhs:names:services:mmquery:PRESCRIPTIONSEARCH_SM01",
-                "urn:nhs:names:services:mm:PORX_IN132004UK30",
-            ]
-        },
+        {"nhs_as_client": [params["nhs_as_client"]]},
+        {"nhs_as_svc_ia": [params["nhs_as_svc_ia"]]},
     ]
     questionnaire_response = questionnaire.respond(responses=response)
     cpmdevice.add_questionnaire_response(questionnaire_response=questionnaire_response)
     cpmdevice.add_tag(
-        nhs_as_client="5NR", nhs_as_svc_ia="urn:nhs:names:services:mm:PORX_IN090101UK31"
+        nhs_as_client=params["nhs_as_client"], nhs_as_svc_ia=params["nhs_as_svc_ia"]
     )
     return cpmdevice
 
 
+@pytest.mark.integration
 @pytest.mark.parametrize(
-    "params, device, expected_body",
+    "params, device",
     [
         (
             {
@@ -92,26 +60,20 @@ def _create_device(device, product_team):
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
             },
             {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
-            device_5NR_result,
         ),
-        # (
-        #     {
-        #         "nhs_as_client": "5NR",
-        #         "nhs_as_svc_ia": "urn:oasis:names:tc:ebxml-msg:service:Acknowledgment",
-        #         "nhs_mhs_manufacturer_org": "LSP02",
-        #     },
-        #     device_5NR_result,
-        # ),
     ],
 )
-def test_index(params, device, expected_body):
+def test_index(params, device):
     product_team = _create_org()
-    cpmdevice = _create_device(device=device, product_team=product_team)
+    cpmdevice = _create_device(device=device, product_team=product_team, params=params)
 
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    with mock.patch.dict(
         os.environ,
         {
-            "DYNAMODB_TABLE": TABLE_NAME,
+            "DYNAMODB_TABLE": table_name,
             "AWS_DEFAULT_REGION": "eu-west-2",
         },
         clear=True,
@@ -134,26 +96,30 @@ def test_index(params, device, expected_body):
                 "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-
     result_body = json_loads(result["body"])
 
-    expected_result = {
-        "statusCode": 200,
-        "body": json.dumps(expected_body),
-        "headers": {
-            "Content-Type": "application/json",
-            "Content-Length": str(len(json.dumps(expected_body))),
-            "Version": "1",
-            "Location": None,
-            "Host": "foo.co.uk",
-        },
-    }
-    _response_assertions(
-        result=result,
-        expected=expected_result,
-        check_body=True,
-        check_content_length=True,
-    )
+    assert result["statusCode"] == 200
+
+    for result in result_body:
+        assert result["name"] == device["device_name"]
+        for key in result["keys"]:
+            assert key["key_value"] == device["device_key"]
+        for tag in result["tags"]:
+            for key, value in params.items():
+                assert [key, value] in tag["components"]
+        questionnaire_responses = result["questionnaire_responses"][
+            f"spine_{device['device_name']}/1"
+        ]
+        iter_items = iter(questionnaire_responses.items())
+        iter_key, iter_value = next(iter_items)
+        filter_count = 0
+        for answer in iter_value["answers"]:
+            for key, value in params.items():
+                if key in answer:
+                    filter_count = filter_count + 1
+                    assert value in answer[key]
+
+        assert filter_count == len(params)
 
 
 @pytest.mark.parametrize(
