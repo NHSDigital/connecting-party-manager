@@ -183,6 +183,20 @@ jobs:
           restore-from-cache: "true"
           requires-aws: true
 
+  apigee--attach-product:
+    needs: [build-head, terraform-head-build]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--deploy
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
   test--integration:
     needs:
       [
