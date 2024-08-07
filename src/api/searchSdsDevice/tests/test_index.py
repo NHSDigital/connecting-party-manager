@@ -165,6 +165,7 @@ def test_index(params, device):
     assert result["statusCode"] == 200
 
     for result in result_body:
+        assert result["status"] == "active"
         assert result["name"] == device["device_name"]
         for key in result["keys"]:
             assert key["key_value"] == device["device_key"]
@@ -289,6 +290,7 @@ def test_multiple_returned(params, devices):
     assert result["statusCode"] == 200
 
     for index, result in enumerate(result_body):
+        assert result["status"] == "active"
         assert result["name"] == devices[index]["device_name"]
         for key in result["keys"]:
             assert key["key_value"] == devices[index]["device_key"]
