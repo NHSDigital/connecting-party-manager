@@ -33,7 +33,8 @@ def query_endpoints(data, cache) -> List[Device]:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.query_by_tag(kwargs=query_params)
+    results = device_repo.query_by_tag(**query_params)
+    return [result.state() for result in results]
 
 
 steps = [

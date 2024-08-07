@@ -32,22 +32,61 @@ def _create_device(device, product_team, params):
     cpmdevice.add_key(key_value=device["device_key"], key_type=DeviceKeyType.PRODUCT_ID)
 
     questionnaire = Questionnaire(name=f"spine_{device['device_name']}", version=1)
-    questionnaire.add_question(
-        name="nhs_as_svc_ia", answer_types=(str,), mandatory=True, multiple=True
-    )
-    questionnaire.add_question(
-        name="nhs_as_client", answer_types=(str,), mandatory=True
-    )
-    response = [
-        {"nhs_as_client": [params["nhs_as_client"]]},
-        {"nhs_as_svc_ia": [params["nhs_as_svc_ia"]]},
-    ]
+
+    response = []
+    for key, value in params.items():
+        questionnaire.add_question(name=key, answer_types=(str,), mandatory=True)
+        response.append({key: [value]})
+
     questionnaire_response = questionnaire.respond(responses=response)
     cpmdevice.add_questionnaire_response(questionnaire_response=questionnaire_response)
-    cpmdevice.add_tag(
-        nhs_as_client=params["nhs_as_client"], nhs_as_svc_ia=params["nhs_as_svc_ia"]
-    )
+    cpmdevice.add_tag(**params)
     return cpmdevice
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "nhs_as_client": "5NR",
+            "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+        },
+    ],
+)
+def test_no_results(params):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchSdsDevice.index import cache as device_cache
+        from api.searchSdsDevice.index import handler as device_handler
+
+        device_cache["DYNAMODB_CLIENT"] = client
+
+        device_repo = DeviceRepository(
+            table_name=device_cache["DYNAMODB_TABLE"],
+            dynamodb_client=device_cache["DYNAMODB_CLIENT"],
+        )
+
+        result = device_handler(
+            event={
+                "headers": {"version": 1},
+                "queryStringParameters": params,
+                "multiValueHeaders": {"Host": ["foo.co.uk"]},
+            }
+        )
+    result_body = json_loads(result["body"])
+
+    assert result["statusCode"] == 200
+    assert len(result_body) == 0
 
 
 @pytest.mark.integration
@@ -58,6 +97,31 @@ def _create_device(device, product_team, params):
             {
                 "nhs_as_client": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+            },
+            {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+        ),
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_manufacturer_org": "foo",
+            },
+            {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+        ),
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_party_key": "foo",
+            },
+            {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+        ),
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_manufacturer_org": "foo",
+                "nhs_mhs_party_key": "foo",
             },
             {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
         ),
@@ -109,6 +173,130 @@ def test_index(params, device):
                 assert [key, value] in tag["components"]
         questionnaire_responses = result["questionnaire_responses"][
             f"spine_{device['device_name']}/1"
+        ]
+        iter_items = iter(questionnaire_responses.items())
+        iter_key, iter_value = next(iter_items)
+        filter_count = 0
+        for answer in iter_value["answers"]:
+            for key, value in params.items():
+                if key in answer:
+                    filter_count = filter_count + 1
+                    assert value in answer[key]
+
+        assert filter_count == len(params)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "params, devices",
+    [
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_manufacturer_org": "foo",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_party_key": "foo",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_manufacturer_org": "foo",
+                "nhs_mhs_party_key": "foo",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+    ],
+)
+def test_multiple_returned(params, devices):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    product_team = _create_org()
+    for device in devices:
+        cpmdevice = _create_device(
+            device=device, product_team=product_team, params=params
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "DYNAMODB_TABLE": table_name,
+                "AWS_DEFAULT_REGION": "eu-west-2",
+            },
+            clear=True,
+        ):
+            from api.searchSdsDevice.index import cache as device_cache
+
+            device_cache["DYNAMODB_CLIENT"] = client
+            device_repo = DeviceRepository(
+                table_name=device_cache["DYNAMODB_TABLE"],
+                dynamodb_client=device_cache["DYNAMODB_CLIENT"],
+            )
+            device_repo.write(cpmdevice)
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchSdsDevice.index import handler as device_handler
+
+        result = device_handler(
+            event={
+                "headers": {"version": 1},
+                "queryStringParameters": params,
+                "multiValueHeaders": {"Host": ["foo.co.uk"]},
+            }
+        )
+
+    result_body = json_loads(result["body"])
+    devices.reverse()
+    if result_body[0]["name"] != devices[0]["device_name"]:
+        devices.reverse()
+
+    assert result["statusCode"] == 200
+
+    for index, result in enumerate(result_body):
+        assert result["name"] == devices[index]["device_name"]
+        for key in result["keys"]:
+            assert key["key_value"] == devices[index]["device_key"]
+        for tag in result["tags"]:
+            for key, value in params.items():
+                assert [key, value] in tag["components"]
+        questionnaire_responses = result["questionnaire_responses"][
+            f"spine_{devices[index]['device_name']}/1"
         ]
         iter_items = iter(questionnaire_responses.items())
         iter_key, iter_value = next(iter_items)
