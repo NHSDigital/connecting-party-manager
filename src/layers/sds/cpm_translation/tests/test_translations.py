@@ -1,9 +1,9 @@
 from unittest import mock
 from uuid import uuid4
 
-from domain.core.device import Device, DeviceType
-from domain.core.root import Root
-from sds.cpm_translation.modify.modify_key import NotAnSdsKey
+from domain.core.device.v2 import Device, DeviceType
+from domain.core.root.v2 import Root
+from sds.cpm_translation.modify_key import NotAnSdsKey
 from sds.cpm_translation.translations import modify_devices
 from sds.domain.organizational_unit import OrganizationalUnitDistinguishedName
 from sds.domain.sds_modification_request import SdsModificationRequest
@@ -24,14 +24,9 @@ def mock_patch(function_name):
     return mock.patch(MOCK_PATH.format(function_name))
 
 
-@mock_patch("read_devices_by_unique_identifier")
 @mock_patch("get_modify_key_function")
 @mock_patch("update_device_metadata")
-def test_modify_devices(
-    mocked_update_device_metadata,
-    mocked_get_modify_key_function,
-    mocked_read_devices_by_unique_identifier,
-):
+def test_modify_devices(mocked_update_device_metadata, mocked_get_modify_key_function):
     class DeviceFactory:
         def __init__(self):
             self.devices: list[Device] = []
@@ -39,7 +34,9 @@ def test_modify_devices(
         def new_device(self) -> Device:
             org = Root.create_ods_organisation(ods_code="foo")
             product_team = org.create_product_team(id=uuid4(), name="foo")
-            device = product_team.create_device(name="foo", type=DeviceType.PRODUCT)
+            device = product_team.create_device(
+                name="foo", device_type=DeviceType.PRODUCT
+            )
             self.devices.append(device)
             return device
 
@@ -56,11 +53,13 @@ def test_modify_devices(
     for _ in range(10):
         old_device_factory.new_device()
 
+    mocked_repository = mock.Mock()
+    mocked_repository.query_by_tag.return_value = old_device_factory.devices
+
     mocked_update_device_metadata.side_effect = (
         lambda device, model, modification_type, field_alias, new_values: device
     )
     mocked_get_modify_key_function.side_effect = _get_modify_key_function
-    mocked_read_devices_by_unique_identifier.return_value = old_device_factory.devices
 
     modified_devices = list(
         modify_devices(
@@ -73,8 +72,7 @@ def test_modify_devices(
                     ("add", "nhsproductname", set()),
                 ],
             ),
-            questionnaire_ids=[],
-            repository=None,
+            repository=mocked_repository,
         )
     )
 

@@ -1,5 +1,8 @@
 import pytest
-from domain.api.query import SearchSDSDeviceQueryParams, SearchSDSEndpointQueryParams
+from domain.api.sds.query import (
+    SearchSDSDeviceQueryParams,
+    SearchSDSEndpointQueryParams,
+)
 from pydantic import ValidationError
 
 

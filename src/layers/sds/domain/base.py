@@ -20,8 +20,7 @@ EXCLUDED_OBJECT_CLASS_VALUES = (
 SET_ALIAS_NAME = f"{set[str]}"
 
 
-class AliasLookupError(Exception):
-    ...
+class AliasLookupError(Exception): ...
 
 
 def _field_is_a_set(cls: "SdsBaseModel", field_name) -> bool:
@@ -164,7 +163,7 @@ class SdsBaseModel(BaseModel):
             values = transform(cls=cls, values=values)
         return values
 
-    def as_questionnaire_response_responses(self) -> list[dict[str, list]]:
+    def as_questionnaire_response_answers(self) -> list[dict[str, list]]:
         data = orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
         return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]
 

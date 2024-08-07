@@ -14,7 +14,14 @@ FUNCTION_NAME = "my-function"
 
 
 def mocked_lambda(FunctionName, Payload):
-    with mock.patch.dict(os.environ, {"SLACK_WEBHOOK_URL": EXAMPLE_DOT_COM}):
+    with mock.patch.dict(
+        os.environ,
+        {
+            "SLACK_WEBHOOK_URL": EXAMPLE_DOT_COM,
+            "ENVIRONMENT": "test",
+            "WORKSPACE": "test",
+        },
+    ):
         from etl.notify.notify import handler
 
         result = handler(event=json_loads(Payload))

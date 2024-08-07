@@ -4,6 +4,7 @@ from attr import asdict as _asdict
 from domain.core.device.v2 import (
     Device,
     DeviceCreatedEvent,
+    DeviceDeletedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
     DeviceTag,
@@ -80,8 +81,14 @@ def _device_primary_keys(
 
 
 def update_device_indexes(
-    table_name: str, id: str, keys: list[DeviceKey], tags: list[DeviceTag], data: dict
+    table_name: str,
+    id: str,
+    keys: list[DeviceKey],
+    data: dict,
+    tags: list[DeviceTag] = None,
 ) -> list[TransactItem]:
+    tags = [] if tags is None else tags
+
     primary_keys = _device_primary_keys(
         device_id=id, device_keys=keys, device_tags=tags
     )
@@ -118,12 +125,19 @@ def create_device_index(
     )
 
 
-def delete_device_index(table_name: str, key_parts: tuple[str]) -> TransactItem:
-    key = TableKey.DEVICE.key(*key_parts)
+def delete_device_index(
+    table_name: str,
+    pk_key_parts: tuple[str],
+    sk_key_parts=None,
+    pk_table_key: TableKey = TableKey.DEVICE,
+    sk_table_key: TableKey = TableKey.DEVICE,
+) -> TransactItem:
+    pk = pk_table_key.key(*pk_key_parts)
+    sk = sk_table_key.key(*sk_key_parts) if sk_key_parts else pk
     return TransactItem(
         Delete=TransactionStatement(
             TableName=table_name,
-            Key=marshall(pk=key, sk=key),
+            Key=marshall(pk=pk, sk=sk),
             ConditionExpression=ConditionExpression.MUST_EXIST,
         )
     )
@@ -155,6 +169,34 @@ class DeviceRepository(Repository[Device]):
             tags=tags,
             data=asdict(event),
         )
+
+    def handle_DeviceDeletedEvent(
+        self, event: DeviceDeletedEvent
+    ) -> list[TransactItem]:
+        # Inactive Devices have tags removed so that they are
+        # no longer searchable
+        delete_transactions = [
+            delete_device_index(
+                table_name=self.table_name,
+                pk_key_parts=(DeviceTag(**tag).value,),
+                sk_key_parts=(event.id,),
+                pk_table_key=TableKey.DEVICE_TAG,
+            )
+            for tag in event.deleted_tags
+        ]
+
+        device_data = asdict(event)
+        device_data.pop("deleted_tags")
+
+        keys = {DeviceKey(**key) for key in event.keys}
+        update_transactions = update_device_indexes(
+            table_name=self.table_name,
+            id=event.id,
+            keys=keys,
+            data=device_data,
+        )
+
+        return delete_transactions + update_transactions
 
     def handle_DeviceKeyAddedEvent(
         self, event: DeviceKeyAddedEvent
@@ -188,7 +230,7 @@ class DeviceRepository(Repository[Device]):
     ) -> list[TransactItem]:
         # Delete the copy of the Device indexed against the deleted key
         delete_transaction = delete_device_index(
-            table_name=self.table_name, key_parts=event.deleted_key.parts
+            table_name=self.table_name, pk_key_parts=event.deleted_key.parts
         )
         # Update the value of "keys" on all other copies of this Device
         device_tags = {DeviceTag(**tag) for tag in event.tags}
@@ -249,6 +291,37 @@ class DeviceRepository(Repository[Device]):
                 "questionnaire_responses": event.questionnaire_responses,
                 "updated_on": event.updated_on,
             },
+        )
+
+    def handle_bulk(self, item: dict) -> list[TransactItem]:
+        create_device_transaction = create_device_index(
+            table_name=self.table_name,
+            pk_key_parts=(item["id"],),
+            device_data=item,
+            root=True,
+        )
+        create_keys_transactions = [
+            create_device_index(
+                table_name=self.table_name,
+                pk_key_parts=(key["key_type"], key["key_value"]),
+                device_data=item,
+            )
+            for key in item["keys"]
+        ]
+        create_tags_transactions = [
+            create_device_index(
+                table_name=self.table_name,
+                pk_key_parts=(DeviceTag(**tag).value,),
+                sk_key_parts=(item["id"],),
+                pk_table_key=TableKey.DEVICE_TAG,
+                device_data=item,
+            )
+            for tag in item["tags"]
+        ]
+        return (
+            [create_device_transaction]
+            + create_keys_transactions
+            + create_tags_transactions
         )
 
     def read(self, *key_parts: str) -> Device:

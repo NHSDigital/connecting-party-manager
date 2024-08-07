@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 
 import boto3
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.device import DeviceEventDeserializer
-from domain.repository.device_repository import DeviceRepository
+from domain.core.device.v2 import DeviceEventDeserializer
+from domain.repository.device_repository.v2 import DeviceRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
-from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
+from etl_utils.worker.model import EtlType, WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
@@ -58,14 +58,21 @@ def load(
 
 
 def handler(event: dict, context):
-    max_records = WorkerEvent(**event).max_records or MAX_RECORDS
+    worker_event = WorkerEvent(**event)
+    max_records = worker_event.max_records or MAX_RECORDS
+    processed_dumper = lambda events: (
+        REPOSITORY.write(AggregateRoot(events=events))
+        if worker_event.etl_type is EtlType.UPDATES
+        else REPOSITORY.write_bulk
+    )
+
     response = execute_step_chain(
         action=load,
         s3_client=S3_CLIENT,
         s3_input_path=ENVIRONMENT.s3_path(WorkerKey.LOAD),
         s3_output_path=None,
         unprocessed_dumper=pkl_dump_lz4,
-        processed_dumper=lambda events: REPOSITORY.write(AggregateRoot(events=events)),
+        processed_dumper=processed_dumper,
         max_records=max_records,
     )
     return asdict(response)

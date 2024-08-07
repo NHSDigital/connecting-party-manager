@@ -3,7 +3,8 @@ from pathlib import Path
 from domain.core.questionnaire import custom_rules
 from event.json import json_load
 
-from . import ALLOWED_QUESTION_TYPES, Questionnaire
+from .v1 import ALLOWED_QUESTION_TYPES
+from .v2 import Questionnaire
 
 PATH_TO_HERE = Path(__file__).parent
 

@@ -1,7 +1,7 @@
 from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.api.query import SearchSDSEndpointQueryParams
+from domain.api.sds.query import SearchSDSEndpointQueryParams
 from domain.core.device import Device
 from domain.repository.device_repository.v2 import DeviceRepository
 from domain.response.validation_errors import InboundValidationError

@@ -1,3 +1,7 @@
+from collections import ChainMap
+from itertools import product
+
+
 def update_in_list_of_dict(obj: list[dict[str, str]], key, value: list):
     found = False
     items_to_remove = []
@@ -28,3 +32,16 @@ def get_in_list_of_dict(obj: list[dict[str, str]], key):
         if value is not None:
             return value
     return None
+
+
+def questionnaire_response_answers_to_device_tags(answers, tag_fields):
+    tag_components = []
+    for field in tag_fields:
+        value = get_in_list_of_dict(obj=answers, key=field)
+        if not value:
+            return []
+        tag_components.append([{field: v} for v in value])
+
+    return [
+        dict(ChainMap(*_tag_components)) for _tag_components in product(*tag_components)
+    ]

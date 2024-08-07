@@ -1,5 +1,5 @@
 import pytest
-from domain.core.questionnaire import Questionnaire
+from domain.core.questionnaire.v2 import Questionnaire
 from domain.core.questionnaire.load_questionnaire import render_questionnaire
 from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from event.json import json_load
@@ -30,7 +30,7 @@ def _test_spine_device_questionnaire_v1(
 ):
     count_mandatory_questions = len(questionnaire.mandatory_questions)
     questionnaire_response_responses = (
-        nhs_accredited_system.as_questionnaire_response_responses()
+        nhs_accredited_system.as_questionnaire_response_answers()
     )
 
     count_accredited_systems = 0
@@ -47,7 +47,7 @@ def _test_spine_device_questionnaire_v1(
             _questionnaire_response.questionnaire.id
             == f"{QuestionnaireInstance.SPINE_DEVICE}/1"
         )
-        assert len(_questionnaire_response.responses) >= count_mandatory_questions
+        assert len(_questionnaire_response.answers) >= count_mandatory_questions
 
     assert count_accredited_systems > 0
     assert count_accredited_systems == len(ods_codes)

@@ -8,9 +8,9 @@ from uuid import UUID
 
 import pytest
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.device import Device, DeviceCreatedEvent, DeviceType
-from domain.core.device_key import DeviceKeyType
-from domain.repository.device_repository import DeviceRepository
+from domain.core.device.v2 import Device, DeviceCreatedEvent, DeviceType
+from domain.core.device_key.v2 import DeviceKeyType
+from domain.repository.device_repository.v2 import DeviceRepository
 from domain.repository.keys import TableKeys
 from domain.repository.marshall import unmarshall
 from etl_utils.constants import WorkerKey
@@ -59,30 +59,19 @@ class MockDeviceRepository(DeviceRepository):
         response = self.client.scan(TableName=self.table_name)
         items = map(unmarshall, response["Items"])
         devices = list(TableKeys.DEVICE.filter(items, key="sk"))
-        yield from (Device(**device) for device in devices)
+        yield from (
+            Device(**device) for device in devices if device.get("root") is True
+        )
 
     def count(self, by: DeviceType | DeviceKeyType):
-        query = lambda kwargs: (
-            self.query_by_key_type(key_type=by, Select="COUNT", **kwargs)
-            if isinstance(by, DeviceKeyType)
-            else self.query_by_device_type(type=by, Select="COUNT", **kwargs)
-        )
-        count = 0
-        scanning = True
-        last_evaluated_key = None
-        while scanning:
-            response = query(
-                kwargs=(
-                    {"ExclusiveStartKey": last_evaluated_key}
-                    if last_evaluated_key
-                    else {}
-                )
+        return sum(
+            (
+                device.device_type is by
+                if isinstance(by, DeviceType)
+                else any(key.key_type is DeviceKeyType for key in device.keys)
             )
-            count += response["Count"]
-            last_evaluated_key = response.get("LastEvaluatedKey")
-            scanning = last_evaluated_key is not None
-
-        return count
+            for device in self.all_devices()
+        )
 
 
 @pytest.fixture
@@ -129,13 +118,15 @@ def device_factory(id: int) -> Device:
     device = Device(
         id=UUID(int=id),
         name=f"device-{id}",
-        type=DeviceType.PRODUCT,
+        device_type=DeviceType.PRODUCT,
         product_team_id=UUID(int=1),
         ods_code=ods_code,
     )
     event = DeviceCreatedEvent(**device.dict())
     device.add_event(event)
-    device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
+    device.add_key(
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=f"{ods_code}:{id}"
+    )
     return device
 
 
@@ -170,7 +161,7 @@ def test_load_worker_pass(
         repository.write(device)
 
     # Execute the load worker
-    response = load.handler(event={}, context=None)
+    response = load.handler(event={"etl_type": "bulk"}, context=None)
     assert response == {
         "stage_name": "load",
         "processed_records": 2 * n_initial_unprocessed,
@@ -233,7 +224,9 @@ def test_load_worker_pass_max_records(
         )
 
         # Execute the load worker
-        response = load.handler(event={"max_records": MAX_RECORDS}, context=None)
+        response = load.handler(
+            event={"max_records": MAX_RECORDS, "etl_type": "bulk"}, context=None
+        )
         assert response == {
             "stage_name": "load",
             # 2 x because above device_factory creates 2 events per device
@@ -290,7 +283,7 @@ def test_load_worker_bad_record(
     )
 
     # Execute the load worker
-    response = load.handler(event={}, context=None)
+    response = load.handler(event={"etl_type": "bulk"}, context=None)
     response["error_message"] = response["error_message"].split("\n")[:6]
     assert response == {
         "stage_name": "load",

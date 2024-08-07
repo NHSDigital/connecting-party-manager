@@ -3,6 +3,7 @@ from datetime import datetime
 import pytest
 from domain.core.device.v2 import (
     Device,
+    DeviceDeletedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
     DeviceTagAddedEvent,
@@ -76,7 +77,7 @@ def test_device_delete(device_v2: Device):
     assert device_v2.created_on == device_created_on
     assert isinstance(device_v2.deleted_on, datetime)
     assert device_v2.updated_on == device_v2.deleted_on
-    assert isinstance(event, DeviceUpdatedEvent)
+    assert isinstance(event, DeviceDeletedEvent)
 
 
 def test_device_add_key(device_v2: Device):

@@ -45,8 +45,8 @@ def sort_devices(devices: list[dict]):
         for questionnaire_responses in device.get(
             "questionnaire_responses", {}
         ).values()
-        for questionnaire_response in questionnaire_responses
-        for response in questionnaire_response["responses"]
+        for _, questionnaire_response in questionnaire_responses.items()
+        for response in questionnaire_response["answers"]
     ]
     for response in responses:
         ((field, answers),) = response.items()
@@ -86,9 +86,7 @@ def test_extract(scenario: Scenario, extract_handler: Handler, s3_client: S3Clie
 def run_transform_and_load(transform_handler: Handler, load_handler: Handler):
     unprocessed_transform_records = None
     while unprocessed_transform_records is None or unprocessed_transform_records > 0:
-        transform_response = transform_handler(
-            event={"max_records": 1, "trust": False}, context=None
-        )
+        transform_response = transform_handler(event={"max_records": 1}, context=None)
         error_message = transform_response.get("error_message")
         if error_message:
             raise EtlError(error_message)
@@ -96,7 +94,9 @@ def run_transform_and_load(transform_handler: Handler, load_handler: Handler):
 
         unprocessed_load_records = None
         while unprocessed_load_records is None or unprocessed_load_records > 0:
-            load_response = load_handler(event={"max_records": 1}, context=None)
+            load_response = load_handler(
+                event={"max_records": 1, "etl_type": "updates"}, context=None
+            )
             error_message = load_response.get("error_message")
             if error_message:
                 raise EtlError(error_message)
