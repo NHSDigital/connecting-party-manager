@@ -70,7 +70,7 @@ function attach_product(){
     _org_name="nhsd-nonprod"
     # Currently hardcoded to CPM PTL id for PR running purposes, could be passed in for adjusting other apps in the future
     _app_id="9d28b416-311b-4523-bda9-686baa2fc437"
-    _product_name="connecting-party-manager--$_apigee_environment--$_workspace_name--app-level0"
+    _product_name="connecting-party-manager--$_apigee_environment--cpm-$_workspace_name--app-level0"
     _secret_name="$_aws_environment--apigee-app-client-info"
 
         echo "
@@ -79,7 +79,6 @@ function attach_product(){
     workspace_name        ${_workspace_name}
     aws_environment       ${_aws_environment}
     apigee_environment    ${_apigee_environment}
-    apigee_stage          ${_apigee_stage}
 "
     client_parameters=$(aws ssm get-parameter --name "apigee-app-client-info" --with-decryption --query "Parameter.Value" --output text)
     client_id=$(echo "$client_parameters" | jq -r '.client_id')
@@ -91,10 +90,10 @@ function attach_product(){
     _access_token=$(get_access_token ${client_id} ${client_secret})
 
     app_product=$(curl -X POST \
-        https://api.enterprise.apigee.com/v1/o/$_org_name/developers/$_email_that_owns_app/apps/CPM%20PTL/keys/$client_key \
+        https://api.enterprise.apigee.com/v1/o/$_org_name/developers/$email_that_owns_app/apps/CPM%20PTL/keys/$client_key \
         -H "Authorization: Bearer $_access_token" \
         -H "Content-type:application/json" \
-        -d "{\"apiProducts\": [\"$_product_name\"]}" \)
+        -d "{\"apiProducts\": [\"$_product_name\"]}")
 
     # add_product_response=$(curl -s -X POST \
     #   "https://api.enterprise.apigee.com/v1/organizations/$_org_name/apps/$_app_id" \
