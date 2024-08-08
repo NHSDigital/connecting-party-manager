@@ -190,9 +190,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH_NAME }}
+      - run: |
+          poetry install --with pytest-nhsd
       - uses: ./.github/actions/make/
         with:
-          command: apigee--deploy
+          command: apigee--attach-product
           save-to-cache: "false"
           restore-from-cache: "true"
           requires-aws: true

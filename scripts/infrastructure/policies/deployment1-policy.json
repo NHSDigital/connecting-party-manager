@@ -245,7 +245,8 @@
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-sds-hscn-endpoint-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-host-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-changelog-user-*",
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-changelog-password-*"
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-changelog-password-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-client-info-*"
       ]
     },
     {
