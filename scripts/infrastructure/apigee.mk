@@ -1,4 +1,4 @@
-.PHONY: apigee--deploy apigee--clean
+.PHONY: apigee--deploy apigee--clean apigee--attach-product
 
 APIGEE_CONFIG_PATH = $(CURDIR)/infrastructure/apigee
 APIGEE_TIMESTAMP = $(TIMESTAMP_DIR)/.apigee.stamp
@@ -13,6 +13,15 @@ apigee--deploy: $(PROXYGEN_TIMESTAMP)
 
 apigee--clean:
 	[[ -f $(PROXYGEN_TIMESTAMP) ]] && rm $(PROXYGEN_TIMESTAMP) || :
+
+apigee--attach-product: aws--login
+	WORKSPACE_OUTPUT_JSON=$(WORKSPACE_OUTPUT_JSON) \
+	ENVIRONMENT_MAPPING_YAML=$(ENVIRONMENT_MAPPING_YAML) \
+	STAGE_MAPPING_YAML=$(STAGE_MAPPING_YAML) \
+	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh attach_product
 
 
 
