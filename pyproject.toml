@@ -65,12 +65,6 @@ ipython = "^8.17.2"
 [tool.poetry.group.sds_update]
 optional = true
 
-[tool.poetry.group.pytest-nhsd]
-optional = true
-
-[tool.poetry.group.pytest-nhsd.dependencies]
-pytest-nhsd-apim = "^3.4.2"
-
 [tool.poetry.group.sds_update.dependencies]
 python-ldap = "^3.4.4"
 lz4 = "^4.3.3"

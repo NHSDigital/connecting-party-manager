@@ -191,7 +191,7 @@ jobs:
         with:
           ref: ${{ env.BRANCH_NAME }}
       - run: |
-          poetry add pytest-nhsd --group pytest-nhsd
+          poetry add pytest-nhsd-apim --group pytest-nhsd
       - uses: ./.github/actions/make/
         with:
           command: apigee--attach-product
