@@ -82,6 +82,23 @@ class DeviceUpdatedEvent(Event):
 
 
 @dataclass(kw_only=True, slots=True)
+class DeviceDeletedEvent(Event):
+    id: str
+    name: str
+    device_type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: Optional[str] = None
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    deleted_tags: list["DeviceTag"] = None
+
+
+@dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
     new_key: DeviceKey
     id: str
@@ -219,16 +236,18 @@ class Device(AggregateRoot):
         return DeviceUpdatedEvent(**device_data)
 
     @event
-    def delete(self) -> DeviceUpdatedEvent:
+    def delete(self) -> DeviceDeletedEvent:
         deleted_on = now()
+        deleted_tags = self.tags
         device_data = self._update(
             data=dict(
                 status=Status.INACTIVE,
                 updated_on=deleted_on,
                 deleted_on=deleted_on,
+                tags=[],
             )
         )
-        return DeviceUpdatedEvent(**device_data)
+        return DeviceDeletedEvent(**device_data, deleted_tags=deleted_tags)
 
     @event
     def add_key(self, key_type: str, key_value: str) -> DeviceKeyAddedEvent:

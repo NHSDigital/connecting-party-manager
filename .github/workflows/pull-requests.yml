@@ -245,6 +245,21 @@ jobs:
           command: test--smoke
           requires-aws: true
 
+  delete--proxy:
+    needs: [test--smoke]
+    runs-on: [self-hosted, ci]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--delete
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
   destroy-redundant-workspaces:
     runs-on: [self-hosted, ci]
     needs: [build-head]
