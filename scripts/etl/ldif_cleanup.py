@@ -26,8 +26,8 @@ from collections import deque
 from io import BytesIO
 from pathlib import Path
 
-from domain.core.load_questionnaire import render_questionnaire
-from domain.core.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.load_questionnaire import render_questionnaire
+from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from etl_utils.io import EtlEncoder
 from etl_utils.ldif.ldif import filter_ldif_from_s3_by_property, parse_ldif
 from etl_utils.worker.action import apply_action

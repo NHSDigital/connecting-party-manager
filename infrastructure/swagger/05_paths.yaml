@@ -168,3 +168,105 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
+
+  /searchSdsDevice:
+    get:
+      operationId: searchsdsdevice
+      summary: searchSdsDevice endpoint for APIGEE integration
+      parameters:
+        - name: nhs_as_client
+          in: query
+          required: false
+          description: "Accredited System Client"
+          schema:
+            type: string
+        - name: nhs_as_svc_ia
+          in: query
+          required: false
+          description: "Accredited System Client Interaction"
+          schema:
+            type: string
+        - name: nhs_mhs_manufacturer_org
+          in: query
+          required: false
+          description: "Manufacturer Organisation"
+          schema:
+            type: string
+        - name: nhs_mhs_party_key
+          in: query
+          required: false
+          description: "Party Key"
+          schema:
+            type: string
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchSdsDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /searchSdsEndpoint:
+    get:
+      operationId: searchsdsendpoint
+      summary: searchSdsEndpoint endpoint for APIGEE integration
+      parameters:
+        - name: nhs_id_code
+          in: query
+          required: false
+          description: "NHS ID Code"
+          schema:
+            type: string
+        - name: nhs_mhs_svc_ia
+          in: query
+          required: false
+          description: "Endpoint Interaction"
+          schema:
+            type: string
+        - name: nhs_mhs_party_key
+          in: query
+          required: false
+          description: "Party Key"
+          schema:
+            type: string
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchSdsEndpoint}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []

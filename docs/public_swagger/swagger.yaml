@@ -324,6 +324,120 @@ paths:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
+  /searchSdsDevice:
+    get:
+      operationId: searchsdsdevice
+      summary: searchSdsDevice endpoint for APIGEE integration
+      parameters:
+        - name: nhs_as_client
+          in: query
+          required: false
+          description: "Accredited System Client"
+          schema:
+            type: string
+        - name: nhs_as_svc_ia
+          in: query
+          required: false
+          description: "Accredited System Client Interaction"
+          schema:
+            type: string
+        - name: nhs_mhs_manufacturer_org
+          in: query
+          required: false
+          description: "Manufacturer Organisation"
+          schema:
+            type: string
+        - name: nhs_mhs_party_key
+          in: query
+          required: false
+          description: "Party Key"
+          schema:
+            type: string
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+  /searchSdsEndpoint:
+    get:
+      operationId: searchsdsendpoint
+      summary: searchSdsEndpoint endpoint for APIGEE integration
+      parameters:
+        - name: nhs_id_code
+          in: query
+          required: false
+          description: "NHS ID Code"
+          schema:
+            type: string
+        - name: nhs_mhs_svc_ia
+          in: query
+          required: false
+          description: "Endpoint Interaction"
+          schema:
+            type: string
+        - name: nhs_mhs_party_key
+          in: query
+          required: false
+          description: "Party Key"
+          schema:
+            type: string
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          description: Search Device operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
 components:
   parameters:
     profileParam:

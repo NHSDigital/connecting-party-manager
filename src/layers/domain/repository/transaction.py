@@ -29,11 +29,15 @@ class TransactionStatement(BaseModel):
     Item: Optional[dict] = Field(default=None)
     Key: Optional[dict] = Field(default=None)
     ConditionExpression: Optional["ConditionExpression"] = Field(default=None)
+    UpdateExpression: Optional[str] = Field(default=None)
+    ExpressionAttributeNames: Optional[dict]
+    ExpressionAttributeValues: Optional[dict]
 
 
 class TransactItem(BaseModel):
     Put: Optional[TransactionStatement] = None
     Delete: Optional[TransactionStatement] = None
+    Update: Optional[TransactionStatement] = None
 
 
 class Transaction(BaseModel):
@@ -73,7 +77,7 @@ def handle_client_errors(commands: list[TransactItem]):
         for reason, command in zip(response.CancellationReasons, commands):
             if not reason.condition_check_failed:
                 continue
-            statement = command.Put or command.Delete
+            statement = command.Put or command.Delete or command.Update
             error = TRANSACTION_ERROR_MAPPING.get(statement.ConditionExpression)
             if error:
                 raise error()

@@ -5,20 +5,18 @@ from domain.core.device.v2 import (
     Device,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
-    DeviceStatus,
     DeviceTagAddedEvent,
     DeviceType,
     DeviceUpdatedEvent,
     DuplicateQuestionnaireResponse,
     QuestionnaireNotFoundError,
-    QuestionnaireResponse,
-    QuestionnaireResponseAddedEvent,
     QuestionnaireResponseNotFoundError,
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
+from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
-from domain.core.questionnaire.v2 import Questionnaire
+from domain.core.questionnaire.v2 import Questionnaire, QuestionnaireResponse
 
 
 @pytest.fixture
@@ -74,7 +72,7 @@ def test_device_delete(device_v2: Device):
     device_created_on = device_v2.created_on
     assert device_v2.deleted_on == None
     event = device_v2.delete()
-    assert device_v2.status == DeviceStatus.INACTIVE
+    assert device_v2.status == Status.INACTIVE
     assert device_v2.created_on == device_created_on
     assert isinstance(device_v2.deleted_on, datetime)
     assert device_v2.updated_on == device_v2.deleted_on
@@ -87,6 +85,8 @@ def test_device_add_key(device_v2: Device):
         DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY")
     ]
     assert isinstance(event, DeviceKeyAddedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
 
 def test_device_delete_key(device_v2: Device):
@@ -96,6 +96,8 @@ def test_device_delete_key(device_v2: Device):
     )
     assert device_v2.keys == []
     assert isinstance(event, DeviceKeyDeletedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
 
 def test_device_delete_key_fail(device_v2: Device):
@@ -111,24 +113,33 @@ def test_device_add_questionnaire_response(
     event = device_v2.add_questionnaire_response(
         questionnaire_response=questionnaire_response
     )
-    created_on_1 = questionnaire_response.created_on
-
+    created_on_1 = questionnaire_response.created_on.isoformat()
+    original_updated_on = device_v2.updated_on
     assert device_v2.questionnaire_responses == {
         "foo/2": {created_on_1: questionnaire_response}
     }
-    assert isinstance(event, QuestionnaireResponseAddedEvent)
+    assert isinstance(event, QuestionnaireResponseUpdatedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
     event_2 = device_v2.add_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
     )
-    created_on_2 = another_good_questionnaire_response.created_on
+    created_on_2 = another_good_questionnaire_response.created_on.isoformat()
     assert device_v2.questionnaire_responses == {
         "foo/2": {
             created_on_1: questionnaire_response,
             created_on_2: another_good_questionnaire_response,
         }
     }
-    assert isinstance(event_2, QuestionnaireResponseAddedEvent)
+
+    assert device_v2.updated_on == event_2.updated_on
+    assert device_v2.updated_on > original_updated_on
+
+    assert isinstance(event_2, QuestionnaireResponseUpdatedEvent)
+    assert event_2.updated_on is not None
+    assert event_2.updated_on > event.updated_on
+    assert event_2.updated_on == device_v2.updated_on
 
 
 def test_device_cannot_add_same_questionnaire_response_twice(
@@ -154,9 +165,11 @@ def test_device_update_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
     )
     assert device_v2.questionnaire_responses == {
-        "foo/2": {created_on: another_good_questionnaire_response}
+        "foo/2": {created_on.isoformat(): another_good_questionnaire_response}
     }
     assert isinstance(event, QuestionnaireResponseUpdatedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
 
 
 def test_device_update_questionnaire_response_mismatching_created_on_error(
@@ -181,13 +194,17 @@ def test_device_update_questionnaire_response_key_error(
 
 
 def test_device_add_tag(device_v2: Device):
-    event = device_v2.add_tag(foo="first", bar="second")
-    assert isinstance(event, DeviceTagAddedEvent)
+    event_1 = device_v2.add_tag(foo="first", bar="second")
+    assert isinstance(event_1, DeviceTagAddedEvent)
     assert [tag.value for tag in device_v2.tags] == [
         "<<bar##second>>##<<foo##first>>",
     ]
+    assert event_1.updated_on is not None
+    assert event_1.updated_on == device_v2.updated_on
 
-    device_v2.add_tag(foo="first", bar="second", baz="third")
+    event_2 = device_v2.add_tag(foo="first", bar="second", baz="third")
+    assert event_2.updated_on is not None
+    assert event_2.updated_on == device_v2.updated_on
 
     with pytest.raises(DuplicateError):
         device_v2.add_tag(bar="second", foo="first")
@@ -196,3 +213,5 @@ def test_device_add_tag(device_v2: Device):
         "<<bar##second>>##<<foo##first>>",
         "<<bar##second>>##<<baz##third>>##<<foo##first>>",
     ]
+
+    assert event_2.updated_on > event_1.updated_on

@@ -2,8 +2,8 @@ from dataclasses import astuple
 
 import pytest
 from domain.core.device import Device, DeviceStatus
-from domain.core.load_questionnaire import render_questionnaire
-from domain.core.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.load_questionnaire import render_questionnaire
+from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from hypothesis import given, settings
 from sds.cpm_translation.modify.modify_key import (
     InvalidModificationRequest,
