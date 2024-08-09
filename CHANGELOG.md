@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-08-09
+- [PI-469] SDS search use query_by_tag
+- [PI-379] Delete apigee proxy after smoke tests
+
 ## 2024-08-05
 - [PI-447] SDS search endpoints
 - [PI-446] Repo v2

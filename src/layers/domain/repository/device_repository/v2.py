@@ -22,15 +22,6 @@ from domain.repository.transaction import (
     TransactItem,
 )
 
-from .mock_search_responses.mock_responses import (
-    device_5NR_result,
-    device_RTX_result,
-    endpoint_5NR_result,
-    endpoint_RTX_result,
-    no_device_results,
-    no_endpoint_results,
-)
-
 
 def asdict(obj) -> dict:
     return _asdict(obj, recurse=False)
@@ -289,30 +280,3 @@ class DeviceRepository(Repository[Device]):
         )
         items = response["Items"]
         return [Device(**unmarshall(item)) for item in items]
-
-    def query_by_tag_mock(self, **kwargs):
-        if "nhs_as_client" in kwargs:
-            if kwargs["nhs_as_client"] != "5NR" and kwargs["nhs_as_client"] != "RTX":
-                return no_device_results
-            else:
-                if kwargs["nhs_as_client"] == "5NR":
-                    return device_5NR_result
-                if kwargs["nhs_as_client"] == "RTX":
-                    return device_RTX_result
-        else:
-            if "nhs_id_code" in kwargs:
-                if kwargs["nhs_id_code"] != "5NR" and kwargs["nhs_id_code"] != "RTX":
-                    return no_endpoint_results
-                else:
-                    if kwargs["nhs_id_code"] == "5NR":
-                        return endpoint_5NR_result
-                    if kwargs["nhs_id_code"] == "RTX":
-                        return endpoint_RTX_result
-            else:
-                if "nhs_mhs_party_key" in kwargs:
-                    if kwargs["nhs_mhs_party_key"] == "D81631-827817":
-                        return endpoint_RTX_result
-                    else:
-                        return no_endpoint_results
-                else:
-                    return no_endpoint_results
