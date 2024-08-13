@@ -2,7 +2,7 @@ from typing import Generator
 
 import pytest
 from domain.core.device.v2 import Device, DeviceType
-from domain.core.device_key.v1 import DeviceKeyType
+from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.root.v2 import Root
 from domain.repository.device_repository.tests.utils import repository_fixture
 from domain.repository.device_repository.v2 import DeviceRepository
