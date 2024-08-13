@@ -71,7 +71,7 @@ def test_no_results(params):
 
         endpoint_cache["DYNAMODB_CLIENT"] = client
 
-        device_repo = DeviceRepository(
+        DeviceRepository(
             table_name=endpoint_cache["DYNAMODB_TABLE"],
             dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
         )
@@ -162,7 +162,7 @@ def test_index(params, device):
             f"spine_{device['device_name']}/1"
         ]
         iter_items = iter(questionnaire_responses.items())
-        iter_key, iter_value = next(iter_items)
+        _, iter_value = next(iter_items)
         filter_count = 0
         for answer in iter_value["answers"]:
             for key, value in params.items():
@@ -271,7 +271,7 @@ def test_multiple_returned(params, devices):
             f"spine_{devices[index]['device_name']}/1"
         ]
         iter_items = iter(questionnaire_responses.items())
-        iter_key, iter_value = next(iter_items)
+        _, iter_value = next(iter_items)
         filter_count = 0
         for answer in iter_value["answers"]:
             for key, value in params.items():
@@ -309,7 +309,7 @@ def test_multiple_returned(params, devices):
         ),
     ],
 )
-def test_filter_errors(params, error, statusCode):
+def test_filter_errors(params, error, status_code):
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
@@ -328,5 +328,5 @@ def test_filter_errors(params, error, statusCode):
                 "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-    assert result["statusCode"] == statusCode
+    assert result["statusCode"] == status_code
     assert error in result["body"]
