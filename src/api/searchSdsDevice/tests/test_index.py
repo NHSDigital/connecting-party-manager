@@ -13,6 +13,7 @@ from event.json import json_loads
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 from test_helpers.uuid import consistent_uuid
+from test_helpers.validate_search_response import validate_result_body
 
 TABLE_NAME = "hiya"
 
@@ -160,31 +161,10 @@ def test_index(params, device):
                 "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-    result_body = json_loads(result["body"])
-
     assert result["statusCode"] == 200
 
-    for result in result_body:
-        assert result["status"] == "active"
-        assert result["name"] == device["device_name"]
-        for key in result["keys"]:
-            assert key["key_value"] == device["device_key"]
-        for tag in result["tags"]:
-            for key, value in params.items():
-                assert [key, value] in tag["components"]
-        questionnaire_responses = result["questionnaire_responses"][
-            f"spine_{device['device_name']}/1"
-        ]
-        iter_items = iter(questionnaire_responses.items())
-        _, iter_value = next(iter_items)
-        filter_count = 0
-        for answer in iter_value["answers"]:
-            for key, value in params.items():
-                if key in answer:
-                    filter_count = filter_count + 1
-                    assert value in answer[key]
-
-        assert filter_count == len(params)
+    result_body = json_loads(result["body"])
+    validate_result_body(result_body, device, params)
 
 
 @pytest.mark.integration
@@ -282,34 +262,13 @@ def test_multiple_returned(params, devices):
             }
         )
 
+    assert result["statusCode"] == 200
+
     result_body = json_loads(result["body"])
     devices.reverse()
     if result_body[0]["name"] != devices[0]["device_name"]:
         devices.reverse()
-
-    assert result["statusCode"] == 200
-
-    for index, result in enumerate(result_body):
-        assert result["status"] == "active"
-        assert result["name"] == devices[index]["device_name"]
-        for key in result["keys"]:
-            assert key["key_value"] == devices[index]["device_key"]
-        for tag in result["tags"]:
-            for key, value in params.items():
-                assert [key, value] in tag["components"]
-        questionnaire_responses = result["questionnaire_responses"][
-            f"spine_{devices[index]['device_name']}/1"
-        ]
-        iter_items = iter(questionnaire_responses.items())
-        _, iter_value = next(iter_items)
-        filter_count = 0
-        for answer in iter_value["answers"]:
-            for key, value in params.items():
-                if key in answer:
-                    filter_count = filter_count + 1
-                    assert value in answer[key]
-
-        assert filter_count == len(params)
+    validate_result_body(result_body, devices, params)
 
 
 @pytest.mark.parametrize(
