@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
-from domain.core.device_key.v1 import DeviceKeyType
+from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.questionnaire.v2 import Questionnaire
 from domain.core.root.v2 import Root
 from domain.repository.device_repository.v2 import DeviceRepository
