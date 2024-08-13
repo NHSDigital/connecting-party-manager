@@ -283,7 +283,7 @@ def test_multiple_returned(params, devices):
 
 
 @pytest.mark.parametrize(
-    "params, error, statusCode",
+    "params, error, status_code",
     [
         (
             {

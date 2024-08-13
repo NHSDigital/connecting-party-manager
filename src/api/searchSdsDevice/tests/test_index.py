@@ -313,7 +313,7 @@ def test_multiple_returned(params, devices):
 
 
 @pytest.mark.parametrize(
-    "params, error, statusCode",
+    "params, error, status_code",
     [
         ({"nhs_as_client": "5NR"}, "MISSING_VALUE", 400),
         (
