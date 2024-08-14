@@ -1,7 +1,6 @@
 import pytest
 from domain.core.device.v2 import Device
-from domain.core.device_key.v1 import DeviceKeyType
-from domain.core.device_key.v2 import DeviceKey
+from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
 from domain.repository.device_repository.v2 import DeviceRepository
 
 

@@ -2,8 +2,8 @@ import pytest
 from domain.core.device.v2 import Device as DeviceV2
 from domain.core.device.v2 import DeviceTag
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
-from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
+from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.core.root.v2 import Root
 from domain.repository.device_repository.v2 import (

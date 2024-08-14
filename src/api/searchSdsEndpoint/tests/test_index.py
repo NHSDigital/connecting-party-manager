@@ -1,78 +1,248 @@
-import json
 import os
 from unittest import mock
 
 import pytest
-from domain.repository.device_repository.mock_search_responses.mock_responses import (
-    endpoint_RTX_result,
-)
+from domain.core.device.v2 import DeviceType as DeviceTypeV2
+from domain.core.device_key.v2 import DeviceKeyType
+from domain.core.questionnaire.v2 import Questionnaire
+from domain.core.root.v2 import Root
+from domain.repository.device_repository.v2 import DeviceRepository
+from event.aws.client import dynamodb_client
+from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table
-from test_helpers.response_assertions import _response_assertions
+from test_helpers.terraform import read_terraform_output
+from test_helpers.uuid import consistent_uuid
+from test_helpers.validate_search_response import validate_result_body
 
 TABLE_NAME = "hiya"
 
 
+def _create_org():
+    org = Root.create_ods_organisation(ods_code="ABC")
+    product_team = org.create_product_team(
+        id=consistent_uuid(1), name="product-team-name-a"
+    )
+    return product_team
+
+
+def _create_device(device, product_team, params):
+    cpmdevice = product_team.create_device(
+        name=device["device_name"], device_type=DeviceTypeV2.ENDPOINT
+    )
+    cpmdevice.add_key(key_value=device["device_key"], key_type=DeviceKeyType.PRODUCT_ID)
+
+    questionnaire = Questionnaire(name=f"spine_{device['device_name']}", version=1)
+
+    response = []
+    for key, value in params.items():
+        questionnaire.add_question(name=key, answer_types=(str,), mandatory=True)
+        response.append({key: [value]})
+
+    questionnaire_response = questionnaire.respond(responses=response)
+    cpmdevice.add_questionnaire_response(questionnaire_response=questionnaire_response)
+    cpmdevice.add_tag(**params)
+    return cpmdevice
+
+
+@pytest.mark.integration
 @pytest.mark.parametrize(
-    "params, expected_body",
+    "params",
     [
-        (
-            {
-                "nhs_id_code": "RTX",
-                "nhs_mhs_svc_ia": "urn:nhs:names:services:ebs:PRSC_IN040000UK08",
-            },
-            endpoint_RTX_result,
-        ),
-        (
-            {"nhs_id_code": "RTX", "nhs_mhs_party_key": "D81631-827817"},
-            endpoint_RTX_result,
-        ),
-        (
-            {
-                "nhs_mhs_svc_ia": "urn:nhs:names:services:ebs:PRSC_IN040000UK08",
-                "nhs_mhs_party_key": "D81631-827817",
-            },
-            endpoint_RTX_result,
-        ),
+        {
+            "nhs_id_code": "5NR",
+            "nhs_mhs_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+        },
     ],
 )
-def test_index(params, expected_body):
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+def test_no_results(params):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    with mock.patch.dict(
         os.environ,
         {
-            "DYNAMODB_TABLE": TABLE_NAME,
+            "DYNAMODB_TABLE": table_name,
             "AWS_DEFAULT_REGION": "eu-west-2",
         },
         clear=True,
     ):
-        from api.searchSdsEndpoint.index import cache, handler
+        from api.searchSdsEndpoint.index import cache as endpoint_cache
+        from api.searchSdsEndpoint.index import handler as endpoint_handler
 
-        cache["DYNAMODB_CLIENT"] = client
-        result = handler(
+        endpoint_cache["DYNAMODB_CLIENT"] = client
+
+        DeviceRepository(
+            table_name=endpoint_cache["DYNAMODB_TABLE"],
+            dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
+        )
+
+        result = endpoint_handler(
             event={
                 "headers": {"version": 1},
                 "queryStringParameters": params,
                 "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-    expected = {
-        "statusCode": 200,
-        "body": json.dumps(expected_body),
-        "headers": {
-            "Content-Type": "application/json",
-            "Content-Length": str(len(json.dumps(expected_body))),
-            "Version": "1",
-            "Location": None,
-            "Host": "foo.co.uk",
+    result_body = json_loads(result["body"])
+
+    assert result["statusCode"] == 200
+    assert len(result_body) == 0
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "params, device",
+    [
+        (
+            {
+                "nhs_id_code": "5NR",
+                "nhs_mhs_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+            },
+            {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+        ),
+        (
+            {
+                "nhs_id_code": "5NR",
+                "nhs_mhs_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_party_key": "foo",
+            },
+            {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+        ),
+        (
+            {"nhs_id_code": "5NR", "nhs_mhs_party_key": "foo"},
+            {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+        ),
+    ],
+)
+def test_index(params, device):
+    product_team = _create_org()
+    cpmdevice = _create_device(device=device, product_team=product_team, params=params)
+
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
         },
-    }
-    _response_assertions(
-        result=result, expected=expected, check_body=True, check_content_length=True
-    )
+        clear=True,
+    ):
+        from api.searchSdsEndpoint.index import cache as endpoint_cache
+        from api.searchSdsEndpoint.index import handler as endpoint_handler
+
+        endpoint_cache["DYNAMODB_CLIENT"] = client
+
+        endpoint_repo = DeviceRepository(
+            table_name=endpoint_cache["DYNAMODB_TABLE"],
+            dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
+        )
+        endpoint_repo.write(cpmdevice)
+
+        result = endpoint_handler(
+            event={
+                "headers": {"version": 1},
+                "queryStringParameters": params,
+                "multiValueHeaders": {"Host": ["foo.co.uk"]},
+            }
+        )
+    assert result["statusCode"] == 200
+
+    result_body = json_loads(result["body"])
+    validate_result_body(result_body, device, params)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "params, devices",
+    [
+        (
+            {
+                "nhs_id_code": "5NR",
+                "nhs_mhs_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+        (
+            {
+                "nhs_id_code": "5NR",
+                "nhs_mhs_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+                "nhs_mhs_party_key": "foo",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+        (
+            {"nhs_id_code": "5NR", "nhs_mhs_party_key": "foo"},
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+    ],
+)
+def test_multiple_returned(params, devices):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    product_team = _create_org()
+    for device in devices:
+        cpmdevice = _create_device(
+            device=device, product_team=product_team, params=params
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "DYNAMODB_TABLE": table_name,
+                "AWS_DEFAULT_REGION": "eu-west-2",
+            },
+            clear=True,
+        ):
+            from api.searchSdsEndpoint.index import cache as endpoint_cache
+
+            endpoint_cache["DYNAMODB_CLIENT"] = client
+            endpoint_repo = DeviceRepository(
+                table_name=endpoint_cache["DYNAMODB_TABLE"],
+                dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
+            )
+            endpoint_repo.write(cpmdevice)
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchSdsEndpoint.index import handler as endpoint_handler
+
+        result = endpoint_handler(
+            event={
+                "headers": {"version": 1},
+                "queryStringParameters": params,
+                "multiValueHeaders": {"Host": ["foo.co.uk"]},
+            }
+        )
+    assert result["statusCode"] == 200
+
+    result_body = json_loads(result["body"])
+    devices.reverse()
+    if result_body[0]["name"] != devices[0]["device_name"]:
+        devices.reverse()
+    validate_result_body(result_body, devices, params)
 
 
 @pytest.mark.parametrize(
-    "params, error, statusCode",
+    "params, error, status_code",
     [
         (
             {
@@ -98,7 +268,7 @@ def test_index(params, expected_body):
         ),
     ],
 )
-def test_filter_errors(params, error, statusCode):
+def test_filter_errors(params, error, status_code):
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
@@ -117,5 +287,5 @@ def test_filter_errors(params, error, statusCode):
                 "multiValueHeaders": {"Host": ["foo.co.uk"]},
             }
         )
-    assert result["statusCode"] == statusCode
+    assert result["statusCode"] == status_code
     assert error in result["body"]

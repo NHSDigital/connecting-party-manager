@@ -1,4 +1,4 @@
-.PHONY: apigee--deploy apigee--clean
+.PHONY: apigee--deploy apigee--delete apigee--clean
 
 APIGEE_CONFIG_PATH = $(CURDIR)/infrastructure/apigee
 APIGEE_TIMESTAMP = $(TIMESTAMP_DIR)/.apigee.stamp
@@ -10,6 +10,18 @@ ENVIRONMENT_MAPPING_YAML = $(CURDIR)/infrastructure/apigee/environment_mapping.y
 STAGE_MAPPING_YAML = $(CURDIR)/infrastructure/apigee/stage_mapping.yaml
 
 apigee--deploy: $(PROXYGEN_TIMESTAMP)
+
+
+apigee--delete: aws--login
+	WORKSPACE_OUTPUT_JSON=$(WORKSPACE_OUTPUT_JSON) \
+	ENVIRONMENT_MAPPING_YAML=$(ENVIRONMENT_MAPPING_YAML) \
+	STAGE_MAPPING_YAML=$(STAGE_MAPPING_YAML) \
+	APIGEE_CONFIG_PATH=$(APIGEE_CONFIG_PATH) \
+	SWAGGER_APIGEE=$(SWAGGER_APIGEE) \
+	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/proxygen.sh delete_proxy
 
 apigee--clean:
 	[[ -f $(PROXYGEN_TIMESTAMP) ]] && rm $(PROXYGEN_TIMESTAMP) || :
