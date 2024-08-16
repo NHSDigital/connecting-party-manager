@@ -249,6 +249,7 @@ jobs:
         test--unit,
         test--feature--local,
         terraform-head-build,
+        test--feature--integration,
         test--integration,
         apigee--deploy,
         apigee--attach-product,
