@@ -30,6 +30,7 @@ jobs:
           fi
 
   deploy:
+    needs: [check-for-ref-sandbox]
     uses: ./.github/workflows/_deploy.yml
     with:
       account: ${{ inputs.account }}
