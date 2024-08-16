@@ -19,6 +19,16 @@ on:
         default: false
 
 jobs:
+  check-for-ref-sandbox:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject if ref sandbox
+        run: |
+          if [[ "${{ inputs.account }}" == "ref" && "${{ inputs.sandbox }}" == "true" ]]; then
+            echo "Error: Sandbox deployment is not allowed for the 'ref' account."
+            exit 1
+          fi
+
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
