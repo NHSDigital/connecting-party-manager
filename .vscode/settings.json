@@ -29,5 +29,8 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "nhsdigital",
     "projectKey": "NHSDigital_connecting-party-manager"
+  },
+  "sonarlint.analyzer.additionalProperties": {
+    "sonar.cpd.exclusions": "src/test_helpers/test_delete_me.py"
   }
 }
