@@ -1,7 +1,7 @@
 from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.api.query import SearchQueryParams
+from domain.api.sds.query import SearchQueryParams
 from domain.core.device import Device
 from domain.fhir_translation.device import create_fhir_searchset_bundle
 from domain.repository.device_repository import DeviceRepository

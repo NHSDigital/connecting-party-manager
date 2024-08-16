@@ -1,10 +1,10 @@
-from domain.core.device import Device
-from domain.core.questionnaire import QuestionnaireResponse
+from domain.core.device.v2 import Device
+from domain.core.questionnaire.v2 import QuestionnaireResponse
 from sds.domain.constants import ModificationType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 
-from ..utils import update_in_list_of_dict
+from .utils import set_device_tags, update_in_list_of_dict
 
 
 class DeletionErrorBase(Exception):
@@ -32,10 +32,14 @@ def new_questionnaire_response_from_template(
 ) -> QuestionnaireResponse:
     answer = _as_questionnaire_response_answer(value)
     update_in_list_of_dict(
-        obj=questionnaire_response.responses, key=field_to_update, value=answer
+        obj=questionnaire_response.answers, key=field_to_update, value=answer
     )
-    non_empty_responses = list(filter(bool, questionnaire_response.responses))
-    return questionnaire_response.questionnaire.respond(non_empty_responses)
+    non_empty_answers = list(filter(bool, questionnaire_response.answers))
+    new_questionnaire_response = questionnaire_response.questionnaire.respond(
+        non_empty_answers
+    )
+    new_questionnaire_response.created_on = questionnaire_response.created_on
+    return new_questionnaire_response
 
 
 def update_device_metadata(
@@ -46,7 +50,9 @@ def update_device_metadata(
     new_values: list,
 ) -> Device:
     field = model.get_field_name_for_alias(alias=field_alias)
-    ((questionnaire_response,),) = device.questionnaire_responses.values()
+    (questionnaire_response_by_datetime,) = device.questionnaire_responses.values()
+    (questionnaire_response,) = questionnaire_response_by_datetime.values()
+    questionnaire_response.questionnaire = model.questionnaire()
     _current_values = questionnaire_response.get_response(question_name=field)
 
     # Replacing with an empty value is another method of deleting
@@ -80,7 +86,14 @@ def update_device_metadata(
         value=parsed_values,
     )
     device.update_questionnaire_response(
-        questionnaire_response_index=0,
-        questionnaire_response=new_questionnaire_response,
+        questionnaire_response=new_questionnaire_response
     )
+
+    device.clear_tags()
+    set_device_tags(
+        device=device,
+        data=new_questionnaire_response.flat_answers,
+        model=model.query_params_model(),
+    )
+
     return device

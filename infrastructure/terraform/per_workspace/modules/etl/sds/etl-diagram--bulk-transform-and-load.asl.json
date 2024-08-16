@@ -11,7 +11,7 @@
         "FunctionName": "${load_worker_arn}:$LATEST",
         "Payload": {
           "max_records": "${bulk_load_chunksize}",
-          "trust": false
+          "etl_type": "bulk"
         }
       },
       "Retry": [
@@ -71,7 +71,7 @@
         "FunctionName": "${transform_worker_arn}:$LATEST",
         "Payload": {
           "max_records": "${bulk_transform_chunksize}",
-          "trust": false
+          "etl_type": "bulk"
         }
       },
       "Retry": [

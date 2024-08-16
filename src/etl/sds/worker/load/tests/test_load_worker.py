@@ -1,16 +1,15 @@
 import os
 from collections import deque
 from datetime import datetime, timezone
-from itertools import chain, permutations
 from typing import Callable, Generator
 from unittest import mock
 from uuid import UUID
 
 import pytest
-from domain.core.aggregate_root import AggregateRoot
-from domain.core.device import Device, DeviceCreatedEvent, DeviceType
-from domain.core.device_key import DeviceKeyType
-from domain.repository.device_repository import DeviceRepository
+from domain.core.compression import pkl_loads_gzip
+from domain.core.device.v2 import Device, DeviceCreatedEvent, DeviceType
+from domain.core.device_key.v2 import DeviceKeyType
+from domain.repository.device_repository.v2 import DeviceRepository
 from domain.repository.keys import TableKeys
 from domain.repository.marshall import unmarshall
 from etl_utils.constants import WorkerKey
@@ -25,32 +24,28 @@ BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
 
 
-BAD_CPM_EVENT = {}
-GOOD_CPM_EVENT_1 = {
-    "device_created_event": {
-        "id": str(UUID(int=1)),
-        "name": "device-1",
-        "type": "product",
-        "product_team_id": str(UUID(int=1)),
-        "ods_code": "ABC",
-        "status": "active",
-        "created_on": datetime.now(timezone.utc),
-        "updated_on": None,
-        "deleted_on": None,
-    }
+BAD_DEVICE = {}
+GOOD_DEVICE_1 = {
+    "id": str(UUID(int=1)),
+    "name": "device-1",
+    "device_type": "product",
+    "product_team_id": str(UUID(int=1)),
+    "ods_code": "ABC",
+    "status": "active",
+    "created_on": datetime.now(timezone.utc),
+    "updated_on": None,
+    "deleted_on": None,
 }
-GOOD_CPM_EVENT_2 = {
-    "device_created_event": {
-        "id": str(UUID(int=2)),
-        "name": "device-1",
-        "type": "product",
-        "product_team_id": str(UUID(int=2)),
-        "ods_code": "ABC",
-        "status": "active",
-        "created_on": datetime.now(timezone.utc),
-        "updated_on": None,
-        "deleted_on": None,
-    }
+GOOD_DEVICE_2 = {
+    "id": str(UUID(int=2)),
+    "name": "device-1",
+    "type": "product",
+    "product_team_id": str(UUID(int=2)),
+    "ods_code": "ABC",
+    "status": "active",
+    "created_on": datetime.now(timezone.utc),
+    "updated_on": None,
+    "deleted_on": None,
 }
 
 
@@ -59,30 +54,25 @@ class MockDeviceRepository(DeviceRepository):
         response = self.client.scan(TableName=self.table_name)
         items = map(unmarshall, response["Items"])
         devices = list(TableKeys.DEVICE.filter(items, key="sk"))
-        yield from (Device(**device) for device in devices)
+        for device in devices:
+            if not device.get("root"):
+                continue
+            device["tags"] = pkl_loads_gzip(device["tags"])
+            yield Device(**device)
 
     def count(self, by: DeviceType | DeviceKeyType):
-        query = lambda kwargs: (
-            self.query_by_key_type(key_type=by, Select="COUNT", **kwargs)
-            if isinstance(by, DeviceKeyType)
-            else self.query_by_device_type(type=by, Select="COUNT", **kwargs)
-        )
-        count = 0
-        scanning = True
-        last_evaluated_key = None
-        while scanning:
-            response = query(
-                kwargs=(
-                    {"ExclusiveStartKey": last_evaluated_key}
-                    if last_evaluated_key
-                    else {}
-                )
+        return sum(
+            (
+                device.device_type is by
+                if isinstance(by, DeviceType)
+                else any(key.key_type is by for key in device.keys)
             )
-            count += response["Count"]
-            last_evaluated_key = response.get("LastEvaluatedKey")
-            scanning = last_evaluated_key is not None
+            for device in self.all_devices()
+        )
 
-        return count
+    def read_inactive(self, *key_parts):
+        # Update this function after PI-XXX is implemented
+        return self.read(*key_parts)
 
 
 @pytest.fixture
@@ -129,13 +119,15 @@ def device_factory(id: int) -> Device:
     device = Device(
         id=UUID(int=id),
         name=f"device-{id}",
-        type=DeviceType.PRODUCT,
+        device_type=DeviceType.PRODUCT,
         product_team_id=UUID(int=1),
         ods_code=ods_code,
     )
     event = DeviceCreatedEvent(**device.dict())
     device.add_event(event)
-    device.add_key(type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=f"{ods_code}:{id}")
+    device.add_key(
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=f"{ods_code}:{id}"
+    )
     return device
 
 
@@ -154,26 +146,23 @@ def test_load_worker_pass(
     from etl.sds.worker.load import load
 
     # Initial state
-    _initial_unprocessed_data = [
+    initial_unprocessed_data = [
         device_factory(id=i + 1) for i in range(n_initial_unprocessed)
     ]
-    initial_unprocessed_data = deque()
-    for device in _initial_unprocessed_data:
-        initial_unprocessed_data += device.export_events()
-
     initial_processed_data = [
         device_factory(id=(i + 1) * 1000) for i in range(n_initial_processed)
     ]
-
-    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_unprocessed_data))
-    for device in initial_processed_data:
-        repository.write(device)
+    put_object(
+        key=WorkerKey.LOAD,
+        body=pkl_dumps_lz4(deque(map(Device.state, initial_unprocessed_data))),
+    )
+    repository.write_bulk(map(Device.state, initial_processed_data))
 
     # Execute the load worker
-    response = load.handler(event={}, context=None)
+    response = load.handler(event={"etl_type": "bulk"}, context=None)
     assert response == {
-        "stage_name": "load",
-        "processed_records": 2 * n_initial_unprocessed,
+        "stage_name": "load_bulk",
+        "processed_records": n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -183,7 +172,7 @@ def test_load_worker_pass(
     final_processed_data: list[Device] = list(repository.all_devices())
 
     initial_ids = sorted(
-        device.id for device in _initial_unprocessed_data + initial_processed_data
+        device.id for device in initial_unprocessed_data + initial_processed_data
     )
     final_processed_ids = sorted(device.id for device in final_processed_data)
 
@@ -210,20 +199,17 @@ def test_load_worker_pass_max_records(
     from etl.sds.worker.load import load
 
     # Initial state
-    _initial_unprocessed_data = [
+    initial_unprocessed_data = [
         device_factory(id=i + 1) for i in range(n_initial_unprocessed)
     ]
-    initial_unprocessed_data = deque()
-    for device in _initial_unprocessed_data:
-        initial_unprocessed_data += device.export_events()
-
     initial_processed_data = [
         device_factory(id=(i + 1) * 1000) for i in range(n_initial_processed)
     ]
-
-    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_unprocessed_data))
-    for device in initial_processed_data:
-        repository.write(device)
+    put_object(
+        key=WorkerKey.LOAD,
+        body=pkl_dumps_lz4(deque(map(Device.state, initial_unprocessed_data))),
+    )
+    repository.write_bulk(map(Device.state, initial_processed_data))
 
     n_unprocessed_records = len(initial_unprocessed_data)
     while n_unprocessed_records > 0:
@@ -233,10 +219,11 @@ def test_load_worker_pass_max_records(
         )
 
         # Execute the load worker
-        response = load.handler(event={"max_records": MAX_RECORDS}, context=None)
+        response = load.handler(
+            event={"max_records": MAX_RECORDS, "etl_type": "bulk"}, context=None
+        )
         assert response == {
-            "stage_name": "load",
-            # 2 x because above device_factory creates 2 events per device
+            "stage_name": "load_bulk",
             "processed_records": n_processed_records_expected,
             "unprocessed_records": n_unprocessed_records_expected,
             "error_message": None,
@@ -249,7 +236,7 @@ def test_load_worker_pass_max_records(
     final_processed_data: list[Device] = list(repository.all_devices())
 
     initial_ids = sorted(
-        device.id for device in _initial_unprocessed_data + initial_processed_data
+        device.id for device in initial_unprocessed_data + initial_processed_data
     )
     final_processed_ids = sorted(device.id for device in final_processed_data)
 
@@ -257,63 +244,3 @@ def test_load_worker_pass_max_records(
     # unprocessed data left in the bucket
     assert final_processed_ids == initial_ids
     assert final_unprocessed_data == deque([])
-
-
-@pytest.mark.slow
-@pytest.mark.parametrize(
-    "initial_unprocessed_data",
-    permutations([BAD_CPM_EVENT, GOOD_CPM_EVENT_1, GOOD_CPM_EVENT_2]),
-)
-def test_load_worker_bad_record(
-    initial_unprocessed_data: str,
-    put_object: Callable[[str], None],
-    get_object: Callable[[str], bytes],
-    repository: DeviceRepository,
-):
-    from etl.sds.worker.load import load
-
-    # Initial state
-    bad_record_index = initial_unprocessed_data.index(BAD_CPM_EVENT)
-    n_initial_unprocessed = len(initial_unprocessed_data)
-    put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(deque(initial_unprocessed_data)))
-
-    n_initial_processed = 1000
-    repository.write(
-        AggregateRoot(
-            events=list(
-                chain.from_iterable(
-                    device_factory(id=(i + 1) * 1000).events
-                    for i in range(n_initial_processed)
-                )
-            )
-        )
-    )
-
-    # Execute the load worker
-    response = load.handler(event={}, context=None)
-    response["error_message"] = response["error_message"].split("\n")[:6]
-    assert response == {
-        "stage_name": "load",
-        "processed_records": bad_record_index,
-        "unprocessed_records": n_initial_unprocessed - bad_record_index,
-        "error_message": [
-            "The following errors were encountered",
-            "  -- Error 1 (ValueError) --",
-            f"  Failed to parse record {bad_record_index}",
-            "  {}",
-            "  not enough values to unpack (expected 1, got 0)",
-            "Traceback (most recent call last):",
-        ],
-    }
-
-    # Final state
-    final_unprocessed_data: str = get_object(key=WorkerKey.LOAD)
-    final_processed_data: list[Device] = list(repository.all_devices())
-    n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
-    n_final_processed = len(final_processed_data)
-
-    # Confirm that there are still unprocessed records, and that there may have been
-    # some records processed successfully
-    assert n_final_unprocessed > 0
-    assert n_final_processed == n_initial_processed + bad_record_index
-    assert n_final_unprocessed == n_initial_unprocessed - bad_record_index

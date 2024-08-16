@@ -4,7 +4,7 @@ from functools import partial
 
 import boto3
 import pytest
-from domain.core.device import DeviceType
+from domain.core.device.v2 import DeviceType
 from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.aws.client import dynamodb_client

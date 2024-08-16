@@ -2,7 +2,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
-from domain.core.device import Device
+from domain.core.device.v2 import Device
 from event.json import json_load, json_loads
 
 PATH_TO_HERE = Path(__file__).parent / "changelog_components"
@@ -84,7 +84,7 @@ class _Scenario:
 obj_likes = (list, set, deque, tuple, dict)
 
 
-def convert_list_likes(obj: tuple | set | deque | list | dict):
+def convert_list_likes(obj):
     if isinstance(obj, (list, set, deque, tuple)):
         _list = list if any(isinstance(item, obj_likes) for item in obj) else sorted
         _obj = _list(map(convert_list_likes, obj))
@@ -96,16 +96,20 @@ def convert_list_likes(obj: tuple | set | deque | list | dict):
 
 
 def device_as_json_dict(device: Device) -> dict:
-    _device: dict = json_loads(device.json())
+    _device: dict = device.state()
     _device.pop("id")
-    _device["keys"] = {k: json_loads(key.json()) for k, key in device.keys.items()}
     _device["questionnaire_responses"] = {
         k: [
-            json_loads(questionnaire_response.json(exclude={"questionnaire"}))
-            for questionnaire_response in questionnaire_responses
+            json_loads(questionnaire_response.json())
+            for _, questionnaire_response in questionnaire_responses.items()
         ]
         for k, questionnaire_responses in device.questionnaire_responses.items()
     }
+
+    for questionnaire_responses in _device["questionnaire_responses"].values():
+        for questionnaire_response in questionnaire_responses:
+            questionnaire_response["created_on"] = "CREATED_ON"
+
     return _device
 
 

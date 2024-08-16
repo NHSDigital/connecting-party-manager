@@ -2,9 +2,9 @@ from copy import deepcopy
 from typing import Generator
 
 import pytest
-from domain.core.device import Device
-from domain.repository.device_repository import DeviceRepository
-from domain.repository.keys import TableKeys
+from domain.core.device.v2 import Device, DeviceTag
+from domain.repository.device_repository.v2 import DeviceRepository
+from domain.repository.keys.v2 import TableKey
 from domain.repository.marshall import unmarshall
 from etl_utils.io import pkl_load_lz4
 from event.aws.client import dynamodb_client as get_dynamodb_client
@@ -17,9 +17,18 @@ from .conftest import ETL_BUCKET, parametrize_over_scenarios
 from .utils import Handler, Scenario, convert_list_likes, device_as_json_dict
 
 
-def get_first_key(device: dict[str, dict[str, str]]):
-    keys = list(device.get("keys", {"": ""}).keys())
-    return keys[0]
+def get_first_key(device: dict[str, list[dict[str, str]]]):
+    return tuple(device["keys"][0].values())
+
+
+def sort_tags(tags: list[dict[str, list[list[str]]]]):
+    if tags and isinstance(tags[0], dict):
+        _tags = [
+            DeviceTag(**{k: v for k, v in tag["components"]}).value for tag in tags
+        ]
+    else:
+        _tags = [DeviceTag(__root__=tag).value for tag in tags]
+    return sorted(_tags)
 
 
 def sort_devices(devices: list[dict]):
@@ -29,6 +38,7 @@ def sort_devices(devices: list[dict]):
         _device.pop("created_on", None)
         _device.pop("deleted_on", None)
         _device.pop("updated_on", None)
+        _device["tags"] = sort_tags(tags=_device["tags"])
         devices_without_dates.append(_device)
 
     sorted_devices = sorted(
@@ -39,6 +49,7 @@ def sort_devices(devices: list[dict]):
             get_first_key(device),
         ),
     )
+
     responses = [
         response
         for device in sorted_devices
@@ -46,7 +57,7 @@ def sort_devices(devices: list[dict]):
             "questionnaire_responses", {}
         ).values()
         for questionnaire_response in questionnaire_responses
-        for response in questionnaire_response["responses"]
+        for response in questionnaire_response["answers"]
     ]
     for response in responses:
         ((field, answers),) = response.items()
@@ -63,9 +74,10 @@ class MockDeviceRepository(DeviceRepository):
     def all_devices(self) -> Generator[Device, None, None]:
         response = self.client.scan(TableName=self.table_name)
         items = list(map(unmarshall, response["Items"]))
-        devices = list(TableKeys.DEVICE.filter(items, key="sk"))
+        devices = list(TableKey.DEVICE.filter(items, key="sk"))
         for device in devices:
-            yield self.read(id=device["id"])
+            if device.get("root"):
+                yield self.read(device["id"])
 
 
 @parametrize_over_scenarios()
@@ -87,7 +99,7 @@ def run_transform_and_load(transform_handler: Handler, load_handler: Handler):
     unprocessed_transform_records = None
     while unprocessed_transform_records is None or unprocessed_transform_records > 0:
         transform_response = transform_handler(
-            event={"max_records": 1, "trust": False}, context=None
+            event={"max_records": 1, "etl_type": "updates"}, context=None
         )
         error_message = transform_response.get("error_message")
         if error_message:
@@ -96,7 +108,9 @@ def run_transform_and_load(transform_handler: Handler, load_handler: Handler):
 
         unprocessed_load_records = None
         while unprocessed_load_records is None or unprocessed_load_records > 0:
-            load_response = load_handler(event={"max_records": 1}, context=None)
+            load_response = load_handler(
+                event={"max_records": 1, "etl_type": "updates"}, context=None
+            )
             error_message = load_response.get("error_message")
             if error_message:
                 raise EtlError(error_message)
@@ -133,5 +147,4 @@ def test_transform_and_load(
     repo = MockDeviceRepository(table_name=table_name, dynamodb_client=dynamodb_client)
     devices = list(map(device_as_json_dict, repo.all_devices()))
     assert len(devices) == len(scenario.load_output), devices
-
     assert sort_devices(devices) == sort_devices(scenario.load_output), devices

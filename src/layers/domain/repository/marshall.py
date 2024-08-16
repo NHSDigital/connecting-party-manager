@@ -7,6 +7,7 @@ MARSHALL_FUNCTION_BY_TYPE = {
     bool: (lambda x: {"BOOL": x}),
     int: (lambda x: {"N": str(x)}),
     float: (lambda x: {"N": str(x)}),
+    set: (lambda x: {"L": [marshall_value(item) for item in x]}),
     list: (lambda x: {"L": [marshall_value(item) for item in x]}),
     tuple: (lambda x: {"L": [marshall_value(item) for item in x]}),
     dict: (lambda x: {"M": {k: marshall_value(v) for (k, v) in x.items()}}),

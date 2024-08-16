@@ -1,20 +1,23 @@
 [
   {
     "name": "C3O9X:C3O9X-823610:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
-    "type": "endpoint",
+    "device_type": "endpoint",
     "status": "active",
     "product_team_id": "12345678-1234-5678-1234-567812345678",
     "ods_code": "C3O9X",
-    "keys": {
-      "C3O9X:C3O9X-823610:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001": {
-        "type": "message_handling_system_id",
-        "key": "C3O9X:C3O9X-823610:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+    "keys": [
+      {
+        "key_type": "message_handling_system_id",
+        "key_value": "C3O9X:C3O9X-823610:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
       }
-    },
+    ],
     "questionnaire_responses": {
       "spine_endpoint/1": [
         {
-          "responses": [
+          "questionnaire_id": "spine_endpoint/1",
+          "created_on": "CREATED_ON",
+          "status": "active",
+          "answers": [
             { "object_class": ["nhsMhs"] },
             { "unique_identifier": ["00000a84594b2ef34279"] },
             {
@@ -56,6 +59,59 @@
           ]
         }
       ]
-    }
+    },
+    "tags": [
+      {
+        "components": [["nhs_id_code", "C3O9X"]]
+      },
+      {
+        "components": [
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+          ]
+        ]
+      },
+      {
+        "components": [["nhs_mhs_party_key", "C3O9X-823610"]]
+      },
+      {
+        "components": [
+          ["nhs_id_code", "C3O9X"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+          ]
+        ]
+      },
+      {
+        "components": [
+          ["nhs_id_code", "C3O9X"],
+          ["nhs_mhs_party_key", "C3O9X-823610"]
+        ]
+      },
+      {
+        "components": [
+          ["nhs_mhs_party_key", "C3O9X-823610"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+          ]
+        ]
+      },
+      {
+        "components": [
+          ["nhs_id_code", "C3O9X"],
+          ["nhs_mhs_party_key", "C3O9X-823610"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+          ]
+        ]
+      },
+      {
+        "components": [["unique_identifier", "00000a84594b2ef34279"]]
+      }
+    ]
   }
 ]

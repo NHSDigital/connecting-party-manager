@@ -56,7 +56,7 @@ module "worker_extract" {
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
   etl_bucket_arn   = module.bucket.s3_bucket_arn
-  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn]
+  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
 
   policy_json = <<-EOT
       {
@@ -115,7 +115,8 @@ module "worker_transform" {
             },
             {
                 "Action": [
-                    "dynamodb:Query"
+                    "dynamodb:Query",
+                    "dynamodb:BatchGetItem"
                 ],
                 "Effect": "Allow",
                 "Resource": ["${var.table_arn}", "${var.table_arn}/*"]
@@ -167,7 +168,10 @@ module "worker_load" {
             },
             {
                 "Action": [
-                    "dynamodb:PutItem"
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:BatchWriteItem"
                 ],
                 "Effect": "Allow",
                 "Resource": ["${var.table_arn}"]

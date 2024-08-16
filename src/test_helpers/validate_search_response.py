@@ -21,7 +21,7 @@ def validate_keys(keys, device):
 def validate_tags(tags, params):
     for tag in tags:
         for key, value in params.items():
-            assert [key, value] in tag["components"]
+            assert [key, value] in tag
 
 
 def validate_questionnaire_responses(result, device, params):

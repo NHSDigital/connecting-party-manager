@@ -2,16 +2,20 @@ from dataclasses import astuple
 from typing import Callable, Generator
 
 import sds.domain
-from domain.core.device import Device
-from domain.core.device_key import DeviceKeyType
-from domain.core.product_team import ProductTeam
+from domain.api.sds.query import (
+    SearchSDSDeviceQueryParams,
+    SearchSDSEndpointQueryParams,
+)
+from domain.core.device.v2 import Device
+from domain.core.device_key.v2 import DeviceKeyType
+from domain.core.product_team.v2 import ProductTeam
 from domain.core.validation import DEVICE_KEY_SEPARATOR
-from sds.cpm_translation.utils import get_in_list_of_dict
+from sds.cpm_translation.utils import get_in_list_of_dict, set_device_tags
 from sds.domain.constants import ModificationType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import MessageHandlingSystemKey, NhsMhs
 
-from ..constants import DEFAULT_PRODUCT_TEAM, UNIQUE_IDENTIFIER
+from .constants import DEFAULT_PRODUCT_TEAM, UNIQUE_IDENTIFIER
 from .modify_device import new_questionnaire_response_from_template
 
 
@@ -38,7 +42,7 @@ def get_modify_key_function(
 
     match (model, modification_type):
         case (sds.domain.NhsAccreditedSystem, ModificationType.ADD):
-            return new_accredited_system
+            return copy_new_accredited_system_from_sibling_device
         case (sds.domain.NhsAccreditedSystem, ModificationType.REPLACE):
             return replace_accredited_systems
         case (sds.domain.NhsMhs, ModificationType.REPLACE):
@@ -49,7 +53,7 @@ def get_modify_key_function(
             )
 
 
-def new_accredited_system(
+def copy_new_accredited_system_from_sibling_device(
     devices: list[Device], field_name: str, value: str
 ) -> Generator[Device, None, None]:
     (ods_code,) = NhsAccreditedSystem.parse_and_validate_field(
@@ -62,17 +66,19 @@ def new_accredited_system(
             f"Accredited System with ODS code '{ods_code}' already exists"
         )
 
-    _device = devices[0]
-    (
-        (questionnaire_id, (questionnaire_response,)),
-    ) = _device.questionnaire_responses.items()
+    _device = devices[0]  # could copy any sibling, but pick the 0th one as convention
+
+    (questionnaire_response_by_datetime,) = _device.questionnaire_responses.values()
+    (questionnaire_response,) = questionnaire_response_by_datetime.values()
+    questionnaire_response.questionnaire = NhsAccreditedSystem.questionnaire()
+
     new_questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=questionnaire_response,
         field_to_update=field_name,
         value=ods_code,
     )
     (unique_identifier,) = get_in_list_of_dict(
-        obj=questionnaire_response.responses, key=UNIQUE_IDENTIFIER
+        obj=questionnaire_response.answers, key=UNIQUE_IDENTIFIER
     )
     new_accredited_system_id = DEVICE_KEY_SEPARATOR.join((ods_code, unique_identifier))
 
@@ -81,16 +87,21 @@ def new_accredited_system(
         ods_code=ods_code,
         name=DEFAULT_PRODUCT_TEAM["name"],
     )
-    new_device = product_team.create_device(name=_device.name, type=_device.type)
+    new_device = product_team.create_device(
+        name=_device.name, device_type=_device.device_type
+    )
     new_device.add_questionnaire_response(
         questionnaire_response=new_questionnaire_response
     )
     new_device.add_key(
-        type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key=new_accredited_system_id
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=new_accredited_system_id
     )
-    new_device.add_index(
-        questionnaire_id=questionnaire_id, question_name=UNIQUE_IDENTIFIER
+    set_device_tags(
+        device=new_device,
+        data=new_questionnaire_response.flat_answers,
+        model=SearchSDSDeviceQueryParams,
     )
+
     # "yield" to match the pattern of the functions returned by 'get_modify_key_function'
     # which may in general yield multiple deleted / added Devices
     for device in devices:
@@ -112,7 +123,7 @@ def replace_accredited_systems(
         yield device
 
     for new_ods_code in final_ods_codes - current_ods_codes:
-        *_, new_device = new_accredited_system(
+        *_, new_device = copy_new_accredited_system_from_sibling_device(
             devices=devices, field_name=field_name, value=[new_ods_code]
         )
         yield new_device
@@ -136,9 +147,10 @@ def replace_msg_handling_system(
     device.delete()
     yield device
 
-    (
-        (questionnaire_id, (_questionnaire_response,)),
-    ) = device.questionnaire_responses.items()
+    (questionnaire_response_by_datetime,) = device.questionnaire_responses.values()
+    (_questionnaire_response,) = questionnaire_response_by_datetime.values()
+    _questionnaire_response.questionnaire = NhsMhs.questionnaire()
+
     new_value = NhsMhs.parse_and_validate_field(field=field_name, value=value)
     questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=_questionnaire_response,
@@ -146,7 +158,7 @@ def replace_msg_handling_system(
         value=new_value,
     )
     msg_handling_system_key = _get_msg_handling_system_key(
-        responses=_questionnaire_response.responses
+        responses=_questionnaire_response.answers
     )
     new_scoped_party_key = DEVICE_KEY_SEPARATOR.join(astuple(msg_handling_system_key))
     product_team = ProductTeam(
@@ -154,12 +166,18 @@ def replace_msg_handling_system(
         ods_code=msg_handling_system_key.nhs_id_code,
         name=DEFAULT_PRODUCT_TEAM["name"],
     )
-    new_device = product_team.create_device(name=device.name, type=device.type)
+    new_device = product_team.create_device(
+        name=device.name, device_type=device.device_type
+    )
     new_device.add_questionnaire_response(questionnaire_response=questionnaire_response)
     new_device.add_key(
-        type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID, key=new_scoped_party_key
+        key_type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
+        key_value=new_scoped_party_key,
     )
-    new_device.add_index(
-        questionnaire_id=questionnaire_id, question_name=UNIQUE_IDENTIFIER
+    set_device_tags(
+        device=new_device,
+        data=questionnaire_response.flat_answers,
+        model=SearchSDSEndpointQueryParams,
     )
+
     yield new_device

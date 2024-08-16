@@ -164,8 +164,11 @@ class SdsBaseModel(BaseModel):
             values = transform(cls=cls, values=values)
         return values
 
-    def as_questionnaire_response_responses(self) -> list[dict[str, list]]:
-        data = orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
+    def export(self) -> dict[str, any]:
+        return orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
+
+    def as_questionnaire_response_answers(self, data=None) -> list[dict[str, list]]:
+        data = data or self.export()
         return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]
 
     @classmethod
