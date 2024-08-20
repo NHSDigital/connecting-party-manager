@@ -8,7 +8,7 @@ class SearchQueryParams(BaseModel, extra=Extra.forbid):
     device_type: DeviceType
 
     @validator("device_type")
-    def validate_device_type(device_type: str):
+    def validate_device_type(cls, device_type: str):
         return device_type.lower()
 
 

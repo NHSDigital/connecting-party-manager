@@ -28,7 +28,7 @@ class AwsLambdaResponse(BaseModel):
     headers: AwsLambdaResponseHeaders = None
 
     @validator("headers", always=True)
-    def generate_response_headers(headers, values):
+    def generate_response_headers(cls, headers, values):
         if headers is not None:
             return headers
         body: str = values["body"]

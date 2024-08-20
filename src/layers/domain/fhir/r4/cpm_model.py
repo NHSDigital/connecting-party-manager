@@ -96,13 +96,13 @@ class Device(BaseModel):
     owner: DeviceOwnerReference
 
     @validator("identifier", each_item=True)
-    def validate_key(identifier: DeviceIdentifier):
+    def validate_key(cls, identifier: DeviceIdentifier):
         if identifier and isinstance(identifier, DeviceIdentifier):
             validate_key(key=identifier.value, type=identifier.key_type)
         return identifier
 
     @validator("identifier")
-    def no_duplicate_keys(identifier: list[DeviceIdentifier]):
+    def no_duplicate_keys(cls, identifier: list[DeviceIdentifier]):
         if identifier and isinstance(identifier, list):
             unique_identifiers = set(map(DeviceIdentifier.as_tuple, identifier))
             if len(unique_identifiers) != len(identifier):
@@ -113,7 +113,7 @@ class Device(BaseModel):
         return identifier
 
     @validator("identifier")
-    def no_duplicate_product_keys(identifier: list[DeviceIdentifier]):
+    def no_duplicate_product_keys(cls, identifier: list[DeviceIdentifier]):
         if identifier and isinstance(identifier, list):
             count = sum(
                 ident.system == "connecting-party-manager/product_id"
