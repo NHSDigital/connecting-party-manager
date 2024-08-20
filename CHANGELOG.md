@@ -3,7 +3,7 @@
 ## 2024-08-20
 - [PI-470] Hide inactive devices
 - [PI-305] Add product to app CI
-- [PI-305] Block ref sandbox deploy workflow
+- [PI-279] Block ref sandbox deploy workflow
 
 ## 2024-08-09
 - [PI-469] SDS search use query_by_tag
