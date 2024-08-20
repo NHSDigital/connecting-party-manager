@@ -6,3 +6,4 @@ from .v1 import TableKeyAction
 class TableKey(TableKeyAction, StrEnum):
     DEVICE = "D"
     DEVICE_TAG = "DT"
+    DEVICE_STATUS = "DS"
