@@ -29,6 +29,22 @@ def device() -> DeviceV2:
 
 
 @pytest.fixture
+def device_with_tag() -> DeviceV2:
+    org = Root.create_ods_organisation(ods_code="AB123")
+    product_team = org.create_product_team(
+        id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
+    )
+    device = product_team.create_device(
+        name="Device-1", device_type=DeviceTypeV2.PRODUCT
+    )
+    device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
+    device.add_tag(
+        nhs_as_client="5NR", nhs_as_svc_ia="urn:nhs:names:services:mm:PORX_IN090101UK31"
+    )
+    return device
+
+
+@pytest.fixture
 def another_device_with_same_key() -> DeviceV2:
     org = Root.create_ods_organisation(ods_code="AB123")
     product_team = org.create_product_team(
@@ -142,19 +158,29 @@ def test__device_repository__update(device: DeviceV2, repository: DeviceReposito
 
 
 @pytest.mark.integration
-def test__device_repository__delete(device: DeviceV2, repository: DeviceRepositoryV2):
-    repository.write(device)
+def test__device_repository__delete(
+    device_with_tag: DeviceV2, repository: DeviceRepositoryV2
+):
+    repository.write(device_with_tag)
 
     # Retrieve the model and treat this as the initial state
-    intermediate_device = repository.read(device.id)
+    intermediate_device = repository.read(device_with_tag.id)
     intermediate_device.delete()
     repository.write(intermediate_device)
 
-    final_device = repository.read(device.id)
-    assert final_device.status is Status.INACTIVE
+    # Attempt to read the original device, expecting an ItemNotFound error
+    with pytest.raises(ItemNotFound):
+        repository.read(device_with_tag.id)
 
-    assert final_device.created_on == device.created_on
-    assert final_device.updated_on > device.updated_on
+    # Read the inactive device
+    inactive_device = repository.read_inactive(device_with_tag.id)
+    key_indexed_inactive_device = repository.read_inactive("product_id", DEVICE_KEY)
+
+    assert inactive_device, key_indexed_inactive_device is not None
+    assert inactive_device.status is Status.INACTIVE
+    assert inactive_device.tags == []
+    assert inactive_device.created_on == device_with_tag.created_on
+    assert inactive_device.updated_on > device_with_tag.updated_on
 
 
 @pytest.mark.integration

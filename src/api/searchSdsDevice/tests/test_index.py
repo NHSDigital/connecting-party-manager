@@ -316,3 +316,80 @@ def test_filter_errors(params, error, status_code):
         )
     assert result["statusCode"] == status_code
     assert error in result["body"]
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "params, devices",
+    [
+        (
+            {
+                "nhs_as_client": "5NR",
+                "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
+            },
+            [
+                {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
+                {"device_key": "P.AAA-HHH", "device_name": "device-name-b"},
+            ],
+        ),
+    ],
+)
+def test_only_active_returned(params, devices):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    product_team = _create_org()
+    for index, device in enumerate(devices):
+        cpmdevice = _create_device(
+            device=device, product_team=product_team, params=params
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "DYNAMODB_TABLE": table_name,
+                "AWS_DEFAULT_REGION": "eu-west-2",
+            },
+            clear=True,
+        ):
+            from api.searchSdsDevice.index import cache as device_cache
+
+            device_cache["DYNAMODB_CLIENT"] = client
+            device_repo = DeviceRepository(
+                table_name=device_cache["DYNAMODB_TABLE"],
+                dynamodb_client=device_cache["DYNAMODB_CLIENT"],
+            )
+            device_repo.write(cpmdevice)
+
+            # Soft delete the first device
+            if index == 0:
+                inactive_device = device_repo.read(cpmdevice.id)
+                inactive_device.delete()
+                device_repo.write(inactive_device)
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchSdsDevice.index import handler as device_handler
+
+        result = device_handler(
+            event={
+                "headers": {"version": 1},
+                "queryStringParameters": params,
+                "multiValueHeaders": {"Host": ["foo.co.uk"]},
+            }
+        )
+
+    result_body = json_loads(result["body"])
+    assert len(result_body) == 1
+
+    assert result["statusCode"] == 200
+
+    for index, result in enumerate(result_body):
+        assert result["status"] == "active"
+        assert result["name"] == "device-name-b"

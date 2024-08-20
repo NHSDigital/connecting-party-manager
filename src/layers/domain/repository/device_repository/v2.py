@@ -4,6 +4,7 @@ from attr import asdict as _asdict
 from domain.core.device.v2 import (
     Device,
     DeviceCreatedEvent,
+    DeviceDeletedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
     DeviceTag,
@@ -71,8 +72,14 @@ def _device_primary_keys(
 
 
 def update_device_indexes(
-    table_name: str, id: str, keys: list[DeviceKey], tags: list[DeviceTag], data: dict
+    table_name: str,
+    id: str,
+    keys: list[DeviceKey],
+    data: dict,
+    tags: list[DeviceTag] = None,
 ) -> list[TransactItem]:
+    tags = [] if tags is None else tags
+
     primary_keys = _device_primary_keys(
         device_id=id, device_keys=keys, device_tags=tags
     )
@@ -109,12 +116,19 @@ def create_device_index(
     )
 
 
-def delete_device_index(table_name: str, key_parts: tuple[str]) -> TransactItem:
-    key = TableKey.DEVICE.key(*key_parts)
+def delete_device_index(
+    table_name: str,
+    pk_key_parts: tuple[str],
+    sk_key_parts=None,
+    pk_table_key: TableKey = TableKey.DEVICE,
+    sk_table_key: TableKey = TableKey.DEVICE,
+) -> TransactItem:
+    pk = pk_table_key.key(*pk_key_parts)
+    sk = sk_table_key.key(*sk_key_parts) if sk_key_parts else pk
     return TransactItem(
         Delete=TransactionStatement(
             TableName=table_name,
-            Key=marshall(pk=key, sk=key),
+            Key=marshall(pk=pk, sk=sk),
             ConditionExpression=ConditionExpression.MUST_EXIST,
         )
     )
@@ -145,6 +159,83 @@ class DeviceRepository(Repository[Device]):
             keys=keys,
             tags=tags,
             data=asdict(event),
+        )
+
+    def handle_DeviceDeletedEvent(
+        self, event: DeviceDeletedEvent
+    ) -> list[TransactItem]:
+        # Inactive Devices have tags removed so that they are
+        # no longer searchable
+        delete_transactions = [
+            delete_device_index(
+                table_name=self.table_name,
+                pk_key_parts=(DeviceTag(**tag).value,),
+                sk_key_parts=(event.id,),
+                pk_table_key=TableKey.DEVICE_TAG,
+            )
+            for tag in event.deleted_tags
+        ]
+
+        # Prepare data for the inactive copies
+        inactive_data = asdict(event)
+        inactive_data.pop("deleted_tags")
+        inactive_data["status"] = "inactive"
+
+        # Collect keys for the original devices
+        original_keys = {DeviceKey(**key) for key in event.keys}
+
+        # Create copy of original device and indexes with new pk and sk
+        inactive_root_copy_transactions = []
+        inactive_root_copy_transactions.append(
+            create_device_index(
+                table_name=self.table_name,
+                pk_table_key=TableKey.DEVICE_STATUS,
+                pk_key_parts=(event.status,),
+                sk_key_parts=(event.id,),
+                device_data=inactive_data,
+                root=True,
+            )
+        )
+
+        inactive_key_indexes_copy_transactions = []
+        for key in original_keys:
+            inactive_key_indexes_copy_transactions.append(
+                create_device_index(
+                    table_name=self.table_name,
+                    pk_table_key=TableKey.DEVICE_STATUS,
+                    pk_key_parts=(event.status,),
+                    sk_key_parts=key.parts,
+                    device_data=inactive_data,
+                    root=False,
+                )
+            )
+
+        # Create delete transactions for original device and key indexes
+        original_root_delete_transactions = []
+        original_root_delete_transactions.append(
+            delete_device_index(
+                table_name=self.table_name,
+                pk_key_parts=(event.id,),
+                pk_table_key=TableKey.DEVICE,
+            )
+        )
+
+        original_key_indexes_delete_transactions = []
+        for key in original_keys:
+            original_key_indexes_delete_transactions.append(
+                delete_device_index(
+                    table_name=self.table_name,
+                    pk_key_parts=key.parts,
+                    pk_table_key=TableKey.DEVICE,
+                )
+            )
+
+        return (
+            delete_transactions
+            + inactive_root_copy_transactions
+            + inactive_key_indexes_copy_transactions
+            + original_root_delete_transactions
+            + original_key_indexes_delete_transactions
         )
 
     def handle_DeviceKeyAddedEvent(
@@ -179,7 +270,7 @@ class DeviceRepository(Repository[Device]):
     ) -> list[TransactItem]:
         # Delete the copy of the Device indexed against the deleted key
         delete_transaction = delete_device_index(
-            table_name=self.table_name, key_parts=event.deleted_key.parts
+            table_name=self.table_name, pk_key_parts=event.deleted_key.parts
         )
         # Update the value of "keys" on all other copies of this Device
         device_tags = {DeviceTag(**tag) for tag in event.tags}
@@ -256,6 +347,29 @@ class DeviceRepository(Repository[Device]):
         key = TableKey.DEVICE.key(*key_parts)
         result = self.client.get_item(
             TableName=self.table_name, Key=marshall(pk=key, sk=key)
+        )
+        try:
+            item = result["Item"]
+        except KeyError:
+            raise ItemNotFound(key_parts)
+        return Device(**unmarshall(item))
+
+    def read_inactive(self, *key_parts: str) -> Device:
+        """
+        Read the inactive device by either id or key. If calling by id, then do:
+
+            repository.read("123")
+
+        If calling by key then you must include the key type (e.g. 'product_id'):
+
+            repository.read("product_id", "123")
+
+        """
+        pk = "DS#inactive"
+        sk = TableKey.DEVICE.key(*key_parts)
+
+        result = self.client.get_item(
+            TableName=self.table_name, Key=marshall(pk=pk, sk=sk)
         )
         try:
             item = result["Item"]
