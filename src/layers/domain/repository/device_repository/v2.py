@@ -73,11 +73,7 @@ def _device_primary_keys(
 
 
 def update_device_indexes(
-    table_name: str,
-    id: str,
-    keys: list[DeviceKey],
-    data: dict,
-    tags: list[DeviceTag] = None,
+    table_name: str, id: str, keys: set[DeviceKey], tags: set[DeviceTag], data: dict
 ) -> list[TransactItem]:
     tags = [] if tags is None else tags
 
