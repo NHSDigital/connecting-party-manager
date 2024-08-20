@@ -183,6 +183,22 @@ jobs:
           restore-from-cache: "true"
           requires-aws: true
 
+  apigee--attach-product:
+    needs: [build-head, apigee--deploy]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - run: |
+          poetry run pip install pytest-nhsd-apim
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--attach-product
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
   test--integration:
     needs:
       [
@@ -233,7 +249,10 @@ jobs:
         test--unit,
         test--feature--local,
         terraform-head-build,
+        test--feature--integration,
+        test--integration,
         apigee--deploy,
+        apigee--attach-product,
       ]
     runs-on: [self-hosted, ci]
     steps:
@@ -245,10 +264,27 @@ jobs:
           command: test--smoke
           requires-aws: true
 
-  delete--proxy:
-    needs: [test--smoke]
+  apigee--detach-product:
+    needs: [build-head, test--smoke, apigee--attach-product]
     runs-on: [self-hosted, ci]
-    if: always()
+    if: ${{ needs.apigee--attach-product.result == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - run: |
+          poetry run pip install pytest-nhsd-apim
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--detach-product
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
+  delete--proxy:
+    needs: [test--smoke, apigee--deploy, apigee--detach-product]
+    runs-on: [self-hosted, ci]
+    if: ${{ needs.apigee--deploy.result == 'success' }}
     steps:
       - uses: actions/checkout@v4
         with:

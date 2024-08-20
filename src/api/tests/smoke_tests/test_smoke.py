@@ -22,25 +22,9 @@ def read_organization(base_url: str, headers: dict):
     return requests.get(url=url, headers=headers)
 
 
-# def create_device(base_url: str, headers: dict, context: dict):
-#     device_body = json.dumps(DEVICE)
-#     url = f"{base_url}/Device"
-#     response = requests.post(url=url, headers=headers, data=device_body)
-#     context["device_id"] = response.headers["Location"]
-#     return response
-
-# def read_device(base_url: str, headers: dict, context: dict):
-#     created_device_id = context["device_id"]
-#     url = f"{base_url}/Device/{created_device_id}"
-#     return requests.get(url=url, headers=headers)
-
-
 REQUEST_METHODS = [
     create_organization,
-    # create_device,
     read_organization,
-    # read_device
-    # delete_device - we need this in order to clean up the tests
 ]
 
 
