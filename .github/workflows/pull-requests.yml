@@ -36,6 +36,16 @@ jobs:
         with:
           command: workflow--check--rebased-on-main
 
+  workflow--check--release-branch-name:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: ./.github/actions/make/
+        with:
+          command: workflow--check--release-branch-name
+
   parse-secrets:
     runs-on: [self-hosted, ci]
     needs: [workflow--check--branch-name]
