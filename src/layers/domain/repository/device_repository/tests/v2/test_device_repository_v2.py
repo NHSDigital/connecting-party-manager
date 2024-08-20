@@ -2,14 +2,14 @@ from copy import deepcopy
 
 import pytest
 from attr import asdict
-from domain.core.compression import pkl_loads_gzip
 from domain.core.device.v2 import Device as DeviceV2
-from domain.core.device.v2 import DeviceCreatedEvent, DeviceTag
+from domain.core.device.v2 import DeviceCreatedEvent
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
 from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
 from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.core.root.v2 import Root
+from domain.repository.compression import pkl_loads_gzip
 from domain.repository.device_repository.v2 import (
     DeviceRepository as DeviceRepositoryV2,
 )
@@ -72,21 +72,15 @@ def test__device_root_primary_key():
 
 def test__device_non_root_primary_keys():
     primary_keys = _device_non_root_primary_keys(
-        device_id="123",
         device_keys=[
             DeviceKeyV2(key_type=DeviceKeyType.PRODUCT_ID, key_value=DEVICE_KEY)
-        ],
-        device_tags=[DeviceTag(foo="bar")],
+        ]
     )
     assert primary_keys == [
         {
             "pk": {"S": f"D#product_id#P.WWW-XXX"},
             "sk": {"S": f"D#product_id#P.WWW-XXX"},
-        },
-        {
-            "pk": {"S": f"DT#<<foo##bar>>"},
-            "sk": {"S": f"D#123"},
-        },
+        }
     ]
 
 
@@ -299,7 +293,7 @@ def test_serialise_data_with_event(device_created_event):
     _tags = _data.pop("tags")
 
     assert _data == _serialised_data
-    assert pkl_loads_gzip(_serialised_tags) == _tags
+    assert [pkl_loads_gzip(tag) for tag in pkl_loads_gzip(_serialised_tags)] == _tags
 
 
 def test_serialise_data_with_dict(device_created_event):
@@ -310,7 +304,7 @@ def test_serialise_data_with_dict(device_created_event):
     _tags = data.pop("tags")
 
     assert data == _serialised_data
-    assert pkl_loads_gzip(_serialised_tags) == _tags
+    assert [pkl_loads_gzip(tag) for tag in pkl_loads_gzip(_serialised_tags)] == _tags
 
 
 def test_serialise_data_with_event_with_other_fields_compressed(device_created_event):
@@ -328,6 +322,6 @@ def test_serialise_data_with_event_with_other_fields_compressed(device_created_e
     _status = _data.pop("status")
 
     assert _data == _serialised_data
-    assert pkl_loads_gzip(_serialised_tags) == _tags
+    assert [pkl_loads_gzip(tag) for tag in pkl_loads_gzip(_serialised_tags)] == _tags
     assert pkl_loads_gzip(_serialised_responses) == _responses
     assert pkl_loads_gzip(_serialised_status) == _status

@@ -6,11 +6,11 @@ from unittest import mock
 from uuid import UUID
 
 import pytest
-from domain.core.compression import pkl_loads_gzip
 from domain.core.device.v2 import Device, DeviceCreatedEvent, DeviceType
 from domain.core.device_key.v2 import DeviceKeyType
+from domain.repository.compression import pkl_loads_gzip
 from domain.repository.device_repository.v2 import DeviceRepository
-from domain.repository.keys import TableKeys
+from domain.repository.keys.v2 import TableKey
 from domain.repository.marshall import unmarshall
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
@@ -53,11 +53,13 @@ class MockDeviceRepository(DeviceRepository):
     def all_devices(self) -> Generator[Device, None, None]:
         response = self.client.scan(TableName=self.table_name)
         items = map(unmarshall, response["Items"])
-        devices = list(TableKeys.DEVICE.filter(items, key="sk"))
+        devices = list(TableKey.DEVICE.filter(items, key="sk"))
         for device in devices:
             if not device.get("root"):
                 continue
-            device["tags"] = pkl_loads_gzip(device["tags"])
+            device["tags"] = [
+                pkl_loads_gzip(tag) for tag in pkl_loads_gzip(device["tags"])
+            ]
             yield Device(**device)
 
     def count(self, by: DeviceType | DeviceKeyType):

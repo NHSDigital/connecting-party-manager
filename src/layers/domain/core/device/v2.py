@@ -9,7 +9,6 @@ import orjson
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
-from domain.core.compression import pkl_dumps_gzip, pkl_loads_gzip
 from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
@@ -206,14 +205,9 @@ class DeviceTag(BaseModel):
     DeviceTag is a mechanism for indexing Device data. In DynamoDB then intention is for this
     to be translated into a duplicated record in the database, so that Devices with with the
     same DeviceTag can be queried directly, therefore mimicking efficient search-like behaviour.
-
-    As an optimisation for bulk operations (for example in an ETL) the value of this tag is
-    compressed (pickle + gzip) for reducing I/O overheads.
-
-    TODO: could the above per-device-tag compression happen in the repository?
     """
 
-    __root__: str
+    __root__: list[tuple[str, str]]
 
     class Config:
         arbitrary_types_allowed = True
@@ -223,29 +217,19 @@ class DeviceTag(BaseModel):
     def encode_tag(cls, values: dict):
         initialised_with_root = "__root__" in values and len(values) == 1
         item_to_process = values["__root__"] if initialised_with_root else values
-
-        initialised_with_root_components = initialised_with_root and isinstance(
-            item_to_process, (list, tuple)
-        )
-        initialised_with_root_compressed_tag = (
-            initialised_with_root and not initialised_with_root_components
-        )
-
-        if initialised_with_root_components:
+        if initialised_with_root:
             _components = tuple((k, v) for k, v in item_to_process)
-        elif initialised_with_root_compressed_tag:
-            _components = pkl_loads_gzip(item_to_process)
         else:  # otherwise initialise directly with key value pairs
             _components = tuple(sorted((k, str(v)) for k, v in item_to_process.items()))
 
-        return {"__root__": pkl_dumps_gzip(_components)}
+        return {"__root__": _components}
 
     def dict(self, *args, **kwargs):
         return self.components
 
     @cached_property
     def components(self):
-        return pkl_loads_gzip(self.__root__)
+        return tuple(self.__root__)
 
     @cached_property
     def hash(self):
@@ -370,21 +354,7 @@ class Device(AggregateRoot):
         )
 
     @event
-    def add_tags(self, tags: list[dict]):
-        new_tags = {DeviceTag(**tag) for tag in tags}
-
-        duplicate_tags = self.tags.intersection(new_tags)
-        if duplicate_tags:
-            raise DuplicateError(
-                f"It is forbidden to supply duplicate tags: {[t.value for t in duplicate_tags]}"
-            )
-        self.tags = self.tags.union(new_tags)
-        device_data = self.state()
-        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
-        return DeviceTagsAddedEvent(new_tags=new_tags, **device_data)
-
-    @event
-    def add_tag(self, **kwargs):
+    def add_tag(self, **kwargs) -> DeviceTagAddedEvent:
         device_tag = DeviceTag(**kwargs)
         if device_tag in self.tags:
             raise DuplicateError(
@@ -394,6 +364,20 @@ class Device(AggregateRoot):
         device_data = self.state()
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
         return DeviceTagAddedEvent(new_tag=device_tag, **device_data)
+
+    @event
+    def add_tags(self, tags: list[dict]) -> DeviceTagsAddedEvent:
+        """Optimised bulk equivalent of performing device.add_tag sequentially."""
+        new_tags = {DeviceTag(**tag) for tag in tags}
+        duplicate_tags = self.tags.intersection(new_tags)
+        if duplicate_tags:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate tags: {[t.value for t in duplicate_tags]}"
+            )
+        self.tags = self.tags.union(new_tags)
+        device_data = self.state()
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceTagsAddedEvent(new_tags=new_tags, **device_data)
 
     @event
     def clear_tags(self):

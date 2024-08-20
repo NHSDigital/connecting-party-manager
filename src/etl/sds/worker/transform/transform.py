@@ -72,6 +72,13 @@ def _transform(
 def transform_bulk(
     s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
 ) -> WorkerActionResponse:
+    """
+    Runs `translate` via `_transform` in "bulk" mode.
+
+    Note that 'bulk' flag is passed through `translate` in order to optimise adding
+    tags to Device. See more details in `set_device_tags_bulk` by clicking through
+    `translate`.
+    """
     return _transform(
         s3_client=s3_client,
         s3_input_path=s3_input_path,
@@ -85,6 +92,7 @@ def transform_bulk(
 def transform_update(
     s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
 ) -> WorkerActionResponse:
+    """Runs `translate` via `_transform` in "updates" mode."""
     return _transform(
         s3_client=s3_client,
         s3_input_path=s3_input_path,

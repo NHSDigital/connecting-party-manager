@@ -1,5 +1,5 @@
 import pytest
-from domain.core.compression import pkl_dumps_gzip, pkl_loads_gzip
+from domain.repository.compression import pkl_dumps_gzip, pkl_loads_gzip
 
 
 class MyThing:

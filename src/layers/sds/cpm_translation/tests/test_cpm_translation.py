@@ -26,6 +26,7 @@ from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 
 from etl.sds.tests.constants import EtlTestDataPath
+from etl.sds.worker.transform.utils import export_events
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 
@@ -38,11 +39,13 @@ EXPECTED_EVENTS_MHS = [
     "device_created_event",
     "device_key_added_event",
     "questionnaire_response_updated_event",
+    "device_tags_added_event",
 ]
 EXPECTED_EVENTS_ACCREDITED_SYSTEM = [
     "device_created_event",
     "device_key_added_event",
     "questionnaire_response_updated_event",
+    "device_tags_added_event",
 ]
 
 
@@ -94,7 +97,7 @@ def repository(
 @settings(deadline=1500)
 @given(nhs_mhs=NHS_MHS_STRATEGY)
 def test_nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs):
-    device = nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs, bulk=True)
+    device = nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs, bulk=False)
     events = device.export_events()
     event_names = list(chain.from_iterable(map(dict.keys, events)))
     assert event_names == EXPECTED_EVENTS_MHS
@@ -117,7 +120,7 @@ def test_nhs_accredited_system_to_cpm_devices(
 ):
     for i, device in enumerate(
         nhs_accredited_system_to_cpm_devices(
-            nhs_accredited_system=nhs_accredited_system, bulk=True
+            nhs_accredited_system=nhs_accredited_system, bulk=False
         ),
         start=1,
     ):
@@ -156,7 +159,11 @@ def test_translate(test_data_paths):
         data = json_load(f)
     assert len(data) > 0
 
-    for obj, events in zip(data, map(lambda record: translate(obj=record), data)):
+    for obj, _devices in zip(
+        data,
+        map(lambda record: translate(obj=record, repository=None, bulk=False), data),
+    ):
+        events = export_events(_devices)
         event_names = list(chain.from_iterable(map(dict.keys, events)))
         ods_codes = obj.get("nhs_as_client") or ["dummy_org"]
         n_ods_codes = len(ods_codes)

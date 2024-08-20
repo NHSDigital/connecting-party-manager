@@ -10,7 +10,7 @@ variable "changelog_key" {
   default = "changelog-number"
 }
 variable "bulk_load_chunksize" {
-  default = 15000
+  default = 1000
 }
 variable "bulk_transform_chunksize" {
   default = 50000

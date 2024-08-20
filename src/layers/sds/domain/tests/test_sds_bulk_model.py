@@ -35,10 +35,9 @@ def test_bulk_data_is_valid_sds_mini(test_data_paths):
         else:
             unprocessed_records.popleft()
 
-    assert Counter(processed_records) == {
-        NhsMhs: 1655,
-        NhsAccreditedSystem: 252,
-    }
+    counts = Counter(processed_records)
+    assert counts[NhsMhs] == 1655
+    assert counts[NhsAccreditedSystem] == 252
 
 
 @memory_intensive

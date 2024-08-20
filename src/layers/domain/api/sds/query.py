@@ -2,16 +2,7 @@ from functools import cache
 from itertools import chain, combinations
 from typing import Optional
 
-from domain.core.device import DeviceType
-from pydantic import BaseModel, Extra, ValidationError, root_validator, validator
-
-
-class SearchQueryParams(BaseModel, extra=Extra.forbid):
-    device_type: DeviceType
-
-    @validator("device_type")
-    def validate_device_type(device_type: str):
-        return device_type.lower()
+from pydantic import BaseModel, Extra, ValidationError, root_validator
 
 
 class SearchSDSQueryParams(BaseModel):

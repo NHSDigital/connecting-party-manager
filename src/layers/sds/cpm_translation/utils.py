@@ -34,7 +34,19 @@ def get_in_list_of_dict(obj: list[dict[str, str]], key):
     return next((item[key] for item in obj if key in item), None)
 
 
-def _cross_product(matrix: list[list[dict]]):
+def _cross_product(matrix: list[list[dict]]) -> list[dict]:
+    """
+    For a outer-list of inner-list of items, returns every
+    combination of containing one item per inner-list, for example:
+    (NB: integers used for illustrative purposes)
+
+        [1, 2, 3]
+        [4, 5]
+
+    would yield
+
+        [1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5]
+    """
     return [
         dict({k: v for d in combo for k, v in d.items()}) for combo in product(*matrix)
     ]
@@ -80,5 +92,11 @@ def set_device_tags(
 def set_device_tags_bulk(
     device: Device, data: dict[str, str | Iterable], model: SearchSDSQueryParams
 ):
+    """
+    Optimisation over `set_device_tags`:
+
+    Avoids using the domain method Device.add_tags as no need to check for
+    tag consistency in bulk operations.
+    """
     tags = sds_metadata_to_device_tags(data=data, model=model)
     device.tags = [DeviceTag(**tag) for tag in tags]

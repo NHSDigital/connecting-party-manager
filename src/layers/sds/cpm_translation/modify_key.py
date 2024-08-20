@@ -144,14 +144,20 @@ def replace_msg_handling_system(
     devices: list[Device], field_name: str, value: str
 ) -> Generator[Device, None, None]:
     (device,) = devices
-    device.delete()
-    yield device
 
     (questionnaire_response_by_datetime,) = device.questionnaire_responses.values()
     (_questionnaire_response,) = questionnaire_response_by_datetime.values()
     _questionnaire_response.questionnaire = NhsMhs.questionnaire()
 
     new_value = NhsMhs.parse_and_validate_field(field=field_name, value=value)
+
+    # Nothing to do if replacing with itself
+    old_value = _questionnaire_response.flat_answers[field_name]
+    if new_value == old_value:
+        return
+    device.delete()
+    yield device
+
     questionnaire_response = new_questionnaire_response_from_template(
         questionnaire_response=_questionnaire_response,
         field_to_update=field_name,
