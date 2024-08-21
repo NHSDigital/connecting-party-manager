@@ -12,6 +12,7 @@ from domain.core.device.v2 import (
     DeviceUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey
+from domain.core.enum import Status
 from domain.core.questionnaire.v2 import QuestionnaireResponseUpdatedEvent
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v2 import TableKey
@@ -190,7 +191,7 @@ class DeviceRepository(Repository[Device]):
             create_device_index(
                 table_name=self.table_name,
                 pk_table_key=TableKey.DEVICE_STATUS,
-                pk_key_parts=(event.status,),
+                pk_key_parts=(event.status, event.id),
                 sk_key_parts=(event.id,),
                 device_data=inactive_data,
                 root=True,
@@ -203,7 +204,7 @@ class DeviceRepository(Repository[Device]):
                 create_device_index(
                     table_name=self.table_name,
                     pk_table_key=TableKey.DEVICE_STATUS,
-                    pk_key_parts=(event.status,),
+                    pk_key_parts=(event.status, event.id),
                     sk_key_parts=key.parts,
                     device_data=inactive_data,
                     root=False,
@@ -356,16 +357,12 @@ class DeviceRepository(Repository[Device]):
 
     def read_inactive(self, *key_parts: str) -> Device:
         """
-        Read the inactive device by either id or key. If calling by id, then do:
+        Read the inactive device by id::
 
             repository.read("123")
 
-        If calling by key then you must include the key type (e.g. 'product_id'):
-
-            repository.read("product_id", "123")
-
         """
-        pk = "DS#inactive"
+        pk = TableKey.DEVICE_STATUS.key(Status.INACTIVE, *key_parts)
         sk = TableKey.DEVICE.key(*key_parts)
 
         result = self.client.get_item(
