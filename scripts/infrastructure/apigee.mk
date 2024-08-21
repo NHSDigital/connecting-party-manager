@@ -1,4 +1,4 @@
-.PHONY: apigee--deploy apigee--delete apigee--clean
+.PHONY: apigee--deploy apigee--delete apigee--clean apigee--attach-product apigee--detach-product
 
 APIGEE_CONFIG_PATH = $(CURDIR)/infrastructure/apigee
 APIGEE_TIMESTAMP = $(TIMESTAMP_DIR)/.apigee.stamp
@@ -26,7 +26,25 @@ apigee--delete: aws--login
 apigee--clean:
 	[[ -f $(PROXYGEN_TIMESTAMP) ]] && rm $(PROXYGEN_TIMESTAMP) || :
 
+apigee--attach-product: aws--login
+	WORKSPACE_OUTPUT_JSON=$(WORKSPACE_OUTPUT_JSON) \
+	ENVIRONMENT_MAPPING_YAML=$(ENVIRONMENT_MAPPING_YAML) \
+	STAGE_MAPPING_YAML=$(STAGE_MAPPING_YAML) \
+	APIGEE_CONFIG_PATH=$(APIGEE_CONFIG_PATH) \
+	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh attach_product
 
+apigee--detach-product: aws--login
+	WORKSPACE_OUTPUT_JSON=$(WORKSPACE_OUTPUT_JSON) \
+	ENVIRONMENT_MAPPING_YAML=$(ENVIRONMENT_MAPPING_YAML) \
+	STAGE_MAPPING_YAML=$(STAGE_MAPPING_YAML) \
+	APIGEE_CONFIG_PATH=$(APIGEE_CONFIG_PATH) \
+	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh detach_product
 
 $(PROXYGEN_TIMESTAMP): aws--login $(SWAGGER_APIGEE) $(WORKSPACE_OUTPUT_JSON)
 	[[ -f $(PROXYGEN_TIMESTAMP) ]] && rm $(PROXYGEN_TIMESTAMP) || :
