@@ -1,4 +1,3 @@
-from ast import FunctionType
 from collections import deque
 from dataclasses import asdict
 from typing import TYPE_CHECKING
@@ -10,13 +9,13 @@ from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
-from etl_utils.worker.model import EtlType, WorkerActionResponse, WorkerEvent
+from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from sds.cpm_translation import translate
 
-from .utils import export_devices, export_events
+from etl.sds.worker.transform_update.utils import export_events
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
@@ -37,13 +36,11 @@ REPOSITORY = DeviceRepository(
 )
 
 
-def _transform(
+def transform(
     s3_client: "S3Client",
     s3_input_path: str,
     s3_output_path: str,
     max_records: int,
-    export_events: FunctionType,
-    bulk: bool,
 ):
     with smart_open(s3_path=s3_input_path, s3_client=s3_client) as f:
         unprocessed_records: deque[dict] = pkl_load_lz4(f)
@@ -55,7 +52,7 @@ def _transform(
         unprocessed_records=unprocessed_records,
         processed_records=processed_records,
         action=lambda record: export_events(
-            translate(obj=record, repository=REPOSITORY, bulk=bulk)
+            translate(obj=record, repository=REPOSITORY, bulk=False)
         ),
         max_records=max_records,
     )
@@ -69,46 +66,10 @@ def _transform(
     )
 
 
-def transform_bulk(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
-) -> WorkerActionResponse:
-    """
-    Runs `translate` via `_transform` in "bulk" mode.
-
-    Note that 'bulk' flag is passed through `translate` in order to optimise adding
-    tags to Device. See more details in `set_device_tags_bulk` by clicking through
-    `translate`.
-    """
-    return _transform(
-        s3_client=s3_client,
-        s3_input_path=s3_input_path,
-        s3_output_path=s3_output_path,
-        max_records=max_records,
-        export_events=export_devices,
-        bulk=True,
-    )
-
-
-def transform_update(
-    s3_client: "S3Client", s3_input_path: str, s3_output_path: str, max_records: int
-) -> WorkerActionResponse:
-    """Runs `translate` via `_transform` in "updates" mode."""
-    return _transform(
-        s3_client=s3_client,
-        s3_input_path=s3_input_path,
-        s3_output_path=s3_output_path,
-        max_records=max_records,
-        export_events=export_events,
-        bulk=False,
-    )
-
-
 def handler(event: dict, context):
     _event = WorkerEvent(**event)
     response = execute_step_chain(
-        action=(
-            transform_update if _event.etl_type is EtlType.UPDATES else transform_bulk
-        ),
+        action=transform,
         s3_client=S3_CLIENT,
         s3_input_path=ENVIRONMENT.s3_path(WorkerKey.TRANSFORM),
         s3_output_path=ENVIRONMENT.s3_path(WorkerKey.LOAD),

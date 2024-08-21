@@ -1,6 +1,5 @@
 from collections import deque
 from dataclasses import dataclass, field
-from enum import StrEnum, auto
 from typing import Optional
 
 from event.environment import BaseEnvironment
@@ -14,14 +13,8 @@ class WorkerEnvironment(BaseEnvironment):
         return f"s3://{self.ETL_BUCKET}/{key}"
 
 
-class EtlType(StrEnum):
-    BULK = auto()
-    UPDATES = auto()
-
-
 class WorkerEvent(BaseModel):
     max_records: Optional[int] = None
-    etl_type: EtlType = None
 
 
 @dataclass

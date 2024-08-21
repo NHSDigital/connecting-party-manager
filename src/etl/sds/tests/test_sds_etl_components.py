@@ -21,7 +21,7 @@ from etl.sds.worker.extract.tests.test_extract_worker import (
     ANOTHER_GOOD_SDS_RECORD,
     GOOD_SDS_RECORD,
 )
-from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from etl.sds.worker.load_bulk.tests.test_load_bulk_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.pytest_skips import long_running
 from test_helpers.terraform import read_terraform_output

@@ -15,7 +15,7 @@ from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
-from etl.sds.worker.transform.utils import export_events
+from etl.sds.worker.transform_update.utils import export_events
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
@@ -65,10 +65,10 @@ def mock_s3_client():
         },
         clear=True,
     ):
-        from etl.sds.worker.transform import transform
+        from etl.sds.worker.transform_update import transform_update
 
-        transform.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
-        yield transform.S3_CLIENT
+        transform_update.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
+        yield transform_update.S3_CLIENT
 
 
 @pytest.fixture
@@ -89,7 +89,7 @@ def test_transform_worker_pass_no_dupes(
     put_object: Callable[[str], None],
     get_object: Callable[[str], bytes],
 ):
-    from etl.sds.worker.transform import transform
+    from etl.sds.worker.transform_update import transform_update
 
     initial_unprocessed_data = deque([GOOD_SDS_RECORD_AS_JSON])
     initial_processed_data = deque([])
@@ -101,11 +101,11 @@ def test_transform_worker_pass_no_dupes(
     put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
 
     # Execute the transform worker
-    response = transform.handler(event={}, context=None)
+    response = transform_update.handler(event={}, context=None)
 
     assert response == {
-        "stage_name": "transform_bulk",
-        "processed_records": n_initial_processed + n_initial_unprocessed,
+        "stage_name": "transform",
+        "processed_records": n_initial_processed + 4 * n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
     }
@@ -118,7 +118,7 @@ def test_transform_worker_pass_no_dupes(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 4 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -128,7 +128,7 @@ def test_transform_worker_pass_no_dupes_max_records(
     get_object: Callable[[str], bytes],
     max_records: int,
 ):
-    from etl.sds.worker.transform import transform
+    from etl.sds.worker.transform_update import transform_update
 
     initial_unprocessed_data = deque([GOOD_SDS_RECORD_AS_JSON] * 10)
     initial_processed_data = deque([])
@@ -146,12 +146,14 @@ def test_transform_worker_pass_no_dupes_max_records(
         n_unprocessed_records_expected = (
             n_unprocessed_records - n_newly_processed_records_expected
         )
-        n_total_processed_records_expected += n_newly_processed_records_expected
+        n_total_processed_records_expected += 4 * n_newly_processed_records_expected
 
         # Execute the transform worker
-        response = transform.handler(event={"max_records": max_records}, context=None)
+        response = transform_update.handler(
+            event={"max_records": max_records}, context=None
+        )
         assert response == {
-            "stage_name": "transform_bulk",
+            "stage_name": "transform",
             "processed_records": n_total_processed_records_expected,
             "unprocessed_records": n_unprocessed_records_expected,
             "error_message": None,
@@ -167,7 +169,7 @@ def test_transform_worker_pass_no_dupes_max_records(
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
-    assert n_final_processed == n_initial_processed + n_initial_unprocessed
+    assert n_final_processed == n_initial_processed + 4 * n_initial_unprocessed
     assert n_final_unprocessed == 0
 
 
@@ -182,7 +184,7 @@ def test_transform_worker_bad_record(
     put_object: Callable[[str], None],
     get_object: Callable[[str], bytes],
 ):
-    from etl.sds.worker.transform import transform
+    from etl.sds.worker.transform_update import transform_update
 
     _initial_unprocessed_data = pkl_dumps_lz4(deque(initial_unprocessed_data))
     bad_record_index = initial_unprocessed_data.index(BAD_SDS_RECORD_AS_JSON)
@@ -197,13 +199,13 @@ def test_transform_worker_bad_record(
     put_object(key=WorkerKey.LOAD, body=initial_processed_data)
 
     # Execute the transform worker
-    response = transform.handler(event={}, context=None)
+    response = transform_update.handler(event={}, context=None)
 
     response["error_message"] = response["error_message"].split("\n")[:6]
 
     assert response == {
-        "stage_name": "transform_bulk",
-        "processed_records": n_initial_processed + bad_record_index,
+        "stage_name": "transform",
+        "processed_records": n_initial_processed + 4 * bad_record_index,
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
         "error_message": [
             "The following errors were encountered",
@@ -224,14 +226,14 @@ def test_transform_worker_bad_record(
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
     assert n_final_unprocessed > 0
-    assert n_final_processed == n_initial_processed + bad_record_index
+    assert n_final_processed == n_initial_processed + 4 * bad_record_index
     assert n_final_unprocessed == n_initial_unprocessed - bad_record_index
 
 
 def test_transform_worker_fatal_record(
     put_object: Callable[[str], None], get_object: Callable[[str], str]
 ):
-    from etl.sds.worker.transform import transform
+    from etl.sds.worker.transform_update import transform_update
 
     # Initial state
     n_initial_processed = 5
@@ -243,7 +245,7 @@ def test_transform_worker_fatal_record(
     put_object(key=WorkerKey.LOAD, body=initial_processed_data)
 
     # Execute the transform worker
-    response = transform.handler(event={}, context=None)
+    response = transform_update.handler(event={}, context=None)
 
     # The line number in the error changes for each example, so
     # substitute it for the value 'NUMBER'
@@ -253,7 +255,7 @@ def test_transform_worker_fatal_record(
     response["error_message"] = response["error_message"].split("\n")[:3]
 
     assert response == {
-        "stage_name": "transform_bulk",
+        "stage_name": "transform",
         "processed_records": None,
         "unprocessed_records": None,
         "error_message": [

@@ -55,7 +55,6 @@ module "worker_extract" {
   workspace_prefix = var.workspace_prefix
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
-  etl_bucket_arn   = module.bucket.s3_bucket_arn
   layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
 
   policy_json = <<-EOT
@@ -81,16 +80,59 @@ module "worker_extract" {
 
 }
 
-module "worker_transform" {
+module "worker_transform_bulk" {
   source = "./worker/"
 
-  etl_stage        = "transform"
+  etl_stage        = "transform_bulk"
   etl_name         = local.etl_name
   assume_account   = var.assume_account
   workspace_prefix = var.workspace_prefix
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
-  etl_bucket_arn   = module.bucket.s3_bucket_arn
+  environment_variables = {
+    TABLE_NAME = var.table_name
+  }
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+
+  policy_json = <<-EOT
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": [
+                    "s3:PutObject",
+                    "s3:AbortMultipartUpload",
+                    "s3:GetBucketLocation",
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:PutObjectVersionTagging"
+                ],
+                "Effect": "Allow",
+                "Resource": ["${module.bucket.s3_bucket_arn}", "${module.bucket.s3_bucket_arn}/*"]
+            },
+            {
+                "Action": [
+                    "kms:Decrypt"
+                ],
+                "Effect": "Allow",
+                "Resource": ["*"]
+            }
+        ]
+      }
+    EOT
+
+}
+
+module "worker_transform_update" {
+  source = "./worker/"
+
+  etl_stage        = "transform_update"
+  etl_name         = local.etl_name
+  assume_account   = var.assume_account
+  workspace_prefix = var.workspace_prefix
+  python_version   = var.python_version
+  etl_bucket_name  = module.bucket.s3_bucket_id
   environment_variables = {
     TABLE_NAME = var.table_name
   }
@@ -134,16 +176,66 @@ module "worker_transform" {
 
 }
 
-module "worker_load" {
+
+module "worker_load_bulk" {
   source = "./worker/"
 
-  etl_stage        = "load"
+  etl_stage        = "load_bulk"
   etl_name         = local.etl_name
   assume_account   = var.assume_account
   workspace_prefix = var.workspace_prefix
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
-  etl_bucket_arn   = module.bucket.s3_bucket_arn
+  environment_variables = {
+    TABLE_NAME = var.table_name
+  }
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+
+  policy_json = <<-EOT
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": [
+                    "s3:PutObject",
+                    "s3:AbortMultipartUpload",
+                    "s3:GetBucketLocation",
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:PutObjectVersionTagging"
+                ],
+                "Effect": "Allow",
+                "Resource": ["${module.bucket.s3_bucket_arn}", "${module.bucket.s3_bucket_arn}/*"]
+            },
+            {
+                "Action": [
+                    "dynamodb:BatchWriteItem"
+                ],
+                "Effect": "Allow",
+                "Resource": ["${var.table_arn}"]
+            },
+            {
+                "Action": [
+                    "kms:Decrypt"
+                ],
+                "Effect": "Allow",
+                "Resource": ["*"]
+            }
+        ]
+      }
+    EOT
+}
+
+module "worker_load_update" {
+  source = "./worker/"
+
+  etl_stage        = "load_update"
+  etl_name         = local.etl_name
+  assume_account   = var.assume_account
+  workspace_prefix = var.workspace_prefix
+  python_version   = var.python_version
+  etl_bucket_name  = module.bucket.s3_bucket_id
   environment_variables = {
     TABLE_NAME = var.table_name
   }
@@ -170,8 +262,7 @@ module "worker_load" {
                 "Action": [
                     "dynamodb:PutItem",
                     "dynamodb:DeleteItem",
-                    "dynamodb:UpdateItem",
-                    "dynamodb:BatchWriteItem"
+                    "dynamodb:UpdateItem"
                 ],
                 "Effect": "Allow",
                 "Resource": ["${var.table_arn}"]
@@ -187,6 +278,19 @@ module "worker_load" {
       }
     EOT
 }
+
+module "worker_load_bulk_reduce" {
+  source = "./worker/"
+
+  etl_stage        = "load_bulk_reduce"
+  etl_name         = local.etl_name
+  assume_account   = var.assume_account
+  workspace_prefix = var.workspace_prefix
+  python_version   = var.python_version
+  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn]
+}
+
+
 
 module "notify" {
   source = "./notify/"
@@ -217,8 +321,8 @@ module "bulk_transform_and_load_step_function" {
   definition = templatefile(
     "${path.module}/etl-diagram--bulk-transform-and-load.asl.json",
     {
-      transform_worker_arn     = module.worker_transform.arn
-      load_worker_arn          = module.worker_load.arn
+      transform_worker_arn     = module.worker_transform_bulk.arn
+      load_worker_arn          = module.worker_load_bulk.arn
       bulk_transform_chunksize = var.bulk_transform_chunksize
       bulk_load_chunksize      = var.bulk_load_chunksize
     }
@@ -227,10 +331,10 @@ module "bulk_transform_and_load_step_function" {
   service_integrations = {
     lambda = {
       lambda = [
-        module.worker_transform.arn,
-        module.worker_load.arn,
-        "${module.worker_transform.arn}:*",
-        "${module.worker_load.arn}:*"
+        module.worker_transform_bulk.arn,
+        module.worker_load_bulk.arn,
+        "${module.worker_transform_bulk.arn}:*",
+        "${module.worker_load_bulk.arn}:*"
       ]
     }
   }
@@ -261,18 +365,18 @@ module "update_transform_and_load_step_function" {
   definition = templatefile(
     "${path.module}/etl-diagram--update-transform-and-load.asl.json",
     {
-      transform_worker_arn = module.worker_transform.arn
-      load_worker_arn      = module.worker_load.arn
+      transform_worker_arn = module.worker_transform_update.arn
+      load_worker_arn      = module.worker_load_update.arn
     }
   )
 
   service_integrations = {
     lambda = {
       lambda = [
-        module.worker_transform.arn,
-        module.worker_load.arn,
-        "${module.worker_transform.arn}:*",
-        "${module.worker_load.arn}:*"
+        module.worker_transform_update.arn,
+        module.worker_load_update.arn,
+        "${module.worker_transform_update.arn}:*",
+        "${module.worker_load_update.arn}:*"
       ]
     }
   }
@@ -298,8 +402,6 @@ resource "aws_sfn_state_machine" "state_machine" {
     "${path.module}/etl-diagram.asl.json",
     {
       extract_worker_arn           = module.worker_extract.arn
-      transform_worker_arn         = module.worker_transform.arn
-      load_worker_arn              = module.worker_load.arn
       notify_arn                   = module.notify.arn
       etl_bucket                   = module.bucket.s3_bucket_id
       changelog_key                = var.changelog_key

@@ -10,7 +10,7 @@ from etl_utils.io import pkl_load_lz4
 from event.aws.client import dynamodb_client as get_dynamodb_client
 from mypy_boto3_s3 import S3Client
 
-from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from etl.sds.worker.load_bulk.tests.test_load_bulk_worker import MockDeviceRepository
 from test_helpers.terraform import read_terraform_output
 
 from .conftest import ETL_BUCKET, parametrize_over_scenarios

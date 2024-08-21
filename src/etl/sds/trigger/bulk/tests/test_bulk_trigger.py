@@ -11,7 +11,7 @@ from event.aws.client import dynamodb_client
 from event.json import json_loads
 
 from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
-from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from etl.sds.worker.load_bulk.tests.test_load_bulk_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.s3 import (
     _ask_s3,

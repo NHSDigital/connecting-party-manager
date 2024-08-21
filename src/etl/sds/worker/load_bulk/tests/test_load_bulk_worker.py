@@ -84,10 +84,10 @@ def mock_s3_client():
         },
         clear=True,
     ):
-        from etl.sds.worker.load import load
+        from etl.sds.worker.load_bulk import load_bulk
 
-        load.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
-        yield load.S3_CLIENT
+        load_bulk.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
+        yield load_bulk.S3_CLIENT
 
 
 @pytest.fixture
@@ -141,7 +141,7 @@ def test_load_worker_pass(
     get_object: Callable[[str], bytes],
     repository: MockDeviceRepository,
 ):
-    from etl.sds.worker.load import load
+    from etl.sds.worker.load_bulk import load_bulk
 
     # Initial state
     initial_unprocessed_data = [
@@ -157,9 +157,9 @@ def test_load_worker_pass(
     repository.write_bulk(map(Device.state, initial_processed_data))
 
     # Execute the load worker
-    response = load.handler(event={"etl_type": "bulk"}, context=None)
+    response = load_bulk.handler(event={"etl_type": "bulk"}, context=None)
     assert response == {
-        "stage_name": "load_bulk",
+        "stage_name": "load",
         "processed_records": n_initial_unprocessed,
         "unprocessed_records": 0,
         "error_message": None,
@@ -194,7 +194,7 @@ def test_load_worker_pass_max_records(
 ):
     MAX_RECORDS = 7
 
-    from etl.sds.worker.load import load
+    from etl.sds.worker.load_bulk import load_bulk
 
     # Initial state
     initial_unprocessed_data = [
@@ -217,11 +217,11 @@ def test_load_worker_pass_max_records(
         )
 
         # Execute the load worker
-        response = load.handler(
+        response = load_bulk.handler(
             event={"max_records": MAX_RECORDS, "etl_type": "bulk"}, context=None
         )
         assert response == {
-            "stage_name": "load_bulk",
+            "stage_name": "load",
             "processed_records": n_processed_records_expected,
             "unprocessed_records": n_unprocessed_records_expected,
             "error_message": None,

@@ -26,7 +26,7 @@ from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 
 from etl.sds.tests.constants import EtlTestDataPath
-from etl.sds.worker.transform.utils import export_events
+from etl.sds.worker.transform_update.utils import export_events
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 
