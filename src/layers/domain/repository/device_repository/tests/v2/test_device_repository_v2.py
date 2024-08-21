@@ -224,8 +224,8 @@ def test__device_repository__can_delete_second_device_with_same_key(
             repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)
 
         # Assert device is inactive after being deleted
-        deleted_device = repository.read_inactive(_device.id)
-        assert deleted_device.status is Status.INACTIVE
+        _deleted_device = repository.read_inactive(_device.id)
+        assert _deleted_device.status is Status.INACTIVE
 
 
 @pytest.mark.integration
