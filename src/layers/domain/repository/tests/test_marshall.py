@@ -90,8 +90,8 @@ def test__unmarshall_value(value, expected):
 
 
 def test_marshall():
-    input = {"one": 1, "two": 2, "three": 3}
-    actual = marshall(pk="_pk_", pk_1="_pk_1_", sk_5="_sk_5_", **input)
+    data = {"one": 1, "two": 2, "three": 3}
+    actual = marshall(pk="_pk_", pk_1="_pk_1_", sk_5="_sk_5_", **data)
     expected = {
         "pk": {"S": "_pk_"},
         "pk_1": {"S": "_pk_1_"},

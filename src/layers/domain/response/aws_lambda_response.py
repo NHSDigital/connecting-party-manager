@@ -25,7 +25,7 @@ class AwsLambdaResponse(BaseModel):
     body: str = Field(min_length=1)
     version: None | str = Field(exclude=True)
     location: None | str = Field(exclude=True, default=None)
-    headers: AwsLambdaResponseHeaders = None
+    headers: Optional[AwsLambdaResponseHeaders] = None
 
     @validator("headers", always=True)
     def generate_response_headers(cls, headers, values):

@@ -68,12 +68,12 @@ def test__device_primary_keys():
     assert primary_keys == [
         {"pk": {"S": "D#123"}, "sk": {"S": "D#123"}},
         {
-            "pk": {"S": f"D#product_id#P.WWW-XXX"},
-            "sk": {"S": f"D#product_id#P.WWW-XXX"},
+            "pk": {"S": "D#product_id#P.WWW-XXX"},
+            "sk": {"S": "D#product_id#P.WWW-XXX"},
         },
         {
-            "pk": {"S": f"DT#<<foo##bar>>"},
-            "sk": {"S": f"D#123"},
+            "pk": {"S": "DT#<<foo##bar>>"},
+            "sk": {"S": "D#123"},
         },
     ]
 

@@ -87,19 +87,19 @@ def before_step(context: Context, step: Step):
     )
 
 
-def after_step(context: Context, step: Step):
+def after_step(context: Context):
     context.table = None
     if context.postman_step:
         context.postman_scenario.item.append(context.postman_step)
 
 
-def after_scenario(context: Context, scenario: Scenario):
+def after_scenario(context: Context):
     context.headers = {}
     if context.postman_scenario:
         context.postman_feature.item.append(context.postman_scenario)
 
 
-def after_feature(context: Context, feature: Feature):
+def after_feature(context: Context):
     if context.postman_feature:
         context.postman_collection.item.append(context.postman_feature)
 

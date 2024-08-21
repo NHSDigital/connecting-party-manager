@@ -16,7 +16,7 @@ TABLE_NAME = "hiya"
 def test__status_check():
     with mock_table(table_name=TABLE_NAME) as client:
         result = _status_check(client=client, table_name=TABLE_NAME)
-    assert result is HTTPStatus.OK
+    assert result == HTTPStatus.OK
 
 
 def test__status_check_not_ok():

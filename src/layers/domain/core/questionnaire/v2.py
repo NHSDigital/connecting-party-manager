@@ -21,7 +21,7 @@ class QuestionnaireResponseUpdatedEvent(Event):
     entity_keys: list
     entity_tags: list
     questionnaire_responses: list["QuestionnaireResponse"]
-    updated_on: str = None
+    updated_on: Optional[str] = None
 
 
 class Questionnaire(QuestionnaireV1):
