@@ -72,10 +72,6 @@ class MockDeviceRepository(DeviceRepository):
             for device in self.all_devices()
         )
 
-    def read_inactive(self, *key_parts):
-        # Update this function after PI-XXX is implemented
-        return self.read(*key_parts)
-
 
 @pytest.fixture
 def mock_s3_client():

@@ -77,7 +77,10 @@ class MockDeviceRepository(DeviceRepository):
         devices = list(TableKey.DEVICE.filter(items, key="sk"))
         for device in devices:
             if device.get("root"):
-                yield self.read(device["id"])
+                try:
+                    yield self.read(device["id"])
+                except:
+                    yield self.read_inactive(device["id"])
 
 
 @parametrize_over_scenarios()

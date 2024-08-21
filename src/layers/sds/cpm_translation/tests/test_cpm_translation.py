@@ -224,7 +224,7 @@ def test_delete_devices(repository: DeviceRepository):
         keys=_device_1.keys,
         tags=set(),
         questionnaire_responses=_device_1.questionnaire_responses,
-        deleted_tags=_device_1.tags,
+        deleted_tags={t.dict() for t in _device_1.tags},
     )
     assert isinstance(event_1.updated_on, datetime)
     assert isinstance(event_1.deleted_on, datetime)
@@ -243,7 +243,7 @@ def test_delete_devices(repository: DeviceRepository):
         keys=_device_2.keys,
         tags=set(),
         questionnaire_responses=_device_2.questionnaire_responses,
-        deleted_tags=_device_2.tags,
+        deleted_tags={t.dict() for t in _device_2.tags},
     )
     assert isinstance(event_2.updated_on, datetime)
     assert isinstance(event_2.deleted_on, datetime)

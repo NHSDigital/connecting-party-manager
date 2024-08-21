@@ -77,7 +77,7 @@ def test_device_delete(device_v2: Device):
     assert device_v2.deleted_on == None
     event = device_v2.delete()
     assert device_v2.status == Status.INACTIVE
-    assert device_v2.tags == []
+    assert device_v2.tags == set()
     assert device_v2.created_on == device_created_on
     assert isinstance(device_v2.deleted_on, datetime)
     assert device_v2.updated_on == device_v2.deleted_on

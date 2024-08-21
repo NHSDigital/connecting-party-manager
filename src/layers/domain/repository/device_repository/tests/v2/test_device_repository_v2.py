@@ -184,7 +184,7 @@ def test__device_repository__delete(
     # Assert device is inactive after being deleted
     assert deleted_device is not None
     assert deleted_device.status is Status.INACTIVE
-    assert deleted_device.tags == []
+    assert deleted_device.tags == set()
     assert deleted_device.created_on == device_with_tag.created_on
     assert deleted_device.updated_on > device_with_tag.updated_on
 

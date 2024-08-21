@@ -257,7 +257,7 @@ class DeviceRepository(Repository[Device]):
         delete_transactions = [
             delete_device_index(
                 table_name=self.table_name,
-                pk_key_parts=(DeviceTag(**tag).value,),
+                pk_key_parts=(DeviceTag(__root__=tag).value,),
                 sk_key_parts=(event.id,),
                 pk_table_key=TableKey.DEVICE_TAG,
             )
@@ -266,8 +266,7 @@ class DeviceRepository(Repository[Device]):
 
         # Prepare data for the inactive copies
         inactive_data = compress_device_fields(event)
-        inactive_data.pop("deleted_tags")
-        inactive_data["status"] = "inactive"
+        inactive_data["status"] = str(Status.INACTIVE)
 
         # Collect keys for the original devices
         original_keys = {DeviceKey(**key) for key in event.keys}
@@ -522,7 +521,9 @@ class DeviceRepository(Repository[Device]):
             item = result["Item"]
         except KeyError:
             raise ItemNotFound(key_parts)
-        return Device(**unmarshall(item))
+
+        _device = unmarshall(item)
+        return Device(**decompress_device_fields(_device))
 
     def query_by_tag(self, **kwargs) -> list[Device]:
         """

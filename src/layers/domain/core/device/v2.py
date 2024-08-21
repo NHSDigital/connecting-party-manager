@@ -315,7 +315,7 @@ class Device(AggregateRoot):
     @event
     def delete(self) -> DeviceDeletedEvent:
         deleted_on = now()
-        deleted_tags = [t.dict() for t in self.tags]
+        deleted_tags = {t.dict() for t in self.tags}
         device_data = self._update(
             data=dict(
                 status=Status.INACTIVE,
