@@ -251,17 +251,17 @@ def test_device_add_tags_in_one_go(device_v2: Device):
     )
 
 
-def test_device_tag():
+def test_device_tag_from__root__():
     tag = DeviceTag(foo="bar", boo="far")
     tag_as_dict = tag.dict()
     reconstituted_tag = DeviceTag(__root__=tag.__root__)
 
-    assert tag_as_dict == tag.__root__
+    assert tag_as_dict == tuple(tag.__root__)
     assert reconstituted_tag == tag
     assert reconstituted_tag in {tag}
 
 
-def test_device_tag():
+def test_device_tag_from_kwargs():
     tag = DeviceTag(foo="bar", boo="far")
     tag_as_dict = tag.dict()
     reconstituted_tag = DeviceTag(**{k: v for k, v in tag_as_dict})

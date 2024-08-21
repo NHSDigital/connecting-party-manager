@@ -111,7 +111,7 @@ def _device_non_root_primary_keys(device_keys: list[DeviceKey]) -> list[dict]:
     """
     Generates all the fully marshalled (i.e. {"pk": {"S": "123"}} DynamoDB
     primary keys (i.e. pk + sk) for the provided Device. This is one primary key
-    for every value of Device.keys and Device.tags
+    for every value of Device.keys
     """
     device_key_primary_keys = [
         marshall(pk=pk, sk=pk)
