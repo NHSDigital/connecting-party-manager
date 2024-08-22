@@ -4,18 +4,13 @@ from collections import deque
 from itertools import permutations
 from typing import Callable
 from unittest import mock
-from uuid import uuid4
 
 import pytest
-from domain.core.device.v2 import DeviceType
-from domain.core.root.v2 import Root
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
-
-from etl.sds.worker.transform_update.utils import export_events
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
@@ -272,24 +267,3 @@ def test_transform_worker_fatal_record(
     # Confirm that no changes were persisted
     assert final_unprocessed_data == initial_unprocessed_data
     assert final_processed_data == initial_processed_data
-
-
-def test__export_events():
-    org = Root.create_ods_organisation(ods_code="AAA")
-    product_team = org.create_product_team(id=uuid4(), name="abc")
-
-    devices = []
-    for i in range(3):
-        device = product_team.create_device(
-            name=f"device-{i}", device_type=DeviceType.PRODUCT
-        )
-        device.add_tag(foo=str(i))
-        devices.append(device)
-    events = export_events(devices)
-    for event in events:
-        assert len(event) == 1
-    event_names = [list(event.keys())[0] for event in events]
-    assert event_names == [
-        "device_created_event",
-        "device_tag_added_event",
-    ] * len(devices)

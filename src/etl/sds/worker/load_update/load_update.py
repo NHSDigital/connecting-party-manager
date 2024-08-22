@@ -2,37 +2,20 @@ from collections import deque
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
-import boto3
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.device.v2 import DeviceEventDeserializer
-from domain.repository.device_repository.v2 import DeviceRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
 from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
-from event.aws.client import dynamodb_client
-from event.environment import BaseEnvironment
+from sds.worker.load import LoadWorkerCache
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
 
-
-class LoadWorkerEnvironment(BaseEnvironment):
-    ETL_BUCKET: str
-    TABLE_NAME: str
-
-    def s3_path(self, key) -> str:
-        return f"s3://{self.ETL_BUCKET}/{key}"
-
-
-S3_CLIENT = boto3.client("s3")
-ENVIRONMENT = LoadWorkerEnvironment.build()
-REPOSITORY = DeviceRepository(
-    table_name=ENVIRONMENT.TABLE_NAME, dynamodb_client=dynamodb_client()
-)
-MAX_RECORDS = 150_000
+CACHE = LoadWorkerCache()
 
 
 def load(
@@ -64,15 +47,17 @@ def load(
 
 def handler(event: dict, context):
     worker_event = WorkerEvent(**event)
-    max_records = worker_event.max_records or MAX_RECORDS
+    max_records = worker_event.max_records or CACHE.MAX_RECORDS
 
     response = execute_step_chain(
         action=load,
-        s3_client=S3_CLIENT,
-        s3_input_path=ENVIRONMENT.s3_path(WorkerKey.LOAD),
+        s3_client=CACHE.S3_CLIENT,
+        s3_input_path=CACHE.ENVIRONMENT.s3_path(WorkerKey.LOAD),
         s3_output_path=None,
         unprocessed_dumper=pkl_dump_lz4,
-        processed_dumper=lambda events: REPOSITORY.write(AggregateRoot(events=events)),
+        processed_dumper=lambda events: CACHE.REPOSITORY.write(
+            AggregateRoot(events=events)
+        ),
         max_records=max_records,
     )
     return asdict(response)

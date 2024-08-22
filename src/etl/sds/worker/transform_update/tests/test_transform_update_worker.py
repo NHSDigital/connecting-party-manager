@@ -15,43 +15,15 @@ from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
+from etl.sds.worker.transform_bulk.tests.test_transform_bulk_worker import (
+    BAD_SDS_RECORD_AS_JSON,
+    BUCKET_NAME,
+    FATAL_SDS_RECORD_AS_JSON,
+    GOOD_SDS_RECORD_AS_JSON,
+    PROCESSED_SDS_JSON_RECORD,
+    TABLE_NAME,
+)
 from etl.sds.worker.transform_update.utils import export_events
-
-BUCKET_NAME = "my-bucket"
-TABLE_NAME = "my-table"
-
-GOOD_SDS_RECORD_AS_JSON = {
-    "description": None,
-    "distinguished_name": {
-        "organisation": "nhs",
-        "organisational_unit": "services",
-        "unique_identifier": None,
-    },
-    "nhs_approver_urp": "uniqueIdentifier=562983788547,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs",
-    "nhs_as_acf": None,
-    "nhs_as_category_bag": None,
-    "nhs_as_client": ["RVL"],
-    "nhs_as_svc_ia": ["urn:nhs:names:services:pds:QUPA_IN040000UK01"],
-    "nhs_date_approved": "20090601140104",
-    "nhs_date_requested": "20090601135904",
-    "nhs_id_code": "RVL",
-    "nhs_mhs_manufacturer_org": "LSP04",
-    "nhs_mhs_party_key": "RVL-806539",
-    "nhs_product_key": "634",
-    "nhs_product_name": "Cerner Millennium",
-    "nhs_product_version": "2005.02",
-    "nhs_requestor_urp": "uniqueIdentifier=977624345541,uniqueIdentifier=883298590547,uid=503560389549,ou=People,o=nhs",
-    "nhs_temp_uid": "9713",
-    "object_class": "nhsAS",
-    "unique_identifier": "000428682512",
-}
-
-BAD_SDS_RECORD_AS_JSON = {}
-
-FATAL_SDS_RECORD_AS_JSON = "<not_json"
-
-
-PROCESSED_SDS_JSON_RECORD = {}  # dummy value, doesn't matter for transform
 
 
 @pytest.fixture

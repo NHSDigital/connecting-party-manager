@@ -1,77 +1,24 @@
 import os
 from collections import deque
-from datetime import datetime, timezone
-from typing import Callable, Generator
+from typing import Callable
 from unittest import mock
-from uuid import UUID
 
 import pytest
-from domain.core.device.v2 import Device, DeviceCreatedEvent, DeviceType
-from domain.core.device_key.v2 import DeviceKeyType
-from domain.repository.compression import pkl_loads_gzip
-from domain.repository.device_repository.v2 import DeviceRepository
-from domain.repository.keys.v2 import TableKey
-from domain.repository.marshall import unmarshall
+from domain.core.device.v2 import Device
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
+from etl.sds.worker.load_bulk.tests.test_load_bulk_worker import (
+    BUCKET_NAME,
+    TABLE_NAME,
+    MockDeviceRepository,
+    device_factory,
+)
 from etl.sds.worker.transform_update.utils import export_events
 from test_helpers.dynamodb import mock_table
-
-BUCKET_NAME = "my-bucket"
-TABLE_NAME = "my-table"
-
-
-BAD_DEVICE = {}
-GOOD_DEVICE_1 = {
-    "id": str(UUID(int=1)),
-    "name": "device-1",
-    "device_type": "product",
-    "product_team_id": str(UUID(int=1)),
-    "ods_code": "ABC",
-    "status": "active",
-    "created_on": datetime.now(timezone.utc),
-    "updated_on": None,
-    "deleted_on": None,
-}
-GOOD_DEVICE_2 = {
-    "id": str(UUID(int=2)),
-    "name": "device-1",
-    "type": "product",
-    "product_team_id": str(UUID(int=2)),
-    "ods_code": "ABC",
-    "status": "active",
-    "created_on": datetime.now(timezone.utc),
-    "updated_on": None,
-    "deleted_on": None,
-}
-
-
-class MockDeviceRepository(DeviceRepository):
-    def all_devices(self) -> Generator[Device, None, None]:
-        response = self.client.scan(TableName=self.table_name)
-        items = map(unmarshall, response["Items"])
-        devices = list(TableKey.DEVICE.filter(items, key="sk"))
-        for device in devices:
-            if not device.get("root"):
-                continue
-            device["tags"] = [
-                pkl_loads_gzip(tag) for tag in pkl_loads_gzip(device["tags"])
-            ]
-            yield Device(**device)
-
-    def count(self, by: DeviceType | DeviceKeyType):
-        return sum(
-            (
-                device.device_type is by
-                if isinstance(by, DeviceType)
-                else any(key.key_type is by for key in device.keys)
-            )
-            for device in self.all_devices()
-        )
 
 
 @pytest.fixture
@@ -87,8 +34,8 @@ def mock_s3_client():
     ):
         from etl.sds.worker.load_update import load_update
 
-        load_update.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
-        yield load_update.S3_CLIENT
+        load_update.CACHE.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
+        yield load_update.CACHE.S3_CLIENT
 
 
 @pytest.fixture
@@ -111,23 +58,6 @@ def repository():
         yield MockDeviceRepository(
             table_name=TABLE_NAME, dynamodb_client=dynamodb_client
         )
-
-
-def device_factory(id: int) -> Device:
-    ods_code = "ABC"
-    device = Device(
-        id=UUID(int=id),
-        name=f"device-{id}",
-        device_type=DeviceType.PRODUCT,
-        product_team_id=UUID(int=1),
-        ods_code=ods_code,
-    )
-    event = DeviceCreatedEvent(**device.dict())
-    device.add_event(event)
-    device.add_key(
-        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=f"{ods_code}:{id}"
-    )
-    return device
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,5 @@
 import os
 from collections import deque
-from datetime import datetime, timezone
 from typing import Callable, Generator
 from unittest import mock
 from uuid import UUID
@@ -22,31 +21,6 @@ from test_helpers.dynamodb import mock_table
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
-
-
-BAD_DEVICE = {}
-GOOD_DEVICE_1 = {
-    "id": str(UUID(int=1)),
-    "name": "device-1",
-    "device_type": "product",
-    "product_team_id": str(UUID(int=1)),
-    "ods_code": "ABC",
-    "status": "active",
-    "created_on": datetime.now(timezone.utc),
-    "updated_on": None,
-    "deleted_on": None,
-}
-GOOD_DEVICE_2 = {
-    "id": str(UUID(int=2)),
-    "name": "device-1",
-    "type": "product",
-    "product_team_id": str(UUID(int=2)),
-    "ods_code": "ABC",
-    "status": "active",
-    "created_on": datetime.now(timezone.utc),
-    "updated_on": None,
-    "deleted_on": None,
-}
 
 
 class MockDeviceRepository(DeviceRepository):
@@ -86,8 +60,8 @@ def mock_s3_client():
     ):
         from etl.sds.worker.load_bulk import load_bulk
 
-        load_bulk.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
-        yield load_bulk.S3_CLIENT
+        load_bulk.CACHE.S3_CLIENT.create_bucket(Bucket=BUCKET_NAME)
+        yield load_bulk.CACHE.S3_CLIENT
 
 
 @pytest.fixture
