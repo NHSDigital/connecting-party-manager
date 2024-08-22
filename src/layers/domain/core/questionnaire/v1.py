@@ -220,7 +220,7 @@ class QuestionnaireResponse(BaseModel):
 
     @validator("responses")
     def validate_mandatory_questions_are_answered(
-        responses: list[dict[str, list]], values: dict[str, Questionnaire]
+        cls, responses: list[dict[str, list]], values: dict[str, Questionnaire]
     ):
         questionnaire = values.get("questionnaire")
         validate_mandatory_questions_answered(
@@ -235,7 +235,9 @@ class QuestionnaireResponse(BaseModel):
         return responses
 
     @validator("responses", each_item=True)
-    def validate_responses(response: dict[str, list], values: dict[str, Questionnaire]):
+    def validate_responses(
+        cls, response: dict[str, list], values: dict[str, Questionnaire]
+    ):
         questionnaire = values.get("questionnaire")
         ((question_name, answers),) = response.items()
         if questionnaire is not None:

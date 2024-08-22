@@ -9,22 +9,41 @@ def error_message(*args, label=""):
     return "\n".join(map(stringify, ("", *label, *args, "")))
 
 
+def should_ignore(expected, received, key, expected_value):
+    if expected_value == IGNORE:
+        expected.pop(key)
+        received.pop(key, None)
+        return True
+    return False
+
+
+def handle_dict_values(expected_value, received_value):
+    if isinstance(expected_value, dict) and isinstance(received_value, dict):
+        _pop_ignore(expected=expected_value, received=received_value)
+
+
+def handle_list_values(expected_value, received_value):
+    if isinstance(expected_value, list) and isinstance(received_value, list):
+        for a, b in zip(received_value, expected_value):
+            if isinstance(a, dict) and isinstance(b, dict):
+                _pop_ignore(expected=b, received=a)
+
+
 def _pop_ignore(expected: dict, received: dict):
-    """If any of expected's values are IGNORE, them removed them from both"""
+    """If any of expected's values are IGNORE, remove them from both."""
+
     for key in list(expected):
         expected_value = expected[key]
-        if expected_value == IGNORE:
-            expected.pop(key)
-            received.pop(key, None)
-        elif isinstance(received, dict):
+
+        if should_ignore(expected, received, key, expected_value):
+            continue
+
+        if isinstance(received, dict):
             received_value = received.get(key)
-            if isinstance(expected_value, dict) and isinstance(received_value, dict):
-                _pop_ignore(expected=expected_value, received=received_value)
-            if isinstance(received_value, list) and isinstance(expected_value, list):
-                for a, b in zip(received_value, expected_value):
-                    if not isinstance(a, dict) and not isinstance(b, dict):
-                        continue
-                    _pop_ignore(expected=b, received=a)
+
+            handle_dict_values(expected_value, received_value)
+
+            handle_list_values(expected_value, received_value)
 
 
 def _fix_backslashes(json_data: dict):

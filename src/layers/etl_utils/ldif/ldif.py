@@ -85,9 +85,8 @@ class StreamBlock:
         self.keep = False
 
     def parse(self, line: bytes):
-        if not self.keep:
-            if any(filter(line) for filter in self.filters):
-                self.keep = True
+        if not self.keep and any(filter(line) for filter in self.filters):
+            self.keep = True
         self.buffer += line
 
     def __bool__(self):

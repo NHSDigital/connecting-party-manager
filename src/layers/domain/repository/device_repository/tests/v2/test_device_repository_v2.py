@@ -78,9 +78,13 @@ def test__device_non_root_primary_keys():
     )
     assert primary_keys == [
         {
-            "pk": {"S": f"D#product_id#P.WWW-XXX"},
-            "sk": {"S": f"D#product_id#P.WWW-XXX"},
-        }
+            "pk": {"S": "D#product_id#P.WWW-XXX"},
+            "sk": {"S": "D#product_id#P.WWW-XXX"},
+        },
+        {
+            "pk": {"S": "DT#<<foo##bar>>"},
+            "sk": {"S": "D#123"},
+        },
     ]
 
 

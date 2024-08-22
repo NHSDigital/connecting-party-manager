@@ -47,7 +47,6 @@ def test__create_product_team(
     assert result.ods_code == org.ods_code
 
     assert len(result.events) == 1
-    event = result.events[0]
     assert isinstance(event, ProductTeamCreatedEvent)
     assert event.id == id
     assert event.name == name

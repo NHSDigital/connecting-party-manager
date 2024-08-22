@@ -96,7 +96,6 @@ def _get_changelog_entries_from_ldap(data, cache: Cache):
 
 def _parse_and_join_changelog_changes(data, cache):
     changelog_records, _ = data[_get_changelog_entries_from_ldap]
-    changelog_records: list[tuple[str, dict]] = changelog_records
     changes_ldif = starmap(parse_changelog_changes, changelog_records)
     return LDIF_RECORD_DELIMITER.join(changes_ldif)
 

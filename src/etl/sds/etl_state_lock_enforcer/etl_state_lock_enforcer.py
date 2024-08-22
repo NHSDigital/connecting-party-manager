@@ -46,9 +46,6 @@ def process_message(message):
         state_machine_input, _ = result
         if not isinstance(state_machine_input, Exception):
             trigger_type = state_machine_input.etl_type
-    else:
-        # If the result is not a tuple, it must be an Exception
-        state_machine_input = result
 
     response = notify(
         lambda_client=LAMBDA_CLIENT,

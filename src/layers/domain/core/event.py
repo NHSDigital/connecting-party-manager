@@ -46,9 +46,9 @@ class EventDeserializer(ABC):
     event_types: tuple[type[Event]]
 
     @classmethod
-    def parse(self, exported_event: ExportedEventTypeDef) -> Event:
+    def parse(cls, exported_event: ExportedEventTypeDef) -> Event:
         ((event_name, event_data),) = exported_event.items()
-        for event_type in self.event_types:
+        for event_type in cls.event_types:
             if event_name == event_type.public_name:
                 return event_type(**event_data)
         raise NotImplementedError(f"Not implemented parsing of {event_name}")
