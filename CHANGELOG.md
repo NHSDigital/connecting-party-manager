@@ -1,5 +1,11 @@
 # Changelog
 
+## 2024-08-22
+- [PI-445] ETL v2
+- [PI-452] Sonarcloud fixes
+- [PI-271] Apigee key fixes
+- [PI-476] Split ETL lambdas
+
 ## 2024-08-20
 - [PI-470] Hide inactive devices
 - [PI-305] Add product to app CI
