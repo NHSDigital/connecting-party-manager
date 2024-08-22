@@ -1,5 +1,6 @@
 import pytest
 from domain.repository.errors import AlreadyExistsError
+from domain.repository.marshall import marshall
 from domain.repository.repository.v2 import Repository as RepositoryV2
 from event.aws.client import dynamodb_client
 
@@ -26,7 +27,8 @@ def repository() -> "MyRepositoryV2":
 
 
 class MyRepositoryV2(RepositoryV2[MyModel], MyRepositoryMixin):
-    pass
+    def handle_bulk(self, item):
+        return [{"PutRequest": {"Item": marshall(**item)}}]
 
 
 @pytest.mark.integration
@@ -134,3 +136,15 @@ def test_repository_add_and_delete_separate_transactions(repository: MyRepositor
 
     with pytest.raises(_NotFoundError):
         repository.read(pk=value)
+
+
+@pytest.mark.integration
+def test_repository_write_bulk(repository: MyRepositoryV2):
+    responses = repository.write_bulk(
+        [{"pk": str(i), "sk": str(i), "field": f"boo-{i}"} for i in range(51)],
+        batch_size=25,
+    )
+    assert len(responses) >= 3  # 51/25
+
+    for i in range(51):
+        assert repository.read(pk=str(i)).field == f"boo-{i}"

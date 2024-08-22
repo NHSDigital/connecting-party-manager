@@ -6,7 +6,10 @@ from domain.core.device.v2 import (
     DeviceDeletedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
+    DeviceTag,
     DeviceTagAddedEvent,
+    DeviceTagsAddedEvent,
+    DeviceTagsClearedEvent,
     DeviceType,
     DeviceUpdatedEvent,
     DuplicateQuestionnaireResponse,
@@ -74,7 +77,7 @@ def test_device_delete(device_v2: Device):
     assert device_v2.deleted_on == None
     event = device_v2.delete()
     assert device_v2.status == Status.INACTIVE
-    assert device_v2.tags == []
+    assert device_v2.tags == set()
     assert device_v2.created_on == device_created_on
     assert isinstance(device_v2.deleted_on, datetime)
     assert device_v2.updated_on == device_v2.deleted_on
@@ -211,9 +214,66 @@ def test_device_add_tag(device_v2: Device):
     with pytest.raises(DuplicateError):
         device_v2.add_tag(bar="second", foo="first")
 
-    assert [tag.value for tag in device_v2.tags] == [
-        "<<bar##second>>##<<foo##first>>",
-        "<<bar##second>>##<<baz##third>>##<<foo##first>>",
-    ]
+    assert sorted(tag.value for tag in device_v2.tags) == sorted(
+        [
+            "<<bar##second>>##<<foo##first>>",
+            "<<bar##second>>##<<baz##third>>##<<foo##first>>",
+        ]
+    )
 
     assert event_2.updated_on > event_1.updated_on
+
+    event_3 = device_v2.clear_tags()
+    assert isinstance(event_3, DeviceTagsClearedEvent)
+    assert event_3.updated_on > event_2.updated_on
+    assert device_v2.tags == set()
+
+
+def test_device_add_tags_in_one_go(device_v2: Device):
+    event = device_v2.add_tags(
+        tags=[
+            dict(foo="first", bar="second"),
+            dict(foo="first", bar="second", baz="third"),
+        ]
+    )
+    assert isinstance(event, DeviceTagsAddedEvent)
+    assert event.updated_on is not None
+    assert event.updated_on == device_v2.updated_on
+
+    with pytest.raises(DuplicateError):
+        device_v2.add_tags([dict(bar="second", foo="first")])
+
+    assert sorted(tag.value for tag in device_v2.tags) == sorted(
+        [
+            "<<bar##second>>##<<foo##first>>",
+            "<<bar##second>>##<<baz##third>>##<<foo##first>>",
+        ]
+    )
+
+
+def test_device_tag_from__root__():
+    tag = DeviceTag(foo="bar", boo="far")
+    tag_as_dict = tag.dict()
+    reconstituted_tag = DeviceTag(__root__=tag.__root__)
+
+    assert tag_as_dict == tuple(tag.__root__)
+    assert reconstituted_tag == tag
+    assert reconstituted_tag in {tag}
+
+
+def test_device_tag_from_kwargs():
+    tag = DeviceTag(foo="bar", boo="far")
+    tag_as_dict = tag.dict()
+    reconstituted_tag = DeviceTag(**{k: v for k, v in tag_as_dict})
+
+    assert tag_as_dict == tuple(tag.components)
+    assert reconstituted_tag == tag
+    assert reconstituted_tag in {tag}
+
+
+def test_device_state_tags(device_v2: Device):
+    device_v2.add_tag(foo="bar")
+    (device_tag,) = device_v2.tags
+    (state_tag,) = device_v2.state()["tags"]
+    assert isinstance(state_tag, list)
+    assert state_tag == [list(component) for component in device_tag.components]

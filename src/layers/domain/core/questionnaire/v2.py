@@ -87,3 +87,11 @@ class QuestionnaireResponse(BaseModel):
             if value is not None:
                 return value
         return []
+
+    @property
+    def flat_answers(self) -> dict[str, any]:
+        return {
+            question: (answer[0] if len(answer) == 1 else answer)
+            for question_answer in self.answers
+            for question, answer in question_answer.items()
+        }

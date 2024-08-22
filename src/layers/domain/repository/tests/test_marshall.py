@@ -17,6 +17,7 @@ class Nested:
         [123, {"N": "123"}],
         [True, {"BOOL": True}],
         [[], {"L": []}],
+        [set(), {"L": []}],
         [
             [
                 None,

@@ -26,7 +26,7 @@ def create_zip_package(
     )
 
     clean_dir(dist_dir)
-    print(f"Building {package_name}")  # noqa: T201
+    print(f"Building {base_dir.parent.name}/{package_name}")  # noqa: T201
     yield copy_dir
     zip_package(build_dir)
     shutil.move(dist_dir / f"{BUILD_DIR}.zip", dist_dir / f"{package_name}.zip")

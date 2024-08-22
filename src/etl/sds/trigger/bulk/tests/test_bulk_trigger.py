@@ -4,14 +4,14 @@ from functools import partial
 
 import boto3
 import pytest
-from domain.core.device import DeviceType
+from domain.core.device.v2 import DeviceType
 from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.aws.client import dynamodb_client
 from event.json import json_loads
 
 from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
-from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from etl.sds.worker.load_bulk.tests.test_load_bulk_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.s3 import (
     _ask_s3,

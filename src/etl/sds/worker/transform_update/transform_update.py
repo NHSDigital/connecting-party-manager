@@ -4,9 +4,7 @@ from typing import TYPE_CHECKING
 
 import boto3
 from domain.core.event import ExportedEventTypeDef
-from domain.core.questionnaire.load_questionnaire import render_questionnaire
-from domain.core.questionnaire.questionnaires import QuestionnaireInstance
-from domain.repository.device_repository import DeviceRepository
+from domain.repository.device_repository.v2 import DeviceRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
@@ -17,7 +15,7 @@ from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from sds.cpm_translation import translate
 
-from etl.sds.worker.transform.reject_duplicates import reject_duplicate_keys
+from etl.sds.worker.transform_update.utils import export_events
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
@@ -43,41 +41,21 @@ def transform(
     s3_input_path: str,
     s3_output_path: str,
     max_records: int,
-    trust: bool,
-) -> WorkerActionResponse:
+):
     with smart_open(s3_path=s3_input_path, s3_client=s3_client) as f:
         unprocessed_records: deque[dict] = pkl_load_lz4(f)
 
     with smart_open(s3_path=s3_output_path, s3_client=s3_client) as f:
         processed_records: deque[ExportedEventTypeDef] = pkl_load_lz4(f)
 
-    spine_device_questionnaire = render_questionnaire(
-        questionnaire_name=QuestionnaireInstance.SPINE_DEVICE, questionnaire_version=1
-    )
-    spine_endpoint_questionnaire = render_questionnaire(
-        questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT, questionnaire_version=1
-    )
-
-    _spine_device_questionnaire = spine_device_questionnaire.dict()
-    _spine_endpoint_questionnaire = spine_endpoint_questionnaire.dict()
-
     exception = apply_action(
         unprocessed_records=unprocessed_records,
         processed_records=processed_records,
-        action=lambda record: translate(
-            obj=record,
-            spine_device_questionnaire=spine_device_questionnaire,
-            _spine_device_questionnaire=_spine_device_questionnaire,
-            spine_endpoint_questionnaire=spine_endpoint_questionnaire,
-            _spine_endpoint_questionnaire=_spine_endpoint_questionnaire,
-            _trust=trust,
-            repository=REPOSITORY,
+        action=lambda record: export_events(
+            translate(obj=record, repository=REPOSITORY, bulk=False)
         ),
         max_records=max_records,
     )
-
-    if trust and exception is None:
-        reject_duplicate_keys(exported_events=processed_records)
 
     return WorkerActionResponse(
         unprocessed_records=unprocessed_records,
@@ -98,6 +76,5 @@ def handler(event: dict, context):
         unprocessed_dumper=pkl_dump_lz4,
         processed_dumper=pkl_dump_lz4,
         max_records=_event.max_records,
-        trust=_event.trust,
     )
     return asdict(response)

@@ -97,20 +97,20 @@ def transform_handler(scenario: Scenario):
     os.environ["ETL_BUCKET"] = etl_bucket
     os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_table_name.value")
 
-    from etl.sds.worker.transform import transform
+    from etl.sds.worker.transform_update import transform_update
 
-    transform.S3_CLIENT.put_object(
+    transform_update.S3_CLIENT.put_object(
         Bucket=etl_bucket,
         Key="input--transform/unprocessed",
         Body=pkl_dumps_lz4(deque(scenario.extract_output)),
     )
-    transform.S3_CLIENT.put_object(
+    transform_update.S3_CLIENT.put_object(
         Bucket=etl_bucket,
         Key="input--load/unprocessed",
         Body=pkl_dumps_lz4(deque()),
     )
 
-    yield transform.handler
+    yield transform_update.handler
 
     os.environ = original_environ
 
@@ -122,7 +122,7 @@ def load_handler(scenario: Scenario):
     os.environ["ETL_BUCKET"] = read_terraform_output("sds_etl.value.bucket")
     os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_table_name.value")
 
-    from etl.sds.worker.load import load
+    from etl.sds.worker.load_update import load_update
 
-    yield load.handler
+    yield load_update.handler
     os.environ = original_environ

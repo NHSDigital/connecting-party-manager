@@ -15,11 +15,8 @@ variable "python_version" {
 }
 
 variable "etl_bucket_name" {
-  type = string
-}
-
-variable "etl_bucket_arn" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "layers" {
@@ -34,5 +31,17 @@ variable "environment_variables" {
 }
 
 variable "policy_json" {
-
+  default = <<-EOT
+      {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Sid": "nullPolicy",
+                  "Effect": "Allow",
+                  "Action": "none:null",
+                  "Resource": "*"
+              }
+          ]
+      }
+    EOT
 }
