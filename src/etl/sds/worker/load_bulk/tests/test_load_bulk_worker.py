@@ -131,7 +131,9 @@ def test_load_worker_pass(
     repository.write_bulk(map(Device.state, initial_processed_data))
 
     # Execute the load worker
-    response = load_bulk.handler(event={"etl_type": "bulk"}, context=None)
+    response = load_bulk.handler(
+        event={"s3_input_path": f"s3://{BUCKET_NAME}/{WorkerKey.LOAD}"}, context=None
+    )
     assert response == {
         "stage_name": "load",
         "processed_records": n_initial_unprocessed,
@@ -192,7 +194,11 @@ def test_load_worker_pass_max_records(
 
         # Execute the load worker
         response = load_bulk.handler(
-            event={"max_records": MAX_RECORDS, "etl_type": "bulk"}, context=None
+            event={
+                "max_records": MAX_RECORDS,
+                "s3_input_path": f"s3://{BUCKET_NAME}/{WorkerKey.LOAD}",
+            },
+            context=None,
         )
         assert response == {
             "stage_name": "load",

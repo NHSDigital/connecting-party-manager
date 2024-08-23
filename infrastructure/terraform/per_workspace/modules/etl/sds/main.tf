@@ -157,8 +157,7 @@ module "worker_transform_update" {
             },
             {
                 "Action": [
-                    "dynamodb:Query",
-                    "dynamodb:BatchGetItem"
+                    "dynamodb:Query"
                 ],
                 "Effect": "Allow",
                 "Resource": ["${var.table_arn}", "${var.table_arn}/*"]
@@ -323,8 +322,9 @@ module "bulk_transform_and_load_step_function" {
     {
       transform_worker_arn     = module.worker_transform_bulk.arn
       load_worker_arn          = module.worker_load_bulk.arn
-      bulk_transform_chunksize = var.bulk_transform_chunksize
+      load_reduce_worker_arn   = module.worker_load_bulk_reduce.arn
       bulk_load_chunksize      = var.bulk_load_chunksize
+      bulk_transform_chunksize = var.bulk_transform_chunksize
     }
   )
 
@@ -333,8 +333,11 @@ module "bulk_transform_and_load_step_function" {
       lambda = [
         module.worker_transform_bulk.arn,
         module.worker_load_bulk.arn,
+        module.worker_load_bulk_reduce.arn,
         "${module.worker_transform_bulk.arn}:*",
-        "${module.worker_load_bulk.arn}:*"
+        "${module.worker_load_bulk.arn}:*",
+        "${module.worker_load_bulk_reduce.arn}:*"
+
       ]
     }
   }
@@ -405,7 +408,6 @@ resource "aws_sfn_state_machine" "state_machine" {
       notify_arn                   = module.notify.arn
       etl_bucket                   = module.bucket.s3_bucket_id
       changelog_key                = var.changelog_key
-      bulk_load_chunksize          = var.bulk_load_chunksize
       etl_update_state_machine_arn = module.update_transform_and_load_step_function.state_machine_arn
       etl_bulk_state_machine_arn   = module.bulk_transform_and_load_step_function.state_machine_arn
       etl_state_lock_key           = var.etl_state_lock_key

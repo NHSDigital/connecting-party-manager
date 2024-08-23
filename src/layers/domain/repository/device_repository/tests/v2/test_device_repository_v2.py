@@ -3,7 +3,7 @@ from copy import deepcopy
 import pytest
 from attr import asdict
 from domain.core.device.v2 import Device as DeviceV2
-from domain.core.device.v2 import DeviceCreatedEvent
+from domain.core.device.v2 import DeviceCreatedEvent, DeviceTag
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
 from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
 from domain.core.device_key.v2 import DeviceKeyType
@@ -72,15 +72,21 @@ def test__device_root_primary_key():
 
 def test__device_non_root_primary_keys():
     primary_keys = _device_non_root_primary_keys(
+        device_id="123",
         device_keys=[
             DeviceKeyV2(key_type=DeviceKeyType.PRODUCT_ID, key_value=DEVICE_KEY)
-        ]
+        ],
+        device_tags=[DeviceTag(foo="bar")],
     )
     assert primary_keys == [
         {
             "pk": {"S": f"D#product_id#P.WWW-XXX"},
             "sk": {"S": f"D#product_id#P.WWW-XXX"},
-        }
+        },
+        {
+            "pk": {"S": f"DT#<<foo##bar>>"},
+            "sk": {"S": f"D#123"},
+        },
     ]
 
 

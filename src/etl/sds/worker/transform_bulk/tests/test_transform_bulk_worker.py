@@ -2,15 +2,20 @@ import os
 import re
 from collections import deque
 from itertools import permutations
+from math import ceil
 from typing import Callable
 from unittest import mock
 
 import pytest
+from botocore.exceptions import ClientError
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
+from etl_utils.smart_open import smart_open
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
+
+from etl.sds.worker.transform_bulk.utils import smart_open_if_exists
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
@@ -98,16 +103,19 @@ def test_transform_worker_pass_no_dupes(
     # Execute the transform worker
     response = transform_bulk.handler(event={}, context=None)
 
-    assert response == {
-        "stage_name": "transform",
-        "processed_records": n_initial_processed + n_initial_unprocessed,
-        "unprocessed_records": 0,
-        "error_message": None,
-    }
+    assert response == [
+        {
+            "stage_name": "transform",
+            "processed_records": n_initial_processed + n_initial_unprocessed,
+            "unprocessed_records": 0,
+            "s3_input_path": "s3://my-bucket/input--load/unprocessed.0",
+            "error_message": None,
+        }
+    ]
 
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
-    final_processed_data: str = get_object(key=WorkerKey.LOAD)
+    final_processed_data: str = get_object(key=f"{WorkerKey.LOAD}.0")
     n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
     n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
@@ -134,38 +142,44 @@ def test_transform_worker_pass_no_dupes_max_records(
     put_object(key=WorkerKey.TRANSFORM, body=pkl_dumps_lz4(initial_unprocessed_data))
     put_object(key=WorkerKey.LOAD, body=pkl_dumps_lz4(initial_processed_data))
 
-    n_total_processed_records_expected = 0
-    n_unprocessed_records = n_initial_unprocessed
-    while n_unprocessed_records > 0:
-        n_newly_processed_records_expected = min(n_unprocessed_records, max_records)
-        n_unprocessed_records_expected = (
-            n_unprocessed_records - n_newly_processed_records_expected
-        )
-        n_total_processed_records_expected += n_newly_processed_records_expected
+    expected_responses = []
+    expected_iterations = min(
+        ceil(n_initial_unprocessed / max_records), transform_bulk.FAN_OUT
+    )
 
-        # Execute the transform worker
-        response = transform_bulk.handler(
-            event={"max_records": max_records}, context=None
-        )
-        assert response == {
-            "stage_name": "transform",
-            "processed_records": n_total_processed_records_expected,
-            "unprocessed_records": n_unprocessed_records_expected,
-            "error_message": None,
-        }
+    total_processed = 0
+    for i in range(expected_iterations):
+        chunk_size = min(n_initial_unprocessed - total_processed, max_records)
 
-        n_unprocessed_records = response["unprocessed_records"]
+        total_processed += chunk_size
+        expected_responses.append(
+            {
+                "stage_name": "transform",
+                "processed_records": chunk_size,
+                "unprocessed_records": (n_initial_unprocessed - total_processed),
+                "s3_input_path": f"s3://my-bucket/input--load/unprocessed.{i}",
+                "error_message": None,
+            }
+        )
+
+    # Execute the transform worker
+    responses = transform_bulk.handler(event={"max_records": max_records}, context=None)
+
+    assert responses == expected_responses
 
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
-    final_processed_data: str = get_object(key=WorkerKey.LOAD)
     n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
-    n_final_processed = len(pkl_loads_lz4(final_processed_data))
+
+    n_final_processed = 0
+    for i in range(expected_iterations):
+        final_processed_data: str = get_object(key=f"{WorkerKey.LOAD}.{i}")
+        n_final_processed += len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that everything has now been processed, and that there is no
     # unprocessed data left in the bucket
     assert n_final_processed == n_initial_processed + n_initial_unprocessed
-    assert n_final_unprocessed == 0
+    assert n_final_unprocessed == n_initial_unprocessed - total_processed
 
 
 @pytest.mark.parametrize(
@@ -185,23 +199,20 @@ def test_transform_worker_bad_record(
     bad_record_index = initial_unprocessed_data.index(BAD_SDS_RECORD_AS_JSON)
 
     # Initial state
-    n_initial_processed = 5
     n_initial_unprocessed = len(initial_unprocessed_data)
-    initial_processed_data = pkl_dumps_lz4(
-        deque(n_initial_processed * [PROCESSED_SDS_JSON_RECORD])
-    )
     put_object(key=WorkerKey.TRANSFORM, body=_initial_unprocessed_data)
-    put_object(key=WorkerKey.LOAD, body=initial_processed_data)
 
     # Execute the transform worker
-    response = transform_bulk.handler(event={}, context=None)
+    responses = transform_bulk.handler(event={}, context=None)
+    assert len(responses) == 1
 
-    response["error_message"] = response["error_message"].split("\n")[:6]
+    responses[0]["error_message"] = responses[0]["error_message"].split("\n")[:6]
 
-    assert response == {
+    assert responses[0] == {
         "stage_name": "transform",
-        "processed_records": n_initial_processed + bad_record_index,
+        "processed_records": bad_record_index,
         "unprocessed_records": n_initial_unprocessed - bad_record_index,
+        "s3_input_path": "s3://my-bucket/input--load/unprocessed.0",
         "error_message": [
             "The following errors were encountered",
             "  -- Error 1 (KeyError) --",
@@ -214,14 +225,14 @@ def test_transform_worker_bad_record(
 
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM)
-    final_processed_data: str = get_object(key=WorkerKey.LOAD)
+    final_processed_data: str = get_object(key=f"{WorkerKey.LOAD}.0")
     n_final_unprocessed = len(pkl_loads_lz4(final_unprocessed_data))
     n_final_processed = len(pkl_loads_lz4(final_processed_data))
 
     # Confirm that there are still unprocessed records, and that there may have been
     # some records processed successfully
     assert n_final_unprocessed > 0
-    assert n_final_processed == n_initial_processed + bad_record_index
+    assert n_final_processed == bad_record_index
     assert n_final_unprocessed == n_initial_unprocessed - bad_record_index
 
 
@@ -231,28 +242,25 @@ def test_transform_worker_fatal_record(
     from etl.sds.worker.transform_bulk import transform_bulk
 
     # Initial state
-    n_initial_processed = 5
     initial_unprocessed_data = FATAL_SDS_RECORD_AS_JSON
-    initial_processed_data = pkl_dumps_lz4(
-        deque(n_initial_processed * [PROCESSED_SDS_JSON_RECORD])
-    )
     put_object(key=WorkerKey.TRANSFORM, body=initial_unprocessed_data)
-    put_object(key=WorkerKey.LOAD, body=initial_processed_data)
 
     # Execute the transform worker
-    response = transform_bulk.handler(event={}, context=None)
+    responses = transform_bulk.handler(event={}, context=None)
+    assert len(responses) == 1
 
     # The line number in the error changes for each example, so
     # substitute it for the value 'NUMBER'
-    response["error_message"] = re.sub(
-        r"Line \d{1,2}", "Line NUMBER", response["error_message"]
+    responses[0]["error_message"] = re.sub(
+        r"Line \d{1,2}", "Line NUMBER", responses[0]["error_message"]
     )
-    response["error_message"] = response["error_message"].split("\n")[:3]
+    responses[0]["error_message"] = responses[0]["error_message"].split("\n")[:3]
 
-    assert response == {
+    assert responses[0] == {
         "stage_name": "transform",
         "processed_records": None,
         "unprocessed_records": None,
+        "s3_input_path": "s3://my-bucket/input--load/unprocessed.0",
         "error_message": [
             "The following errors were encountered",
             "  -- Error 1 (RuntimeError) --",
@@ -262,8 +270,31 @@ def test_transform_worker_fatal_record(
 
     # Final state
     final_unprocessed_data: str = get_object(key=WorkerKey.TRANSFORM).decode()
-    final_processed_data: str = get_object(key=WorkerKey.LOAD)
+
+    with pytest.raises(ClientError):
+        get_object(key=f"{WorkerKey.LOAD}.0")
 
     # Confirm that no changes were persisted
     assert final_unprocessed_data == initial_unprocessed_data
-    assert final_processed_data == initial_processed_data
+
+
+def test_smart_open_if_exists(mock_s3_client: "S3Client"):
+    s3_path = f"s3://{BUCKET_NAME}/some_file"
+    initial_content = b"hiya"
+    final_content = b"bye"
+
+    # Set initial content via a default value
+    with smart_open_if_exists(
+        s3_client=mock_s3_client, s3_path=s3_path, empty_content=initial_content
+    ) as f:
+        assert f.read() == initial_content
+
+    # Overwrite with standard smart_open
+    with smart_open(s3_client=mock_s3_client, s3_path=s3_path, mode="wb") as f:
+        f.write(final_content)
+
+    # Verify not overwritten with default value
+    with smart_open_if_exists(
+        s3_client=mock_s3_client, s3_path=s3_path, empty_content=initial_content
+    ) as f:
+        assert f.read() == final_content

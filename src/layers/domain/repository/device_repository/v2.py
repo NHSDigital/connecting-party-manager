@@ -22,7 +22,6 @@ from domain.repository.compression import pkl_dumps_gzip, pkl_loads_gzip
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v2 import TableKey
 from domain.repository.marshall import marshall, marshall_value, unmarshall
-from domain.repository.repository.v1 import batched
 from domain.repository.repository.v2 import Repository
 from domain.repository.transaction import (
     ConditionExpression,
@@ -107,17 +106,24 @@ def _device_root_primary_key(device_id: str) -> dict:
     return marshall(pk=root_pk, sk=root_pk)
 
 
-def _device_non_root_primary_keys(device_keys: list[DeviceKey]) -> list[dict]:
+def _device_non_root_primary_keys(
+    device_id: str, device_keys: list[DeviceKey], device_tags: list[DeviceTag]
+) -> list[dict]:
     """
     Generates all the fully marshalled (i.e. {"pk": {"S": "123"}} DynamoDB
     primary keys (i.e. pk + sk) for the provided Device. This is one primary key
-    for every value of Device.keys
+    for every value of Device.keys and Device.tags
     """
+    root_pk = TableKey.DEVICE.key(device_id)
     device_key_primary_keys = [
         marshall(pk=pk, sk=pk)
         for pk in (TableKey.DEVICE.key(k.key_type, k.key_value) for k in device_keys)
     ]
-    return device_key_primary_keys
+    device_tag_primary_keys = [
+        marshall(pk=pk, sk=root_pk)
+        for pk in (TableKey.DEVICE_TAG.key(t.value) for t in device_tags)
+    ]
+    return device_key_primary_keys + device_tag_primary_keys
 
 
 def _update_device_indexes(
@@ -141,6 +147,7 @@ def update_device_indexes(
     data: dict | DeviceUpdatedEvent,
     id: str,
     keys: list[DeviceKey],
+    tags: list[DeviceTag],
 ):
     # Update the root device without compressing the 'questionnaire_responses' field
     root_primary_key = _device_root_primary_key(device_id=id)
@@ -150,7 +157,9 @@ def update_device_indexes(
         data=compress_device_fields(data),
     )
     # Update non-root devices with compressed 'questionnaire_responses' field
-    non_root_primary_keys = _device_non_root_primary_keys(device_keys=keys)
+    non_root_primary_keys = _device_non_root_primary_keys(
+        device_id=id, device_keys=keys, device_tags=tags
+    )
     update_non_root_devices_transactions = _update_device_indexes(
         table_name=table_name,
         primary_keys=non_root_primary_keys,
@@ -245,8 +254,9 @@ class DeviceRepository(Repository[Device]):
         self, event: DeviceUpdatedEvent
     ) -> list[TransactItem]:
         keys = {DeviceKey(**key) for key in event.keys}
+        tags = {DeviceTag(__root__=tag) for tag in event.tags}
         return update_device_indexes(
-            table_name=self.table_name, data=event, id=event.id, keys=keys
+            table_name=self.table_name, data=event, id=event.id, keys=keys, tags=tags
         )
 
     def handle_DeviceDeletedEvent(
@@ -339,10 +349,12 @@ class DeviceRepository(Repository[Device]):
         # Update the value of "keys" on all other copies of this Device
         device_keys = {DeviceKey(**key) for key in event.keys}
         device_keys_before_update = device_keys - {event.new_key}
+        device_tags = {DeviceTag(__root__=tag) for tag in event.tags}
         update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys_before_update,
+            tags=device_tags,
             data={
                 "keys": event.keys,
                 "updated_on": event.updated_on,
@@ -360,10 +372,12 @@ class DeviceRepository(Repository[Device]):
         # Update the value of "keys" on all other copies of this Device
         device_keys = {DeviceKey(**key) for key in event.keys}
         device_keys_before_update = device_keys - {event.deleted_key}
+        device_tags = {DeviceTag(__root__=tag) for tag in event.tags}
         update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys_before_update,
+            tags=device_tags,
             data={
                 "keys": event.keys,
                 "updated_on": event.updated_on,
@@ -380,37 +394,48 @@ class DeviceRepository(Repository[Device]):
             pk_key_parts=(event.new_tag.value,),
             sk_key_parts=(event.id,),
             pk_table_key=TableKey.DEVICE_TAG,
-            device_data={},
+            device_data=compress_device_fields(
+                event, fields_to_compress=NON_ROOT_FIELDS_TO_COMPRESS
+            ),
         )
         # Update the value of "tags" on all other copies of this Device
         device_keys = {DeviceKey(**key) for key in event.keys}
+        device_tags = {DeviceTag(__root__=tag) for tag in event.tags}
+        device_tags_before_update = device_tags - {event.new_tag}
         update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys,
+            tags=device_tags_before_update,
             data={"tags": event.tags, "updated_on": event.updated_on},
         )
         return [create_transaction] + update_transactions
 
     def handle_DeviceTagsAddedEvent(self, event: DeviceTagsAddedEvent):
         # Create a copy of the Device indexed against the new tag
+        device_data = compress_device_fields(
+            event, fields_to_compress=NON_ROOT_FIELDS_TO_COMPRESS
+        )
         create_transactions = [
             create_device_index(
                 table_name=self.table_name,
                 pk_key_parts=(new_tag.value,),
                 sk_key_parts=(event.id,),
                 pk_table_key=TableKey.DEVICE_TAG,
-                device_data={},
+                device_data=device_data,
             )
             for new_tag in event.new_tags
         ]
 
         # Update the value of "tags" on all other copies of this Device
         device_keys = {DeviceKey(**key) for key in event.keys}
+        device_tags = {DeviceTag(__root__=tag) for tag in event.tags}
+        device_tags_before_update = device_tags - event.new_tags
         update_transactions = update_device_indexes(
             table_name=self.table_name,
             id=event.id,
             keys=device_keys,
+            tags=device_tags_before_update,
             data={"tags": event.tags, "updated_on": event.updated_on},
         )
         return create_transactions + update_transactions
@@ -431,6 +456,7 @@ class DeviceRepository(Repository[Device]):
             table_name=self.table_name,
             id=event.id,
             keys=keys,
+            tags=[],  # tags already deleted in delete_tags_transactions
             data={"tags": []},
         )
         return delete_tags_transactions + update_transactions
@@ -439,10 +465,12 @@ class DeviceRepository(Repository[Device]):
         self, event: QuestionnaireResponseUpdatedEvent
     ):
         keys = {DeviceKey(**key) for key in event.entity_keys}
+        tags = {DeviceTag(__root__=tag) for tag in event.entity_tags}
         return update_device_indexes(
             table_name=self.table_name,
             id=event.entity_id,
             keys=keys,
+            tags=tags,
             data={
                 "questionnaire_responses": event.questionnaire_responses,
                 "updated_on": event.updated_on,
@@ -471,7 +499,7 @@ class DeviceRepository(Repository[Device]):
                 pk_key_parts=(DeviceTag(__root__=tag).value,),
                 sk_key_parts=(item["id"],),
                 pk_table_key=TableKey.DEVICE_TAG,
-                device_data={},
+                device_data=device_data,
             )
             for tag in item["tags"]
         ]
@@ -544,23 +572,9 @@ class DeviceRepository(Repository[Device]):
         if "LastEvaluatedKey" in response:
             raise TooManyResults(f"Too many results for query '{kwargs}'")
 
-        device_keys = [
-            {"pk": item["sk"], "sk": item["sk"]} for item in response.get("Items")
-        ]
-
-        # Retrieve all devices in batches until done
-        db_devices = []
-        for device_key_chunk in batched(device_keys, BATCH_GET_SIZE):
-            while device_key_chunk:
-                response = self.client.batch_get_item(
-                    RequestItems={self.table_name: {"Keys": device_key_chunk}}
-                )
-                db_devices += response["Responses"].get(self.table_name)
-                device_key_chunk = response["UnprocessedKeys"]
-
         # Convert to Device, sorted by 'pk', which would have been
         # the expected behaviour if tags in the database were
         # Device duplicates rather than references
-        compressed_devices = map(unmarshall, db_devices)
+        compressed_devices = map(unmarshall, response["Items"])
         devices_as_dict = map(decompress_device_fields, compressed_devices)
         return [Device(**d) for d in sorted(devices_as_dict, key=lambda d: d["id"])]

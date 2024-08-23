@@ -1,1 +1,1 @@
-["dynamodb:Query", "dynamodb:BatchGetItem"]
+["dynamodb:Query"]

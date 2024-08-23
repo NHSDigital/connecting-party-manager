@@ -2,7 +2,6 @@ from collections import deque
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
-from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
@@ -14,6 +13,10 @@ if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
 
 CACHE = LoadWorkerCache()
+
+
+class BulkLoadWorkerEvent(WorkerEvent):
+    s3_input_path: str
 
 
 def load(
@@ -45,12 +48,12 @@ def load(
 
 
 def handler(event: dict, context):
-    worker_event = WorkerEvent(**event)
+    worker_event = BulkLoadWorkerEvent(**event)
     max_records = worker_event.max_records or CACHE.MAX_RECORDS
     response = execute_step_chain(
         action=load,
         s3_client=CACHE.S3_CLIENT,
-        s3_input_path=CACHE.ENVIRONMENT.s3_path(WorkerKey.LOAD),
+        s3_input_path=worker_event.s3_input_path,
         s3_output_path=None,
         unprocessed_dumper=pkl_dump_lz4,
         processed_dumper=CACHE.REPOSITORY.write_bulk,

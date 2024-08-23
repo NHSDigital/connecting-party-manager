@@ -1,68 +1,8 @@
 {
   "Comment": "SDS ETL - Transform and Load for bulk",
   "TimeoutSeconds": 10800,
-  "StartAt": "load",
+  "StartAt": "transform",
   "States": {
-    "load": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
-      "Parameters": {
-        "FunctionName": "${load_worker_arn}:$LATEST",
-        "Payload": {
-          "max_records": "${bulk_load_chunksize}",
-          "etl_type": "bulk"
-        }
-      },
-      "Retry": [
-        {
-          "ErrorEquals": [
-            "Lambda.ServiceException",
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.TooManyRequestsException"
-          ],
-          "IntervalSeconds": 1,
-          "MaxAttempts": 3,
-          "BackoffRate": 2
-        }
-      ],
-      "Next": "load-result"
-    },
-    "load-result": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "And": [
-            {
-              "Variable": "$.error_message",
-              "IsNull": true
-            },
-            {
-              "Not": {
-                "Variable": "$.unprocessed_records",
-                "NumericEquals": 0
-              }
-            }
-          ],
-          "Next": "load"
-        },
-        {
-          "And": [
-            {
-              "Variable": "$.error_message",
-              "IsNull": true
-            },
-            {
-              "Variable": "$.unprocessed_records",
-              "NumericEquals": 0
-            }
-          ],
-          "Next": "transform"
-        }
-      ],
-      "Default": "etl-stopped"
-    },
     "transform": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
@@ -70,8 +10,7 @@
       "Parameters": {
         "FunctionName": "${transform_worker_arn}:$LATEST",
         "Payload": {
-          "max_records": "${bulk_transform_chunksize}",
-          "etl_type": "bulk"
+          "max_records": "${bulk_transform_chunksize}"
         }
       },
       "Retry": [
@@ -87,10 +26,67 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "etl-stopped"
+      "Next": "Map"
     },
-    "etl-stopped": {
-      "Type": "Pass",
+    "Map": {
+      "Type": "Map",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "load",
+        "States": {
+          "load": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+              "FunctionName": "${load_worker_arn}:$LATEST",
+              "Payload": {
+                "s3_input_path.$": "$.s3_input_path",
+                "max_records": "${bulk_load_chunksize}"
+              }
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 1,
+                "MaxAttempts": 3,
+                "BackoffRate": 2
+              }
+            ],
+            "End": true
+          }
+        }
+      },
+      "Next": "load-reduce"
+    },
+    "load-reduce": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${load_reduce_worker_arn}:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "End": true
     }
   }
