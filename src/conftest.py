@@ -36,6 +36,10 @@ def is_s3(request: FixtureRequest) -> bool:
     return request.node.get_closest_marker("s3") is not None
 
 
+def is_matrix(request: FixtureRequest) -> bool:
+    return request.node.get_closest_marker("matrix") is not None
+
+
 def download_files_from_s3(request: FixtureRequest):
     client = boto3.client("s3")
     test_data_bucket = read_terraform_output("test_data_bucket.value")

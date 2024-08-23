@@ -185,11 +185,12 @@ Run `make` to get a list of helpful commands.
 
 ### `pytest` tests
 
-There are three types of `pytest` in this project:
+There are four types of `pytest` in this project:
 
 - Unit: these _do not have_ any `@pytest.mark` markers;
 - Integration: these have `@pytest.mark.integration` markers;
 - Smoke: these have `@pytest.mark.smoke` markers;
+- Matrix: these have `@pytest.mark.matrix` markers;
 
 In order to run these you can do one of::
 
@@ -197,6 +198,7 @@ In order to run these you can do one of::
 make test--unit
 make test--integration   # Will attempt to log you into AWS first
 make test--smoke         # Will attempt to log you into AWS first
+make test--sds--matrix
 ```
 
 If you would like to rerun all failed tests, you can append `--rerun` to the test command, e.g.:
@@ -214,6 +216,8 @@ make test--unit PYTEST_FLAGS="-xvv"
 Otherwise, feel free to run `pytest` from your `poetry` shell for more fine-grained control (see Google for more info!).
 
 The VSCode settings for "Run and Debug" are also set up to run these tests if your prefer.
+
+`make test--sds--matrix` is used for testing responses match in SDS FHIR between CPM and LDAP. You must provide `SDS_PROD_APIKEY` and `SDS_DEV_APIKEY`. There are 2 optional variables `USE_CPM_PROD`, defaults to `FALSE`, and `TEST_COUNT`, defaults to `10` and is the number of requests to make.
 
 ## Workflow
 
