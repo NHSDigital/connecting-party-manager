@@ -1,7 +1,11 @@
+import random
+import time
 from abc import abstractmethod
+from functools import wraps
 from itertools import chain
 from typing import TYPE_CHECKING, Generator, Generic, Iterable, TypeVar
 
+from botocore.exceptions import ClientError
 from domain.core.aggregate_root import AggregateRoot
 from domain.repository.repository.v1 import batched
 from domain.repository.transaction import (  # TransactItem,
@@ -20,7 +24,44 @@ if TYPE_CHECKING:
 ModelType = TypeVar("ModelType", bound=AggregateRoot)
 T = TypeVar("T")
 BATCH_SIZE = 100
-MAX_BATCH_WRITE_SIZE = 25
+MAX_BATCH_WRITE_SIZE = 10
+RETRY_ERRORS = [
+    "ProvisionedThroughputExceededException",
+    "ThrottlingException",
+    "InternalServerError",
+]
+
+
+def exponential_backoff_with_jitter(
+    n_retries, base_delay=0.1, min_delay=0.05, max_delay=5
+):
+    """Calculate the delay with exponential backoff and jitter."""
+    delay = min(base_delay * (2**n_retries), max_delay)
+    return random.uniform(min_delay, delay)
+
+
+def retry_with_jitter(max_retries=5, error=ClientError):
+    def wrapper(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            exceptions = []
+            while len(exceptions) < max_retries:
+                try:
+                    return func(*args, **kwargs)
+                except error as e:
+                    error_code = e.response["Error"]["Code"]
+                    if error_code not in RETRY_ERRORS:
+                        raise
+                    exceptions.append(e)
+                delay = exponential_backoff_with_jitter(n_retries=len(exceptions))
+                time.sleep(delay)
+            raise ExceptionGroup(
+                f"Failed to put item after {max_retries} retries", exceptions
+            )
+
+        return wrapped
+
+    return wrapper
 
 
 def _split_transactions_by_key(
@@ -50,6 +91,7 @@ def transact_write_chunk(
     return _response
 
 
+@retry_with_jitter()
 def batch_write_chunk(
     client: "DynamoDBClient", table_name: str, chunk: list[dict]
 ) -> "BatchWriteItemOutputTypeDef":

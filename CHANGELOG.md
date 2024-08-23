@@ -5,6 +5,7 @@
 - [PI-452] Sonarcloud fixes
 - [PI-271] Apigee key fixes
 - [PI-476] Split ETL lambdas
+- [PI-475] Query by tag
 
 ## 2024-08-20
 - [PI-470] Hide inactive devices

@@ -9,11 +9,12 @@ variable "domain_layer" {}
 variable "changelog_key" {
   default = "changelog-number"
 }
-variable "bulk_load_chunksize" {
-  default = 1000
-}
 variable "bulk_transform_chunksize" {
-  default = 50000
+  default = 500
+}
+
+variable "bulk_load_chunksize" {
+  default = 1000 # needs to be larger than 'bulk_transform_chunksize' in the case of overflow
 }
 
 variable "etl_state_lock_key" {
