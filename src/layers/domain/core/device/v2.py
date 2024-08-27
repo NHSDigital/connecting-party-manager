@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
-from functools import wraps
+from functools import cached_property, wraps
 from typing import Callable, Optional, ParamSpec, TypeVar
 from uuid import UUID, uuid4
 
@@ -19,7 +19,7 @@ from domain.core.questionnaire.v2 import (
 )
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
-from pydantic import Field, validator
+from pydantic import Field, root_validator
 
 TAG_SEPARATOR = "##"
 TAG_COMPONENT_SEPARATOR = "##"
@@ -99,6 +99,23 @@ class DeviceDeletedEvent(Event):
 
 
 @dataclass(kw_only=True, slots=True)
+class DeviceDeletedEvent(Event):
+    id: str
+    name: str
+    device_type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: Optional[str] = None
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    deleted_tags: list["DeviceTag"] = None
+
+
+@dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
     new_key: DeviceKey
     id: str
@@ -141,6 +158,31 @@ class DeviceTagAddedEvent(Event):
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
+@dataclass(kw_only=True, slots=True)
+class DeviceTagsAddedEvent(Event):
+    new_tags: list["DeviceTag"]
+    id: str
+    name: str
+    device_type: "DeviceType"
+    product_team_id: UUID
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: Optional[str] = None
+    keys: list[DeviceKey]
+    tags: list["DeviceTag"]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+
+
+@dataclass(kw_only=True, slots=True)
+class DeviceTagsClearedEvent(Event):
+    id: str
+    keys: list[dict]
+    deleted_tags: list["DeviceTag"]
+    updated_on: str = None
+
+
 class DeviceType(StrEnum):
     """
     A Product is to be classified as being one of the following.  These terms
@@ -159,21 +201,56 @@ class DeviceType(StrEnum):
 
 
 class DeviceTag(BaseModel):
-    components: list[tuple[str, str]]
+    """
+    DeviceTag is a mechanism for indexing Device data. In DynamoDB then intention is for this
+    to be translated into a duplicated record in the database, so that Devices with with the
+    same DeviceTag can be queried directly, therefore mimicking efficient search-like behaviour.
+    """
 
-    @validator("components")
-    def sort_components(cls, components: list[tuple[str, str]]):
-        return list(sorted(components, key=lambda elements: elements[0]))
+    __root__: list[tuple[str, str]]
+
+    class Config:
+        arbitrary_types_allowed = True
+        keep_untouched = (cached_property,)
+
+    @root_validator(pre=True)
+    def encode_tag(cls, values: dict):
+        initialised_with_root = "__root__" in values and len(values) == 1
+        item_to_process = values["__root__"] if initialised_with_root else values
+        if initialised_with_root:
+            _components = tuple((k, v) for k, v in item_to_process)
+        else:  # otherwise initialise directly with key value pairs
+            _components = tuple(sorted((k, str(v)) for k, v in item_to_process.items()))
+
+        return {"__root__": _components}
+
+    def dict(self, *args, **kwargs):
+        return self.components
+
+    @cached_property
+    def components(self):
+        return tuple(self.__root__)
+
+    @cached_property
+    def hash(self):
+        return hash(self.components)
 
     @property
-    def value(self):
+    def value(self) -> str:
+        """
+        Tags 'value' is a string-rendering of the tag.
+        TODO: Could improve by switching to query parameter + url encoding instead of our own syntax?
+        """
         return TAG_SEPARATOR.join(
             f"{TAG_COMPONENT_CONTAINER_LEFT}{key}{TAG_COMPONENT_SEPARATOR}{value}{TAG_COMPONENT_CONTAINER_RIGHT}"
             for key, value in self.components
         )
 
     def __hash__(self):
-        return hash(tuple(self.components))
+        return self.hash
+
+    def __eq__(self, other: "DeviceTag"):
+        return self.hash == other.hash
 
 
 RT = TypeVar("RT")
@@ -224,7 +301,7 @@ class Device(AggregateRoot):
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
     keys: list[DeviceKey] = Field(default_factory=list)
-    tags: list[DeviceTag] = Field(default_factory=list)
+    tags: set[DeviceTag] | list[DeviceTag] = Field(default_factory=set)
     questionnaire_responses: dict[str, dict[str, QuestionnaireResponse]] = Field(
         default_factory=lambda: defaultdict(dict)
     )
@@ -238,13 +315,13 @@ class Device(AggregateRoot):
     @event
     def delete(self) -> DeviceDeletedEvent:
         deleted_on = now()
-        deleted_tags = [t.dict() for t in self.tags]
+        deleted_tags = {t.dict() for t in self.tags}
         device_data = self._update(
             data=dict(
                 status=Status.INACTIVE,
                 updated_on=deleted_on,
                 deleted_on=deleted_on,
-                tags=[],
+                tags=set(),
             )
         )
         return DeviceDeletedEvent(**device_data, deleted_tags=deleted_tags)
@@ -277,17 +354,39 @@ class Device(AggregateRoot):
         )
 
     @event
-    def add_tag(self, **kwargs):
-        components = list(map(tuple, kwargs.items()))
-        device_tag = DeviceTag(components=components)
+    def add_tag(self, **kwargs) -> DeviceTagAddedEvent:
+        device_tag = DeviceTag(**kwargs)
         if device_tag in self.tags:
             raise DuplicateError(
                 f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
             )
-        self.tags.append(device_tag)
+        self.tags.add(device_tag)
         device_data = self.state()
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
         return DeviceTagAddedEvent(new_tag=device_tag, **device_data)
+
+    @event
+    def add_tags(self, tags: list[dict]) -> DeviceTagsAddedEvent:
+        """Optimised bulk equivalent of performing device.add_tag sequentially."""
+        new_tags = {DeviceTag(**tag) for tag in tags}
+        duplicate_tags = self.tags.intersection(new_tags)
+        if duplicate_tags:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate tags: {[t.value for t in duplicate_tags]}"
+            )
+        self.tags = self.tags.union(new_tags)
+        device_data = self.state()
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceTagsAddedEvent(new_tags=new_tags, **device_data)
+
+    @event
+    def clear_tags(self):
+        deleted_tags = self.tags
+        self.tags = set()
+        device_data = self.state()
+        return DeviceTagsClearedEvent(
+            id=device_data["id"], keys=device_data["keys"], deleted_tags=deleted_tags
+        )
 
     @event
     def add_questionnaire_response(
@@ -359,8 +458,11 @@ class DeviceEventDeserializer(EventDeserializer):
     event_types = (
         DeviceCreatedEvent,
         DeviceUpdatedEvent,
+        DeviceDeletedEvent,
         DeviceKeyAddedEvent,
         DeviceKeyDeletedEvent,
         DeviceTagAddedEvent,
+        DeviceTagsClearedEvent,
+        DeviceTagsAddedEvent,
         QuestionnaireResponseUpdatedEvent,
     )

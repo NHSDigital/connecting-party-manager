@@ -2,27 +2,32 @@ from functools import partial
 from itertools import filterfalse
 from typing import Generator
 
-from domain.core.device import Device, DeviceType
-from domain.core.device_key import DeviceKeyType
-from domain.core.product_team import ProductTeam
-from domain.core.questionnaire import Questionnaire
-from domain.core.root import Root
+import orjson
+from domain.api.sds.query import (
+    SearchSDSDeviceQueryParams,
+    SearchSDSEndpointQueryParams,
+)
+from domain.core.device.v2 import Device, DeviceType
+from domain.core.device_key.v2 import DeviceKeyType
+from domain.core.product_team.v2 import ProductTeam
+from domain.core.root.v2 import Root
 from domain.core.validation import DEVICE_KEY_SEPARATOR
-from domain.repository.device_repository import DeviceRepository
+from domain.repository.device_repository.v2 import DeviceRepository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
+from sds.domain.parse import UnknownSdsModel
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 from sds.domain.sds_modification_request import SdsModificationRequest
 
 from .constants import (
+    BAD_UNIQUE_IDENTIFIERS,
     DEFAULT_ORGANISATION,
     DEFAULT_PRODUCT_TEAM,
     EXCEPTIONAL_ODS_CODES,
-    UNIQUE_IDENTIFIER,
 )
-from .modify.modify_device import update_device_metadata
-from .modify.modify_key import NotAnSdsKey, get_modify_key_function
-from .utils import update_in_list_of_dict
+from .modify_device import update_device_metadata
+from .modify_key import NotAnSdsKey, get_modify_key_function
+from .utils import set_device_tags, set_device_tags_bulk, update_in_list_of_dict
 
 
 def accredited_system_ids(
@@ -53,111 +58,111 @@ def create_product_team(ods_code: str) -> ProductTeam:
 
 
 def nhs_accredited_system_to_cpm_devices(
-    nhs_accredited_system: NhsAccreditedSystem,
-    questionnaire: Questionnaire,
-    _questionnaire: dict,
-    _trust: bool = False,
+    nhs_accredited_system: NhsAccreditedSystem, bulk: bool
 ) -> Generator[Device, None, None]:
     unique_identifier = nhs_accredited_system.unique_identifier
     product_name = nhs_accredited_system.nhs_product_name or unique_identifier
-    questionnaire_response_responses = (
-        nhs_accredited_system.as_questionnaire_response_responses()
+    raw_questionnaire_response_answers = nhs_accredited_system.export()
+    questionnaire_response_answers = (
+        nhs_accredited_system.as_questionnaire_response_answers(
+            data=raw_questionnaire_response_answers
+        )
     )
+
+    questionnaire = NhsAccreditedSystem.questionnaire()
 
     for (
         ods_code,
         accredited_system_id,
     ) in accredited_system_ids(nhs_accredited_system):
         update_in_list_of_dict(
-            obj=questionnaire_response_responses, key="nhs_as_client", value=[ods_code]
+            obj=questionnaire_response_answers,
+            key="nhs_as_client",
+            value=[ods_code],
         )
         _questionnaire_response = questionnaire.respond(
-            responses=questionnaire_response_responses
+            responses=questionnaire_response_answers
         )
         _organisation = Root.create_ods_organisation(ods_code=ods_code)
         _product_team = _organisation.create_product_team(**DEFAULT_PRODUCT_TEAM)
         _device = _product_team.create_device(
-            name=product_name, type=DeviceType.PRODUCT, _trust=_trust
+            name=product_name, device_type=DeviceType.PRODUCT
         )
         _device.add_key(
-            type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
-            key=accredited_system_id,
-            _trust=_trust,
+            key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID,
+            key_value=accredited_system_id,
         )
         _device.add_questionnaire_response(
-            questionnaire_response=_questionnaire_response,
-            _questionnaire=_questionnaire,
-            _trust=True,
+            questionnaire_response=_questionnaire_response
         )
-        _device.add_index(
-            questionnaire_id=questionnaire.id, question_name=UNIQUE_IDENTIFIER
-        )
+        if bulk:
+            set_device_tags_bulk(
+                device=_device,
+                data=raw_questionnaire_response_answers,
+                model=SearchSDSDeviceQueryParams,
+            )
+        else:
+            set_device_tags(
+                device=_device,
+                data=raw_questionnaire_response_answers,
+                model=SearchSDSDeviceQueryParams,
+            )
         yield _device
 
 
-def nhs_mhs_to_cpm_device(
-    nhs_mhs: NhsMhs,
-    questionnaire: Questionnaire,
-    _questionnaire: dict,
-    _trust: bool = False,
-) -> Device:
+def nhs_mhs_to_cpm_device(nhs_mhs: NhsMhs, bulk: bool) -> Device:
     ods_code = nhs_mhs.nhs_id_code
     _scoped_party_key = scoped_party_key(nhs_mhs)
     product_name = nhs_mhs.nhs_product_name or _scoped_party_key
-    questionnaire_response_responses = nhs_mhs.as_questionnaire_response_responses()
+    raw_questionnaire_response_answers = orjson.loads(
+        nhs_mhs.json(exclude_none=True, exclude={"change_type"})
+    )
+    questionnaire_response_answers = nhs_mhs.as_questionnaire_response_answers(
+        data=raw_questionnaire_response_answers
+    )
+
+    questionnaire = NhsMhs.questionnaire()
     questionnaire_response = questionnaire.respond(
-        responses=questionnaire_response_responses
+        responses=questionnaire_response_answers
     )
 
     product_team = create_product_team(ods_code=ods_code)
     device = product_team.create_device(
-        name=product_name, type=DeviceType.ENDPOINT, _trust=_trust
+        name=product_name, device_type=DeviceType.ENDPOINT
     )
     device.add_key(
-        type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
-        key=_scoped_party_key,
-        _trust=_trust,
+        key_type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,
+        key_value=_scoped_party_key,
     )
-    device.add_questionnaire_response(
-        questionnaire_response=questionnaire_response,
-        _questionnaire=_questionnaire,
-        _trust=True,
-    )
-    device.add_index(questionnaire_id=questionnaire.id, question_name=UNIQUE_IDENTIFIER)
+    device.add_questionnaire_response(questionnaire_response=questionnaire_response)
+    if bulk:
+        set_device_tags_bulk(
+            device=device,
+            data=raw_questionnaire_response_answers,
+            model=SearchSDSEndpointQueryParams,
+        )
+    else:
+        set_device_tags(
+            device=device,
+            data=raw_questionnaire_response_answers,
+            model=SearchSDSEndpointQueryParams,
+        )
     return device
 
 
-def read_devices_by_unique_identifier(
-    questionnaire_ids: list[str], repository: DeviceRepository, value: str
-) -> Generator[Device, None, None]:
-    for questionnaire_id in questionnaire_ids:
-        for device in repository.read_by_index(
-            questionnaire_id=questionnaire_id,
-            question_name=UNIQUE_IDENTIFIER,
-            value=value,
-        ):
-            if device.is_active():
-                yield device
-
-
 def modify_devices(
-    modification_request: SdsModificationRequest,
-    questionnaire_ids: list[str],
-    repository: DeviceRepository,
+    modification_request: SdsModificationRequest, repository: DeviceRepository
 ) -> Generator[Device, None, None]:
-    devices = list(
-        read_devices_by_unique_identifier(
-            questionnaire_ids=questionnaire_ids,
-            repository=repository,
-            value=modification_request.unique_identifier,
-        )
+    devices = repository.query_by_tag(
+        unique_identifier=modification_request.unique_identifier
     )
+
     # Only apply modifications if there are devices to modify
     modifications = modification_request.modifications if devices else []
 
     _devices = devices
     for modification_type, field, new_values in modifications:
-        device_type = _devices[0].type
+        device_type = _devices[0].device_type
         model = NhsAccreditedSystem if device_type is DeviceType.PRODUCT else NhsMhs
         field_name = model.get_field_name_for_alias(alias=field)
 
@@ -185,16 +190,43 @@ def modify_devices(
 
 
 def delete_devices(
-    deletion_request: SdsDeletionRequest,
-    questionnaire_ids: list[str],
-    repository: DeviceRepository,
+    deletion_request: SdsDeletionRequest, repository: DeviceRepository
 ) -> list[Device]:
     devices = []
-    for _device in read_devices_by_unique_identifier(
-        questionnaire_ids=questionnaire_ids,
-        repository=repository,
-        value=deletion_request.unique_identifier,
+    for _device in repository.query_by_tag(
+        unique_identifier=deletion_request.unique_identifier
     ):
         _device.delete()
         devices.append(_device)
+    return devices
+
+
+def translate(obj: dict[str, str], repository: DeviceRepository, bulk: bool):
+    if obj.get("unique_identifier") in BAD_UNIQUE_IDENTIFIERS:
+        return []
+
+    object_class = obj["object_class"].lower()
+    if object_class == NhsAccreditedSystem.OBJECT_CLASS:
+        nhs_accredited_system = NhsAccreditedSystem.construct(**obj)
+        devices = nhs_accredited_system_to_cpm_devices(
+            nhs_accredited_system=nhs_accredited_system, bulk=bulk
+        )
+    elif object_class == NhsMhs.OBJECT_CLASS:
+        nhs_mhs = NhsMhs.construct(**obj)
+        device = nhs_mhs_to_cpm_device(nhs_mhs=nhs_mhs, bulk=bulk)
+        devices = [device]
+    elif object_class == SdsDeletionRequest.OBJECT_CLASS:
+        deletion_request = SdsDeletionRequest.construct(**obj)
+        devices = delete_devices(
+            deletion_request=deletion_request, repository=repository
+        )
+    elif object_class == SdsModificationRequest.OBJECT_CLASS:
+        modification_request = SdsModificationRequest.construct(**obj)
+        devices = modify_devices(
+            modification_request=modification_request, repository=repository
+        )
+    else:
+        raise UnknownSdsModel(
+            f"No translation available for models with object class '{object_class}'"
+        )
     return devices

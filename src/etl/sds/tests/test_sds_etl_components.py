@@ -21,7 +21,7 @@ from etl.sds.worker.extract.tests.test_extract_worker import (
     ANOTHER_GOOD_SDS_RECORD,
     GOOD_SDS_RECORD,
 )
-from etl.sds.worker.load.tests.test_load_worker import MockDeviceRepository
+from etl.sds.worker.load_bulk.tests.test_load_bulk_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.pytest_skips import long_running
 from test_helpers.terraform import read_terraform_output
@@ -281,6 +281,9 @@ def test_end_to_end_changelog_delete(
         worker_data[WorkerKey.EXTRACT].split("\n\n")
     )
 
+    # Get the id of the device with unique id 000428682512
+    (device_000428682512,) = repository.query_by_tag(unique_identifier="000428682512")
+
     # Now execute a changelog initial state in the ETL
     put_object(s3_client, key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000428682512)
     response = execute_state_machine(
@@ -292,20 +295,12 @@ def test_end_to_end_changelog_delete(
     assert response["status"] == "SUCCEEDED"
 
     # Verify that the device with unique id 000428682512 is now "inactive"
-    (device,) = repository.read_by_index(
-        questionnaire_id="spine_device/1",
-        question_name="unique_identifier",
-        value="000428682512",
-    )
-    assert device.status == DeviceStatus.INACTIVE
+    _device_000428682512 = repository.read_inactive(device_000428682512.id)
+    assert _device_000428682512.status == DeviceStatus.INACTIVE
 
     # Verify that the other device is still "active"
-    (device,) = repository.read_by_index(
-        questionnaire_id="spine_device/1",
-        question_name="unique_identifier",
-        value="000842065542",
-    )
-    assert device.status == DeviceStatus.ACTIVE
+    (device_000842065542,) = repository.query_by_tag(unique_identifier="000842065542")
+    assert device_000842065542.status == DeviceStatus.ACTIVE
 
     # Execute another changelog initial state in the ETL
     put_object(s3_client, key=WorkerKey.EXTRACT, body=DELETION_REQUEST_000842065542)
@@ -318,17 +313,13 @@ def test_end_to_end_changelog_delete(
     assert response["status"] == "SUCCEEDED"
 
     # Verify that the device with unique id 000428682512 is still "inactive"
-    (device,) = repository.read_by_index(
-        questionnaire_id="spine_device/1",
-        question_name="unique_identifier",
-        value="000428682512",
-    )
-    assert device.status == DeviceStatus.INACTIVE
+    __device_000428682512 = repository.read_inactive(_device_000428682512.id)
+    assert __device_000428682512.status == DeviceStatus.INACTIVE
 
     # Verify that the other device is now "inactive"
-    (device,) = repository.read_by_index(
-        questionnaire_id="spine_device/1",
-        question_name="unique_identifier",
-        value="000842065542",
-    )
-    assert device.status == DeviceStatus.INACTIVE
+    _device_000842065542 = repository.read_inactive(device_000842065542.id)
+    assert _device_000842065542.status == DeviceStatus.INACTIVE
+
+    # Verify that inactive devices cannot be queried by tag
+    assert repository.query_by_tag(unique_identifier="000842065542") == []
+    assert repository.query_by_tag(unique_identifier="000842065542") == []

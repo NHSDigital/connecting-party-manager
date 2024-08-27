@@ -21,7 +21,7 @@ class QuestionnaireResponseUpdatedEvent(Event):
     entity_keys: list
     entity_tags: list
     questionnaire_responses: list["QuestionnaireResponse"]
-    updated_on: str = None
+    updated_on: Optional[str] = None
 
 
 class Questionnaire(QuestionnaireV1):
@@ -49,7 +49,7 @@ class QuestionnaireResponse(BaseModel):
 
     @validator("answers")
     def validate_mandatory_questions_are_answered(
-        answers: list[dict[str, list]], values: dict[str, Questionnaire]
+        cls, answers: list[dict[str, list]], values: dict[str, Questionnaire]
     ):
         questionnaire = values.get("questionnaire")
         if questionnaire is None:
@@ -66,7 +66,9 @@ class QuestionnaireResponse(BaseModel):
         return answers
 
     @validator("answers", each_item=True)
-    def validate_responses(answer: dict[str, list], values: dict[str, Questionnaire]):
+    def validate_responses(
+        cls, answer: dict[str, list], values: dict[str, Questionnaire]
+    ):
         questionnaire = values.get("questionnaire")
         if questionnaire is None:
             return answer
@@ -87,3 +89,11 @@ class QuestionnaireResponse(BaseModel):
             if value is not None:
                 return value
         return []
+
+    @property
+    def flat_answers(self) -> dict[str, any]:
+        return {
+            question: (answer[0] if len(answer) == 1 else answer)
+            for question_answer in self.answers
+            for question, answer in question_answer.items()
+        }

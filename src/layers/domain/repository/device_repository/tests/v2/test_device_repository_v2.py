@@ -1,15 +1,23 @@
+from copy import deepcopy
+
 import pytest
+from attr import asdict
 from domain.core.device.v2 import Device as DeviceV2
-from domain.core.device.v2 import DeviceTag
+from domain.core.device.v2 import DeviceCreatedEvent, DeviceTag
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
 from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
 from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.core.root.v2 import Root
+from domain.repository.compression import pkl_loads_gzip
 from domain.repository.device_repository.v2 import (
     DeviceRepository as DeviceRepositoryV2,
 )
-from domain.repository.device_repository.v2 import _device_primary_keys
+from domain.repository.device_repository.v2 import (
+    _device_non_root_primary_keys,
+    _device_root_primary_key,
+    compress_device_fields,
+)
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 
 DEVICE_KEY = "P.WWW-XXX"
@@ -57,23 +65,27 @@ def another_device_with_same_key() -> DeviceV2:
     return device
 
 
-def test__device_primary_keys():
-    primary_keys = _device_primary_keys(
+def test__device_root_primary_key():
+    primary_key = _device_root_primary_key(device_id="123")
+    assert primary_key == {"pk": {"S": "D#123"}, "sk": {"S": "D#123"}}
+
+
+def test__device_non_root_primary_keys():
+    primary_keys = _device_non_root_primary_keys(
         device_id="123",
         device_keys=[
             DeviceKeyV2(key_type=DeviceKeyType.PRODUCT_ID, key_value=DEVICE_KEY)
         ],
-        device_tags=[DeviceTag(components=[("foo", "bar")])],
+        device_tags=[DeviceTag(foo="bar")],
     )
     assert primary_keys == [
-        {"pk": {"S": "D#123"}, "sk": {"S": "D#123"}},
         {
-            "pk": {"S": f"D#product_id#P.WWW-XXX"},
-            "sk": {"S": f"D#product_id#P.WWW-XXX"},
+            "pk": {"S": "D#product_id#P.WWW-XXX"},
+            "sk": {"S": "D#product_id#P.WWW-XXX"},
         },
         {
-            "pk": {"S": f"DT#<<foo##bar>>"},
-            "sk": {"S": f"D#123"},
+            "pk": {"S": "DT#<<foo##bar>>"},
+            "sk": {"S": "D#123"},
         },
     ]
 
@@ -178,7 +190,7 @@ def test__device_repository__delete(
     # Assert device is inactive after being deleted
     assert deleted_device is not None
     assert deleted_device.status is Status.INACTIVE
-    assert deleted_device.tags == []
+    assert deleted_device.tags == set()
     assert deleted_device.created_on == device_with_tag.created_on
     assert deleted_device.updated_on > device_with_tag.updated_on
 
@@ -259,3 +271,63 @@ def test__device_repository__add_key(device: DeviceV2, repository: DeviceReposit
 
     assert retrieved_devices[0]["created_on"] == device.created_on
     assert retrieved_devices[0]["updated_on"] > device.updated_on
+
+
+@pytest.fixture
+def device_created_event():
+    return DeviceCreatedEvent(
+        id="123",
+        name="foo",
+        device_type="type",
+        product_team_id="123",
+        ods_code="abc",
+        status="good",
+        created_on="123",
+        updated_on=None,
+        deleted_on=None,
+        keys=[],
+        tags=["a", "b", "c"],
+        questionnaire_responses={"foo": "bar"},
+    )
+
+
+def test_serialise_data_with_event(device_created_event):
+    _serialised_data = compress_device_fields(data=device_created_event)
+    _serialised_tags = _serialised_data.pop("tags")
+
+    _data = asdict(device_created_event)
+    _tags = _data.pop("tags")
+
+    assert _data == _serialised_data
+    assert [pkl_loads_gzip(tag) for tag in pkl_loads_gzip(_serialised_tags)] == _tags
+
+
+def test_serialise_data_with_dict(device_created_event):
+    data = asdict(device_created_event, recurse=False)
+    _serialised_data = compress_device_fields(data=deepcopy(data))
+    _serialised_tags = _serialised_data.pop("tags")
+
+    _tags = data.pop("tags")
+
+    assert data == _serialised_data
+    assert [pkl_loads_gzip(tag) for tag in pkl_loads_gzip(_serialised_tags)] == _tags
+
+
+def test_serialise_data_with_event_with_other_fields_compressed(device_created_event):
+    _serialised_data = compress_device_fields(
+        data=device_created_event,
+        fields_to_compress=["questionnaire_responses", "status"],
+    )
+    _serialised_tags = _serialised_data.pop("tags")
+    _serialised_responses = _serialised_data.pop("questionnaire_responses")
+    _serialised_status = _serialised_data.pop("status")
+
+    _data = asdict(device_created_event)
+    _tags = _data.pop("tags")
+    _responses = _data.pop("questionnaire_responses")
+    _status = _data.pop("status")
+
+    assert _data == _serialised_data
+    assert [pkl_loads_gzip(tag) for tag in pkl_loads_gzip(_serialised_tags)] == _tags
+    assert pkl_loads_gzip(_serialised_responses) == _responses
+    assert pkl_loads_gzip(_serialised_status) == _status

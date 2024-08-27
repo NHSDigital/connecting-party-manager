@@ -10,6 +10,7 @@ from dataclasses import asdict, dataclass
 from functools import partial
 
 import boto3
+import botocore
 from changelog.changelog_precommit import PATH_TO_ROOT
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from etl_utils.io import EtlEncoder, pkl_load_lz4
@@ -34,7 +35,7 @@ def _get_object(s3_client: S3Client, bucket, key):
     try:
         response = s3_client.get_object(Bucket=bucket, Key=key)
         return response["Body"]
-    except:
+    except botocore.exceptions.ClientError:
         return None
 
 

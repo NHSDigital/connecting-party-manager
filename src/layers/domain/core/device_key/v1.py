@@ -34,7 +34,7 @@ class DeviceKey(BaseModel):
     key: str
 
     @validator("key", check_fields=True)
-    def validate_key(key: str, values: dict):
+    def validate_key(cls, key: str, values: dict):
         type: DeviceKeyType = values.get("type")
         return validate_key(key=key, type=type)
 

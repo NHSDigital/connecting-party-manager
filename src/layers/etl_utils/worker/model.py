@@ -15,7 +15,6 @@ class WorkerEnvironment(BaseEnvironment):
 
 class WorkerEvent(BaseModel):
     max_records: Optional[int] = None
-    trust: Optional[bool] = None  # flag to db indicating not to do condition check
 
 
 @dataclass
@@ -23,9 +22,9 @@ class WorkerResponse:
     """The response of an ETL worker lambda"""
 
     stage_name: str
-    processed_records: int
-    unprocessed_records: int
-    error_message: None | str
+    processed_records: int = 0
+    unprocessed_records: int = 0
+    error_message: None | str = None
 
 
 @dataclass

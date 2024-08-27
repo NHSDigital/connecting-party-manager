@@ -25,7 +25,8 @@
             "Parameters": {
               "FunctionName": "${load_worker_arn}:$LATEST",
               "Payload": {
-                "max_records": "1"
+                "max_records": "1",
+                "etl_type": "updates"
               }
             },
             "Retry": [
@@ -79,7 +80,7 @@
               "FunctionName": "${transform_worker_arn}:$LATEST",
               "Payload": {
                 "max_records": "1",
-                "trust": false
+                "etl_type": "updates"
               }
             },
             "Retry": [

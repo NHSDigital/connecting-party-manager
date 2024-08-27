@@ -25,7 +25,7 @@ class SdsModificationRequest(SdsBaseModel):
 
     @validator("modifications")
     def validate_immutable_fields(
-        modifications: list[tuple[ModificationType, str, any]]
+        cls, modifications: list[tuple[ModificationType, str, any]]
     ):
         for _, field, _ in modifications:
             if field in IMMUTABLE_SDS_FIELDS:

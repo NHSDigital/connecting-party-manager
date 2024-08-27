@@ -42,20 +42,15 @@ def test__device_repository__multiple_devices_with_same_tags(
     )
 
 
-@pytest.mark.integration
-def test__device_repository__add_two_tags(device: Device, repository: DeviceRepository):
-    repository.write(device)
-    second_device = repository.read(device.id)
-    second_device.add_tag(shoe_size=123)
-    second_device.add_tag(shoe_size=456)
-    repository.write(second_device)
-
-    expected_tags = [
-        DeviceTag(components=[("abc", "123")]),
-        DeviceTag(components=[("bar", "foo")]),
-        DeviceTag(components=[("shoe_size", "123")]),
-        DeviceTag(components=[("shoe_size", "456")]),
-    ]
+def _test_add_two_tags(
+    device: Device, second_device: Device, repository: DeviceRepository
+):
+    expected_tags = {
+        DeviceTag(abc="123"),
+        DeviceTag(bar="foo"),
+        DeviceTag(shoe_size="123"),
+        DeviceTag(shoe_size="456"),
+    }
 
     assert repository.read(device.id).tags == expected_tags
     assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == expected_tags
@@ -65,3 +60,51 @@ def test__device_repository__add_two_tags(device: Device, repository: DeviceRepo
 
     (_device_456,) = repository.query_by_tag(shoe_size=456)
     assert _device_456.dict() == second_device.dict()
+    return True
+
+
+@pytest.mark.integration
+def test__device_repository__add_two_tags(device: Device, repository: DeviceRepository):
+    repository.write(device)
+    second_device = repository.read(device.id)
+    second_device.add_tag(shoe_size=123)
+    second_device.add_tag(shoe_size=456)
+    repository.write(second_device)
+
+    assert _test_add_two_tags(
+        device=device, second_device=second_device, repository=repository
+    )
+
+
+@pytest.mark.integration
+def test__device_repository__add_two_tags_at_once(
+    device: Device, repository: DeviceRepository
+):
+    repository.write(device)
+    second_device = repository.read(device.id)
+    second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
+    repository.write(second_device)
+
+    assert _test_add_two_tags(
+        device=device, second_device=second_device, repository=repository
+    )
+
+
+@pytest.mark.integration
+def test__device_repository__add_two_tags_and_then_clear(
+    device: Device, repository: DeviceRepository
+):
+    repository.write(device)
+    second_device = repository.read(device.id)
+    second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
+    repository.write(second_device)
+
+    second_device.clear_events()
+    second_device.clear_tags()
+    repository.write(second_device)
+
+    assert repository.read(device.id).tags == set()
+    assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == set()
+
+    assert repository.query_by_tag(shoe_size=123) == []
+    assert repository.query_by_tag(shoe_size=456) == []

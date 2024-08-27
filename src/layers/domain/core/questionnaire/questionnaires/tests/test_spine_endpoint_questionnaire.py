@@ -1,7 +1,7 @@
 import pytest
-from domain.core.questionnaire import Questionnaire
 from domain.core.questionnaire.load_questionnaire import render_questionnaire
 from domain.core.questionnaire.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.v2 import Questionnaire
 from event.json import json_load
 from hypothesis import given, settings
 from sds.cpm_translation.tests.test_cpm_translation import NHS_MHS_STRATEGY
@@ -25,17 +25,18 @@ def _mhs(obj: dict[str, str]) -> bool:
 def _test_spine_endpoint_questionnaire_v1(
     nhs_mhs: NhsMhs, questionnaire: Questionnaire
 ):
+    assert nhs_mhs.questionnaire() == questionnaire
     count_mandatory_questions = len(questionnaire.mandatory_questions)
-    questionnaire_response_responses = nhs_mhs.as_questionnaire_response_responses()
+    questionnaire_response_answers = nhs_mhs.as_questionnaire_response_answers()
 
     _questionnaire_response = questionnaire.respond(
-        responses=questionnaire_response_responses
+        responses=questionnaire_response_answers
     )
     assert (
         _questionnaire_response.questionnaire.id
         == f"{QuestionnaireInstance.SPINE_ENDPOINT}/1"
     )
-    assert len(_questionnaire_response.responses) >= count_mandatory_questions
+    assert len(_questionnaire_response.answers) >= count_mandatory_questions
     return True
 
 

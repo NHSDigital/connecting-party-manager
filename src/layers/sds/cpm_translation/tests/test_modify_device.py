@@ -1,13 +1,19 @@
 import pytest
-from domain.core.device import Device, DeviceType
-from domain.core.questionnaire import (
+from domain.api.sds.query import SearchSDSDeviceQueryParams
+from domain.core.device.v2 import (
+    Device,
+    DeviceTagsAddedEvent,
+    DeviceTagsClearedEvent,
+    DeviceType,
+)
+from domain.core.questionnaire.v2 import (
     Questionnaire,
     QuestionnaireResponse,
     QuestionnaireResponseUpdatedEvent,
 )
-from domain.core.root import Root
+from domain.core.root.v2 import Root
 from pydantic import ValidationError
-from sds.cpm_translation.modify.modify_device import (
+from sds.cpm_translation.modify_device import (
     CannotDeleteMandatoryField,
     NothingToDelete,
     _as_questionnaire_response_answer,
@@ -34,6 +40,8 @@ def _sort(obj):
 
 
 class MyModel:
+    _questionnaire = None
+
     @classmethod
     def get_field_name_for_alias(cls, alias):
         return alias
@@ -45,6 +53,14 @@ class MyModel:
     @classmethod
     def is_mandatory_field(cls, field):
         return False
+
+    @classmethod
+    def questionnaire(cls):
+        return cls._questionnaire
+
+    @classmethod
+    def query_params_model(cls):
+        return SearchSDSDeviceQueryParams
 
 
 @pytest.mark.parametrize("x", ["foo", 123, True, None, {"foo": "bar"}, ("foo",)])
@@ -74,7 +90,7 @@ def device(questionnaire_response):
     product_team = org.create_product_team(
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
-    _device = product_team.create_device(name="foo", type=DeviceType.PRODUCT)
+    _device = product_team.create_device(name="foo", device_type=DeviceType.PRODUCT)
     _device.add_questionnaire_response(questionnaire_response=questionnaire_response)
     return _device
 
@@ -87,7 +103,7 @@ def test_new_questionnaire_response_from_template_modification(
         field_to_update="hello",
         value="whatever",
     )
-    assert new_questionnaire_response.responses == [
+    assert new_questionnaire_response.answers == [
         {"hello": ["whatever"]},
         {"foo": ["bar", "baz"]},
     ]
@@ -101,7 +117,7 @@ def test_new_questionnaire_response_from_template_deletion(
         field_to_update="hello",
         value=[],
     )
-    assert new_questionnaire_response.responses == [
+    assert new_questionnaire_response.answers == [
         {"foo": ["bar", "baz"]},
     ]
 
@@ -126,7 +142,9 @@ def test_update_device_metadata_add_or_replace_non_empty_data_to_non_multiple(
     field_alias,
     new_values,
     device,
+    questionnaire_response: QuestionnaireResponse,
 ):
+    MyModel._questionnaire = questionnaire_response.questionnaire
     with pytest.raises(ValidationError) as error:
         update_device_metadata(
             device=device,
@@ -187,8 +205,8 @@ def test_update_device_metadata(
     device: Device,
     questionnaire_response: QuestionnaireResponse,
 ):
+    MyModel._questionnaire = questionnaire_response.questionnaire
     events_before = list(device.events)
-
     _device = update_device_metadata(
         device=device,
         model=MyModel,
@@ -198,13 +216,15 @@ def test_update_device_metadata(
     )
 
     assert _device is device
-    assert len(_device.events) == len(events_before) + 1
+    assert len(_device.events) == len(events_before) + 3
     assert all(event in _device.events for event in events_before)
-    assert isinstance(_device.events[-1], QuestionnaireResponseUpdatedEvent)
+    assert isinstance(_device.events[-1], DeviceTagsAddedEvent)
+    assert isinstance(_device.events[-2], DeviceTagsClearedEvent)
+    assert isinstance(_device.events[-3], QuestionnaireResponseUpdatedEvent)
 
     device_metadata = _device.questionnaire_responses[
         questionnaire_response.questionnaire.id
-    ][0].responses
+    ][questionnaire_response.created_on.isoformat()].answers
     assert _sort(device_metadata) == _sort(expected_responses)
 
 

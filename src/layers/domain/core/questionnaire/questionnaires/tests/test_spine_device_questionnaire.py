@@ -1,7 +1,7 @@
 import pytest
-from domain.core.questionnaire import Questionnaire
 from domain.core.questionnaire.load_questionnaire import render_questionnaire
 from domain.core.questionnaire.questionnaires import QuestionnaireInstance
+from domain.core.questionnaire.v2 import Questionnaire
 from event.json import json_load
 from hypothesis import assume, given, settings
 from sds.cpm_translation.tests.test_cpm_translation import (
@@ -28,9 +28,10 @@ def _is_accredited_system(obj: dict[str, str]) -> bool:
 def _test_spine_device_questionnaire_v1(
     nhs_accredited_system: NhsAccreditedSystem, questionnaire: Questionnaire
 ):
+    assert nhs_accredited_system.questionnaire() == questionnaire
     count_mandatory_questions = len(questionnaire.mandatory_questions)
     questionnaire_response_responses = (
-        nhs_accredited_system.as_questionnaire_response_responses()
+        nhs_accredited_system.as_questionnaire_response_answers()
     )
 
     count_accredited_systems = 0
@@ -47,7 +48,7 @@ def _test_spine_device_questionnaire_v1(
             _questionnaire_response.questionnaire.id
             == f"{QuestionnaireInstance.SPINE_DEVICE}/1"
         )
-        assert len(_questionnaire_response.responses) >= count_mandatory_questions
+        assert len(_questionnaire_response.answers) >= count_mandatory_questions
 
     assert count_accredited_systems > 0
     assert count_accredited_systems == len(ods_codes)

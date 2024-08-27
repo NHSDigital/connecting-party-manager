@@ -13,7 +13,7 @@ class DeviceKey(BaseModel):
     key_value: str
 
     @validator("key_value", check_fields=True)
-    def validate_key(key_value: str, values: dict):
+    def validate_key(cls, key_value: str, values: dict):
         key_type: DeviceKeyType = values.get("key_type")
         return validate_key(key_value=key_value, key_type=key_type)
 

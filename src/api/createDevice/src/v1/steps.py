@@ -63,7 +63,7 @@ def save_device(data, cache) -> dict:
     return device_repo.write(entity=device)
 
 
-def set_http_status(data, cache) -> HTTPStatus:
+def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
     device: Device = data[create_device]
     return HTTPStatus.CREATED, str(device.id)
 
