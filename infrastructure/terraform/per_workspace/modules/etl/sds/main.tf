@@ -55,7 +55,7 @@ module "worker_extract" {
   workspace_prefix = var.workspace_prefix
   python_version   = var.python_version
   etl_bucket_name  = module.bucket.s3_bucket_id
-  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers           = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer_arn]
 
   policy_json = <<-EOT
       {
@@ -92,7 +92,7 @@ module "worker_transform_bulk" {
   environment_variables = {
     TABLE_NAME = var.table_name
   }
-  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer_arn]
 
   policy_json = <<-EOT
       {
@@ -136,7 +136,7 @@ module "worker_transform_update" {
   environment_variables = {
     TABLE_NAME = var.table_name
   }
-  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer_arn]
 
   policy_json = <<-EOT
       {
@@ -188,7 +188,7 @@ module "worker_load_bulk" {
   environment_variables = {
     TABLE_NAME = var.table_name
   }
-  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer_arn]
 
   policy_json = <<-EOT
       {
@@ -238,7 +238,7 @@ module "worker_load_update" {
   environment_variables = {
     TABLE_NAME = var.table_name
   }
-  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer]
+  layers = [var.event_layer_arn, var.third_party_core_layer_arn, module.etl_layer.lambda_layer_arn, module.sds_layer.lambda_layer_arn, var.domain_layer_arn]
 
   policy_json = <<-EOT
       {
@@ -438,6 +438,7 @@ module "trigger_bulk" {
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
   third_party_layer_arn = var.third_party_core_layer_arn
+  domain_layer_arn      = var.domain_layer_arn
   sds_layer_arn         = var.sds_layer_arn
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
@@ -489,6 +490,7 @@ module "trigger_update" {
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
   third_party_layer_arn = var.third_party_sds_update_layer_arn
+  domain_layer_arn      = var.domain_layer_arn
   sds_layer_arn         = var.sds_layer_arn
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn
@@ -602,6 +604,7 @@ module "trigger_manual" {
   python_version        = var.python_version
   event_layer_arn       = var.event_layer_arn
   third_party_layer_arn = var.third_party_core_layer_arn
+  domain_layer_arn      = var.domain_layer_arn
   sds_layer_arn         = var.sds_layer_arn
   etl_bucket_arn        = module.bucket.s3_bucket_arn
   etl_layer_arn         = module.etl_layer.lambda_layer_arn

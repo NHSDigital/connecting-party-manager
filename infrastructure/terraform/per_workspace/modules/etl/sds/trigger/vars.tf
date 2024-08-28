@@ -35,6 +35,10 @@ variable "third_party_layer_arn" {
   type = string
 }
 
+variable "domain_layer_arn" {
+  type = string
+}
+
 variable "sds_layer_arn" {
   type = string
 }
