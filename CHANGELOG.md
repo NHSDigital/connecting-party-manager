@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-08-28
+- [PI-468] Bulk and upload fixes
+
 ## 2024-08-22
 - [PI-445] ETL v2
 - [PI-452] Sonarcloud fixes
