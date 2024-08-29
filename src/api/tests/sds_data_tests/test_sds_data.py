@@ -90,10 +90,7 @@ def normalize_case(data):
     Recursively traverse the dictionary and normalize the case of all string keys and values.
     """
     if isinstance(data, dict):
-        return {
-            k.lower(): normalize_case(v) if isinstance(k, str) else normalize_case(v)
-            for k, v in data.items()
-        }
+        return {k.lower(): normalize_case(v) for k, v in data.items()}
     elif isinstance(data, list):
         return [normalize_case(item) for item in data]
     elif isinstance(data, str):
