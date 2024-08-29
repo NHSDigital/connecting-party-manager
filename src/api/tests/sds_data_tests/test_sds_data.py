@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import re
@@ -15,6 +16,29 @@ non_prod_urls = {
     "dev": "https://internal-dev.api.service.nhs.uk/spine-directory/FHIR/R4",
     "qa": "https://internal-qa.api.service.nhs.uk/spine-directory/FHIR/R4",
 }
+
+
+def _create_output_json(
+    ldap_status,
+    cpm_status,
+    ldap_body,
+    cpm_body,
+    path,
+    params,
+    ldap_response_time,
+    cpm_response_time,
+):
+    output = {
+        "ldap_status": ldap_status,
+        "ldap_body": str(ldap_body),
+        "cpm_status": cpm_status,
+        "cpm_body": str(cpm_body),
+        "path": path,
+        "params": str(params),
+        "ldap_response_time": ldap_response_time,
+        "cpm_response_time": cpm_response_time,
+    }
+    return json.dumps(output)
 
 
 def clean_json(data):
@@ -234,6 +258,16 @@ def test_api_responses_match(item, request):
             ldap_body["issue"][0]["diagnostics"] == cpm_body["issue"][0]["diagnostics"]
         ), f"Non 200 diagnositc message does not match. When calling with {item}"
         pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+        pytest.success_message_full = _create_output_json(
+            ldap_status,
+            cpm_status,
+            ldap_body_reordered,
+            cpm_body_reordered,
+            item["path"],
+            item["params"],
+            ldap_response_time,
+            cpm_response_time,
+        )
     else:
         assert (
             ldap_status == cpm_status
@@ -256,6 +290,7 @@ def test_api_responses_match(item, request):
                 item=item,
             )
             pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+            pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
         else:
             if ldap_body_reordered["total"] == cpm_body_reordered["total"]:
                 assert len(cpm_body_reordered["entry"]) == len(
@@ -272,6 +307,7 @@ def test_api_responses_match(item, request):
                     item=item,
                 )
                 pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+                pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
             else:
                 assert len(cpm_body_reordered["entry"]) == len(
                     ldap_body_reordered["entry"]
@@ -281,9 +317,9 @@ def test_api_responses_match(item, request):
     if not test_count:
         index = request.node.callspec.indicies[request.node.originalname]
         if (index + 1) % 1000 == 0:
-            time.sleep(180)
+            time.sleep(60)
         else:
-            time.sleep(1)
+            time.sleep(0.5)
 
 
 @pytest.mark.parametrize("item", _generate_test_data("sds_fhir_queries_errors.json"))
@@ -306,7 +342,8 @@ def test_api_responses_expected_errors(item):
     if ldap_status != 200:
         assert (
             ldap_body["issue"][0]["diagnostics"] == cpm_body["issue"][0]["diagnostics"]
-        ), f"Non 200 diagnositc message does not match. When calling with {item}"
+        ), f"Non 200 diagnostic message does not match. When calling with {item}"
         pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+        pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body, cpm_body, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
     else:
         assert ldap_body["entry"] == cpm_body["entry"]
