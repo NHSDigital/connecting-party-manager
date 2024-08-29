@@ -10,6 +10,12 @@ import pytest
 import requests
 from event.json import json_load
 
+non_prod_urls = {
+    "local": "http://localhost:9000",
+    "dev": "https://internal-dev.api.service.nhs.uk/spine-directory/FHIR/R4",
+    "qa": "https://internal-qa.api.service.nhs.uk/spine-directory/FHIR/R4",
+}
+
 
 def clean_json(data):
     """
@@ -213,18 +219,15 @@ def test_api_responses_match(item, request):
     ldap_status, ldap_body, ldap_response_time = _request(item)
     use_cpm_prod = os.getenv("USE_CPM_PROD", "FALSE")
     use_cpm_prod = use_cpm_prod.upper() == "TRUE"
+    cpm_item = item
+    cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
     if use_cpm_prod:
-        cpm_item = item
-        cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
         cpm_status, cpm_body, cpm_response_time = _request(cpm_item)
     else:
-        cpm_item = item
-        cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
-        # cpm_status, cpm_body, cpm_response_time = _request_non_prod(item, "https://internal-dev.api.service.nhs.uk/spine-directory/FHIR/R4")
+        non_prod_env = os.getenv("COMPARISON_ENV", "local")
         cpm_status, cpm_body, cpm_response_time = _request_non_prod(
-            item, "https://internal-qa.api.service.nhs.uk/spine-directory/FHIR/R4"
+            cpm_item, non_prod_urls[non_prod_env]
         )
-        # cpm_status, cpm_body, cpm_response_time = _request_non_prod(item, "http://localhost:9000")
 
     if ldap_status != 200:
         assert (
@@ -292,18 +295,15 @@ def test_api_responses_expected_errors(item):
     ldap_status, ldap_body, ldap_response_time = _request(item)
     use_cpm_prod = os.getenv("USE_CPM_PROD", "FALSE")
     use_cpm_prod = use_cpm_prod.upper() == "TRUE"
+    cpm_item = item
+    cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
     if use_cpm_prod:
-        cpm_item = item
-        cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
         cpm_status, cpm_body, cpm_response_time = _request(cpm_item)
     else:
-        cpm_item = item
-        cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
-        # cpm_status, cpm_body, cpm_response_time = _request_non_prod(item, "https://internal-dev.api.service.nhs.uk/spine-directory/FHIR/R4")
+        non_prod_env = os.getenv("COMPARISON_ENV", "local")
         cpm_status, cpm_body, cpm_response_time = _request_non_prod(
-            cpm_item, "https://internal-qa.api.service.nhs.uk/spine-directory/FHIR/R4"
+            cpm_item, non_prod_urls[non_prod_env]
         )
-        # cpm_status, cpm_body, cpm_response_time = _request_non_prod(item, "http://localhost:9000")
 
     assert cpm_status == ldap_status, f"Status do not match. When calling with {item}"
     if ldap_status != 200:

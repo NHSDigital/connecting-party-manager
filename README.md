@@ -217,7 +217,8 @@ Otherwise, feel free to run `pytest` from your `poetry` shell for more fine-grai
 
 The VSCode settings for "Run and Debug" are also set up to run these tests if your prefer.
 
-`make test--sds--matrix` is used for testing responses match in SDS FHIR between CPM and LDAP. You must provide `SDS_PROD_APIKEY` and `SDS_DEV_APIKEY`. There are 2 optional variables `USE_CPM_PROD`, defaults to `FALSE`, and `TEST_COUNT`, defaults to `10` and is the number of requests to make.
+`make test--sds--matrix` is used for testing responses match in SDS FHIR between CPM and LDAP. You must provide `SDS_PROD_APIKEY` and `SDS_DEV_APIKEY`. There are 3 optional variables `USE_CPM_PROD`, defaults to `FALSE`, `COMPARISON_ENV`, defaults to `local` and `TEST_COUNT`, defaults to `10` and is the number of requests to make.
+Add `PYTEST_FLAGS='-sv'`.
 
 ## Workflow
 
