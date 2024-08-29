@@ -4,7 +4,7 @@ _CACHE_CLEAR := "--cache-clear"
 SDS_PROD_APIKEY =
 SDS_DEV_APIKEY =
 USE_CPM_PROD ?= FALSE
-TEST_COUNT ?= 10
+TEST_COUNT =
 COMPARISON_ENV ?= local
 
 _pytest:

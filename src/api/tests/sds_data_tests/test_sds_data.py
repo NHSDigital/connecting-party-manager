@@ -183,9 +183,9 @@ def _generate_test_data(filename, test_count=None):
                 transformed_item["path"] = value
         transformed_data.append((transformed_item))
     if not test_count:
-        test_count = len(transformed_data)
-    test_items = random.sample(transformed_data, test_count)
-    return test_items
+        return transformed_data
+
+    return random.sample(transformed_data, test_count)
 
 
 def _assert_response_match(expected, result, item):
@@ -317,7 +317,7 @@ def test_api_responses_match(item, request):
     if not test_count:
         index = request.node.callspec.indicies[request.node.originalname]
         if (index + 1) % 1000 == 0:
-            time.sleep(60)
+            time.sleep(120)
         else:
             time.sleep(0.5)
 
