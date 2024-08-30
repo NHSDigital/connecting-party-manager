@@ -109,6 +109,29 @@ def reorder_entries_by_asid_value(data):
     return data
 
 
+def sort_entries_by_nhsserviceinteractionid_value(entries):
+    def get_nhsserviceinteractionid_value(entry):
+        # Get the list of extensions for the current entry
+        extensions = entry["resource"]["extension"]
+
+        # Iterate through the extensions to find the one with url == "FOOBAR2"
+        for ext in extensions:
+            if (
+                ext["url"]
+                == "https://fhir.nhs.uk/StructureDefinition/Extension-SDS-NhsServiceInteractionId"
+            ):
+                # Return the value associated with this extension
+                return ext["valueReference"]["identifier"]["value"]
+
+        # If FOOBAR2 is not found, return an empty string or any fallback value
+        return ""
+
+    # Sort the entries using the value from the FOOBAR2 extension
+    sorted_entries = sorted(entries, key=get_nhsserviceinteractionid_value)
+
+    return sorted_entries
+
+
 def normalize_case(data):
     """
     Recursively traverse the dictionary and normalize the case of all string keys and values.
@@ -195,23 +218,36 @@ def _generate_test_data(filename, test_count=None):
     return random.sample(transformed_data, int(test_count))
 
 
-def _assert_response_match(expected, result, item):
+def _assert_response_match(expected, result, item, name):
     assert len(result["entry"]) == len(
         expected["entry"]
     ), f"Entries do not match the total. When calling with {item}"
+    if item["path"] == "/Endpoint":
+        sorted_entries_result = sort_entries_by_nhsserviceinteractionid_value(
+            result["entry"]
+        )
+        result["entry"] = sorted_entries_result
+        sorted_entries_expected = sort_entries_by_nhsserviceinteractionid_value(
+            expected["entry"]
+        )
+        expected["entry"] = sorted_entries_expected
     for idx, device_value in enumerate(result["entry"]):
         assert (
             device_value["resource"]["resourceType"]
             == expected["entry"][idx]["resource"]["resourceType"]
         ), f"ResourceTypes do not match. When calling with {item}"
-        for extension in device_value["resource"]["extension"]:
-            assert normalize_case(extension) in normalize_case(
-                expected["entry"][idx]["resource"]["extension"]
-            ), f"Extension not in LDAP. When calling with {item}"
+        for index, ext in enumerate(device_value["resource"]["extension"]):
+            if "extension" in ext:
+                for extension in ext["extension"]:
+                    assert normalize_case(extension) in normalize_case(
+                        expected["entry"][idx]["resource"]["extension"][index][
+                            "extension"
+                        ]
+                    ), f"Extension not in {name}. When calling with {item}"
         for identifier in device_value["resource"]["identifier"]:
             assert normalize_case(identifier) in normalize_case(
                 expected["entry"][idx]["resource"]["identifier"]
-            ), f"Identifier not in LDAP. When calling with {item}"
+            ), f"Identifier not in {name}. When calling with {item}"
         if item["path"] != "/Endpoint":
             assert (
                 "owner" in device_value["resource"]
@@ -234,6 +270,10 @@ def _assert_response_match(expected, result, item):
 @pytest.mark.parametrize(
     "item",
     _generate_test_data(
+        "sds_fhir_api.failed_queries.device.json",
+        test_count=os.getenv("TEST_COUNT", None),
+    ),
+    +_generate_test_data(
         "sds_fhir_api.unique_queries.device.json",
         test_count=os.getenv("TEST_COUNT", None),
     )
@@ -272,8 +312,8 @@ def test_api_responses_match(item, request):
                 pytest.success_message_full = _create_output_json(
                     ldap_status,
                     cpm_status,
-                    ldap_body_reordered,
-                    cpm_body_reordered,
+                    ldap_body,
+                    cpm_body,
                     item["path"],
                     item["params"],
                     ldap_response_time,
@@ -294,11 +334,13 @@ def test_api_responses_match(item, request):
                         expected=ldap_body_reordered,
                         result=cpm_body_reordered,
                         item=item,
+                        name="CPM",
                     )
                     _assert_response_match(
                         expected=cpm_body_reordered,
                         result=ldap_body_reordered,
                         item=item,
+                        name="LDAP",
                     )
                     pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
                     pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
@@ -311,11 +353,13 @@ def test_api_responses_match(item, request):
                             expected=ldap_body_reordered,
                             result=cpm_body_reordered,
                             item=item,
+                            name="CPM",
                         )
                         _assert_response_match(
                             expected=cpm_body_reordered,
                             result=ldap_body_reordered,
                             item=item,
+                            name="LDAP",
                         )
                         pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
                         pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
