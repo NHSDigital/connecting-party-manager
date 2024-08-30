@@ -2,6 +2,17 @@ import json
 
 import pytest
 
+current_file_index = 0
+entry_count = 0
+max_entries_per_file = 2000
+file_name_template = "test_success_{}.json"
+
+
+def get_current_file():
+    """Helper function to get the current file name."""
+    global current_file_index
+    return file_name_template.format(current_file_index)
+
 
 def strip_request_from_message(message):
     # Find the index of ", request = " and slice the string
@@ -23,6 +34,8 @@ def strip_request_from_message(message):
 
 
 def pytest_runtest_logreport(report):
+    global current_file_index, entry_count, max_entries_per_file
+
     if report.when == "call" and report.failed:
         failed_request, assertion_error = strip_request_from_message(
             str(report.longreprtext)
@@ -39,5 +52,14 @@ def pytest_runtest_logreport(report):
         and report.passed
         and hasattr(pytest, "success_message_full")
     ):
-        with open("test_success.json", "a") as f:
+        # Check if the current file has reached the maximum number of entries
+        if entry_count >= max_entries_per_file:
+            current_file_index += 1  # Move to the next file
+            entry_count = 0  # Reset entry count for the new file
+
+        # Write to the current file
+        with open(get_current_file(), "a") as f:
             f.write(pytest.success_message_full)
+            f.write("\n")  # Optionally add a newline after each entry
+
+        entry_count += 1  # Increment the entry count
