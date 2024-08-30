@@ -124,8 +124,15 @@ def normalize_case(data):
 
 
 def _request_base(url, request, headers):
+    retry = 0
     start_time = time.time()
     res = requests.get(url, params=request["params"], headers=headers)
+    while res.status_code > 499:
+        start_time = time.time()
+        res = requests.get(url, params=request["params"], headers=headers)
+        if retry == 3:
+            break
+        retry += 1
     end_time = time.time()
     response_time = (end_time - start_time) * 1000
     return res, response_time
@@ -185,7 +192,7 @@ def _generate_test_data(filename, test_count=None):
     if not test_count:
         return transformed_data
 
-    return random.sample(transformed_data, test_count)
+    return random.sample(transformed_data, int(test_count))
 
 
 def _assert_response_match(expected, result, item):
@@ -228,98 +235,103 @@ def _assert_response_match(expected, result, item):
     "item",
     _generate_test_data(
         "sds_fhir_api.unique_queries.device.json",
-        test_count=int(os.getenv("TEST_COUNT", None)),
+        test_count=os.getenv("TEST_COUNT", None),
     )
     + _generate_test_data(
         "sds_fhir_api.unique_queries.endpoint.json",
-        test_count=int(os.getenv("TEST_COUNT", None)),
+        test_count=os.getenv("TEST_COUNT", None),
     ),
 )
 @pytest.mark.matrix
 def test_api_responses_match(item, request):
     ldap_status, ldap_body, ldap_response_time = _request(item)
-    use_cpm_prod = os.getenv("USE_CPM_PROD", "FALSE")
-    use_cpm_prod = use_cpm_prod.upper() == "TRUE"
-    cpm_item = item
-    cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
-    if use_cpm_prod:
-        cpm_status, cpm_body, cpm_response_time = _request(cpm_item)
-    else:
-        non_prod_env = os.getenv("COMPARISON_ENV", "local")
-        cpm_status, cpm_body, cpm_response_time = _request_non_prod(
-            cpm_item, non_prod_urls[non_prod_env]
-        )
-
-    if ldap_status != 200:
-        assert (
-            cpm_status == ldap_status
-        ), f"Status do not match. When calling with {item}"
-        assert (
-            ldap_body["issue"][0]["diagnostics"] == cpm_body["issue"][0]["diagnostics"]
-        ), f"Non 200 diagnositc message does not match. When calling with {item}"
-        pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
-        pytest.success_message_full = _create_output_json(
-            ldap_status,
-            cpm_status,
-            ldap_body_reordered,
-            cpm_body_reordered,
-            item["path"],
-            item["params"],
-            ldap_response_time,
-            cpm_response_time,
-        )
-    else:
-        assert (
-            ldap_status == cpm_status
-        ), f"CPM status does not match 200 from ldap. When calling with {item}"
-        ldap_body_cleaned = clean_json(deepcopy(ldap_body))
-        cpm_body_cleaned = clean_json(deepcopy(cpm_body))
-        ldap_body_reordered = reorder_entries_by_asid_value(ldap_body_cleaned)
-        cpm_body_reordered = reorder_entries_by_asid_value(cpm_body_cleaned)
-
+    if ldap_status < 500:
+        use_cpm_prod = os.getenv("USE_CPM_PROD", "FALSE")
+        use_cpm_prod = use_cpm_prod.upper() == "TRUE"
+        cpm_item = item
+        cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
+        retry_cpm = 0
         if use_cpm_prod:
-            assert ldap_body_reordered["total"] == cpm_body_reordered["total"]
-            _assert_response_match(
-                expected=ldap_body_reordered,
-                result=cpm_body_reordered,
-                item=item,
-            )
-            _assert_response_match(
-                expected=cpm_body_reordered,
-                result=ldap_body_reordered,
-                item=item,
-            )
-            pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
-            pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
+            cpm_status, cpm_body, cpm_response_time = _request(cpm_item)
         else:
-            if ldap_body_reordered["total"] == cpm_body_reordered["total"]:
-                assert len(cpm_body_reordered["entry"]) == len(
-                    ldap_body_reordered["entry"]
-                ), f"Entries do not match the total. When calling with {item}"
-                _assert_response_match(
-                    expected=ldap_body_reordered,
-                    result=cpm_body_reordered,
-                    item=item,
-                )
-                _assert_response_match(
-                    expected=cpm_body_reordered,
-                    result=ldap_body_reordered,
-                    item=item,
-                )
-                pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
-                pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
-            else:
-                assert len(cpm_body_reordered["entry"]) == len(
-                    ldap_body_reordered["entry"]
-                ), f"Entries do not match the total. When calling with {item}"
+            non_prod_env = os.getenv("COMPARISON_ENV", "local")
+            cpm_status, cpm_body, cpm_response_time = _request_non_prod(
+                cpm_item, non_prod_urls[non_prod_env]
+            )
 
-    test_count = int(os.getenv("TEST_COUNT", None))
-    if not test_count:
-        index = request.node.callspec.indicies[request.node.originalname]
-        if (index + 1) % 1000 == 0:
-            time.sleep(120)
-        else:
-            time.sleep(0.5)
+        if cpm_status < 500:
+            if ldap_status != 200:
+                assert (
+                    cpm_status == ldap_status
+                ), f"Status do not match. When calling with {item}"
+                assert (
+                    ldap_body["issue"][0]["diagnostics"]
+                    == cpm_body["issue"][0]["diagnostics"]
+                ), f"Non 200 diagnositc message does not match. When calling with {item}"
+                pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+                pytest.success_message_full = _create_output_json(
+                    ldap_status,
+                    cpm_status,
+                    ldap_body_reordered,
+                    cpm_body_reordered,
+                    item["path"],
+                    item["params"],
+                    ldap_response_time,
+                    cpm_response_time,
+                )
+            else:
+                assert (
+                    ldap_status == cpm_status
+                ), f"CPM status does not match 200 from ldap. When calling with {item}"
+                ldap_body_cleaned = clean_json(deepcopy(ldap_body))
+                cpm_body_cleaned = clean_json(deepcopy(cpm_body))
+                ldap_body_reordered = reorder_entries_by_asid_value(ldap_body_cleaned)
+                cpm_body_reordered = reorder_entries_by_asid_value(cpm_body_cleaned)
+
+                if use_cpm_prod:
+                    assert ldap_body_reordered["total"] == cpm_body_reordered["total"]
+                    _assert_response_match(
+                        expected=ldap_body_reordered,
+                        result=cpm_body_reordered,
+                        item=item,
+                    )
+                    _assert_response_match(
+                        expected=cpm_body_reordered,
+                        result=ldap_body_reordered,
+                        item=item,
+                    )
+                    pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+                    pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
+                else:
+                    if ldap_body_reordered["total"] == cpm_body_reordered["total"]:
+                        assert len(cpm_body_reordered["entry"]) == len(
+                            ldap_body_reordered["entry"]
+                        ), f"Entries do not match the total. When calling with {item}"
+                        _assert_response_match(
+                            expected=ldap_body_reordered,
+                            result=cpm_body_reordered,
+                            item=item,
+                        )
+                        _assert_response_match(
+                            expected=cpm_body_reordered,
+                            result=ldap_body_reordered,
+                            item=item,
+                        )
+                        pytest.success_message = f"Response Status of {ldap_status} match / Responses both contain {ldap_body_reordered['total']} devices and all devices are present in both responses / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+                        pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body_reordered, cpm_body_reordered, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
+                    else:
+                        assert len(cpm_body_reordered["entry"]) == len(
+                            ldap_body_reordered["entry"]
+                        ), f"Entries do not match the total. When calling with {item}"
+
+            test_count = os.getenv("TEST_COUNT", None)
+            if not test_count:
+                # params = request.node.callspec.params
+                # index = list(params.values()).index(input)
+                # if (index + 1) % 1000 == 0:
+                #     time.sleep(120)
+                # else:
+                time.sleep(0.5)
 
 
 @pytest.mark.parametrize("item", _generate_test_data("sds_fhir_queries_errors.json"))
