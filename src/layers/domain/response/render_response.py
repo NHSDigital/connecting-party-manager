@@ -1,6 +1,5 @@
 import json
 from http import HTTPStatus
-from typing import TypeVar
 
 from nhs_context_logging import app_logger
 
@@ -12,10 +11,10 @@ from .validators import (
     validate_json_serialisable_response,
 )
 
-JsonSerialisable = TypeVar("JsonSerialisable")
 
-
-def render_response(
+def render_response[
+    JsonSerialisable
+](
     response: JsonSerialisable | HTTPStatus | Exception,
     id: str = None,
     version: str = None,

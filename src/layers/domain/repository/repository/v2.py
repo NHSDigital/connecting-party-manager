@@ -2,12 +2,11 @@ import random
 import time
 from abc import abstractmethod
 from functools import wraps
-from itertools import chain
-from typing import TYPE_CHECKING, Generator, Generic, Iterable, TypeVar
+from itertools import batched, chain
+from typing import TYPE_CHECKING, Generator, Iterable
 
 from botocore.exceptions import ClientError
 from domain.core.aggregate_root import AggregateRoot
-from domain.repository.repository.v1 import batched
 from domain.repository.transaction import (  # TransactItem,
     Transaction,
     TransactItem,
@@ -21,8 +20,6 @@ if TYPE_CHECKING:
         TransactWriteItemsOutputTypeDef,
     )
 
-ModelType = TypeVar("ModelType", bound=AggregateRoot)
-T = TypeVar("T")
 BATCH_SIZE = 100
 MAX_BATCH_WRITE_SIZE = 10
 RETRY_ERRORS = [
@@ -101,7 +98,7 @@ def batch_write_chunk(
     return _response
 
 
-class Repository(Generic[ModelType]):
+class Repository[ModelType: AggregateRoot]:
     def __init__(self, table_name, model: type[ModelType], dynamodb_client):
         self.table_name = table_name
         self.model = model
@@ -109,8 +106,7 @@ class Repository(Generic[ModelType]):
         self.batch_size = BATCH_SIZE
 
     @abstractmethod
-    def handle_bulk(self, item):
-        ...
+    def handle_bulk(self, item): ...
 
     def write(self, entity: ModelType, batch_size=None):
         batch_size = batch_size or self.batch_size

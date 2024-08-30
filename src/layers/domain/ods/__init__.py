@@ -2,7 +2,7 @@ import re
 import time
 from functools import wraps
 from http import HTTPStatus
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable
 
 import requests
 from requests.exceptions import RequestException
@@ -46,12 +46,7 @@ def _is_whitespace(item: str) -> bool:
     return WHITESPACE.match(item) is not None
 
 
-T = TypeVar("T")
-RT = TypeVar("RT")
-P = ParamSpec("P")
-
-
-def retry(max_attempts: int) -> Callable[[Callable[P, RT]], Callable[P, RT]]:
+def retry[RT, **P](max_attempts: int) -> Callable[[Callable[P, RT]], Callable[P, RT]]:
     """Retrying on RequestException, with exponential back-off of 2*n seconds"""
 
     def decorator(fn: Callable[P, RT]) -> Callable[P, RT]:

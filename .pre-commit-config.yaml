@@ -30,7 +30,7 @@ repos:
 
   # Flake8 for print only (error code T201)
   - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 7.1.1
     hooks:
       - id: flake8
         additional_dependencies:
@@ -41,7 +41,7 @@ repos:
 
   # Flake8 for asserts (error code S101)
   - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 7.1.1
     hooks:
       - id: flake8
         args:
@@ -49,7 +49,7 @@ repos:
           - "--exclude=.git,__pycache__,dist,.venv,tests"
 
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 24.8.0
     hooks:
       - id: black
         language_version: python3

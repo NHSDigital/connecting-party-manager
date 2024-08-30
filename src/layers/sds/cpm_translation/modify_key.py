@@ -19,16 +19,13 @@ from .constants import DEFAULT_PRODUCT_TEAM, UNIQUE_IDENTIFIER
 from .modify_device import new_questionnaire_response_from_template
 
 
-class AccreditedSystemAlreadyExists(Exception):
-    ...
+class AccreditedSystemAlreadyExists(Exception): ...
 
 
-class NotAnSdsKey(Exception):
-    ...
+class NotAnSdsKey(Exception): ...
 
 
-class InvalidModificationRequest(Exception):
-    ...
+class InvalidModificationRequest(Exception): ...
 
 
 def get_modify_key_function(

@@ -1,5 +1,5 @@
 import re
-from typing import Any, TypeVar
+from typing import Any
 
 from behave.model import Table
 
@@ -29,10 +29,7 @@ def _expand(value: str):
     return value
 
 
-T = TypeVar("T")
-
-
-def _make_nested_dict(path: tuple[str], value: T) -> dict[str, T]:
+def _make_nested_dict[T](path: tuple[str], value: T) -> dict[str, T]:
     """Recursively convert a path to a nested dict"""
     if path:
         head, *tail = path

@@ -20,8 +20,7 @@ EXCLUDED_OBJECT_CLASS_VALUES = (
 SET_ALIAS_NAME = f"{set[str]}"
 
 
-class AliasLookupError(Exception):
-    ...
+class AliasLookupError(Exception): ...
 
 
 def _field_is_a_set(cls: "SdsBaseModel", field_name) -> bool:

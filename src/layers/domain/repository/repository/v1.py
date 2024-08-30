@@ -1,6 +1,5 @@
-import sys
-from itertools import islice
-from typing import TYPE_CHECKING, Generator, Generic, TypeVar
+from itertools import batched
+from typing import TYPE_CHECKING
 
 from domain.core.aggregate_root import AggregateRoot
 from domain.repository.transaction import (
@@ -12,24 +11,10 @@ from domain.repository.transaction import (
 if TYPE_CHECKING:
     from mypy_boto3_dynamodb import DynamoDBClient
 
-ModelType = TypeVar("ModelType", bound=AggregateRoot)
-T = TypeVar("T")
 BATCH_SIZE = 100
 
 
-def batched(iterable: T, n: int) -> Generator[T, None, None]:
-    if sys.version_info >= (3, 12):
-        raise RuntimeError(
-            f"Replace function '{__file__.__name__}.{batched}' with built-in 'from itertools import batched'"
-        )
-    i = iter(iterable)
-    piece = list(islice(i, n))
-    while piece:
-        yield piece
-        piece = list(islice(i, n))
-
-
-class Repository(Generic[ModelType]):
+class Repository[ModelType: AggregateRoot]:
     def __init__(self, table_name, model: type[ModelType], dynamodb_client):
         self.table_name = table_name
         self.model = model

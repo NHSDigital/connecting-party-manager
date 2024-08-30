@@ -1,14 +1,9 @@
-from typing import TypeVar
-
 from attr import asdict
 from domain.core.error import ImmutableFieldError, UnknownFields
 from pydantic import Field, validate_model
 
 from .base import BaseModel
 from .event import Event, ExportedEventsTypeDef
-
-K = TypeVar("K")
-V = TypeVar("V")
 
 
 def _validate_model(model, input_data):
@@ -98,7 +93,7 @@ class AggregateRoot(BaseModel):
             if self.__fields__[field_name].field_info.extra.get("immutable") is True
         )
 
-    def _update(self, data: dict[K, V]) -> dict[K, V]:
+    def _update[K, V](self, data: dict[K, V]) -> dict[K, V]:
         fields_to_update = set(data)
         unknown_fields = fields_to_update - self.model_fields
         if unknown_fields:

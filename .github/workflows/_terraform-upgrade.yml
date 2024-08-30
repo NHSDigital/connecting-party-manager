@@ -1,0 +1,46 @@
+on:
+  workflow_call:
+    inputs:
+      account:
+        description: The AWS account being deployed
+        type: string
+        required: true
+      workspace:
+        description: The Terraform workspace being deployed
+        type: string
+        required: true
+      scope:
+        description: The Terraform scope being deployed
+        type: string
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+env:
+  ACCOUNT: ${{ inputs.account }}
+  WORKSPACE: ${{ inputs.workspace }}
+  CACHE_NAME: ${{ inputs.workspace }}-${{ inputs.account }}-${{ inputs.scope }}
+  SCOPE: ${{ inputs.scope }}
+  CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
+
+jobs:
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+
+  terraform--init--upgrade:
+    needs: [parse-secrets]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: ./.github/actions/terraform/
+        with:
+          command: init--upgrade
+          account: ${{ env.ACCOUNT }}
+          workspace: ${{ env.WORKSPACE }}
+          scope: ${{ env.SCOPE }}

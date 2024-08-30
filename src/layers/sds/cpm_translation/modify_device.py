@@ -12,12 +12,10 @@ class DeletionErrorBase(Exception):
         super().__init__(f"Field '{field}' cannot be deleted")
 
 
-class CannotDeleteMandatoryField(DeletionErrorBase):
-    ...
+class CannotDeleteMandatoryField(DeletionErrorBase): ...
 
 
-class NothingToDelete(DeletionErrorBase):
-    ...
+class NothingToDelete(DeletionErrorBase): ...
 
 
 def _as_questionnaire_response_answer(item):
