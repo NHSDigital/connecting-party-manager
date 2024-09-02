@@ -1,6 +1,6 @@
 # Changelog
 
-## 2024-08-29-a
+## 2024-09-02
 - [PI-302] SDS Smoke Test
 - [PI-245] Matrix Testing
 
