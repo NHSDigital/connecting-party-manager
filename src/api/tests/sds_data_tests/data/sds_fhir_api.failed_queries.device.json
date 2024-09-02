@@ -50,5 +50,14 @@
     "request.params.organization": [
       "https://fhir.nhs.uk/Id/ods-organization-code|R8J3N"
     ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CYEA"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apds%3APRPA_IN160000UK01"
+    ]
   }
 ]

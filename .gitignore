@@ -84,4 +84,4 @@ cpm.cdx.json
 
 # test output files
 test_failure.json
-test_success.json
+test_success_*.json

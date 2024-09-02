@@ -272,8 +272,8 @@ def _assert_response_match(expected, result, item, name):
     _generate_test_data(
         "sds_fhir_api.failed_queries.device.json",
         test_count=os.getenv("TEST_COUNT", None),
-    ),
-    +_generate_test_data(
+    )
+    + _generate_test_data(
         "sds_fhir_api.unique_queries.device.json",
         test_count=os.getenv("TEST_COUNT", None),
     )
@@ -300,6 +300,8 @@ def test_api_responses_match(item, request):
             )
 
         if cpm_status < 500:
+            if cpm_status == 429:
+                assert False, f"CPM responded with {cpm_status} for {item}"
             if ldap_status != 200:
                 assert (
                     cpm_status == ldap_status
@@ -370,12 +372,13 @@ def test_api_responses_match(item, request):
 
             test_count = os.getenv("TEST_COUNT", None)
             if not test_count:
-                # params = request.node.callspec.params
-                # index = list(params.values()).index(input)
-                # if (index + 1) % 1000 == 0:
-                #     time.sleep(120)
-                # else:
                 time.sleep(0.5)
+
+        else:
+            assert False, f"CPM responded with a {cpm_status} error with {item}"
+
+    else:
+        assert False, f"LDAP responded with a {ldap_status} error with {item}"
 
 
 @pytest.mark.parametrize("item", _generate_test_data("sds_fhir_queries_errors.json"))
