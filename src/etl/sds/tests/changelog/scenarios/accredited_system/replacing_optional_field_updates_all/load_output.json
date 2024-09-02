@@ -75,19 +75,19 @@
         "components": [
           [
             "nhs_as_svc_ia",
-            "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+            "urn:nhs:names:services:pdsquery:quqi_in010000uk14"
           ],
-          ["nhs_as_client", "K83015"]
+          ["nhs_as_client", "k83015"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "K83015-806782"],
+          ["nhs_mhs_party_key", "k83015-806782"],
           [
             "nhs_as_svc_ia",
-            "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+            "urn:nhs:names:services:pdsquery:quqi_in010000uk14"
           ],
-          ["nhs_as_client", "K83015"]
+          ["nhs_as_client", "k83015"]
         ]
       }
     ]
@@ -168,19 +168,19 @@
         "components": [
           [
             "nhs_as_svc_ia",
-            "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+            "urn:nhs:names:services:pdsquery:quqi_in010000uk14"
           ],
-          ["nhs_as_client", "AAA"]
+          ["nhs_as_client", "aaa"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "K83015-806782"],
+          ["nhs_mhs_party_key", "k83015-806782"],
           [
             "nhs_as_svc_ia",
-            "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+            "urn:nhs:names:services:pdsquery:quqi_in010000uk14"
           ],
-          ["nhs_as_client", "AAA"]
+          ["nhs_as_client", "aaa"]
         ]
       }
     ]

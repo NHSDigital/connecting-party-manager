@@ -25,6 +25,7 @@ def device() -> Device:
     device = product_team.create_device(name="Device-1", device_type=DeviceType.PRODUCT)
     device.add_tag(abc="123")
     device.add_tag(bar="foo")
+    device.add_tag(mixed_case="AbC")
     device.add_key(key_value="P.WWW-XXX", key_type=DeviceKeyType.PRODUCT_ID)
     return device
 

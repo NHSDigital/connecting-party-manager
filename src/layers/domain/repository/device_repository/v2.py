@@ -558,6 +558,8 @@ class DeviceRepository(Repository[Device]):
         Query the device by predefined tags:
 
             repository.query_by_tag(foo="123", bar="456")
+
+        NB: the DeviceTag enforces that values (but not keys) are case insensitive
         """
         tag_value = DeviceTag(**kwargs).value
         pk = TableKey.DEVICE_TAG.key(tag_value)
