@@ -300,6 +300,7 @@ def test_api_responses_match(item, request):
             )
 
         if cpm_status < 500:
+            # Check if 429.
             if cpm_status == 429:
                 assert False, f"CPM responded with {cpm_status} for {item}"
             if ldap_status != 200:
