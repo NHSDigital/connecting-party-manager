@@ -212,7 +212,7 @@ def _generate_test_data(filename, test_count=None):
                 # Path key remains as is
                 transformed_item["path"] = value
         transformed_data.append((transformed_item))
-    if not test_count:
+    if not test_count or int(test_count) > len(transformed_data):
         return transformed_data
 
     return random.sample(transformed_data, int(test_count))
