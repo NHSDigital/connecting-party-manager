@@ -1,0 +1,81 @@
+[
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CR8J3N"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CR8J3N-830217"
+    ]
+  },
+  {
+    "path": "/Device",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Aoperation%3Agpc.getcarerecord"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7C%20D83078"
+    ]
+  },
+  {
+    "path": "/Device",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Aoperation%3Agpc.getcarerecord"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7Cc83007"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https://fhir.nhs.uk/Id/nhsServiceInteractionId|urn:nhs:names:services:gp2gp:COPC_IN000001UK01",
+      "https://fhir.nhs.uk/Id/nhsMhsPartyKey|YGA-0021074"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https://fhir.nhs.uk/Id/nhsMhsPartyKey|Y04933-814028"
+    ],
+    "request.params.organization": [
+      "https://fhir.nhs.uk/Id/ods-organization-code|Y04933"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https://fhir.nhs.uk/Id/nhsMhsPartyKey|R8J3N-830217"
+    ],
+    "request.params.organization": [
+      "https://fhir.nhs.uk/Id/ods-organization-code|R8J3N"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CYEA"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apds%3APRPA_IN160000UK01"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CYEC"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Aebs%3APRSC_IN130000UK07"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CYEC"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Aebs%3APRSC_IN100000UK06"
+    ]
+  }
+]

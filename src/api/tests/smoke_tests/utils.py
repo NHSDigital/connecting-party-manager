@@ -11,9 +11,9 @@ class SmokeTestError(Exception):
     pass
 
 
-def get_app_key(environment: str) -> str:
+def get_app_key(environment: str, project: str = "") -> str:
     client = boto3.client("secretsmanager")
-    secret_name = f"{environment}-apigee-app-key"
+    secret_name = f"{environment}-apigee{project}-app-key"
     secret = client.get_secret_value(SecretId=secret_name)
     return secret["SecretString"]
 

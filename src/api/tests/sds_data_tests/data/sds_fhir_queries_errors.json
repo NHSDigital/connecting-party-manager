@@ -1,0 +1,31 @@
+[
+  {
+    "request.params.identifier": "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apsisquery%3AFOO",
+    "request.params.manufacturing-organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "request.params.organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "path": "/Device"
+  },
+  {
+    "request.params.manufacturing-organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "request.params.organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "path": "/Device"
+  },
+  {
+    "request.params.identifier": "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apsisquery%3AFOO",
+    "request.params.manufacturing-organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "path": "/Device"
+  },
+  {
+    "request.params.identifier": "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apsisquery%3AFOO",
+    "request.params.organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "path": "/Endpoint"
+  },
+  {
+    "request.params.identifier": "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apsisquery%3AFOO",
+    "path": "/Endpoint"
+  },
+  {
+    "request.params.organization": "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CFOOBAR",
+    "path": "/Endpoint"
+  }
+]

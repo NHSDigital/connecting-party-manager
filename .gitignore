@@ -81,3 +81,7 @@ src/layers/domain/fhir/r4/*models.py
 postman-collection.json
 token_cache.json
 cpm.cdx.json
+
+# test output files
+test_failure.json
+test_success_*.json
