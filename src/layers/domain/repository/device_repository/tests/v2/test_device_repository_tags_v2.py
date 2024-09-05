@@ -13,6 +13,10 @@ def test__device_repository__tags(device: Device, repository: DeviceRepository):
     (_device_bar,) = repository.query_by_tag(bar="foo")
     assert _device_bar.dict() == device.dict()
 
+    for value in ["aBc", "ABC", "abc", "AbC"]:
+        (_device_abc,) = repository.query_by_tag(mixed_case=value)
+        assert _device_abc.dict() == device.dict()
+
 
 @pytest.mark.integration
 def test__device_repository__tag_does_not_exist(
@@ -48,6 +52,7 @@ def _test_add_two_tags(
     expected_tags = {
         DeviceTag(abc="123"),
         DeviceTag(bar="foo"),
+        DeviceTag(mixed_case="abc"),
         DeviceTag(shoe_size="123"),
         DeviceTag(shoe_size="456"),
     }

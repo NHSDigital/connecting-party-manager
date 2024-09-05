@@ -192,37 +192,37 @@
         "components": [["unique_identifier", "00000a84594b2ef34279"]]
       },
       {
-        "components": [["nhs_id_code", "C3O9X"]]
+        "components": [["nhs_id_code", "c3o9x"]]
       },
       {
-        "components": [["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:ABCDEFG"]]
+        "components": [["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:abcdefg"]]
       },
       {
-        "components": [["nhs_mhs_party_key", "C3O9X-123456"]]
+        "components": [["nhs_mhs_party_key", "c3o9x-123456"]]
       },
       {
         "components": [
-          ["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:ABCDEFG"],
-          ["nhs_id_code", "C3O9X"]
+          ["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:abcdefg"],
+          ["nhs_id_code", "c3o9x"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "C3O9X-123456"],
-          ["nhs_id_code", "C3O9X"]
+          ["nhs_mhs_party_key", "c3o9x-123456"],
+          ["nhs_id_code", "c3o9x"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "C3O9X-123456"],
-          ["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:ABCDEFG"]
+          ["nhs_mhs_party_key", "c3o9x-123456"],
+          ["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:abcdefg"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "C3O9X-123456"],
-          ["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:ABCDEFG"],
-          ["nhs_id_code", "C3O9X"]
+          ["nhs_mhs_party_key", "c3o9x-123456"],
+          ["nhs_mhs_svc_ia", "urn:nhs:names:services:ers:abcdefg"],
+          ["nhs_id_code", "c3o9x"]
         ]
       }
     ]

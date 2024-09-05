@@ -218,11 +218,12 @@ class DeviceTag(BaseModel):
         initialised_with_root = "__root__" in values and len(values) == 1
         item_to_process = values["__root__"] if initialised_with_root else values
         if initialised_with_root:
-            _components = tuple((k, v) for k, v in item_to_process)
+            _components = ((k, v) for k, v in item_to_process)
         else:  # otherwise initialise directly with key value pairs
-            _components = tuple(sorted((k, str(v)) for k, v in item_to_process.items()))
+            _components = sorted((k, str(v)) for k, v in item_to_process.items())
 
-        return {"__root__": _components}
+        case_insensitive_components = tuple((k, v.lower()) for k, v in _components)
+        return {"__root__": case_insensitive_components}
 
     def dict(self, *args, **kwargs):
         return self.components
