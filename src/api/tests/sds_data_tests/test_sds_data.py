@@ -132,6 +132,18 @@ def sort_entries_by_nhsserviceinteractionid_value(entries):
     return sorted_entries
 
 
+def sort_entries_by_identifier_value(entries):
+    def get_partykey_value(entry):
+        identifiers = entry["resource"]["identifier"]
+        for idt in identifiers:
+            if idt["system"] == "https://fhir.nhs.uk/Id/nhsMhsPartyKey":
+                return idt["value"]
+        return ""
+
+    sorted_entries = sorted(entries, key=get_partykey_value)
+    return sorted_entries
+
+
 def normalize_case(data):
     """
     Recursively traverse the dictionary and normalize the case of all string keys and values.
@@ -156,6 +168,7 @@ def _request_base(url, request, headers):
         if retry == 3:
             break
         retry += 1
+        time.sleep(1)
     end_time = time.time()
     response_time = (end_time - start_time) * 1000
     return res, response_time
@@ -226,9 +239,13 @@ def _assert_response_match(expected, result, item, name):
         sorted_entries_result = sort_entries_by_nhsserviceinteractionid_value(
             result["entry"]
         )
+        sorted_entries_result = sort_entries_by_identifier_value(sorted_entries_result)
         result["entry"] = sorted_entries_result
         sorted_entries_expected = sort_entries_by_nhsserviceinteractionid_value(
             expected["entry"]
+        )
+        sorted_entries_expected = sort_entries_by_identifier_value(
+            sorted_entries_expected
         )
         expected["entry"] = sorted_entries_expected
     for idx, device_value in enumerate(result["entry"]):

@@ -59,5 +59,23 @@
     "request.params.identifier": [
       "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Apds%3APRPA_IN160000UK01"
     ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CYEC"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Aebs%3APRSC_IN130000UK07"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CYEC"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Aebs%3APRSC_IN100000UK06"
+    ]
   }
 ]
