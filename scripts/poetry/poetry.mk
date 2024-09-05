@@ -14,10 +14,11 @@ poetry--clean:  ## Remove .venv directory
 
 $(VENV_PYTHON):
 	poetry -q || (pip install --upgrade pip && pip install poetry)
+	[[ -f $(POETRY_LOCK) ]] && rm $(POETRY_LOCK) || :
 	mkdir -p .venv
 	poetry install --only main,dev --no-ansi
 	.venv/bin/pre-commit install
 
 $(POETRY_LOCK): $(TOOL_VERSIONS_COPY) $(VENV_PYTHON) $(PYPROJECT_TOML)
-	poetry update
+	poetry update --only main,dev
 	touch $(POETRY_LOCK)

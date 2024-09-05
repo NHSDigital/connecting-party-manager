@@ -1,0 +1,14 @@
+name: "Terraform Upgrade: Workspace - prod"
+run-name: "Upgrading terraform of workspace - prod"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_terraform-upgrade.yml
+    with:
+      account: prod
+      workspace: prod
+      scope: "per_workspace"
+    secrets: inherit # pragma: allowlist secret

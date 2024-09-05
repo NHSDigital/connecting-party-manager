@@ -24,6 +24,9 @@ terraform--apply: $(WORKSPACE_OUTPUT_JSON) ## Run terraform apply
 terraform--apply--force: terraform--clean terraform--apply ## Run terraform apply
 terraform--destroy: _terraform--destroy ## Run terraform destroy
 
+terraform--init--upgrade:
+	$(MAKE) terraform--init TERRAFORM_ARGS=-upgrade
+
 terraform--plan--qa: ## Run terraform plan against qa
 	$(MAKE) terraform--plan AWS_ACCOUNT=qa
 terraform--apply--qa: ## Run terraform apply against qa

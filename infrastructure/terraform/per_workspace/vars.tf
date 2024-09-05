@@ -59,7 +59,7 @@ variable "apigateway_arn_prefix" {
 }
 
 variable "python_version" {
-  default = "python3.11"
+  default = "python3.12"
 }
 
 variable "domain" {

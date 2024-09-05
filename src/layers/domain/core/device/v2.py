@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
 from functools import cached_property, wraps
-from typing import Callable, Optional, ParamSpec, TypeVar
+from typing import Callable, Optional
 from uuid import UUID, uuid4
 
 import orjson
@@ -253,10 +253,6 @@ class DeviceTag(BaseModel):
         return self.hash == other.hash
 
 
-RT = TypeVar("RT")
-P = ParamSpec("P")
-
-
 def _set_updated_on(device: "Device", event: "Event"):
     if not hasattr(event, UPDATED_ON):
         raise EventUpdatedError(
@@ -267,7 +263,7 @@ def _set_updated_on(device: "Device", event: "Event"):
     device.updated_on = updated_on
 
 
-def event(fn: Callable[P, RT]) -> Callable[P, RT]:
+def event[RT, **P](fn: Callable[P, RT]) -> Callable[P, RT]:
     @wraps(fn)
     def wrapper(self: "Device", *args: P.args, **kwargs: P.kwargs) -> RT:
         _event = fn(self, *args, **kwargs)
