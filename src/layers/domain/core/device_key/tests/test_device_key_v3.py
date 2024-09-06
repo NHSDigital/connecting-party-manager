@@ -8,7 +8,7 @@ from test_helpers.terraform import read_terraform_output
 def test_key_generator_instantiation():
     # Instantiating KeyGenerator directly should raise TypeError
     with pytest.raises(TypeError):
-        KeyGenerator(last_used_number=100)
+        KeyGenerator(key_name="PARTYKEYNUMBER")
 
 
 # Mock the database interaction in the KeyGenerator class for testing
