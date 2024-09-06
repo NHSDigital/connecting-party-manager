@@ -86,7 +86,7 @@ class PartyKeyGenerator(KeyGenerator):
         """
         Format the party key with the ODS code and a 7-digit number.
         """
-        return f"{self.ods_code}-{self.current_number:07d}"
+        return f"{self.ods_code}-{self.current_number:06d}"
 
     def validate_key(self, key: str) -> bool:
         """
@@ -96,7 +96,7 @@ class PartyKeyGenerator(KeyGenerator):
         if len(parts) != 2:
             return False
         ods_code, number = parts
-        return ods_code.isalpha() and number.isdigit() and len(number) == 7
+        return ods_code.isalpha() and number.isdigit() and len(number) == 6
 
 
 class ASIDGenerator(KeyGenerator):
