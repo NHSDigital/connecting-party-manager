@@ -1,10 +1,7 @@
 import os
 from abc import ABC
-from typing import TypeVar
 
 from pydantic import BaseModel
-
-Model = TypeVar("Model")
 
 
 class BaseEnvironment(BaseModel, ABC):
@@ -21,5 +18,5 @@ class BaseEnvironment(BaseModel, ABC):
     """
 
     @classmethod
-    def build(cls: type[Model]) -> Model:
+    def build[Model](cls: type[Model]) -> Model:
         return cls(**os.environ)

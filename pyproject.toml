@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.09.02"
+version = "2024.09.05"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -16,8 +16,8 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "3.11.4"
-pydantic = "1.10.17"
+python = "3.12.3"
+pydantic = "1.10.18"
 nhs-context-logging = "^0.5.1"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
@@ -85,7 +85,7 @@ profile = "black"
 [tool.pytest.ini_options]
 markers = ["unit", "integration", "smoke", "slow", "s3", "matrix"]
 addopts = "--import-mode=importlib"
-filterwarnings = ["ignore:from_type:"]                   # Ignores an annoying hypothesis warning
+filterwarnings = ["ignore:from_type:", "ignore::DeprecationWarning:botocore"]
 
 [tool.black]
 line-length = 88

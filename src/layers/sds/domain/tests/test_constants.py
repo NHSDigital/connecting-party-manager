@@ -15,13 +15,12 @@ def test_CaseInsensitiveEnum():
 
 
 def test_CaseInsensitiveEnum_not_a_string():
-    class MyType(CaseInsensitiveEnum):
-        ...
+    class MyType(CaseInsensitiveEnum): ...
 
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(TypeError) as error:
         MyType(123)
 
     assert (
         str(error.value)
-        == "123 is not a valid test_CaseInsensitiveEnum_not_a_string.<locals>.MyType"
+        == "<enum 'MyType'> has no members; specify `names=()` if you meant to create a new, empty, enum"
     )

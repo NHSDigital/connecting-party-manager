@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-09-05
+- [PI-219] Upgrade to Python 3.12
+- [PI-491] Case-insensitive search
+
 ## 2024-09-02
 - [PI-302] SDS Smoke Test
 - [PI-245] Matrix Testing

@@ -75,27 +75,27 @@
       {
         "components": [
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:45678"],
-          ["nhs_as_client", "K83015"]
+          ["nhs_as_client", "k83015"]
         ]
       },
       {
         "components": [
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:78910"],
-          ["nhs_as_client", "K83015"]
+          ["nhs_as_client", "k83015"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "K83015-806782"],
+          ["nhs_mhs_party_key", "k83015-806782"],
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:45678"],
-          ["nhs_as_client", "K83015"]
+          ["nhs_as_client", "k83015"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "K83015-806782"],
+          ["nhs_mhs_party_key", "k83015-806782"],
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:78910"],
-          ["nhs_as_client", "K83015"]
+          ["nhs_as_client", "k83015"]
         ]
       }
     ]
@@ -176,27 +176,27 @@
       {
         "components": [
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:45678"],
-          ["nhs_as_client", "AAA"]
+          ["nhs_as_client", "aaa"]
         ]
       },
       {
         "components": [
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:78910"],
-          ["nhs_as_client", "AAA"]
+          ["nhs_as_client", "aaa"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "K83015-806782"],
+          ["nhs_mhs_party_key", "k83015-806782"],
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:45678"],
-          ["nhs_as_client", "AAA"]
+          ["nhs_as_client", "aaa"]
         ]
       },
       {
         "components": [
-          ["nhs_mhs_party_key", "K83015-806782"],
+          ["nhs_mhs_party_key", "k83015-806782"],
           ["nhs_as_svc_ia", "urn:nhs:names:services:pdsquery:78910"],
-          ["nhs_as_client", "AAA"]
+          ["nhs_as_client", "aaa"]
         ]
       }
     ]

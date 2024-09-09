@@ -1,12 +1,8 @@
 from functools import wraps
 from json import JSONDecodeError
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable
 
 from pydantic import BaseModel, ValidationError
-
-T = TypeVar("T")
-RT = TypeVar("RT")
-P = ParamSpec("P")
 
 
 class ValidationErrorItem(BaseModel):
@@ -41,7 +37,7 @@ class InboundJSONDecodeError(JSONDecodeError):
     pass
 
 
-def mark_json_decode_errors_as_inbound(function: Callable[P, RT]):
+def mark_json_decode_errors_as_inbound[RT, **P](function: Callable[P, RT]):
     @wraps(function)
     def decorator(*args: P.args, **kwargs: P.kwargs):
         try:
@@ -56,7 +52,7 @@ def mark_json_decode_errors_as_inbound(function: Callable[P, RT]):
     return decorator
 
 
-def mark_validation_errors_as_inbound(function: Callable[P, RT]):
+def mark_validation_errors_as_inbound[RT, **P](function: Callable[P, RT]):
     @wraps(function)
     def decorator(*args: P.args, **kwargs: P.kwargs):
         try:

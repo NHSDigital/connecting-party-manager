@@ -155,7 +155,9 @@ class Device(AggregateRoot):
     status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
     product_team_id: UUID
     ods_code: str
-    created_on: datetime = Field(default_factory=datetime.utcnow, immutable=True)
+    created_on: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), immutable=True
+    )
     updated_on: Optional[datetime] = Field(default=None)
     deleted_on: Optional[datetime] = Field(default=None)
     keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
@@ -277,9 +279,9 @@ class Device(AggregateRoot):
             ) from None
 
         try:
-            questionnaire_responses[
-                questionnaire_response_index
-            ] = questionnaire_response
+            questionnaire_responses[questionnaire_response_index] = (
+                questionnaire_response
+            )
         except IndexError:
             raise QuestionnaireResponseNotFoundError(
                 "This device does not contain a Questionnaire with a "

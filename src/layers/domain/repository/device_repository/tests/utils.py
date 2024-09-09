@@ -1,4 +1,4 @@
-from typing import Generator, TypeVar
+from typing import Generator
 
 from domain.core.device import Device
 from domain.repository.device_repository import DeviceRepository
@@ -9,12 +9,10 @@ from test_helpers.terraform import read_terraform_output
 
 TABLE_NAME = "my_table"
 
-T = TypeVar("T", bound=DeviceRepository)
 
-
-def repository_fixture(
-    is_integration_test: bool, repository_class: type[T]
-) -> Generator[T, None, None]:
+def repository_fixture[
+    T: DeviceRepository
+](is_integration_test: bool, repository_class: type[T]) -> Generator[T, None, None]:
     if is_integration_test:
         table_name = read_terraform_output("dynamodb_table_name.value")
         client = dynamodb_client()

@@ -91,7 +91,8 @@ def log_on_failure(pytestconfig: Config, request: FixtureRequest, log_capture):
     std_out, std_err = log_capture
     for log in (*std_out, *std_err):
         if pytestconfig.getoption("suppress_logs") is False:
-            print(json.dumps(log, indent=2, default=json_serializer))  # noqa: T201
+            serialised = json_serializer(log)
+            print(json.dumps(serialised, indent=2))  # noqa: T201
 
     if isinstance(exception, Exception):
         raise exception
