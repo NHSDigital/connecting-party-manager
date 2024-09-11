@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-09-11
+- [PI-493] Generating Party Keys
+- [PI-494] Generating ASIDs
+
 ## 2024-09-05
 - [PI-219] Upgrade to Python 3.12
 - [PI-491] Case-insensitive search
