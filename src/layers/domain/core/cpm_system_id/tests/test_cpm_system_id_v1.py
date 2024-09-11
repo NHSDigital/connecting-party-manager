@@ -85,6 +85,56 @@ def test_party_key_generation(start, expected):
     assert new_id["latest"] == expected
 
 
+@pytest.mark.integration
+def test_party_key_generation_increment():
+    TABLE_NAME = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+    start_value = 100000
+
+    # Insert a dummy entry with an initial 'latest' value
+    client.put_item(
+        TableName=TABLE_NAME,
+        Item={
+            "pk": {"S": "CSI#PARTYKEYNUMBER"},
+            "sk": {"S": "CSI#PARTYKEYNUMBER"},
+            "latest": {"N": f"{start_value}"},  # Set the initial value for the test
+        },
+    )
+
+    repository = CpmSystemIdRepository(table_name=TABLE_NAME, dynamodb_client=client)
+
+    # Number of times to call the generator
+    num_calls = 5
+    current_id = repository.read(key_name="PARTYKEYNUMBER")
+
+    previous_latest = int(current_id["latest"])
+
+    for _ in range(num_calls):
+        generator = PartyKeyId.create(current_id=current_id, ods_code="ABC")
+
+        expected_latest = previous_latest + 1
+
+        assert generator.latest == expected_latest
+        assert generator.latest_id == f"ABC-{expected_latest}"
+
+        # Update repository with new number
+        repository.create_or_update(
+            key_name="PARTYKEYNUMBER", new_number=generator.latest
+        )
+
+        # Fetch the updated ID and check if it was correctly incremented
+        new_id = repository.read(key_name="PARTYKEYNUMBER")
+        assert int(new_id["latest"]) == expected_latest
+
+        # Update for next iteration
+        previous_latest = expected_latest
+        current_id = new_id
+
+    # Final assertion to check if latest is num_calls greater than start
+    final_latest = int(repository.read(key_name="PARTYKEYNUMBER")["latest"])
+    assert final_latest == start_value + num_calls
+
+
 def test_asid_generator_validate_key_valid():
     valid_key = "223456789014"
     is_valid = AsidId.validate_key(valid_key)
@@ -165,3 +215,51 @@ def test_asid_key_generation(start, expected):
     repository.create_or_update(key_name="ASIDNUMBER", new_number=generator.latest)
     new_id = repository.read(key_name="ASIDNUMBER")
     assert new_id["latest"] == expected
+
+
+@pytest.mark.integration
+def test_asid_generation_increment():
+    TABLE_NAME = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+    start_value = 200000000000
+
+    # Insert a dummy entry with an initial 'latest' value
+    client.put_item(
+        TableName=TABLE_NAME,
+        Item={
+            "pk": {"S": "CSI#ASIDNUMBER"},
+            "sk": {"S": "CSI#ASIDNUMBER"},
+            "latest": {"N": f"{start_value}"},  # Set the initial value for the test
+        },
+    )
+
+    repository = CpmSystemIdRepository(table_name=TABLE_NAME, dynamodb_client=client)
+
+    # Number of times to call the generator
+    num_calls = 5
+    current_id = repository.read(key_name="ASIDNUMBER")
+
+    previous_latest = int(current_id["latest"])
+
+    for _ in range(num_calls):
+        generator = AsidId.create(current_id=current_id)
+
+        expected_latest = previous_latest + 1
+
+        assert generator.latest == expected_latest
+        assert generator.latest_id == str(expected_latest)
+
+        # Update repository with new number
+        repository.create_or_update(key_name="ASIDNUMBER", new_number=generator.latest)
+
+        # Fetch the updated ID and check if it was correctly incremented
+        new_id = repository.read(key_name="ASIDNUMBER")
+        assert int(new_id["latest"]) == expected_latest
+
+        # Update for next iteration
+        previous_latest = expected_latest
+        current_id = new_id
+
+    # Final assertion to check if latest is num_calls greater than start_value
+    final_latest = int(repository.read(key_name="ASIDNUMBER")["latest"])
+    assert final_latest == start_value + num_calls
