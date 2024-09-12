@@ -7,7 +7,7 @@ import pytest
 
 from test_helpers.terraform import read_terraform_output
 
-EXAMPLE_DOT_COM = "https://example.com"
+EXAMPLE_DOT_COM = "https://httpbin.org"
 
 NOTIFY_ENVIRONMENT = {
     "SLACK_WEBHOOK_URL": EXAMPLE_DOT_COM,
