@@ -9,14 +9,13 @@ Feature: Create CPM Product for EPR - failure scenarios
 
   Scenario: Cannot create a Cpm Product for EPR with a Cpm Product that is missing fields (no product_name) and has extra param
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path                     | value                                                          |
-      | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${ uuid(1) }                                                   |
-      | name                     | My Great Product Team                                          |
-      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
-      | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product/Epr" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     Then I receive a status code "400" with body
@@ -32,14 +31,13 @@ Feature: Create CPM Product for EPR - failure scenarios
 
   Scenario: Cannot create a Cpm Product for EPR with a Cpm Product that is missing fields (no product_name)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path                     | value                                                          |
-      | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${ uuid(1) }                                                   |
-      | name                     | My Great Product Team                                          |
-      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
-      | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product/Epr" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
       """
       {}
       """
@@ -54,14 +52,13 @@ Feature: Create CPM Product for EPR - failure scenarios
 
   Scenario: Cannot create a Cpm Product for EPR with an invalid body (extra parameter is not allowed)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path                     | value                                                          |
-      | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${ uuid(1) }                                                   |
-      | name                     | My Great Product Team                                          |
-      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
-      | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product/Epr" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
       | path         | value            |
       | product_name | My Great Product |
       | foo          | bar              |
@@ -76,14 +73,13 @@ Feature: Create CPM Product for EPR - failure scenarios
 
   Scenario: Cannot create a Cpm Product for EPR with corrupt body
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path                     | value                                                          |
-      | resourceType             | Organization                                                   |
-      | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${ uuid(1) }                                                   |
-      | name                     | My Great Product Team                                          |
-      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
-      | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product/Epr" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
       """
       {"invalid_array": [}
       """

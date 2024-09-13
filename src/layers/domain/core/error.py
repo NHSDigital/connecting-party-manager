@@ -10,6 +10,10 @@ class InvalidKeyPattern(ValueError):
     pass
 
 
+class InvalidProductTeamKeyError(ValueError):
+    pass
+
+
 class InvalidKeyError(Exception):
     pass
 

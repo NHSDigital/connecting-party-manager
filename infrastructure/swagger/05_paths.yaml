@@ -67,21 +67,6 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /Organization:
-    post:
-      responses:
-        "201":
-          <<: *Response201
-        "4XX":
-          <<: *Response4XX
-      <<: *RequestHeaders
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_createProductTeam}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
-
   /Organization/{id}:
     get:
       parameters:
