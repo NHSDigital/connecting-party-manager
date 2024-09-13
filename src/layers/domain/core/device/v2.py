@@ -450,6 +450,10 @@ class Device(AggregateRoot):
     def is_active(self):
         return self.status is Status.ACTIVE
 
+    @classmethod
+    def get_all_fields(cls) -> set[str]:
+        return set(cls.__fields__.keys())
+
 
 class DeviceEventDeserializer(EventDeserializer):
     event_types = (

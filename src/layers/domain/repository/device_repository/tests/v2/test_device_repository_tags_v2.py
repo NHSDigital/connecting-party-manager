@@ -1,7 +1,13 @@
+from collections import defaultdict
+
 import pytest
 from domain.core.device.v2 import Device, DeviceTag
 from domain.core.device_key.v2 import DeviceKeyType
-from domain.repository.device_repository.v2 import DeviceRepository
+from domain.core.enum import Status
+from domain.repository.device_repository.v2 import (
+    MANDATORY_DEVICE_FIELDS,
+    DeviceRepository,
+)
 
 
 @pytest.mark.integration
@@ -113,3 +119,50 @@ def test__device_repository__add_two_tags_and_then_clear(
 
     assert repository.query_by_tag(shoe_size=123) == []
     assert repository.query_by_tag(shoe_size=456) == []
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "field_to_drop, expected_default_value",
+    [
+        (["tags"], set()),  # If 'tags' is dropped, it should default to an empty set
+        (["keys"], []),  # If 'keys' is dropped, it should default to an empty list
+        (["status"], Status.ACTIVE),  # 'status' should default to Status.ACTIVE
+        (["updated_on"], None),  # 'updated_on' should default to None
+        (["deleted_on"], None),  # 'deleted_on' should default to None
+        (
+            ["questionnaire_responses"],
+            defaultdict(dict),
+        ),  # 'questionnaire_responses' defaults to an empty dict
+    ],
+)
+def test__device_repository__drop_fields(
+    device: Device, repository: DeviceRepository, field_to_drop, expected_default_value
+):
+    repository.write(device)
+    (_device_123,) = repository.query_by_tag(abc=123)
+    assert _device_123.dict() == device.dict()
+
+    # Query with specific fields to drop
+    results = repository.query_by_tag(abc=123, fields_to_drop=field_to_drop)
+    assert len(results) == 1
+
+    device_result = results[0]
+
+    assert device_result.dict()[field_to_drop[0]] == expected_default_value
+    assert all(field in device_result.dict() for field in MANDATORY_DEVICE_FIELDS)
+
+
+@pytest.mark.integration
+def test__device_repository__drop_mandatory_fields(
+    device: Device, repository: DeviceRepository
+):
+    repository.write(device)
+    (_device_123,) = repository.query_by_tag(abc=123)
+    assert _device_123.dict() == device.dict()
+
+    # Query with mandatory fields to drop
+    fields_to_drop = list(MANDATORY_DEVICE_FIELDS)
+
+    with pytest.raises(ValueError, match="Cannot drop mandatory fields:"):
+        repository.query_by_tag(abc=123, fields_to_drop=fields_to_drop)
