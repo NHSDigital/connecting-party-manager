@@ -112,6 +112,7 @@ module "lambdas" {
       resources = local.permission_resource_map[replace(file, ".json", "")]
     }
   }
+  memory_size = var.lambda_memory_size
 }
 
 module "authoriser" {

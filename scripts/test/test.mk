@@ -6,6 +6,7 @@ SDS_DEV_APIKEY =
 USE_CPM_PROD ?= FALSE
 TEST_COUNT =
 COMPARISON_ENV ?= local
+RUN_SPEEDTEST = ?= FALSE
 
 _pytest:
 	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
@@ -40,4 +41,4 @@ test--feature--%--auto-retry:  ## Autoretry of failed feature (gherkin) tests
 	$(MAKE) test--feature--$* _INTERNAL_FLAGS="--define='auto_retry=true'"
 
 test--sds--matrix: ## Run end-to-end smoke tests that check data matches betweeen cpm and ldap
-	SDS_PROD_APIKEY=$(SDS_PROD_APIKEY) SDS_DEV_APIKEY=$(SDS_DEV_APIKEY) USE_CPM_PROD=$(USE_CPM_PROD) TEST_COUNT=$(TEST_COUNT) COMPARISON_ENV=$(COMPARISON_ENV) poetry run python -m pytest $(PYTEST_FLAGS) -m 'matrix' --ignore=src/layers --ignore=src/etl $(_CACHE_CLEAR)
+	SDS_PROD_APIKEY=$(SDS_PROD_APIKEY) SDS_DEV_APIKEY=$(SDS_DEV_APIKEY) USE_CPM_PROD=$(USE_CPM_PROD) TEST_COUNT=$(TEST_COUNT) COMPARISON_ENV=$(COMPARISON_ENV) RUN_SPEEDTEST=$(RUN_SPEEDTEST) poetry run python -m pytest $(PYTEST_FLAGS) -m 'matrix' --ignore=src/layers --ignore=src/etl $(_CACHE_CLEAR)

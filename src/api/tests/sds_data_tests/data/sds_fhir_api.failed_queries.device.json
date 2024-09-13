@@ -77,5 +77,187 @@
     "request.params.identifier": [
       "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Aebs%3APRSC_IN100000UK06"
     ]
+  },
+  {
+    "path": "/Device",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aread%3Ametadata"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CK81100"
+    ]
+  },
+  {
+    "path": "/Device",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CK81100"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Aoperation%3Agpc.getcarerecord",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CK81100-826756"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Acreate%3Aappointment-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aread%3Aappointment-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Asearch%3Apatient-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Asearch%3Aslot-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aread%3Alocation-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Aoperation%3Agpc.getcarerecord",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Aoperation%3Agpc.getcarerecord"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aread%3Apractitioner-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Asearch%3Apatient_appointments-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Adocuments%3Afhir%3Arest%3Aread%3Ametadata-1"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aread%3Ametadata"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Astructured%3Afhir%3Arest%3Aread%3Ametadata-1"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Acancel%3Aappointment-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aread%3Ametadata-1"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Aupdate%3Aappointment-1",
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsMhsPartyKey%7CD83045-812816"
+    ],
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CD83045"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Arest%3Asearch%3Apatient-1"
+    ]
+  },
+  {
+    "path": "/Endpoint",
+    "request.params.organization": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2Fods-organization-code%7CK81100"
+    ],
+    "request.params.identifier": [
+      "https%3A%2F%2Ffhir.nhs.uk%2FId%2FnhsServiceInteractionId%7Curn%3Anhs%3Anames%3Aservices%3Agpconnect%3Afhir%3Aoperation%3Agpc.getcarerecord"
+    ]
   }
 ]
