@@ -1,5 +1,11 @@
 # Changelog
 
+## 2024-09-11
+- [PI-493] Generating Party Keys
+- [PI-494] Generating ASIDs
+- [PI-499] CI s3 tests are running twice
+- [PI-513] Unit test post request failing
+
 ## 2024-09-05
 - [PI-219] Upgrade to Python 3.12
 - [PI-491] Case-insensitive search

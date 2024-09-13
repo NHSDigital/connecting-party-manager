@@ -23,13 +23,13 @@ test--slow:  ## Run slow (pytest) tests
 	$(MAKE) _pytest _INTERNAL_FLAGS="-m 'slow'" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
 test--s3: aws--login ## Run (pytest) tests that require s3 downloads
-	$(MAKE) _pytest _INTERNAL_FLAGS="-m 's3'" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
+	$(MAKE) _pytest _INTERNAL_FLAGS="-m 's3' $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
 
 test--smoke: aws--login ## Run end-to-end smoke tests (pytest)
 	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) WORKSPACE=$(WORKSPACE) ACCOUNT=$(ACCOUNT) poetry run python -m pytest $(PYTEST_FLAGS) -m 'smoke' --ignore=src/layers --ignore=src/etl $(_CACHE_CLEAR)
 
 test--%--rerun: ## Rerun failed integration or unit (pytest) tests
-	$(MAKE) test--$* _INTERNAL_FLAGS="--last-failed --last-failed-no-failures none" _CACHE_CLEAR=
+	$(MAKE) test--$* _INTERNAL_FLAGS="--last-failed --last-failed-no-failures none" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
 test--feature--integration: aws--login ## Run integration feature (gherkin) tests
 	$(MAKE) _behave _INTERNAL_FLAGS="--define='test_mode=integration' $(_INTERNAL_FLAGS)" AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
