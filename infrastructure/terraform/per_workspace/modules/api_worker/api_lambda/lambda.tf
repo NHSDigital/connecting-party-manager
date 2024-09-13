@@ -7,6 +7,7 @@ module "lambda_function" {
   handler       = "api.${var.name}.index.handler"
   runtime       = var.python_version
   timeout       = 10
+  memory_size   = var.memory_size
 
   timeouts = {
     create = "5m"

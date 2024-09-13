@@ -162,13 +162,14 @@ def _request_base(url, request, headers):
     retry = 0
     start_time = time.time()
     res = requests.get(url, params=request["params"], headers=headers)
-    while res.status_code > 499:
-        start_time = time.time()
-        res = requests.get(url, params=request["params"], headers=headers)
-        if retry == 3:
-            break
-        retry += 1
-        time.sleep(1)
+    if res.status_code > 499:
+        while res.status_code > 499:
+            time.sleep(1)
+            start_time = time.time()
+            res = requests.get(url, params=request["params"], headers=headers)
+            if retry == 3:
+                break
+            retry += 1
     end_time = time.time()
     response_time = (end_time - start_time) * 1000
     return res, response_time
@@ -201,6 +202,10 @@ def _request_non_prod(request, url):
 
 
 def _generate_test_data(filename, test_count=None):
+    speed_test = os.getenv("RUN_SPEEDTEST", "FALSE")
+    speed_test = speed_test.upper() == "TRUE"
+    if speed_test:
+        test_count = None
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "data", filename)
     with open(file_path, "r") as file:
@@ -284,20 +289,33 @@ def _assert_response_match(expected, result, item, name):
             )
 
 
+speed_test = os.getenv("RUN_SPEEDTEST", "FALSE")
+speed_test = speed_test.upper() == "TRUE"
+if not speed_test:
+    unique_data = (
+        _generate_test_data(
+            "sds_fhir_api.failed_queries.device.json",
+            test_count=os.getenv("TEST_COUNT", None),
+        )
+        + _generate_test_data(
+            "sds_fhir_api.unique_queries.device.json",
+            test_count=os.getenv("TEST_COUNT", None),
+        )
+        + _generate_test_data(
+            "sds_fhir_api.unique_queries.endpoint.json",
+            test_count=os.getenv("TEST_COUNT", None),
+        )
+    )
+else:
+    unique_data = _generate_test_data(
+        "sds_fhir_api.speed_test_queries.device.json",
+        test_count=os.getenv("TEST_COUNT", None),
+    )
+
+
 @pytest.mark.parametrize(
     "item",
-    _generate_test_data(
-        "sds_fhir_api.failed_queries.device.json",
-        test_count=os.getenv("TEST_COUNT", None),
-    )
-    + _generate_test_data(
-        "sds_fhir_api.unique_queries.device.json",
-        test_count=os.getenv("TEST_COUNT", None),
-    )
-    + _generate_test_data(
-        "sds_fhir_api.unique_queries.endpoint.json",
-        test_count=os.getenv("TEST_COUNT", None),
-    ),
+    unique_data,
 )
 @pytest.mark.matrix
 def test_api_responses_match(item, request):
@@ -329,16 +347,7 @@ def test_api_responses_match(item, request):
                     == cpm_body["issue"][0]["diagnostics"]
                 ), f"Non 200 diagnositc message does not match. When calling with {item}"
                 pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
-                pytest.success_message_full = _create_output_json(
-                    ldap_status,
-                    cpm_status,
-                    ldap_body,
-                    cpm_body,
-                    item["path"],
-                    item["params"],
-                    ldap_response_time,
-                    cpm_response_time,
-                )
+                pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body, cpm_body, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
             else:
                 assert (
                     ldap_status == cpm_status
@@ -399,28 +408,35 @@ def test_api_responses_match(item, request):
         assert False, f"LDAP responded with a {ldap_status} error with {item}"
 
 
-@pytest.mark.parametrize("item", _generate_test_data("sds_fhir_queries_errors.json"))
+@pytest.mark.parametrize(
+    "item",
+    _generate_test_data("sds_fhir_queries_errors.json"),
+)
 @pytest.mark.matrix
 def test_api_responses_expected_errors(item):
-    ldap_status, ldap_body, ldap_response_time = _request(item)
-    use_cpm_prod = os.getenv("USE_CPM_PROD", "FALSE")
-    use_cpm_prod = use_cpm_prod.upper() == "TRUE"
-    cpm_item = item
-    cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
-    if use_cpm_prod:
-        cpm_status, cpm_body, cpm_response_time = _request(cpm_item)
-    else:
-        non_prod_env = os.getenv("COMPARISON_ENV", "local")
-        cpm_status, cpm_body, cpm_response_time = _request_non_prod(
-            cpm_item, non_prod_urls[non_prod_env]
-        )
+    if not speed_test:
+        ldap_status, ldap_body, ldap_response_time = _request(item)
+        use_cpm_prod = os.getenv("USE_CPM_PROD", "FALSE")
+        use_cpm_prod = use_cpm_prod.upper() == "TRUE"
+        cpm_item = item
+        cpm_item["params"]["use_cpm"] = "iwanttogetdatafromcpm"
+        if use_cpm_prod:
+            cpm_status, cpm_body, cpm_response_time = _request(cpm_item)
+        else:
+            non_prod_env = os.getenv("COMPARISON_ENV", "local")
+            cpm_status, cpm_body, cpm_response_time = _request_non_prod(
+                cpm_item, non_prod_urls[non_prod_env]
+            )
 
-    assert cpm_status == ldap_status, f"Status do not match. When calling with {item}"
-    if ldap_status != 200:
         assert (
-            ldap_body["issue"][0]["diagnostics"] == cpm_body["issue"][0]["diagnostics"]
-        ), f"Non 200 diagnostic message does not match. When calling with {item}"
-        pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
-        pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body, cpm_body, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
-    else:
-        assert ldap_body["entry"] == cpm_body["entry"]
+            cpm_status == ldap_status
+        ), f"Status do not match. When calling with {item}"
+        if ldap_status != 200:
+            assert (
+                ldap_body["issue"][0]["diagnostics"]
+                == cpm_body["issue"][0]["diagnostics"]
+            ), f"Non 200 diagnostic message does not match. When calling with {item}"
+            pytest.success_message = f"Response Status of {ldap_status} match / Diagnostic messages match: {ldap_body['issue'][0]['diagnostics']} / Response time: LDAP, CPM / {ldap_response_time:.2f}ms, {cpm_response_time:.2f}ms"
+            pytest.success_message_full = f"{_create_output_json(ldap_status, cpm_status, ldap_body, cpm_body, item['path'], item['params'], ldap_response_time, cpm_response_time)},"
+        else:
+            assert ldap_body["entry"] == cpm_body["entry"]
