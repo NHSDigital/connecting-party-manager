@@ -4,7 +4,7 @@ def validate_result_body(result_body, devices, params):
     for index, result in enumerate(result_body):
         validate_device(result, devices[index])
         validate_keys(result["keys"], devices[index])
-        validate_tags(result["tags"], params)
+        validate_tags(result["tags"])
         validate_questionnaire_responses(result, devices[index], params)
 
 
@@ -18,10 +18,8 @@ def validate_keys(keys, device):
         assert key["key_value"] == device["device_key"]
 
 
-def validate_tags(tags, params):
-    for tag in tags:
-        for key, value in params.items():
-            assert [key, value.lower()] in tag
+def validate_tags(tags):
+    assert tags == []  # The tags field is dropped due to being chunky
 
 
 def validate_questionnaire_responses(result, device, params):
