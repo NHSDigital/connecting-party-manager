@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-09-13
+- [PI-477] query_by_tag ignore chunky device fields
+- [PI-506] Upgrade lambda memory
+
 ## 2024-09-11
 - [PI-493] Generating Party Keys
 - [PI-494] Generating ASIDs
