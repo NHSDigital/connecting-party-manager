@@ -46,6 +46,8 @@ def render_response[
         # Implicit failure from all other Exceptions
         outcome = ErrorResponse.from_exception(exception=response).dict()
         http_status = http_status_from_exception(exception=response)
+    elif isinstance(response, tuple):
+        http_status, outcome = response
     else:
         if isinstance(response, tuple):
             http_status, outcome = response

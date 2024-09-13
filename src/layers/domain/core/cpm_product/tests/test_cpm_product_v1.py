@@ -41,3 +41,12 @@ def test_invalid_product_id(invalid_product_id):
             ods_code="ABC123",
             product_team_id="ABC123.18934119-5780-4d28-b9be-0e6dff3908ba",
         )
+
+
+def test_cpm_product_create_device_reference_data(cpm_product: CpmProduct):
+    device_reference_data = cpm_product.create_device_reference_data(name="foo")
+    assert isinstance(device_reference_data.id, UUID)
+    assert device_reference_data.name == "foo"
+    assert device_reference_data.product_id == cpm_product.id
+    assert device_reference_data.product_team_id == cpm_product.product_team_id
+    assert device_reference_data.ods_code == cpm_product.ods_code

@@ -1,11 +1,15 @@
+import json
+
 import pytest
-from domain.common_steps.read_product import before_steps
+from domain.api.common_steps.create_product import before_steps
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
-from domain.response.validation_errors import InboundValidationError
+from domain.response.validation_errors import (
+    InboundJSONDecodeError,
+    InboundValidationError,
+)
 from event.aws.client import dynamodb_client
 from event.step_chain import StepChain
 
@@ -19,21 +23,31 @@ TABLE_NAME = "my-table"
     ["event", "expected_exception"],
     [
         (
-            {"pathParameters": {"product_team_id": "does-not-exist"}},
+            {
+                "body": "not:json",
+                "pathParameters": {"product_team_id": "does-not-exist"},
+            },
+            InboundJSONDecodeError,
+        ),
+        (
+            {
+                "body": json.dumps({"invalid": "data"}),
+                "pathParameters": {"product_team_id": "does-not-exist"},
+            },
             InboundValidationError,
         ),
         (
             {
-                "pathParameters": {
-                    "product_team_id": "does-not-exist",
-                    "product_id": "does-not-exist",
-                },
+                "body": json.dumps({"product_name": "foo"}),
+                "pathParameters": {"product_team_id": "does-not-exist"},
             },
             ItemNotFound,
         ),
     ],
 )
-def test_read_product_steps_bad_input(event: dict, expected_exception: type[Exception]):
+def test_create_product_steps_bad_input(
+    event: dict, expected_exception: type[Exception]
+):
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
@@ -43,12 +57,18 @@ def test_read_product_steps_bad_input(event: dict, expected_exception: type[Exce
     assert isinstance(step_chain.result, expected_exception)
 
 
-def test_read_product_steps_good_input():
+def test_create_product_steps_good_input():
+    ods_code = CPM_PRODUCT_TEAM_NO_ID["ods_code"]
+    product_name = "foo"
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
     product_team = org.create_product_team(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
-    ods_code = CPM_PRODUCT_TEAM_NO_ID["ods_code"]
+    event = {
+        "body": json.dumps({"product_name": product_name}),
+        "pathParameters": {"product_team_id": str(product_team.id)},
+    }
+
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
@@ -58,23 +78,7 @@ def test_read_product_steps_good_input():
             dynamodb_client=mocked_cache["DYNAMODB_CLIENT"],
         )
         product_team_repo.write(product_team)
-
-        product_repo = CpmProductRepository(
-            table_name=mocked_cache["DYNAMODB_TABLE"],
-            dynamodb_client=mocked_cache["DYNAMODB_CLIENT"],
-        )
-        product = product_team.create_cpm_product(name="foo-product")
-        product_repo.write(product)
-
-        step_chain.run(
-            init={
-                "pathParameters": {
-                    "product_team_id": str(product_team.id),
-                    "product_id": str(product.id),
-                },
-            },
-            cache=mocked_cache,
-        )
+        step_chain.run(init=event, cache=mocked_cache)
 
     assert isinstance(step_chain.result, CpmProduct)
     assert step_chain.result.product_team_id == product_team.id

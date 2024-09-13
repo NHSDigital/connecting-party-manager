@@ -26,3 +26,7 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
         self.keys = list(
             {frozenset(key.dict().items()): key for key in self.keys}.values()
         )
+
+
+class CreateDeviceReferenceDataParams(BaseModel, extra=Extra.forbid):
+    name: str = Field(...)
