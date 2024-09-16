@@ -3,6 +3,8 @@ from domain.core.cpm_system_id import AsidId, PartyKeyId
 from domain.repository.cpm_system_id_repository import CpmSystemIdRepository
 from event.aws.client import dynamodb_client
 
+from src.layers.domain.core.cpm_system_id.v1 import CpmSystemIdType, ProductId
+from src.layers.domain.repository.keys.v3 import TableKey
 from test_helpers.terraform import read_terraform_output
 
 
@@ -48,12 +50,14 @@ def test_party_key_generation_seeded():
     TABLE_NAME = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
     repository = CpmSystemIdRepository(table_name=TABLE_NAME, dynamodb_client=client)
-    current_id = repository.read(key_name="PARTYKEYNUMBER")
+    current_id = repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)
     generator = PartyKeyId.create(current_id=current_id, ods_code="ABC")
     assert generator.latest == 850000
     assert generator.latest_id == "ABC-850000"
-    repository.create_or_update(key_name="PARTYKEYNUMBER", new_number=generator.latest)
-    new_id = repository.read(key_name="PARTYKEYNUMBER")
+    repository.create_or_update(
+        key_name=CpmSystemIdType.PARTYKEYNUMBER, new_number=generator.latest
+    )
+    new_id = repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)
     assert new_id["latest"] == 850000
 
 
@@ -69,19 +73,21 @@ def test_party_key_generation(start, expected):
     client.put_item(
         TableName=TABLE_NAME,
         Item={
-            "pk": {"S": "CSI#PARTYKEYNUMBER"},
-            "sk": {"S": "CSI#PARTYKEYNUMBER"},
+            "pk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.PARTYKEYNUMBER}"},
+            "sk": {"S": f"CSI#{CpmSystemIdType.PARTYKEYNUMBER}"},
             "latest": {"N": f"{start}"},  # Set the initial value for the test
         },
     )
 
     repository = CpmSystemIdRepository(table_name=TABLE_NAME, dynamodb_client=client)
-    current_id = repository.read(key_name="PARTYKEYNUMBER")
+    current_id = repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)
     generator = PartyKeyId.create(current_id=current_id, ods_code="ABC")
     assert generator.latest == expected
     assert generator.latest_id == f"ABC-{str(expected)}"
-    repository.create_or_update(key_name="PARTYKEYNUMBER", new_number=generator.latest)
-    new_id = repository.read(key_name="PARTYKEYNUMBER")
+    repository.create_or_update(
+        key_name=CpmSystemIdType.PARTYKEYNUMBER, new_number=generator.latest
+    )
+    new_id = repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)
     assert new_id["latest"] == expected
 
 
@@ -95,8 +101,8 @@ def test_party_key_generation_increment():
     client.put_item(
         TableName=TABLE_NAME,
         Item={
-            "pk": {"S": "CSI#PARTYKEYNUMBER"},
-            "sk": {"S": "CSI#PARTYKEYNUMBER"},
+            "pk": {"S": f"CSI#{CpmSystemIdType.PARTYKEYNUMBER}"},
+            "sk": {"S": f"CSI#{CpmSystemIdType.PARTYKEYNUMBER}"},
             "latest": {"N": f"{start_value}"},  # Set the initial value for the test
         },
     )
@@ -105,7 +111,7 @@ def test_party_key_generation_increment():
 
     # Number of times to call the generator
     num_calls = 5
-    current_id = repository.read(key_name="PARTYKEYNUMBER")
+    current_id = repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)
 
     previous_latest = int(current_id["latest"])
 
@@ -119,11 +125,11 @@ def test_party_key_generation_increment():
 
         # Update repository with new number
         repository.create_or_update(
-            key_name="PARTYKEYNUMBER", new_number=generator.latest
+            key_name=CpmSystemIdType.PARTYKEYNUMBER, new_number=generator.latest
         )
 
         # Fetch the updated ID and check if it was correctly incremented
-        new_id = repository.read(key_name="PARTYKEYNUMBER")
+        new_id = repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)
         assert int(new_id["latest"]) == expected_latest
 
         # Update for next iteration
@@ -131,7 +137,9 @@ def test_party_key_generation_increment():
         current_id = new_id
 
     # Final assertion to check if latest is num_calls greater than start
-    final_latest = int(repository.read(key_name="PARTYKEYNUMBER")["latest"])
+    final_latest = int(
+        repository.read(key_name=CpmSystemIdType.PARTYKEYNUMBER)["latest"]
+    )
     assert final_latest == start_value + num_calls
 
 
@@ -176,12 +184,14 @@ def test_asid_key_generation_seeded():
     TABLE_NAME = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
     repository = CpmSystemIdRepository(table_name=TABLE_NAME, dynamodb_client=client)
-    current_id = repository.read(key_name="ASIDNUMBER")
+    current_id = repository.read(key_name=CpmSystemIdType.ASIDNUMBER)
     generator = AsidId.create(current_id=current_id)
     assert generator.latest == 200000100000
     assert generator.latest_id == "200000100000"
-    repository.create_or_update(key_name="ASIDNUMBER", new_number=generator.latest)
-    new_id = repository.read(key_name="ASIDNUMBER")
+    repository.create_or_update(
+        key_name=CpmSystemIdType.ASIDNUMBER, new_number=generator.latest
+    )
+    new_id = repository.read(key_name=CpmSystemIdType.ASIDNUMBER)
     assert new_id["latest"] == 200000100000
 
 
@@ -201,19 +211,21 @@ def test_asid_key_generation(start, expected):
     client.put_item(
         TableName=TABLE_NAME,
         Item={
-            "pk": {"S": "CSI#ASIDNUMBER"},
-            "sk": {"S": "CSI#ASIDNUMBER"},
+            "pk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
+            "sk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
             "latest": {"N": f"{start}"},  # Set the initial value for the test
         },
     )
 
     repository = CpmSystemIdRepository(table_name=TABLE_NAME, dynamodb_client=client)
-    current_id = repository.read(key_name="ASIDNUMBER")
+    current_id = repository.read(key_name=CpmSystemIdType.ASIDNUMBER)
     generator = AsidId.create(current_id=current_id)
     assert generator.latest == expected
     assert generator.latest_id == str(expected)
-    repository.create_or_update(key_name="ASIDNUMBER", new_number=generator.latest)
-    new_id = repository.read(key_name="ASIDNUMBER")
+    repository.create_or_update(
+        key_name=CpmSystemIdType.ASIDNUMBER, new_number=generator.latest
+    )
+    new_id = repository.read(key_name=CpmSystemIdType.ASIDNUMBER)
     assert new_id["latest"] == expected
 
 
@@ -227,8 +239,8 @@ def test_asid_generation_increment():
     client.put_item(
         TableName=TABLE_NAME,
         Item={
-            "pk": {"S": "CSI#ASIDNUMBER"},
-            "sk": {"S": "CSI#ASIDNUMBER"},
+            "pk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
+            "sk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
             "latest": {"N": f"{start_value}"},  # Set the initial value for the test
         },
     )
@@ -237,7 +249,7 @@ def test_asid_generation_increment():
 
     # Number of times to call the generator
     num_calls = 5
-    current_id = repository.read(key_name="ASIDNUMBER")
+    current_id = repository.read(key_name=CpmSystemIdType.ASIDNUMBER)
 
     previous_latest = int(current_id["latest"])
 
@@ -250,10 +262,12 @@ def test_asid_generation_increment():
         assert generator.latest_id == str(expected_latest)
 
         # Update repository with new number
-        repository.create_or_update(key_name="ASIDNUMBER", new_number=generator.latest)
+        repository.create_or_update(
+            key_name=CpmSystemIdType.ASIDNUMBER, new_number=generator.latest
+        )
 
         # Fetch the updated ID and check if it was correctly incremented
-        new_id = repository.read(key_name="ASIDNUMBER")
+        new_id = repository.read(key_name=CpmSystemIdType.ASIDNUMBER)
         assert int(new_id["latest"]) == expected_latest
 
         # Update for next iteration
@@ -261,5 +275,34 @@ def test_asid_generation_increment():
         current_id = new_id
 
     # Final assertion to check if latest is num_calls greater than start_value
-    final_latest = int(repository.read(key_name="ASIDNUMBER")["latest"])
+    final_latest = int(repository.read(key_name=CpmSystemIdType.ASIDNUMBER)["latest"])
     assert final_latest == start_value + num_calls
+
+
+def test_product_id_generator_format_key():
+    generator = ProductId.create()
+    assert generator.latest_id is not None
+
+
+def test_product_id_generator_validate_key_valid():
+    valid_key = "P.AAA-333"
+    is_valid = ProductId.validate_key(valid_key)
+    assert is_valid
+
+
+@pytest.mark.parametrize(
+    "invalid_key",
+    [
+        "ABC000124",  # Missing 'P.' and hyphen
+        "P-ABC-123",  # Extra hyphen
+        "P.ABC123",  # Missing hyphen
+        "P.ABC-1234",  # Too many digits
+        "P.ABC-12",  # Too few digits
+        "P.AB1-123",  # ODS code contains a digit
+        "P.ABC-12A",  # Number part contains a non-digit character
+        "",  # Empty string
+    ],
+)
+def test_product_id_generator_validate_key_invalid_format(invalid_key):
+    is_valid = ProductId.validate_key(key=invalid_key)
+    assert not is_valid
