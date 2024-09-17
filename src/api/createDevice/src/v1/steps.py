@@ -12,7 +12,7 @@ from domain.fhir_translation.device import (
     parse_fhir_device_json,
 )
 from domain.repository.device_repository import DeviceRepository
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from domain.response.validation_errors import mark_json_decode_errors_as_inbound
 from event.aws.client import dynamodb_client
 from event.step_chain import StepChain

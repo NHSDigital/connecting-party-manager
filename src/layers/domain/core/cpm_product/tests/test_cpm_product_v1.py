@@ -19,7 +19,7 @@ def test_cpm_product_created_with_datetime(cpm_product: CpmProduct):
     assert isinstance(cpm_product.created_on, datetime)
 
 
-def test_device_created(cpm_product: CpmProduct):
+def test_cpm_product_created(cpm_product: CpmProduct):
     assert isinstance(cpm_product.id, str)
     assert isinstance(cpm_product.name, str)
     assert isinstance(cpm_product.ods_code, str)

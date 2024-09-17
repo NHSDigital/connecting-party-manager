@@ -4,7 +4,7 @@ from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product import CpmProduct, CpmProductIncomingParams
 from domain.core.cpm_system_id import ProductId
 from domain.core.product_team.v3 import ProductTeam
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from domain.response.validation_errors import (
     InboundValidationError,
     mark_json_decode_errors_as_inbound,
