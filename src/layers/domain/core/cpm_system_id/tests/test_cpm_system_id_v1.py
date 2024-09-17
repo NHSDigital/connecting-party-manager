@@ -74,7 +74,7 @@ def test_party_key_generation(start, expected):
         TableName=TABLE_NAME,
         Item={
             "pk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.PARTYKEYNUMBER}"},
-            "sk": {"S": f"CSI#{CpmSystemIdType.PARTYKEYNUMBER}"},
+            "sk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.PARTYKEYNUMBER}"},
             "latest": {"N": f"{start}"},  # Set the initial value for the test
         },
     )
@@ -211,8 +211,8 @@ def test_asid_key_generation(start, expected):
     client.put_item(
         TableName=TABLE_NAME,
         Item={
-            "pk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
-            "sk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
+            "pk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.ASIDNUMBER}"},
+            "sk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.ASIDNUMBER}"},
             "latest": {"N": f"{start}"},  # Set the initial value for the test
         },
     )
@@ -239,8 +239,8 @@ def test_asid_generation_increment():
     client.put_item(
         TableName=TABLE_NAME,
         Item={
-            "pk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
-            "sk": {"S": f"CSI#{CpmSystemIdType.ASIDNUMBER}"},
+            "pk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.ASIDNUMBER}"},
+            "sk": {"S": f"{TableKey.CPM_SYSTEM_ID}#{CpmSystemIdType.ASIDNUMBER}"},
             "latest": {"N": f"{start_value}"},  # Set the initial value for the test
         },
     )
