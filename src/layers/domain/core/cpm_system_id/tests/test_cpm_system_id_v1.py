@@ -300,6 +300,7 @@ def test_product_id_generator_validate_key_valid(valid_key):
 @pytest.mark.parametrize(
     "invalid_key",
     [
+        "P.BBB-111",  # Invalid characters
         "AAC346",  # Missing 'P.' and hyphen
         "P-ACD-333",  # Extra hyphen
         "P.ACC344",  # Missing hyphen
