@@ -103,9 +103,15 @@ class PartyKeyId(CpmSystemId):
 
 
 class ProductId(CpmSystemId):
+    length: Optional[int]  # Length of each part of the ID
+    n_parts: Optional[int]  # Number of parts in the ID
+    valid_chars: Optional[str]  # Valid characters for the ID
 
     @classmethod
     def create(cls):
+        cls.length = 3
+        cls.n_parts = 2
+        cls.valid_chars = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
         """No current_id needed, key is generated randomly."""
         instance = super().create()
         instance.latest_id = cls._format_key()
@@ -118,22 +124,18 @@ class ProductId(CpmSystemId):
     @classmethod
     def _format_key(cls) -> str:
         """Generate the product ID as a random string in the format 'P.XXX-XXX'."""
-        PART_LENGTH = 3
-        N_PARTS = 2
-        PRODUCT_ID_VALID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"
-
         rng = random.Random(datetime.now().timestamp())
         device_key = "-".join(
-            "".join(rng.choices(PRODUCT_ID_VALID_CHARS, k=PART_LENGTH))
-            for _ in range(N_PARTS)
+            "".join(rng.choices(cls.valid_chars, k=cls.length))
+            for _ in range(cls.n_parts)
         )
         return f"P.{device_key}"
 
     @classmethod
     def validate_key(cls, key: str) -> bool:
         """Validate that the ProductId has the correct format."""
-        PRODUCT_ID_VALID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"
+        cls.valid_chars = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
         ID_PATTERN = re.compile(
-            rf"^P\.[{PRODUCT_ID_VALID_CHARS}]{{3}}-[{PRODUCT_ID_VALID_CHARS}]{{3}}$"
+            rf"^P\.[{cls.valid_chars}]{{3}}-[{cls.valid_chars}]{{3}}$"
         )
         return bool(ID_PATTERN.match(key))

@@ -284,8 +284,15 @@ def test_product_id_generator_format_key():
     assert generator.latest_id is not None
 
 
-def test_product_id_generator_validate_key_valid():
-    valid_key = "P.AAA-333"
+@pytest.mark.parametrize(
+    "valid_key",
+    [
+        "P.AAA-333",
+        "P.AC3-333",
+        "P.ACC-33A",
+    ],
+)
+def test_product_id_generator_validate_key_valid(valid_key):
     is_valid = ProductId.validate_key(valid_key)
     assert is_valid
 
@@ -293,13 +300,11 @@ def test_product_id_generator_validate_key_valid():
 @pytest.mark.parametrize(
     "invalid_key",
     [
-        "ABC000124",  # Missing 'P.' and hyphen
-        "P-ABC-123",  # Extra hyphen
-        "P.ABC123",  # Missing hyphen
-        "P.ABC-1234",  # Too many digits
-        "P.ABC-12",  # Too few digits
-        "P.AB1-123",  # ODS code contains a digit
-        "P.ABC-12A",  # Number part contains a non-digit character
+        "AAC346",  # Missing 'P.' and hyphen
+        "P-ACD-333",  # Extra hyphen
+        "P.ACC344",  # Missing hyphen
+        "P.ACC-3467",  # Too many digits
+        "P.AAC-34",  # Too few digits
         "",  # Empty string
     ],
 )
