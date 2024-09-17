@@ -31,7 +31,7 @@ class CpmProduct(AggregateRoot):
     A product in the database.
     """
 
-    id: str
+    id: str  # product_id
     product_team_id: UUID = Field(...)
     name: str = Field(regex=PRODUCT_NAME_REGEX, min_length=1)
     ods_code: str
