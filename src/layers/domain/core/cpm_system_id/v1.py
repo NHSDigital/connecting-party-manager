@@ -103,16 +103,16 @@ class PartyKeyId(CpmSystemId):
 
 
 class ProductId(CpmSystemId):
-    length: Optional[int]  # Length of each part of the ID
-    n_parts: Optional[int]  # Number of parts in the ID
-    valid_chars: Optional[str]  # Valid characters for the ID
-
     @classmethod
-    def create(cls):
+    def set_defaults(cls):
         cls.length = 3
         cls.n_parts = 2
         cls.valid_chars = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
+
+    @classmethod
+    def create(cls):
         """No current_id needed, key is generated randomly."""
+        cls.set_defaults()
         instance = super().create()
         instance.latest_id = cls._format_key()
         return instance
@@ -134,7 +134,7 @@ class ProductId(CpmSystemId):
     @classmethod
     def validate_key(cls, key: str) -> bool:
         """Validate that the ProductId has the correct format."""
-        cls.valid_chars = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
+        cls.set_defaults()
         ID_PATTERN = re.compile(
             rf"^P\.[{cls.valid_chars}]{{3}}-[{cls.valid_chars}]{{3}}$"
         )
