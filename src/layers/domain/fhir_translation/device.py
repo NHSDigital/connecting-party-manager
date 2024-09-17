@@ -2,7 +2,7 @@ from typing import List
 from uuid import uuid4
 
 from domain.core.device import Device as DomainDevice
-from domain.core.product_team import ProductTeam
+from domain.core.product_team.v1 import ProductTeam
 from domain.fhir.r4 import Device as FhirDevice
 from domain.fhir.r4 import StrictDevice as StrictFhirDevice
 from domain.fhir.r4.cpm_model import SYSTEM, Answer, CollectionBundle

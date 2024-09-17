@@ -4,7 +4,7 @@ from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.device import Device
 from domain.core.device_id import generate_device_key
 from domain.core.device_key import DeviceKeyType
-from domain.core.product_team import ProductTeam
+from domain.core.product_team.v1 import ProductTeam
 from domain.fhir.r4.cpm_model import SYSTEM
 from domain.fhir.r4.cpm_model import Device as FhirDevice
 from domain.fhir_translation.device import (
