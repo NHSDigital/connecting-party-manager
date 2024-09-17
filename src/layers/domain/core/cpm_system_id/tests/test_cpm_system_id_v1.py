@@ -293,7 +293,7 @@ def test_product_id_generator_format_key():
     ],
 )
 def test_product_id_generator_validate_key_valid(valid_key):
-    is_valid = ProductId.validate_key(valid_key)
+    is_valid = ProductId.validate_key(key=valid_key)
     assert is_valid
 
 
