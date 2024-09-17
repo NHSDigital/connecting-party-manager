@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product import CpmProduct, CpmProductIncomingParams
+from domain.core.cpm_system_id import ProductId
 from domain.core.product_team.v3 import ProductTeam
 from domain.repository.product_team_repository import ProductTeamRepository
 from domain.response.validation_errors import (
@@ -37,7 +38,8 @@ def read_product_team(data, cache) -> ProductTeam:
 
 
 def generate_cpm_product_id(data, cache) -> str:
-    return "P.123-456"
+    generated_product_id = ProductId.create()
+    return generated_product_id.latest_id
 
 
 def create_cpm_product(data, cache) -> CpmProduct:
