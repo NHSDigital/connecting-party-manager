@@ -24,7 +24,6 @@ TABLE_NAME = "hiya"
 def test_index(version):
     org = Root.create_ods_organisation(ods_code=product_team_payload["ods_code"])
 
-    # Note 'f9518c12-6c83-4544-97db-d9dd1d64da97' is consistent with DEVICE
     product_team = org.create_product_team(
         id=product_team_payload["id"], name=product_team_payload["name"]
     )
@@ -90,109 +89,43 @@ def test_index(version):
     )
 
 
-# @pytest.mark.parametrize(
-#     "version",
-#     [
-#         "1",
-#     ],
-# )
-# def test_index_bad_payload(version):
-#     with mock_table(table_name=TABLE_NAME), mock.patch.dict(
-#         os.environ,
-#         {
-#             "DYNAMODB_TABLE": TABLE_NAME,
-#             "AWS_DEFAULT_REGION": "eu-west-2",
-#         },
-#         clear=True,
-#     ):
-#         from api.createDevice.index import handler
+@pytest.mark.parametrize(
+    "params, error, status_code, version",
+    [
+        ({"product_name": "Foobar product"}, "MISSING_VALUE", 400, "1"),
+        (
+            {"product_team_id": "641be376-3954-4339-822c-54071c9ff1a0"},
+            "MISSING_VALUE",
+            400,
+            "1",
+        ),
+        ({}, "MISSING_VALUE", 400, "1"),
+        (
+            {
+                "product_name": "Foobar product",
+                "product_team_id": "641be376-3954-4339-822c-54071c9ff1a0",
+                "foo": "bar",
+            },
+            "VALIDATION_ERROR",
+            400,
+            "1",
+        ),
+    ],
+)
+def test_incoming_errors(params, error, status_code, version):
+    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.createCpmProduct.index import cache, handler
 
-#         result = handler(
-#             event={"headers": {"version": version}, "body": json.dumps({})}
-#         )
-
-#     expected_body = json.dumps(
-#         {
-#             "resourceType": "OperationOutcome",
-#             "id": app_logger.service_name,
-#             "meta": {
-#                 "profile": [
-#                     "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-#                 ]
-#             },
-#             "issue": [
-#                 {
-#                     "severity": "error",
-#                     "code": "processing",
-#                     "details": {
-#                         "coding": [
-#                             {
-#                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-#                                 "code": "MISSING_VALUE",
-#                                 "display": "Missing value",
-#                             }
-#                         ]
-#                     },
-#                     "diagnostics": "field required",
-#                     "expression": ["Device.resourceType"],
-#                 },
-#                 {
-#                     "severity": "error",
-#                     "code": "processing",
-#                     "details": {
-#                         "coding": [
-#                             {
-#                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-#                                 "code": "MISSING_VALUE",
-#                                 "display": "Missing value",
-#                             }
-#                         ]
-#                     },
-#                     "diagnostics": "field required",
-#                     "expression": ["Device.deviceName"],
-#                 },
-#                 {
-#                     "severity": "error",
-#                     "code": "processing",
-#                     "details": {
-#                         "coding": [
-#                             {
-#                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-#                                 "code": "MISSING_VALUE",
-#                                 "display": "Missing value",
-#                             }
-#                         ]
-#                     },
-#                     "diagnostics": "field required",
-#                     "expression": ["Device.definition"],
-#                 },
-#                 {
-#                     "severity": "error",
-#                     "code": "processing",
-#                     "details": {
-#                         "coding": [
-#                             {
-#                                 "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-#                                 "code": "MISSING_VALUE",
-#                                 "display": "Missing value",
-#                             }
-#                         ]
-#                     },
-#                     "diagnostics": "field required",
-#                     "expression": ["Device.owner"],
-#                 },
-#             ],
-#         }
-#     )
-#     expected = {
-#         "statusCode": 400,
-#         "body": expected_body,
-#         "headers": {
-#             "Content-Length": str(len(expected_body)),
-#             "Content-Type": "application/json",
-#             "Version": version,
-#         },
-#     }
-#     _response_assertions(
-#         result=result, expected=expected, check_body=True, check_content_length=True
-#     )
+        cache["DYNAMODB_CLIENT"] = client
+        result = handler(
+            event={"headers": {"version": version}, "body": json.dumps(params)}
+        )
+    assert result["statusCode"] == status_code
+    assert error in result["body"]

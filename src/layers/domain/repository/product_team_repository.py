@@ -1,5 +1,5 @@
 from attr import asdict
-from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
+from domain.core.product_team.v3 import ProductTeam, ProductTeamCreatedEvent
 
 from .errors import ItemNotFound
 from .keys import TableKeys

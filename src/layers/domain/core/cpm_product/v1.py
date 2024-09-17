@@ -7,7 +7,12 @@ from domain.core.aggregate_root import AggregateRoot
 from domain.core.event import Event
 from domain.core.timestamp import now
 from domain.core.validation import PRODUCT_NAME_REGEX
-from pydantic import Field
+from pydantic import BaseModel, Extra, Field
+
+
+class CpmProductIncomingParams(BaseModel, extra=Extra.forbid):
+    product_team_id: UUID = Field(...)
+    product_name: str = Field(regex=PRODUCT_NAME_REGEX, min_length=1)
 
 
 @dataclass(kw_only=True, slots=True)
@@ -27,8 +32,8 @@ class CpmProduct(AggregateRoot):
     """
 
     id: str
-    product_team_id: UUID
-    name: str = Field(regex=PRODUCT_NAME_REGEX)
+    product_team_id: UUID = Field(...)
+    name: str = Field(regex=PRODUCT_NAME_REGEX, min_length=1)
     ods_code: str
     created_on: datetime = Field(default_factory=now, immutable=True)
     updated_on: Optional[datetime] = Field(default=None)
