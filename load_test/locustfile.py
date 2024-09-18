@@ -1,8 +1,7 @@
 import random
 
 from locust import HttpUser, events, task
-
-from src.api.tests.sds_data_tests.test_sds_data import _generate_test_data
+from speed_test_queries import queries
 
 
 class QueryParams:
@@ -59,6 +58,14 @@ def _(parser):
         required=True,
         help="apikey for hitting desired host",
     )
+    parser.add_argument(
+        "--usecpm",
+        choices=["TRUE", "FALSE"],
+        default="FALSE",
+        env_var="USE_CPM",
+        required=False,
+        help="use_cpm for hitting cpm",
+    )
 
 
 def _get_headers(version: str, apikey: str):
@@ -68,22 +75,33 @@ def _get_headers(version: str, apikey: str):
 
 
 class CPMUser(HttpUser):
-    @task
-    def read_device_by_id(self):
-        device_id = random.choice(device_ids)
-        url_path = f"/Device/{device_id}"
-        APIKEY = self.environment.parsed_options.apikey
-        API_VERSION = self.environment.parsed_options.api_version
+    # @task
+    # def read_device_by_id(self):
+    #     device_id = random.choice(device_ids)
+    #     url_path = f"/Device/{device_id}"
+    #     APIKEY = self.environment.parsed_options.apikey
+    #     API_VERSION = self.environment.parsed_options.api_version
 
-        self.client.get(
-            url=url_path, headers=_get_headers(version=API_VERSION, apikey=APIKEY)
-        )
+    #     self.client.get(
+    #         url=url_path, headers=_get_headers(version=API_VERSION, apikey=APIKEY)
+    #     )
 
     @task
     def search_devices(self):
-        test_data = _generate_test_data("queries.json")
-        url_path = f"/Device?{QueryParams.LDAP_UNIQUE_IDENTIFIER}={unique_identifier}"
-        self.client.get(url=url_path)
+        apikey = self.environment.parsed_options.apikey
+        API_VERSION = self.environment.parsed_options.api_version
+        USE_CPM = self.environment.parsed_options.usecpm
+        random_queries = random.sample(queries, 100)
+        for query in random_queries:
+            params = query["params"]
+            if USE_CPM == "TRUE":
+                params["use_cpm"] = "iwanttogetdatafromcpm"
+            url_path = f"{query['path']}"
+            self.client.get(
+                url=url_path,
+                params=params,
+                headers=_get_headers(version=API_VERSION, apikey=apikey),
+            )
 
     # @task
     # def search_cpm_for_unique_identifier(self):
