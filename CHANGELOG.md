@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-09-18-a
+- [PI-477] query_by_tag ignore chunky device fields
+- [PI-506] Upgrade lambda memory
+
 ## 2024-09-13
 - [PI-477] query_by_tag ignore chunky device fields
 - [PI-506] Upgrade lambda memory
