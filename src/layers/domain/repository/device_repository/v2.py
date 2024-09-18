@@ -33,6 +33,7 @@ TAGS = "tags"
 ROOT_FIELDS_TO_COMPRESS = [TAGS]
 NON_ROOT_FIELDS_TO_COMPRESS = ["questionnaire_responses"]
 BATCH_GET_SIZE = 100
+MANDATORY_DEVICE_FIELDS = {"name", "device_type", "product_team_id", "ods_code"}
 
 
 class TooManyResults(Exception):
@@ -42,36 +43,38 @@ class TooManyResults(Exception):
 def compress_device_fields(data: Event | dict, fields_to_compress=None) -> dict:
     _data = copy(data) if isinstance(data, dict) else asdict(data, recurse=False)
 
-    # pop unknown keys
+    # Pop unknown keys
     unknown_keys = _data.keys() - set(Device.__fields__)
     for k in unknown_keys:
         _data.pop(k)
 
-    # compress specified keys if they exist in the data
+    # Compress specified keys if they exist in the data
     fields_to_compress = (fields_to_compress or []) + ROOT_FIELDS_TO_COMPRESS
-    fields_to_compress_that_exist = [f for f in fields_to_compress if f in _data]
+    fields_to_compress_that_exist = [f for f in fields_to_compress if _data.get(f)]
     for field in fields_to_compress_that_exist:
+        # Only proceed if the field is not empty
         if field == TAGS:
-            # tags are doubly compressed: first compress each tag in the list,
-            # and then compress the entire list in the line directly after this
-            # if-block
+            # Tags are doubly compressed: first compress each tag in the list
             _data[field] = [pkl_dumps_gzip(tag) for tag in _data[field]]
+        # Compress the entire field (which includes the doubly compressed tags)
         _data[field] = pkl_dumps_gzip(_data[field])
     return _data
 
 
 def decompress_device_fields(device: dict):
     for field in ROOT_FIELDS_TO_COMPRESS:
-        device[field] = pkl_loads_gzip(device[field])
-        if field == TAGS:
-            # tags are doubly compressed, so first decompress the entire tag list
-            # in the line directly before this if-block, then decompress each tag
-            # in the list
-            device[field] = [pkl_loads_gzip(tag) for tag in device[field]]
+        if device.get(field):  # Check if the field is present and not empty
+            device[field] = pkl_loads_gzip(device[field])  # First decompression
+            if field == TAGS:  # Tags are doubly compressed.
+                # Second decompression: Decompress each tag in the list
+                device[field] = [pkl_loads_gzip(tag) for tag in device[field]]
 
-    if device["root"] is False:
+    # Decompress non-root fields if the device is not a root and fields exist
+    if not device.get("root"):  # Use get to handle missing 'root' field
         for field in NON_ROOT_FIELDS_TO_COMPRESS:
-            device[field] = pkl_loads_gzip(device[field])
+            if device.get(field):  # Check if the field is present and non empty
+                device[field] = pkl_loads_gzip(device[field])
+
     return device
 
 
@@ -553,30 +556,64 @@ class DeviceRepository(Repository[Device]):
         _device = unmarshall(item)
         return Device(**decompress_device_fields(_device))
 
-    def query_by_tag(self, **kwargs) -> list[Device]:
+    def query_by_tag(self, fields_to_drop: list[str] = None, **kwargs) -> list[Device]:
         """
-        Query the device by predefined tags:
-
-            repository.query_by_tag(foo="123", bar="456")
-
-        NB: the DeviceTag enforces that values (but not keys) are case insensitive
+        Query the device by predefined tags, optionally dropping specific fields from the query result.
+        Example: repository.query_by_tag(fields_to_drop=["field1", "field2"], foo="123", bar="456")
         """
+
         tag_value = DeviceTag(**kwargs).value
         pk = TableKey.DEVICE_TAG.key(tag_value)
 
-        # Initial query to retrieve a list of all the root-device pk's
-        response = self.client.query(
-            ExpressionAttributeValues={":pk": marshall_value(pk)},
-            KeyConditionExpression="pk = :pk",
-            TableName=self.table_name,
-        )
+        query_params = {
+            "ExpressionAttributeValues": {":pk": marshall_value(pk)},
+            "KeyConditionExpression": "pk = :pk",
+            "TableName": self.table_name,
+        }
+
+        # If fields to drop are provided, create a ProjectionExpression
+        if fields_to_drop:
+            all_fields = Device.get_all_fields()
+
+            # Ensure no mandatory fields are dropped
+            dropped_mandatory_fields = set(fields_to_drop) & MANDATORY_DEVICE_FIELDS
+            if dropped_mandatory_fields:
+                raise ValueError(
+                    f"Cannot drop mandatory fields: {', '.join(dropped_mandatory_fields)}"
+                )
+
+            fields_to_return = all_fields - set(fields_to_drop)
+
+            # DynamoDB ProjectionExpression, specifying which fields to return
+            query_params.update(_dynamodb_projection_expression(fields_to_return))
+
+        # Perform the DynamoDB query
+        response = self.client.query(**query_params)
+
         # Not yet implemented: pagination
         if "LastEvaluatedKey" in response:
             raise TooManyResults(f"Too many results for query '{kwargs}'")
 
-        # Convert to Device, sorted by 'pk', which would have been
-        # the expected behaviour if tags in the database were
-        # Device duplicates rather than references
+        # Convert to Device, sorted by 'pk'
         compressed_devices = map(unmarshall, response["Items"])
         devices_as_dict = map(decompress_device_fields, compressed_devices)
+
         return [Device(**d) for d in sorted(devices_as_dict, key=lambda d: d["id"])]
+
+
+def _dynamodb_projection_expression(updated_fields: list[str]):
+    expression_attribute_names = {}
+    update_clauses = []
+
+    for field_name in updated_fields:
+        field_name_placeholder = f"#{field_name}"
+
+        update_clauses.append(field_name_placeholder)
+        expression_attribute_names[field_name_placeholder] = field_name
+
+    projection_expression = ", ".join(update_clauses)
+
+    return dict(
+        ProjectionExpression=projection_expression,
+        ExpressionAttributeNames=expression_attribute_names,
+    )

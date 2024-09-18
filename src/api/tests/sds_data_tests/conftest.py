@@ -1,11 +1,22 @@
 import json
+import subprocess
 
 import pytest
 
 current_file_index = 0
 entry_count = 0
 max_entries_per_file = 2000
-file_name_template = "test_success_{}.json"
+file_name_template = "src/api/tests/sds_data_tests/test_success_{}.json"
+
+
+@pytest.fixture(scope="session", autouse=True)
+def run_after_tests():
+    # This code will run after all tests have finished
+    yield
+    # Code to run after tests
+    subprocess.run(
+        ["python", "src/api/tests/sds_data_tests/calculation.py"], check=True
+    )
 
 
 def get_current_file():
@@ -41,7 +52,7 @@ def pytest_runtest_logreport(report):
             str(report.longreprtext)
         )
         output = {"failed_request": failed_request, "error": assertion_error}
-        with open("test_failure.json", "a") as f:
+        with open("src/api/tests/sds_data_tests/test_failure.json", "a") as f:
             f.write(json.dumps(output))
             f.write(",")
     if report.when == "call" and report.passed and hasattr(pytest, "success_message"):

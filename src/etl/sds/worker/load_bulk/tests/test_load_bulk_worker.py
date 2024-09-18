@@ -31,9 +31,10 @@ class MockDeviceRepository(DeviceRepository):
         for device in devices:
             if not device.get("root"):
                 continue
-            device["tags"] = [
-                pkl_loads_gzip(tag) for tag in pkl_loads_gzip(device["tags"])
-            ]
+            if device.get("tags"):  # Only compress if tags not empty
+                device["tags"] = [
+                    pkl_loads_gzip(tag) for tag in pkl_loads_gzip(device["tags"])
+                ]
             yield Device(**device)
 
     def count(self, by: DeviceType | DeviceKeyType):

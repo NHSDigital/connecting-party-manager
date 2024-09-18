@@ -65,3 +65,7 @@ variable "python_version" {
 variable "domain" {
   type = string
 }
+
+variable "lambda_memory_size" {
+  default = 128
+}

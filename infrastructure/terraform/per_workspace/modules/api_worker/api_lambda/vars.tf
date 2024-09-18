@@ -40,3 +40,7 @@ variable "attach_policy_statements" {
 variable "policy_statements" {
   default = {}
 }
+
+variable "memory_size" {
+  default = 128
+}

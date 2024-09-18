@@ -41,7 +41,8 @@ def _create_device(device, product_team, params):
 
     questionnaire_response = questionnaire.respond(responses=response)
     cpmdevice.add_questionnaire_response(questionnaire_response=questionnaire_response)
-    cpmdevice.add_tag(**params)
+    tag_params = [params]
+    cpmdevice.add_tags(tags=tag_params)
     return cpmdevice
 
 
