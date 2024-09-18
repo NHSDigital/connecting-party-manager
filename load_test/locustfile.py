@@ -2,6 +2,8 @@ import random
 
 from locust import HttpUser, events, task
 
+from src.api.tests.sds_data_tests.test_sds_data import _generate_test_data
+
 
 class QueryParams:
     LDAP_UNIQUE_IDENTIFIER = "ldap_unique_identifier"
@@ -76,6 +78,12 @@ class CPMUser(HttpUser):
         self.client.get(
             url=url_path, headers=_get_headers(version=API_VERSION, apikey=APIKEY)
         )
+
+    @task
+    def search_devices(self):
+        test_data = _generate_test_data("queries.json")
+        url_path = f"/Device?{QueryParams.LDAP_UNIQUE_IDENTIFIER}={unique_identifier}"
+        self.client.get(url=url_path)
 
     # @task
     # def search_cpm_for_unique_identifier(self):
