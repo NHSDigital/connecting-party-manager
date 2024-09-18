@@ -92,6 +92,19 @@ def test_parse_path_read_product_team():
     ) == ({"id": "123"}, {}, api.readProductTeam.index)
 
 
+def test_parse_path_create_cpm_product():
+    with api_lambda_environment_variables():
+        import api.createCpmProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="POST",
+        path="CpmProduct",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({}, {}, api.createCpmProduct.index)
+
+
 def test_parse_path_error():
     with pytest.raises(EndpointConfigurationError):
         parse_api_path(method="GET", path="ProductTeam/123", endpoint_lambda_mapping={})
