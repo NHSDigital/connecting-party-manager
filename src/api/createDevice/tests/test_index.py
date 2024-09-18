@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 from domain.core.root import Root
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table

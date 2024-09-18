@@ -1,7 +1,7 @@
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.product_team import ProductTeam
 from domain.fhir_translation.product_team import create_fhir_model_from_product_team
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from event.step_chain import StepChain
 
 
