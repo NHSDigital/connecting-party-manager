@@ -44,6 +44,7 @@ resource "aws_instance" "locust_master" {
               sudo apt-get update
               sudo apt-get install -y python3-pip
               sudo apt-get install -y awscli
+              aws s3 cp s3://nhse-cpm--mgmt--locust-file/speed_test_queries.py .
               aws s3 cp s3://nhse-cpm--mgmt--locust-file/locustfile.py .
               pip3 install locust
               EOF
@@ -68,6 +69,7 @@ resource "aws_instance" "locust_worker" {
               sudo apt-get update
               sudo apt-get install -y python3-pip
               sudo apt-get install -y awscli
+              aws s3 cp s3://nhse-cpm--mgmt--locust-file/speed_test_queries.py .
               aws s3 cp s3://nhse-cpm--mgmt--locust-file/locustfile.py .
               pip3 install locust
               EOF
