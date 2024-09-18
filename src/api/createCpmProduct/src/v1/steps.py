@@ -39,7 +39,7 @@ def read_product_team(data, cache) -> ProductTeam:
 
 def generate_cpm_product_id(data, cache) -> str:
     generated_product_id = ProductId.create()
-    return generated_product_id.latest_id
+    return generated_product_id.id
 
 
 def create_cpm_product(data, cache) -> CpmProduct:

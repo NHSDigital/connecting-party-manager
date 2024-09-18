@@ -95,7 +95,7 @@ Feature: Create CPM Product - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 520              |
 
-  Scenario: Cannot create a Cpm Product with a Cpm Product with an invalid body
+  Scenario: Cannot create a Cpm Product with a Cpm Product with an invalid body extra parameter is not allowed
     Given I have already made a "POST" request with "default" headers to "Organization" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |

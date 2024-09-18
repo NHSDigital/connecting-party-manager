@@ -36,6 +36,7 @@ Feature: Create CPM Product - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 460              |
 
+    # This is commented out to aid the the dev who will pick up the readCpmProduct ticket. This came from the createDevice feature tests so will need updating to suit
     # When I make a "GET" request with "default" headers to the id in the location response header to the Device endpoint
     # Then I receive a status code "200" with body
     # | path                         | value                                    |
