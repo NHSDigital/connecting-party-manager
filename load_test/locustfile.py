@@ -87,7 +87,7 @@ class CPMUser(HttpUser):
     #     )
 
     @task
-    def search_devices(self):
+    def search(self):
         apikey = self.environment.parsed_options.apikey
         API_VERSION = self.environment.parsed_options.api_version
         USE_CPM = self.environment.parsed_options.usecpm
