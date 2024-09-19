@@ -1,8 +1,8 @@
 # Changelog
 
 ## 2024-09-19
-- [PI-477] query_by_tag ignore chunky device fields
-- [PI-506] Upgrade lambda memory
+- [PI-495] Generating Product Ids
+- [PI-496] Create CPM product
 
 ## 2024-09-13
 - [PI-477] query_by_tag ignore chunky device fields
