@@ -117,7 +117,6 @@ class ProductId(CpmSystemId):
     def validate_key(cls, key: str) -> bool:
         """Validate that the ProductId has the correct format."""
         instance = super().create()
-
         ID_PATTERN = re.compile(
             rf"^P\.[{instance.valid_chars}]{{3}}-[{instance.valid_chars}]{{3}}$"
         )
