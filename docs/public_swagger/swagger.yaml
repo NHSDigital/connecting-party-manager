@@ -150,7 +150,7 @@ paths:
       operationId: createDevice
       responses:
         "201":
-          description: Create Device operation successful
+          description: Create operation successful
           content:
             application/fhir+json:
               schema:
@@ -262,7 +262,7 @@ paths:
       operationId: createOrganization
       responses:
         "201":
-          description: Create Organization operation successful
+          description: Create operation successful
           content:
             application/fhir+json:
               schema:
@@ -438,6 +438,36 @@ paths:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
+  /CpmProduct:
+    post:
+      operationId: cpmproductendpoint
+      summary: cpmProduct endpoint for APIGEE integration
+      responses:
+        "201":
+          description: Create operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+      parameters:
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
 components:
   parameters:
     profileParam:
