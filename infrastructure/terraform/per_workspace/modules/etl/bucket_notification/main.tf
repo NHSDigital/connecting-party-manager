@@ -7,6 +7,8 @@ resource "aws_s3_bucket_notification" "notification" {
     filter_prefix       = var.filter_prefix
     filter_suffix       = var.filter_suffix
   }
+
+  depends_on = [aws_lambda_permission.s3_bucket_can_invoke_lambda]
 }
 
 resource "aws_lambda_permission" "s3_bucket_can_invoke_lambda" {
