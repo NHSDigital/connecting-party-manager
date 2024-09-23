@@ -40,7 +40,7 @@ def save_unprocessed_records(data: dict, cache: dict):
         dumper=dumper,
         records=action_response.unprocessed_records,
     )
-    del action_response.unprocessed_records
+    action_response.unprocessed_records = None
 
 
 def save_processed_records(data: dict, cache: dict):
@@ -55,4 +55,4 @@ def save_processed_records(data: dict, cache: dict):
         )
     elif action_response.processed_records:
         dumper(action_response.processed_records)
-    del action_response.processed_records
+    action_response.processed_records = None
