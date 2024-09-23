@@ -7,6 +7,10 @@ from test_helpers.terraform import read_terraform_output
 
 from .utils import get_app_key, get_base_url
 
+WORKSPACES_WITHOUT_SDS_FHIR_API = {
+    "dev-sandbox",
+}
+
 
 def _request(request):
     url = f"{request['domain']}/spine-directory/FHIR/R4{request['path']}"
@@ -38,6 +42,9 @@ def _request(request):
 @pytest.mark.smoke
 def test_sds_smoke_tests(apirequest):
     workspace = os.environ.get("WORKSPACE") or read_terraform_output("workspace.value")
+    if workspace in WORKSPACES_WITHOUT_SDS_FHIR_API:
+        pytest.skip(f"SDS FHIR API doesn't have a workspace '{workspace}'")
+
     environment = os.environ.get("ACCOUNT") or read_terraform_output(
         "environment.value"
     )
