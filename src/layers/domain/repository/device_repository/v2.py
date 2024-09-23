@@ -561,13 +561,22 @@ class DeviceRepository(Repository[Device]):
         return Device(**decompress_device_fields(_device))
 
     def query_by_tag(
-        self, fields_to_drop: list[str] | set[str] = None, **kwargs
+        self,
+        fields_to_drop: list[str] | set[str] = None,
+        drop_tags_field=True,
+        **kwargs,
     ) -> list[Device]:
         """
-        Query the device by predefined tags, optionally dropping specific fields from the query result.
-        Example: repository.query_by_tag(fields_to_drop=["field1", "field2"], foo="123", bar="456")
+        Query the device by predefined tags, optionally dropping specific fields from the query result,
+        noting that 'tags' field is dropped by default.
+
+        Example:
+            repository.query_by_tag(fields_to_drop=["field1", "field2"], foo="123", bar="456")
         """
-        fields_to_drop = {"tags", *(fields_to_drop or [])}  # always drop 'tags' field
+        fields_to_drop = {
+            *(fields_to_drop or []),
+            *(["tags"] if drop_tags_field else []),
+        }
         fields_to_return = Device.get_all_fields() - fields_to_drop
 
         dropped_mandatory_fields = Device.get_mandatory_fields() & fields_to_drop
