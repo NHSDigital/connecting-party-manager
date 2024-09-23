@@ -18,3 +18,11 @@ class BaseModel(_BaseModel):
             type: lambda _type: _type.__name__,
         }
         json_dumps = orjson_dumps
+
+    @classmethod
+    def get_all_fields(cls) -> set[str]:
+        return set(cls.__fields__.keys())
+
+    @classmethod
+    def get_mandatory_fields(cls) -> set[str]:
+        return set(f.name for f in cls.__fields__.values() if f.required)

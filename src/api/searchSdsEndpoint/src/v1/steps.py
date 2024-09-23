@@ -7,8 +7,6 @@ from domain.response.validation_errors import InboundValidationError
 from event.step_chain import StepChain
 from pydantic import ValidationError
 
-FIELDS_TO_DROP = ["tags"]
-
 
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
@@ -34,7 +32,7 @@ def query_endpoints(data, cache) -> List[dict]:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    results = device_repo.query_by_tag(fields_to_drop=FIELDS_TO_DROP, **query_params)
+    results = device_repo.query_by_tag(**query_params)
     return [result.state() for result in results]
 
 

@@ -33,11 +33,15 @@ TAGS = "tags"
 ROOT_FIELDS_TO_COMPRESS = [TAGS]
 NON_ROOT_FIELDS_TO_COMPRESS = ["questionnaire_responses"]
 BATCH_GET_SIZE = 100
-MANDATORY_DEVICE_FIELDS = {"name", "device_type", "product_team_id", "ods_code"}
 
 
 class TooManyResults(Exception):
     pass
+
+
+class CannotDropMandatoryFields(Exception):
+    def __init__(self, bad_fields: set[str]) -> None:
+        super().__init__(f"Cannot drop mandatory fields: {', '.join(bad_fields)}")
 
 
 def compress_device_fields(data: Event | dict, fields_to_compress=None) -> dict:
@@ -556,48 +560,36 @@ class DeviceRepository(Repository[Device]):
         _device = unmarshall(item)
         return Device(**decompress_device_fields(_device))
 
-    def query_by_tag(self, fields_to_drop: list[str] = None, **kwargs) -> list[Device]:
+    def query_by_tag(
+        self, fields_to_drop: list[str] | set[str] = None, **kwargs
+    ) -> list[Device]:
         """
         Query the device by predefined tags, optionally dropping specific fields from the query result.
         Example: repository.query_by_tag(fields_to_drop=["field1", "field2"], foo="123", bar="456")
         """
+        fields_to_drop = {"tags", *(fields_to_drop or [])}  # always drop 'tags' field
+        fields_to_return = Device.get_all_fields() - fields_to_drop
+
+        dropped_mandatory_fields = Device.get_mandatory_fields() & fields_to_drop
+        if dropped_mandatory_fields:
+            raise CannotDropMandatoryFields(dropped_mandatory_fields)
 
         tag_value = DeviceTag(**kwargs).value
         pk = TableKey.DEVICE_TAG.key(tag_value)
-
         query_params = {
             "ExpressionAttributeValues": {":pk": marshall_value(pk)},
             "KeyConditionExpression": "pk = :pk",
             "TableName": self.table_name,
+            **_dynamodb_projection_expression(fields_to_return),
         }
 
-        # If fields to drop are provided, create a ProjectionExpression
-        if fields_to_drop:
-            all_fields = Device.get_all_fields()
-
-            # Ensure no mandatory fields are dropped
-            dropped_mandatory_fields = set(fields_to_drop) & MANDATORY_DEVICE_FIELDS
-            if dropped_mandatory_fields:
-                raise ValueError(
-                    f"Cannot drop mandatory fields: {', '.join(dropped_mandatory_fields)}"
-                )
-
-            fields_to_return = all_fields - set(fields_to_drop)
-
-            # DynamoDB ProjectionExpression, specifying which fields to return
-            query_params.update(_dynamodb_projection_expression(fields_to_return))
-
-        # Perform the DynamoDB query
         response = self.client.query(**query_params)
-
-        # Not yet implemented: pagination
         if "LastEvaluatedKey" in response:
             raise TooManyResults(f"Too many results for query '{kwargs}'")
 
         # Convert to Device, sorted by 'pk'
         compressed_devices = map(unmarshall, response["Items"])
         devices_as_dict = map(decompress_device_fields, compressed_devices)
-
         return [Device(**d) for d in sorted(devices_as_dict, key=lambda d: d["id"])]
 
 
