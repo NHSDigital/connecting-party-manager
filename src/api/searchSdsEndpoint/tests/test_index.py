@@ -2,8 +2,10 @@ import os
 from unittest import mock
 
 import pytest
+from domain.core.device.v2 import Device
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
 from domain.core.device_key.v2 import DeviceKeyType
+from domain.core.product_team.v2 import ProductTeam
 from domain.core.questionnaire.v2 import Questionnaire
 from domain.core.root.v2 import Root
 from domain.repository.device_repository.v2 import DeviceRepository
@@ -26,11 +28,13 @@ def _create_org():
     return product_team
 
 
-def _create_device(device, product_team, params):
-    cpmdevice = product_team.create_device(
+def _create_device(device: Device, product_team: ProductTeam, params: dict):
+    cpm_device = product_team.create_device(
         name=device["device_name"], device_type=DeviceTypeV2.ENDPOINT
     )
-    cpmdevice.add_key(key_value=device["device_key"], key_type=DeviceKeyType.PRODUCT_ID)
+    cpm_device.add_key(
+        key_value=device["device_key"], key_type=DeviceKeyType.PRODUCT_ID
+    )
 
     questionnaire = Questionnaire(name=f"spine_{device['device_name']}", version=1)
 
@@ -40,10 +44,10 @@ def _create_device(device, product_team, params):
         response.append({key: [value]})
 
     questionnaire_response = questionnaire.respond(responses=response)
-    cpmdevice.add_questionnaire_response(questionnaire_response=questionnaire_response)
+    cpm_device.add_questionnaire_response(questionnaire_response=questionnaire_response)
     tag_params = [params]
-    cpmdevice.add_tags(tags=tag_params)
-    return cpmdevice
+    cpm_device.add_tags(tags=tag_params)
+    return cpm_device
 
 
 @pytest.mark.integration
@@ -118,7 +122,7 @@ def test_no_results(params):
 )
 def test_index(params, device):
     product_team = _create_org()
-    cpmdevice = _create_device(device=device, product_team=product_team, params=params)
+    cpm_device = _create_device(device=device, product_team=product_team, params=params)
 
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
@@ -140,7 +144,7 @@ def test_index(params, device):
             table_name=endpoint_cache["DYNAMODB_TABLE"],
             dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
         )
-        endpoint_repo.write(cpmdevice)
+        endpoint_repo.write(cpm_device)
 
         result = endpoint_handler(
             event={
@@ -195,7 +199,7 @@ def test_multiple_returned(params, devices):
 
     product_team = _create_org()
     for device in devices:
-        cpmdevice = _create_device(
+        cpm_device = _create_device(
             device=device, product_team=product_team, params=params
         )
 
@@ -214,7 +218,7 @@ def test_multiple_returned(params, devices):
                 table_name=endpoint_cache["DYNAMODB_TABLE"],
                 dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
             )
-            endpoint_repo.write(cpmdevice)
+            endpoint_repo.write(cpm_device)
 
     with mock.patch.dict(
         os.environ,
@@ -243,21 +247,28 @@ def test_multiple_returned(params, devices):
 
 
 @pytest.mark.parametrize(
-    "params, error, status_code",
+    ["params", "error_code", "error_msg", "status_code"],
     [
         (
             {
                 "nhs_id_code": "RTX",
             },
             "VALIDATION_ERROR",
+            "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
             400,
         ),
         (
             {"nhs_mhs_svc_ia": "urn:nhs:names:services:ebs:PRSC_IN040000UK08"},
             "VALIDATION_ERROR",
+            "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
             400,
         ),
-        ({"nhs_mhs_party_key": "D81631-827817"}, "VALIDATION_ERROR", 400),
+        (
+            {"nhs_mhs_party_key": "D81631-827817"},
+            "VALIDATION_ERROR",
+            "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
+            400,
+        ),
         (
             {
                 "nhs_id_code": "RTX",
@@ -265,11 +276,12 @@ def test_multiple_returned(params, devices):
                 "foo": "bar",
             },
             "VALIDATION_ERROR",
+            "extra fields not permitted",
             400,
         ),
     ],
 )
-def test_filter_errors(params, error, status_code):
+def test_filter_errors(params, error_code, error_msg, status_code):
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
@@ -289,7 +301,10 @@ def test_filter_errors(params, error, status_code):
             }
         )
     assert result["statusCode"] == status_code
-    assert error in result["body"]
+    result_body = json_loads(result["body"])
+
+    assert result_body["issue"][0]["details"]["coding"][0]["code"] == error_code
+    assert result_body["issue"][0]["diagnostics"] == error_msg
 
 
 @pytest.mark.integration
@@ -314,7 +329,7 @@ def test_only_active_returned(params, devices):
 
     product_team = _create_org()
     for index, device in enumerate(devices):
-        cpmdevice = _create_device(
+        cpm_device = _create_device(
             device=device, product_team=product_team, params=params
         )
 
@@ -333,11 +348,11 @@ def test_only_active_returned(params, devices):
                 table_name=endpoint_cache["DYNAMODB_TABLE"],
                 dynamodb_client=endpoint_cache["DYNAMODB_CLIENT"],
             )
-            endpoint_repo.write(cpmdevice)
+            endpoint_repo.write(cpm_device)
 
             # Soft delete the first device
             if index == 0:
-                inactive_device = endpoint_repo.read(cpmdevice.id)
+                inactive_device = endpoint_repo.read(cpm_device.id)
                 inactive_device.delete()
                 endpoint_repo.write(inactive_device)
 
