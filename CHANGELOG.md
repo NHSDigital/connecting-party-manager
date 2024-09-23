@@ -3,6 +3,7 @@
 ## 2024-09-19
 - [PI-495] Generating Product Ids
 - [PI-496] Create CPM product
+- [PI-519] Spike CI pipeline - terraform-base-build failure
 
 ## 2024-09-13
 - [PI-477] query_by_tag ignore chunky device fields
