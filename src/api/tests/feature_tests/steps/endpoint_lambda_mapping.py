@@ -32,15 +32,15 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     return {
         "POST": {
             "Device": api.createDevice.index,
-            "Organization": api.createProductTeam.index,
-            "CpmProduct": api.createCpmProduct.index,
+            "ProductTeam": api.createProductTeam.index,
+            "ProductTeam/{id}/Product": api.createCpmProduct.index,
         },
         "GET": {
             "Device/{id}": api.readDevice.index,
             "Device?device_type={device_type}": api.searchDevice.index,
             "Device?device_type={device_type}&foo={foo}": api.searchDevice.index,
             "Device?foo={foo}": api.searchDevice.index,
-            "Organization/{id}": api.readProductTeam.index,
+            "ProductTeam/{id}": api.readProductTeam.index,
             "_status": api.status.index,
         },
     }

@@ -74,7 +74,7 @@ def test_parse_path_create_product_team():
 
     assert parse_api_path(
         method="POST",
-        path="Organization",
+        path="ProductTeam",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({}, {}, api.createProductTeam.index)
 
@@ -87,7 +87,7 @@ def test_parse_path_read_product_team():
 
     assert parse_api_path(
         method="GET",
-        path="Organization/123",
+        path="ProductTeam/123",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"id": "123"}, {}, api.readProductTeam.index)
 
@@ -100,7 +100,7 @@ def test_parse_path_create_cpm_product():
 
     assert parse_api_path(
         method="POST",
-        path="CpmProduct",
+        path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({}, {}, api.createCpmProduct.index)
 
