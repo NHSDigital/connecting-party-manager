@@ -9,7 +9,7 @@ CHUNK_SIZE = 100
 
 KEY_SCHEMAS = [
     {"AttributeName": "pk", "KeyType": "HASH"},
-    {"AttributeName": "sk", "KeyType": "HASH"},
+    {"AttributeName": "sk", "KeyType": "RANGE"},
 ]
 GLOBAL_SECONDARY_INDEXES = [
     {
