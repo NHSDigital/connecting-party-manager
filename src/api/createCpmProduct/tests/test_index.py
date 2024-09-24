@@ -44,7 +44,11 @@ def test_index(version):
         product_team_repo.write(entity=product_team)
 
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(product_payload)}
+            event={
+                "headers": {"version": version},
+                "body": json.dumps(product_payload),
+                "pathParameters": {"product_team_id": product_team_payload["id"]},
+            }
         )
 
     expected_body = json.dumps(
@@ -92,18 +96,10 @@ def test_index(version):
 @pytest.mark.parametrize(
     "params, error, status_code, version",
     [
-        ({"product_name": "Foobar product"}, "MISSING_VALUE", 400, "1"),
-        (
-            {"product_team_id": "641be376-3954-4339-822c-54071c9ff1a0"},
-            "MISSING_VALUE",
-            400,
-            "1",
-        ),
         ({}, "MISSING_VALUE", 400, "1"),
         (
             {
                 "product_name": "Foobar product",
-                "product_team_id": "641be376-3954-4339-822c-54071c9ff1a0",
                 "foo": "bar",
             },
             "VALIDATION_ERROR",
@@ -113,7 +109,13 @@ def test_index(version):
     ],
 )
 def test_incoming_errors(params, error, status_code, version):
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    org = Root.create_ods_organisation(ods_code=product_team_payload["ods_code"])
+
+    product_team = org.create_product_team(
+        id=product_team_payload["id"], name=product_team_payload["name"]
+    )
+
+    with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -121,11 +123,87 @@ def test_incoming_errors(params, error, status_code, version):
         },
         clear=True,
     ):
-        from api.createCpmProduct.index import cache, handler
+        from api.createCpmProduct.index import handler
 
-        cache["DYNAMODB_CLIENT"] = client
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(params)}
+            event={
+                "headers": {"version": version},
+                "body": json.dumps(params),
+                "pathParameters": {"product_team_id": product_team_payload["id"]},
+            }
         )
     assert result["statusCode"] == status_code
     assert error in result["body"]
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_no_such_product_team(version):
+    with mock_table(TABLE_NAME), mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.createCpmProduct.index import handler
+
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "body": json.dumps(product_payload),
+                "pathParameters": {"product_team_id": "FOOBAR"},
+            }
+        )
+
+    expected_result = json.dumps(
+        {
+            "resourceType": "OperationOutcome",
+            "id": app_logger.service_name,
+            "meta": {
+                "profile": [
+                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
+                ]
+            },
+            "issue": [
+                {
+                    "severity": "error",
+                    "code": "processing",
+                    "details": {
+                        "coding": [
+                            {
+                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
+                                "code": "RESOURCE_NOT_FOUND",
+                                "display": "Resource not found",
+                            }
+                        ]
+                    },
+                    "diagnostics": "Could not find object with key '123'",
+                }
+            ],
+        }
+    )
+
+    expected = {
+        "statusCode": 404,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+            "Location": None,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )

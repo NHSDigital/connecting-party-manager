@@ -8,7 +8,7 @@ Feature: Create CPM Product - failure scenarios
       | Authorization | letmein |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product that is missing fields (no product_name)
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -37,7 +37,7 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 500              |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product that is missing fields (no product_team_id)
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -66,7 +66,7 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 503              |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product with an invalid product team id
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -96,7 +96,7 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 520              |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product with an invalid body extra parameter is not allowed
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -127,7 +127,7 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 509              |
 
   Scenario: Cannot create a Cpm Product with corrupt body
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |

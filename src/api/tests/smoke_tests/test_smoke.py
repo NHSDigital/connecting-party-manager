@@ -10,21 +10,21 @@ from test_helpers.terraform import read_terraform_output
 from .utils import execute_smoke_test, get_app_key, get_base_url, get_headers
 
 
-def create_organization(base_url: str, headers: dict):
+def create_product_team(base_url: str, headers: dict):
     organisation_body = json.dumps(ORGANISATION)
     url = f"{base_url}/ProductTeam"
     return requests.post(url=url, headers=headers, data=organisation_body)
 
 
-def read_organization(base_url: str, headers: dict):
+def read_product_team(base_url: str, headers: dict):
     org_id = "f9518c12-6c83-4544-97db-d9dd1d64da97"
     url = f"{base_url}/ProductTeam/{org_id}"
     return requests.get(url=url, headers=headers)
 
 
 REQUEST_METHODS = [
-    create_organization,
-    read_organization,
+    create_product_team,
+    read_product_team,
 ]
 
 

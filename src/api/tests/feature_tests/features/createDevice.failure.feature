@@ -8,7 +8,7 @@ Feature: Create Device - failure scenarios
       | Authorization | letmein |
 
   Scenario: Cannot create a Device with an Device that is missing fields (no owner.identifier.value)
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -42,7 +42,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 488              |
 
   Scenario: Cannot create a Device with invalid FHIR
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -83,7 +83,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 806              |
 
   Scenario: Cannot create a Device with an invalid name
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -118,7 +118,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 515              |
 
   Scenario: Cannot create a Device with an invalid name type
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -153,7 +153,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 527              |
 
   Scenario: Cannot create a Device with an invalid device type
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -188,7 +188,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 535              |
 
   Scenario: Cannot create a Device with an invalid key type
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -225,7 +225,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 596              |
 
   Scenario: Cannot create a Device with an invalid device id
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -262,7 +262,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 642              |
 
   Scenario: Cannot create a Device with a repeated key
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -301,7 +301,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 521              |
 
   Scenario: Cannot create a Device with a product_id
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -338,7 +338,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 506              |
 
   Scenario: Cannot create a Device with corrupt body
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |

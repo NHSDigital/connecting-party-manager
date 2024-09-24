@@ -8,7 +8,7 @@ Feature: Create Device - success scenarios
       | Authorization | letmein |
 
   Scenario Outline: Successfully create a Device for each device type
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
