@@ -134,6 +134,12 @@ paths:
           description: logical identifier
           schema:
             type: string
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
@@ -154,6 +160,40 @@ paths:
         - app-level0: []
 
   /ProductTeam/{product_team_id}/Product:
+    get:
+      operationId: searchCpmProduct
+      summary: searchCpmProduct endpoint for APIGEE integration
+      parameters:
+        - name: product_team_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - $ref: "#/components/parameters/profileParam"
+        - $ref: "#/components/parameters/lastUpdatedParam"
+        - $ref: "#/components/parameters/tagParam"
+        - $ref: "#/components/parameters/securityParam"
+        - $ref: "#/components/parameters/sourceParam"
+        - $ref: "#/components/parameters/idParam"
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "200":
+          description: Search CpmProducts operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
     post:
       operationId: createproductendpoint
       summary: createProduct endpoint for APIGEE integration
