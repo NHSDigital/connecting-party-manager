@@ -1,7 +1,21 @@
-import random
+# import random
 
 from locust import HttpUser, events, task
-from speed_test_queries import queries
+
+# from speed_test_queries import queries
+
+queries = [
+    {
+        "params": {
+            "organization": ["https://fhir.nhs.uk/Id/ods-organization-code|E82652"],
+            "identifier": [
+                "https://fhir.nhs.uk/Id/nhsServiceInteractionId|urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord",
+                "https://fhir.nhs.uk/Id/nhsMhsPartyKey|E82652-826971",
+            ],
+        },
+        "path": "/Device",
+    }
+]
 
 
 @events.init_command_line_parser.add_listener
@@ -43,8 +57,8 @@ class CPMUser(HttpUser):
         apikey = self.environment.parsed_options.apikey
         API_VERSION = self.environment.parsed_options.api_version
         USE_CPM = self.environment.parsed_options.usecpm
-        random_queries = random.sample(queries, 100)
-        for query in random_queries:
+        # random_queries = random.sample(queries, 100)
+        for query in queries:
             params = query["params"]
             if USE_CPM == "TRUE":
                 params["use_cpm"] = "iwanttogetdatafromcpm"
