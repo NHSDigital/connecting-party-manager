@@ -1,7 +1,7 @@
 import pytest
 from domain.core.root import Root
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.aws.client import dynamodb_client
 
 from test_helpers.dynamodb import mock_table
@@ -44,7 +44,7 @@ def test__product_team_repository_already_exists():
 
 
 @pytest.mark.integration
-def test__product_team_repository__device_does_not_exist():
+def test__product_team_repository__product_team_does_not_exist():
     team_id = "359e28eb-6e2c-409c-a3ab-a4868ab5c2df"
     table_name = read_terraform_output("dynamodb_table_name.value")
     repo = ProductTeamRepository(
@@ -72,7 +72,7 @@ def test__product_team_repository_local():
     assert result == team
 
 
-def test__product_team_repository__device_does_not_exist_local():
+def test__product_team_repository__product_team_does_not_exist_local():
     team_id = "359e28eb-6e2c-409c-a3ab-a4868ab5c2df"
 
     with mock_table("my_table") as client:

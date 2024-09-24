@@ -9,6 +9,7 @@ UUID_REGEX = (
 ODS_CODE_REGEX = rf"^({_ODS_CODE_REGEX})$"
 ENTITY_NAME_REGEX = r"^\S+( \S+)*$"
 DEVICE_NAME_REGEX = r"^[ -~]+$"  # any sequence of ascii
+PRODUCT_NAME_REGEX = r"^[ -~]+$"  # any sequence of ascii
 
 
 class CpmId:
