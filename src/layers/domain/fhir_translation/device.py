@@ -87,7 +87,7 @@ def create_fhir_model_from_questionnaire_response(
         subject=Reference(reference=f"https://{host}/Device/{device.id}"),
         # "authored": "<dateTime>",
         author=Reference(
-            reference=f"https://{host}/ProductTeam/{device.product_team_id}"
+            reference=f"https://{host}/Organization/{device.product_team_id}"
         ),
         item=items,
     )
