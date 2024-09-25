@@ -130,7 +130,7 @@ def _create_expected_device(
                 "status": "completed",
                 "subject": {"reference": collection_url},
                 # "authored": "<dateTime>",
-                "author": {"reference": f"https://foo.co.uk/ProductTeam/{product_id}"},
+                "author": {"reference": f"https://foo.co.uk/Organization/{product_id}"},
                 "item": [
                     {
                         "link_id": "nhs_as_svc_ia",
