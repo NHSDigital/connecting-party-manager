@@ -34,5 +34,9 @@ class ImmutableFieldError(Exception):
     pass
 
 
+class EventUpdatedError(Exception):
+    pass
+
+
 class EventExpected(Exception):
     pass

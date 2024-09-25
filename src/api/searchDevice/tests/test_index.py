@@ -4,7 +4,6 @@ from unittest import mock
 
 import pytest
 from domain.core.device import DeviceStatus
-from domain.core.device_key import DeviceKeyType
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
@@ -33,7 +32,6 @@ def _create_device(device, product_team):
         type=device["device_type"],
         status=DeviceStatus(device["status"]),
     )
-    cpmdevice.add_key(DeviceKeyType.PRODUCT_ID, device["device_key"])
 
     questionnaire = Questionnaire(name=f"spine_{device['device_name']}", version=1)
     questionnaire.add_question(

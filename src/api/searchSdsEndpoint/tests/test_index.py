@@ -4,7 +4,6 @@ from unittest import mock
 import pytest
 from domain.core.device.v2 import Device
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
-from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.product_team.v2 import ProductTeam
 from domain.core.questionnaire.v2 import Questionnaire
 from domain.core.root.v2 import Root
@@ -32,10 +31,6 @@ def _create_device(device: Device, product_team: ProductTeam, params: dict):
     cpm_device = product_team.create_device(
         name=device["device_name"], device_type=DeviceTypeV2.ENDPOINT
     )
-    cpm_device.add_key(
-        key_value=device["device_key"], key_type=DeviceKeyType.PRODUCT_ID
-    )
-
     questionnaire = Questionnaire(name=f"spine_{device['device_name']}", version=1)
 
     response = []

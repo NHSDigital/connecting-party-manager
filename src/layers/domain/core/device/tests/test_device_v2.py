@@ -85,9 +85,11 @@ def test_device_delete(device_v2: Device):
 
 
 def test_device_add_key(device_v2: Device):
-    event = device_v2.add_key(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY")
+    event = device_v2.add_key(
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123"
+    )
     assert device_v2.keys == [
-        DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY")
+        DeviceKey(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123")
     ]
     assert isinstance(event, DeviceKeyAddedEvent)
     assert event.updated_on is not None
@@ -95,9 +97,9 @@ def test_device_add_key(device_v2: Device):
 
 
 def test_device_delete_key(device_v2: Device):
-    device_v2.add_key(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY")
+    device_v2.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123")
     event = device_v2.delete_key(
-        key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY"
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123"
     )
     assert device_v2.keys == []
     assert isinstance(event, DeviceKeyDeletedEvent)
@@ -107,7 +109,9 @@ def test_device_delete_key(device_v2: Device):
 
 def test_device_delete_key_fail(device_v2: Device):
     with pytest.raises(NotFoundError):
-        device_v2.delete_key(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.XXX-YYY")
+        device_v2.delete_key(
+            key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123"
+        )
 
 
 def test_device_add_questionnaire_response(

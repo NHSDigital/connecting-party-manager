@@ -1,5 +1,5 @@
 import pytest
-from domain.core.device import Device, DeviceKeyType, DeviceStatus, DeviceType
+from domain.core.device import Device, DeviceStatus, DeviceType
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
@@ -12,7 +12,6 @@ def device() -> Device:
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
     device = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
-    device.add_key(key="P.WWW-XXX", type=DeviceKeyType.PRODUCT_ID)
     return device
 
 

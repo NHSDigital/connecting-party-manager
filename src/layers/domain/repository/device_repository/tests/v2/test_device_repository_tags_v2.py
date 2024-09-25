@@ -77,7 +77,10 @@ def _test_add_two_tags(
     }
 
     assert repository.read(device.id).tags == expected_tags
-    assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == expected_tags
+    assert (
+        repository.read(DeviceKeyType.ACCREDITED_SYSTEM_ID, "ABC:123").tags
+        == expected_tags
+    )
 
     (_device_123,) = repository.query_by_tag(shoe_size=123)
     assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == second_device.dict(
@@ -132,7 +135,7 @@ def test__device_repository__add_two_tags_and_then_clear(
     repository.write(second_device)
 
     assert repository.read(device.id).tags == set()
-    assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == set()
+    assert repository.read(DeviceKeyType.ACCREDITED_SYSTEM_ID, "ABC:123").tags == set()
 
     assert repository.query_by_tag(shoe_size=123) == []
     assert repository.query_by_tag(shoe_size=456) == []

@@ -1,13 +1,11 @@
 from collections import defaultdict
-from collections.abc import Callable
 from datetime import datetime
 from enum import StrEnum, auto
-from functools import cached_property, wraps
+from functools import cached_property
 from uuid import UUID, uuid4
 
-import orjson
 from attr import dataclass
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.base import BaseModel
 from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
@@ -25,7 +23,6 @@ TAG_SEPARATOR = "##"
 TAG_COMPONENT_SEPARATOR = "##"
 TAG_COMPONENT_CONTAINER_LEFT = "<<"
 TAG_COMPONENT_CONTAINER_RIGHT = ">>"
-UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
 
 
@@ -42,10 +39,6 @@ class DuplicateQuestionnaireResponse(Exception):
 
 
 class QuestionNotFoundError(Exception):
-    pass
-
-
-class EventUpdatedError(Exception):
     pass
 
 
@@ -254,27 +247,6 @@ class DeviceTag(BaseModel):
         return self.hash == other.hash
 
 
-def _set_updated_on(device: "Device", event: "Event"):
-    if not hasattr(event, UPDATED_ON):
-        raise EventUpdatedError(
-            f"All returned events must have attribute '{UPDATED_ON}'"
-        )
-    updated_on = getattr(event, UPDATED_ON) or now()
-    setattr(event, UPDATED_ON, updated_on)
-    device.updated_on = updated_on
-
-
-def event[RT, **P](fn: Callable[P, RT]) -> Callable[P, RT]:
-    @wraps(fn)
-    def wrapper(self: "Device", *args: P.args, **kwargs: P.kwargs) -> RT:
-        _event = fn(self, *args, **kwargs)
-        self.add_event(_event)
-        _set_updated_on(device=self, event=_event)
-        return _event
-
-    return wrapper
-
-
 class Device(AggregateRoot):
     """
     An entity in the database.  It could model all sorts of different logical or
@@ -442,10 +414,6 @@ class Device(AggregateRoot):
                 for qid, _qr in self.questionnaire_responses.items()
             },
         )
-
-    def state(self) -> dict:
-        """Returns a deepcopy of the Device itself, useful for bulk operations rather than dealing with events"""
-        return orjson.loads(self.json())
 
     def is_active(self):
         return self.status is Status.ACTIVE

@@ -3,7 +3,6 @@ from domain.core.device_key.v2 import DeviceKeyType, validate_key
 from domain.core.error import InvalidDeviceKeyError
 
 GOOD_ID_EXAMPLES = {
-    "product_id": "P.XXX-YYY",
     "accredited_system_id": "ABC:12345",
     "message_handling_system_id": "ABC:ABC-12345:abc123",
 }

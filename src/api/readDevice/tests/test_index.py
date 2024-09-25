@@ -28,7 +28,7 @@ def test_index(version):
         id=consistent_uuid(1), name="product-team-name"
     )
     device = product_team.create_device(name="device-name", type="product")
-    device.add_key(DeviceKeyType.PRODUCT_ID, device_key)
+    device.add_key(key_value="ABC:123", key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
 
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
@@ -63,7 +63,7 @@ def test_index(version):
                 }
             },
             "identifier": [
-                {"system": "connecting-party-manager/product_id", "value": "P.XXX-YYY"}
+                {"system": "connecting-party-manager/product_id", "value": "ABC:123"}
             ],
             "owner": {
                 "identifier": {

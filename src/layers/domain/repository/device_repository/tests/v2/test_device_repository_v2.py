@@ -5,7 +5,6 @@ from attr import asdict
 from domain.core.device.v2 import Device as DeviceV2
 from domain.core.device.v2 import DeviceCreatedEvent, DeviceTag
 from domain.core.device.v2 import DeviceType as DeviceTypeV2
-from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
 from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.core.root.v2 import Root
@@ -20,7 +19,7 @@ from domain.repository.device_repository.v2 import (
 )
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 
-DEVICE_KEY = "P.WWW-XXX"
+DEVICE_KEY = "ABC:123"
 
 
 @pytest.fixture
@@ -32,7 +31,7 @@ def device() -> DeviceV2:
     device = product_team.create_device(
         name="Device-1", device_type=DeviceTypeV2.PRODUCT
     )
-    device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
+    device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     return device
 
 
@@ -45,7 +44,6 @@ def device_with_tag() -> DeviceV2:
     device = product_team.create_device(
         name="Device-1", device_type=DeviceTypeV2.PRODUCT
     )
-    device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     device.add_tag(
         nhs_as_client="5NR", nhs_as_svc_ia="urn:nhs:names:services:mm:PORX_IN090101UK31"
     )
@@ -61,7 +59,6 @@ def another_device_with_same_key() -> DeviceV2:
     device = product_team.create_device(
         name="Device-2", device_type=DeviceTypeV2.PRODUCT
     )
-    device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     return device
 
 
@@ -73,9 +70,7 @@ def test__device_root_primary_key():
 def test__device_non_root_primary_keys():
     primary_keys = _device_non_root_primary_keys(
         device_id="123",
-        device_keys=[
-            DeviceKeyV2(key_type=DeviceKeyType.PRODUCT_ID, key_value=DEVICE_KEY)
-        ],
+        device_keys=[],
         device_tags=[DeviceTag(foo="bar")],
     )
     assert primary_keys == [
@@ -207,15 +202,13 @@ def test__device_repository__can_delete_second_device_with_same_key(
     device = product_team.create_device(
         name="OriginalDevice", device_type=DeviceTypeV2.PRODUCT
     )
-    device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     repository.write(device)
-    repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)  # passes
 
     device.clear_events()
     device.delete()
     repository.write(device)
     with pytest.raises(ItemNotFound):
-        repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)
+        repository.read(DeviceKeyType.ACCREDITED_SYSTEM_ID, DEVICE_KEY)
 
     deleted_device = repository.read_inactive(device.id)
     assert deleted_device.status is Status.INACTIVE
@@ -225,15 +218,17 @@ def test__device_repository__can_delete_second_device_with_same_key(
         _device = product_team.create_device(
             name=f"Device-{i}", device_type=DeviceTypeV2.PRODUCT
         )
-        _device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
+        _device.add_key(
+            key_value=DEVICE_KEY, key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID
+        )
         repository.write(_device)
-        repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)  # passes
+        repository.read(DeviceKeyType.ACCREDITED_SYSTEM_ID, DEVICE_KEY)  # passes
 
         _device.clear_events()
         _device.delete()
         repository.write(_device)
         with pytest.raises(ItemNotFound):
-            repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)
+            repository.read(DeviceKeyType.ACCREDITED_SYSTEM_ID, DEVICE_KEY)
 
         # Assert device is inactive after being deleted
         _deleted_device = repository.read_inactive(_device.id)
@@ -249,7 +244,7 @@ def test__device_repository__add_key(device: DeviceV2, repository: DeviceReposit
     assert len(intermediate_device.keys) == 1
 
     intermediate_device.add_key(
-        key_type=DeviceKeyType.PRODUCT_ID, key_value="P.AAA-CCC"
+        key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123456"
     )
     repository.write(intermediate_device)
 

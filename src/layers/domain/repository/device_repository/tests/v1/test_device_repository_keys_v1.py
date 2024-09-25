@@ -1,6 +1,5 @@
 import pytest
 from domain.core.device import Device, DeviceKeyType, DeviceType
-from domain.core.device_key import DeviceKey
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.marshall import unmarshall
@@ -13,7 +12,6 @@ def device_with_asid() -> Device:
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
     device = product_team.create_device(name="Device-1", type=DeviceType.PRODUCT)
-    device.add_key(key="P.WWW-XXX", type=DeviceKeyType.PRODUCT_ID)
     device.add_key(key="ABC:1234567890", type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     return device
 
@@ -25,7 +23,6 @@ def device_with_mhs_id() -> Device:
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
     device = team.create_device(name="Device-2", type=DeviceType.ENDPOINT)
-    device.add_key(key="P.WWW-YYY", type=DeviceKeyType.PRODUCT_ID)
     device.add_key(
         key="ABC:DEF-444:4444444444", type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID
     )
@@ -78,6 +75,4 @@ def test__device_repository__delete_key(
     intermediate_device.delete_key(key="ABC:1234567890")
     repository.write(intermediate_device)
 
-    assert repository.read(device_with_asid.id).keys == {
-        "P.WWW-XXX": DeviceKey(type=DeviceKeyType.PRODUCT_ID, key="P.WWW-XXX")
-    }
+    assert repository.read(device_with_asid.id).keys == {}

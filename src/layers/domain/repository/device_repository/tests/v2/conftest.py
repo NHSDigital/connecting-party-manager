@@ -26,7 +26,7 @@ def device() -> Device:
     device.add_tag(abc="123")
     device.add_tag(bar="foo")
     device.add_tag(mixed_case="AbC")
-    device.add_key(key_value="P.WWW-XXX", key_type=DeviceKeyType.PRODUCT_ID)
+    device.add_key(key_value="ABC:123", key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID)
     return device
 
 
@@ -42,7 +42,6 @@ def device_with_asid() -> Device:
     device.add_key(
         key_value="ABC:1234567890", key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID
     )
-    device.add_key(key_value="P.WWW-CCC", key_type=DeviceKeyType.PRODUCT_ID)
     return device
 
 
@@ -53,7 +52,6 @@ def device_with_mhs_id() -> Device:
         id="6f8c285e-04a2-4194-a84e-dabeba474ff7", name="Team"
     )
     device = team.create_device(name="Device-2", device_type=DeviceType.ENDPOINT)
-    device.add_key(key_value="P.WWW-YYY", key_type=DeviceKeyType.PRODUCT_ID)
     device.add_key(
         key_value="ABC:DEF-444:4444444444",
         key_type=DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID,

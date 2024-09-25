@@ -3,31 +3,35 @@ import re
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import StrEnum, auto
-from typing import Optional
 
 from domain.core.base import BaseModel
 
 
 class CpmSystemIdType(StrEnum):
-    ASIDNUMBER = auto()
-    PARTYKEYNUMBER = auto()
-    PRODUCTID = auto()
+    ASID_NUMBER = auto()
+    PARTY_KEY_NUMBER = auto()
+    PRODUCT_ID = auto()
+
+
+FIRST_ASID = 200000099999
+FIRST_PARTY_KEY = 849999
+
+PRODUCT_ID_PART_LENGTH = 3
+PRODUCT_ID_NUMBER_OF_PARTS: int = 2
+PRODUCT_ID_VALID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
+PRODUCT_ID_PATTERN = re.compile(
+    rf"^P\.[{PRODUCT_ID_VALID_CHARS}]{{{PRODUCT_ID_PART_LENGTH}}}-[{PRODUCT_ID_VALID_CHARS}]{{{PRODUCT_ID_PART_LENGTH}}}$"
+)
 
 
 class CpmSystemId(BaseModel, ABC):
-    key_name: str
-    id: str
+    key_name: str = None
+    id: str = None
 
     @classmethod
     @abstractmethod
     def create(cls, current_number=None, **kwargs):
         """Create a new instance of the ID."""
-        instance = cls(key_name="", id="")
-        return instance
-
-    @abstractmethod
-    def _format_key(self, **kwargs) -> str:
-        """Format the key according to the specific ID rules."""
         pass
 
     @classmethod
@@ -38,23 +42,16 @@ class CpmSystemId(BaseModel, ABC):
 
 
 class AsidId(CpmSystemId):
-    latest_number: Optional[int]
+    latest_number: int = None
 
     @classmethod
-    def create(cls, current_number=None):
-        current_number = (
-            current_number.get("latest") if current_number else 200000099999
+    def create(cls, current_number: int):
+        current_number = current_number or FIRST_ASID
+        latest_number = current_number + 1
+        id = f"{latest_number:012d}"
+        return cls(
+            key_name=CpmSystemIdType.ASID_NUMBER, id=id, latest_number=latest_number
         )
-        instance = super().create(
-            current_number=current_number, key_name=CpmSystemIdType.ASIDNUMBER
-        )
-        instance.latest_number = current_number + 1  # Increment current_id
-        instance.id = cls._format_key(cls, instance.latest_number)
-        return instance
-
-    def _format_key(cls, latest_number: int) -> str:
-        """Return the ASID as a 12-digit number."""
-        return f"{latest_number:012d}"
 
     @classmethod
     def validate_key(cls, key: str) -> bool:
@@ -63,24 +60,19 @@ class AsidId(CpmSystemId):
 
 
 class PartyKeyId(CpmSystemId):
-    ods_code: str
-    latest_number: Optional[int]
+    ods_code: str = None
+    latest_number: int = None
 
     @classmethod
-    def create(cls, current_number=None, ods_code=""):
-        current_number = current_number.get("latest") if current_number else 849999
-        instance = cls(
-            key_name=CpmSystemIdType.PARTYKEYNUMBER, id="", ods_code=ods_code
+    def create(cls, current_number: int, ods_code: str):
+        current_number = current_number or FIRST_PARTY_KEY
+        latest_number = current_number + 1
+        return cls(
+            key_name=CpmSystemIdType.PARTY_KEY_NUMBER,
+            id=f"{ods_code}-{latest_number:06d}",
+            ods_code=ods_code,
+            latest_number=latest_number,
         )
-        instance.latest_number = current_number + 1
-        instance.id = cls._format_key(
-            cls=cls, ods_code=ods_code, latest_number=instance.latest_number
-        )
-        return instance
-
-    def _format_key(cls, ods_code: str, latest_number: int) -> str:
-        """Format the party key with the ODS code and a 7-digit number."""
-        return f"{ods_code}-{latest_number:06d}"
 
     @classmethod
     def validate_key(cls, key: str) -> bool:
@@ -93,32 +85,17 @@ class PartyKeyId(CpmSystemId):
 
 
 class ProductId(CpmSystemId):
-    length: int = 3
-    n_parts: int = 2
-    valid_chars: str = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
-
     @classmethod
     def create(cls):
         """No current_id needed, key is generated randomly."""
-        instance = super().create(key_name=CpmSystemIdType.PRODUCTID)
         rng = random.Random(datetime.now().timestamp())
         product_id = "-".join(
-            "".join(rng.choices(instance.valid_chars, k=instance.length))
-            for _ in range(instance.n_parts)
+            "".join(rng.choices(PRODUCT_ID_VALID_CHARS, k=PRODUCT_ID_PART_LENGTH))
+            for _ in range(PRODUCT_ID_NUMBER_OF_PARTS)
         )
-        instance.id = instance._format_key(product_id)
-        return instance
-
-    def _format_key(cls, product_id) -> str:
-        """Generate the product ID as a random string in the format 'P.XXX-XXX'."""
-        return f"P.{product_id}"
+        return cls(key_name=CpmSystemIdType.PRODUCT_ID, id=f"P.{product_id}")
 
     @classmethod
     def validate_key(cls, key: str) -> bool:
         """Validate that the ProductId has the correct format."""
-        instance = super().create()
-
-        ID_PATTERN = re.compile(
-            rf"^P\.[{instance.valid_chars}]{{3}}-[{instance.valid_chars}]{{3}}$"
-        )
-        return bool(ID_PATTERN.match(key))
+        return PRODUCT_ID_PATTERN.match(key) is not None

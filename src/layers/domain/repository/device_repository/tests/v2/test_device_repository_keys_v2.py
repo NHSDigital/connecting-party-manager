@@ -14,13 +14,7 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     repository.write(second_device)
 
     assert repository.read(device.id).keys == [
-        DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-XXX"),
-        DeviceKey(
-            key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:1234567890"
-        ),
-    ]
-    assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").keys == [
-        DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-XXX"),
+        DeviceKey(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123"),
         DeviceKey(
             key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:1234567890"
         ),
@@ -28,7 +22,7 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     assert repository.read(
         DeviceKeyType.ACCREDITED_SYSTEM_ID, "ABC:1234567890"
     ).keys == [
-        DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-XXX"),
+        DeviceKey(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:123"),
         DeviceKey(
             key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="ABC:1234567890"
         ),
@@ -49,6 +43,4 @@ def test__device_repository__delete_key(
     )
     repository.write(intermediate_device)
 
-    assert repository.read(device_with_asid.id).keys == [
-        DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-CCC")
-    ]
+    assert repository.read(device_with_asid.id).keys == []

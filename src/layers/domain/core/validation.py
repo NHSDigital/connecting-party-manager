@@ -12,14 +12,6 @@ DEVICE_NAME_REGEX = r"^[ -~]+$"  # any sequence of ascii
 PRODUCT_NAME_REGEX = r"^[ -~]+$"  # any sequence of ascii
 
 
-class CpmId:
-    class Product:
-        PRODUCT_ID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"
-        ID_PATTERN = re.compile(
-            rf"^P\.[{PRODUCT_ID_CHARS}]{{3}}-[{PRODUCT_ID_CHARS}]{{3}}$"
-        )
-
-
 class SdsId:
     class AccreditedSystem:
         ID_PATTERN = re.compile(
@@ -32,3 +24,7 @@ class SdsId:
         ID_PATTERN = re.compile(
             rf"^{_ODS_CODE_REGEX}{DEVICE_KEY_SEPARATOR}{PARTY_KEY_REGEX}{DEVICE_KEY_SEPARATOR}{INTERACTION_ID_REGEX}$"
         )
+
+    class PartyKey:
+        PARTY_KEY_REGEX = rf"{_ODS_CODE_REGEX}-[0-9]{{1,12}}"
+        ID_PATTERN = re.compile(PARTY_KEY_REGEX)
