@@ -165,7 +165,6 @@ def test_index_no_such_product_team(version):
                 "pathParameters": {"product_team_id": "FOOBAR"},
             }
         )
-
     expected_result = json.dumps(
         {
             "resourceType": "OperationOutcome",
@@ -188,7 +187,7 @@ def test_index_no_such_product_team(version):
                             }
                         ]
                     },
-                    "diagnostics": "Could not find object with key '123'",
+                    "diagnostics": "Could not find object with key 'FOOBAR'",
                 }
             ],
         }

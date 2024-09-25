@@ -8,7 +8,7 @@ Feature: Read Device - success scenarios
       | Authorization | letmein |
 
   Scenario: Read an existing Device
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |

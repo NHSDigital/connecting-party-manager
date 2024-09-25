@@ -7,7 +7,10 @@ from event.step_chain import StepChain
 
 def read_product_team(data, cache) -> ProductTeam:
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    id = event.path_parameters["id"]
+    if "product_team_id" in event.path_parameters:
+        id = event.path_parameters["product_team_id"]
+    else:
+        id = event.path_parameters["id"]
     product_team_repo = ProductTeamRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )

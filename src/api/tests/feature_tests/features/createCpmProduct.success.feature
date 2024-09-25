@@ -12,14 +12,13 @@ Feature: Create CPM Product - success scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | ${ uuid(1) }                                                   |
+      | identifier.0.value       | f9518c12-6c83-4544-97db-d9dd1d64da97                           |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "CpmProduct" with body:
-      | path            | value            |
-      | product_team_id | ${ uuid(1) }     |
-      | product_name    | My Great Product |
+    When I make a "POST" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product" with body:
+      | path         | value            |
+      | product_name | My Great Product |
     Then I receive a status code "201" with body
       | path                             | value                                                               |
       | resourceType                     | OperationOutcome                                                    |

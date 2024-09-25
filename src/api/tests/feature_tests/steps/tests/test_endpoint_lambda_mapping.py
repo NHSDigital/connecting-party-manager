@@ -89,7 +89,7 @@ def test_parse_path_read_product_team():
         method="GET",
         path="ProductTeam/123",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({"id": "123"}, {}, api.readProductTeam.index)
+    ) == ({"product_team_id": "123"}, {}, api.readProductTeam.index)
 
 
 def test_parse_path_create_cpm_product():
@@ -102,7 +102,7 @@ def test_parse_path_create_cpm_product():
         method="POST",
         path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({}, {}, api.createCpmProduct.index)
+    ) == ({"product_team_id": "123"}, {}, api.createCpmProduct.index)
 
 
 def test_parse_path_error():
