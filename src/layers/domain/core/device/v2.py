@@ -1,8 +1,8 @@
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import datetime
 from enum import StrEnum, auto
 from functools import cached_property, wraps
-from typing import Callable, Optional
 from uuid import UUID, uuid4
 
 import orjson
@@ -58,8 +58,8 @@ class DeviceCreatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -74,8 +74,8 @@ class DeviceUpdatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -90,8 +90,8 @@ class DeviceDeletedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -108,7 +108,7 @@ class DeviceDeletedEvent(Event):
     status: Status
     created_on: str
     updated_on: str = None
-    deleted_on: Optional[str] = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -125,8 +125,8 @@ class DeviceKeyAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -138,7 +138,7 @@ class DeviceKeyDeletedEvent(Event):
     id: str
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
-    updated_on: Optional[str] = None
+    updated_on: str = None
 
 
 @dataclass(kw_only=True, slots=True)
@@ -151,8 +151,8 @@ class DeviceTagAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -169,7 +169,7 @@ class DeviceTagsAddedEvent(Event):
     status: Status
     created_on: str
     updated_on: str = None
-    deleted_on: Optional[str] = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -295,8 +295,8 @@ class Device(AggregateRoot):
     product_team_id: UUID
     ods_code: str
     created_on: datetime = Field(default_factory=now, immutable=True)
-    updated_on: Optional[datetime] = Field(default=None)
-    deleted_on: Optional[datetime] = Field(default=None)
+    updated_on: datetime = Field(default=None)
+    deleted_on: datetime = Field(default=None)
     keys: list[DeviceKey] = Field(default_factory=list)
     tags: set[DeviceTag] | list[DeviceTag] = Field(default_factory=set)
     questionnaire_responses: dict[str, dict[str, QuestionnaireResponse]] = Field(
@@ -449,10 +449,6 @@ class Device(AggregateRoot):
 
     def is_active(self):
         return self.status is Status.ACTIVE
-
-    @classmethod
-    def get_all_fields(cls) -> set[str]:
-        return set(cls.__fields__.keys())
 
 
 class DeviceEventDeserializer(EventDeserializer):

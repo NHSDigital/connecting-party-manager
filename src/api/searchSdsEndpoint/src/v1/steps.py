@@ -4,8 +4,6 @@ from domain.repository.device_repository.v2 import DeviceRepository
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
-FIELDS_TO_DROP = ["tags"]
-
 
 @mark_validation_errors_as_inbound
 def _parse_event_query(query_params: dict):
@@ -28,7 +26,7 @@ def query_endpoints(data, cache) -> list[dict]:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    results = device_repo.query_by_tag(fields_to_drop=FIELDS_TO_DROP, **query_params)
+    results = device_repo.query_by_tag(**query_params)
     return [result.state() for result in results]
 
 
