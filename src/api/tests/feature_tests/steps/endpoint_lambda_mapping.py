@@ -32,8 +32,8 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     return {
         "POST": {
             "Device": api.createDevice.index,
-            "ProductTeam": api.createProductTeam.index,
             "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
+            "ProductTeam": api.createProductTeam.index,
             # "Organization": api.createProductTeam.index,
         },
         "GET": {
@@ -83,7 +83,6 @@ def _parse_params_from_url(
     path_template, *_query_template = path_template.split("?")
     path, *_query = path.split("?")
     result = True
-
     # Parse query against template
     query_match = None
     if _query_template and _query:
@@ -96,6 +95,7 @@ def _parse_params_from_url(
 
     # Parse path against template
     path_pattern = _template_to_regex(path_template)
+
     path_match = re.match(path_pattern, path)
     path_params = path_match.groupdict() if path_match else {}
 
@@ -110,6 +110,7 @@ def parse_api_path(
     Iterate over 'endpoint_lambda_mapping' to find a matching method/path/index
     and parse out any path and query parameters
     """
+
     path_index_mapping = endpoint_lambda_mapping.get(method, {})
     for path_template, index in path_index_mapping.items():
         path_params, query_params, result = _parse_params_from_url(

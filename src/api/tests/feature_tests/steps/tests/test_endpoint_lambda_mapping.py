@@ -40,6 +40,15 @@ def test__parse_params_from_url():
     assert query_params == {"id3": "hiya"}
 
 
+def test__parse_params_from_url_post_product():
+    path_params, query_params, result = _parse_params_from_url(
+        path_template="ProductTeam/{product_team_id}/Product",
+        path="ProductTeam/123/Product",
+    )
+    assert result is True
+    assert path_params == {"product_team_id": "123"}
+
+
 def test_parse_path_create_device():
     with api_lambda_environment_variables():
         import api.createDevice.index
