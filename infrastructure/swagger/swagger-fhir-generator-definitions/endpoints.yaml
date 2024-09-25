@@ -11,4 +11,4 @@
 
 Organization: [create, read]
 Device: [create, read, search]
-# Product: [create, read]
+Product: [create, read]

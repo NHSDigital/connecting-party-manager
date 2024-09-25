@@ -328,6 +328,8 @@ paths:
     post:
       operationId: createproductteam
       summary: createProductTeam endpoint for APIGEE integration
+      requestBody:
+        $ref: "#/components/requestBodies/Organization"
       responses:
         "201":
           description: Create operation successful
@@ -383,7 +385,7 @@ paths:
           content:
             application/fhir+json:
               schema:
-                $ref: "#/components/schemas/Bundle"
+                $ref: "#/components/schemas/Organization"
         "4XX":
           description: "Client Error"
           content:
