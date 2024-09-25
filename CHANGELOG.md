@@ -1,5 +1,11 @@
 # Changelog
 
+## 2024-09-25
+- [PI-465] Extract worker bug
+- [PI-479] SDS endpoint error messaging
+- [PI-515] Drop tags field by default when searching tags
+- [PI-520] Don't do SDS smoke test for dev-sandbox
+
 ## 2024-09-19
 - [PI-495] Generating Product Ids
 - [PI-496] Create CPM product
