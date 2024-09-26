@@ -31,10 +31,12 @@ def parse_incoming_cpm_product(data, cache) -> CpmProductIncomingParams:
 
 def read_product_team(data, cache) -> ProductTeam:
     incoming_product = data[parse_incoming_cpm_product]
+    event = APIGatewayProxyEvent(data[StepChain.INIT])
+    product_team_id = event.path_parameters["product_team_id"]
     product_team_repo = ProductTeamRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=dynamodb_client()
     )
-    return product_team_repo.read(id=incoming_product.product_team_id)
+    return product_team_repo.read(id=product_team_id)
 
 
 def generate_cpm_product_id(data, cache) -> str:
