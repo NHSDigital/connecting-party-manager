@@ -1,8 +1,7 @@
 from functools import cache
 from itertools import chain, combinations
-from typing import Optional
 
-from pydantic import BaseModel, Extra, ValidationError, root_validator
+from pydantic import BaseModel, Extra, root_validator
 
 
 class SearchSDSQueryParams(BaseModel):
@@ -40,23 +39,23 @@ class SearchSDSQueryParams(BaseModel):
 class SearchSDSDeviceQueryParams(SearchSDSQueryParams, extra=Extra.forbid):
     nhs_as_client: str
     nhs_as_svc_ia: str
-    nhs_mhs_manufacturer_org: Optional[str] = None
-    nhs_mhs_party_key: Optional[str] = None
+    nhs_mhs_manufacturer_org: str = None
+    nhs_mhs_party_key: str = None
 
 
 class SearchSDSEndpointQueryParams(SearchSDSQueryParams, extra=Extra.forbid):
-    nhs_id_code: Optional[str] = None
-    nhs_mhs_svc_ia: Optional[str] = None
-    nhs_mhs_party_key: Optional[str] = None
+    nhs_id_code: str = None
+    nhs_mhs_svc_ia: str = None
+    nhs_mhs_party_key: str = None
 
     @root_validator
-    def check_filters(cls, values):
+    def check_filters(cls, values: dict):
         count = 2
         non_empty_count = sum(
             1 for value in values.values() if value is not None and value != 0
         )
         if non_empty_count < count:
-            raise ValidationError(
+            raise ValueError(
                 "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
             )
         return values

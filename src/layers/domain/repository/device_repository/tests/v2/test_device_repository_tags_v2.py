@@ -5,23 +5,31 @@ from domain.core.device.v2 import Device, DeviceTag
 from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.repository.device_repository.v2 import (
-    MANDATORY_DEVICE_FIELDS,
+    CannotDropMandatoryFields,
     DeviceRepository,
 )
+
+DONT_COMPARE_FIELDS = {"tags"}
 
 
 @pytest.mark.integration
 def test__device_repository__tags(device: Device, repository: DeviceRepository):
     repository.write(device)
     (_device_123,) = repository.query_by_tag(abc=123)
-    assert _device_123.dict() == device.dict()
+    assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
+        exclude=DONT_COMPARE_FIELDS
+    )
 
     (_device_bar,) = repository.query_by_tag(bar="foo")
-    assert _device_bar.dict() == device.dict()
+    assert _device_bar.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
+        exclude=DONT_COMPARE_FIELDS
+    )
 
     for value in ["aBc", "ABC", "abc", "AbC"]:
         (_device_abc,) = repository.query_by_tag(mixed_case=value)
-        assert _device_abc.dict() == device.dict()
+        assert _device_abc.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
+            exclude=DONT_COMPARE_FIELDS
+        )
 
 
 @pytest.mark.integration
@@ -47,9 +55,14 @@ def test__device_repository__multiple_devices_with_same_tags(
     devices = repository.query_by_tag(bar="foo")
     assert len(devices) == 3
 
-    assert devices == sorted(
+    expected_devices = sorted(
         (device, device_with_asid, device_with_mhs_id), key=lambda d: d.id
     )
+    # Tags are dropped by 'query_by_tag' so re-set these manually for comparison
+    for d1, d2 in zip(devices, expected_devices):
+        d1.tags = d2.tags
+
+    assert devices == expected_devices
 
 
 def _test_add_two_tags(
@@ -67,10 +80,14 @@ def _test_add_two_tags(
     assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == expected_tags
 
     (_device_123,) = repository.query_by_tag(shoe_size=123)
-    assert _device_123.dict() == second_device.dict()
+    assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == second_device.dict(
+        exclude=DONT_COMPARE_FIELDS
+    )
 
     (_device_456,) = repository.query_by_tag(shoe_size=456)
-    assert _device_456.dict() == second_device.dict()
+    assert _device_456.dict(exclude=DONT_COMPARE_FIELDS) == second_device.dict(
+        exclude=DONT_COMPARE_FIELDS
+    )
     return True
 
 
@@ -141,7 +158,9 @@ def test__device_repository__drop_fields(
 ):
     repository.write(device)
     (_device_123,) = repository.query_by_tag(abc=123)
-    assert _device_123.dict() == device.dict()
+    assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
+        exclude=DONT_COMPARE_FIELDS
+    )
 
     # Query with specific fields to drop
     results = repository.query_by_tag(abc=123, fields_to_drop=field_to_drop)
@@ -150,7 +169,7 @@ def test__device_repository__drop_fields(
     device_result = results[0]
 
     assert device_result.dict()[field_to_drop[0]] == expected_default_value
-    assert all(field in device_result.dict() for field in MANDATORY_DEVICE_FIELDS)
+    assert all(field in device_result.dict() for field in Device.get_mandatory_fields())
 
 
 @pytest.mark.integration
@@ -159,10 +178,14 @@ def test__device_repository__drop_mandatory_fields(
 ):
     repository.write(device)
     (_device_123,) = repository.query_by_tag(abc=123)
-    assert _device_123.dict() == device.dict()
+    assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
+        exclude=DONT_COMPARE_FIELDS
+    )
 
     # Query with mandatory fields to drop
-    fields_to_drop = list(MANDATORY_DEVICE_FIELDS)
+    fields_to_drop = Device.get_mandatory_fields()
 
-    with pytest.raises(ValueError, match="Cannot drop mandatory fields:"):
+    with pytest.raises(
+        CannotDropMandatoryFields, match="Cannot drop mandatory fields:"
+    ):
         repository.query_by_tag(abc=123, fields_to_drop=fields_to_drop)
