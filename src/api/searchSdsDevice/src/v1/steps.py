@@ -13,7 +13,7 @@ def _parse_event_query(query_params: dict):
 
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    query_params = _parse_event_query(event.query_string_parameters)
+    query_params = _parse_event_query(event.query_string_parameters or {})
     return {
         "query_params": query_params,
         "host": event.multi_value_headers["Host"],
