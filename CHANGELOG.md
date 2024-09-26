@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-09-26
+- [PI-525] Update path structure for ProductTeams and Products
+
 ## 2024-09-25
 - [PI-465] Extract worker bug
 - [PI-479] SDS endpoint error messaging
