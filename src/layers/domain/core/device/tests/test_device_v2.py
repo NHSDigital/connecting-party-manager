@@ -201,9 +201,7 @@ def test_device_update_questionnaire_response_key_error(
 def test_device_add_tag(device_v2: Device):
     event_1 = device_v2.add_tag(foo="first", bar="second")
     assert isinstance(event_1, DeviceTagAddedEvent)
-    assert [tag.value for tag in device_v2.tags] == [
-        "<<bar##second>>##<<foo##first>>",
-    ]
+    assert [tag.value for tag in device_v2.tags] == ["bar=second&foo=first"]
     assert event_1.updated_on is not None
     assert event_1.updated_on == device_v2.updated_on
 
@@ -215,10 +213,7 @@ def test_device_add_tag(device_v2: Device):
         device_v2.add_tag(bar="second", foo="first")
 
     assert sorted(tag.value for tag in device_v2.tags) == sorted(
-        [
-            "<<bar##second>>##<<foo##first>>",
-            "<<bar##second>>##<<baz##third>>##<<foo##first>>",
-        ]
+        ["bar=second&foo=first", "bar=second&baz=third&foo=first"]
     )
 
     assert event_2.updated_on > event_1.updated_on
@@ -244,10 +239,7 @@ def test_device_add_tags_in_one_go(device_v2: Device):
         device_v2.add_tags([dict(bar="second", foo="first")])
 
     assert sorted(tag.value for tag in device_v2.tags) == sorted(
-        [
-            "<<bar##second>>##<<foo##first>>",
-            "<<bar##second>>##<<baz##third>>##<<foo##first>>",
-        ]
+        ["bar=second&foo=first", "bar=second&baz=third&foo=first"]
     )
 
 
