@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-09-30
+- [PI-473] Serialise tags more nicer
+- [PI-522] Shorten lambda name
+
 ## 2024-09-26
 - [PI-525] Update path structure for ProductTeams and Products
 
