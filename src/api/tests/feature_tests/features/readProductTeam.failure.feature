@@ -8,7 +8,7 @@ Feature: Read Product Team - failure scenarios
       | Authorization | letmein |
 
   Scenario: Unknown Product Team
-    When I make a "GET" request with "default" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
+    When I make a "GET" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then I receive a status code "404" with body
       | path                             | value                                                                 |
       | resourceType                     | OperationOutcome                                                      |

@@ -15,13 +15,7 @@ from .data import product_payload, product_team_payload
 TABLE_NAME = "hiya"
 
 
-@pytest.mark.parametrize(
-    "version",
-    [
-        "1",
-    ],
-)
-def test_index(version):
+def _mock_test(version, params):
     org = Root.create_ods_organisation(ods_code=product_team_payload["ods_code"])
 
     product_team = org.create_product_team(
@@ -44,8 +38,24 @@ def test_index(version):
         product_team_repo.write(entity=product_team)
 
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(product_payload)}
+            event={
+                "headers": {"version": version},
+                "body": params,
+                "pathParameters": {"product_team_id": product_team_payload["id"]},
+            }
         )
+
+        return result
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index(version):
+    result = _mock_test(version=version, params=json.dumps(product_payload))
 
     expected_body = json.dumps(
         {
@@ -92,18 +102,10 @@ def test_index(version):
 @pytest.mark.parametrize(
     "params, error, status_code, version",
     [
-        ({"product_name": "Foobar product"}, "MISSING_VALUE", 400, "1"),
-        (
-            {"product_team_id": "641be376-3954-4339-822c-54071c9ff1a0"},
-            "MISSING_VALUE",
-            400,
-            "1",
-        ),
         ({}, "MISSING_VALUE", 400, "1"),
         (
             {
                 "product_name": "Foobar product",
-                "product_team_id": "641be376-3954-4339-822c-54071c9ff1a0",
                 "foo": "bar",
             },
             "VALIDATION_ERROR",
@@ -113,7 +115,19 @@ def test_index(version):
     ],
 )
 def test_incoming_errors(params, error, status_code, version):
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    result = _mock_test(version=version, params=json.dumps(params))
+    assert result["statusCode"] == status_code
+    assert error in result["body"]
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_no_such_product_team(version):
+    with mock_table(TABLE_NAME), mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -121,11 +135,53 @@ def test_incoming_errors(params, error, status_code, version):
         },
         clear=True,
     ):
-        from api.createCpmProduct.index import cache, handler
+        from api.createCpmProduct.index import handler
 
-        cache["DYNAMODB_CLIENT"] = client
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(params)}
+            event={
+                "headers": {"version": version},
+                "body": json.dumps(product_payload),
+                "pathParameters": {"product_team_id": "FOOBAR"},
+            }
         )
-    assert result["statusCode"] == status_code
-    assert error in result["body"]
+    expected_result = json.dumps(
+        {
+            "resourceType": "OperationOutcome",
+            "id": app_logger.service_name,
+            "meta": {
+                "profile": [
+                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
+                ]
+            },
+            "issue": [
+                {
+                    "severity": "error",
+                    "code": "processing",
+                    "details": {
+                        "coding": [
+                            {
+                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
+                                "code": "RESOURCE_NOT_FOUND",
+                                "display": "Resource not found",
+                            }
+                        ]
+                    },
+                    "diagnostics": "Could not find object with key 'FOOBAR'",
+                }
+            ],
+        }
+    )
+
+    expected = {
+        "statusCode": 404,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+            "Location": None,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )

@@ -11,7 +11,6 @@ from pydantic import BaseModel, Extra, Field
 
 
 class CpmProductIncomingParams(BaseModel, extra=Extra.forbid):
-    product_team_id: UUID = Field(...)
     product_name: str = Field(regex=PRODUCT_NAME_REGEX, min_length=1)
 
 

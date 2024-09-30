@@ -40,6 +40,15 @@ def test__parse_params_from_url():
     assert query_params == {"id3": "hiya"}
 
 
+def test__parse_params_from_url_post_product():
+    path_params, query_params, result = _parse_params_from_url(
+        path_template="ProductTeam/{product_team_id}/Product",
+        path="ProductTeam/123/Product",
+    )
+    assert result is True
+    assert path_params == {"product_team_id": "123"}
+
+
 def test_parse_path_create_device():
     with api_lambda_environment_variables():
         import api.createDevice.index
@@ -74,7 +83,7 @@ def test_parse_path_create_product_team():
 
     assert parse_api_path(
         method="POST",
-        path="Organization",
+        path="ProductTeam",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({}, {}, api.createProductTeam.index)
 
@@ -87,9 +96,9 @@ def test_parse_path_read_product_team():
 
     assert parse_api_path(
         method="GET",
-        path="Organization/123",
+        path="ProductTeam/123",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({"id": "123"}, {}, api.readProductTeam.index)
+    ) == ({"product_team_id": "123"}, {}, api.readProductTeam.index)
 
 
 def test_parse_path_create_cpm_product():
@@ -100,9 +109,9 @@ def test_parse_path_create_cpm_product():
 
     assert parse_api_path(
         method="POST",
-        path="CpmProduct",
+        path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({}, {}, api.createCpmProduct.index)
+    ) == ({"product_team_id": "123"}, {}, api.createCpmProduct.index)
 
 
 def test_parse_path_error():
