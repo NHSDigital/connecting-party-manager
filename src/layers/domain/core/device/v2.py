@@ -3,6 +3,7 @@ from collections.abc import Callable
 from datetime import datetime
 from enum import StrEnum, auto
 from functools import cached_property, wraps
+from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
 import orjson
@@ -21,10 +22,6 @@ from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field, root_validator
 
-TAG_SEPARATOR = "##"
-TAG_COMPONENT_SEPARATOR = "##"
-TAG_COMPONENT_CONTAINER_LEFT = "<<"
-TAG_COMPONENT_CONTAINER_RIGHT = ">>"
 UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
 
@@ -238,14 +235,7 @@ class DeviceTag(BaseModel):
 
     @property
     def value(self) -> str:
-        """
-        Tags 'value' is a string-rendering of the tag.
-        TODO: Could improve by switching to query parameter + url encoding instead of our own syntax?
-        """
-        return TAG_SEPARATOR.join(
-            f"{TAG_COMPONENT_CONTAINER_LEFT}{key}{TAG_COMPONENT_SEPARATOR}{value}{TAG_COMPONENT_CONTAINER_RIGHT}"
-            for key, value in self.components
-        )
+        return urlencode(self.components)
 
     def __hash__(self):
         return self.hash

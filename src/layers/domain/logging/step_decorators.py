@@ -6,9 +6,7 @@ from nhs_context_logging import log_action as _log_action
 
 def log_action(function):
     return _log_action(
-        log_args=["data", "cache"],
-        expected_errors=EXPECTED_EXCEPTIONS,
-        log_result=True,
+        log_args=[], expected_errors=EXPECTED_EXCEPTIONS, log_result=True
     )(function)
 
 
