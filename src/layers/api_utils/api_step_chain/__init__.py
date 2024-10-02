@@ -7,7 +7,7 @@ from api_utils.versioning.steps import (
     versioning_steps,
 )
 from domain.logging.step_decorators import logging_step_decorators
-from domain.response.steps import response_steps
+from domain.response.steps_old import response_steps
 from event.step_chain import StepChain
 
 STEP_DECORATORS = [*logging_step_decorators]

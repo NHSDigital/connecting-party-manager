@@ -14,10 +14,10 @@ from test_helpers.uuid import consistent_uuid
 
 
 def _create_product_team(
-    seed: int = 1, name: str = "product-team-name", ods_code: str = "ABC"
+    name: str = "product-team-name", ods_code: str = "ABC"
 ):
     org = Root.create_ods_organisation(ods_code=ods_code)
-    return org.create_product_team(id=consistent_uuid(seed), name=name)
+    return org.create_product_team(name=name, keys=[{"key_type": "product_team_id_alias", "key_value": "BAR"}])
 
 
 @pytest.mark.integration
@@ -129,10 +129,7 @@ def test__query_products_by_product_team_a():
 def test__query_products_by_product_team_with_sk_prefix():
     product_team = _create_product_team()
     table_name = read_terraform_output("dynamodb_table_name.value")
-    repo = CpmProductRepository(
-        table_name=table_name,
-        dynamodb_client=dynamodb_client(),
-    )
+
     product_id = ProductId.create()
     cpm_product = product_team.create_cpm_product(
         name="cpm-product-name", product_id=product_id.id

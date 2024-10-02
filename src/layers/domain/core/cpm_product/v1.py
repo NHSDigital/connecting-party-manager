@@ -1,5 +1,5 @@
 from datetime import datetime
-from uuid import UUID
+from typing import Optional
 
 from attr import dataclass
 from domain.core import event
@@ -18,7 +18,7 @@ from pydantic import Field
 @dataclass(kw_only=True, slots=True)
 class CpmProductCreatedEvent(Event):
     id: str
-    product_team_id: UUID
+    product_team_id: str
     name: str
     ods_code: str
     status: Status
@@ -60,7 +60,7 @@ class CpmProduct(AggregateRoot):
     """
 
     id: ProductId = Field(default_factory=ProductId.create)
-    product_team_id: UUID = Field(...)
+    product_team_id: str = Field(...)
     name: str = Field(regex=CPM_PRODUCT_NAME_REGEX, min_length=1)
     ods_code: str
     status: Status = Status.ACTIVE
