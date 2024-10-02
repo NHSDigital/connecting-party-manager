@@ -12,7 +12,7 @@ from api.tests.feature_tests.steps.assertion import (
 from api.tests.feature_tests.steps.context import Context
 from api.tests.feature_tests.steps.postman import Body, HeaderItem, PostmanRequest, Url
 from api.tests.feature_tests.steps.requests import make_request
-from api.tests.feature_tests.steps.table import parse_table
+from api.tests.feature_tests.steps.table import expand_macro, parse_table
 
 
 @given('"{header_name}" request headers')
@@ -86,6 +86,7 @@ def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
     body = parse_table(table=context.table) if context.table else context.text
+    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -111,6 +112,7 @@ def when_make_request(
 def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
+    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -137,6 +139,7 @@ def when_make_request_with_id(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
     endpoint = endpoint.replace("<id>", context.response.headers.get("Location"))
+    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,

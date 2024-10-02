@@ -31,7 +31,7 @@ class ProductTeam(AggregateRoot):
         product = CpmProduct(
             product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs
         )
-        product_created_event = CpmProductCreatedEvent(**product.dict())
+        product_created_event = CpmProductCreatedEvent(**product.dict(exclude={"keys"}))
         product.add_event(product_created_event)
         self.add_event(product_created_event)
         return product

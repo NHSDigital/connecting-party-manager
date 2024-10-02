@@ -1,13 +1,12 @@
 from collections import defaultdict
-from collections.abc import Callable
 from datetime import datetime
 from enum import StrEnum, auto
-from functools import cached_property, wraps
+from functools import cached_property
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
 from attr import dataclass
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.base import BaseModel
 from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
@@ -38,10 +37,6 @@ class DuplicateQuestionnaireResponse(Exception):
 
 
 class QuestionNotFoundError(Exception):
-    pass
-
-
-class EventUpdatedError(Exception):
     pass
 
 
@@ -241,27 +236,6 @@ class DeviceTag(BaseModel):
 
     def __eq__(self, other: "DeviceTag"):
         return self.hash == other.hash
-
-
-def _set_updated_on(device: "Device", event: "Event"):
-    if not hasattr(event, UPDATED_ON):
-        raise EventUpdatedError(
-            f"All returned events must have attribute '{UPDATED_ON}'"
-        )
-    updated_on = getattr(event, UPDATED_ON) or now()
-    setattr(event, UPDATED_ON, updated_on)
-    device.updated_on = updated_on
-
-
-def event[RT, **P](fn: Callable[P, RT]) -> Callable[P, RT]:
-    @wraps(fn)
-    def wrapper(self: "Device", *args: P.args, **kwargs: P.kwargs) -> RT:
-        _event = fn(self, *args, **kwargs)
-        self.add_event(_event)
-        _set_updated_on(device=self, event=_event)
-        return _event
-
-    return wrapper
 
 
 class Device(AggregateRoot):

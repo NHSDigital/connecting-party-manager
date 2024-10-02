@@ -30,8 +30,8 @@ def test_cpm_product_created(cpm_product: CpmProduct):
     [
         "P.111-XXX",  # Contains invalid characters
         "P.AAA.AAA",  # Uses '.' instead of '-' as the separator
-        "P.AC-33A",  # Not enough charactors
-        "P.ACCC-33A",  # Too many charactors
+        "P.AC-33A",  # Not enough characters
+        "P.ACCC-33A",  # Too many characters
     ],
 )
 def test_invalid_product_id(invalid_product_id):

@@ -1,5 +1,4 @@
 from copy import copy
-from functools import partial
 
 from attr import asdict
 from domain.core.device.v2 import (
@@ -27,6 +26,7 @@ from domain.repository.transaction import (
     ConditionExpression,
     TransactionStatement,
     TransactItem,
+    update_transactions,
 )
 
 TAGS = "tags"
@@ -82,28 +82,6 @@ def decompress_device_fields(device: dict):
     return device
 
 
-def _dynamodb_update_expression(updated_fields: dict):
-    expression_attribute_names = {}
-    expression_attribute_values = {}
-    update_clauses = []
-
-    for field_name, value in updated_fields.items():
-        field_name_placeholder = f"#{field_name}"
-        field_value_placeholder = f":{field_name}"
-
-        update_clauses.append(f"{field_name_placeholder} = {field_value_placeholder}")
-        expression_attribute_names[field_name_placeholder] = field_name
-        expression_attribute_values[field_value_placeholder] = marshall_value(value)
-
-    update_expression = "SET " + ", ".join(update_clauses)
-
-    return dict(
-        UpdateExpression=update_expression,
-        ExpressionAttributeNames=expression_attribute_names,
-        ExpressionAttributeValues=expression_attribute_values,
-    )
-
-
 def _device_root_primary_key(device_id: str) -> dict:
     """
     Generates one fully marshalled (i.e. {"pk": {"S": "123"}} DynamoDB
@@ -133,22 +111,6 @@ def _device_non_root_primary_keys(
     return device_key_primary_keys + device_tag_primary_keys
 
 
-def _update_device_indexes(
-    table_name: str, primary_keys: list[dict], data: dict
-) -> list[TransactItem]:
-    update_expression = _dynamodb_update_expression(updated_fields=data)
-    update_statement = partial(
-        TransactionStatement,
-        TableName=table_name,
-        ConditionExpression=ConditionExpression.MUST_EXIST,
-        **update_expression,
-    )
-    transact_items = [
-        TransactItem(Update=update_statement(Key=key)) for key in primary_keys
-    ]
-    return transact_items
-
-
 def update_device_indexes(
     table_name: str,
     data: dict | DeviceUpdatedEvent,
@@ -158,7 +120,7 @@ def update_device_indexes(
 ):
     # Update the root device without compressing the 'questionnaire_responses' field
     root_primary_key = _device_root_primary_key(device_id=id)
-    update_root_device_transactions = _update_device_indexes(
+    update_root_device_transactions = update_transactions(
         table_name=table_name,
         primary_keys=[root_primary_key],
         data=compress_device_fields(data),
@@ -167,7 +129,7 @@ def update_device_indexes(
     non_root_primary_keys = _device_non_root_primary_keys(
         device_id=id, device_keys=keys, device_tags=tags
     )
-    update_non_root_devices_transactions = _update_device_indexes(
+    update_non_root_devices_transactions = update_transactions(
         table_name=table_name,
         primary_keys=non_root_primary_keys,
         data=compress_device_fields(

@@ -1,5 +1,5 @@
-Feature: Create CPM Product - success scenarios
-  These scenarios demonstrate successful CPM product creation
+Feature: Create CPM Product for EPR - success scenarios
+  These scenarios demonstrate successful CPM product for EPR creation
 
   Background:
     Given "default" request headers:
@@ -7,7 +7,7 @@ Feature: Create CPM Product - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Successfully create a CPM Product
+  Scenario: Successfully create a CPM Product for EPR
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
@@ -16,7 +16,7 @@ Feature: Create CPM Product - success scenarios
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product/Epr" with body:
       | path         | value            |
       | product_name | My Great Product |
     Then I receive a status code "201" with body
@@ -33,19 +33,20 @@ Feature: Create CPM Product - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 460              |
+      | Content-Length | 466              |
     When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/${ uuid(1) }/Product/<id>"
     Then I receive a status code "200" with body
-      | path            | value            |
-      | id              | << ignore >>     |
-      | name            | My Great Product |
-      | product_team_id | ${ uuid(1) }     |
-      | ods_code        | F5H1R            |
-      | keys            | []               |
-      | created_on      | << ignore >>     |
-      | updated_on      | << ignore >>     |
-      | deleted_on      | << ignore >>     |
+      | path             | value            |
+      | id               | << ignore >>     |
+      | name             | My Great Product |
+      | product_team_id  | ${ uuid(1) }     |
+      | ods_code         | F5H1R            |
+      | keys.0.key_value | F5H1R-850000     |
+      | keys.0.key_type  | party_key        |
+      | created_on       | << ignore >>     |
+      | updated_on       | << ignore >>     |
+      | deleted_on       | << ignore >>     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 229              |
+      | Content-Length | 313              |

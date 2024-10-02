@@ -6,7 +6,7 @@ class NotFoundError(Exception):
     pass
 
 
-class InvalidDeviceKeyError(ValueError):
+class InvalidKeyPattern(ValueError):
     pass
 
 
@@ -31,6 +31,10 @@ class UnknownFields(Exception):
 
 
 class ImmutableFieldError(Exception):
+    pass
+
+
+class EventUpdatedError(Exception):
     pass
 
 

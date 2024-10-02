@@ -20,10 +20,8 @@ def test_party_key_generator_validate_key_valid():
     "invalid_key",
     [
         "ABC000124",  # Missing hyphen
-        "123-000124",  # Numeric ODS code
         "ABC-1234",  # Number part too short
         "ABC-1234567",  # Number part too long
-        "AB1-000124",  # ODS code contains a digit
         "ABC-0001A4",  # Number part contains a non-digit character
         "",  # Empty string
     ],

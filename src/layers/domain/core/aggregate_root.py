@@ -1,10 +1,18 @@
+import datetime
+from collections.abc import Callable
+from functools import wraps
+from typing import Protocol
+
 import orjson
 from attr import asdict
-from domain.core.error import ImmutableFieldError, UnknownFields
+from domain.core.error import EventUpdatedError, ImmutableFieldError, UnknownFields
+from domain.core.timestamp import now
 from pydantic import Field, validate_model
 
 from .base import BaseModel
 from .event import Event, ExportedEventsTypeDef
+
+UPDATED_ON = "updated_on"
 
 
 def _validate_model(model, input_data):
@@ -115,3 +123,28 @@ class AggregateRoot(BaseModel):
     def state(self) -> dict:
         """Returns a deepcopy, useful for bulk operations rather than dealing with events"""
         return orjson.loads(self.json())
+
+
+class Updatable(Protocol):
+    updated_on: datetime
+
+
+def _set_updated_on(updatable: Updatable, event: "Event"):
+    if not hasattr(event, UPDATED_ON):
+        raise EventUpdatedError(
+            f"All returned events must have attribute '{UPDATED_ON}'"
+        )
+    updated_on = getattr(event, UPDATED_ON) or now()
+    setattr(event, UPDATED_ON, updated_on)
+    updatable.updated_on = updated_on
+
+
+def event[RT, **P](fn: Callable[P, RT]) -> Callable[P, RT]:
+    @wraps(fn)
+    def wrapper(self: AggregateRoot, *args: P.args, **kwargs: P.kwargs) -> RT:
+        _event = fn(self, *args, **kwargs)
+        self.add_event(_event)
+        _set_updated_on(updatable=self, event=_event)
+        return _event
+
+    return wrapper

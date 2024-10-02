@@ -20,7 +20,5 @@ cache = {
 def handler(event: dict, context=None):
     setup_logger(service_name=__file__)
     return execute_step_chain_with_location(
-        event=event,
-        cache=cache,
-        versioned_steps=versioned_steps,
+        event=event, cache=cache, versioned_steps=versioned_steps
     )
