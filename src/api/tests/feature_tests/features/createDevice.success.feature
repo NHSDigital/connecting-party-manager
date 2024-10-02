@@ -40,7 +40,7 @@ Feature: Create Device - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 456              |
-    When I make a "GET" request with "default" headers to the id in the location response header to the Device endpoint
+    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "Device/<id>"
     Then I receive a status code "200" with body
       | path                         | value                                    |
       | resourceType                 | Device                                   |

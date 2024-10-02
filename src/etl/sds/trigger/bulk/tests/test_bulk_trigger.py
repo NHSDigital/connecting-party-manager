@@ -71,7 +71,7 @@ def test_bulk_trigger():
     )
     was_etl_state_lock_removed = lambda: not ask_s3(key=ETL_STATE_LOCK)
 
-    _set_etl_content(s3_client=s3_client, bucket_config=bucket_config, bulk=True)
+    _set_etl_content(s3_client=s3_client, bucket_config=bucket_config)
     s3_client.delete_object(Bucket=bucket_config["etl_bucket"], Key=CHANGELOG_NUMBER)
     s3_client.delete_object(Bucket=bucket_config["etl_bucket"], Key=ETL_STATE_LOCK)
     clear_dynamodb_table(client=client, table_name=bucket_config["table_name"])

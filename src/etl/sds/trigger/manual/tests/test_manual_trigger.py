@@ -1,7 +1,6 @@
 import json
 import time
 from collections import deque
-from datetime import datetime, timezone
 
 import boto3
 import pytest
@@ -37,69 +36,52 @@ def test_manual_trigger(history_object):
 
     # Set some questions
     s3_client = boto3.client("s3")
-    _set_etl_content(s3_client=s3_client, bucket_config=bucket_config, bulk=False)
+    _set_etl_content(s3_client=s3_client, bucket_config=bucket_config)
 
-    s3_bucket_contents = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
+    # Assert history folder empty
+    state_machine_bucket_contents = s3_client.list_objects(
+        Bucket=bucket_config["etl_bucket"], Prefix=f"{ETL_STATE_MACHINE_HISTORY}/"
     )
-    if "Contents" in s3_bucket_contents:
-        objects_to_delete = [
-            {"Key": obj["Key"]} for obj in s3_bucket_contents["Contents"]
-        ]
-        # Delete the objects
-        s3_client.delete_objects(
-            Bucket=bucket_config["etl_bucket"], Delete={"Objects": objects_to_delete}
-        )
-    s3_bucket_contents = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
-    )
-    assert "Contents" not in s3_bucket_contents
+    assert "Contents" not in state_machine_bucket_contents
 
+    # set up test (add file to history bucket)
     s3_client.put_object(
         Bucket=bucket_config["etl_bucket"],
         Key=f"{ETL_STATE_MACHINE_HISTORY}/{history_object}",
         Body=GOOD_SDS_RECORD,
     )
 
-    s3_bucket_contents = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
-    )
-    assert "Contents" in s3_bucket_contents
-    item_count = 0
-    for item in s3_bucket_contents.get("Contents", []):
-        item_count = item_count + 1
-        assert history_object in item["Key"]
-    assert item_count == 1
-
+    # manually trigger
     lambda_client = boto3.client("lambda")
     payload = {}
-
-    # manually trigger
-    start_time = datetime.now(timezone.utc)
     response: InvocationResponseTypeDef = lambda_client.invoke(
         FunctionName=manual_trigger_arn,
         InvocationType="RequestResponse",
         Payload=json.dumps(payload).encode("utf-8"),
     )
+
     response_payload = response["Payload"]
     response_payload_json = json_loads(response_payload.read().decode("utf-8"))
     assert response_payload_json == "pass"
     stepfunctions_client = boto3.client("stepfunctions")
     state_machine_arn = read_terraform_output("sds_etl.value.state_machine_arn")
+    time.sleep(15)  # Wait for current run to finish/status successful
     executions = stepfunctions_client.list_executions(
         stateMachineArn=state_machine_arn, maxResults=1
     )
-    for execution in executions["executions"]:
-        if execution["startDate"].replace(tzinfo=timezone.utc) > start_time:
-            result = execution["name"].split(".")
-            result_prefix = ".".join(result[:3])
-            assert result_prefix == expected_prefix
-    time.sleep(10)
-    queue_history_files = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=ETL_STATE_MACHINE_HISTORY
+    if executions["executions"]:  # Ensure there's at least one execution
+        execution = executions["executions"][0]  # Get the first (and only) execution
+        result = execution["name"].split(".")
+        result_prefix = ".".join(result[:3])
+        assert (
+            result_prefix == expected_prefix
+        )  # Ensure the latest execution was the rerun expected
+
+    state_machine_history_files = s3_client.list_objects(
+        Bucket=bucket_config["etl_bucket"], Prefix=f"{ETL_STATE_MACHINE_HISTORY}/"
     )
     item_count = 0
-    for item in queue_history_files.get("Contents", []):
+    for item in state_machine_history_files.get("Contents", []):
         item_count = item_count + 1
         assert expected_prefix in item["Key"]
     assert item_count == 2

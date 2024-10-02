@@ -26,9 +26,10 @@ class ProductTeam(AggregateRoot):
     name: str = Field(regex=ENTITY_NAME_REGEX)
     ods_code: str
 
-    def create_cpm_product(self, product_id: str, name: str) -> CpmProduct:
+    def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:
+        extra_kwargs = {"id": product_id} if product_id is not None else {}
         product = CpmProduct(
-            id=product_id, product_team_id=self.id, name=name, ods_code=self.ods_code
+            product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs
         )
         product_created_event = CpmProductCreatedEvent(**product.dict())
         product.add_event(product_created_event)
