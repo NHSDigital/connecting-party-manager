@@ -1,3 +1,4 @@
+import orjson
 from attr import asdict
 from domain.core.error import ImmutableFieldError, UnknownFields
 from pydantic import Field, validate_model
@@ -110,3 +111,7 @@ class AggregateRoot(BaseModel):
         for field, value in data.items():
             setattr(self, field, value)
         return _data
+
+    def state(self) -> dict:
+        """Returns a deepcopy, useful for bulk operations rather than dealing with events"""
+        return orjson.loads(self.json())

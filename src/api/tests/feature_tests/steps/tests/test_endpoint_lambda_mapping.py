@@ -41,7 +41,7 @@ def test__parse_params_from_url():
 
 
 def test__parse_params_from_url_post_product():
-    path_params, query_params, result = _parse_params_from_url(
+    path_params, _, result = _parse_params_from_url(
         path_template="ProductTeam/{product_team_id}/Product",
         path="ProductTeam/123/Product",
     )
@@ -112,6 +112,19 @@ def test_parse_path_create_cpm_product():
         path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123"}, {}, api.createCpmProduct.index)
+
+
+def test_parse_path_read_cpm_product():
+    with api_lambda_environment_variables():
+        import api.readCpmProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="ProductTeam/123/Product/456",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readCpmProduct.index)
 
 
 def test_parse_path_error():

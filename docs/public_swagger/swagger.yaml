@@ -438,6 +438,48 @@ paths:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
+  /ProductTeam/{product_team_id}/Product/{product_id}:
+    get:
+      operationId: readproductendpoint
+      summary: readProduct endpoint for APIGEE integration
+      parameters:
+        - name: product_team_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - name: product_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          description: Read Product operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
   /searchSdsDevice:
     get:
       operationId: searchsdsdevice
