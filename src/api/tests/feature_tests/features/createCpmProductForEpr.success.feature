@@ -43,6 +43,7 @@ Feature: Create CPM Product for EPR - success scenarios
       | ods_code         | F5H1R            |
       | keys.0.key_value | F5H1R-850000     |
       | keys.0.key_type  | party_key        |
+      | status           | active           |
       | created_on       | << ignore >>     |
       | updated_on       | << ignore >>     |
       | deleted_on       | << ignore >>     |

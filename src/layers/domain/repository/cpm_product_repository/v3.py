@@ -2,8 +2,10 @@ from attr import asdict
 from domain.core.cpm_product.v1 import (
     CpmProduct,
     CpmProductCreatedEvent,
+    CpmProductDeletedEvent,
     CpmProductKeyAddedEvent,
 )
+from domain.core.enum import Status
 from domain.core.product_key.v1 import ProductKey
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v3 import TableKey
@@ -127,6 +129,15 @@ class CpmProductRepository(Repository[CpmProduct]):
         )
         return [create_transaction] + update_transactions
 
+    def handle_CpmProductDeletedEvent(self, event: CpmProductDeletedEvent):
+        return update_product_indexes(
+            table_name=self.table_name,
+            product_id=event.id,
+            product_team_id=event.product_team_id,
+            keys=event.keys,
+            data=asdict(event),
+        )
+
     def read(self, product_team_id: str, product_id: str) -> CpmProduct:
         pk = TableKey.PRODUCT_TEAM.key(product_team_id)
         sk = TableKey.CPM_PRODUCT.key(product_id)
@@ -136,7 +147,12 @@ class CpmProductRepository(Repository[CpmProduct]):
             "ExpressionAttributeValues": {
                 ":pk": marshall_value(pk),
                 ":sk": marshall_value(sk),
+                ":status": marshall_value(Status.ACTIVE),
             },
+            "ExpressionAttributeNames": {
+                "#status": "status",  # need to alias 'status' as it's a DynamoDb "reserved keyword"
+            },
+            "FilterExpression": "#status = :status",
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]

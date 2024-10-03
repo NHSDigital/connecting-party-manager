@@ -7,6 +7,7 @@ from uuid import UUID
 
 import pytest
 from domain.core.cpm_system_id.v1 import PartyKeyId, ProductId
+from domain.core.enum import Status
 from domain.core.root import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
@@ -108,6 +109,7 @@ def test_index():
         "name": PRODUCT_NAME,
         "ods_code": ODS_CODE,
         "product_team_id": UUID(PRODUCT_TEAM_ID),
+        "status": Status.ACTIVE,
     }
 
 
