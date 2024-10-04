@@ -386,8 +386,8 @@ Feature: Create Device - failure scenarios
       | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
       | issue.0.details.coding.0.code    | RESOURCE_NOT_FOUND                                                  |
       | issue.0.details.coding.0.display | Resource not found                                                  |
-      | issue.0.diagnostics              | Could not find object with key '${ uuid(1) }'                       |
+      | issue.0.diagnostics              | Could not find ProductTeam for key ('${ uuid(1) }')                 |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 504              |
+      | Content-Length | 510              |

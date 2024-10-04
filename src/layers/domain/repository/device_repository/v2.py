@@ -496,7 +496,7 @@ class DeviceRepository(Repository[Device]):
         try:
             item = result["Item"]
         except KeyError:
-            raise ItemNotFound(key_parts)
+            raise ItemNotFound(*key_parts, item_type=Device)
 
         _device = unmarshall(item)
         return Device(**decompress_device_fields(_device))
@@ -517,7 +517,7 @@ class DeviceRepository(Repository[Device]):
         try:
             item = result["Item"]
         except KeyError:
-            raise ItemNotFound(key_parts)
+            raise ItemNotFound(*key_parts, item_type=Device)
 
         _device = unmarshall(item)
         return Device(**decompress_device_fields(_device))

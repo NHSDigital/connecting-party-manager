@@ -146,7 +146,7 @@ def test_index_no_such_cpm_product(version):
                             }
                         ]
                     },
-                    "diagnostics": f"Could not find object with key '{PRODUCT_TEAM_ID}:{PRODUCT_ID}'",
+                    "diagnostics": f"Could not find CpmProduct for key ('{PRODUCT_TEAM_ID}', '{PRODUCT_ID}')",
                 }
             ],
         }
@@ -227,7 +227,7 @@ def test_index_no_such_product_team(version):
                             }
                         ]
                     },
-                    "diagnostics": f"Could not find object with key '{PRODUCT_TEAM_ID}'",
+                    "diagnostics": f"Could not find ProductTeam for key ('{PRODUCT_TEAM_ID}')",
                 }
             ],
         }

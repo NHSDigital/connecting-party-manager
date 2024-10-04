@@ -141,7 +141,7 @@ class CpmProductRepository(Repository[CpmProduct]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise ItemNotFound(key=f"{product_team_id}:{product_id}")
+            raise ItemNotFound(product_team_id, product_id, item_type=CpmProduct)
         (item,) = items
 
         return CpmProduct(**item)
