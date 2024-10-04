@@ -101,10 +101,10 @@ Feature: Create CPM Product - failure scenarios
       | path         | value            |
       | product_name | My Great Product |
     Then I receive a status code "404" with body
-      | path             | value                                                                 |
-      | errors.0.code    | RESOURCE_NOT_FOUND                                                    |
+      | path             | value                                                                       |
+      | errors.0.code    | RESOURCE_NOT_FOUND                                                          |
       | errors.0.message | Could not find ProductTeam for key ('f9518c12-6c83-4544-97db-d9dd1d64da97') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 128              |
+      | Content-Length | 134              |

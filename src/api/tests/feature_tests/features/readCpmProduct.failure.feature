@@ -21,13 +21,13 @@ Feature: Read CPM Product - failure scenarios
       | product_name | My Great CpmProduct |
     When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/123/Product/<id>"
     Then I receive a status code "404" with body
-      | path             | value                                |
-      | errors.0.code    | RESOURCE_NOT_FOUND                   |
+      | path             | value                                      |
+      | errors.0.code    | RESOURCE_NOT_FOUND                         |
       | errors.0.message | Could not find ProductTeam for key ('123') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 95               |
+      | Content-Length | 101              |
 
   Scenario: Unknown Product ID
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -40,10 +40,10 @@ Feature: Read CPM Product - failure scenarios
       | partOf.identifier.value  | F5H1R                                                          |
     When I make a "GET" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product/P.XXX.YYY"
     Then I receive a status code "404" with body
-      | path             | value                                                                           |
-      | errors.0.code    | RESOURCE_NOT_FOUND                                                              |
+      | path             | value                                                                                   |
+      | errors.0.code    | RESOURCE_NOT_FOUND                                                                      |
       | errors.0.message | Could not find CpmProduct for key ('f9518c12-6c83-4544-97db-d9dd1d64da97', 'P.XXX.YYY') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 138              |
+      | Content-Length | 146              |

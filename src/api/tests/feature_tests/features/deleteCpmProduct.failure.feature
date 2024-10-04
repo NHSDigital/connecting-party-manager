@@ -27,7 +27,7 @@ Feature: Delete CPM Product - failure scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 95               |
+      | Content-Length | 101              |
 
   Scenario: Unknown Product ID
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -46,4 +46,4 @@ Feature: Delete CPM Product - failure scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 138              |
+      | Content-Length | 146              |
