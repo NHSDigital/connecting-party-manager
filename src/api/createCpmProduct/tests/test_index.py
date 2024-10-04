@@ -146,27 +146,10 @@ def test_index_no_such_product_team(version):
         )
     expected_result = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_NOT_FOUND",
-                                "display": "Resource not found",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Could not find ProductTeam for key ('FOOBAR')",
+                    "code": "RESOURCE_NOT_FOUND",
+                    "message": "Could not find ProductTeam for key ('FOOBAR')",
                 }
             ],
         }
