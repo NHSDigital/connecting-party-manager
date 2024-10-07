@@ -12,7 +12,7 @@ from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v3 import TableKey
-from domain.repository.marshall import marshall_value, unmarshall
+from domain.repository.marshall import marshall, unmarshall
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 
 from test_helpers.dynamodb import mock_table
@@ -31,25 +31,17 @@ class MockCpmProductRepository(CpmProductRepository):
     def read_inactive_product(
         self, product_team_id: str, product_id: str
     ) -> CpmProduct:
-        pk = TableKey.PRODUCT_TEAM.key(product_team_id)
+        pk = TableKey.CPM_PRODUCT_STATUS.key(Status.INACTIVE, product_team_id)
         sk = TableKey.CPM_PRODUCT.key(product_id)
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk AND sk = :sk",
-            "ExpressionAttributeValues": {
-                ":pk": marshall_value(pk),
-                ":sk": marshall_value(sk),
-                ":status": marshall_value(Status.INACTIVE),
-            },
-            "ExpressionAttributeNames": {
-                "#status": "status",  # need to alias 'status' as it's a DynamoDb "reserved keyword"
-            },
-            "FilterExpression": "#status = :status",
+            "ExpressionAttributeValues": marshall(**{":pk": pk, ":sk": sk}),
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise ItemNotFound(key=f"{product_team_id}:{product_id}")
+            raise ItemNotFound(product_team_id, product_id, item_type=CpmProduct)
         (item,) = items
 
         return CpmProduct(**item)

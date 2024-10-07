@@ -30,11 +30,11 @@ Feature: Delete CPM Product - failure scenarios
       | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
       | issue.0.details.coding.0.code    | RESOURCE_NOT_FOUND                                                  |
       | issue.0.details.coding.0.display | Resource not found                                                  |
-      | issue.0.diagnostics              | Could not find object with key '123'                                |
+      | issue.0.diagnostics              | Could not find ProductTeam for key ('123')                          |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 475              |
+      | Content-Length | 481              |
 
   Scenario: Unknown Product ID
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -56,8 +56,8 @@ Feature: Delete CPM Product - failure scenarios
       | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
       | issue.0.details.coding.0.code    | RESOURCE_NOT_FOUND                                                  |
       | issue.0.details.coding.0.display | Resource not found                                                  |
-      | issue.0.diagnostics              | Could not find object with key '${ uuid(1) }:P.XXX.YYY'             |
+      | issue.0.diagnostics              | Could not find CpmProduct for key ('${ uuid(1) }', 'P.XXX.YYY')     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 518              |
+      | Content-Length | 526              |
