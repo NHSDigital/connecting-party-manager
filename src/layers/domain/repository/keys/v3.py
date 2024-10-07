@@ -8,3 +8,4 @@ class TableKey(TableKeyAction, StrEnum):
     CPM_SYSTEM_ID = "CSI"
     CPM_PRODUCT = "P"
     CPM_PRODUCT_KEY = "PK"
+    CPM_PRODUCT_STATUS = "PS"
