@@ -1,1 +1,6 @@
-["dynamodb:Query", "dynamodb:UpdateItem"]
+[
+  "dynamodb:Query",
+  "dynamodb:PutItem",
+  "dynamodb:UpdateItem",
+  "dynamodb:DeleteItem"
+]
