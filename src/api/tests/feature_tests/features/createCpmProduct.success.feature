@@ -1,5 +1,5 @@
 Feature: Create CPM Product - success scenarios
-  These scenarios demonstrate successful Device creation
+  These scenarios demonstrate successful CPM product creation
 
   Background:
     Given "default" request headers:
@@ -7,7 +7,7 @@ Feature: Create CPM Product - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario Outline: Successfully create a CPM Product
+  Scenario: Successfully create a CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
@@ -34,21 +34,17 @@ Feature: Create CPM Product - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 460              |
-
-    # This is commented out to aid the the dev who will pick up the readCpmProduct ticket. This came from the createDevice feature tests so will need updating to suit
-    # When I make a "GET" request with "default" headers to the id in the location response header to the Device endpoint
-    # Then I receive a status code "200" with body
-    # | path                         | value                                    |
-    # | resourceType                 | Device                                   |
-    # | id                           | << ignore >>                             |
-    # | deviceName.0.name            | My Device of type "<type>"               |
-    # | deviceName.0.type            | user-friendly-name                       |
-    # | definition.identifier.system | connecting-party-manager/device-type     |
-    # | definition.identifier.value  | <type>                                   |
-    # | identifier.0.system          | connecting-party-manager/product_id      |
-    # | identifier.0.value           | << ignore >>                             |
-    # | owner.identifier.system      | connecting-party-manager/product-team-id |
-    # | owner.identifier.value       | ${ uuid(1) }                             |
-    Examples:
-      | type    |
-      | product |
+    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product/<id>"
+    Then I receive a status code "200" with body
+      | path            | value                                |
+      | id              | << ignore >>                         |
+      | name            | My Great Product                     |
+      | product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
+      | ods_code        | F5H1R                                |
+      | created_on      | << ignore >>                         |
+      | updated_on      | << ignore >>                         |
+      | deleted_on      | << ignore >>                         |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 217              |

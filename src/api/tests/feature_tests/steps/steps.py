@@ -131,10 +131,12 @@ def when_make_request(
 
 
 @when(
-    'I make a "{http_method}" request with "{header_name}" headers to the id in the location response header to the Device endpoint'
+    'I make a "{http_method}" request with "{header_name}" headers to the id in the location response header to the endpoint prefix "{endpoint}"'
 )
-def when_make_device_request(context: Context, http_method: str, header_name: str):
-    endpoint = f"Device/{context.response.headers.get('Location')}"
+def when_make_request_with_id(
+    context: Context, http_method: str, header_name: str, endpoint: str
+):
+    endpoint = endpoint.replace("<id>", context.response.headers.get("Location"))
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,

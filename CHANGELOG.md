@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-10-02
+- [PI-497] Read a CPM Product
+- [PI-543] Remove snapshot from etl
+
 ## 2024-09-30
 - [PI-473] Serialise tags more nicer
 - [PI-522] Shorten lambda name

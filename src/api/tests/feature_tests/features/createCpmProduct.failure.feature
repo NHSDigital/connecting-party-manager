@@ -30,18 +30,18 @@ Feature: Create CPM Product - failure scenarios
       | issue.0.details.coding.0.code    | MISSING_VALUE                                                       |
       | issue.0.details.coding.0.display | Missing value                                                       |
       | issue.0.diagnostics              | field required                                                      |
-      | issue.0.expression.0             | CpmProductIncomingParams.product_name                               |
+      | issue.0.expression.0             | CreateCpmProductIncomingParams.product_name                         |
       | issue.1.severity                 | error                                                               |
       | issue.1.code                     | processing                                                          |
       | issue.1.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
       | issue.1.details.coding.0.code    | VALIDATION_ERROR                                                    |
       | issue.1.details.coding.0.display | Validation error                                                    |
       | issue.1.diagnostics              | extra fields not permitted                                          |
-      | issue.1.expression.0             | CpmProductIncomingParams.name                                       |
+      | issue.1.expression.0             | CreateCpmProductIncomingParams.name                                 |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 806              |
+      | Content-Length | 818              |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product that is missing fields (no product_name)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -67,13 +67,13 @@ Feature: Create CPM Product - failure scenarios
       | issue.0.details.coding.0.code    | MISSING_VALUE                                                       |
       | issue.0.details.coding.0.display | Missing value                                                       |
       | issue.0.diagnostics              | field required                                                      |
-      | issue.0.expression.0             | CpmProductIncomingParams.product_name                               |
+      | issue.0.expression.0             | CreateCpmProductIncomingParams.product_name                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 500              |
+      | Content-Length | 506              |
 
-  Scenario: Cannot create a Cpm Product with a Cpm Product with an invalid body extra parameter is not allowed
+  Scenario: Cannot create a Cpm Product with an invalid body (extra parameter is not allowed)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
@@ -97,11 +97,11 @@ Feature: Create CPM Product - failure scenarios
       | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
       | issue.0.details.coding.0.display | Validation error                                                    |
       | issue.0.diagnostics              | extra fields not permitted                                          |
-      | issue.0.expression.0             | CpmProductIncomingParams.foo                                        |
+      | issue.0.expression.0             | CreateCpmProductIncomingParams.foo                                  |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 509              |
+      | Content-Length | 515              |
 
   Scenario: Cannot create a Cpm Product with corrupt body
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:

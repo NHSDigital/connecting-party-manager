@@ -6,7 +6,6 @@ from functools import cached_property, wraps
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
-import orjson
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
@@ -432,10 +431,6 @@ class Device(AggregateRoot):
                 for qid, _qr in self.questionnaire_responses.items()
             },
         )
-
-    def state(self) -> dict:
-        """Returns a deepcopy of the Device itself, useful for bulk operations rather than dealing with events"""
-        return orjson.loads(self.json())
 
     def is_active(self):
         return self.status is Status.ACTIVE
