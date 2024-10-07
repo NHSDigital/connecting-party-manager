@@ -14,7 +14,7 @@ def delete_product(data, cache) -> CpmProduct:
     return product_repo.write(product)
 
 
-def set_http_status(data, cache) -> HTTPStatus:
+def set_http_status(data, cache) -> int:
     return HTTPStatus.NO_CONTENT
 
 

@@ -33,7 +33,7 @@ def render_response[
     if isinstance(response, Exception):
         response = validate_exception(response)
 
-    if response is HTTPStatus.NO_CONTENT:
+    if response == HTTPStatus.NO_CONTENT:
         http_status = response
         outcome = None
     elif isinstance(response, HTTPStatus):
