@@ -2,6 +2,8 @@
 
 ## 2024-10-07
 - [PI-505] Create EPR Product
+- [PI-538] Increase rate limiting
+- Dependabot: pre-commit
 
 ## 2024-10-02
 - [PI-497] Read a CPM Product
