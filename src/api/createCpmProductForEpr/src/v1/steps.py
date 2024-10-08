@@ -1,4 +1,4 @@
-from ast import FunctionType
+from types import FunctionType
 
 from domain.common_steps.create_product import (
     after_steps,
@@ -38,10 +38,21 @@ def add_party_key_to_product(
     product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=party_key.id)
 
 
+def write_party_key(data: dict[FunctionType, CpmProduct | PartyKeyId], cache) -> str:
+    party_key_repo = CpmSystemIdRepository[PartyKeyId](
+        table_name=cache["DYNAMODB_TABLE"],
+        dynamodb_client=cache["DYNAMODB_CLIENT"],
+        model=PartyKeyId,
+    )
+    party_key: PartyKeyId = data[generate_party_key]
+    return party_key_repo.create_or_update(party_key)
+
+
 steps = [
     *before_steps,
     get_latest_party_key,
     generate_party_key,
     add_party_key_to_product,
+    write_party_key,
     *after_steps,
 ]

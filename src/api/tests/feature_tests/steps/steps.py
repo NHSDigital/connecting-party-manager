@@ -31,6 +31,7 @@ def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
     body = parse_table(table=context.table)
+    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -59,6 +60,7 @@ def given_made_request(
 def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
+    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
