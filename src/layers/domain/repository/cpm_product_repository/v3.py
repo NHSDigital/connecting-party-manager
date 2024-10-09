@@ -2,12 +2,13 @@ from attr import asdict
 from domain.core.cpm_product.v1 import (
     CpmProduct,
     CpmProductCreatedEvent,
+    CpmProductDeletedEvent,
     CpmProductKeyAddedEvent,
 )
 from domain.core.product_key.v1 import ProductKey
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v3 import TableKey
-from domain.repository.marshall import marshall, marshall_value, unmarshall
+from domain.repository.marshall import marshall, unmarshall
 from domain.repository.repository.v2 import Repository
 from domain.repository.transaction import (
     ConditionExpression,
@@ -89,6 +90,24 @@ def update_product_indexes(
     return update_root_product_transactions + update_non_root_devices_transactions
 
 
+def delete_product_index(
+    table_name: str,
+    pk_key_parts: tuple[str],
+    sk_key_parts: tuple[str],
+    pk_table_key: TableKey = TableKey.PRODUCT_TEAM,
+    sk_table_key: TableKey = TableKey.CPM_PRODUCT,
+):
+    pk = pk_table_key.key(*pk_key_parts)
+    sk = sk_table_key.key(*sk_key_parts)
+    return TransactItem(
+        Delete=TransactionStatement(
+            TableName=table_name,
+            Key=marshall(pk=pk, sk=sk),
+            ConditionExpression=ConditionExpression.MUST_EXIST,
+        )
+    )
+
+
 class CpmProductRepository(Repository[CpmProduct]):
     def __init__(self, table_name: str, dynamodb_client):
         super().__init__(
@@ -127,16 +146,66 @@ class CpmProductRepository(Repository[CpmProduct]):
         )
         return [create_transaction] + update_transactions
 
+    def handle_CpmProductDeletedEvent(self, event: CpmProductDeletedEvent):
+        inactive_root_copy_transaction = create_product_index(
+            table_name=self.table_name,
+            product_data=asdict(event),
+            pk_table_key=TableKey.CPM_PRODUCT_STATUS,
+            pk_key_parts=(
+                event.status,
+                event.product_team_id,
+            ),
+            sk_key_parts=(event.id,),
+            root=True,
+        )
+
+        keys = {ProductKey(**k) for k in event.keys}
+        inactive_key_indexes_copy_transactions = [
+            create_product_index(
+                table_name=self.table_name,
+                pk_table_key=TableKey.CPM_PRODUCT_STATUS,
+                pk_key_parts=(
+                    event.status,
+                    event.product_team_id,
+                ),
+                sk_key_parts=key.parts,
+                product_data=asdict(event),
+                root=False,
+            )
+            for key in keys
+        ]
+
+        original_root_delete_transaction = delete_product_index(
+            table_name=self.table_name,
+            pk_key_parts=(event.product_team_id,),
+            sk_key_parts=(event.id,),
+        )
+
+        original_key_indexes_delete_transactions = [
+            delete_product_index(
+                table_name=self.table_name,
+                pk_key_parts=key.parts,
+                sk_key_parts=key.parts,
+                pk_table_key=TableKey.CPM_PRODUCT_KEY,
+                sk_table_key=TableKey.CPM_PRODUCT_KEY,
+            )
+            for key in keys
+        ]
+
+        return (
+            [inactive_root_copy_transaction]
+            + inactive_key_indexes_copy_transactions
+            + [original_root_delete_transaction]
+            + original_key_indexes_delete_transactions
+        )
+
     def read(self, product_team_id: str, product_id: str) -> CpmProduct:
         pk = TableKey.PRODUCT_TEAM.key(product_team_id)
         sk = TableKey.CPM_PRODUCT.key(product_id)
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk AND sk = :sk",
-            "ExpressionAttributeValues": {
-                ":pk": marshall_value(pk),
-                ":sk": marshall_value(sk),
-            },
+            "ExpressionAttributeValues": marshall(**{":pk": pk, ":sk": sk}),
         }
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]

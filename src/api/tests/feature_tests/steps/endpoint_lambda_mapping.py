@@ -25,6 +25,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.createCpmProductForEpr.index
     import api.createDevice.index
     import api.createProductTeam.index
+    import api.deleteCpmProduct.index
     import api.readCpmProduct.index
     import api.readDevice.index
     import api.readProductTeam.index
@@ -47,6 +48,9 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}": api.readProductTeam.index,
             # "Organization/{id}": api.readProductTeam.index,
             "_status": api.status.index,
+        },
+        "DELETE": {
+            "ProductTeam/{product_team_id}/Product/{product_id}": api.deleteCpmProduct.index,
         },
     }
 
