@@ -163,66 +163,6 @@ def test__create_product_team_provided_id_equals_none_is_ignored(
 
 
 @pytest.mark.parametrize(
-    "id,keys,name,ods_code",
-    [
-        [
-            "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
-            [
-                {
-                    "key_type": "product_team_id_alias",
-                    "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
-                }
-            ],
-            "First",
-            "AB123",
-        ],
-        [
-            "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
-            [
-                {
-                    "key_type": "product_team_id_alias",
-                    "key_value": "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
-                }
-            ],
-            "Second",
-            "AB123",
-        ],
-        [
-            "f9518c12-6c83-4544-97db-d9dd1d64da97",
-            [
-                {
-                    "key_type": "product_team_id_alias",
-                    "key_value": "f9518c12-6c83-4544-97db-d9dd1d64da97",
-                }
-            ],
-            "Third",
-            "AB123",
-        ],
-        [
-            "foobar",
-            [{"key_type": "product_team_id_alias", "key_value": "foobar"}],
-            "Fourth",
-            "AB123",
-        ],
-    ],
-)
-def test__create_product_team_provided_id_is_ignored(
-    id: str,
-    keys: str,
-    name: str,
-    ods_code: str,
-):
-    product_team = ProductTeam(id=id, name=name, ods_code=ods_code, keys=keys)
-    generated_id = product_team.id
-    assert isinstance(product_team, ProductTeam)
-    assert re.match(rf"{ods_code}\.[0-9a-fA-F-]{{36}}", generated_id)
-    assert product_team.id != id
-    assert product_team.keys == keys
-    assert product_team.name == name
-    assert product_team.ods_code == ods_code
-
-
-@pytest.mark.parametrize(
     "keys,name",
     [
         [

@@ -31,12 +31,13 @@ class ProductTeam(AggregateRoot):
 
     @root_validator(pre=True)
     def set_id(cls, values):
-        ods_code = values.get("ods_code")
-        if ods_code:
-            values["id"] = f"{ods_code}.{uuid4()}"
+        if values.get("id") is None:
+            ods_code = values.get("ods_code")
+            if ods_code:
+                values["id"] = f"{ods_code}.{uuid4()}"
         return values
 
-    def create_cpm_product(self, product_id: str, name: str) -> CpmProduct:
+    def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:
         extra_kwargs = {"id": product_id} if product_id is not None else {}
         product = CpmProduct(
             product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs

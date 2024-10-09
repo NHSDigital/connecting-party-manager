@@ -3,25 +3,26 @@ import os
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import mock
-from uuid import UUID
 
 import pytest
 from domain.core.cpm_system_id.v1 import PartyKeyId, ProductId
 from domain.core.enum import Status
-from domain.core.root import Root
+from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.json import json_loads
 from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.uuid import consistent_uuid
 
 TABLE_NAME = "hiya"
 
-ODS_CODE = "AAA"
+ODS_CODE = "F5H1R"
 PRODUCT_TEAM_ID = consistent_uuid(1)
 PRODUCT_NAME = "My Product"
+PRODUCT_TEAM_KEYS = CPM_PRODUCT_TEAM_NO_ID["keys"]
 VERSION = 1
 RESOURCE_CREATED = {
     "resourceType": "OperationOutcome",
@@ -51,8 +52,10 @@ RESOURCE_CREATED = {
 
 @contextmanager
 def mock_lambda():
-    org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(id=PRODUCT_TEAM_ID, name=PRODUCT_NAME)
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
+    product_team = org.create_product_team(
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
+    )
 
     with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
@@ -68,20 +71,19 @@ def mock_lambda():
 
         index.cache["DYNAMODB_CLIENT"] = client
 
-        yield index
+        yield index, product_team
 
 
 def test_index():
-    with mock_lambda() as index:
+    with mock_lambda() as (index, product_team):
         # Execute the lambda
         response = index.handler(
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps({"product_name": PRODUCT_NAME}),
-                "pathParameters": {"product_team_id": PRODUCT_TEAM_ID},
+                "pathParameters": {"product_team_id": product_team.id},
             }
         )
-
         # Validate that the response indicates that a resource was created
         assert response["statusCode"] == 201
         assert json_loads(response["body"]) == {
@@ -94,7 +96,7 @@ def test_index():
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
         created_product = repo.read(
-            product_team_id=PRODUCT_TEAM_ID, product_id=response["headers"]["Location"]
+            product_team_id=product_team.id, product_id=response["headers"]["Location"]
         ).dict()
 
     # Sense checks on the created resource
@@ -108,7 +110,7 @@ def test_index():
         "deleted_on": None,
         "name": PRODUCT_NAME,
         "ods_code": ODS_CODE,
-        "product_team_id": UUID(PRODUCT_TEAM_ID),
+        "product_team_id": product_team.id,
         "status": Status.ACTIVE,
     }
 
@@ -143,7 +145,7 @@ def test_index():
     ],
 )
 def test_incoming_errors(body, path_parameters, error_code, status_code):
-    with mock_lambda() as index:
+    with mock_lambda() as (index, product_team):
         # Execute the lambda
         response = index.handler(
             event={

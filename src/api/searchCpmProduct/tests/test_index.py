@@ -9,17 +9,17 @@ from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.aws.client import dynamodb_client
 from event.json import json_loads
 
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
-from test_helpers.uuid import consistent_uuid
 from test_helpers.validate_search_response import validate_product_result_body
 
 TABLE_NAME = "hiya"
 
 
 def _create_org():
-    org = Root.create_ods_organisation(ods_code="ABC")
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
     product_team = org.create_product_team(
-        id=consistent_uuid(1), name="product-team-name-a"
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
     return product_team
 
@@ -161,12 +161,9 @@ def test_index_no_such_product_team():
 
     result_body = json_loads(result["body"])
     assert result["statusCode"] == 404
-    assert result_body["resourceType"] == "OperationOutcome"
+    assert result_body["errors"][0]["code"] == "RESOURCE_NOT_FOUND"
     assert (
-        result_body["issue"][0]["details"]["coding"][0]["code"] == "RESOURCE_NOT_FOUND"
-    )
-    assert (
-        result_body["issue"][0]["diagnostics"]
+        result_body["errors"][0]["message"]
         == "Could not find ProductTeam for key ('123456')"
     )
 

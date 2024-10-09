@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from attr import dataclass
 from domain.core import event
@@ -31,7 +30,7 @@ class CpmProductCreatedEvent(Event):
 class CpmProductKeyAddedEvent(Event):
     new_key: ProductKey
     id: str
-    product_team_id: UUID
+    product_team_id: str
     name: str
     ods_code: str
     status: Status
@@ -44,7 +43,7 @@ class CpmProductKeyAddedEvent(Event):
 @dataclass(kw_only=True, slots=True)
 class CpmProductDeletedEvent(Event):
     id: str
-    product_team_id: UUID
+    product_team_id: str
     name: str
     ods_code: str
     status: Status
