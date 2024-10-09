@@ -24,6 +24,6 @@ from api.tests.feature_tests.steps.table import _unpack_nested_lists
     ],
 )
 def test__unpack_nested_lists(data, expected):
-    result = _unpack_nested_lists(data)
+    result = _unpack_nested_lists(data, context=None)
     assert_is_subset(result, expected)
     assert_is_subset(expected, result)
