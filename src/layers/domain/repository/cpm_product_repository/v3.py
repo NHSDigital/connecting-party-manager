@@ -214,3 +214,24 @@ class CpmProductRepository(Repository[CpmProduct]):
         (item,) = items
 
         return CpmProduct(**item)
+
+    def query_products_by_product_team(self, product_team_id) -> list[CpmProduct]:
+        product_team_id = TableKey.PRODUCT_TEAM.key(product_team_id)
+        args = {
+            "TableName": self.table_name,
+            "KeyConditionExpression": "pk = :pk AND begins_with(sk, :sk_prefix)",
+            "ExpressionAttributeValues": {
+                ":pk": marshall_value(product_team_id),
+                ":sk_prefix": marshall_value(f"{TableKey.CPM_PRODUCT}#"),
+            },
+        }
+        response = self.client.query(**args)
+        if "LastEvaluatedKey" in response:
+            raise TooManyResults(f"Too many results for query '{kwargs}'")
+
+        # Convert to Products
+        if len(response["Items"]) > 0:
+            products = map(unmarshall, response["Items"])
+            return [CpmProduct(**p) for p in products]
+
+        return []
