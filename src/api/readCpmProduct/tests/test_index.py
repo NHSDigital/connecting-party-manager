@@ -154,65 +154,54 @@ def test_index_no_such_cpm_product(version):
     )
 
 
-# @pytest.mark.parametrize(
-#     "version",
-#     [
-#         "1",
-#     ],
-# )
-# def test_index_no_such_product_team(version):
-#     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-#     product_team = org.create_product_team(name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS)
-#     cpm_product = product_team.create_cpm_product(
-#         name=PRODUCT_NAME, product_id=PRODUCT_ID
-#     )
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_no_such_product_team(version):
+    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.readCpmProduct.index import handler
 
-#     with mock_table(TABLE_NAME) as client, mock.patch.dict(
-#         os.environ,
-#         {
-#             "DYNAMODB_TABLE": TABLE_NAME,
-#             "AWS_DEFAULT_REGION": "eu-west-2",
-#         },
-#         clear=True,
-#     ):
-#         from api.readCpmProduct.index import handler
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": {
+                    "product_id": str(PRODUCT_ID),
+                    "product_team_id": str(PRODUCT_TEAM_ID),
+                },
+            }
+        )
 
-#         product_repo = CpmProductRepository(
-#             table_name=TABLE_NAME, dynamodb_client=client
-#         )
-#         product_repo.write(cpm_product)
+    expected_result = json.dumps(
+        {
+            "errors": [
+                {
+                    "code": "RESOURCE_NOT_FOUND",
+                    "message": f"Could not find ProductTeam for key ('{PRODUCT_TEAM_ID}')",
+                }
+            ],
+        }
+    )
 
-#         result = handler(
-#             event={
-#                 "headers": {"version": version},
-#                 "pathParameters": {
-#                     "product_id": str(cpm_product.id.id),
-#                     "product_team_id": str(PRODUCT_TEAM_ID),
-#                 },
-#             }
-#         )
-
-    # expected_result = json.dumps(
-    #     {
-    #         "errors": [
-    #             {
-    #                 "code": "RESOURCE_NOT_FOUND",
-    #                 "message": f"Could not find ProductTeam for key ('{PRODUCT_TEAM_ID}')",
-    #             }
-    #         ],
-    #     }
-    # )
-
-#     expected = {
-#         "statusCode": 404,
-#         "body": expected_result,
-#         "headers": {
-#             "Content-Length": str(len(expected_result)),
-#             "Content-Type": "application/json",
-#             "Version": version,
-#             "Location": None,
-#         },
-#     }
-#     _response_assertions(
-#         result=result, expected=expected, check_body=True, check_content_length=True
-#     )
+    expected = {
+        "statusCode": 404,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+            "Location": None,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
