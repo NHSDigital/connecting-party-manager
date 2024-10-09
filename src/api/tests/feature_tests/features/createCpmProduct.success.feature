@@ -42,10 +42,11 @@ Feature: Create CPM Product - success scenarios
       | product_team_id | ${ uuid(1) }     |
       | ods_code        | F5H1R            |
       | keys            | []               |
+      | status          | active           |
       | created_on      | << ignore >>     |
       | updated_on      | << ignore >>     |
       | deleted_on      | << ignore >>     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 229              |
+      | Content-Length | 249              |

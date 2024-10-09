@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-10-09
+- [PI-504] Delete product
+- [PI-498] Search products
+
 ## 2024-10-07
 - [PI-505] Create EPR Product
 - [PI-538] Increase rate limiting

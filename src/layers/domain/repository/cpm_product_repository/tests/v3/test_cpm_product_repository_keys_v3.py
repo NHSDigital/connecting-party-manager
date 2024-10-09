@@ -3,7 +3,7 @@ from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.product_key.v1 import ProductKey, ProductKeyType
 from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.errors import AlreadyExistsError
+from domain.repository.errors import AlreadyExistsError, ItemNotFound
 
 from test_helpers.uuid import consistent_uuid
 
@@ -22,6 +22,31 @@ def test__product_repository__add_key(
         product_team_id=product.product_team_id, product_id=product.id
     )
     assert product_by_id.keys == [party_key]
+
+
+@pytest.mark.integration
+def test__product_repository__add_key_then_delete(
+    product: CpmProduct, repository: CpmProductRepository
+):
+    party_key = ProductKey(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
+    product.add_key(**party_key.dict())
+    repository.write(product)
+
+    product_by_id = repository.read(
+        product_team_id=product.product_team_id, product_id=product.id
+    )
+    assert product_by_id.keys == [party_key]
+
+    # Read and delete product
+    product_from_db = repository.read(
+        product_team_id=product.product_team_id, product_id=product.id
+    )
+    product_from_db.delete()
+    repository.write(product_from_db)
+
+    # No longer retrievable
+    with pytest.raises(ItemNotFound):
+        repository.read(product_team_id=product.product_team_id, product_id=product.id)
 
 
 @pytest.mark.integration

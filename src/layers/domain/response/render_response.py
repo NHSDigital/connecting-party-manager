@@ -33,7 +33,10 @@ def render_response[
     if isinstance(response, Exception):
         response = validate_exception(response)
 
-    if isinstance(response, HTTPStatus):
+    if response == HTTPStatus.NO_CONTENT:
+        http_status = response
+        outcome = None
+    elif isinstance(response, HTTPStatus):
         # Explicit success (e.g. CREATE, DELETE, UPDATE operations)
         http_status = response
         outcome = operation_outcome_ok(id=id, http_status=http_status)
@@ -45,7 +48,7 @@ def render_response[
         http_status = HTTPStatus.OK
         outcome = response
 
-    body = json.dumps(outcome)
+    body = json.dumps(outcome) if outcome is not None else ""
     return AwsLambdaResponse(
         statusCode=http_status, body=body, version=version, location=location
     )

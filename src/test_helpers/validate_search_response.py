@@ -41,3 +41,11 @@ def check_answer(answer, params):
             assert value in answer[key]
             count += 1
     return count
+
+
+def validate_product_result_body(result_body, products):
+    if isinstance(products, dict):  # single product
+        products = [products]
+    assert sorted(result_body, key=lambda d: d["id"]) == sorted(
+        products, key=lambda d: d["id"]
+    )
