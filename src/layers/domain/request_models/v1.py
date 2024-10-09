@@ -12,3 +12,7 @@ class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+
+
+class CreateDeviceReferenceDataParams(BaseModel, extra=Extra.forbid):
+    name: str = Field(...)

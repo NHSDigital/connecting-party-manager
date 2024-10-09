@@ -24,6 +24,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.createCpmProduct.index
     import api.createCpmProductForEpr.index
     import api.createDevice.index
+    import api.createDeviceReferenceData.index
     import api.createProductTeam.index
     import api.deleteCpmProduct.index
     import api.readCpmProduct.index
@@ -35,19 +36,20 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
 
     return {
         "POST": {
-            "Device": api.createDevice.index,
-            "ProductTeam/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
-            "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
             "ProductTeam": api.createProductTeam.index,
+            "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
+            "ProductTeam/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData": api.createDeviceReferenceData.index,
+            "Device": api.createDevice.index,
         },
         "GET": {
+            "ProductTeam/{product_team_id}": api.readProductTeam.index,
+            "ProductTeam/{product_team_id}/Product": api.searchCpmProduct.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
             "Device/{id}": api.readDevice.index,
             "Device?device_type={device_type}": api.searchDevice.index,
             "Device?device_type={device_type}&foo={foo}": api.searchDevice.index,
             "Device?foo={foo}": api.searchDevice.index,
-            "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
-            "ProductTeam/{product_team_id}/Product": api.searchCpmProduct.index,
-            "ProductTeam/{product_team_id}": api.readProductTeam.index,
             # "Organization/{id}": api.readProductTeam.index,
             "_status": api.status.index,
         },
@@ -59,7 +61,8 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
 
 def _template_to_regex(template: str) -> str:
     """Convert a pattern like 'Device/{id}' to a regex pattern like 'Device/(?P<id>[^\\/]+)'"""
-    return re.sub(r"\{([^}]*)\}", r"(?P<\1>[^\/]+)", template)
+    regex = re.sub(r"\{([^}]*)\}", r"(?P<\1>[^\/]+)", template)
+    return f"^{regex}$"
 
 
 def _parse_params_from_url(
