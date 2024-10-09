@@ -7,7 +7,6 @@ from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.json import json_loads
-from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.response_assertions import _response_assertions
@@ -126,27 +125,10 @@ def test_index_no_such_cpm_product(version):
 
     expected_result = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_NOT_FOUND",
-                                "display": "Resource not found",
-                            }
-                        ]
-                    },
-                    "diagnostics": f"Could not find CpmProduct for key ('{PRODUCT_TEAM_ID}', '{PRODUCT_ID}')",
+                    "code": "RESOURCE_NOT_FOUND",
+                    "message": f"Could not find CpmProduct for key ('{PRODUCT_TEAM_ID}', '{PRODUCT_ID}')",
                 }
             ],
         }
@@ -207,27 +189,10 @@ def test_index_no_such_product_team(version):
 
     expected_result = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_NOT_FOUND",
-                                "display": "Resource not found",
-                            }
-                        ]
-                    },
-                    "diagnostics": f"Could not find ProductTeam for key ('{PRODUCT_TEAM_ID}')",
+                    "code": "RESOURCE_NOT_FOUND",
+                    "message": f"Could not find ProductTeam for key ('{PRODUCT_TEAM_ID}')",
                 }
             ],
         }
