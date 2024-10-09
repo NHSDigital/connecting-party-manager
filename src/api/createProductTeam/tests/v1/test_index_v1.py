@@ -41,6 +41,10 @@ def test_index(version):
             "id": result_body["id"],
             "name": "FOOBAR Product Team",
             "ods_code": "F5H1R",
+            "status": "active",
+            "created_on": result_body["created_on"],
+            "updated_on": None,
+            "deleted_on": None,
             "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
         }
     )

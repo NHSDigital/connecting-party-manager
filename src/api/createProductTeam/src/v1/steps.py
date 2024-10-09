@@ -55,7 +55,7 @@ def save_product_team(data, cache) -> dict:
     return product_team_repo.write(entity=product_team)
 
 
-def set_http_status(data, cache) -> HTTPStatus:
+def set_http_status(data, cache) -> tuple[HTTPStatus, dict]:
     product_team: ProductTeam = data[create_product_team]
     return HTTPStatus.CREATED, product_team.state()
 
