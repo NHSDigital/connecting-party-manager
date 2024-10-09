@@ -1,8 +1,15 @@
 import pytest
 from domain.core.cpm_product.v1 import CpmProduct
+from domain.core.cpm_system_id.v1 import ProductId
+from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
+from domain.repository.keys.v3 import TableKey
+from domain.repository.marshall import marshall_value
+from event.aws.client import dynamodb_client
 
+from test_helpers.dynamodb import mock_table
+from test_helpers.terraform import read_terraform_output
 from test_helpers.uuid import consistent_uuid
 
 

@@ -26,13 +26,15 @@ Feature: Search CPM Products - success scenarios
       | 0.product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
       | 0.name            | My Great CpmProduct                  |
       | 0.ods_code        | F5H1R                                |
+      | 0.status          | active                               |
+      | 0.keys            | []                                   |
       | 0.created_on      | << ignore >>                         |
       | 0.updated_on      | << ignore >>                         |
       | 0.deleted_on      | << ignore >>                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 222              |
+      | Content-Length | 254              |
 
   Scenario: Successfully search more than one CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -59,6 +61,8 @@ Feature: Search CPM Products - success scenarios
       | 0.product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
       | 0.name            | My Great Product 1                   |
       | 0.ods_code        | F5H1R                                |
+      | 0.status          | active                               |
+      | 0.keys            | []                                   |
       | 0.created_on      | << ignore >>                         |
       | 0.updated_on      | << ignore >>                         |
       | 0.deleted_on      | << ignore >>                         |
@@ -66,6 +70,8 @@ Feature: Search CPM Products - success scenarios
       | 1.product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
       | 1.name            | My Great Product 2                   |
       | 1.ods_code        | F5H1R                                |
+      | 1.status          | active                               |
+      | 1.keys            | []                                   |
       | 1.created_on      | << ignore >>                         |
       | 1.updated_on      | << ignore >>                         |
       | 1.deleted_on      | << ignore >>                         |
@@ -73,10 +79,12 @@ Feature: Search CPM Products - success scenarios
       | 2.product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
       | 2.name            | My Great Product 3                   |
       | 2.ods_code        | F5H1R                                |
+      | 2.status          | active                               |
+      | 2.keys            | []                                   |
       | 2.created_on      | << ignore >>                         |
       | 2.updated_on      | << ignore >>                         |
       | 2.deleted_on      | << ignore >>                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 663              |
+      | Content-Length | 759              |

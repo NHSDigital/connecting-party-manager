@@ -167,7 +167,7 @@ def test_index_no_such_product_team():
     )
     assert (
         result_body["issue"][0]["diagnostics"]
-        == "Could not find object with key '123456'"
+        == "Could not find ProductTeam for key ('123456')"
     )
 
 

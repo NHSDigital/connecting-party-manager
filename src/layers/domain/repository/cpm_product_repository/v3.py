@@ -6,9 +6,10 @@ from domain.core.cpm_product.v1 import (
     CpmProductKeyAddedEvent,
 )
 from domain.core.product_key.v1 import ProductKey
+from domain.repository.device_repository.v2 import TooManyResults
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v3 import TableKey
-from domain.repository.marshall import marshall, unmarshall
+from domain.repository.marshall import marshall, marshall_value, unmarshall
 from domain.repository.repository.v2 import Repository
 from domain.repository.transaction import (
     ConditionExpression,
@@ -227,7 +228,7 @@ class CpmProductRepository(Repository[CpmProduct]):
         }
         response = self.client.query(**args)
         if "LastEvaluatedKey" in response:
-            raise TooManyResults(f"Too many results for query '{kwargs}'")
+            raise TooManyResults(f"Too many results for query '{args}'")
 
         # Convert to Products
         if len(response["Items"]) > 0:
