@@ -166,7 +166,7 @@ def test_index_no_such_product_team(version):
                             }
                         ]
                     },
-                    "diagnostics": "Could not find object with key 'FOOBAR'",
+                    "diagnostics": "Could not find ProductTeam for key ('FOOBAR')",
                 }
             ],
         }

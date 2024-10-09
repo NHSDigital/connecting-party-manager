@@ -26,10 +26,11 @@ Feature: Read CPM Product - success scenarios
       | name            | My Great CpmProduct                  |
       | product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
       | ods_code        | F5H1R                                |
+      | keys            | []                                   |
       | created_on      | << ignore >>                         |
       | updated_on      | << ignore >>                         |
       | deleted_on      | << ignore >>                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 220              |
+      | Content-Length | 232              |

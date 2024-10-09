@@ -6,8 +6,9 @@ class UnableToUnmarshall(Exception):
 
 
 class ItemNotFound(Exception):
-    def __init__(self, key):
-        super().__init__(f"Could not find object with key '{key}'")
+    def __init__(self, *key_parts: str, item_type: type):
+        key = ", ".join(f"'{k}'" for k in key_parts)
+        super().__init__(f"Could not find {item_type.__name__} for key ({key})")
 
 
 class AlreadyExistsError(Exception):

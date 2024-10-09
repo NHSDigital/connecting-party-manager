@@ -32,3 +32,7 @@ class SdsId:
         ID_PATTERN = re.compile(
             rf"^{_ODS_CODE_REGEX}{DEVICE_KEY_SEPARATOR}{PARTY_KEY_REGEX}{DEVICE_KEY_SEPARATOR}{INTERACTION_ID_REGEX}$"
         )
+
+    class PartyKey:
+        PARTY_KEY_REGEX = rf"^{_ODS_CODE_REGEX}-[0-9]{{6}}$"
+        ID_PATTERN = re.compile(PARTY_KEY_REGEX)

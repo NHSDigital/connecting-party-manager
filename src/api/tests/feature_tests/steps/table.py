@@ -7,10 +7,14 @@ from test_helpers.uuid import consistent_uuid
 
 FN_REGEX = re.compile(r"\${\s([a-zA-Z_]\w*)\(([^)]*)\)\s}")
 EXPAND_FUNCTIONS = {
+    # macros here
     "uuid": consistent_uuid,
     # behave formatter workarounds here:
     "dollar": lambda: "$",
     "pipe": lambda: "|",
+}
+EMPTY_TYPES_AS_STRING = {
+    "[]": list,
 }
 
 
@@ -20,7 +24,10 @@ def parse_table(table: Table) -> dict:
     return _unflatten_dict(_dict)
 
 
-def _expand(value: str):
+def expand_macro(value: str):
+    if value in EMPTY_TYPES_AS_STRING:
+        return EMPTY_TYPES_AS_STRING[value]()
+
     _match: list[tuple[str, str]] = FN_REGEX.findall(value)
     for fn_name, _args in _match:
         args = filter(bool, map(str.strip, _args.split(",")))
@@ -53,7 +60,7 @@ def _merge_nested_dicts(d1, d2):
 def _unpack_nested_lists(obj: Any | dict[str, any]):
     """Recursively convert any dict to a list where all keys are integer-like"""
     if not isinstance(obj, dict) or not obj:
-        return _expand(obj)
+        return expand_macro(obj)
     if all(key.isdigit() for key in obj):
         unpacked_list = [None] * (int(max(obj)) + 1)
         for key, value in obj.items():

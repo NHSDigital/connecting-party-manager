@@ -12,11 +12,11 @@ Feature: Create CPM Product - success scenarios
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
-      | identifier.0.value       | f9518c12-6c83-4544-97db-d9dd1d64da97                           |
+      | identifier.0.value       | ${ uuid(1) }                                                   |
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product" with body:
       | path         | value            |
       | product_name | My Great Product |
     Then I receive a status code "201" with body
@@ -34,17 +34,18 @@ Feature: Create CPM Product - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 460              |
-    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product/<id>"
+    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/${ uuid(1) }/Product/<id>"
     Then I receive a status code "200" with body
-      | path            | value                                |
-      | id              | << ignore >>                         |
-      | name            | My Great Product                     |
-      | product_team_id | f9518c12-6c83-4544-97db-d9dd1d64da97 |
-      | ods_code        | F5H1R                                |
-      | created_on      | << ignore >>                         |
-      | updated_on      | << ignore >>                         |
-      | deleted_on      | << ignore >>                         |
+      | path            | value            |
+      | id              | << ignore >>     |
+      | name            | My Great Product |
+      | product_team_id | ${ uuid(1) }     |
+      | ods_code        | F5H1R            |
+      | keys            | []               |
+      | created_on      | << ignore >>     |
+      | updated_on      | << ignore >>     |
+      | deleted_on      | << ignore >>     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 217              |
+      | Content-Length | 229              |

@@ -135,7 +135,7 @@ def test_index_no_such_device(version):
                             }
                         ]
                     },
-                    "diagnostics": "Could not find object with key '123'",
+                    "diagnostics": "Could not find Device for key ('123')",
                 }
             ],
         }

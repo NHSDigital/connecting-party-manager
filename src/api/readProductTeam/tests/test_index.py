@@ -141,7 +141,7 @@ def test_index_no_such_product_team(version):
                             }
                         ]
                     },
-                    "diagnostics": "Could not find object with key '123'",
+                    "diagnostics": "Could not find ProductTeam for key ('123')",
                 }
             ],
         }

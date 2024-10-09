@@ -22,6 +22,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     """
 
     import api.createCpmProduct.index
+    import api.createCpmProductForEpr.index
     import api.createDevice.index
     import api.createProductTeam.index
     import api.readCpmProduct.index
@@ -33,9 +34,9 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     return {
         "POST": {
             "Device": api.createDevice.index,
+            "ProductTeam/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
             "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
             "ProductTeam": api.createProductTeam.index,
-            # "Organization": api.createProductTeam.index,
         },
         "GET": {
             "Device/{id}": api.readDevice.index,

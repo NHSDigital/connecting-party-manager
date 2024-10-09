@@ -4,6 +4,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from domain.core.base import BaseModel
+from domain.core.device_key.v1 import validate_key
+from domain.core.error import InvalidKeyPattern
+from domain.core.product_key.v1 import ProductKeyType
 from pydantic import validator
 
 FIRST_ASID = 200000099999
@@ -83,11 +86,11 @@ class PartyKeyId(CpmSystemId):
     @classmethod
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the party key has the correct format."""
-        parts = cpm_system_id.split("-")
-        if len(parts) != 2:
+        try:
+            validate_key(key=cpm_system_id, type=ProductKeyType.PARTY_KEY)
+        except InvalidKeyPattern:
             return False
-        ods_code, number = parts
-        return ods_code.isalpha() and number.isdigit() and len(number) == 6
+        return True
 
     @property
     def latest_number(self):

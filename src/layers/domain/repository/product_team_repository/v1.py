@@ -40,7 +40,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise ItemNotFound(key=id)
+            raise ItemNotFound(id, item_type=ProductTeam)
         (item,) = items
 
         return ProductTeam(**item)

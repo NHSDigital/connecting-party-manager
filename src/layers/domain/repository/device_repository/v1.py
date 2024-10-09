@@ -229,7 +229,7 @@ class DeviceRepository(Repository[Device]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise ItemNotFound(key)
+            raise ItemNotFound(key, item_type=Device)
         (item,) = items
         return self.read(strip_key_prefix(item["pk"]))
 
@@ -243,7 +243,7 @@ class DeviceRepository(Repository[Device]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise ItemNotFound(id)
+            raise ItemNotFound(id, item_type=Device)
 
         (device,) = TableKeys.DEVICE.filter(items, key="sk")
         keys = TableKeys.DEVICE_KEY.filter_and_group(items, key="sk")
