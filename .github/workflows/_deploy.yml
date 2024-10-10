@@ -73,6 +73,9 @@ jobs:
     needs: [get-branch-from-workflow-file, build]
     runs-on: [self-hosted, ci]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: init
@@ -87,6 +90,9 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--init]
     runs-on: [self-hosted, ci]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: plan
@@ -102,6 +108,9 @@ jobs:
     environment: ${{ inputs.account }}
     runs-on: [self-hosted, ci]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: apply
@@ -116,6 +125,9 @@ jobs:
     needs: [get-branch-from-workflow-file, terraform--apply]
     runs-on: [self-hosted, ci]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
         if: ${{ env.SCOPE == 'per_workspace'}}
         with:
@@ -137,6 +149,9 @@ jobs:
     needs: [get-branch-from-workflow-file, apigee--deploy]
     runs-on: [self-hosted, ci]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - if: ${{ env.ACCOUNT != 'mgmt'}}
         uses: ./.github/actions/make/
         with:
