@@ -1,11 +1,11 @@
 from datetime import datetime
-from uuid import uuid4
 
 from attr import dataclass
 
 # from domain.core import event
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.cpm_product import CpmProduct, CpmProductCreatedEvent
+from domain.core.cpm_system_id.v1 import ProductTeamId
 
 # from domain.core.device.v2 import UPDATED_ON, event
 from domain.core.enum import Status
@@ -64,7 +64,8 @@ class ProductTeam(AggregateRoot):
         if values.get("id") is None:
             ods_code = values.get("ods_code")
             if ods_code:
-                values["id"] = f"{ods_code}.{uuid4()}"
+                product_team_id = ProductTeamId.create(ods_code=ods_code)
+                values["id"] = product_team_id.id
         return values
 
     # @event

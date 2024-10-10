@@ -2,6 +2,7 @@ import random
 import re
 from abc import ABC, abstractmethod
 from datetime import datetime
+from uuid import uuid4
 
 from domain.core.base import BaseModel
 from domain.core.device_key.v1 import validate_key
@@ -17,6 +18,9 @@ PRODUCT_ID_NUMBER_OF_PARTS: int = 2
 PRODUCT_ID_VALID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
 PRODUCT_ID_PATTERN = re.compile(
     rf"^P\.[{PRODUCT_ID_VALID_CHARS}]{{{PRODUCT_ID_PART_LENGTH}}}-[{PRODUCT_ID_VALID_CHARS}]{{{PRODUCT_ID_PART_LENGTH}}}$"
+)
+PRODUCT_TEAM_ID_PATTERN = re.compile(
+    r"^[a-zA-Z0-9]+\.([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
 
 
@@ -113,3 +117,14 @@ class ProductId(CpmSystemId):
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the ProductId has the correct format."""
         return PRODUCT_ID_PATTERN.match(cpm_system_id) is not None
+
+
+class ProductTeamId(CpmSystemId):
+    @classmethod
+    def create(cls, ods_code: str):
+        return cls(__root__=f"{ods_code}.{uuid4()}")
+
+    @classmethod
+    def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
+        """Validate that the product_team key has the correct format."""
+        return PRODUCT_TEAM_ID_PATTERN.match(cpm_system_id) is not None
