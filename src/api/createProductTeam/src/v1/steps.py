@@ -36,7 +36,7 @@ def validate_product_team_ods_code(data, cache) -> None:
     validate_ods_code(ods_code=product_team_params.ods_code)
 
 
-def create_product_team(data, cache) -> CreateProductTeamIncomingParams:
+def create_product_team(data, cache) -> ProductTeam:
     product_team_params: CreateProductTeamIncomingParams = data[
         parse_incoming_product_team
     ]
@@ -48,7 +48,7 @@ def create_product_team(data, cache) -> CreateProductTeamIncomingParams:
 
 
 def save_product_team(data, cache) -> dict:
-    product_team = data[create_product_team]
+    product_team: ProductTeam = data[create_product_team]
     product_team_repo = ProductTeamRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )

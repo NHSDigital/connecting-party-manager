@@ -20,9 +20,9 @@ Feature: Create Product Team - failure scenarios
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
-    Then I receive a status code "409" with body
+    Then I receive a status code "400" with body
       | path             | value               |
-      | errors.0.code    | CONFLICT_ERROR      |
+      | errors.0.code    | VALIDATION_ERROR    |
       | errors.0.message | Item already exists |
     And the response headers contain:
       | name           | value            |

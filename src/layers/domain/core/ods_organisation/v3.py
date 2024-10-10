@@ -1,5 +1,9 @@
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.product_team.v3 import ProductTeam, ProductTeamCreatedEvent
+from domain.core.product_team.v3 import (
+    ProductTeam,
+    ProductTeamAliasCreatedEvent,
+    ProductTeamCreatedEvent,
+)
 from domain.core.validation import ODS_CODE_REGEX
 from pydantic import Field
 
@@ -18,4 +22,7 @@ class OdsOrganisation(AggregateRoot):
         event = ProductTeamCreatedEvent(**product_team.dict())
         product_team.add_event(event)
         self.add_event(event=event)
+        key_event = ProductTeamAliasCreatedEvent(**product_team.dict())
+        product_team.add_event(key_event)
+        self.add_event(event=key_event)
         return product_team

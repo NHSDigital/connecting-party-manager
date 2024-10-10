@@ -1,5 +1,9 @@
 from attr import asdict
-from domain.core.product_team.v3 import ProductTeam, ProductTeamCreatedEvent
+from domain.core.product_team.v3 import (
+    ProductTeam,
+    ProductTeamAliasCreatedEvent,
+    ProductTeamCreatedEvent,
+)
 from domain.core.product_team_key import ProductTeamKey
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v3 import TableKey
@@ -47,13 +51,16 @@ class ProductTeamRepository(Repository[ProductTeam]):
             root=True,
         )
 
-        # Get Key value if exists.
+        return create_transaction
+
+    def handle_ProductTeamAliasCreatedEvent(self, event: ProductTeamAliasCreatedEvent):
         product_team_keys = {ProductTeamKey(**key) for key in event.keys}
+        transactions = []
         for product_team_key in product_team_keys:
             key_type = (
                 product_team_key.key_type.replace("_", " ").title().replace(" ", "")
             )
-            create_key_transaction = create_product_team_index(
+            create_transaction = create_product_team_index(
                 table_name=self.table_name,
                 product_team_data=asdict(event),
                 pk_key_parts=(
@@ -67,8 +74,9 @@ class ProductTeamRepository(Repository[ProductTeam]):
                 pk_table_key=TableKey.PRODUCT_TEAM_KEY,
                 sk_table_key=TableKey.PRODUCT_TEAM_KEY,
             )
+            transactions.append(create_transaction)
 
-        return create_transaction
+        return transactions[0]
 
     def read(self, id) -> ProductTeam:
         pk = TableKey.PRODUCT_TEAM.key(id)

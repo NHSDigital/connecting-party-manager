@@ -115,6 +115,7 @@ class Repository[ModelType: AggregateRoot]:
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
             transact_items = handler(event=event)
+
             if not isinstance(transact_items, list):
                 transact_items = [transact_items]
             return transact_items
