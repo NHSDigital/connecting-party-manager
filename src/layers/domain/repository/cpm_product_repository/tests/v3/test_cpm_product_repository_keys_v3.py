@@ -5,7 +5,7 @@ from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 
-from test_helpers.uuid import consistent_uuid
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 
 PARTY_KEY = "ABC-123456"
 
@@ -60,9 +60,9 @@ def test__product_repository__cannot_add_duplicate_key(
     repository.write(product)
 
     # Create a second unrelated product
-    org = Root.create_ods_organisation(ods_code="ABC")
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
     second_product_team = org.create_product_team(
-        id=consistent_uuid(2), name="another-product-team-name"
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
     second_product = second_product_team.create_cpm_product(
         name="another-cpm-product-name"

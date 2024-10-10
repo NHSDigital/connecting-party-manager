@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 import pytest
 from domain.common_steps.read_product import before_steps
 from domain.core.cpm_product.v1 import CpmProduct
@@ -12,6 +10,7 @@ from event.aws.client import dynamodb_client
 from event.step_chain import StepChain
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 
 TABLE_NAME = "my-table"
 
@@ -45,8 +44,11 @@ def test_read_product_steps_bad_input(event: dict, expected_exception: type[Exce
 
 
 def test_read_product_steps_good_input():
-    product_team_id = uuid4()
-    ods_code = "AAA"
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
+    product_team = org.create_product_team(
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
+    )
+    ods_code = CPM_PRODUCT_TEAM_NO_ID["ods_code"]
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
@@ -55,8 +57,6 @@ def test_read_product_steps_good_input():
             table_name=mocked_cache["DYNAMODB_TABLE"],
             dynamodb_client=mocked_cache["DYNAMODB_CLIENT"],
         )
-        org = Root.create_ods_organisation(ods_code=ods_code)
-        product_team = org.create_product_team(id=product_team_id, name="foo-team")
         product_team_repo.write(product_team)
 
         product_repo = CpmProductRepository(
@@ -69,7 +69,7 @@ def test_read_product_steps_good_input():
         step_chain.run(
             init={
                 "pathParameters": {
-                    "product_team_id": str(product_team_id),
+                    "product_team_id": str(product_team.id),
                     "product_id": str(product.id),
                 },
             },
@@ -77,5 +77,5 @@ def test_read_product_steps_good_input():
         )
 
     assert isinstance(step_chain.result, CpmProduct)
-    assert step_chain.result.product_team_id == product_team_id
+    assert step_chain.result.product_team_id == product_team.id
     assert step_chain.result.ods_code == ods_code

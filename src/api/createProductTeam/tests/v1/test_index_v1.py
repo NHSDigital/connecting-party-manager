@@ -3,11 +3,11 @@ import os
 from unittest import mock
 
 import pytest
-from nhs_context_logging import app_logger
+from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.response_assertions import _response_assertions
-from test_helpers.sample_data import ORGANISATION
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 
 TABLE_NAME = "hiya"
 
@@ -30,34 +30,22 @@ def test_index(version):
         from api.createProductTeam.index import handler
 
         result = handler(
-            event={"headers": {"version": version}, "body": json.dumps(ORGANISATION)}
+            event={
+                "headers": {"version": version},
+                "body": json.dumps(CPM_PRODUCT_TEAM_NO_ID),
+            }
         )
-
+    result_body = json_loads(result["body"])
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
-                {
-                    "severity": "information",
-                    "code": "informational",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_CREATED",
-                                "display": "Resource created",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Resource created",
-                }
-            ],
+            "id": result_body["id"],
+            "name": "FOOBAR Product Team",
+            "ods_code": "F5H1R",
+            "status": "active",
+            "created_on": result_body["created_on"],
+            "updated_on": None,
+            "deleted_on": None,
+            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
         }
     )
     expected = {
@@ -95,25 +83,16 @@ def test_index_bad_payload(version):
         result = handler(
             event={"headers": {"version": version}, "body": json.dumps({})}
         )
-
     expected_body = json.dumps(
         {
             "errors": [
                 {
                     "code": "MISSING_VALUE",
-                    "message": "Organization.resourceType: field required",
+                    "message": "CreateProductTeamIncomingParams.ods_code: field required",
                 },
                 {
                     "code": "MISSING_VALUE",
-                    "message": "Organization.identifier: field required",
-                },
-                {
-                    "code": "MISSING_VALUE",
-                    "message": "Organization.name: field required",
-                },
-                {
-                    "code": "MISSING_VALUE",
-                    "message": "Organization.partOf: field required",
+                    "message": "CreateProductTeamIncomingParams.name: field required",
                 },
             ],
         }

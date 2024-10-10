@@ -24,7 +24,7 @@ def test__mock_requests():
 
     with mock_request(), mock.patch(
         PATH.format("get_endpoint_lambda_mapping"),
-        return_value={"GET": {"my_url/{id}/{something}": index}},
+        return_value={"GET": {"my_url/{id}/{something}/the_endpoint": index}},
     ):
         response = make_request(
             base_url="BASE_URL/my_url/my_id/my_something",

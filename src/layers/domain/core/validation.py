@@ -19,6 +19,9 @@ class CpmId:
             rf"^P\.[{PRODUCT_ID_CHARS}]{{3}}-[{PRODUCT_ID_CHARS}]{{3}}$"
         )
 
+    class ProductTeamIdAlias:
+        ID_PATTERN = re.compile(rf"^[ -~]+$")
+
 
 class SdsId:
     class AccreditedSystem:

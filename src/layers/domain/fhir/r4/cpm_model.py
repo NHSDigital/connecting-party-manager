@@ -29,7 +29,7 @@ def ConstStrField(value):
 
 class ProductTeamIdentifier(BaseModel):
     system: str = ConstStrField(PRODUCT_TEAM_ID_SYSTEM)
-    value: UUID
+    value: UUID | str
 
     def dict(self, *args, **kwargs):
         """Additionally converts UUID to string"""

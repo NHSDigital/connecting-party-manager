@@ -19,7 +19,7 @@ def _mock_test(version, params):
     org = Root.create_ods_organisation(ods_code=product_team_payload["ods_code"])
 
     product_team = org.create_product_team(
-        id=product_team_payload["id"], name=product_team_payload["name"]
+        name=product_team_payload["name"], keys=product_team_payload["keys"]
     )
 
     with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
@@ -41,7 +41,7 @@ def _mock_test(version, params):
             event={
                 "headers": {"version": version},
                 "body": params,
-                "pathParameters": {"product_team_id": product_team_payload["id"]},
+                "pathParameters": {"product_team_id": product_team.id},
             }
         )
 

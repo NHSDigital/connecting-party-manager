@@ -9,15 +9,16 @@ from domain.repository.marshall import marshall_value
 from event.aws.client import dynamodb_client
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
 from test_helpers.uuid import consistent_uuid
 
 
-def _create_product_team(
-    seed: int = 1, name: str = "product-team-name", ods_code: str = "ABC"
-):
-    org = Root.create_ods_organisation(ods_code=ods_code)
-    return org.create_product_team(id=consistent_uuid(seed), name=name)
+def _create_product_team(name: str = "FOOBAR Product Team", ods_code: str = "F5H1R"):
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
+    return org.create_product_team(
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
+    )
 
 
 @pytest.mark.integration
@@ -111,7 +112,7 @@ def test__query_products_by_product_team_a():
         name="cpm-product-name-2", product_id=product_id.id
     )
     repo.write(cpm_product_2)
-    product_team_b = _create_product_team(seed=2, name="product_team_b", ods_code="CBA")
+    product_team_b = _create_product_team(name="product_team_b", ods_code="CBA")
     product_id = ProductId.create()
     cpm_product_3 = product_team_b.create_cpm_product(
         name="cpm-product-name-3", product_id=product_id.id
@@ -129,11 +130,12 @@ def test__query_products_by_product_team_a():
 def test__query_products_by_product_team_with_sk_prefix():
     product_team = _create_product_team()
     table_name = read_terraform_output("dynamodb_table_name.value")
+
+    product_id = ProductId.create()
     repo = CpmProductRepository(
         table_name=table_name,
         dynamodb_client=dynamodb_client(),
     )
-    product_id = ProductId.create()
     cpm_product = product_team.create_cpm_product(
         name="cpm-product-name", product_id=product_id.id
     )
