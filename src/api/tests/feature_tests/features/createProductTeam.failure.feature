@@ -7,27 +7,28 @@ Feature: Create Product Team - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  # Scenario: Cannot create a ProductTeam with a product_team_id_alias that already exists
-  # Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-  # | path             | value                 |
-  # | name             | My Great Product Team |
-  # | ods_code         | F5H1R                 |
-  # | keys.0.key_type  | product_team_id_alias |
-  # | keys.0.key_value | FOOBAR                |
-  # When I make a "POST" request with "default" headers to "ProductTeam" with body:
-  # | path             | value                 |
-  # | name             | My Great Product Team |
-  # | ods_code         | F5H1R                 |
-  # | keys.0.key_type  | product_team_id_alias |
-  # | keys.0.key_value | FOOBAR                |
-  # Then I receive a status code "409" with body
-  # | path             | value               |
-  # | errors.0.code    | CONFLICT_ERROR      |
-  # | errors.0.message | Item already exists |
-  # And the response headers contain:
-  # | name           | value            |
-  # | Content-Type   | application/json |
-  # | Content-Length | 76               |
+  Scenario: Cannot create a ProductTeam with a product_team_id_alias that already exists
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Then I receive a status code "409" with body
+      | path             | value               |
+      | errors.0.code    | CONFLICT_ERROR      |
+      | errors.0.message | Item already exists |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 76               |
+
   Scenario: Cannot create a ProductTeam with an that is missing fields
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
