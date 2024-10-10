@@ -2,6 +2,7 @@ set -e
 
 PATH_TO_HERE="scripts/infrastructure/apigee"
 APIGEE_DEPLOYMENT_ROLE="NHSDeploymentRole"
+API_NAME="connecting-party-manager"
 
 if [[ -z ${WORKSPACE_OUTPUT_JSON} ]]; then
     echo "WORKSPACE_OUTPUT_JSON not set"
@@ -80,27 +81,27 @@ function generate_proxy(){
     apigee_stage          ${_apigee_stage}
 "
 
-    # Some validation rules to avoid being rejected by proxygen:
-    # 1. No double hyphens part 1
-    if [[ ${_workspace_name} == *--* ]];
-    then
-        echo "proxy name must not contain '--'"
-        exit 1
-    fi
+    # # Some validation rules to avoid being rejected by proxygen:
+    # # 1. No double hyphens part 1
+    # if [[ ${_workspace_name} == *--* ]];
+    # then
+    #     echo "proxy name must not contain '--'"
+    #     exit 1
+    # fi
 
-    # 2. Since we will prefix with 'connecting-party-manager-'
-    # we cannot start with a hyphen either
-    if [[ ${_workspace_name} == -* ]];
-    then
-        echo "proxy name must start with '-'"
-        exit 1
-    fi
+    # # 2. Since we will prefix with 'connecting-party-manager-'
+    # # we cannot start with a hyphen either
+    # if [[ ${_workspace_name} == -* ]];
+    # then
+    #     echo "proxy name must start with '-'"
+    #     exit 1
+    # fi
 
-    #3. Apigee services expect int-sandbox to be sandbox to match
-    if [[ ${_workspace_name} == "int-sandbox" ]];
-    then
-        _workspace_name="sandbox"
-    fi
+    # #3. Apigee services expect int-sandbox to be sandbox to match
+    # if [[ ${_workspace_name} == "int-sandbox" ]];
+    # then
+    #     _workspace_name="sandbox"
+    # fi
 
     # Download the pem file if it does not exist
     if [ ! -f "${APIGEE_CONFIG_PATH}/${_apigee_stage}/.proxygen/private_key.pem" ]; then
@@ -111,7 +112,7 @@ function generate_proxy(){
         poetry run \
         python ${PATH_TO_HERE}/proxygen.py instance deploy \
         ${_apigee_environment} \
-        cpm-${_workspace_name} \
+        ${API_NAME} \
         ${SWAGGER_APIGEE} \
         --no-confirm
 }
@@ -162,7 +163,7 @@ function delete_proxy(){
         poetry run \
         python ${PATH_TO_HERE}/proxygen.py instance delete \
         ${_apigee_environment} \
-        cpm-${_workspace_name} \
+        ${API_NAME} \
         --no-confirm
 }
 
