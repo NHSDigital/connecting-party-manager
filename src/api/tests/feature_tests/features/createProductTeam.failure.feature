@@ -8,7 +8,7 @@ Feature: Create Product Team - failure scenarios
       | Authorization | letmein |
 
   Scenario: Cannot create a ProductTeam that already exists
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -16,7 +16,7 @@ Feature: Create Product Team - failure scenarios
       | name                     | My Great Product Team                                          |
       | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
       | partOf.identifier.value  | F5H1R                                                          |
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -41,7 +41,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Length | 455              |
 
   Scenario: Cannot create a ProductTeam with an Organization that is missing fields (no partOf.identifier.value)
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -66,7 +66,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Length | 500              |
 
   Scenario: Cannot create a ProductTeam with invalid FHIR
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path                | value                                    |
       | resourceType        | invalid_type                             |
       | identifier.0.system | connecting-party-manager/product-team-id |
@@ -98,7 +98,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Length | 830              |
 
   Scenario: Cannot create a ProductTeam with an invalid ID
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -124,7 +124,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Length | 512              |
 
   Scenario: Cannot create a ProductTeam with a syntactically invalid ODS Code
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -150,7 +150,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Length | 544              |
 
   Scenario: Cannot create a ProductTeam with an ODS code that is syntatically correct but doesn't exist
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -175,7 +175,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Length | 567              |
 
   Scenario: Cannot create a ProductTeam with corrupt body
-    When I make a "POST" request with "default" headers to "Organization" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
       """
       {"invalid_array": [}
       """

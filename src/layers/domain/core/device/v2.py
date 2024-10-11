@@ -1,13 +1,12 @@
 from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
-from functools import cached_property, wraps
-from typing import Callable, Optional
+from functools import cached_property
+from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
-import orjson
 from attr import dataclass
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.base import BaseModel
 from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
@@ -21,10 +20,6 @@ from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field, root_validator
 
-TAG_SEPARATOR = "##"
-TAG_COMPONENT_SEPARATOR = "##"
-TAG_COMPONENT_CONTAINER_LEFT = "<<"
-TAG_COMPONENT_CONTAINER_RIGHT = ">>"
 UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
 
@@ -45,10 +40,6 @@ class QuestionNotFoundError(Exception):
     pass
 
 
-class EventUpdatedError(Exception):
-    pass
-
-
 @dataclass(kw_only=True, slots=True)
 class DeviceCreatedEvent(Event):
     id: str
@@ -58,8 +49,8 @@ class DeviceCreatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -74,8 +65,8 @@ class DeviceUpdatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -90,8 +81,8 @@ class DeviceDeletedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -108,7 +99,7 @@ class DeviceDeletedEvent(Event):
     status: Status
     created_on: str
     updated_on: str = None
-    deleted_on: Optional[str] = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -125,8 +116,8 @@ class DeviceKeyAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -138,7 +129,7 @@ class DeviceKeyDeletedEvent(Event):
     id: str
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
-    updated_on: Optional[str] = None
+    updated_on: str = None
 
 
 @dataclass(kw_only=True, slots=True)
@@ -151,8 +142,8 @@ class DeviceTagAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -169,7 +160,7 @@ class DeviceTagsAddedEvent(Event):
     status: Status
     created_on: str
     updated_on: str = None
-    deleted_on: Optional[str] = None
+    deleted_on: str = None
     keys: list[DeviceKey]
     tags: list["DeviceTag"]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
@@ -238,41 +229,13 @@ class DeviceTag(BaseModel):
 
     @property
     def value(self) -> str:
-        """
-        Tags 'value' is a string-rendering of the tag.
-        TODO: Could improve by switching to query parameter + url encoding instead of our own syntax?
-        """
-        return TAG_SEPARATOR.join(
-            f"{TAG_COMPONENT_CONTAINER_LEFT}{key}{TAG_COMPONENT_SEPARATOR}{value}{TAG_COMPONENT_CONTAINER_RIGHT}"
-            for key, value in self.components
-        )
+        return urlencode(self.components)
 
     def __hash__(self):
         return self.hash
 
     def __eq__(self, other: "DeviceTag"):
         return self.hash == other.hash
-
-
-def _set_updated_on(device: "Device", event: "Event"):
-    if not hasattr(event, UPDATED_ON):
-        raise EventUpdatedError(
-            f"All returned events must have attribute '{UPDATED_ON}'"
-        )
-    updated_on = getattr(event, UPDATED_ON) or now()
-    setattr(event, UPDATED_ON, updated_on)
-    device.updated_on = updated_on
-
-
-def event[RT, **P](fn: Callable[P, RT]) -> Callable[P, RT]:
-    @wraps(fn)
-    def wrapper(self: "Device", *args: P.args, **kwargs: P.kwargs) -> RT:
-        _event = fn(self, *args, **kwargs)
-        self.add_event(_event)
-        _set_updated_on(device=self, event=_event)
-        return _event
-
-    return wrapper
 
 
 class Device(AggregateRoot):
@@ -295,8 +258,8 @@ class Device(AggregateRoot):
     product_team_id: UUID
     ods_code: str
     created_on: datetime = Field(default_factory=now, immutable=True)
-    updated_on: Optional[datetime] = Field(default=None)
-    deleted_on: Optional[datetime] = Field(default=None)
+    updated_on: datetime = Field(default=None)
+    deleted_on: datetime = Field(default=None)
     keys: list[DeviceKey] = Field(default_factory=list)
     tags: set[DeviceTag] | list[DeviceTag] = Field(default_factory=set)
     questionnaire_responses: dict[str, dict[str, QuestionnaireResponse]] = Field(
@@ -443,16 +406,8 @@ class Device(AggregateRoot):
             },
         )
 
-    def state(self) -> dict:
-        """Returns a deepcopy of the Device itself, useful for bulk operations rather than dealing with events"""
-        return orjson.loads(self.json())
-
     def is_active(self):
         return self.status is Status.ACTIVE
-
-    @classmethod
-    def get_all_fields(cls) -> set[str]:
-        return set(cls.__fields__.keys())
 
 
 class DeviceEventDeserializer(EventDeserializer):

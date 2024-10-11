@@ -313,7 +313,7 @@ module "bulk_transform_and_load_step_function" {
   version = "4.2.0"
 
   type                              = "STANDARD"
-  name                              = "${var.workspace_prefix}--${local.etl_name}--bulk-transform-and-load"
+  name                              = "${var.workspace_prefix}--${local.etl_name}--bulk-transform-load"
   use_existing_cloudwatch_log_group = true
   cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
 
@@ -349,7 +349,7 @@ module "bulk_transform_and_load_step_function" {
   }
 
   tags = {
-    Name = "${var.workspace_prefix}--${local.etl_name}--bulk-transform-and-load"
+    Name = "${var.workspace_prefix}--${local.etl_name}--bulk-transform-load"
   }
 
   depends_on = [aws_cloudwatch_log_group.step_function]
@@ -361,7 +361,7 @@ module "update_transform_and_load_step_function" {
   version = "4.2.0"
 
   type                              = "STANDARD"
-  name                              = "${var.workspace_prefix}--${local.etl_name}--update-transform-and-load"
+  name                              = "${var.workspace_prefix}--${local.etl_name}--update-transform-load"
   use_existing_cloudwatch_log_group = true
   cloudwatch_log_group_name         = aws_cloudwatch_log_group.step_function.name
 
@@ -391,7 +391,7 @@ module "update_transform_and_load_step_function" {
   }
 
   tags = {
-    Name = "${var.workspace_prefix}--${local.etl_name}--update-transform-and-load"
+    Name = "${var.workspace_prefix}--${local.etl_name}--update-transform-load"
   }
 
   depends_on = [aws_cloudwatch_log_group.step_function]
@@ -558,7 +558,7 @@ module "schedule_trigger_update" {
   source              = "./schedule/"
   lambda_arn          = module.trigger_update.lambda_function.lambda_function_arn
   lambda_name         = module.trigger_update.lambda_function.lambda_function_name
-  schedule_expression = contains(["qa", "prod"], var.environment) ? "rate(15 minutes)" : "cron(0 0 1 1 ? 2000)" # changelog schedule only active for qa & prod
+  schedule_expression = contains(["prod"], var.environment) ? "rate(15 minutes)" : "cron(0 0 1 1 ? 2000)" # changelog schedule only active for prod
 }
 
 module "bulk_trigger_notification" {

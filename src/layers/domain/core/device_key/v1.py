@@ -2,7 +2,7 @@ import re
 from enum import StrEnum, auto
 
 from domain.core.base import BaseModel
-from domain.core.error import InvalidDeviceKeyError
+from domain.core.error import InvalidKeyPattern
 from domain.core.validation import CpmId, SdsId
 from pydantic import validator
 
@@ -41,7 +41,7 @@ class DeviceKey(BaseModel):
 
 def validate_key(key: str, type: DeviceKeyType):
     if type and type.pattern.match(key) is None:
-        raise InvalidDeviceKeyError(
+        raise InvalidKeyPattern(
             f"Key '{key}' does not match the expected "
             f"pattern '{type.pattern.pattern}' associated with "
             f"key type '{type}'"

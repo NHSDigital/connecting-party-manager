@@ -1,9 +1,8 @@
 from unittest import mock
 
 from domain.logging.step_decorators import logging_step_decorators
-from event.logging.models import StepLog
+from event.logging.models import LogTemplate
 from event.step_chain import StepChain
-from event.step_chain.tests.utils import step_data
 from nhs_context_logging.fixtures import (  # noqa: F401
     log_capture_fixture as log_capture,
 )
@@ -34,14 +33,9 @@ def test_logging_step_decorators(log_capture):
 
     # Validate the log structure
     (log,) = std_out
-    parsed_log = StepLog(**log)
+    parsed_log = LogTemplate(**log)
 
     # Validate the log data
-    assert parsed_log.data == dict(step_data(init=init_data))
-    assert (
-        parsed_log.cache is not cache
-    )  # Make sure that the log doesn't have a direct reference to global data
-    assert parsed_log.cache == cache
     assert parsed_log.action_result == return_value
     assert (
         parsed_log.action
@@ -75,14 +69,9 @@ def test_logging_step_decorators_with_fatal_error(log_capture):
 
     # Validate the log structure
     (log,) = std_err
-    parsed_log = StepLog(**log)
+    parsed_log = LogTemplate(**log)
 
     # Validate the log data
-    assert parsed_log.data == dict(step_data(init=init_data))
-    assert (
-        parsed_log.cache is not cache
-    )  # Make sure that the log doesn't have a direct reference to global data
-    assert parsed_log.cache == cache
     assert parsed_log.action_result == None
     assert (
         parsed_log.action
@@ -119,14 +108,9 @@ def test_logging_step_decorators_with_non_fatal_error(log_capture):
 
     # Validate the log structure
     (log,) = std_out
-    parsed_log = StepLog(**log)
+    parsed_log = LogTemplate(**log)
 
     # Validate the log data
-    assert parsed_log.data == dict(step_data(init=init_data))
-    assert (
-        parsed_log.cache is not cache
-    )  # Make sure that the log doesn't have a direct reference to global data
-    assert parsed_log.cache == cache
     assert parsed_log.action_result == None
     assert (
         parsed_log.action

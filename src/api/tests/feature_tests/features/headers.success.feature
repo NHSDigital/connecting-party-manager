@@ -6,7 +6,7 @@ Feature: Headers - success scenarios
       | name          | value   |
       | authoRizatION | letmein |
       | VERsion       | 1       |
-    When I make a "GET" request with "default" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
+    When I make a "GET" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then the response headers contain:
       | name    | value |
       | Version | 1     |
@@ -16,7 +16,7 @@ Feature: Headers - success scenarios
       | name          | value     |
       | Authorization | letmein   |
       | Version       | <version> |
-    When I make a "GET" request with "default" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
+    When I make a "GET" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then the response headers contain:
       | name    | value     |
       | Version | <version> |
@@ -30,7 +30,7 @@ Feature: Headers - success scenarios
       | name          | value     |
       | Authorization | letmein   |
       | Version       | <version> |
-    When I make a "GET" request with "default" headers to "Organization/f9518c12-6c83-4544-97db-d9dd1d64da97"
+    When I make a "GET" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97"
     Then the response headers contain:
       | name    | value |
       | Version | 1     |

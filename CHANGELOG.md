@@ -1,5 +1,27 @@
 # Changelog
 
+## 2024-10-07
+- [PI-505] Create EPR Product
+- [PI-538] Increase rate limiting
+- Dependabot: pre-commit
+
+## 2024-10-02
+- [PI-497] Read a CPM Product
+- [PI-543] Remove snapshot from etl
+
+## 2024-09-30
+- [PI-473] Serialise tags more nicer
+- [PI-522] Shorten lambda name
+
+## 2024-09-26
+- [PI-525] Update path structure for ProductTeams and Products
+
+## 2024-09-25
+- [PI-465] Extract worker bug
+- [PI-479] SDS endpoint error messaging
+- [PI-515] Drop tags field by default when searching tags
+- [PI-520] Don't do SDS smoke test for dev-sandbox
+
 ## 2024-09-19
 - [PI-495] Generating Product Ids
 - [PI-496] Create CPM product

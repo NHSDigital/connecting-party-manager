@@ -8,7 +8,7 @@ Feature: Read Device - success scenarios
       | Authorization | letmein |
 
   Scenario: Read an existing Device
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -25,7 +25,7 @@ Feature: Read Device - success scenarios
       | definition.identifier.value  | product                                  |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
-    When I make a "GET" request with "default" headers to the id in the location response header to the Device endpoint
+    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "Device/<id>"
     Then I receive a status code "200" with body
       | path                         | value                                    |
       | resourceType                 | Device                                   |

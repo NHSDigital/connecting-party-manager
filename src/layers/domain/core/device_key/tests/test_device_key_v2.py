@@ -1,6 +1,6 @@
 import pytest
 from domain.core.device_key.v2 import DeviceKeyType, validate_key
-from domain.core.error import InvalidDeviceKeyError
+from domain.core.error import InvalidKeyPattern
 
 GOOD_ID_EXAMPLES = {
     "product_id": "P.XXX-YYY",
@@ -20,7 +20,7 @@ def test_validate_key_fail(key, type):
     if (type, key) in GOOD_ID_EXAMPLES.items():
         pytest.skip("Already covered in 'test_validate_key_pass'")
 
-    with pytest.raises(InvalidDeviceKeyError):
+    with pytest.raises(InvalidKeyPattern):
         validate_key(key_value=key, key_type=DeviceKeyType(type))
 
 
@@ -34,5 +34,5 @@ def test_validate_key_fail(key, type):
     ),
 )
 def test_validate_key_fail_other(key, type):
-    with pytest.raises(InvalidDeviceKeyError):
+    with pytest.raises(InvalidKeyPattern):
         validate_key(key_value=key, key_type=DeviceKeyType(type))

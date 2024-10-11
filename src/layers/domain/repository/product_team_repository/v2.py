@@ -1,7 +1,7 @@
 from attr import asdict
 from domain.core.product_team.v3 import ProductTeam, ProductTeamCreatedEvent
 from domain.repository.errors import ItemNotFound
-from domain.repository.keys import TableKeys
+from domain.repository.keys.v3 import TableKey
 from domain.repository.marshall import marshall, marshall_value, unmarshall
 from domain.repository.repository import Repository
 from domain.repository.transaction import (
@@ -18,7 +18,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         )
 
     def handle_ProductTeamCreatedEvent(self, event: ProductTeamCreatedEvent):
-        pk = TableKeys.PRODUCT_TEAM.key(event.id)
+        pk = TableKey.PRODUCT_TEAM.key(event.id)
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
@@ -28,7 +28,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         )
 
     def read(self, id) -> ProductTeam:
-        pk = TableKeys.PRODUCT_TEAM.key(id)
+        pk = TableKey.PRODUCT_TEAM.key(id)
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk AND sk = :sk",
@@ -40,7 +40,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         result = self.client.query(**args)
         items = [unmarshall(i) for i in result["Items"]]
         if len(items) == 0:
-            raise ItemNotFound(key=id)
+            raise ItemNotFound(id, item_type=ProductTeam)
         (item,) = items
 
         return ProductTeam(**item)

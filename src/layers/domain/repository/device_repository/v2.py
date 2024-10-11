@@ -1,5 +1,4 @@
 from copy import copy
-from functools import partial
 
 from attr import asdict
 from domain.core.device.v2 import (
@@ -27,17 +26,22 @@ from domain.repository.transaction import (
     ConditionExpression,
     TransactionStatement,
     TransactItem,
+    update_transactions,
 )
 
 TAGS = "tags"
 ROOT_FIELDS_TO_COMPRESS = [TAGS]
 NON_ROOT_FIELDS_TO_COMPRESS = ["questionnaire_responses"]
 BATCH_GET_SIZE = 100
-MANDATORY_DEVICE_FIELDS = {"name", "device_type", "product_team_id", "ods_code"}
 
 
 class TooManyResults(Exception):
     pass
+
+
+class CannotDropMandatoryFields(Exception):
+    def __init__(self, bad_fields: set[str]) -> None:
+        super().__init__(f"Cannot drop mandatory fields: {', '.join(bad_fields)}")
 
 
 def compress_device_fields(data: Event | dict, fields_to_compress=None) -> dict:
@@ -78,28 +82,6 @@ def decompress_device_fields(device: dict):
     return device
 
 
-def _dynamodb_update_expression(updated_fields: dict):
-    expression_attribute_names = {}
-    expression_attribute_values = {}
-    update_clauses = []
-
-    for field_name, value in updated_fields.items():
-        field_name_placeholder = f"#{field_name}"
-        field_value_placeholder = f":{field_name}"
-
-        update_clauses.append(f"{field_name_placeholder} = {field_value_placeholder}")
-        expression_attribute_names[field_name_placeholder] = field_name
-        expression_attribute_values[field_value_placeholder] = marshall_value(value)
-
-    update_expression = "SET " + ", ".join(update_clauses)
-
-    return dict(
-        UpdateExpression=update_expression,
-        ExpressionAttributeNames=expression_attribute_names,
-        ExpressionAttributeValues=expression_attribute_values,
-    )
-
-
 def _device_root_primary_key(device_id: str) -> dict:
     """
     Generates one fully marshalled (i.e. {"pk": {"S": "123"}} DynamoDB
@@ -129,22 +111,6 @@ def _device_non_root_primary_keys(
     return device_key_primary_keys + device_tag_primary_keys
 
 
-def _update_device_indexes(
-    table_name: str, primary_keys: list[dict], data: dict
-) -> list[TransactItem]:
-    update_expression = _dynamodb_update_expression(updated_fields=data)
-    update_statement = partial(
-        TransactionStatement,
-        TableName=table_name,
-        ConditionExpression=ConditionExpression.MUST_EXIST,
-        **update_expression,
-    )
-    transact_items = [
-        TransactItem(Update=update_statement(Key=key)) for key in primary_keys
-    ]
-    return transact_items
-
-
 def update_device_indexes(
     table_name: str,
     data: dict | DeviceUpdatedEvent,
@@ -154,7 +120,7 @@ def update_device_indexes(
 ):
     # Update the root device without compressing the 'questionnaire_responses' field
     root_primary_key = _device_root_primary_key(device_id=id)
-    update_root_device_transactions = _update_device_indexes(
+    update_root_device_transactions = update_transactions(
         table_name=table_name,
         primary_keys=[root_primary_key],
         data=compress_device_fields(data),
@@ -163,7 +129,7 @@ def update_device_indexes(
     non_root_primary_keys = _device_non_root_primary_keys(
         device_id=id, device_keys=keys, device_tags=tags
     )
-    update_non_root_devices_transactions = _update_device_indexes(
+    update_non_root_devices_transactions = update_transactions(
         table_name=table_name,
         primary_keys=non_root_primary_keys,
         data=compress_device_fields(
@@ -530,7 +496,7 @@ class DeviceRepository(Repository[Device]):
         try:
             item = result["Item"]
         except KeyError:
-            raise ItemNotFound(key_parts)
+            raise ItemNotFound(*key_parts, item_type=Device)
 
         _device = unmarshall(item)
         return Device(**decompress_device_fields(_device))
@@ -551,53 +517,50 @@ class DeviceRepository(Repository[Device]):
         try:
             item = result["Item"]
         except KeyError:
-            raise ItemNotFound(key_parts)
+            raise ItemNotFound(*key_parts, item_type=Device)
 
         _device = unmarshall(item)
         return Device(**decompress_device_fields(_device))
 
-    def query_by_tag(self, fields_to_drop: list[str] = None, **kwargs) -> list[Device]:
+    def query_by_tag(
+        self,
+        fields_to_drop: list[str] | set[str] = None,
+        drop_tags_field=True,
+        **kwargs,
+    ) -> list[Device]:
         """
-        Query the device by predefined tags, optionally dropping specific fields from the query result.
-        Example: repository.query_by_tag(fields_to_drop=["field1", "field2"], foo="123", bar="456")
+        Query the device by predefined tags, optionally dropping specific fields from the query result,
+        noting that 'tags' field is dropped by default.
+
+        Example:
+            repository.query_by_tag(fields_to_drop=["field1", "field2"], foo="123", bar="456")
         """
+        fields_to_drop = {
+            *(fields_to_drop or []),
+            *(["tags"] if drop_tags_field else []),
+        }
+        fields_to_return = Device.get_all_fields() - fields_to_drop
+
+        dropped_mandatory_fields = Device.get_mandatory_fields() & fields_to_drop
+        if dropped_mandatory_fields:
+            raise CannotDropMandatoryFields(dropped_mandatory_fields)
 
         tag_value = DeviceTag(**kwargs).value
         pk = TableKey.DEVICE_TAG.key(tag_value)
-
         query_params = {
             "ExpressionAttributeValues": {":pk": marshall_value(pk)},
             "KeyConditionExpression": "pk = :pk",
             "TableName": self.table_name,
+            **_dynamodb_projection_expression(fields_to_return),
         }
 
-        # If fields to drop are provided, create a ProjectionExpression
-        if fields_to_drop:
-            all_fields = Device.get_all_fields()
-
-            # Ensure no mandatory fields are dropped
-            dropped_mandatory_fields = set(fields_to_drop) & MANDATORY_DEVICE_FIELDS
-            if dropped_mandatory_fields:
-                raise ValueError(
-                    f"Cannot drop mandatory fields: {', '.join(dropped_mandatory_fields)}"
-                )
-
-            fields_to_return = all_fields - set(fields_to_drop)
-
-            # DynamoDB ProjectionExpression, specifying which fields to return
-            query_params.update(_dynamodb_projection_expression(fields_to_return))
-
-        # Perform the DynamoDB query
         response = self.client.query(**query_params)
-
-        # Not yet implemented: pagination
         if "LastEvaluatedKey" in response:
             raise TooManyResults(f"Too many results for query '{kwargs}'")
 
         # Convert to Device, sorted by 'pk'
         compressed_devices = map(unmarshall, response["Items"])
         devices_as_dict = map(decompress_device_fields, compressed_devices)
-
         return [Device(**d) for d in sorted(devices_as_dict, key=lambda d: d["id"])]
 
 

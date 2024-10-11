@@ -34,6 +34,14 @@ runs:
       run: echo "date=$(date +'%Y-%m-%d-%M:%S')" >> $GITHUB_OUTPUT
 
     - if: ${{ inputs.save-or-restore == 'restore' }}
+      id: timestamp--reset
+      uses: ./.github/actions/make/
+      with:
+        command: timestamp--reset FILEPATH=.
+        save-to-cache: "false"
+        restore-from-cache: "false"
+
+    - if: ${{ inputs.save-or-restore == 'restore' }}
       id: restore-cache
       uses: actions/cache/restore@v3
       with:

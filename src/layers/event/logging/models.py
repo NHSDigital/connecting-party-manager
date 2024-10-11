@@ -20,8 +20,3 @@ class LogTemplate(BaseModel):
     action_status: Literal["succeeded", "failed", "error"]
     action_result: Optional[Any] = None
     log_info: LogInfoTemplate
-
-
-class StepLog(LogTemplate):
-    data: dict
-    cache: dict

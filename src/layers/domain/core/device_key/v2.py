@@ -1,6 +1,6 @@
 from domain.core.base import BaseModel
 from domain.core.device_key.v1 import DeviceKeyType, validate_key
-from domain.core.error import InvalidDeviceKeyError
+from domain.core.error import InvalidKeyPattern
 from pydantic import validator
 
 
@@ -27,7 +27,7 @@ class DeviceKey(BaseModel):
 
 def validate_key(key_value: str, key_type: DeviceKeyType):
     if key_type and key_type.pattern.match(key_value) is None:
-        raise InvalidDeviceKeyError(
+        raise InvalidKeyPattern(
             f"Key '{key_value}' does not match the expected "
             f"pattern '{key_type.pattern.pattern}' associated with "
             f"key type '{key_type}'"

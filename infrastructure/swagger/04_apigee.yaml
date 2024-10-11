@@ -14,3 +14,7 @@ x-nhsd-apim:
       type: apikey
       header: apikey
       secret: cpm-1 # NB: this is the *name* of the secret, not the value
+  ratelimiting:
+    proxy:
+      timeunit: "minute"
+      limit: 2000

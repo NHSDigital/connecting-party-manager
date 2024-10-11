@@ -154,7 +154,7 @@ def modify_devices(
     modification_request: SdsModificationRequest, repository: DeviceRepository
 ) -> Generator[Device, None, None]:
     devices = repository.query_by_tag(
-        unique_identifier=modification_request.unique_identifier
+        unique_identifier=modification_request.unique_identifier, drop_tags_field=False
     )
 
     # Only apply modifications if there are devices to modify
@@ -194,7 +194,7 @@ def delete_devices(
 ) -> list[Device]:
     devices = []
     for _device in repository.query_by_tag(
-        unique_identifier=deletion_request.unique_identifier
+        unique_identifier=deletion_request.unique_identifier, drop_tags_field=False
     ):
         _device.delete()
         devices.append(_device)

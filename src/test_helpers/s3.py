@@ -58,19 +58,11 @@ def _set_etl_content_config():
     }
 
 
-def _set_etl_content(s3_client: S3Client, bucket_config: dict, bulk: bool = False):
-    queue_history_key_prefix = (
-        f"{bucket_config['queue_history_key_prefix']}/bulk"
-        if bulk
-        else bucket_config["queue_history_key_prefix"]
-    )
-    state_machine_history_key_prefix = (
-        f"{bucket_config['state_machine_history_key_prefix']}/bulk"
-        if bulk
-        else bucket_config["state_machine_history_key_prefix"]
-    )
+def _set_etl_content(s3_client: S3Client, bucket_config: dict):
+    queue_history_key_prefix = bucket_config["queue_history_key_prefix"]
+    state_machine_history_key_prefix = bucket_config["state_machine_history_key_prefix"]
 
-    #     # Clear/set the initial state
+    # Clear/set the initial state
     s3_client.put_object(
         Bucket=bucket_config["etl_bucket"], Key=WorkerKey.EXTRACT, Body=EMPTY_LDIF_DATA
     )
@@ -88,12 +80,13 @@ def _set_etl_content(s3_client: S3Client, bucket_config: dict, bulk: bool = Fals
         Bucket=bucket_config["etl_bucket"], Key=bucket_config["initial_trigger_key"]
     )
     queue_history_files = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=queue_history_key_prefix
+        Bucket=bucket_config["etl_bucket"], Prefix=f"{queue_history_key_prefix}/"
     )
     for item in queue_history_files.get("Contents", []):
         s3_client.delete_object(Bucket=bucket_config["etl_bucket"], Key=item["Key"])
     state_machine_history_files = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=state_machine_history_key_prefix
+        Bucket=bucket_config["etl_bucket"],
+        Prefix=f"{state_machine_history_key_prefix}/",
     )
     for item in state_machine_history_files.get("Contents", []):
         s3_client.delete_object(Bucket=bucket_config["etl_bucket"], Key=item["Key"])

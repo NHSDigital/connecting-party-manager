@@ -84,7 +84,7 @@ def test__device_non_root_primary_keys():
             "sk": {"S": "D#product_id#P.WWW-XXX"},
         },
         {
-            "pk": {"S": "DT#<<foo##bar>>"},
+            "pk": {"S": "DT#foo=bar"},
             "sk": {"S": "D#123"},
         },
     ]

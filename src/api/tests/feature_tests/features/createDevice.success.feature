@@ -8,7 +8,7 @@ Feature: Create Device - success scenarios
       | Authorization | letmein |
 
   Scenario Outline: Successfully create a Device for each device type
-    Given I have already made a "POST" request with "default" headers to "Organization" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |
       | resourceType             | Organization                                                   |
       | identifier.0.system      | connecting-party-manager/product-team-id                       |
@@ -40,7 +40,7 @@ Feature: Create Device - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 456              |
-    When I make a "GET" request with "default" headers to the id in the location response header to the Device endpoint
+    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "Device/<id>"
     Then I receive a status code "200" with body
       | path                         | value                                    |
       | resourceType                 | Device                                   |
