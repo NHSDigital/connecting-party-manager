@@ -3,6 +3,7 @@
 ## 2024-10-09
 - [PI-504] Delete product
 - [PI-498] Search products
+- [PI-549] Fix flaky CI
 
 ## 2024-10-07
 - [PI-505] Create EPR Product
