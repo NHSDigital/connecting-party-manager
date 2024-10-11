@@ -7,6 +7,22 @@ Feature: Search CPM Products - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
+  Scenario: Successfully search CPM Products with no results
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path                     | value                                                          |
+      | resourceType             | Organization                                                   |
+      | identifier.0.system      | connecting-party-manager/product-team-id                       |
+      | identifier.0.value       | f9518c12-6c83-4544-97db-d9dd1d64da97                           |
+      | name                     | My Great Product Team                                          |
+      | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
+      | partOf.identifier.value  | F5H1R                                                          |
+    When I make a "GET" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product"
+    Then I receive a status code "200" with an empty body
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 2                |
+
   Scenario: Successfully search one CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path                     | value                                                          |

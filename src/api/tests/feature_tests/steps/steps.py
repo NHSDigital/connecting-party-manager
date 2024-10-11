@@ -219,6 +219,19 @@ def then_response(context: Context, status_code: str, entity_type: str):
     )
 
 
+@then('I receive a status code "{status_code}" with an empty body')
+def then_response(context: Context, status_code: str):
+    try:
+        response_body = context.response.json()
+    except JSONDecodeError:
+        response_body = context.response.text
+    assert response_body == []
+    assert_equal(
+        expected=int(status_code),
+        received=context.response.status_code,
+    )
+
+
 @then('I receive a status code "{status_code}"')
 def then_response(context: Context, status_code: str):
     assert_equal(
