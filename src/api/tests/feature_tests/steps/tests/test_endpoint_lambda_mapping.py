@@ -40,8 +40,6 @@ def test__parse_params_from_url():
     assert query_params == {"id3": "hiya"}
 
 
-<<<<<<< HEAD
-=======
 @pytest.mark.parametrize(
     ["path_template", "path"],
     [
@@ -54,7 +52,6 @@ def test__parse_params_from_url_fail(path_template: str, path: str):
     assert result is False
 
 
->>>>>>> 86bfcdd (release/2024-09-13 Create release branch)
 def test__parse_params_from_url_post_product():
     path_params, _, result = _parse_params_from_url(
         path_template="ProductTeam/{product_team_id}/Product",
@@ -140,8 +137,6 @@ def test_parse_path_read_cpm_product():
         path="ProductTeam/123/Product/456",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readCpmProduct.index)
-<<<<<<< HEAD
-=======
 
 
 def test_parse_path_search_product():
@@ -155,7 +150,6 @@ def test_parse_path_search_product():
         path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123"}, {}, api.searchCpmProduct.index)
->>>>>>> 86bfcdd (release/2024-09-13 Create release branch)
 
 
 def test_parse_path_search_product():
