@@ -19,8 +19,6 @@ from api.tests.feature_tests.steps.table import (
 
 sort_keys = {"product": "name"}
 
-sort_keys = {"product": "name"}
-
 
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
@@ -66,7 +64,6 @@ def given_made_request(
 def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -123,7 +120,6 @@ def when_make_request(
 def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -200,36 +196,6 @@ def then_response(context: Context, status_code: str):
 )
 def then_response(context: Context, status_code: str, entity_type: str):
     expected_body = parse_table(table=context.table, context=context)
-    expected_body = sorted(expected_body, key=lambda x: x[sort_keys[entity_type]])
-    try:
-        response_body = context.response.json()
-    except JSONDecodeError:
-        response_body = context.response.text
-    response_body = sorted(response_body, key=lambda x: x[sort_keys[entity_type]])
-    assert_many(
-        assertions=(
-            assert_equal,
-            assert_same_type,
-            assert_equal,
-        ),
-        expected=(
-            int(status_code),
-            expected_body,
-            expected_body,
-        ),
-        received=(
-            context.response.status_code,
-            response_body,
-            response_body,
-        ),
-    )
-
-
-@then(
-    'I receive a status code "{status_code}" with a "{entity_type}" search body reponse that contains'
-)
-def then_response(context: Context, status_code: str, entity_type: str):
-    expected_body = parse_table(table=context.table)
     expected_body = sorted(expected_body, key=lambda x: x[sort_keys[entity_type]])
     try:
         response_body = context.response.json()
