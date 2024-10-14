@@ -101,3 +101,16 @@ module "vpc" {
 resource "aws_route53_zone" "dev-ns" {
   name = "api.cpm.dev.national.nhs.uk"
 }
+
+module "billing-alert" {
+  source                              = "../modules/billing-alert"
+  prefix                              = "${local.project}--${terraform.workspace}"
+  metric_name                         = "EstimatedCharges"
+  metric_statistic                    = "Maximum"
+  metric_number_of_evaluation_periods = 1
+  threshold_dollars                   = 20
+  recipients                          = [] # get from secrets
+  tags = {
+    Name = "${local.project}--${replace(terraform.workspace, "_", "-")}"
+  }
+}

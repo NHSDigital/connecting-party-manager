@@ -259,6 +259,28 @@
         "iam:ListRoles"
       ],
       "Resource": ["*"]
+    },
+    {
+      "Sid": "BillingAlertPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "sns:CreateTopic",
+        "sns:TagResource",
+        "sns:SetTopicAttributes",
+        "sns:GetTopicAttributes",
+        "sns:ListTagsForResource",
+        "sns:DeleteTopic",
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:ListTagsForResource",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:EnableAlarmActions",
+        "cloudwatch:DisableAlarmActions",
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:TagResource"
+      ],
+      "Resource": ["*"]
     }
   ]
 }
