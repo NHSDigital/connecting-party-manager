@@ -35,35 +35,11 @@ def test_render_response_of_json_serialisable():
 
 
 def test_render_response_of_success_http_status_created():
-    expected_body = json.dumps(
-        {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
-                {
-                    "severity": "information",
-                    "code": "informational",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_CREATED",
-                                "display": "Resource created",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Resource created",
-                }
-            ],
-        }
-    )
+    expected_body = json.dumps({"foo": "bar"})
 
-    aws_lambda_response = render_response(response=HTTPStatus.CREATED, id="foo")
+    aws_lambda_response = render_response(
+        response=(HTTPStatus.CREATED, {"foo": "bar"}),
+    )
 
     expected = {
         "statusCode": 201,

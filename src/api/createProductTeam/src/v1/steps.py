@@ -7,11 +7,10 @@ from domain.ods import validate_ods_code
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from domain.request_models.v1 import CreateProductTeamIncomingParams
 from domain.response.validation_errors import (
-    InboundValidationError,
     mark_json_decode_errors_as_inbound,
+    mark_validation_errors_as_inbound,
 )
 from event.step_chain import StepChain
-from pydantic import ValidationError
 
 
 @mark_json_decode_errors_as_inbound
@@ -20,13 +19,11 @@ def parse_event_body(data, cache) -> dict:
     return event.json_body if event.body else {}
 
 
+@mark_validation_errors_as_inbound
 def parse_incoming_product_team(data, cache) -> CreateProductTeamIncomingParams:
     json_body = data[parse_event_body]
-    try:
-        incoming_product_team = CreateProductTeamIncomingParams(**json_body)
-        return incoming_product_team
-    except ValidationError as exc:
-        raise InboundValidationError(errors=exc.raw_errors, model=exc.model)
+    incoming_product_team = CreateProductTeamIncomingParams(**json_body)
+    return incoming_product_team
 
 
 def validate_product_team_ods_code(data, cache) -> None:

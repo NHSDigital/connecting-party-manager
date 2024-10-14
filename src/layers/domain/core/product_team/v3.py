@@ -42,11 +42,10 @@ class ProductTeam(AggregateRoot):
 
     @root_validator(pre=True)
     def set_id(cls, values):
-        if values.get("id") is None:
-            ods_code = values.get("ods_code")
-            if ods_code:
-                product_team_id = ProductTeamId.create(ods_code=ods_code)
-                values["id"] = product_team_id.id
+        ods_code = values.get("ods_code")
+        if ods_code and not values.get("id"):
+            product_team = ProductTeamId.create(ods_code=ods_code)
+            values["id"] = product_team.id
         return values
 
     def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:

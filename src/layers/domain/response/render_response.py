@@ -7,7 +7,6 @@ from nhs_context_logging import app_logger
 from pydantic import ValidationError
 
 from .aws_lambda_response import AwsLambdaResponse
-from .operation_outcome import operation_outcome_ok
 from .validators import (
     validate_exception,
     validate_http_status_response,
@@ -39,10 +38,6 @@ def render_response[
     if response == HTTPStatus.NO_CONTENT:
         http_status = response
         outcome = None
-    elif isinstance(response, HTTPStatus):
-        # Explicit success (e.g. CREATE, DELETE, UPDATE operations)
-        http_status = response
-        outcome = operation_outcome_ok(id=id, http_status=http_status)
     elif isinstance(response, ValidationError):
         # Implicit failure from ValidationError
         outcome = ErrorResponse.from_validation_error(exception=response).dict()
@@ -53,8 +48,7 @@ def render_response[
         http_status = http_status_from_exception(exception=response)
     else:
         if isinstance(response, tuple):
-            http_status = response[0]
-            outcome = response[1]
+            http_status, outcome = response
         else:
             # Implicit success (e.g. SEARCH, READ operations)
             http_status = HTTPStatus.OK
