@@ -43,13 +43,14 @@ Feature: Create CPM Product for EPR - success scenarios
       | ods_code         | F5H1R            |
       | keys.0.key_value | F5H1R-850000     |
       | keys.0.key_type  | party_key        |
+      | status           | active           |
       | created_on       | << ignore >>     |
       | updated_on       | << ignore >>     |
       | deleted_on       | << ignore >>     |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 313              |
+      | Content-Length | 333              |
 
   Scenario: Successfully create two CPM Products for EPR with the same ProductTeam
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -90,10 +91,11 @@ Feature: Create CPM Product for EPR - success scenarios
       | ods_code         | F5H1R                  |
       | keys.0.key_value | F5H1R-850001           |
       | keys.0.key_type  | party_key              |
+      | status           | active                 |
       | created_on       | << ignore >>           |
       | updated_on       | << ignore >>           |
       | deleted_on       | << ignore >>           |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 319              |
+      | Content-Length | 339              |

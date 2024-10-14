@@ -45,3 +45,10 @@ generate--sbom: build
 
 validate--sbom: generate--sbom
 	grype sbom:./cpm.cdx.json --fail-on CRITICAL
+
+timestamp--reset:
+	@if [ -z "$(FILEPATH)" ]; then \
+		echo "Error: FILEPATH not provided"; \
+		exit 1; \
+	fi
+	FILEPATH=$(FILEPATH) bash $(CURDIR)/scripts/builder/timestamp_reset.sh

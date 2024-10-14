@@ -72,6 +72,8 @@ def assert_equal(expected, received, label=""):
     if isinstance(expected, dict):
         _fix_backslashes(json_data=expected)
         _pop_ignore(expected=expected, received=received)
+    if isinstance(expected, list):
+        handle_list_values(expected_value=expected, received_value=received)
     assert expected == received, error_message(
         expected, "does not equal", received, label=label
     )

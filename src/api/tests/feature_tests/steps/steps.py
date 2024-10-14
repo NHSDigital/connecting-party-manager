@@ -14,6 +14,8 @@ from api.tests.feature_tests.steps.postman import Body, HeaderItem, PostmanReque
 from api.tests.feature_tests.steps.requests import make_request
 from api.tests.feature_tests.steps.table import expand_macro, parse_table
 
+sort_keys = {"product": "name"}
+
 
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
@@ -168,7 +170,6 @@ def then_response(context: Context, status_code: str):
         response_body = context.response.json()
     except JSONDecodeError:
         response_body = context.response.text
-
     assert_many(
         assertions=(
             assert_equal,
@@ -185,6 +186,49 @@ def then_response(context: Context, status_code: str):
             response_body,
             response_body,
         ),
+    )
+
+
+@then(
+    'I receive a status code "{status_code}" with a "{entity_type}" search body reponse that contains'
+)
+def then_response(context: Context, status_code: str, entity_type: str):
+    expected_body = parse_table(table=context.table)
+    expected_body = sorted(expected_body, key=lambda x: x[sort_keys[entity_type]])
+    try:
+        response_body = context.response.json()
+    except JSONDecodeError:
+        response_body = context.response.text
+    response_body = sorted(response_body, key=lambda x: x[sort_keys[entity_type]])
+    assert_many(
+        assertions=(
+            assert_equal,
+            assert_same_type,
+            assert_equal,
+        ),
+        expected=(
+            int(status_code),
+            expected_body,
+            expected_body,
+        ),
+        received=(
+            context.response.status_code,
+            response_body,
+            response_body,
+        ),
+    )
+
+
+@then('I receive a status code "{status_code}" with an empty body')
+def then_response(context: Context, status_code: str):
+    try:
+        response_body = context.response.json()
+    except JSONDecodeError:
+        response_body = context.response.text
+    assert response_body == []
+    assert_equal(
+        expected=int(status_code),
+        received=context.response.status_code,
     )
 
 
