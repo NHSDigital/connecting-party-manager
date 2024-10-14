@@ -160,6 +160,7 @@ def test_index_no_such_product_team():
         )
 
     result_body = json_loads(result["body"])
+
     assert result["statusCode"] == 404
     assert result_body == {
         "errors": [
