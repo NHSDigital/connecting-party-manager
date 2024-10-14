@@ -160,15 +160,14 @@ def test_index_no_such_product_team():
         )
 
     result_body = json_loads(result["body"])
-    assert result["statusCode"] == 404
-    assert result_body["resourceType"] == "OperationOutcome"
-    assert (
-        result_body["issue"][0]["details"]["coding"][0]["code"] == "RESOURCE_NOT_FOUND"
-    )
-    assert (
-        result_body["issue"][0]["diagnostics"]
-        == "Could not find ProductTeam for key ('123456')"
-    )
+    assert result_body == {
+        "errors": [
+            {
+                "code": "RESOURCE_NOT_FOUND",
+                "message": "Could not find ProductTeam for key ('123456')",
+            }
+        ]
+    }
 
 
 @pytest.mark.integration
