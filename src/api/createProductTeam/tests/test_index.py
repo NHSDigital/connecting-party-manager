@@ -98,73 +98,22 @@ def test_index_bad_payload(version):
 
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
-                    "expression": ["Organization.resourceType"],
+                    "code": "MISSING_VALUE",
+                    "message": "Organization.resourceType: field required",
                 },
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
-                    "expression": ["Organization.identifier"],
+                    "code": "MISSING_VALUE",
+                    "message": "Organization.identifier: field required",
                 },
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
-                    "expression": ["Organization.name"],
+                    "code": "MISSING_VALUE",
+                    "message": "Organization.name: field required",
                 },
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
-                    "expression": ["Organization.partOf"],
+                    "code": "MISSING_VALUE",
+                    "message": "Organization.partOf: field required",
                 },
             ],
         }

@@ -47,10 +47,10 @@ def _pop_ignore(expected: dict, received: dict):
 
 
 def _fix_backslashes(json_data: dict):
-    if "issue" in json_data and isinstance(json_data["issue"], list):
-        for issue in json_data["issue"]:
-            if "diagnostics" in issue and isinstance(issue["diagnostics"], str):
-                issue["diagnostics"] = issue["diagnostics"].replace("\\\\", "\\")
+    if "errors" in json_data and isinstance(json_data["errors"], list):
+        for error in json_data["errors"]:
+            if "message" in error and isinstance(error["message"], str):
+                error["message"] = error["message"].replace("\\\\", "\\")
 
 
 def stringify(item) -> str:

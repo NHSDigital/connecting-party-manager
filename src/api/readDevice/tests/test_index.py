@@ -6,7 +6,6 @@ import pytest
 from domain.core.device_key import DeviceKeyType
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
-from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.response_assertions import _response_assertions
@@ -115,27 +114,10 @@ def test_index_no_such_device(version):
 
     expected_result = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_NOT_FOUND",
-                                "display": "Resource not found",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Could not find Device for key ('123')",
+                    "code": "RESOURCE_NOT_FOUND",
+                    "message": "Could not find Device for key ('123')",
                 }
             ],
         }
