@@ -1,31 +1,29 @@
+from http import HTTPStatus
+
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.product_team.v3 import ProductTeam
-from domain.fhir_translation.product_team import create_fhir_model_from_product_team
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.request_models.v1 import ProductTeamPathParams
 from event.step_chain import StepChain
 
 
-def read_product_team(data, cache) -> ProductTeam:
+@mark_validation_errors_as_inbound
+def parse_path_params(data, cache) -> ProductTeamPathParams:
     event = APIGatewayProxyEvent(data[StepChain.INIT])
-    if "product_team_id" in event.path_parameters:
-        id = event.path_parameters["product_team_id"]
-    else:
-        id = event.path_parameters["id"]
-    # The conditonal statement is here because the Organization endpoint still exists whcih will be removed with the FHIR removal tickets.
-    # Remove the "id" path param once Organization and FHIR have been removed.
+    return ProductTeamPathParams(**event.path_parameters)
+
+
+def read_product_team(data, cache) -> ProductTeam:
+    path_params: ProductTeamPathParams = data[parse_path_params]
     product_team_repo = ProductTeamRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return product_team_repo.read(id=id)
+    return product_team_repo.read(id=path_params.product_team_id)
 
 
-def product_team_to_fhir_org(data, cache) -> dict:
-    product_team = data[read_product_team]
-    fhir_org = create_fhir_model_from_product_team(product_team=product_team)
-    return fhir_org.dict()
+def return_product_team(data, cache) -> tuple[HTTPStatus, dict]:
+    product_team: ProductTeam = data[read_product_team]
+    return HTTPStatus.OK, product_team.state()
 
 
-steps = [
-    read_product_team,
-    product_team_to_fhir_org,
-]
+steps = [parse_path_params, read_product_team, return_product_team]

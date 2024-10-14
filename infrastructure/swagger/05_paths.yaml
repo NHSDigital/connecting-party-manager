@@ -67,34 +67,35 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /Organization/{id}:
-    get:
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
-      responses:
-        "4XX":
-          <<: *Response4XX
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_readProductTeam}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
-
   /ProductTeam:
     post:
       operationId: createproductteam
       summary: createProductTeam endpoint for APIGEE integration
       requestBody:
-        $ref: "#/components/requestBodies/Organization"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the product team
+                ods_code:
+                  type: string
+                  description: ODS code associated with the product team
+                keys:
+                  type: array
+                  description: List of keys associated with the product team
+                  items:
+                    type: object
+                    properties:
+                      key_type:
+                        type: string
+                        description: The type of the key (e.g., product_team_id_alias)
+                      key_value:
+                        type: string
+                        description: The value of the key
       responses:
         "201":
           <<: *Response201
@@ -130,11 +131,11 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Read Product Team operation successful
+          description: Read Product operation successful
           content:
             application/fhir+json:
               schema:
-                $ref: "#/components/schemas/Organization"
+                $ref: "#/components/schemas/Bundle"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
