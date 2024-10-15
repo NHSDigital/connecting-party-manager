@@ -1,10 +1,9 @@
 import json
-from uuid import uuid4
 
 import pytest
 from domain.common_steps.create_product import before_steps
 from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.root.v2 import Root
+from domain.core.root.v3 import Root
 from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from domain.response.validation_errors import (
@@ -15,6 +14,7 @@ from event.aws.client import dynamodb_client
 from event.step_chain import StepChain
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 
 TABLE_NAME = "my-table"
 
@@ -58,12 +58,15 @@ def test_create_product_steps_bad_input(
 
 
 def test_create_product_steps_good_input():
-    product_team_id = uuid4()
-    ods_code = "AAA"
+    ods_code = CPM_PRODUCT_TEAM_NO_ID["ods_code"]
     product_name = "foo"
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
+    product_team = org.create_product_team(
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
+    )
     event = {
         "body": json.dumps({"product_name": product_name}),
-        "pathParameters": {"product_team_id": str(product_team_id)},
+        "pathParameters": {"product_team_id": str(product_team.id)},
     }
 
     step_chain = StepChain(step_chain=before_steps)
@@ -74,11 +77,9 @@ def test_create_product_steps_good_input():
             table_name=mocked_cache["DYNAMODB_TABLE"],
             dynamodb_client=mocked_cache["DYNAMODB_CLIENT"],
         )
-        org = Root.create_ods_organisation(ods_code=ods_code)
-        product_team = org.create_product_team(id=product_team_id, name="foo-team")
         product_team_repo.write(product_team)
         step_chain.run(init=event, cache=mocked_cache)
 
     assert isinstance(step_chain.result, CpmProduct)
-    assert step_chain.result.product_team_id == product_team_id
+    assert step_chain.result.product_team_id == product_team.id
     assert step_chain.result.ods_code == ods_code

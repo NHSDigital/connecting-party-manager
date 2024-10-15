@@ -1,6 +1,5 @@
 import json
 
-from behave import given, then, when
 from requests import JSONDecodeError
 
 from api.tests.feature_tests.steps.assertion import (
@@ -10,16 +9,20 @@ from api.tests.feature_tests.steps.assertion import (
     assert_same_type,
 )
 from api.tests.feature_tests.steps.context import Context
+from api.tests.feature_tests.steps.decorators import given, then, when
 from api.tests.feature_tests.steps.postman import Body, HeaderItem, PostmanRequest, Url
 from api.tests.feature_tests.steps.requests import make_request
-from api.tests.feature_tests.steps.table import expand_macro, parse_table
+from api.tests.feature_tests.steps.table import (
+    extract_from_response_by_jsonpath,
+    parse_table,
+)
 
 sort_keys = {"product": "name"}
 
 
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
-    table_headers = parse_table(table=context.table)
+    table_headers = parse_table(table=context.table, context=context)
     apikey_header = {
         "apikey": context.apikey
     }  # Hidden here because the value cant be written in the tests
@@ -32,8 +35,7 @@ def given_request_headers(context: Context, header_name: str):
 def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    body = parse_table(table=context.table)
-    endpoint = expand_macro(endpoint)
+    body = parse_table(table=context.table, context=context)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -62,7 +64,6 @@ def given_made_request(
 def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -89,8 +90,11 @@ def given_made_request(
 def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    body = parse_table(table=context.table) if context.table else context.text
-    endpoint = expand_macro(endpoint)
+    body = (
+        parse_table(table=context.table, context=context)
+        if context.table
+        else context.text
+    )
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -116,7 +120,6 @@ def when_make_request(
 def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
-    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -143,7 +146,6 @@ def when_make_request_with_id(
     context: Context, http_method: str, header_name: str, endpoint: str
 ):
     endpoint = endpoint.replace("<id>", context.response.headers.get("Location"))
-    endpoint = expand_macro(endpoint)
     context.response = make_request(
         base_url=context.base_url,
         http_method=http_method,
@@ -165,7 +167,7 @@ def when_make_request_with_id(
 
 @then('I receive a status code "{status_code}" with body')
 def then_response(context: Context, status_code: str):
-    expected_body = parse_table(table=context.table)
+    expected_body = parse_table(table=context.table, context=context)
     try:
         response_body = context.response.json()
     except JSONDecodeError:
@@ -193,7 +195,7 @@ def then_response(context: Context, status_code: str):
     'I receive a status code "{status_code}" with a "{entity_type}" search body reponse that contains'
 )
 def then_response(context: Context, status_code: str, entity_type: str):
-    expected_body = parse_table(table=context.table)
+    expected_body = parse_table(table=context.table, context=context)
     expected_body = sorted(expected_body, key=lambda x: x[sort_keys[entity_type]])
     try:
         response_body = context.response.json()
@@ -242,7 +244,14 @@ def then_response(context: Context, status_code: str):
 
 @then("the response headers contain")
 def then_response(context: Context):
-    expected_response_headers = parse_table(table=context.table)
+    expected_response_headers = parse_table(table=context.table, context=context)
     assert_is_subset(
         expected=expected_response_headers, received=context.response.headers
+    )
+
+
+@given('I note the response field "{jsonpath}" as "{alias}"')
+def note_response_field(context: Context, jsonpath: str, alias: str):
+    context.notes[alias] = extract_from_response_by_jsonpath(
+        response=context.response.json(), jsonpath=jsonpath
     )

@@ -2,7 +2,6 @@ import os
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import mock
-from uuid import UUID
 
 import pytest
 from domain.core.cpm_product.v1 import CpmProduct
@@ -16,11 +15,12 @@ from domain.repository.marshall import marshall, unmarshall
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 
 from test_helpers.dynamodb import mock_table
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.uuid import consistent_uuid
 
 TABLE_NAME = "hiya"
 
-ODS_CODE = "AAA"
+ODS_CODE = "F5H1R"
 PRODUCT_TEAM_ID = consistent_uuid(1)
 PRODUCT_ID = "P.AAA-AAA"
 PRODUCT_NAME = "My Product"
@@ -49,8 +49,10 @@ class MockCpmProductRepository(CpmProductRepository):
 
 @contextmanager
 def mock_lambda():
-    org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(id=PRODUCT_TEAM_ID, name=PRODUCT_NAME)
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
+    product_team = org.create_product_team(
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
+    )
 
     with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
@@ -74,17 +76,17 @@ def mock_lambda():
 
         index.cache["DYNAMODB_CLIENT"] = client
 
-        yield index
+        yield index, product_team
 
 
 def test_index():
-    with mock_lambda() as index:
+    with mock_lambda() as (index, product_team):
         # Execute the lambda
         response = index.handler(
             event={
                 "headers": {"version": VERSION},
                 "pathParameters": {
-                    "product_team_id": PRODUCT_TEAM_ID,
+                    "product_team_id": product_team.id,
                     "product_id": PRODUCT_ID,
                 },
             }
@@ -98,13 +100,13 @@ def test_index():
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
         with pytest.raises(ItemNotFound):
-            repo.read(product_team_id=PRODUCT_TEAM_ID, product_id=PRODUCT_ID)
+            repo.read(product_team_id=product_team.id, product_id=PRODUCT_ID)
 
         repo = MockCpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
         deleted_product = repo.read_inactive_product(
-            product_team_id=PRODUCT_TEAM_ID, product_id=PRODUCT_ID
+            product_team_id=product_team.id, product_id=PRODUCT_ID
         ).dict()
 
     # Sense checks on the deleted resource
@@ -121,7 +123,7 @@ def test_index():
     assert deleted_product == {
         "name": PRODUCT_NAME,
         "ods_code": ODS_CODE,
-        "product_team_id": UUID(PRODUCT_TEAM_ID),
+        "product_team_id": product_team.id,
         "status": Status.INACTIVE,
         "keys": [],
     }
@@ -162,7 +164,7 @@ def test_index():
     ],
 )
 def test_incoming_errors(path_parameters, error_code, status_code):
-    with mock_lambda() as index:
+    with mock_lambda() as (index, product_team):
         # Execute the lambda
         response = index.handler(
             event={

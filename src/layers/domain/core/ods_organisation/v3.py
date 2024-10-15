@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.product_team.v3 import ProductTeam, ProductTeamCreatedEvent
 from domain.core.validation import ODS_CODE_REGEX
@@ -15,8 +13,9 @@ class OdsOrganisation(AggregateRoot):
 
     ods_code: str = Field(regex=ODS_CODE_REGEX)
 
-    def create_product_team(self, id: UUID, name: str) -> ProductTeam:
-        product_team = ProductTeam(id=id, name=name, ods_code=self.ods_code)
+    def create_product_team(self, name: str, keys: list = None) -> ProductTeam:
+        keys = keys or []
+        product_team = ProductTeam(name=name, ods_code=self.ods_code, keys=keys)
         event = ProductTeamCreatedEvent(**product_team.dict())
         product_team.add_event(event)
         self.add_event(event=event)

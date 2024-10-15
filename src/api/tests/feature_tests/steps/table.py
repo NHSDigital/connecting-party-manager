@@ -3,36 +3,60 @@ from typing import Any
 
 from behave.model import Table
 
+from api.tests.feature_tests.steps.context import Context
 from test_helpers.uuid import consistent_uuid
 
 FN_REGEX = re.compile(r"\${\s([a-zA-Z_]\w*)\(([^)]*)\)\s}")
-EXPAND_FUNCTIONS = {
-    # macros here
-    "uuid": consistent_uuid,
-    # behave formatter workarounds here:
-    "dollar": lambda: "$",
-    "pipe": lambda: "|",
+JSON_PATH_PATTERN = re.compile(r"\.([^\.\[\]]+|\d+)")
+EMPTY_TYPES_AS_STRING = {
+    "[]": list,
 }
 EMPTY_TYPES_AS_STRING = {
     "[]": list,
 }
 
 
-def parse_table(table: Table) -> dict:
+EXPAND_FUNCTIONS = {
+    # macros here
+    "uuid": lambda *args, **kwargs: consistent_uuid(*args),
+    "note": lambda alias, context: context.notes[alias],
+    # behave formatter workarounds here:
+    "dollar": lambda context: "$",
+    "pipe": lambda context: "|",
+}
+
+
+def _split_jsonpath(jsonpath: str):
+    if not jsonpath.startswith("$."):
+        return None
+    segments: list[str] = JSON_PATH_PATTERN.findall(jsonpath)
+    return [int(item) if item.isdigit() else item for item in segments]
+
+
+def extract_from_response_by_jsonpath(response: dict, jsonpath: str):
+    _jsonpath_segments = _split_jsonpath(jsonpath=jsonpath)
+    value = response
+    for key in _jsonpath_segments:
+        value = value[key]
+    return value
+
+
+def parse_table(context: Context, table: Table) -> dict:
     key_heading, value_heading = table.headings
     _dict = {row[key_heading]: row[value_heading] for row in table.rows}
-    return _unflatten_dict(_dict)
+    return _unflatten_dict(_dict, context=context)
 
 
-def expand_macro(value: str):
+def expand_macro(value: str, *, context: Context):
     if value in EMPTY_TYPES_AS_STRING:
         return EMPTY_TYPES_AS_STRING[value]()
 
     _match: list[tuple[str, str]] = FN_REGEX.findall(value)
     for fn_name, _args in _match:
+        value_to_replace = f"${{ {fn_name}({_args}) }}"
         args = filter(bool, map(str.strip, _args.split(",")))
-        expanded_value = EXPAND_FUNCTIONS[fn_name](*args)
-        value = FN_REGEX.sub(expanded_value, value)
+        expanded_value = EXPAND_FUNCTIONS[fn_name](*args, context=context)
+        value = value.replace(value_to_replace, expanded_value)
     return value
 
 
@@ -57,19 +81,21 @@ def _merge_nested_dicts(d1, d2):
     return d1
 
 
-def _unpack_nested_lists(obj: Any | dict[str, any]):
+def _unpack_nested_lists(obj: Any | dict[str, any], context: Context):
     """Recursively convert any dict to a list where all keys are integer-like"""
     if not isinstance(obj, dict) or not obj:
-        return expand_macro(obj)
+        return expand_macro(obj, context=context)
     if all(key.isdigit() for key in obj):
         unpacked_list = [None] * (int(max(obj)) + 1)
         for key, value in obj.items():
-            unpacked_list[int(key)] = _unpack_nested_lists(value)
+            unpacked_list[int(key)] = _unpack_nested_lists(value, context=context)
         return unpacked_list
-    return {key: _unpack_nested_lists(value) for key, value in obj.items()}
+    return {
+        key: _unpack_nested_lists(value, context=context) for key, value in obj.items()
+    }
 
 
-def _unflatten_dict(flat_dict: dict[str, any]):
+def _unflatten_dict(flat_dict: dict[str, any], context: Context):
     nested_dict = {}
     for key, value in flat_dict.items():
         head, *tail = key.split(".")
@@ -80,4 +106,4 @@ def _unflatten_dict(flat_dict: dict[str, any]):
         else:
             _merge_nested_dicts(nested_dict[head], _nested_dict)
 
-    return _unpack_nested_lists(obj=nested_dict)
+    return _unpack_nested_lists(obj=nested_dict, context=context)
