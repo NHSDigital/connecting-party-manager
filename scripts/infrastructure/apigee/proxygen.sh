@@ -2,6 +2,10 @@ set -e
 
 PATH_TO_HERE="scripts/infrastructure/apigee"
 APIGEE_DEPLOYMENT_ROLE="NHSDeploymentRole"
+API_NAME="connecting-party-manager"
+DEV_BUILD="${2:-true}"
+echo "DEV_BUILD is: $DEV_BUILD"
+
 
 if [[ -z ${WORKSPACE_OUTPUT_JSON} ]]; then
     echo "WORKSPACE_OUTPUT_JSON not set"
@@ -107,11 +111,19 @@ function generate_proxy(){
         poetry run python ${PATH_TO_HERE}/download_pem.py ${_apigee_stage} ${APIGEE_DEPLOYMENT_ROLE}
     fi
 
+    echo "API_NAME before is: $API_NAME"
+
+    if [ "$DEV_BUILD" = "true" ]; then
+        API_NAME=$_workspace_name
+    fi
+
+    echo "API_NAME is: $API_NAME"
+
     DOT_PROXYGEN=${APIGEE_CONFIG_PATH}/${_apigee_stage} \
         poetry run \
         python ${PATH_TO_HERE}/proxygen.py instance deploy \
         ${_apigee_environment} \
-        cpm-${_workspace_name} \
+        ${API_NAME} \
         ${SWAGGER_APIGEE} \
         --no-confirm
 }
@@ -153,6 +165,10 @@ function delete_proxy(){
         _workspace_name="sandbox"
     fi
 
+    if [ "$DEV_BUILD" = "true" ]; then
+        API_NAME=$_workspace_name
+    fi
+
     # Download the pem file if it does not exist
     if [ ! -f "${APIGEE_CONFIG_PATH}/${_apigee_stage}/.proxygen/private_key.pem" ]; then
         poetry run python ${PATH_TO_HERE}/download_pem.py ${_apigee_stage} ${APIGEE_DEPLOYMENT_ROLE}
@@ -162,7 +178,7 @@ function delete_proxy(){
         poetry run \
         python ${PATH_TO_HERE}/proxygen.py instance delete \
         ${_apigee_environment} \
-        cpm-${_workspace_name} \
+        ${API_NAME} \
         --no-confirm
 }
 
