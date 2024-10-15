@@ -131,7 +131,7 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Read Product operation successful
+          description: Read Product Team operation successful
           content:
             application/fhir+json:
               schema:
