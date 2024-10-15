@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 import pytest
 from domain.core.cpm_product import CpmProduct
