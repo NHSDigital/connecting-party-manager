@@ -103,12 +103,14 @@ Feature: Create Product Team - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 288              |
     When I make a "GET" request with "default" headers to "ProductTeam/FOOBAR"
-
-# Then I receive a status code "200" with body
-# | path                     | value                                                          |
-# | resourceType             | Organization                                                   |
-# | identifier.0.system      | connecting-party-manager/product-team-id                       |
-# | identifier.0.value       | ${ note(product_team_id) }                                     |
-# | name                     | My Great Product Team                                          |
-# | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
-# | partOf.identifier.value  | F5H1R                                                          |
+    Then I receive a status code "200" with body
+      | path             | value                 |
+      | id               | << ignore >>          |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | status           | active                |
+      | created_on       | << ignore >>          |
+      | updated_on       | << ignore >>          |
+      | deleted_on       | << ignore >>          |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
