@@ -5,7 +5,7 @@ source ./scripts/infrastructure/terraform/terraform-constants.sh
 
 PATH_TO_HERE="scripts/infrastructure/apigee"
 APIGEE_DEPLOYMENT_ROLE="NHSDeploymentRole"
-DEV_BUILD="${2:-true}"
+PERSISTENT_ENVIRONMENT_BUILD="${2:-false}"
 API_NAME="connecting-party-manager"
 
 
@@ -93,7 +93,7 @@ function attach_product(){
     # Currently hardcoded to CPM PTL id for PR running purposes, could be passed in for adjusting other apps in the future
     _app_id="9d28b416-311b-4523-bda9-686baa2fc437"
 
-    if [ "$DEV_BUILD" = "true" ]; then
+    if [ "$PERSISTENT_ENVIRONMENT_BUILD" = "false" ]; then
         API_NAME=$_workspace_name
     fi
 
@@ -179,7 +179,7 @@ function detach_product(){
     # Currently hardcoded to CPM PTL id for PR running purposes, could be passed in for adjusting other apps in the future
     _app_id="9d28b416-311b-4523-bda9-686baa2fc437"
 
-    if [ "$DEV_BUILD" = "true" ]; then
+    if [ "$PERSISTENT_ENVIRONMENT_BUILD" = "false" ]; then
         API_NAME=$_workspace_name
     fi
 
