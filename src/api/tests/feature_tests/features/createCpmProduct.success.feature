@@ -18,9 +18,10 @@ Feature: Create CPM Product - success scenarios
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path         | value            |
       | product_name | My Great Product |
+    And I note the response field "$.id" as "product_id"
     Then I receive a status code "201" with body
       | path            | value                      |
-      | id              | << ignore >>               |
+      | id              | ${ note(product_id) }      |
       | name            | My Great Product           |
       | product_team_id | ${ note(product_team_id) } |
       | ods_code        | F5H1R                      |
@@ -33,7 +34,6 @@ Feature: Create CPM Product - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 255              |
-    And I note the response field "$.id" as "product_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }"
     Then I receive a status code "200" with body
       | path            | value                      |
