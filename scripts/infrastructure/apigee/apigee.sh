@@ -5,6 +5,9 @@ source ./scripts/infrastructure/terraform/terraform-constants.sh
 
 PATH_TO_HERE="scripts/infrastructure/apigee"
 APIGEE_DEPLOYMENT_ROLE="NHSDeploymentRole"
+DEV_BUILD="${2:-true}"
+API_NAME="connecting-party-manager"
+
 
 
 if [[ -z ${WORKSPACE_OUTPUT_JSON} ]]; then
@@ -89,7 +92,12 @@ function attach_product(){
     _org_name="nhsd-nonprod"
     # Currently hardcoded to CPM PTL id for PR running purposes, could be passed in for adjusting other apps in the future
     _app_id="9d28b416-311b-4523-bda9-686baa2fc437"
-    _product_name="connecting-party-manager--$_apigee_environment--cpm-$_workspace_name--app-level0"
+
+    if [ "$DEV_BUILD" = "true" ]; then
+        API_NAME=$_workspace_name
+    fi
+
+    _product_name="connecting-party-manager--$_apigee_environment--$API_NAME--app-level0"
     _secret_name="$_aws_environment--apigee-app-client-info"
     _apigee_stage=$(get_apigee_stage ${_workspace_name})
 
@@ -146,7 +154,6 @@ function attach_product(){
             -H "Content-type:application/json" \
             -d "{\"apiProducts\": [\"$_product_name\"]}")
 
-        echo "$add_product_response"
         status=$(echo "$add_product_response" | jq -r '.status')
         echo "$status"
 
@@ -171,7 +178,12 @@ function detach_product(){
     _org_name="nhsd-nonprod"
     # Currently hardcoded to CPM PTL id for PR running purposes, could be passed in for adjusting other apps in the future
     _app_id="9d28b416-311b-4523-bda9-686baa2fc437"
-    _product_name="connecting-party-manager--$_apigee_environment--cpm-$_workspace_name--app-level0"
+
+    if [ "$DEV_BUILD" = "true" ]; then
+        API_NAME=$_workspace_name
+    fi
+
+    _product_name="connecting-party-manager--$_apigee_environment--$API_NAME--app-level0"
     _secret_name="$_aws_environment--apigee-app-client-info"
     _apigee_stage=$(get_apigee_stage ${_workspace_name})
 
@@ -228,7 +240,6 @@ function detach_product(){
             -H "Content-type:application/json" \
             -d "{\"apiProducts\": [\"$_product_name\"]}")
 
-        echo "$detach_product_response"
         status=$(echo "$detach_product_response" | jq -r '.status')
         echo "$status"
 
