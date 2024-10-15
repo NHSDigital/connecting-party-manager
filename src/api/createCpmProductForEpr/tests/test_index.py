@@ -18,7 +18,6 @@ from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.uuid import consistent_uuid
 
 TABLE_NAME = "hiya"
-
 ODS_CODE = "F5H1R"
 PRODUCT_TEAM_ID = consistent_uuid(1)
 PRODUCT_NAME = "My Product"
