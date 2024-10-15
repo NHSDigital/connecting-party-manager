@@ -72,33 +72,10 @@ paths:
       operationId: createproductteam
       summary: createProductTeam endpoint for APIGEE integration
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: Name of the product team
-                ods_code:
-                  type: string
-                  description: ODS code associated with the product team
-                keys:
-                  type: array
-                  description: List of keys associated with the product team
-                  items:
-                    type: object
-                    properties:
-                      key_type:
-                        type: string
-                        description: The type of the key (e.g., product_team_id_alias)
-                      key_value:
-                        type: string
-                        description: The value of the key
+        $ref: "#/components/requestBodies/ProductTeamRequest"
       responses:
         "201":
-          <<: *Response201
+          $ref: "#/components/responses/ProductTeamResponse"
         "4XX":
           <<: *Response4XX
       <<: *RequestHeaders
@@ -131,11 +108,7 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Read Product Team operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
+          $ref: "#/components/responses/ProductTeamResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
