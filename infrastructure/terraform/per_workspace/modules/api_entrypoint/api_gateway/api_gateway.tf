@@ -82,11 +82,9 @@ resource "aws_api_gateway_gateway_response" "api_access_denied" {
   response_type = "ACCESS_DENIED"
   response_templates = {
     "application/json" = jsonencode({
-      resourceType : "OperationOutcome",
-      issue : [{
-        severity : "error",
-        code : "processing",
-        diagnostics : "$context.authorizer.error"
+      errors : [{
+        code : "PROCESSING"
+        message : "$context.authorizer.error"
       }]
     })
   }
@@ -100,11 +98,9 @@ resource "aws_api_gateway_gateway_response" "api_default_4xx" {
   response_type = "DEFAULT_4XX"
   response_templates = {
     "application/json" = jsonencode({
-      resourceType : "OperationOutcome",
-      issue : [{
-        severity : "error",
-        code : "processing"
-        diagnostics : "$context.error.message"
+      errors : [{
+        code : "PROCESSING"
+        message : "$context.error.message"
       }]
   }) }
   response_parameters = { "gatewayresponse.header.Access-Control-Allow-Origin" = "'*'"
@@ -116,10 +112,9 @@ resource "aws_api_gateway_gateway_response" "api_default_5xx" {
   response_type = "DEFAULT_5XX"
   response_templates = {
     "application/json" = jsonencode({
-      resourceType : "OperationOutcome",
-      issue : [{
-        severity : "error",
-        code : "exception"
+      errors : [{
+        code : "PROCESSING"
+        message : "exception"
       }]
   }) }
   response_parameters = { "gatewayresponse.header.Access-Control-Allow-Origin" = "'*'"
