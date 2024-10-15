@@ -4,6 +4,7 @@ from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.product_team.v3 import ProductTeam
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from domain.request_models.v1 import ProductTeamPathParams
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
 
