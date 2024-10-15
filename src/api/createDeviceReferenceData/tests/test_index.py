@@ -91,16 +91,13 @@ def test_index() -> None:
         repo = DeviceReferenceDataRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
-        if hasattr(repo, "read"):
-            raise Exception(
-                "uncomment the following code now that you've implemented read"
-            )
-            created_device_reference_data = repo.read(
-                product_team_id=device_reference_data.product_team_id,
-                product_id=device_reference_data.product_id,
-                device_reference_data_id=device_reference_data.id,
-            )
-            assert created_device_reference_data == device_reference_data
+
+        created_device_reference_data = repo.read(
+            product_team_id=device_reference_data.product_team_id,
+            product_id=device_reference_data.product_id,
+            device_reference_data_id=device_reference_data.id,
+        )
+        assert created_device_reference_data == device_reference_data
 
 
 @pytest.mark.parametrize(

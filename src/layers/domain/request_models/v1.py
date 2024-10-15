@@ -30,3 +30,9 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
 
 class CreateDeviceReferenceDataParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
+
+
+class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
+    product_id: str = Field(...)
+    product_team_id: str = Field(...)
+    device_reference_data_id: str = Field(...)
