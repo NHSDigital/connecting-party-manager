@@ -139,32 +139,6 @@ def when_make_request(
     )
 
 
-@when(
-    'I make a "{http_method}" request with "{header_name}" headers to the id in the location response header to the endpoint prefix "{endpoint}"'
-)
-def when_make_request_with_id(
-    context: Context, http_method: str, header_name: str, endpoint: str
-):
-    endpoint = endpoint.replace("<id>", context.response.headers.get("Location"))
-    context.response = make_request(
-        base_url=context.base_url,
-        http_method=http_method,
-        endpoint=endpoint,
-        headers=context.headers[header_name],
-    )
-    context.postman_step.request = PostmanRequest(
-        url=Url(
-            raw=context.response.url,
-            host=[context.base_url.rstrip("/")],
-            path=[endpoint],
-        ),
-        method=http_method,
-        header=[
-            HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
-        ],
-    )
-
-
 @then('I receive a status code "{status_code}" with body')
 def then_response(context: Context, status_code: str):
     expected_body = parse_table(table=context.table, context=context)

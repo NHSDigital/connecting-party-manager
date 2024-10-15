@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.api.common_steps.general import parse_event_body
@@ -12,6 +13,9 @@ from domain.request_models.v1 import (
 )
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
+
+if TYPE_CHECKING:
+    from mypy_boto3_dynamodb.type_defs import TransactWriteItemsOutputTypeDef
 
 
 @mark_validation_errors_as_inbound
@@ -52,7 +56,9 @@ def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
     return product_repo.write(product)
 
 
-def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
+def write_cpm_product(
+    data: dict[str, CpmProduct], cache
+) -> list["TransactWriteItemsOutputTypeDef"]:
     product: CpmProduct = data[create_cpm_product]
     product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
@@ -60,9 +66,9 @@ def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
     return product_repo.write(product)
 
 
-def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
+def set_http_status(data, cache) -> tuple[HTTPStatus, CpmProduct]:
     product: CpmProduct = data[create_cpm_product]
-    return HTTPStatus.CREATED, str(product.id)
+    return HTTPStatus.CREATED, product.state()
 
 
 before_steps = [

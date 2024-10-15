@@ -18,11 +18,11 @@ Feature: Read CPM Product - success scenarios
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
       | path         | value            |
       | product_name | My Great Product |
-    Given I note the response field "$.id" as "product_id"
-    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/${ note(product_team_id) }/Product/<id>"
+    And I note the response field "$.id" as "product_id"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }"
     Then I receive a status code "200" with body
       | path             | value                      |
-      | id               | << ignore >>               |
+      | id               | ${ note(product_id) }      |
       | name             | My Great Product           |
       | product_team_id  | ${ note(product_team_id) } |
       | ods_code         | F5H1R                      |
