@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-10-14
+- [PI-534] Errors without FHIR
+
 ## 2024-10-09
 - [PI-504] Delete product
 - [PI-498] Search products

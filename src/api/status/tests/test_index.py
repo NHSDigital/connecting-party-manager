@@ -99,27 +99,10 @@ def test_index_not_ok():
 
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_UNAVAILABLE",
-                                "display": "Service unavailable - could be temporary",
-                            }
-                        ]
-                    },
-                    "diagnostics": "An error occurred (ResourceNotFoundException) when calling the Scan operation: Requested resource not found",
+                    "code": "SERVICE_UNAVAILABLE",
+                    "message": "An error occurred (ResourceNotFoundException) when calling the Scan operation: Requested resource not found",
                 }
             ],
         }

@@ -25,21 +25,13 @@ Feature: Create Device - failure scenarios
       | definition.identifier.value  | product                                  |
       | owner.identifier.system      | connecting-party-manager/product-team-id |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | MISSING_VALUE                                                       |
-      | issue.0.details.coding.0.display | Missing value                                                       |
-      | issue.0.diagnostics              | field required                                                      |
-      | issue.0.expression.0             | Device.owner.identifier.value                                       |
+      | path             | value                                         |
+      | errors.0.code    | MISSING_VALUE                                 |
+      | errors.0.message | Device.owner.identifier.value: field required |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 488              |
+      | Content-Length | 99               |
 
   Scenario: Cannot create a Device with invalid FHIR
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -59,28 +51,15 @@ Feature: Create Device - failure scenarios
       | definition.identifier.value  | product                                  |
       | owner.identifier             | connecting-party-manager/product-team-id |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | unexpected value; permitted: 'Device'                               |
-      | issue.0.expression.0             | Device.resourceType                                                 |
-      | issue.1.severity                 | error                                                               |
-      | issue.1.code                     | processing                                                          |
-      | issue.1.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.1.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.1.details.coding.0.display | Validation error                                                    |
-      | issue.1.diagnostics              | value is not a valid dict                                           |
-      | issue.1.expression.0             | Device.owner.identifier                                             |
+      | path             | value                                                      |
+      | errors.0.code    | VALIDATION_ERROR                                           |
+      | errors.0.message | Device.resourceType: unexpected value; permitted: 'Device' |
+      | errors.1.code    | VALIDATION_ERROR                                           |
+      | errors.1.message | Device.owner.identifier: value is not a valid dict         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 806              |
+      | Content-Length | 210              |
 
   Scenario: Cannot create a Device with an invalid name
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -101,21 +80,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | string does not match regex "^[ -~]+$"                              |
-      | issue.0.expression.0             | Device.deviceName.0.name                                            |
+      | path             | value                                                            |
+      | errors.0.code    | VALIDATION_ERROR                                                 |
+      | errors.0.message | Device.deviceName.0.name: string does not match regex "^[ -~]+$" |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 515              |
+      | Content-Length | 123              |
 
   Scenario: Cannot create a Device with an invalid name type
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -136,21 +107,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | string does not match regex "^user-friendly-name$"                  |
-      | issue.0.expression.0             | Device.deviceName.0.type                                            |
+      | path             | value                                                                        |
+      | errors.0.code    | VALIDATION_ERROR                                                             |
+      | errors.0.message | Device.deviceName.0.type: string does not match regex "^user-friendly-name$" |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 527              |
+      | Content-Length | 135              |
 
   Scenario: Cannot create a Device with an invalid device type
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -171,21 +134,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | string does not match regex "^product\|endpoint$"                   |
-      | issue.0.expression.0             | Device.definition.identifier.value                                  |
+      | path             | value                                                                                 |
+      | errors.0.code    | VALIDATION_ERROR                                                                      |
+      | errors.0.message | Device.definition.identifier.value: string does not match regex "^product\|endpoint$" |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 535              |
+      | Content-Length | 143              |
 
   Scenario: Cannot create a Device with an invalid key type
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -208,21 +163,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
-      | path                             | value                                                                                                                                     |
-      | resourceType                     | OperationOutcome                                                                                                                          |
-      | id                               | << ignore >>                                                                                                                              |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome                                                                       |
-      | issue.0.severity                 | error                                                                                                                                     |
-      | issue.0.code                     | processing                                                                                                                                |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome                                                                       |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                                                                                          |
-      | issue.0.details.coding.0.display | Validation error                                                                                                                          |
-      | issue.0.diagnostics              | string does not match regex "^connecting-party-manager/(product_id${ pipe() }accredited_system_id${ pipe() }message_handling_system_id)$" |
-      | issue.0.expression.0             | Device.identifier.0.system                                                                                                                |
+      | path             | value                                                                                                                                                                 |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                                                      |
+      | errors.0.message | Device.identifier.0.system: string does not match regex "^connecting-party-manager/(product_id${ pipe() }accredited_system_id${ pipe() }message_handling_system_id)$" |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 596              |
+      | Content-Length | 204              |
 
   Scenario: Cannot create a Device with an invalid device id
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -245,21 +192,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
-      | path                             | value                                                                                                                                                                                    |
-      | resourceType                     | OperationOutcome                                                                                                                                                                         |
-      | id                               | << ignore >>                                                                                                                                                                             |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome                                                                                                                      |
-      | issue.0.severity                 | error                                                                                                                                                                                    |
-      | issue.0.code                     | processing                                                                                                                                                                               |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome                                                                                                                      |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                                                                                                                                         |
-      | issue.0.details.coding.0.display | Validation error                                                                                                                                                                         |
-      | issue.0.diagnostics              | Key 'not_a_valid_product_id' does not match the expected pattern '^P\\.[ACDEFGHJKLMNPRTUVWXY34679]{3}-[ACDEFGHJKLMNPRTUVWXY34679]{3}${ dollar() }' associated with key type 'product_id' |
-      | issue.0.expression.0             | Device.identifier.0                                                                                                                                                                      |
+      | path             | value                                                                                                                                                                                                         |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                                                                                              |
+      | errors.0.message | Device.identifier.0: Key 'not_a_valid_product_id' does not match the expected pattern '^P\\.[ACDEFGHJKLMNPRTUVWXY34679]{3}-[ACDEFGHJKLMNPRTUVWXY34679]{3}${ dollar() }' associated with key type 'product_id' |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 642              |
+      | Content-Length | 250              |
 
   Scenario: Cannot create a Device with a repeated key
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -284,21 +223,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id      |
       | owner.identifier.value       | ${ uuid(1) }                                  |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | It is forbidden to supply the same key multiple times               |
-      | issue.0.expression.0             | Device.identifier                                                   |
+      | path             | value                                                                    |
+      | errors.0.code    | VALIDATION_ERROR                                                         |
+      | errors.0.message | Device.identifier: It is forbidden to supply the same key multiple times |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 521              |
+      | Content-Length | 129              |
 
   Scenario: Cannot create a Device with a product_id
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -321,21 +252,13 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | It is forbidden to supply a product_id                              |
-      | issue.0.expression.0             | Device.identifier                                                   |
+      | path             | value                                                     |
+      | errors.0.code    | VALIDATION_ERROR                                          |
+      | errors.0.message | Device.identifier: It is forbidden to supply a product_id |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 506              |
+      | Content-Length | 114              |
 
   Scenario: Cannot create a Device with corrupt body
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -351,20 +274,13 @@ Feature: Create Device - failure scenarios
       {"invalid_array": [}
       """
     Then I receive a status code "400" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | VALIDATION_ERROR                                                    |
-      | issue.0.details.coding.0.display | Validation error                                                    |
-      | issue.0.diagnostics              | Invalid JSON body was provided: line 1 column 20 (char 19)          |
+      | path             | value                                                      |
+      | errors.0.code    | VALIDATION_ERROR                                           |
+      | errors.0.message | Invalid JSON body was provided: line 1 column 20 (char 19) |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 489              |
+      | Content-Length | 115              |
 
   Scenario: Cannot create a Device with a Product Team that does not exist
     When I make a "POST" request with "default" headers to "Device" with body:
@@ -377,17 +293,10 @@ Feature: Create Device - failure scenarios
       | owner.identifier.system      | connecting-party-manager/product-team-id |
       | owner.identifier.value       | ${ uuid(1) }                             |
     Then I receive a status code "404" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | error                                                               |
-      | issue.0.code                     | processing                                                          |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | RESOURCE_NOT_FOUND                                                  |
-      | issue.0.details.coding.0.display | Resource not found                                                  |
-      | issue.0.diagnostics              | Could not find ProductTeam for key ('${ uuid(1) }')                 |
+      | path             | value                                               |
+      | errors.0.code    | RESOURCE_NOT_FOUND                                  |
+      | errors.0.message | Could not find ProductTeam for key ('${ uuid(1) }') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 510              |
+      | Content-Length | 134              |

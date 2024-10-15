@@ -1,10 +1,13 @@
 import json
 from http import HTTPStatus
 
+from domain.response.error_response import ErrorResponse
+from domain.response.response_matrix import http_status_from_exception
 from nhs_context_logging import app_logger
+from pydantic import ValidationError
 
 from .aws_lambda_response import AwsLambdaResponse
-from .operation_outcome import operation_outcome_not_ok, operation_outcome_ok
+from .operation_outcome import operation_outcome_ok
 from .validators import (
     validate_exception,
     validate_http_status_response,
@@ -16,7 +19,7 @@ def render_response[
     JsonSerialisable
 ](
     response: JsonSerialisable | HTTPStatus | Exception,
-    id: str = None,
+    id: str = None,  # Deprecated: remove when FHIR is removed
     version: str = None,
     location: str = None,
 ) -> AwsLambdaResponse:
@@ -40,9 +43,14 @@ def render_response[
         # Explicit success (e.g. CREATE, DELETE, UPDATE operations)
         http_status = response
         outcome = operation_outcome_ok(id=id, http_status=http_status)
+    elif isinstance(response, ValidationError):
+        # Implicit failure from ValidationError
+        outcome = ErrorResponse.from_validation_error(exception=response).dict()
+        http_status = http_status_from_exception(exception=response)
     elif isinstance(response, Exception):
-        # Implicit failure
-        http_status, outcome = operation_outcome_not_ok(id=id, exception=response)
+        # Implicit failure from all other Exceptions
+        outcome = ErrorResponse.from_exception(exception=response).dict()
+        http_status = http_status_from_exception(exception=response)
     else:
         # Implicit success (e.g. SEARCH, READ operations)
         http_status = HTTPStatus.OK

@@ -254,19 +254,19 @@ def test_multiple_returned(params, devices):
                 "nhs_id_code": "RTX",
             },
             "VALIDATION_ERROR",
-            "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
+            "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
             400,
         ),
         (
             {"nhs_mhs_svc_ia": "urn:nhs:names:services:ebs:PRSC_IN040000UK08"},
             "VALIDATION_ERROR",
-            "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
+            "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
             400,
         ),
         (
             {"nhs_mhs_party_key": "D81631-827817"},
             "VALIDATION_ERROR",
-            "At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
+            "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key",
             400,
         ),
         (
@@ -276,7 +276,7 @@ def test_multiple_returned(params, devices):
                 "foo": "bar",
             },
             "VALIDATION_ERROR",
-            "extra fields not permitted",
+            "SearchSDSEndpointQueryParams.foo: extra fields not permitted",
             400,
         ),
     ],
@@ -303,8 +303,8 @@ def test_filter_errors(params, error_code, error_msg, status_code):
     assert result["statusCode"] == status_code
     result_body = json_loads(result["body"])
 
-    assert result_body["issue"][0]["details"]["coding"][0]["code"] == error_code
-    assert result_body["issue"][0]["diagnostics"] == error_msg
+    assert result_body["errors"][0]["code"] == error_code
+    assert result_body["errors"][0]["message"] == error_msg
 
 
 @pytest.mark.integration

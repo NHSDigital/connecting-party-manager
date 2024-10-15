@@ -8,6 +8,7 @@ from domain.response.tests.test_validation_errors import (
     _get_inbound_validation_error,
     _get_validation_error,
 )
+from event.json import json_loads
 
 from test_helpers.response_assertions import _response_assertions
 
@@ -86,27 +87,14 @@ def test_render_response_of_success_http_status_created():
 def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": f"HTTP Status '{http_status.value}' should not be explicitly returned from the API. For non-2XX statuses we should raise exceptions for control flow of API failures. Any 2XX statuses should be added to SUCCESS_STATUSES.",
+                    "code": "SERVICE_ERROR",
+                    "message": (
+                        f"HTTP Status '{http_status.value}' should not be explicitly returned from the API. "
+                        "For non-2XX statuses we should raise exceptions for control flow of API failures. "
+                        "Any 2XX statuses should be added to SUCCESS_STATUSES."
+                    ),
                 }
             ],
         }
@@ -134,27 +122,10 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
 def test_render_response_of_non_json_serialisable():
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Object of type object is not JSON serializable",
+                    "code": "SERVICE_ERROR",
+                    "message": "Object of type object is not JSON serializable",
                 }
             ],
         }
@@ -210,27 +181,10 @@ def test_render_response_of_blank_exception():
     aws_lambda_response = render_response(response=Exception(), id="foo")
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": "An exception of type 'Exception' was raised with no message",
+                    "code": "SERVICE_ERROR",
+                    "message": "An exception of type 'Exception' was raised with no message",
                 }
             ],
         }
@@ -256,27 +210,10 @@ def test_render_response_of_general_exception():
     aws_lambda_response = render_response(response=Exception("oops"), id="foo")
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
+            "errors": [
                 {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": "oops",
+                    "code": "SERVICE_ERROR",
+                    "message": "oops",
                 }
             ],
         }
@@ -311,139 +248,52 @@ def test_render_response_of_general_validation_error():
 
     validation_error = _get_validation_error(model_inputs)
     aws_lambda_response = render_response(response=validation_error, id="foo")
-    expected_body = json.dumps(
-        {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
+    expected_body = {
+        "errors": [
+            {
+                "code": "SERVICE_ERROR",
+                "message": "MyModel.top_field: value is not a valid float",
             },
-            "issue": [
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": "value is not a valid float",
-                    "expression": ["MyModel.top_field"],
-                },
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": "str type expected",
-                    "expression": ["MyModel.nested_models.0.field_1"],
-                },
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "SERVICE_ERROR",
-                                "display": "Service error",
-                            }
-                        ]
-                    },
-                    "diagnostics": "value could not be parsed to a boolean",
-                    "expression": ["MyModel.nested_models.0.field_2"],
-                },
-            ],
-        }
-    )
-    expected = {
-        "statusCode": 500,
-        "body": expected_body,
-        "headers": {
-            "Content-Type": "application/json",
-            "Content-Length": str(len(expected_body)),
-            "Version": "null",
-        },
+            {
+                "code": "SERVICE_ERROR",
+                "message": "MyModel.nested_models.0.field_1: str type expected",
+            },
+            {
+                "code": "SERVICE_ERROR",
+                "message": "MyModel.nested_models.0.field_2: value could not be parsed to a boolean",
+            },
+        ],
     }
-    _response_assertions(
-        result=aws_lambda_response.dict(),
-        expected=expected,
-        check_body=True,
-        check_content_length=True,
+    body = json_loads(aws_lambda_response.body)
+    assert body == expected_body
+    assert aws_lambda_response.statusCode == 500
+    assert aws_lambda_response.headers.content_length == str(
+        len(aws_lambda_response.body)
     )
+    assert aws_lambda_response.headers.content_type == "application/json"
+    assert aws_lambda_response.headers.version == "null"
 
 
 def test_render_response_of_internal_validation_error():
     validation_error = _get_inbound_validation_error()
     aws_lambda_response = render_response(response=validation_error, id="foo")
-    expected_body = json.dumps(
-        {
-            "resourceType": "OperationOutcome",
-            "id": "foo",
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
+    expected_body = {
+        "errors": [
+            {
+                "code": "MISSING_VALUE",
+                "message": "MyModel.top_field: field required",
             },
-            "issue": [
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
-                    "expression": ["MyModel.top_field"],
-                },
-                {
-                    "severity": "error",
-                    "code": "processing",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "MISSING_VALUE",
-                                "display": "Missing value",
-                            }
-                        ]
-                    },
-                    "diagnostics": "field required",
-                    "expression": ["MyModel.nested_models"],
-                },
-            ],
-        }
-    )
-    expected = {
-        "statusCode": 400,
-        "body": expected_body,
-        "headers": {
-            "Content-Type": "application/json",
-            "Content-Length": str(len(expected_body)),
-            "Version": "null",
-        },
+            {
+                "code": "MISSING_VALUE",
+                "message": "MyModel.nested_models: field required",
+            },
+        ],
     }
-    _response_assertions(
-        result=aws_lambda_response.dict(),
-        expected=expected,
-        check_body=True,
-        check_content_length=True,
+    body = json_loads(aws_lambda_response.body)
+    assert body == expected_body
+    assert aws_lambda_response.statusCode == 400
+    assert aws_lambda_response.headers.content_length == str(
+        len(aws_lambda_response.body)
     )
+    assert aws_lambda_response.headers.content_type == "application/json"
+    assert aws_lambda_response.headers.version == "null"
