@@ -131,7 +131,7 @@ jobs:
       - uses: ./.github/actions/make/
         if: ${{ env.SCOPE == 'per_workspace'}}
         with:
-          command: apigee--deploy
+          command: apigee--deploy PERSISTENT_ENVIRONMENT_BUILD="true"
           requires-aws: true
           restore-from-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}

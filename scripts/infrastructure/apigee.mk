@@ -21,7 +21,7 @@ apigee--delete: aws--login
 	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
-		bash $(PATH_TO_INFRASTRUCTURE)/apigee/proxygen.sh delete_proxy $(DEV_BUILD)
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/proxygen.sh delete_proxy $(PERSISTENT_ENVIRONMENT_BUILD)
 
 apigee--clean:
 	[[ -f $(PROXYGEN_TIMESTAMP) ]] && rm $(PROXYGEN_TIMESTAMP) || :
@@ -34,7 +34,7 @@ apigee--attach-product: aws--login
 	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
-		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh attach_product $(DEV_BUILD)
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh attach_product $(PERSISTENT_ENVIRONMENT_BUILD)
 
 apigee--detach-product: aws--login
 	WORKSPACE_OUTPUT_JSON=$(WORKSPACE_OUTPUT_JSON) \
@@ -44,7 +44,7 @@ apigee--detach-product: aws--login
 	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
-		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh detach_product $(DEV_BUILD)
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/apigee.sh detach_product $(PERSISTENT_ENVIRONMENT_BUILD)
 
 $(PROXYGEN_TIMESTAMP): aws--login $(SWAGGER_APIGEE) $(WORKSPACE_OUTPUT_JSON)
 	[[ -f $(PROXYGEN_TIMESTAMP) ]] && rm $(PROXYGEN_TIMESTAMP) || :
@@ -57,6 +57,6 @@ $(PROXYGEN_TIMESTAMP): aws--login $(SWAGGER_APIGEE) $(WORKSPACE_OUTPUT_JSON)
 	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
 	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
-		bash $(PATH_TO_INFRASTRUCTURE)/apigee/proxygen.sh generate_proxy $(DEV_BUILD)
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/proxygen.sh generate_proxy $(PERSISTENT_ENVIRONMENT_BUILD)
 
 	touch $(PROXYGEN_TIMESTAMP)
