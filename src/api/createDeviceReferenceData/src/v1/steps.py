@@ -47,5 +47,6 @@ steps = [
     read_product_team,
     read_product,
     create_device_reference_data,
+    write_device_reference_data,
     set_http_status,
 ]
