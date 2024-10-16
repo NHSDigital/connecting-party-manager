@@ -4,6 +4,7 @@
 - [PI-501] Create Device Reference Data
 - [PI-503] Read Device Reference Data
 - [PI-536] Create Cpm Product without FHIR
+- [PI-535] Read Product Team without FHIR
 
 ## 2024-10-15
 - [PI-533] Create Product Team without FHIR
