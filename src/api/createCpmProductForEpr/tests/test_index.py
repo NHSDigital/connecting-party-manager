@@ -1,7 +1,6 @@
 import json
 import os
 from contextlib import contextmanager
-from datetime import datetime
 from unittest import mock
 
 import pytest
@@ -11,7 +10,6 @@ from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.json import json_loads
-from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
@@ -23,30 +21,6 @@ PRODUCT_TEAM_ID = consistent_uuid(1)
 PRODUCT_NAME = "My Product"
 PRODUCT_TEAM_KEYS = CPM_PRODUCT_TEAM_NO_ID["keys"]
 VERSION = 1
-RESOURCE_CREATED = {
-    "resourceType": "OperationOutcome",
-    "meta": {
-        "profile": [
-            "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-        ]
-    },
-    "issue": [
-        {
-            "severity": "information",
-            "code": "informational",
-            "details": {
-                "coding": [
-                    {
-                        "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                        "code": "RESOURCE_CREATED",
-                        "display": "Resource created",
-                    }
-                ]
-            },
-            "diagnostics": "Resource created",
-        }
-    ],
-}
 
 
 @contextmanager
@@ -85,22 +59,23 @@ def test_index():
         )
         # Validate that the response indicates that a resource was created
         assert response["statusCode"] == 201
-        assert json_loads(response["body"]) == {
-            "id": app_logger.service_name,
-            **RESOURCE_CREATED,
-        }
+        created_product = json_loads(response["body"])
 
         # Retrieve the created resource
         repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
-        created_product = repo.read(
-            product_team_id=product_team.id, product_id=response["headers"]["Location"]
-        ).dict()
+        read_product = repo.read(
+            product_team_id=product_team.id, product_id=created_product["id"]
+        ).state()
+
+    assert created_product == read_product
+
+    # Don't check dates
+    created_product.pop("created_on")
+    created_product.pop("updated_on")
 
     # Sense checks on the created resource
-    assert isinstance(created_product.pop("created_on"), datetime)
-    assert isinstance(created_product.pop("updated_on"), datetime)
     assert ProductId.validate_cpm_system_id(created_product.pop("id"))
     assert PartyKeyId.validate_cpm_system_id(
         created_product.pop("keys")[0]["key_value"]

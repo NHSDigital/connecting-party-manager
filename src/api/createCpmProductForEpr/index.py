@@ -1,4 +1,4 @@
-from api_utils.api_step_chain import execute_step_chain_with_location
+from api_utils.api_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
@@ -19,6 +19,4 @@ cache = {
 
 def handler(event: dict, context=None):
     setup_logger(service_name=__file__)
-    return execute_step_chain_with_location(
-        event=event, cache=cache, versioned_steps=versioned_steps
-    )
+    return execute_step_chain(event=event, cache=cache, versioned_steps=versioned_steps)
