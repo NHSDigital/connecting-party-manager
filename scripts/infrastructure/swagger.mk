@@ -16,6 +16,8 @@ SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 SWAGGER_APIGEE = $(SWAGGER_DIST)/apigee/swagger.yaml
 _CLEANED_SWAGGER_FILE = $(SWAGGER_DIST)/build/_02_clean.yaml
+PROXYGEN_TIMESTAMP = $(TIMESTAMP_DIR)/.proxygen.stamp
+SWAGGER_PUBLISH_TIMESTAMP = $(TIMESTAMP_DIR)/.swagger.publish.stamp
 
 TOOL_VERSIONS_COPY = $(TIMESTAMP_DIR)/tool-versions.copy
 SWAGGER_DEPENDENCIES = $(FHIR_BASE_TIMESTAMP) $(shell find infrastructure/swagger -type f -name "*.yaml" -not -path "*/dist/*.yaml" ) $(shell find scripts/infrastructure/swagger -type f -name "*.sh") $(TOOL_VERSIONS_COPY)
@@ -29,6 +31,8 @@ swagger--clean:  ## Removes swagger builds.
 	[[ -f $(PATH_TO_SWAGGER_GENERATOR_JAR) ]] && rm $(PATH_TO_SWAGGER_GENERATOR_JAR) || :
 swagger--generate-fhir-base: $(FHIR_BASE_TIMESTAMP)
 swagger--download-generator: $(PATH_TO_SWAGGER_GENERATOR_JAR)  ## Downloads the latest swagger fhir generator
+swagger--publish: $(SWAGGER_PUBLISH_TIMESTAMP) ## Publish swagger docs via proxygen to API Catalogue
+
 
 
 $(PATH_TO_SWAGGER_GENERATOR_JAR): $(INIT_TIMESTAMP)
@@ -61,3 +65,17 @@ $(SWAGGER_PUBLIC): $(SWAGGER_DEPENDENCIES) $(_CLEANED_SWAGGER_FILE)
 $(SWAGGER_APIGEE): $(SWAGGER_DEPENDENCIES) $(_CLEANED_SWAGGER_FILE) $(WORKSPACE_OUTPUT_JSON)
 	@env bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh generate_apigee_swagger
 	npx --yes @redocly/cli lint $(SWAGGER_APIGEE) --skip-rule security-defined || ([[ -f $(FHIR_BASE_TIMESTAMP) ]] && rm $(FHIR_BASE_TIMESTAMP) || :; exit 1)
+
+$(SWAGGER_PUBLISH_TIMESTAMP): aws--login $(SWAGGER_PUBLIC) $(WORKSPACE_OUTPUT_JSON)
+	[[ -f $(SWAGGER_PUBLISH_TIMESTAMP) ]] && rm $(SWAGGER_PUBLISH_TIMESTAMP) || :
+
+	WORKSPACE_OUTPUT_JSON=$(WORKSPACE_OUTPUT_JSON) \
+	ENVIRONMENT_MAPPING_YAML=$(ENVIRONMENT_MAPPING_YAML) \
+	STAGE_MAPPING_YAML=$(STAGE_MAPPING_YAML) \
+	APIGEE_CONFIG_PATH=$(APIGEE_CONFIG_PATH) \
+	SWAGGER_APIGEE=$(SWAGGER_APIGEE) \
+	SWAGGER_PUBLIC=$(SWAGGER_PUBLIC) \
+	AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
+	AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) \
+		bash $(PATH_TO_INFRASTRUCTURE)/apigee/proxygen.sh publish_swagger

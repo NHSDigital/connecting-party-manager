@@ -166,5 +166,51 @@ function delete_proxy(){
         --no-confirm
 }
 
+
+function publish_swagger(){
+    if [[ -z ${SWAGGER_PUBLIC} ]]; then
+        echo "SWAGGER_PUBLIC not set"
+        exit 1
+    fi
+
+
+    _workspace_name=$(get_workspace_name)
+    _aws_environment=$(get_aws_environment)
+    _apigee_environment=$(get_apigee_environment ${_workspace_name} ${_aws_environment})
+    _apigee_stage=$(get_apigee_stage ${_workspace_name})
+
+    if [[ ${_aws_environment} == "prod" ]]; then
+        _flags=""
+    #elif [[ ${_aws_environment} == "int" ]]; then
+    else
+        _flags="--uat"
+    # else
+    #     echo "ERROR: only environments to deploy to are 'prod' and 'int'"
+    #     exit 1;
+    fi
+
+        echo "
+    Publishing swagger
+    -------------------- ----------------------------------------
+    workspace_name        ${_workspace_name}
+    aws_environment       ${_aws_environment}
+    apigee_environment    ${_apigee_environment}
+    apigee_stage          ${_apigee_stage}
+    flags                 ${_flags}
+"
+
+    # Download the pem file if it does not exist
+    if [ ! -f "${APIGEE_CONFIG_PATH}/${_apigee_stage}/.proxygen/private_key.pem" ]; then
+        poetry run python ${PATH_TO_HERE}/download_pem.py ${_apigee_stage} ${APIGEE_DEPLOYMENT_ROLE}
+    fi
+
+    DOT_PROXYGEN=${APIGEE_CONFIG_PATH}/${_apigee_stage} \
+        poetry run \
+        python ${PATH_TO_HERE}/proxygen.py spec publish \
+        ${SWAGGER_PUBLIC} \
+        ${_flags} \
+        --no-confirm
+}
+
 # Expose functions publicly
 $@
