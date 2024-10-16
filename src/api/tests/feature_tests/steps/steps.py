@@ -192,6 +192,35 @@ def then_response(context: Context, status_code: str):
 
 
 @then(
+    'I receive a status code "{status_code}" with body where "{list_to_check}" has a length of "{count}"'
+)
+def then_response(context: Context, status_code: str, list_to_check: str, count: str):
+    expected_body = parse_table(table=context.table, context=context)
+    try:
+        response_body = context.response.json()
+    except JSONDecodeError:
+        response_body = context.response.text
+    assert len(response_body[list_to_check]) == int(count)
+    assert_many(
+        assertions=(
+            assert_equal,
+            assert_same_type,
+            assert_equal,
+        ),
+        expected=(
+            int(status_code),
+            expected_body,
+            expected_body,
+        ),
+        received=(
+            context.response.status_code,
+            response_body,
+            response_body,
+        ),
+    )
+
+
+@then(
     'I receive a status code "{status_code}" with a "{entity_type}" search body reponse that contains'
 )
 def then_response(context: Context, status_code: str, entity_type: str):
