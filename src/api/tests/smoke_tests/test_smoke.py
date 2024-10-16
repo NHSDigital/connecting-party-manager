@@ -4,27 +4,23 @@ import os
 import pytest
 import requests
 
-from test_helpers.sample_data import ORGANISATION
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
 
 from .utils import execute_smoke_test, get_app_key, get_base_url, get_headers
 
 
-def create_product_team(base_url: str, headers: dict):
-    organisation_body = json.dumps(ORGANISATION)
+def create_and_read_product_team(base_url: str, headers: dict):
+    product_team_body = json.dumps(CPM_PRODUCT_TEAM_NO_ID)
     url = f"{base_url}/ProductTeam"
-    return requests.post(url=url, headers=headers, data=organisation_body)
-
-
-def read_product_team(base_url: str, headers: dict):
-    org_id = "f9518c12-6c83-4544-97db-d9dd1d64da97"
-    url = f"{base_url}/ProductTeam/{org_id}"
+    response = requests.post(url=url, headers=headers, data=product_team_body)
+    response_body = response.json()
+    url = f"{base_url}/ProductTeam/{response_body["id"]}"
     return requests.get(url=url, headers=headers)
 
 
 REQUEST_METHODS = [
-    create_product_team,
-    read_product_team,
+    create_and_read_product_team,
 ]
 
 

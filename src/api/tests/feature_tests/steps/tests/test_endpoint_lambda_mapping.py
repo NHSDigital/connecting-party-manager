@@ -28,7 +28,7 @@ def api_lambda_environment_variables():
 
 def test__template_to_regex():
     result = _template_to_regex("Device/{id1}/{id2}?field={id3}")
-    assert result == r"Device/(?P<id1>[^\/]+)/(?P<id2>[^\/]+)?field=(?P<id3>[^\/]+)"
+    assert result == r"^Device/(?P<id1>[^\/]+)/(?P<id2>[^\/]+)?field=(?P<id3>[^\/]+)$"
 
 
 def test__parse_params_from_url():
@@ -38,6 +38,18 @@ def test__parse_params_from_url():
     assert result is True
     assert path_params == {"id1": "123", "id2": "foo"}
     assert query_params == {"id3": "hiya"}
+
+
+@pytest.mark.parametrize(
+    ["path_template", "path"],
+    [
+        ("Device/{id1}/{id2}", "Device/123/foo/bar"),
+        ("Device/{id1}/{id2}?field={id3}", "Device/123/foo/bar"),
+    ],
+)
+def test__parse_params_from_url_fail(path_template: str, path: str):
+    _, _, result = _parse_params_from_url(path_template=path_template, path=path)
+    assert result is False
 
 
 def test__parse_params_from_url_post_product():
@@ -125,6 +137,19 @@ def test_parse_path_read_cpm_product():
         path="ProductTeam/123/Product/456",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readCpmProduct.index)
+
+
+def test_parse_path_search_product():
+    with api_lambda_environment_variables():
+        import api.searchCpmProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="ProductTeam/123/Product",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({"product_team_id": "123"}, {}, api.searchCpmProduct.index)
 
 
 def test_parse_path_search_product():

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-10-15
+- [PI-533] Create Product Team without FHIR
+
 ## 2024-10-14
 - [PI-534] Errors without FHIR
 

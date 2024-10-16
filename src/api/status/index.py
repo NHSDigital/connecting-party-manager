@@ -1,5 +1,5 @@
 from domain.logging.step_decorators import logging_step_decorators
-from domain.response.steps import response_steps
+from domain.response.steps_old import response_steps
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from event.logging.logger import setup_logger
