@@ -67,37 +67,15 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /Organization/{id}:
-    get:
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
-      responses:
-        "4XX":
-          <<: *Response4XX
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_readProductTeam}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
-
   /ProductTeam:
     post:
       operationId: createproductteam
       summary: createProductTeam endpoint for APIGEE integration
       requestBody:
-        $ref: "#/components/requestBodies/Organization"
+        $ref: "#/components/requestBodies/ProductTeamRequest"
       responses:
         "201":
-          <<: *Response201
+          $ref: "#/components/responses/ProductTeamResponse"
         "4XX":
           <<: *Response4XX
       <<: *RequestHeaders
@@ -130,11 +108,7 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Read Product Team operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Organization"
+          $ref: "#/components/responses/ProductTeamResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:

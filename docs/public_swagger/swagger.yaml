@@ -256,55 +256,15 @@ paths:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
-  /Organization/{id}:
-    get:
-      summary: Read an Organization resource
-      operationId: readOrganization
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - in: header
-          name: version
-          schema:
-            $ref: "#/components/schemas/Version"
-        - in: header
-          name: x-request-id
-          schema:
-            $ref: "#/components/schemas/RequestId"
-        - in: header
-          name: x-correlation-id
-          schema:
-            $ref: "#/components/schemas/CorrelationId"
-      responses:
-        "200":
-          description: Read Organization operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Organization"
-        "4XX":
-          description: "Client Error"
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/OperationOutcome"
   /ProductTeam:
     post:
       operationId: createproductteam
       summary: createProductTeam endpoint for APIGEE integration
       requestBody:
-        $ref: "#/components/requestBodies/Organization"
+        $ref: "#/components/requestBodies/ProductTeamRequest"
       responses:
         "201":
-          description: Create operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/OperationOutcome"
+          $ref: "#/components/responses/ProductTeamResponse"
         "4XX":
           description: "Client Error"
           content:
@@ -355,11 +315,7 @@ paths:
             $ref: "#/components/schemas/CorrelationId"
       responses:
         "200":
-          description: Read Product Team operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Organization"
+          $ref: "#/components/responses/ProductTeamResponse"
         "4XX":
           description: "Client Error"
           content:
@@ -799,12 +755,42 @@ components:
           schema:
             $ref: "#/components/schemas/Device"
       required: true
-    Organization:
-      content:
-        application/fhir+json:
-          schema:
-            $ref: "#/components/schemas/Organization"
+    ProductTeamRequest:
+      description: Request body to create a Product Team
       required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the product team
+              ods_code:
+                type: string
+                description: ODS code associated with the product team
+              keys:
+                type: array
+                description: List of keys associated with the product team
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                      description: The type of the key (e.g., product_team_id_alias)
+                    key_value:
+                      type: string
+                      description: The value of the key
+            required:
+              - name
+              - ods_code
+              - keys
+          example:
+            name: "Sample Product Team"
+            ods_code: "F5H1R"
+            keys:
+              - key_type: "product_team_id_alias"
+                key_value: "BAR"
   schemas:
     Resource:
       type: object
@@ -2821,233 +2807,6 @@ components:
               description: Value of extension &ndash; must be one of a constrained set of the data types (see [Extensibility](extensibility.html) for a list).
           required:
             - url
-    Organization:
-      allOf:
-        - $ref: "#/components/schemas/DomainResource"
-        - type: object
-          properties:
-            identifier:
-              type: array
-              items:
-                $ref: "#/components/schemas/Identifier"
-                description: Identifier for the organization that is used to identify the organization across multiple disparate systems.
-            active:
-              type: boolean
-              description: Whether the organization's record is still in active use.
-            type:
-              type: array
-              items:
-                $ref: "#/components/schemas/CodeableConcept"
-                description: The kind(s) of organization that this is.
-            name:
-              type: string
-              pattern: "[ \\r\\n\\t\\S]+"
-              description: A name associated with the organization.
-            alias:
-              type: array
-              items:
-                type: string
-                pattern: "[ \\r\\n\\t\\S]+"
-                description: A list of alternate names that the organization is known as, or was known as in the past.
-            telecom:
-              type: array
-              items:
-                $ref: "#/components/schemas/ContactPoint"
-                description: A contact detail for the organization.
-            address:
-              type: array
-              items:
-                $ref: "#/components/schemas/Address"
-                description: An address for the organization.
-            partOf:
-              $ref: "#/components/schemas/Reference"
-              description: The organization of which this organization forms a part.
-            contact:
-              type: array
-              items:
-                $ref: "#/components/schemas/OrganizationContact"
-                description: Contact for the organization for a certain purpose.
-            endpoint:
-              type: array
-              items:
-                $ref: "#/components/schemas/Reference"
-                description: Technical endpoints providing access to services operated for the organization.
-      example:
-        resourceType: Organization
-        meta:
-          versionId: MkhCKF3NPs
-          lastUpdated: "2020-11-04T11:22:55.495627-05:00"
-          source: zrGPPE8DJH
-          profile:
-            - z3pU0zspXr
-          security:
-            - system: oC2Jc7y4Zf
-              version: EQHqJLdyML
-              code: zBvY_yWgVY
-              display: GsL8gnlzvu
-              userSelected: true
-          tag:
-            - system: aNNTmndRB8
-              version: E7tloLtD33
-              code: kMOXjB2zxk
-              display: 9ugg6ChWzh
-              userSelected: true
-            - code: ibm/complete-mock
-        implicitRules: 011v9tCoKf
-        language: en-US
-        text:
-          status: additional
-          div: <div xmlns="http://www.w3.org/1999/xhtml"></div>
-        identifier:
-          - use: old
-            type:
-              coding:
-                - system: 1SUEu2dRCO
-                  version: SqWkXr_J9k
-                  code: 9aTcdpFSZ8
-                  display: weo1p1jIrt
-                  userSelected: true
-              text: b_lOMGm6ta
-            system: XxeSGme8g0
-            value: EVVScECcrs
-            period:
-              start: "2020-11-04T11:22:55.498156-05:00"
-              end: "2020-11-04T11:22:55.498323-05:00"
-        active: true
-        type:
-          - coding:
-              - system: GJz7DeJAID
-                version: SoNWcpaGaO
-                code: VqNBaGgdd8
-                display: D_01X4Yhro
-                userSelected: true
-            text: _da3dnjC1g
-        name: _Yghclpf6e
-        alias:
-          - v6TGkG3UzA
-        telecom:
-          - system: fax
-            value: XUXar8gIJw
-            use: old
-            rank: 6.04214668e+08
-            period:
-              start: "2020-11-04T11:22:55.500697-05:00"
-              end: "2020-11-04T11:22:55.500991-05:00"
-        address:
-          - use: billing
-            type: postal
-            text: KRPWrCLw0J
-            line:
-              - Y0UGna670q
-            city: T9ymhEJMWe
-            district: CsINuTto0Y
-            state: _5_y00xVnB
-            postalCode: JPMLnjxKN8
-            country: 1xSh_aRALw
-            period:
-              start: "2020-11-04T11:22:55.503025-05:00"
-              end: "2020-11-04T11:22:55.503358-05:00"
-        partOf:
-          reference: Organization/sBzEw2QIM9
-          type: Organization
-          identifier:
-            use: official
-            type:
-              coding:
-                - system: 3lk1UxUrO1
-                  version: gxRtW6o8rV
-                  code: N1PckpnwPx
-                  display: ZWYPZB4ypF
-                  userSelected: true
-              text: wGMie0kDM0
-            system: 4Acfpp1Qus
-            value: sTkfzvUNRc
-            period:
-              start: "2020-11-04T11:22:55.505211-05:00"
-              end: "2020-11-04T11:22:55.505435-05:00"
-          display: fi35hwOFFC
-        contact:
-          - purpose:
-              coding:
-                - system: gXJWNpvPYH
-                  version: ixSX6ZizQU
-                  code: iYvO1m8ZdT
-                  display: 7xT105543A
-                  userSelected: true
-              text: xka69Q61Dz
-            name:
-              use: usual
-              text: DfxDNX8On5
-              family: ozZugaAElu
-              given:
-                - v_ww8YMzVs
-              prefix:
-                - _hBm2j1wTY
-              suffix:
-                - DgzwLOgfj_
-              period:
-                start: "2020-11-04T11:22:55.507967-05:00"
-                end: "2020-11-04T11:22:55.508327-05:00"
-            telecom:
-              - system: email
-                value: HE9t3cWC8v
-                use: work
-                rank: 1.386494584e+09
-                period:
-                  start: "2020-11-04T11:22:55.508975-05:00"
-                  end: "2020-11-04T11:22:55.50928-05:00"
-            address:
-              use: billing
-              type: both
-              text: hy6FvAwKUf
-              line:
-                - y8f7C2_rKu
-              city: PAj0k3xx6m
-              district: ETBhWSq3V3
-              state: 78AvjHfIfy
-              postalCode: 3NGE0wSbNy
-              country: PT_vsjai4f
-              period:
-                start: "2020-11-04T11:22:55.510249-05:00"
-                end: "2020-11-04T11:22:55.510429-05:00"
-        endpoint:
-          - reference: Endpoint/IQlLQrnkp9
-            type: Endpoint
-            identifier:
-              use: secondary
-              type:
-                coding:
-                  - system: bflJysEUwb
-                    version: wXmVSZF3xN
-                    code: uLMS2MG468
-                    display: 7iCeHMVBnr
-                    userSelected: true
-                text: vkMjQ4BX4w
-              system: h5wLHJqvsB
-              value: 1GAC_uwdo4
-              period:
-                start: "2020-11-04T11:22:55.511516-05:00"
-                end: "2020-11-04T11:22:55.511804-05:00"
-            display: pcy6U9Fxm0
-    OrganizationContact:
-      allOf:
-        - $ref: "#/components/schemas/BackboneElement"
-        - type: object
-          properties:
-            purpose:
-              $ref: "#/components/schemas/CodeableConcept"
-              description: Indicates a purpose for which the contact can be reached.
-            name:
-              $ref: "#/components/schemas/HumanName"
-              description: A name associated with the contact.
-            telecom:
-              type: array
-              items:
-                $ref: "#/components/schemas/ContactPoint"
-                description: A contact detail (e.g. a telephone number or an email address) by which the party may be contacted.
-            address:
-              $ref: "#/components/schemas/Address"
-              description: Visiting or postal addresses for the contact.
     Version:
       type: string
       pattern: "^[1-9][0-9]+$"
@@ -3061,4 +2820,44 @@ components:
   securitySchemes:
     app-level0:
       $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
-  responses: {}
+  responses:
+    ProductTeamResponse:
+      description: Read Product Team operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              ods_code:
+                type: string
+              status:
+                type: string
+              created_on:
+                type: string
+              updated_on:
+                type: string
+              deleted_on:
+                type: string
+              keys:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                    key_value:
+                      type: string
+            example:
+              id: "F5H1R"
+              name: "Sample Product Team"
+              ods_code: "F5H1R"
+              status: "active"
+              created_on: "2024-10-15T10:00:00Z"
+              updated_on: "2024-10-15T10:00:00Z"
+              keys:
+                - key_type: "product_team_id_alias"
+                  key_value: "FOOBAR"
