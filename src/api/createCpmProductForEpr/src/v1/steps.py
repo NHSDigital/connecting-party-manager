@@ -1,6 +1,6 @@
 from types import FunctionType
 
-from domain.common_steps.create_product import (
+from domain.api.common_steps.create_product import (
     after_steps,
     before_steps,
     create_cpm_product,

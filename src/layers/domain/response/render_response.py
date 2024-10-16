@@ -46,13 +46,12 @@ def render_response[
         # Implicit failure from all other Exceptions
         outcome = ErrorResponse.from_exception(exception=response).dict()
         http_status = http_status_from_exception(exception=response)
+    elif isinstance(response, tuple):
+        http_status, outcome = response
     else:
-        if isinstance(response, tuple):
-            http_status, outcome = response
-        else:
-            # Implicit success (e.g. SEARCH, READ operations)
-            http_status = HTTPStatus.OK
-            outcome = response
+        # Implicit success (e.g. SEARCH, READ operations)
+        http_status = HTTPStatus.OK
+        outcome = response
 
     body = json.dumps(outcome) if outcome is not None else ""
     return AwsLambdaResponse(

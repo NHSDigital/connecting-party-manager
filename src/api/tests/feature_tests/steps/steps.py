@@ -279,8 +279,10 @@ def then_response(context: Context):
     )
 
 
-@given('I note the response field "{jsonpath}" as "{alias}"')
-def note_response_field(context: Context, jsonpath: str, alias: str):
-    context.notes[alias] = extract_from_response_by_jsonpath(
-        response=context.response.json(), jsonpath=jsonpath
-    )
+for decorator in (given, when, then):
+
+    @decorator('I note the response field "{jsonpath}" as "{alias}"')
+    def note_response_field(context: Context, jsonpath: str, alias: str):
+        context.notes[alias] = extract_from_response_by_jsonpath(
+            response=context.response.json(), jsonpath=jsonpath
+        )

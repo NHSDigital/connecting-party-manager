@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+from domain.api.common_steps.general import parse_event_body
 from domain.core.cpm_product import CpmProduct
 from domain.core.product_team.v3 import ProductTeam
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
@@ -9,10 +10,7 @@ from domain.request_models.v1 import (
     CreateCpmProductIncomingParams,
     ProductTeamPathParams,
 )
-from domain.response.validation_errors import (
-    mark_json_decode_errors_as_inbound,
-    mark_validation_errors_as_inbound,
-)
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
 
@@ -20,12 +18,6 @@ from event.step_chain import StepChain
 def parse_path_params(data, cache) -> ProductTeamPathParams:
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     return ProductTeamPathParams(**event.path_parameters)
-
-
-@mark_json_decode_errors_as_inbound
-def parse_event_body(data, cache) -> dict:
-    event = APIGatewayProxyEvent(data[StepChain.INIT])
-    return event.json_body if event.body else {}
 
 
 @mark_validation_errors_as_inbound
@@ -50,6 +42,14 @@ def create_cpm_product(
     product_team: ProductTeam = data[read_product_team]
     product = product_team.create_cpm_product(name=incoming_product.product_name)
     return product
+
+
+def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
+    product: CpmProduct = data[create_cpm_product]
+    product_repo = CpmProductRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+    )
+    return product_repo.write(product)
 
 
 def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
