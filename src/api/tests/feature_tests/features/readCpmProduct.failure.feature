@@ -18,7 +18,8 @@ Feature: Read CPM Product - failure scenarios
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path         | value               |
       | product_name | My Great CpmProduct |
-    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/123/Product/<id>"
+    And I note the response field "$.id" as "product_id"
+    When I make a "GET" request with "default" headers to "ProductTeam/123/Product/${ note(product_id) }"
     Then I receive a status code "404" with body
       | path             | value                                      |
       | errors.0.code    | RESOURCE_NOT_FOUND                         |

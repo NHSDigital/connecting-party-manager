@@ -5,6 +5,10 @@ from domain.core import event
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.cpm_system_id.v1 import ProductId
 from domain.core.device.v2 import UPDATED_ON, event
+from domain.core.device_reference_data.v1 import (
+    DeviceReferenceData,
+    DeviceReferenceDataCreatedEvent,
+)
 from domain.core.enum import Status
 from domain.core.error import DuplicateError
 from domain.core.event import Event
@@ -67,6 +71,18 @@ class CpmProduct(AggregateRoot):
     updated_on: datetime = Field(default=None)
     deleted_on: datetime = Field(default=None)
     keys: list[ProductKey] = Field(default_factory=list)
+
+    def create_device_reference_data(self, name: str) -> DeviceReferenceData:
+        device_reference_data = DeviceReferenceData(
+            name=name,
+            product_id=self.id,
+            product_team_id=self.product_team_id,
+            ods_code=self.ods_code,
+        )
+        event = DeviceReferenceDataCreatedEvent(**device_reference_data.dict())
+        self.add_event(event)
+        device_reference_data.add_event(event)
+        return device_reference_data
 
     @event
     def add_key(self, key_type: str, key_value: str) -> CpmProductKeyAddedEvent:

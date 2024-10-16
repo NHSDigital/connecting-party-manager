@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 from domain.core.root.v3 import Root
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
-from nhs_context_logging import app_logger
+from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.response_assertions import _response_assertions
@@ -57,31 +57,18 @@ def _mock_test(version, params):
 def test_index(version):
     result = _mock_test(version=version, params=json.dumps(product_payload))
 
+    product = json_loads(result["body"])
     expected_body = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
-                {
-                    "severity": "information",
-                    "code": "informational",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "RESOURCE_CREATED",
-                                "display": "Resource created",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Resource created",
-                }
-            ],
+            "id": product["id"],
+            "product_team_id": product["product_team_id"],
+            "name": "Foobar product",
+            "ods_code": "F5H1R",
+            "status": "active",
+            "created_on": product["created_on"],
+            "updated_on": None,
+            "deleted_on": None,
+            "keys": [],
         }
     )
     expected = {
