@@ -59,9 +59,10 @@ class CPMUser(HttpUser):
         USE_CPM = self.environment.parsed_options.usecpm
         # random_queries = random.sample(queries, 100)
         for query in queries:
-            params = query["params"]
+            params = query["params"].copy()
             if USE_CPM == "TRUE":
                 params["use_cpm"] = "iwanttogetdatafromcpm"
+
             url_path = f"{query['path']}"
             self.client.get(
                 url=url_path,
