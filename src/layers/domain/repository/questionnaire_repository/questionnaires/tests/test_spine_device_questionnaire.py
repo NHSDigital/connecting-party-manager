@@ -1,7 +1,9 @@
 import pytest
-from domain.core.questionnaire.load_questionnaire import render_questionnaire
-from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from domain.core.questionnaire.v2 import Questionnaire
+from domain.repository.questionnaire_repository import QuestionnaireRepository
+from domain.repository.questionnaire_repository.questionnaires import (
+    QuestionnaireInstance,
+)
 from event.json import json_load
 from hypothesis import assume, given, settings
 from sds.cpm_translation.tests.test_cpm_translation import (
@@ -15,10 +17,8 @@ from etl.sds.tests.constants import EtlTestDataPath
 
 @pytest.fixture
 def spine_device_questionnaire_v1() -> Questionnaire:
-    return render_questionnaire(
-        questionnaire_name=QuestionnaireInstance.SPINE_DEVICE,
-        questionnaire_version=1,
-    )
+    repo = QuestionnaireRepository()
+    return repo.read(name=QuestionnaireInstance.SPINE_DEVICE)
 
 
 def _is_accredited_system(obj: dict[str, str]) -> bool:
@@ -61,10 +61,9 @@ def test_spine_device_questionnaire_v1_local(
     nhs_accredited_system: NhsAccreditedSystem,
 ):
     assume(len(nhs_accredited_system.nhs_as_client) > 0)
-    spine_device_questionnaire_v1 = render_questionnaire(
-        questionnaire_name=QuestionnaireInstance.SPINE_DEVICE,
-        questionnaire_version=1,
-    )
+    repo = QuestionnaireRepository()
+    spine_device_questionnaire_v1 = repo.read(name=QuestionnaireInstance.SPINE_DEVICE)
+
     assert _test_spine_device_questionnaire_v1(
         nhs_accredited_system=nhs_accredited_system,
         questionnaire=spine_device_questionnaire_v1,
