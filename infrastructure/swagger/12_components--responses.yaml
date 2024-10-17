@@ -65,3 +65,28 @@ components:
               keys:
                 - key_type: "product_team_id_alias"
                   key_value: "FOOBAR"
+    DeviceReferenceDataResponse:
+      description: Read Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              product_id:
+                type: string
+              product_team_id:
+                type: string
+              ods_code:
+                type: string
+              status:
+                type: string
+              created_on:
+                type: string
+              updated_on:
+                type: string
+              deleted_on:
+                type: string
