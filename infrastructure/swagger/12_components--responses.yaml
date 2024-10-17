@@ -24,3 +24,13 @@ components:
                 enum: ["OK"]
       headers:
         <<: *ResponseHeaders
+
+    Questionnaire:
+      description: Questionnaire response body
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tbc:
+                type: string

@@ -104,7 +104,7 @@ module "lambdas" {
   environment_variables = {
     DYNAMODB_TABLE = module.table.dynamodb_table_name
   }
-  attach_policy_statements = true
+  attach_policy_statements = length((fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json"))) > 0
   policy_statements = {
     for file in fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json") : replace(file, ".json", "") => {
       effect    = "Allow"
