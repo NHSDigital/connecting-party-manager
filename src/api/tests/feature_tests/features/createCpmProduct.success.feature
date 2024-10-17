@@ -18,25 +18,26 @@ Feature: Create CPM Product - success scenarios
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path         | value            |
       | product_name | My Great Product |
+    And I note the response field "$.id" as "product_id"
     Then I receive a status code "201" with body
-      | path                             | value                                                               |
-      | resourceType                     | OperationOutcome                                                    |
-      | id                               | << ignore >>                                                        |
-      | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.severity                 | information                                                         |
-      | issue.0.code                     | informational                                                       |
-      | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-      | issue.0.details.coding.0.code    | RESOURCE_CREATED                                                    |
-      | issue.0.details.coding.0.display | Resource created                                                    |
-      | issue.0.diagnostics              | Resource created                                                    |
+      | path            | value                      |
+      | id              | ${ note(product_id) }      |
+      | name            | My Great Product           |
+      | product_team_id | ${ note(product_team_id) } |
+      | ods_code        | F5H1R                      |
+      | status          | active                     |
+      | keys            | []                         |
+      | created_on      | << ignore >>               |
+      | updated_on      | << ignore >>               |
+      | deleted_on      | << ignore >>               |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 460              |
-    When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/${ note(product_team_id) }/Product/<id>"
+      | Content-Length | 255              |
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }"
     Then I receive a status code "200" with body
       | path            | value                      |
-      | id              | << ignore >>               |
+      | id              | ${ note(product_id) }      |
       | name            | My Great Product           |
       | product_team_id | ${ note(product_team_id) } |
       | ods_code        | F5H1R                      |
