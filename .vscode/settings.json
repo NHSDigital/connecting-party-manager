@@ -11,6 +11,9 @@
   "cSpell.words": [
     "attrlist",
     "changetype",
+    "deserialise",
+    "deserialiser",
+    "DESERIALISERS",
     "filterstr",
     "firstchangenumber",
     "getbuffer",

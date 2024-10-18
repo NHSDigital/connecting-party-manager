@@ -36,3 +36,7 @@ class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
     device_reference_data_id: str = Field(...)
+
+
+class QuestionnairePathParams(BaseModel, extra=Extra.forbid):
+    questionnaire_id: str  # NB: this maps onto the domain field Questionnaire.name

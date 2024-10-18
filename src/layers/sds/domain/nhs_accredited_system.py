@@ -1,8 +1,11 @@
 from typing import ClassVar, Literal, Optional
 
 from domain.api.sds.query import SearchSDSDeviceQueryParams
-from domain.core.questionnaire.load_questionnaire import render_questionnaire
 from domain.core.questionnaire.v1 import Questionnaire
+from domain.repository.questionnaire_repository import QuestionnaireRepository
+from domain.repository.questionnaire_repository.questionnaires import (
+    QuestionnaireInstance,
+)
 from pydantic import Field
 
 from .base import OBJECT_CLASS_FIELD_NAME, SdsBaseModel
@@ -41,9 +44,8 @@ class NhsAccreditedSystem(SdsBaseModel):
 
     @classmethod
     def questionnaire(cls) -> Questionnaire:
-        return render_questionnaire(
-            questionnaire_name="spine_device", questionnaire_version=1
-        )
+        repo = QuestionnaireRepository()
+        return repo.read(name=QuestionnaireInstance.SPINE_DEVICE)
 
     @classmethod
     def query_params_model(cls) -> type[SearchSDSDeviceQueryParams]:

@@ -21,10 +21,10 @@ from domain.core.questionnaire import (
     QuestionnaireResponseDeletedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
-from domain.core.questionnaire.load_questionnaire import render_question
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys import TableKeys, strip_key_prefix
 from domain.repository.marshall import marshall, marshall_value, unmarshall
+from domain.repository.questionnaire_repository import deserialise_question
 from domain.repository.repository import Repository
 from domain.repository.transaction import (
     ConditionExpression,
@@ -256,7 +256,7 @@ class DeviceRepository(Repository[Device]):
         questionnaires = {}
         for id_, data in TableKeys.QUESTIONNAIRE.filter_and_group(items, key="sk"):
             data["questions"] = {
-                question_name: render_question(question)
+                question_name: deserialise_question(question)
                 for question_name, question in json_loads(data["questions"]).items()
             }
             questionnaires[id_] = Questionnaire(**data)
