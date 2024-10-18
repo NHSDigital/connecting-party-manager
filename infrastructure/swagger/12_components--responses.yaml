@@ -24,6 +24,17 @@ components:
                 enum: ["OK"]
       headers:
         <<: *ResponseHeaders
+
+    Questionnaire:
+      description: Questionnaire response body
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tbc:
+                type: string
+
     ProductTeamResponse:
       description: Read Product Team operation successful
       content:
@@ -89,4 +100,3 @@ components:
               updated_on:
                 type: string
               deleted_on:
-                type: string
