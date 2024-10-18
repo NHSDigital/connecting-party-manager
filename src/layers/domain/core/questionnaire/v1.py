@@ -5,6 +5,7 @@ from typing import Self
 
 import orjson
 from attr import dataclass, field
+from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
 from domain.core.error import DuplicateError, InvalidResponseError
 from domain.core.event import Event
@@ -24,7 +25,11 @@ class TooManyAnswerTypes(ValueError):
     pass
 
 
-ALLOWED_QUESTION_TYPES = {
+class NoSuchQuestionType(Exception):
+    pass
+
+
+ALLOWED_ANSWER_TYPES = {
     str,
     int,
     bool,
@@ -34,6 +39,8 @@ ALLOWED_QUESTION_TYPES = {
     time,
     CaseInsensitiveString,
 }
+
+ALLOWED_ANSWER_TYPES_LOOKUP = {_type.__name__: _type for _type in ALLOWED_ANSWER_TYPES}
 
 
 @dataclass(kw_only=True, slots=True)
@@ -99,7 +106,7 @@ class Question(BaseModel):
     @validator("answer_types")
     def validate_question_type(cls, answer_types):
         invalid_types = {
-            item for item in answer_types if item not in ALLOWED_QUESTION_TYPES
+            item for item in answer_types if item not in ALLOWED_ANSWER_TYPES
         }
         if invalid_types:
             raise ValueError(f"Answer types {invalid_types} are not allowed.")
@@ -122,13 +129,13 @@ def choice_type_matches_answer_types(choice, answer_types: set):
     )
 
 
-class Questionnaire(BaseModel):
+class Questionnaire(AggregateRoot):
     """
     A Questionnaire represents a collection of Questions, in a specific order.
     """
 
     name: str = Field(regex=ENTITY_NAME_REGEX)
-    version: int
+    version: str
     questions: dict[str, Question] = Field(default_factory=dict)
 
     @property

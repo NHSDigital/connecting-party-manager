@@ -26,3 +26,7 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
         self.keys = list(
             {frozenset(key.dict().items()): key for key in self.keys}.values()
         )
+
+
+class QuestionnairePathParams(BaseModel, extra=Extra.forbid):
+    questionnaire_id: str  # NB: this maps onto the domain field Questionnaire.name
