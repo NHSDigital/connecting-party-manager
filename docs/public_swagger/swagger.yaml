@@ -176,50 +176,6 @@ paths:
           name: x-correlation-id
           schema:
             $ref: "#/components/schemas/CorrelationId"
-    get:
-      summary: Search for Device resources
-      operationId: searchDevice
-      parameters:
-        - name: device_type
-          in: query
-          required: true
-          description: "Type of device (product or endpoint)"
-          schema:
-            type: string
-            enum:
-              - product
-              - endpoint
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
-        - in: header
-          name: version
-          schema:
-            $ref: "#/components/schemas/Version"
-        - in: header
-          name: x-request-id
-          schema:
-            $ref: "#/components/schemas/RequestId"
-        - in: header
-          name: x-correlation-id
-          schema:
-            $ref: "#/components/schemas/CorrelationId"
-      responses:
-        "200":
-          description: Search Device operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
-        "4XX":
-          description: "Client Error"
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/OperationOutcome"
   /Device/{id}:
     get:
       summary: Read a Device resource
@@ -335,12 +291,6 @@ paths:
           description: logical identifier
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - in: header
           name: version
           schema:
@@ -377,12 +327,6 @@ paths:
           description: logical identifier
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - in: header
           name: version
           schema:
@@ -611,12 +555,6 @@ paths:
           description: "Party Key"
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - in: header
           name: version
           schema:
@@ -665,12 +603,6 @@ paths:
           description: "Party Key"
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - in: header
           name: version
           schema:
@@ -697,49 +629,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
 components:
-  parameters:
-    profileParam:
-      name: _profile
-      description: Profiles this resource claims to conform to
-      in: query
-      required: false
-      schema:
-        type: string
-    lastUpdatedParam:
-      name: _lastUpdated
-      description: When the resource version last changed
-      in: query
-      required: false
-      schema:
-        type: string
-    tagParam:
-      name: _tag
-      description: Tags applied to this resource
-      in: query
-      required: false
-      schema:
-        type: string
-    securityParam:
-      name: _security
-      description: Security Labels applied to this resource
-      in: query
-      required: false
-      schema:
-        type: string
-    sourceParam:
-      name: _source
-      description: Identifies where the resource comes from
-      in: query
-      required: false
-      schema:
-        type: string
-    idParam:
-      name: _id
-      description: Logical id of this artifact
-      in: query
-      required: false
-      schema:
-        type: string
   requestBodies:
     Device:
       content:

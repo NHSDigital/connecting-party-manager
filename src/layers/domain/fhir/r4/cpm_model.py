@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Literal, Union
+from typing import Literal  # , Dict, Union
 from uuid import UUID
 
 from domain.core.device import DeviceKeyType, DeviceType
@@ -36,9 +36,9 @@ class ProductTeamIdentifier(BaseModel):
         return {"system": self.system, "value": str(self.value)}
 
 
-class Link(BaseModel):
-    relation: str
-    url: str
+# class Link(BaseModel):
+#     relation: str
+#     url: str
 
 
 class OdsIdentifier(BaseModel):
@@ -124,46 +124,46 @@ class Device(BaseModel):
         return identifier
 
 
-class Reference(BaseModel):
-    reference: str
+# class Reference(BaseModel):
+#     reference: str
 
 
-class Answer(BaseModel):
-    valueString: str
+# class Answer(BaseModel):
+#     valueString: str
 
 
-class QuestionAndAnswer(BaseModel):
-    link_id: str
-    text: str
-    answer: list[Answer]
+# class QuestionAndAnswer(BaseModel):
+#     link_id: str
+#     text: str
+#     answer: list[Answer]
 
 
-class QuestionnaireResponse(BaseModel):
-    resourceType: Literal["QuestionnaireResponse"]
-    status: str = ConstStrField("completed")
-    subject: Reference
-    author: Reference
-    item: list[QuestionAndAnswer] = Field(min_items=0)
+# class QuestionnaireResponse(BaseModel):
+#     resourceType: Literal["QuestionnaireResponse"]
+#     status: str = ConstStrField("completed")
+#     subject: Reference
+#     author: Reference
+#     item: list[QuestionAndAnswer] = Field(min_items=0)
 
 
-class Resource(BaseModel):
-    fullUrl: str
-    resource: Device
-    search: Dict[str, str] = Field(default_factory=lambda: {"mode": "match"})
+# class Resource(BaseModel):
+#     fullUrl: str
+#     resource: Device
+#     search: Dict[str, str] = Field(default_factory=lambda: {"mode": "match"})
 
 
-class Bundle(BaseModel):
-    resourceType: Literal["Bundle"]
-    id: str
-    total: int
-    link: list[Link]
+# class Bundle(BaseModel):
+#     resourceType: Literal["Bundle"]
+#     id: str
+#     total: int
+#     link: list[Link]
 
 
-class CollectionBundle(Bundle):
-    type: str = ConstStrField("collection")
-    entry: list[Union[Resource, QuestionnaireResponse]] = Field(min_items=1)
+# class CollectionBundle(Bundle):
+#     type: str = ConstStrField("collection")
+#     entry: list[Union[Resource, QuestionnaireResponse]] = Field(min_items=1)
 
 
-class SearchsetBundle(Bundle):
-    type: str = ConstStrField("searchset")
-    entry: list[CollectionBundle] = Field(min_items=0)
+# class SearchsetBundle(Bundle):
+#     type: str = ConstStrField("searchset")
+#     entry: list[CollectionBundle] = Field(min_items=0)
