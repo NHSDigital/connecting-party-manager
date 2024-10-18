@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
@@ -28,7 +29,7 @@ def query_products(data, cache) -> List[CpmProduct]:
     results = cpm_product_repo.query_products_by_product_team(
         product_team_id=product_team_id
     )
-    return [result.state() for result in results]
+    return HTTPStatus.OK, [result.state() for result in results]
 
 
 steps = [
