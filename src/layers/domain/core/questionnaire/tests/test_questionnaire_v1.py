@@ -17,14 +17,14 @@ from domain.core.questionnaire import (
 from pydantic import ValidationError
 
 QUESTIONNAIRE_NAME = "sample_questionnaire"
-VERSION_1 = 1
+VERSION_1 = "1"
 
 
 @pytest.mark.parametrize(
     ["name", "version"],
     [[QUESTIONNAIRE_NAME, VERSION_1]],
 )
-def test_questionnaire_constructor(name: str, version: int):
+def test_questionnaire_constructor(name: str, version: str):
     questionnaire = Questionnaire(name=name, version=version)
 
     assert questionnaire.name == name
