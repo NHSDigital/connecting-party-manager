@@ -6,7 +6,5 @@ from .models import (  # noqa: F401
     Meta,
     OperationOutcome,
     OperationOutcomeIssue,
-    Organization,
 )
 from .strict_models import Device as StrictDevice  # noqa: F401
-from .strict_models import Organization as StrictOrganization  # noqa: F401

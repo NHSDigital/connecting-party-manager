@@ -1,6 +1,8 @@
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+from domain.api.common_steps.general import parse_event_body
 from domain.core.cpm_product import CpmProduct
 from domain.core.product_team.v3 import ProductTeam
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
@@ -9,23 +11,17 @@ from domain.request_models.v1 import (
     CreateCpmProductIncomingParams,
     ProductTeamPathParams,
 )
-from domain.response.validation_errors import (
-    mark_json_decode_errors_as_inbound,
-    mark_validation_errors_as_inbound,
-)
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
+
+if TYPE_CHECKING:
+    from mypy_boto3_dynamodb.type_defs import TransactWriteItemsOutputTypeDef
 
 
 @mark_validation_errors_as_inbound
 def parse_path_params(data, cache) -> ProductTeamPathParams:
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     return ProductTeamPathParams(**event.path_parameters)
-
-
-@mark_json_decode_errors_as_inbound
-def parse_event_body(data, cache) -> dict:
-    event = APIGatewayProxyEvent(data[StepChain.INIT])
-    return event.json_body if event.body else {}
 
 
 @mark_validation_errors_as_inbound
@@ -60,9 +56,19 @@ def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
     return product_repo.write(product)
 
 
-def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
+def write_cpm_product(
+    data: dict[str, CpmProduct], cache
+) -> list["TransactWriteItemsOutputTypeDef"]:
     product: CpmProduct = data[create_cpm_product]
-    return HTTPStatus.CREATED, str(product.id)
+    product_repo = CpmProductRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+    )
+    return product_repo.write(product)
+
+
+def set_http_status(data, cache) -> tuple[HTTPStatus, CpmProduct]:
+    product: CpmProduct = data[create_cpm_product]
+    return HTTPStatus.CREATED, product.state()
 
 
 before_steps = [

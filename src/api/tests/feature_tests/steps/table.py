@@ -11,9 +11,6 @@ JSON_PATH_PATTERN = re.compile(r"\.([^\.\[\]]+|\d+)")
 EMPTY_TYPES_AS_STRING = {
     "[]": list,
 }
-EMPTY_TYPES_AS_STRING = {
-    "[]": list,
-}
 
 
 EXPAND_FUNCTIONS = {

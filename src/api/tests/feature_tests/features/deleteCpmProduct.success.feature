@@ -18,7 +18,8 @@ Feature: Delete CPM Product - success scenarios
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path         | value            |
       | product_name | My Great Product |
-    When I make a "DELETE" request with "default" headers to the id in the location response header to the endpoint prefix "ProductTeam/${ note(product_team_id) }/Product/<id>"
+    And I note the response field "$.id" as "product_id"
+    When I make a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }"
     Then I receive a status code "204"
     And the response headers contain:
       | name           | value            |

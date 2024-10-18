@@ -1,6 +1,9 @@
 from typing import Generator
 
 from domain.core.device import Device
+from domain.repository.device_reference_data_repository.v1 import (
+    DeviceReferenceDataRepository,
+)
 from domain.repository.device_repository import DeviceRepository
 from event.aws.client import dynamodb_client
 
@@ -11,7 +14,7 @@ TABLE_NAME = "my_table"
 
 
 def repository_fixture[
-    T: DeviceRepository
+    T: DeviceRepository | DeviceReferenceDataRepository
 ](is_integration_test: bool, repository_class: type[T]) -> Generator[T, None, None]:
     if is_integration_test:
         table_name = read_terraform_output("dynamodb_table_name.value")

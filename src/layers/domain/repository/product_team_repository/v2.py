@@ -1,4 +1,5 @@
 from attr import asdict
+from domain.core.cpm_system_id.v1 import ProductTeamId
 from domain.core.product_team.v3 import ProductTeam, ProductTeamCreatedEvent
 from domain.core.product_team_key import ProductTeamKey
 from domain.repository.errors import ItemNotFound
@@ -72,7 +73,11 @@ class ProductTeamRepository(Repository[ProductTeam]):
         return [create_transaction] + transactions
 
     def read(self, id) -> ProductTeam:
-        pk = TableKey.PRODUCT_TEAM.key(id)
+        pk = (
+            TableKey.PRODUCT_TEAM.key(id)
+            if ProductTeamId.validate_cpm_system_id(id)
+            else TableKey.PRODUCT_TEAM_KEY.key(f"ProductTeamIdAlias#{id}")
+        )
         args = {
             "TableName": self.table_name,
             "KeyConditionExpression": "pk = :pk AND sk = :sk",

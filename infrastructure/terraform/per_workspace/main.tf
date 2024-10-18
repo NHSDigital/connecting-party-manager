@@ -70,7 +70,7 @@ module "layers" {
   source         = "./modules/api_worker/api_layer"
   name           = each.key
   python_version = var.python_version
-  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
   source_path    = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
@@ -79,7 +79,7 @@ module "third_party_layers" {
   source         = "./modules/api_worker/api_layer"
   name           = each.key
   python_version = var.python_version
-  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda-layer"
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
   source_path    = "${path.module}/../../../src/layers/third_party/dist/${each.key}.zip"
 }
 
@@ -88,7 +88,7 @@ module "lambdas" {
   source         = "./modules/api_worker/api_lambda"
   python_version = var.python_version
   name           = each.key
-  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}-lambda"
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(replace(each.key, "_", "-"), "DeviceReferenceData", "DeviceRefData")}"
   //Compact will remove all nulls from the list and create a new one - this is because TF throws an error if there is a null item in the list.
   layers = concat(
     compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
@@ -119,7 +119,7 @@ module "authoriser" {
   name           = "authoriser"
   source         = "./modules/api_worker/api_lambda"
   python_version = var.python_version
-  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser"
   source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
   environment_variables = {
     ENVIRONMENT = var.environment
@@ -145,7 +145,7 @@ module "authoriser" {
           {
               "Action": "lambda:InvokeFunction",
               "Effect": "Allow",
-              "Resource": "arn:aws:lambda:eu-west-2:${var.assume_account}:function:${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser-lambda"
+              "Resource": "arn:aws:lambda:eu-west-2:${var.assume_account}:function:${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser"
           },
           {
               "Action": "secretsmanager:GetSecretValue",
