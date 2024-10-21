@@ -195,7 +195,7 @@ def then_response(context: Context, status_code: str, list_to_check: str, count:
 
 
 @then(
-    'I receive a status code "{status_code}" with a "{entity_type}" search body reponse that contains'
+    'I receive a status code "{status_code}" with a "{entity_type}" search body response that contains'
 )
 def then_response(context: Context, status_code: str, entity_type: str):
     expected_body = parse_table(table=context.table, context=context)
