@@ -534,8 +534,8 @@ paths:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
-  /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}:
-    get:
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}
+  : get:
       operationId: readDeviceReferenceData
       summary: readDeviceReferenceData endpoint for APIGEE integration
       parameters:
