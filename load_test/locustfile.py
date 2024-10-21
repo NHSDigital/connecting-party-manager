@@ -1,8 +1,4 @@
-# import random
-
 from locust import HttpUser, events, task
-
-# from speed_test_queries import queries
 
 queries = [
     {
@@ -57,7 +53,6 @@ class CPMUser(HttpUser):
         apikey = self.environment.parsed_options.apikey
         API_VERSION = self.environment.parsed_options.api_version
         USE_CPM = self.environment.parsed_options.usecpm
-        # random_queries = random.sample(queries, 100)
         for query in queries:
             params = query["params"].copy()
             if USE_CPM == "TRUE":
