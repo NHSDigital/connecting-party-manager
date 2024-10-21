@@ -35,7 +35,7 @@ def read_product(data, cache) -> CpmProduct:
     return cpm_product
 
 
-def product_to_dict(data, cache) -> dict:
+def product_to_dict(data, cache) -> tuple[str, dict]:
     product: CpmProduct = data[read_product]
     return HTTPStatus.OK, product.state()
 
