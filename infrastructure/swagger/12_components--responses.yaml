@@ -24,3 +24,69 @@ components:
                 enum: ["OK"]
       headers:
         <<: *ResponseHeaders
+    ProductTeamResponse:
+      description: Read Product Team operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              ods_code:
+                type: string
+              status:
+                type: string
+              created_on:
+                type: string
+              updated_on:
+                type: string
+              deleted_on:
+                type: string
+              keys:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                    key_value:
+                      type: string
+            example:
+              id: "F5H1R"
+              name: "Sample Product Team"
+              ods_code: "F5H1R"
+              status: "active"
+              created_on: "2024-10-15T10:00:00Z"
+              updated_on: "2024-10-15T10:00:00Z"
+              deleted_on: "null"
+              keys:
+                - key_type: "product_team_id_alias"
+                  key_value: "FOOBAR"
+    DeviceReferenceDataResponse:
+      description: Read Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              product_id:
+                type: string
+              product_team_id:
+                type: string
+              ods_code:
+                type: string
+              status:
+                type: string
+              created_on:
+                type: string
+              updated_on:
+                type: string
+              deleted_on:
+                type: string

@@ -28,6 +28,9 @@ CPM_PRODUCT_TEAM_ID = _read_core_test_data(
 CPM_PRODUCT_TEAM_NO_ID = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-no-id.json"
 )
+CPM_PRODUCT_TEAM_NO_ID_NO_KEYS = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-no-id-no-keys.json"
+)
 CPM_PRODUCT_TEAM_NO_ID_KEYS_NOT_ALLOWED = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-no-id-keys-not-allowed.json"
 )

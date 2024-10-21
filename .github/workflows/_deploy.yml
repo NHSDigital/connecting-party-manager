@@ -145,6 +145,22 @@ jobs:
             infrastructure/swagger/dist/apigee/swagger.yaml
         if: ${{ always() }}
 
+  swagger--publish:
+    needs: [get-branch-from-workflow-file, apigee--deploy]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      # change below to (env.ACCOUNT == 'int') || (env.ACCOUNT == 'prod') when ready for prod
+      - if: (${{ env.SCOPE == 'per_workspace'}}) && (${{ env.ACCOUNT == 'int' }})
+        uses: ./.github/actions/make/
+        with:
+          command: swagger--publish
+          requires-aws: true
+          restore-from-cache: "true"
+          cache-suffix: ${{ env.CACHE_NAME }}
+
   test--smoke:
     needs: [get-branch-from-workflow-file, apigee--deploy]
     runs-on: [self-hosted, ci]
@@ -162,7 +178,7 @@ jobs:
 
   set-success:
     name: Set Success
-    needs: [test--smoke]
+    needs: [test--smoke, apigee--deploy]
     runs-on: [self-hosted, ci]
     steps:
       - name: Set success env var

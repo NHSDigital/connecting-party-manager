@@ -1,1 +1,39 @@
 ---
+components:
+  requestBodies:
+    ProductTeamRequest:
+      description: Request body to create a Product Team
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the product team
+              ods_code:
+                type: string
+                description: ODS code associated with the product team
+              keys:
+                type: array
+                description: List of keys associated with the product team
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                      description: The type of the key (e.g., product_team_id_alias)
+                    key_value:
+                      type: string
+                      description: The value of the key
+            required:
+              - name
+              - ods_code
+              - keys
+          example:
+            name: "Sample Product Team"
+            ods_code: "F5H1R"
+            keys:
+              - key_type: "product_team_id_alias"
+                key_value: "BAR"

@@ -4,14 +4,14 @@ import os
 import pytest
 import requests
 
-from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
+from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID_NO_KEYS
 from test_helpers.terraform import read_terraform_output
 
 from .utils import execute_smoke_test, get_app_key, get_base_url, get_headers
 
 
 def create_and_read_product_team(base_url: str, headers: dict):
-    product_team_body = json.dumps(CPM_PRODUCT_TEAM_NO_ID)
+    product_team_body = json.dumps(CPM_PRODUCT_TEAM_NO_ID_NO_KEYS)
     url = f"{base_url}/ProductTeam"
     response = requests.post(url=url, headers=headers, data=product_team_body)
     response_body = response.json()

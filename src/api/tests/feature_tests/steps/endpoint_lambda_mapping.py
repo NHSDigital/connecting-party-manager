@@ -1,7 +1,7 @@
 import re
-from ast import FunctionType
+from types import ModuleType
 
-ENDPOINT_LAMBDA_MAPPING = dict[str, dict[str, FunctionType]]
+ENDPOINT_LAMBDA_MAPPING = dict[str, dict[str, ModuleType]]
 
 
 class EndpointConfigurationError(Exception):
@@ -24,10 +24,12 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.createCpmProduct.index
     import api.createCpmProductForEpr.index
     import api.createDevice.index
+    import api.createDeviceReferenceData.index
     import api.createProductTeam.index
     import api.deleteCpmProduct.index
     import api.readCpmProduct.index
     import api.readDevice.index
+    import api.readDeviceReferenceData.index
     import api.readProductTeam.index
     import api.searchCpmProduct.index
     import api.searchDevice.index
@@ -38,17 +40,18 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam": api.createProductTeam.index,
             "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
             "ProductTeam/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData": api.createDeviceReferenceData.index,
             "Device": api.createDevice.index,
         },
         "GET": {
             "ProductTeam/{product_team_id}": api.readProductTeam.index,
             "ProductTeam/{product_team_id}/Product": api.searchCpmProduct.index,
             "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}": api.readDeviceReferenceData.index,
             "Device/{id}": api.readDevice.index,
             "Device?device_type={device_type}": api.searchDevice.index,
             "Device?device_type={device_type}&foo={foo}": api.searchDevice.index,
             "Device?foo={foo}": api.searchDevice.index,
-            # "Organization/{id}": api.readProductTeam.index,
             "_status": api.status.index,
         },
         "DELETE": {

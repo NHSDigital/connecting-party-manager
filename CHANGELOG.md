@@ -1,5 +1,15 @@
 # Changelog
 
+## 2024-10-16
+- [PI-501] Create Device Reference Data
+- [PI-503] Read Device Reference Data
+- [PI-536] Create Cpm Product without FHIR
+- [PI-535] Read Product Team without FHIR
+- [PI-548] Sonarcloud configuration
+- [PI-365] Locust load testing
+- [PI-276] Proxygen Spec
+- [PI-562] Feature Tests for CpmProduct
+
 ## 2024-10-15
 - [PI-533] Create Product Team without FHIR
 
