@@ -10,4 +10,3 @@
 # described in https://hl7.org/fhir/r4b/http.html
 
 Device: [create, read]
-Product: [read]
