@@ -49,6 +49,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}": api.readDeviceReferenceData.index,
             "Device/{id}": api.readDevice.index,
+            "Questionnaire/{questionnaire_id}": api.readQuestionnaire.index,
             "_status": api.status.index,
         },
         "DELETE": {
