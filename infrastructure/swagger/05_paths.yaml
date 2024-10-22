@@ -493,3 +493,29 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
+
+  /Questionnaire/{questionnaire_id}:
+    get:
+      operationId: readQuestionnaire
+      summary: readQuestionnaire endpoint for APIGEE integration
+      parameters:
+        - name: questionnaire_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "200":
+          $ref: "#/components/responses/Questionnaire"
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readQuestionnaire}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
