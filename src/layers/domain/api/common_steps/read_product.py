@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.product_team.v3 import ProductTeam
@@ -33,9 +35,9 @@ def read_product(data, cache) -> CpmProduct:
     return cpm_product
 
 
-def product_to_dict(data, cache) -> dict:
+def product_to_dict(data, cache) -> tuple[str, dict]:
     product: CpmProduct = data[read_product]
-    return product.state()
+    return HTTPStatus.OK, product.state()
 
 
 before_steps = [
