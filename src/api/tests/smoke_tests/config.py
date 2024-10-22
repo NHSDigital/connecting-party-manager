@@ -11,3 +11,14 @@ APIGEE_URL_PREFIX_BY_ENVIRONMENT = {
     "int-sandbox": "sandbox",
     "prod": "",
 }
+
+PERSISTENT_ENVIRONMENTS = [
+    "dev",
+    "dev-sandbox",
+    "qa",
+    "qa-sandbox",
+    "ref",
+    "int",
+    "int-sandbox",
+    "prod",
+]
