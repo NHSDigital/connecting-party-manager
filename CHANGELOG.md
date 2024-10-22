@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-10-22
+- [PI-552] Remove FHIR from search CPMProduct
+- [PI-557] Remove search Device
+- [PI-560] Proxy naming
+- [PI-563] Read a Questionnaire
+- [PI-546] Fix ETL failure
+
 ## 2024-10-16
 - [PI-501] Create Device Reference Data
 - [PI-503] Read Device Reference Data
