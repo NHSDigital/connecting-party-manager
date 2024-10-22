@@ -7,7 +7,7 @@ class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
 
 
 class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
-    product_name: str = Field(...)
+    name: str = Field(...)
 
 
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
@@ -28,7 +28,7 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
         )
 
 
-class CreateDeviceReferenceDataParams(BaseModel, extra=Extra.forbid):
+class CreateDeviceReferenceDataIncomingParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
 
 

@@ -38,7 +38,7 @@ TABLE_NAME = "my-table"
         ),
         (
             {
-                "body": json.dumps({"product_name": "foo"}),
+                "body": json.dumps({"name": "foo"}),
                 "pathParameters": {"product_team_id": "does-not-exist"},
             },
             ItemNotFound,
@@ -65,7 +65,7 @@ def test_create_product_steps_good_input():
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
     event = {
-        "body": json.dumps({"product_name": product_name}),
+        "body": json.dumps({"name": product_name}),
         "pathParameters": {"product_team_id": str(product_team.id)},
     }
 

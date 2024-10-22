@@ -161,7 +161,7 @@ paths:
             schema:
               type: object
               properties:
-                product_name:
+                name:
                   type: string
                   description: Name of the product
       responses:
@@ -270,7 +270,7 @@ paths:
             schema:
               type: object
               properties:
-                product_name:
+                name:
                   type: string
                   description: Name of the product
       responses:
