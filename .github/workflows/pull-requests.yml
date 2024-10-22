@@ -188,7 +188,7 @@ jobs:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
-          command: apigee--deploy
+          command: apigee--deploy DEV_BUILD="true"
           save-to-cache: "false"
           restore-from-cache: "true"
           requires-aws: true
@@ -204,7 +204,7 @@ jobs:
           poetry add pytest-nhsd-apim
       - uses: ./.github/actions/make/
         with:
-          command: apigee--attach-product
+          command: apigee--attach-product DEV_BUILD="true"
           save-to-cache: "false"
           restore-from-cache: "true"
           requires-aws: true
@@ -286,7 +286,7 @@ jobs:
           poetry add pytest-nhsd-apim
       - uses: ./.github/actions/make/
         with:
-          command: apigee--detach-product
+          command: apigee--detach-product DEV_BUILD="true"
           save-to-cache: "false"
           restore-from-cache: "true"
           requires-aws: true
@@ -301,7 +301,7 @@ jobs:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
         with:
-          command: apigee--delete
+          command: apigee--delete DEV_BUILD="true"
           save-to-cache: "false"
           restore-from-cache: "true"
           requires-aws: true
