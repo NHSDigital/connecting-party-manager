@@ -680,6 +680,38 @@ paths:
             application/fhir+json:
               schema:
                 $ref: "#/components/schemas/OperationOutcome"
+  /Questionnaire/{questionnaire_id}:
+    get:
+      operationId: readQuestionnaire
+      summary: readQuestionnaire endpoint for APIGEE integration
+      parameters:
+        - name: questionnaire_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/Questionnaire"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
 components:
   requestBodies:
     Device:
@@ -2754,6 +2786,15 @@ components:
     app-level0:
       $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
   responses:
+    Questionnaire:
+      description: Questionnaire response body
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tbc:
+                type: string
     ProductTeamResponse:
       description: Read Product Team operation successful
       content:
@@ -2816,6 +2857,4 @@ components:
               created_on:
                 type: string
               updated_on:
-                type: string
-              deleted_on:
                 type: string
