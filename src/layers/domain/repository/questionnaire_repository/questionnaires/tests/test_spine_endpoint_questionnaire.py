@@ -1,7 +1,9 @@
 import pytest
-from domain.core.questionnaire.load_questionnaire import render_questionnaire
-from domain.core.questionnaire.questionnaires import QuestionnaireInstance
 from domain.core.questionnaire.v2 import Questionnaire
+from domain.repository.questionnaire_repository import QuestionnaireRepository
+from domain.repository.questionnaire_repository.questionnaires import (
+    QuestionnaireInstance,
+)
 from event.json import json_load
 from hypothesis import given, settings
 from sds.cpm_translation.tests.test_cpm_translation import NHS_MHS_STRATEGY
@@ -12,10 +14,8 @@ from etl.sds.tests.constants import EtlTestDataPath
 
 @pytest.fixture
 def spine_endpoint_questionnaire_v1() -> Questionnaire:
-    return render_questionnaire(
-        questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT,
-        questionnaire_version=1,
-    )
+    repo = QuestionnaireRepository()
+    return repo.read(name=QuestionnaireInstance.SPINE_ENDPOINT)
 
 
 def _mhs(obj: dict[str, str]) -> bool:
@@ -43,10 +43,11 @@ def _test_spine_endpoint_questionnaire_v1(
 @settings(deadline=1500)
 @given(nhs_mhs=NHS_MHS_STRATEGY)
 def test_spine_endpoint_questionnaire_v1_local(nhs_mhs: NhsMhs):
-    spine_endpoint_questionnaire_v1 = render_questionnaire(
-        questionnaire_name=QuestionnaireInstance.SPINE_ENDPOINT,
-        questionnaire_version=1,
+    repo = QuestionnaireRepository()
+    spine_endpoint_questionnaire_v1 = repo.read(
+        name=QuestionnaireInstance.SPINE_ENDPOINT
     )
+
     assert _test_spine_endpoint_questionnaire_v1(
         nhs_mhs=nhs_mhs, questionnaire=spine_endpoint_questionnaire_v1
     )

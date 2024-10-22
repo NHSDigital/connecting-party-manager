@@ -4,7 +4,11 @@ from uuid import uuid4
 import boto3
 import requests
 
-from .config import APIGEE_BASE_URL, APIGEE_URL_PREFIX_BY_ENVIRONMENT
+from .config import (
+    APIGEE_BASE_URL,
+    APIGEE_URL_PREFIX_BY_ENVIRONMENT,
+    PERSISTENT_ENVIRONMENTS,
+)
 
 
 class SmokeTestError(Exception):
@@ -30,13 +34,18 @@ def get_headers(app_key: str) -> dict:
 
 
 def get_base_url(workspace: str, environment: str) -> str:
+    api_name = "connecting-party-manager"
     apigee_url_prefix = (
         APIGEE_URL_PREFIX_BY_ENVIRONMENT[workspace]
         if workspace == f"{environment}-sandbox"
         else APIGEE_URL_PREFIX_BY_ENVIRONMENT[environment]
     )
     base_url = ".".join(filter(bool, (apigee_url_prefix, APIGEE_BASE_URL)))
-    return f"https://{base_url}/cpm-{workspace}"
+
+    if workspace not in PERSISTENT_ENVIRONMENTS:
+        api_name = workspace
+
+    return f"https://{base_url}/{api_name}"
 
 
 def is_2xx(status_code: int):
