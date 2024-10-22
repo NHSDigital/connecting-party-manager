@@ -40,3 +40,7 @@ class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
 
 class QuestionnairePathParams(BaseModel, extra=Extra.forbid):
     questionnaire_id: str  # NB: this maps onto the domain field Questionnaire.name
+
+
+class CreateDeviceIncomingParams(BaseModel, extra=Extra.forbid):
+    name: str = Field(...)

@@ -285,17 +285,21 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /Device:
+  /ProductTeam/{id}/Product/{id}/Device:
     post:
+      operationId: createdevice
+      summary: createDevice endpoint for APIGEE integration
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceRequest"
       responses:
         "201":
-          <<: *Response201
+          $ref: "#/components/responses/DeviceResponse"
         "4XX":
           <<: *Response4XX
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_createDevice}
+        uri: ${method_createProductTeam}
       security:
         - ${authoriser_name}: []
         - app-level0: []

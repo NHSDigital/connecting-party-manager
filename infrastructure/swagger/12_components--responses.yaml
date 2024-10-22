@@ -76,6 +76,45 @@ components:
               keys:
                 - key_type: "product_team_id_alias"
                   key_value: "FOOBAR"
+    # need device type removing and product_id adding?
+    DeviceResponse:
+      description: Read Device operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              device_type:
+                tyoe: string
+              product_team_id:
+                type: string
+              ods_code:
+                type: string
+              status:
+                type: string
+              created_on:
+                type: string
+              updated_on:
+                type: string
+              deleted_on:
+                type: string
+              keys:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                    key_value:
+                      type: string
+              tags:
+                type: #todo
+              questionnaire_responses:
+                type: #todo
     DeviceReferenceDataResponse:
       description: Read Device Reference Data operation successful
       content:
@@ -100,3 +139,4 @@ components:
               updated_on:
                 type: string
               deleted_on:
+                type: string
