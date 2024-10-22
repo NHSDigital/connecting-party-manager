@@ -1,4 +1,4 @@
-from api_utils.api_step_chain import execute_step_chain_fhir as execute_step_chain
+from api_utils.api_step_chain import execute_step_chain
 from domain.logging.step_decorators import logging_step_decorators
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
