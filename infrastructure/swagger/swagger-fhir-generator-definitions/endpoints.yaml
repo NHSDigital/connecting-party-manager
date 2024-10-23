@@ -9,5 +9,5 @@
 # RESTful API "Instance Level" or "Type Level" interactions
 # described in https://hl7.org/fhir/r4b/http.html
 
-Device: [read]
+Device: [create, read] # Remove after device unfhired
 Product: [read]
