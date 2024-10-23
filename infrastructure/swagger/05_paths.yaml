@@ -33,14 +33,6 @@ x-definitions:
           - *RequestHeaderRequestId
           - *RequestHeaderCorrelationId
 
-  SuccessResponses:
-    "201": &Response201
-      description: Create operation successful
-      content:
-        application/fhir+json:
-          schema:
-            $ref: "#/components/schemas/OperationOutcome"
-
   ErrorResponses:
     "4XX": &Response4XX
       description: "Client Error"
