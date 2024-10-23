@@ -517,3 +517,25 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
+
+  /Device/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
