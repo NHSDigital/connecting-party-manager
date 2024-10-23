@@ -16,8 +16,8 @@ Feature: Create CPM Product for EPR - success scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     Then I receive a status code "201" with body
       | path             | value                      |
       | id               | << ignore >>               |
@@ -62,12 +62,12 @@ Feature: Create CPM Product for EPR - success scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id_1"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value                  |
-      | product_name | My Other Great Product |
+      | path | value                  |
+      | name | My Other Great Product |
     And I note the response field "$.id" as "product_id_2"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id_1) }"
     Then I receive a status code "200" with body

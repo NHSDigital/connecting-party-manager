@@ -28,7 +28,7 @@ def _create_product(product, product_team):
     generated_product_id = ProductId.create()
     product_id = generated_product_id.id
     cpmproduct = product_team.create_cpm_product(
-        product_id=product_id, name=product["product_name"]
+        product_id=product_id, name=product["name"]
     )
 
     return cpmproduct
@@ -77,10 +77,10 @@ def test_no_results():
 @pytest.mark.parametrize(
     "product",
     [
-        {"product_name": "product-name-a"},
-        {"product_name": "product-name-b"},
-        {"product_name": "product-name-c"},
-        {"product_name": "product-name-d"},
+        {"name": "product-name-a"},
+        {"name": "product-name-b"},
+        {"name": "product-name-c"},
+        {"name": "product-name-d"},
     ],
 )
 def test_index(product):
@@ -177,10 +177,10 @@ def test_index_no_such_product_team():
     "products",
     [
         [
-            {"product_name": "product-name-a"},
-            {"product_name": "product-name-b"},
-            {"product_name": "product-name-c"},
-            {"product_name": "product-name-d"},
+            {"name": "product-name-a"},
+            {"name": "product-name-b"},
+            {"name": "product-name-c"},
+            {"name": "product-name-d"},
         ],
     ],
 )

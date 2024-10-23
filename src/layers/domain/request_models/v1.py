@@ -7,7 +7,7 @@ class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
 
 
 class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
-    product_name: str = Field(...)
+    name: str = Field(...)
 
 
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
@@ -28,7 +28,7 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
         )
 
 
-class CreateDeviceReferenceDataParams(BaseModel, extra=Extra.forbid):
+class CreateDeviceReferenceDataIncomingParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
 
 
@@ -40,3 +40,7 @@ class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
 
 class QuestionnairePathParams(BaseModel, extra=Extra.forbid):
     questionnaire_id: str  # NB: this maps onto the domain field Questionnaire.name
+
+
+class CreateDeviceIncomingParams(BaseModel, extra=Extra.forbid):
+    name: str = Field(...)

@@ -37,3 +37,19 @@ components:
             keys:
               - key_type: "product_team_id_alias"
                 key_value: "BAR"
+    DeviceRequest:
+      description: Request body to create a Device
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the device
+            required:
+              - name
+          example:
+            name: "Device"
+# keys?

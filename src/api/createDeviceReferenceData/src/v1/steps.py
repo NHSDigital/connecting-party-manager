@@ -11,19 +11,21 @@ from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
-from domain.request_models.v1 import CreateDeviceReferenceDataParams
+from domain.request_models.v1 import CreateDeviceReferenceDataIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 
 @mark_validation_errors_as_inbound
 def parse_device_reference_data_payload(data, cache) -> DeviceReferenceData:
     payload: dict = data[parse_event_body]
-    return CreateDeviceReferenceDataParams(**payload)
+    return CreateDeviceReferenceDataIncomingParams(**payload)
 
 
 def create_device_reference_data(data, cache) -> DeviceReferenceData:
     product: CpmProduct = data[read_product]
-    payload: CreateDeviceReferenceDataParams = data[parse_device_reference_data_payload]
+    payload: CreateDeviceReferenceDataIncomingParams = data[
+        parse_device_reference_data_payload
+    ]
     return product.create_device_reference_data(**payload.dict())
 
 

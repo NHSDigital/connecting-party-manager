@@ -161,7 +161,7 @@ paths:
             schema:
               type: object
               properties:
-                product_name:
+                name:
                   type: string
                   description: Name of the product
       responses:
@@ -270,7 +270,7 @@ paths:
             schema:
               type: object
               properties:
-                product_name:
+                name:
                   type: string
                   description: Name of the product
       responses:
@@ -285,14 +285,34 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /Device:
+  /ProductTeam/{product_team_id}/Product/{product_id}/Device:
     post:
+      operationId: createDevice
+      summary: createDevice endpoint for APIGEE integration
+      parameters:
+        - name: product_team_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - name: product_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceRequest"
       responses:
+        responses:
         "201":
           <<: *Response201
         "4XX":
           <<: *Response4XX
-      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createDevice}
@@ -378,28 +398,6 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readDeviceReferenceData}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
-
-  /Device/{id}:
-    get:
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
-      responses:
-        "4XX":
-          <<: *Response4XX
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_readDevice}
       security:
         - ${authoriser_name}: []
         - app-level0: []
@@ -516,6 +514,61 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readQuestionnaire}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  # Remove after device unfhired
+  /Device:
+    post:
+      summary: Create a Device resource
+      operationId: createdevice
+      responses:
+        "201":
+          description: Create operation successful
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+        "4XX":
+          description: "Client Error"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+      requestBody:
+        $ref: "#/components/requestBodies/Device"
+      parameters:
+        - in: header
+          name: version
+          schema:
+            $ref: "#/components/schemas/Version"
+        - in: header
+          name: x-request-id
+          schema:
+            $ref: "#/components/schemas/RequestId"
+        - in: header
+          name: x-correlation-id
+          schema:
+            $ref: "#/components/schemas/CorrelationId"
+  /Device/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readDevice}
       security:
         - ${authoriser_name}: []
         - app-level0: []
