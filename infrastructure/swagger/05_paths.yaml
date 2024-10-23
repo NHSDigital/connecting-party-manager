@@ -128,11 +128,7 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Search CpmProducts operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
+          $ref: "#/components/responses/ProductSearchResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -166,7 +162,7 @@ paths:
                   description: Name of the product
       responses:
         "201":
-          <<: *Response201
+          $ref: "#/components/responses/ProductResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -199,11 +195,7 @@ paths:
       responses:
         responses:
         "200":
-          description: Read Product operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
+          $ref: "#/components/responses/ProductResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -236,10 +228,6 @@ paths:
         responses:
         "204":
           description: Delete Product operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -275,27 +263,12 @@ paths:
                   description: Name of the product
       responses:
         "201":
-          <<: *Response201
+          $ref: "#/components/responses/ProductResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createCpmProductForEpr}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
-
-  /Device:
-    post:
-      responses:
-        "201":
-          <<: *Response201
-        "4XX":
-          <<: *Response4XX
-      <<: *RequestHeaders
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_createDevice}
       security:
         - ${authoriser_name}: []
         - app-level0: []
@@ -333,7 +306,7 @@ paths:
       responses:
         responses:
         "201":
-          <<: *Response201
+          $ref: "#/components/responses/DeviceReferenceDataResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -382,6 +355,21 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
+  /Device:
+    post:
+      responses:
+        "201":
+          $ref: "#/components/responses/DeviceResponse"
+        "4XX":
+          <<: *Response4XX
+      <<: *RequestHeaders
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
   /Device/{id}:
     get:
       parameters:
@@ -395,6 +383,8 @@ paths:
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
+        "201":
+          $ref: "#/components/responses/DeviceResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -438,11 +428,7 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Search Device operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
+          $ref: "#/components/responses/DeviceSearchResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
@@ -480,11 +466,7 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          description: Search Device operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
+          $ref: "#/components/responses/DeviceSearchResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:

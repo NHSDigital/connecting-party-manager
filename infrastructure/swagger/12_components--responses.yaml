@@ -76,6 +76,114 @@ components:
               keys:
                 - key_type: "product_team_id_alias"
                   key_value: "FOOBAR"
+    ProductResponse:
+      description: Read Product operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              ods_code:
+                type: string
+              status:
+                type: string
+              created_on:
+                type: string
+              updated_on:
+                type: string
+              deleted_on:
+                type: string
+              keys:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                    key_value:
+                      type: string
+            example:
+              id: "123-XXX"
+              name: "Sample Product Team"
+              ods_code: "F5H1R"
+              status: "active"
+              created_on: "2024-10-15T10:00:00Z"
+              updated_on: "2024-10-15T10:00:00Z"
+              deleted_on: "null"
+              keys:
+                - key_type: "product_team_id_alias"
+                  key_value: "FOOBAR"
+    ProductSearchResponse:
+      description: Search Product operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              result:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    ods_code:
+                      type: string
+                    status:
+                      type: string
+                    created_on:
+                      type: string
+                    updated_on:
+                      type: string
+                    deleted_on:
+                      type: string
+                    keys:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          key_type:
+                            type: string
+                          key_value:
+                            type: string
+            example:
+              result:
+                - id: "123-XXX"
+                  name: "Sample Product Team"
+                  ods_code: "F5H1R"
+                  status: "active"
+                  created_on: "2024-10-15T10:00:00Z"
+                  updated_on: "2024-10-15T10:00:00Z"
+                  deleted_on: "null"
+                  keys:
+                    - key_type: "product_team_id_alias"
+                      key_value: "FOOBAR"
+    DeviceResponse:
+      description: Read Device operation successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+    DeviceSearchResponse:
+      description: Search Device operation successful
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
     DeviceReferenceDataResponse:
       description: Read Device Reference Data operation successful
       content:
