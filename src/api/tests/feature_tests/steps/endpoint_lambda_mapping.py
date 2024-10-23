@@ -41,7 +41,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
             "ProductTeam/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData": api.createDeviceReferenceData.index,
-            "Device": api.createDevice.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/Device": api.createDevice.index,
         },
         "GET": {
             "ProductTeam/{product_team_id}": api.readProductTeam.index,

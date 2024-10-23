@@ -7,8 +7,8 @@ from domain.api.common_steps.read_product import (
     read_product_team,
 )
 from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device.v2 import Device
-from domain.repository.device_repository.v2 import DeviceRepository
+from domain.core.device.v3 import Device
+from domain.repository.device_repository.v3 import DeviceRepository
 from domain.request_models.v1 import CreateDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
