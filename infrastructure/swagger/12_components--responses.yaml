@@ -89,7 +89,7 @@ components:
               name:
                 type: string
               device_type:
-                tyoe: string
+                type: string
               product_team_id:
                 type: string
               ods_code:
@@ -112,9 +112,9 @@ components:
                     key_value:
                       type: string
               tags:
-                type: #todo
+                # type: #todo
               questionnaire_responses:
-                type: #todo
+                # type: #todo
     DeviceReferenceDataResponse:
       description: Read Device Reference Data operation successful
       content:
