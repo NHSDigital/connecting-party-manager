@@ -33,14 +33,6 @@ x-definitions:
           - *RequestHeaderRequestId
           - *RequestHeaderCorrelationId
 
-  ErrorResponses:
-    "4XX": &Response4XX
-      description: "Client Error"
-      content:
-        application/fhir+json:
-          schema:
-            $ref: "#/components/schemas/OperationOutcome"
-
 paths:
   /_status:
     get:
@@ -49,8 +41,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/StatusOK"
-        "4XX":
-          <<: *Response4XX
+        "404":
+          $ref: "#/components/responses/NotFound"
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
@@ -64,12 +56,14 @@ paths:
       operationId: createproductteam
       summary: createProductTeam endpoint for APIGEE integration
       requestBody:
-        $ref: "#/components/requestBodies/ProductTeamRequest"
+        $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/ProductTeamResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/ProductTeamCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
@@ -83,20 +77,15 @@ paths:
       operationId: readproductteam
       summary: readProductTeam endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          $ref: "#/components/responses/ProductTeamResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/ProductTeamRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}
@@ -109,20 +98,15 @@ paths:
       operationId: searchCpmProduct
       summary: searchCpmProduct endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          $ref: "#/components/responses/ProductSearchResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/ProductSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_searchCpmProduct}
@@ -133,30 +117,19 @@ paths:
       operationId: createproductendpoint
       summary: createProduct endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                product_name:
-                  type: string
-                  description: Name of the product
+        $ref: "#/components/requestBodies/ProductCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/ProductResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/ProductCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createCpmProduct}
@@ -169,27 +142,17 @@ paths:
       operationId: readproductendpoint
       summary: readProduct endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - name: product_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         responses:
         "200":
-          $ref: "#/components/responses/ProductResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/ProductRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readCpmProduct}
@@ -201,18 +164,8 @@ paths:
       operationId: deleteproductendpoint
       summary: deleteProduct endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - name: product_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
@@ -220,8 +173,8 @@ paths:
         responses:
         "204":
           description: Delete Product operation successful
-        "4XX":
-          <<: *Response4XX
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_deleteCpmProduct}
@@ -234,30 +187,19 @@ paths:
       operationId: createproductforeprendpoint
       summary: createCpmProductForEpr endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                product_name:
-                  type: string
-                  description: Name of the product
+        $ref: "#/components/requestBodies/ProductCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/ProductResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/EprProductCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createCpmProductForEpr}
@@ -270,37 +212,21 @@ paths:
       operationId: createDeviceReferenceData
       summary: createDeviceReferenceData endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - name: product_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: Name of the DeviceReferenceData
+        $ref: "#/components/requestBodies/DeviceReferenceDataCreateRequestBody"
       responses:
         responses:
         "201":
-          $ref: "#/components/responses/DeviceReferenceDataResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/DeviceRefDataCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createDeviceReferenceData}
@@ -313,33 +239,18 @@ paths:
       operationId: readDeviceReferenceData
       summary: readDeviceReferenceData endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - name: product_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - name: device_reference_data_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/DeviceReferenceDataId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         responses:
         "200":
-          $ref: "#/components/responses/DeviceReferenceDataResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/DeviceRefDataRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readDeviceReferenceData}
@@ -351,9 +262,11 @@ paths:
     post:
       responses:
         "201":
-          $ref: "#/components/responses/DeviceResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/DeviceCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
       <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
@@ -368,7 +281,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: logical identifier
+          description: Device identifier
           schema:
             type: string
         - *RequestHeaderVersion
@@ -376,9 +289,9 @@ paths:
         - *RequestHeaderCorrelationId
       responses:
         "201":
-          $ref: "#/components/responses/DeviceResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/DeviceRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readDevice}
@@ -391,38 +304,18 @@ paths:
       operationId: searchsdsdevice
       summary: searchSdsDevice endpoint for APIGEE integration
       parameters:
-        - name: nhs_as_client
-          in: query
-          required: false
-          description: "Accredited System Client"
-          schema:
-            type: string
-        - name: nhs_as_svc_ia
-          in: query
-          required: false
-          description: "Accredited System Client Interaction"
-          schema:
-            type: string
-        - name: nhs_mhs_manufacturer_org
-          in: query
-          required: false
-          description: "Manufacturer Organisation"
-          schema:
-            type: string
-        - name: nhs_mhs_party_key
-          in: query
-          required: false
-          description: "Party Key"
-          schema:
-            type: string
+        - $ref: "#/components/parameters/NhsAsClient"
+        - $ref: "#/components/parameters/NhsAsClientInteration"
+        - $ref: "#/components/parameters/NhsMhsManOrg"
+        - $ref: "#/components/parameters/NhsMhsPartyKey"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          $ref: "#/components/responses/DeviceSearchResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/SdsDeviceSearch"
+        "400":
+          $ref: "#/components/responses/BadRequest"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_searchSdsDevice}
@@ -435,32 +328,17 @@ paths:
       operationId: searchsdsendpoint
       summary: searchSdsEndpoint endpoint for APIGEE integration
       parameters:
-        - name: nhs_id_code
-          in: query
-          required: false
-          description: "NHS ID Code"
-          schema:
-            type: string
-        - name: nhs_mhs_svc_ia
-          in: query
-          required: false
-          description: "Endpoint Interaction"
-          schema:
-            type: string
-        - name: nhs_mhs_party_key
-          in: query
-          required: false
-          description: "Party Key"
-          schema:
-            type: string
+        - $ref: "#/components/parameters/NhsIdCode"
+        - $ref: "#/components/parameters/NhsMhsInteration"
+        - $ref: "#/components/parameters/NhsMhsPartyKey"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          $ref: "#/components/responses/DeviceSearchResponse"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/SdsEndpointSearch"
+        "400":
+          $ref: "#/components/responses/BadRequest"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_searchSdsEndpoint}
@@ -473,20 +351,15 @@ paths:
       operationId: readQuestionnaire
       summary: readQuestionnaire endpoint for APIGEE integration
       parameters:
-        - name: questionnaire_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
+        - $ref: "#/components/parameters/QuestionnaireId"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
       responses:
         "200":
-          $ref: "#/components/responses/Questionnaire"
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/QuestionnaireRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readQuestionnaire}
