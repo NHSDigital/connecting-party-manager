@@ -287,7 +287,7 @@ paths:
 
   /ProductTeam/{product_team_id}/Product/{product_id}/Device:
     post:
-      operationId: createdevice
+      operationId: createDevice
       summary: createDevice endpoint for APIGEE integration
       parameters:
         - name: product_team_id
@@ -308,11 +308,11 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/DeviceRequest"
       responses:
+        responses:
         "201":
-          $ref: "#/components/responses/DeviceResponse"
+          <<: *Response201
         "4XX":
           <<: *Response4XX
-      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createDevice}
