@@ -79,6 +79,7 @@ def test_index() -> None:
         _device = json_loads(response["body"])
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
+        assert device.product_id == product.id
         assert device.name == DEVICE_NAME
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()

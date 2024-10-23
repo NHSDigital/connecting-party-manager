@@ -79,9 +79,10 @@ class CpmProduct(AggregateRoot):
     ) -> Device:
         device = Device(
             name=name,
-            status=status,
             product_team_id=self.product_team_id,
+            product_id=self.id,
             ods_code=self.ods_code,
+            status=status,
         )
         device_created_event = DeviceCreatedEvent(**device.dict())
         self.add_event(device_created_event)

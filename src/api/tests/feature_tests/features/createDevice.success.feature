@@ -25,6 +25,7 @@ Feature: Create Device - success scenarios
       | id                      | << ignore >>               |
       | name                    | My Device                  |
       | status                  | active                     |
+      | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
       | created_on              | << ignore >>               |
@@ -36,7 +37,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 318              |
+      | Content-Length | 345              |
 
 # And I note the response field "$.id" as "device_id"
 # When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"

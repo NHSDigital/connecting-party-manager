@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 from attr import dataclass
 from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.base import BaseModel
+from domain.core.cpm_system_id.v1 import ProductId
 from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
@@ -45,6 +46,7 @@ class DeviceCreatedEvent(Event):
     id: str
     name: str
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
     status: Status
     created_on: str
@@ -61,6 +63,7 @@ class DeviceUpdatedEvent(Event):
     name: str
     device_type: "DeviceType"
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
     status: Status
     created_on: str
@@ -77,23 +80,7 @@ class DeviceDeletedEvent(Event):
     name: str
     device_type: "DeviceType"
     product_team_id: UUID
-    ods_code: str
-    status: Status
-    created_on: str
-    updated_on: str = None
-    deleted_on: str = None
-    keys: list[DeviceKey]
-    tags: list["DeviceTag"]
-    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
-    deleted_tags: list["DeviceTag"] = None
-
-
-@dataclass(kw_only=True, slots=True)
-class DeviceDeletedEvent(Event):
-    id: str
-    name: str
-    device_type: "DeviceType"
-    product_team_id: UUID
+    product_id: ProductId
     ods_code: str
     status: Status
     created_on: str
@@ -112,6 +99,7 @@ class DeviceKeyAddedEvent(Event):
     name: str
     device_type: "DeviceType"
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
     status: Status
     created_on: str
@@ -138,6 +126,7 @@ class DeviceTagAddedEvent(Event):
     name: str
     device_type: "DeviceType"
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
     status: Status
     created_on: str
@@ -155,6 +144,7 @@ class DeviceTagsAddedEvent(Event):
     name: str
     device_type: "DeviceType"
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
     status: Status
     created_on: str
@@ -253,6 +243,7 @@ class Device(AggregateRoot):
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     status: Status = Field(default=Status.ACTIVE)
+    product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str
     created_on: datetime = Field(default_factory=now, immutable=True)
