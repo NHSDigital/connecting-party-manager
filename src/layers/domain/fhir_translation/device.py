@@ -54,3 +54,6 @@ def create_fhir_model_from_device(device: DomainDevice) -> CpmFhirDevice:
             identifier=ProductTeamIdentifier(value=device.product_team_id)
         ),
     )
+
+
+# remove these once readDevice refactored as well
