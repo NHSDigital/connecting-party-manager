@@ -8,7 +8,7 @@ from domain.api.common_steps.read_product import (
 )
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v2 import Device
-from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.device_repository.v2 import DeviceRepository
 from domain.request_models.v1 import CreateDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
@@ -22,7 +22,7 @@ def parse_device_payload(data, cache) -> Device:
 def create_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateDeviceIncomingParams = data[parse_device_payload]
-    return product.create_device_reference_data(**payload.dict())
+    return product.create_device(**payload.dict())
 
 
 def write_device(data: dict[str, CpmProduct], cache) -> CpmProduct:
@@ -34,8 +34,8 @@ def write_device(data: dict[str, CpmProduct], cache) -> CpmProduct:
 
 
 def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
-    device_reference_data: Device = data[create_device]
-    return HTTPStatus.CREATED, device_reference_data.state()
+    device: Device = data[create_device]
+    return HTTPStatus.CREATED, device.state()
 
 
 steps = [
