@@ -1,0 +1,8 @@
+{
+  "nhs_mhs_in": "MHS IN",
+  "nhs_mhs_retry_interval": "Reliability Configuration Retry Interval",
+  "nhs_mhs_retries": "Reliability Configuration Retries",
+  "nhs_mhs_persist_duration": "Reliability Configuration Persist Duration",
+  "nhs_mhs_sn": "MHS SN",
+  "nhs_mhs_svc_ia": "Interaction ID"
+}

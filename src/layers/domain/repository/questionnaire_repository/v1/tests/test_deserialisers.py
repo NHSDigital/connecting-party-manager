@@ -1,6 +1,6 @@
 import pytest
 from domain.core.questionnaire.v1 import NoSuchQuestionType
-from domain.repository.questionnaire_repository.deserialisers import (
+from domain.repository.questionnaire_repository.v1.deserialisers import (
     _deserialise_answer_type,
     _deserialise_rule,
 )
