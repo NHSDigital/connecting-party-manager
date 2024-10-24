@@ -1,8 +1,8 @@
 ---
 servers:
-  - url: https://sandbox.api.service.nhs.uk/connecting-party-manager/FHIR/R4
+  - url: https://sandbox.api.service.nhs.uk/connecting-party-manager
     description: Sandbox environment.
-  - url: https://int.api.service.nhs.uk/connecting-party-manager/FHIR/R4
+  - url: https://int.api.service.nhs.uk/connecting-party-manager
     description: Integration test environment.
-  - url: https://api.service.nhs.uk/connecting-party-manager/FHIR/R4
+  - url: https://api.service.nhs.uk/connecting-party-manager
     description: Production environment.

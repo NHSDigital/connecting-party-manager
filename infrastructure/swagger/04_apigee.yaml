@@ -1,5 +1,4 @@
 ---
-openapi: 3.0.3
 x-nhsd-apim:
   temporary: ${ terraform_output("workspace_type.value") != "PERSISTENT" }
   access:
@@ -17,4 +16,4 @@ x-nhsd-apim:
   ratelimiting:
     proxy:
       timeunit: "minute"
-      limit: 2000
+      limit: 6000
