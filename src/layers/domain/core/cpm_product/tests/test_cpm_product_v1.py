@@ -51,3 +51,12 @@ def test_cpm_product_create_device_reference_data(cpm_product: CpmProduct):
     assert device_reference_data.product_id == cpm_product.id
     assert device_reference_data.product_team_id == cpm_product.product_team_id
     assert device_reference_data.ods_code == cpm_product.ods_code
+
+
+def test_cpm_product_create_device(cpm_product: CpmProduct):
+    device = cpm_product.create_device(name="foo")
+    assert isinstance(device.id, UUID)
+    assert device.name == "foo"
+    assert device.product_id == cpm_product.id
+    assert device.product_team_id == cpm_product.product_team_id
+    assert device.ods_code == cpm_product.ods_code

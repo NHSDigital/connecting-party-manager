@@ -14,22 +14,22 @@ Feature: Create Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
       | path      | value                    |
       | bad_field | My Device Reference Data |
     Then I receive a status code "400" with body
-      | path             | value                                                                 |
-      | errors.0.code    | MISSING_VALUE                                                         |
-      | errors.0.message | CreateDeviceReferenceDataParams.name: field required                  |
-      | errors.1.code    | VALIDATION_ERROR                                                      |
-      | errors.1.message | CreateDeviceReferenceDataParams.bad_field: extra fields not permitted |
+      | path             | value                                                                         |
+      | errors.0.code    | MISSING_VALUE                                                                 |
+      | errors.0.message | CreateDeviceReferenceDataIncomingParams.name: field required                  |
+      | errors.1.code    | VALIDATION_ERROR                                                              |
+      | errors.1.message | CreateDeviceReferenceDataIncomingParams.bad_field: extra fields not permitted |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 220              |
+      | Content-Length | 236              |
 
   Scenario: Cannot create a Device Reference Data with a Device Reference Data with a corrupt body
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -38,8 +38,8 @@ Feature: Create Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
       """
