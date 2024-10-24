@@ -72,11 +72,11 @@ def test_spine_mhs_questionnaires_pass(nhs_mhs: NhsMhs):
     assert len(mhs_data) + len(mhs_interactions_data) == len(_mhs_data) - 1
 
     response = mhs_questionnaire.validate(mhs_data)
-    assert response.name == QuestionnaireInstance.SPINE_MHS
-    assert response.version == "1"
+    assert response.questionnaire_name == QuestionnaireInstance.SPINE_MHS
+    assert response.questionnaire_version == "1"
     assert response.data == mhs_data
 
     response = mhs_interactions_questionnaire.validate(mhs_interactions_data)
-    assert response.name == QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
-    assert response.version == "1"
+    assert response.questionnaire_name == QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
+    assert response.questionnaire_version == "1"
     assert response.data == mhs_interactions_data
