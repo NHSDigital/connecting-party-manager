@@ -17,4 +17,4 @@ x-nhsd-apim:
   ratelimiting:
     proxy:
       timeunit: "minute"
-      limit: 2000
+      limit: 6000

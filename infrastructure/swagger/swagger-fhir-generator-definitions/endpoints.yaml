@@ -8,6 +8,3 @@
 # Please update the below mapping of FHIR entities on to any of the
 # RESTful API "Instance Level" or "Type Level" interactions
 # described in https://hl7.org/fhir/r4b/http.html
-
-Device: [create, read, search]
-Product: [create, read]
