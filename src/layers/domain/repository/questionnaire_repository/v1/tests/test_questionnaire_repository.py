@@ -2,11 +2,11 @@ from collections import defaultdict
 
 import pytest
 from domain.repository.errors import ItemNotFound
-from domain.repository.questionnaire_repository import (
+from domain.repository.questionnaire_repository.v1 import (
     PATH_TO_QUESTIONNAIRES,
     QuestionnaireRepository,
 )
-from domain.repository.questionnaire_repository.questionnaires import (
+from domain.repository.questionnaire_repository.v1.questionnaires import (
     QuestionnaireInstance,
 )
 

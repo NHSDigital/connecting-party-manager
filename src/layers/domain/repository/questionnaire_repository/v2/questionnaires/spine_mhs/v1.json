@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "Address": {
+      "type": "string",
+      "format": "url"
+    },
+    "Unique Identifier": {
+      "type": "string"
+    },
+    "Managing Organization": {
+      "type": "string"
+    },
+    "MHS Party key": {
+      "type": "string"
+    },
+    "MHS CPA ID": {
+      "type": "string"
+    },
+    "Reliability Configuration Actor": {
+      "type": "string",
+      "enum": [
+        "urn:oasis:names:tc:ebxml-msg:actor:topartymsh",
+        "urn:oasis:names:tc:ebxml-msg:actor:nextmsh",
+        "ignored",
+        "IGNORED"
+      ]
+    },
+    "Reliability Configuration Reply Mode": {
+      "type": "string",
+      "enum": [
+        "MSHSIGNALSONLY",
+        "NEVER",
+        "NONE",
+        "SIGNALSANDRESPONSE",
+        "mshsignalsonly",
+        "never",
+        "none",
+        "signalsandresponse"
+      ]
+    },
+
+    "Reliability Configuration Duplication Elimination": {
+      "type": "string",
+      "enum": ["ALWAYS", "NEVER", "always", "never"]
+    },
+    "Reliability Configuration Ack Requested": {
+      "type": "string",
+      "enum": ["ALWAYS", "NEVER", "always", "never"]
+    },
+
+    "Approver URP": {
+      "type": "string"
+    },
+    "Contract Property Template Key": {
+      "type": "string"
+    },
+    "Date Approved": {
+      "type": "string"
+    },
+    "Date DNS Approved": {
+      "type": "string"
+    },
+    "Date Requested": {
+      "type": "string"
+    },
+    "DNS Approver": {
+      "type": "string"
+    },
+    "Interaction Type": {
+      "type": "string",
+      "enum": [
+        "FHIR",
+        "HL7",
+        "EBXML",
+        "N/A",
+        "MSHSIGNALSONLY",
+        "fhir",
+        "hl7",
+        "ebxml",
+        "n/a",
+        "mshsignalsonly"
+      ]
+    },
+    "MHS FQDN": {
+      "type": "string"
+    },
+    "MHS IP Address": {
+      "type": "string"
+    },
+    "MHS Is Authenticated": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "TRANSIENT",
+        "PERSISTENT",
+        "none",
+        "transient",
+        "persistent"
+      ]
+    },
+    "Product Key": {
+      "type": "string"
+    },
+    "Product Name": {
+      "type": "string"
+    },
+    "Product Version": {
+      "type": "string"
+    },
+    "Requestor URP": {
+      "type": "string"
+    },
+    "MHS Service Description": {
+      "type": "string"
+    },
+    "Manufacturer ODS code": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "Address",
+    "Unique Identifier",
+    "Managing Organization",
+    "MHS Party key",
+    "MHS CPA ID",
+    "Approver URP",
+    "Contract Property Template Key",
+    "Date Approved",
+    "Date DNS Approved",
+    "Date Requested",
+    "DNS Approver",
+    "Interaction Type",
+    "MHS FQDN",
+    "MHS Is Authenticated",
+    "Product Key",
+    "Requestor URP"
+  ],
+  "additionalProperties": false
+}

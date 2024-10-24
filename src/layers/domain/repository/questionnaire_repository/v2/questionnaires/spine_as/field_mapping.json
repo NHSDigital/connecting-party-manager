@@ -1,0 +1,18 @@
+{
+  "nhs_mhs_manufacturer_org": "MHS Manufacturer Organisation",
+  "nhs_mhs_party_key": "Party Key",
+  "nhs_id_code": "ODS Code",
+  "nhs_product_name": "Product Name",
+  "unique_identifier": "ASID",
+  "nhs_as_client": "Client ODS Codes",
+  "nhs_approver_urp": "Approver URP",
+  "nhs_date_approved": "Date Approved",
+  "nhs_requestor_urp": "Requestor URP",
+  "nhs_date_requested": "Date Requested",
+  "nhs_product_key": "Product Key",
+  "nhs_product_version": "Product Version",
+  "nhs_as_acf": "AS ACF",
+  "nhs_temp_uid": "Temp UID",
+  "description": "Description",
+  "nhs_as_category_bag": "AS Category Bag"
+}
