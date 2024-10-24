@@ -11,28 +11,6 @@ x-definitions:
       passthroughBehavior: when_no_match
       contentHandling: CONVERT_TO_TEXT
 
-  RequestHeaders:
-    - &RequestHeaderVersion
-      in: header
-      name: version
-      schema:
-        $ref: "#/components/schemas/Version"
-    - &RequestHeaderRequestId
-      in: header
-      name: x-request-id
-      schema:
-        $ref: "#/components/schemas/RequestId"
-    - &RequestHeaderCorrelationId
-      in: header
-      name: x-correlation-id
-      schema:
-        $ref: "#/components/schemas/CorrelationId"
-    - headers: &RequestHeaders
-        parameters:
-          - *RequestHeaderVersion
-          - *RequestHeaderRequestId
-          - *RequestHeaderCorrelationId
-
 paths:
   /_status:
     get:
@@ -43,7 +21,10 @@ paths:
           $ref: "#/components/responses/StatusOK"
         "404":
           $ref: "#/components/responses/NotFound"
-      <<: *RequestHeaders
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_status}
@@ -64,7 +45,10 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
-      <<: *RequestHeaders
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createProductTeam}
@@ -78,9 +62,9 @@ paths:
       summary: readProductTeam endpoint for APIGEE integration
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/ProductTeamRead"
@@ -99,9 +83,9 @@ paths:
       summary: searchCpmProduct endpoint for APIGEE integration
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/ProductSearch"
@@ -118,9 +102,9 @@ paths:
       summary: createProduct endpoint for APIGEE integration
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       requestBody:
         $ref: "#/components/requestBodies/ProductCreateRequestBody"
       responses:
@@ -144,9 +128,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/ProductRead"
@@ -165,9 +149,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "204":
           description: Delete Product operation successful
@@ -186,9 +170,9 @@ paths:
       summary: createCpmProductForEpr endpoint for APIGEE integration
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       requestBody:
         $ref: "#/components/requestBodies/ProductCreateRequestBody"
       responses:
@@ -212,9 +196,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       requestBody:
         $ref: "#/components/requestBodies/DeviceReferenceDataCreateRequestBody"
       responses:
@@ -239,9 +223,9 @@ paths:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
         - $ref: "#/components/parameters/DeviceReferenceDataId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/DeviceRefDataRead"
@@ -261,9 +245,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       requestBody:
         $ref: "#/components/requestBodies/DeviceCreateRequestBody"
       responses:
@@ -273,7 +257,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
-      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createDevice}
@@ -289,15 +272,14 @@ paths:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
         - $ref: "#/components/parameters/DeviceId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/DeviceRead"
         "404":
           $ref: "#/components/responses/NotFound"
-      <<: *RequestHeaders
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readDevice}
@@ -314,7 +296,10 @@ paths:
   #         $ref: "#/components/responses/BadRequest"
   #       "404":
   #         $ref: "#/components/responses/NotFound"
-  #     <<: *RequestHeaders
+  # parameters:
+  #   - $ref: "#/components/parameters/HeaderVersion"
+  #   - $ref: "#/components/parameters/HeaderRequestId"
+  #   - $ref: "#/components/parameters/HeaderCorrelationId"
   #     x-amazon-apigateway-integration:
   #       <<: *ApiGatewayIntegration
   #       uri: ${method_createDevice}
@@ -331,9 +316,9 @@ paths:
   #         description: Device identifier
   #         schema:
   #           type: string
-  #       - *RequestHeaderVersion
-  #       - *RequestHeaderRequestId
-  #       - *RequestHeaderCorrelationId
+  #       - $ref: "#/components/parameters/HeaderVersion"
+  #   - $ref: "#/components/parameters/HeaderRequestId"
+  #   - $ref: "#/components/parameters/HeaderCorrelationId"
   #     responses:
   #       "201":
   #         $ref: "#/components/responses/DeviceRead"
@@ -355,9 +340,9 @@ paths:
         - $ref: "#/components/parameters/NhsAsClientInteration"
         - $ref: "#/components/parameters/NhsMhsManOrg"
         - $ref: "#/components/parameters/NhsMhsPartyKey"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/SdsDeviceSearch"
@@ -378,9 +363,9 @@ paths:
         - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsInteration"
         - $ref: "#/components/parameters/NhsMhsPartyKey"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/SdsEndpointSearch"
@@ -399,9 +384,9 @@ paths:
       summary: readQuestionnaire endpoint for APIGEE integration
       parameters:
         - $ref: "#/components/parameters/QuestionnaireId"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
           $ref: "#/components/responses/QuestionnaireRead"

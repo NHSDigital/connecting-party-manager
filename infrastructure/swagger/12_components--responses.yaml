@@ -5,10 +5,10 @@ x-definitions:
     headers: &ResponseHeaders
       X-Correlation-Id:
         schema:
-          $ref: "#/components/schemas/CorrelationId"
+          $ref: "#/components/schemas/HeaderCorrelationId"
       X-Request-Id:
         schema:
-          $ref: "#/components/schemas/RequestId"
+          $ref: "#/components/schemas/HeaderRequestId"
 
 components:
   responses:
