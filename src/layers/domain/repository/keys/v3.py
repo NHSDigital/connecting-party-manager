@@ -11,3 +11,6 @@ class TableKey(TableKeyAction, StrEnum):
     CPM_PRODUCT_KEY = "PK"
     CPM_PRODUCT_STATUS = "PS"
     DEVICE_REFERENCE_DATA = "DRD"
+    DEVICE = "D"
+    DEVICE_TAG = "DT"
+    DEVICE_STATUS = "DS"

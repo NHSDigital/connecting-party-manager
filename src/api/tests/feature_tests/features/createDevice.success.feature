@@ -1,56 +1,60 @@
-# Feature: Create Device - success scenarios
-# These scenarios demonstrate successful Device creation
-# Background:
-# Given "default" request headers:
-# | name          | value   |
-# | version       | 1       |
-# | Authorization | letmein |
-# Scenario Outline: Successfully create a Device for each device type
-# Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-# | path                     | value                                                          |
-# | resourceType             | Organization                                                   |
-# | identifier.0.system      | connecting-party-manager/product-team-id                       |
-# | identifier.0.value       | ${ uuid(1) }                                                   |
-# | name                     | My Great Product Team                                          |
-# | partOf.identifier.system | https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations |
-# | partOf.identifier.value  | F5H1R                                                          |
-# When I make a "POST" request with "default" headers to "Device" with body:
-# | path                         | value                                    |
-# | resourceType                 | Device                                   |
-# | deviceName.0.name            | My Device of type "<type>"               |
-# | deviceName.0.type            | user-friendly-name                       |
-# | definition.identifier.system | connecting-party-manager/device-type     |
-# | definition.identifier.value  | <type>                                   |
-# | owner.identifier.system      | connecting-party-manager/product-team-id |
-# | owner.identifier.value       | ${ uuid(1) }                             |
-# Then I receive a status code "201" with body
-# | path                             | value                                                               |
-# | resourceType                     | OperationOutcome                                                    |
-# | id                               | << ignore >>                                                        |
-# | meta.profile.0                   | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-# | issue.0.severity                 | information                                                         |
-# | issue.0.code                     | informational                                                       |
-# | issue.0.details.coding.0.system  | https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome |
-# | issue.0.details.coding.0.code    | RESOURCE_CREATED                                                    |
-# | issue.0.details.coding.0.display | Resource created                                                    |
-# | issue.0.diagnostics              | Resource created                                                    |
-# And the response headers contain:
-# | name           | value            |
-# | Content-Type   | application/json |
-# | Content-Length | 456              |
-# When I make a "GET" request with "default" headers to the id in the location response header to the endpoint prefix "Device/<id>"
-# Then I receive a status code "200" with body
-# | path                         | value                                    |
-# | resourceType                 | Device                                   |
-# | id                           | << ignore >>                             |
-# | deviceName.0.name            | My Device of type "<type>"               |
-# | deviceName.0.type            | user-friendly-name                       |
-# | definition.identifier.system | connecting-party-manager/device-type     |
-# | definition.identifier.value  | <type>                                   |
-# | identifier.0.system          | connecting-party-manager/product_id      |
-# | identifier.0.value           | << ignore >>                             |
-# | owner.identifier.system      | connecting-party-manager/product-team-id |
-# | owner.identifier.value       | ${ uuid(1) }                             |
-# Examples:
-# | type    |
-# | product |
+Feature: Create Device - success scenarios
+  These scenarios demonstrate successful Device creation
+
+  Background:
+    Given "default" request headers:
+      | name          | value   |
+      | version       | 1       |
+      | Authorization | letmein |
+
+  Scenario: Successfully create a Device
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device" with body:
+      | path | value     |
+      | name | My Device |
+    Then I receive a status code "201" with body
+      | path                    | value                      |
+      | id                      | << ignore >>               |
+      | name                    | My Device                  |
+      | status                  | active                     |
+      | product_id              | ${ note(product_id) }      |
+      | product_team_id         | ${ note(product_team_id) } |
+      | ods_code                | F5H1R                      |
+      | created_on              | << ignore >>               |
+      | updated_on              | << ignore >>               |
+      | deleted_on              | << ignore >>               |
+      | keys                    | []                         |
+      | tags                    | []                         |
+      | questionnaire_responses | << ignore >>               |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 345              |
+    And I note the response field "$.id" as "device_id"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    Then I receive a status code "200" with body
+      | path                    | value                      |
+      | id                      | ${ note(device_id) }       |
+      | name                    | My Device                  |
+      | status                  | active                     |
+      | product_id              | ${ note(product_id) }      |
+      | product_team_id         | ${ note(product_team_id) } |
+      | ods_code                | F5H1R                      |
+      | created_on              | << ignore >>               |
+      | updated_on              | << ignore >>               |
+      | deleted_on              | << ignore >>               |
+      | keys                    | []                         |
+      | tags                    | []                         |
+      | questionnaire_responses | << ignore >>               |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 345              |

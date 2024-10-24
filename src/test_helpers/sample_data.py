@@ -13,9 +13,6 @@ def _read_core_test_data(file_name: str) -> dict | list:
         return json_load(f)
 
 
-# ORGANISATION = _read_core_test_data(
-#     f"{PATH_TO_CORE_TEST_DATA}/organization-fhir-example-required.json"
-# )
 DEVICE = _read_core_test_data(
     f"{PATH_TO_CORE_TEST_DATA}/device-fhir-example-required.json"
 )
@@ -39,4 +36,22 @@ CPM_PRODUCT_TEAM_NO_ID_DUPED_KEYS = _read_core_test_data(
 )
 CPM_PRODUCT_TEAM_EXTRA_PARAMS = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-extra.json"
+)
+CPM_PRODUCT = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-example.json"
+)
+CPM_PRODUCT_EXTRA_PARAMS = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-example-extra.json"
+)
+CPM_DEVICE = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-example.json"
+)
+CPM_DEVICE_EXTRA_PARAMS = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-example-extra.json"
+)
+CPM_DEVICE_REFERENCE_DATA = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-reference-data-example.json"
+)
+CPM_DEVICE_REFERENCE_DATA_EXTRA_PARAMS = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-reference-data-example-extra.json"
 )

@@ -61,32 +61,6 @@ def test__parse_params_from_url_post_product():
     assert path_params == {"product_team_id": "123"}
 
 
-def test_parse_path_create_device():
-    with api_lambda_environment_variables():
-        import api.createDevice.index
-
-        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
-
-    assert parse_api_path(
-        method="POST",
-        path="Device",
-        endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({}, {}, api.createDevice.index)
-
-
-def test_parse_path_read_device():
-    with api_lambda_environment_variables():
-        import api.readDevice.index
-
-        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
-
-    assert parse_api_path(
-        method="GET",
-        path="Device/123",
-        endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({"id": "123"}, {}, api.readDevice.index)
-
-
 def test_parse_path_create_product_team():
     with api_lambda_environment_variables():
         import api.createProductTeam.index
@@ -150,6 +124,78 @@ def test_parse_path_search_product():
         path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123"}, {}, api.searchCpmProduct.index)
+
+
+def test_parse_path_create_device():
+    with api_lambda_environment_variables():
+        import api.createDevice.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="POST",
+        path="ProductTeam/123/Product/456/Device",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.createDevice.index)
+
+
+def test_parse_path_read_device():
+    with api_lambda_environment_variables():
+        import api.readDevice.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="ProductTeam/123/Product/456/Device/789",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == (
+        {
+            "product_team_id": "123",
+            "product_id": "456",
+            "device_id": "789",
+        },
+        {},
+        api.readDevice.index,
+    )
+
+
+def test_parse_path_create_device_reference_data():
+    with api_lambda_environment_variables():
+        import api.createDeviceReferenceData.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="POST",
+        path="ProductTeam/123/Product/456/DeviceReferenceData",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == (
+        {"product_team_id": "123", "product_id": "456"},
+        {},
+        api.createDeviceReferenceData.index,
+    )
+
+
+def test_parse_path_read_device_reference_data():
+    with api_lambda_environment_variables():
+        import api.readDeviceReferenceData.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="ProductTeam/123/Product/456/DeviceReferenceData/789",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == (
+        {
+            "product_team_id": "123",
+            "product_id": "456",
+            "device_reference_data_id": "789",
+        },
+        {},
+        api.readDeviceReferenceData.index,
+    )
 
 
 def test_parse_path_error():
