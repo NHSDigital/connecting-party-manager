@@ -1,7 +1,7 @@
 ---
 components:
   requestBodies:
-    ProductTeamRequest:
+    ProductTeamCreateRequestBody:
       description: Request body to create a Product Team
       required: true
       content:
@@ -37,3 +37,48 @@ components:
             keys:
               - key_type: "product_team_id_alias"
                 key_value: "BAR"
+    ProductCreateRequestBody:
+      description: Request body to create a Product Team
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the product
+            required:
+              - name
+          example:
+            name: "Sample Product"
+    DeviceReferenceDataCreateRequestBody:
+      description: Request body to create a Device Reference Data object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the DeviceReferenceData
+            required:
+              - name
+          example:
+            name: "Sample Device Reference Data"
+    DeviceCreateRequestBody:
+      description: Request body to create a Device object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the Device
+            required:
+              - name
+          example:
+            name: "Sample Device"
