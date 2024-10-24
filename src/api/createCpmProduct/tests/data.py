@@ -4,4 +4,4 @@ product_team_payload = {
     "name": "FOOBAR Product Team",
 }
 
-product_payload = {"product_name": "Foobar product"}
+product_payload = {"name": "Foobar product"}
