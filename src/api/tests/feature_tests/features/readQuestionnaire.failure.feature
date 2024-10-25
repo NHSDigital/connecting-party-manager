@@ -15,10 +15,8 @@ Feature: Read Questionnaire - failure scenarios
       | errors.0.message | Could not find Questionnaire for key ('<questionnaire_name>') |
 
     Examples:
-      | questionnaire_name         |
-      | has spaces in it           |
-      | has_underscores_and spaces |
-      | isMixedCase                |
+      | questionnaire_name |
+      | isMixedCase        |
 
   Scenario Outline: Read an non-existing Questionnaire, but fail early due to bad characters
     When I make a "GET" request with "default" headers to "Questionnaire/<questionnaire_name>"
@@ -30,4 +28,4 @@ Feature: Read Questionnaire - failure scenarios
     Examples:
       | questionnaire_name   |
       | has-hyphen-in-it     |
-      | has+other characters |
+      | has+other+characters |
