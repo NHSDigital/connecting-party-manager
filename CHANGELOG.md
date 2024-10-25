@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-10-25
+- [PI-551] Remove FHIR from Read CPM Product flow
+- [PI-553] Remove FHIR from Delete CPM Product flow
+
 ## 2024-10-22
 - [PI-552] Remove FHIR from search CPMProduct
 - [PI-557] Remove search Device
