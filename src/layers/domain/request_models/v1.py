@@ -1,6 +1,8 @@
 from domain.core.product_team_key import ProductTeamKey
 from pydantic import BaseModel, Extra, Field
 
+ALPHANUMERIC_SPACES_AND_UNDERSCORES = r"^[a-zA-Z0-9 _]*$"
+
 
 class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
     product_team_id: str = Field(...)
@@ -39,4 +41,6 @@ class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
 
 
 class QuestionnairePathParams(BaseModel, extra=Extra.forbid):
-    questionnaire_id: str  # NB: this maps onto the domain field Questionnaire.name
+
+    # NB: questionnaire_id maps onto the domain field Questionnaire.name
+    questionnaire_id: str = Field(regex=ALPHANUMERIC_SPACES_AND_UNDERSCORES)

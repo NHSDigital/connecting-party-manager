@@ -19,3 +19,5 @@ Feature: Read Questionnaire - success scenarios
       | questionnaire_name |
       | spine_endpoint     |
       | spine_device       |
+      | spine_ENDpoint     |
+      | SPINE_DEVICE       |

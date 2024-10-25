@@ -41,7 +41,7 @@ def read_questions(path: Path):
 class QuestionnaireRepository:
 
     def read(self, name: str) -> Questionnaire:
-        path = get_latest_questions_by_name(name=name)
+        path = get_latest_questions_by_name(name=name.lower())
         if not path:
             raise ItemNotFound(name, item_type=Questionnaire)
 
