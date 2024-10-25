@@ -97,12 +97,6 @@ paths:
           description: logical identifier
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
@@ -129,12 +123,6 @@ paths:
           description: logical identifier
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
@@ -311,35 +299,6 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    get:
-      parameters:
-        - name: device_type
-          in: query
-          required: true
-          description: "Type of device (product or endpoint)"
-          schema:
-            type: string
-            enum:
-              - product
-              - endpoint
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
-      responses:
-        "4XX":
-          <<: *Response4XX
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_searchDevice}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
 
   /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData:
     post:
@@ -474,12 +433,6 @@ paths:
           description: "Party Key"
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
@@ -522,12 +475,6 @@ paths:
           description: "Party Key"
           schema:
             type: string
-        - $ref: "#/components/parameters/profileParam"
-        - $ref: "#/components/parameters/lastUpdatedParam"
-        - $ref: "#/components/parameters/tagParam"
-        - $ref: "#/components/parameters/securityParam"
-        - $ref: "#/components/parameters/sourceParam"
-        - $ref: "#/components/parameters/idParam"
         - *RequestHeaderVersion
         - *RequestHeaderRequestId
         - *RequestHeaderCorrelationId
@@ -543,6 +490,32 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_searchSdsEndpoint}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /Questionnaire/{questionnaire_id}:
+    get:
+      operationId: readQuestionnaire
+      summary: readQuestionnaire endpoint for APIGEE integration
+      parameters:
+        - name: questionnaire_id
+          in: path
+          required: true
+          description: logical identifier
+          schema:
+            type: string
+        - *RequestHeaderVersion
+        - *RequestHeaderRequestId
+        - *RequestHeaderCorrelationId
+      responses:
+        "200":
+          $ref: "#/components/responses/Questionnaire"
+        "4XX":
+          <<: *Response4XX
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readQuestionnaire}
       security:
         - ${authoriser_name}: []
         - app-level0: []

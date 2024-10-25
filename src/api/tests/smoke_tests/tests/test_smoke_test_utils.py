@@ -9,42 +9,42 @@ from api.tests.smoke_tests.utils import get_base_url
         (
             "dev",
             "dev",
-            "https://internal-dev.api.service.nhs.uk/cpm-dev",
+            "https://internal-dev.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "dev-sandbox",
             "dev",
-            "https://internal-dev-sandbox.api.service.nhs.uk/cpm-dev-sandbox",
+            "https://internal-dev-sandbox.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "qa",
             "qa",
-            "https://internal-qa.api.service.nhs.uk/cpm-qa",
+            "https://internal-qa.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "qa-sandbox",
             "qa",
-            "https://internal-qa-sandbox.api.service.nhs.uk/cpm-qa-sandbox",
+            "https://internal-qa-sandbox.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "ref",
             "ref",
-            "https://ref.api.service.nhs.uk/cpm-ref",
+            "https://ref.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "int",
             "int",
-            "https://int.api.service.nhs.uk/cpm-int",
+            "https://int.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "int-sandbox",
             "int",
-            "https://sandbox.api.service.nhs.uk/cpm-int-sandbox",
+            "https://sandbox.api.service.nhs.uk/connecting-party-manager",
         ),
         (
             "prod",
             "prod",
-            "https://api.service.nhs.uk/cpm-prod",
+            "https://api.service.nhs.uk/connecting-party-manager",
         ),
     ],
 )
@@ -60,22 +60,22 @@ def test_get_base_url_persistent_workspaces(
         (
             "foobar",
             "dev",
-            "https://internal-dev.api.service.nhs.uk/cpm-foobar",
+            "https://internal-dev.api.service.nhs.uk/foobar",
         ),
         (
             "foobar-sandbox",
             "dev",
-            "https://internal-dev.api.service.nhs.uk/cpm-foobar-sandbox",
+            "https://internal-dev.api.service.nhs.uk/foobar-sandbox",
         ),
         (
             "foobar",
             "qa",
-            "https://internal-qa.api.service.nhs.uk/cpm-foobar",
+            "https://internal-qa.api.service.nhs.uk/foobar",
         ),
         (
             "foobar-sandbox",
             "qa",
-            "https://internal-qa.api.service.nhs.uk/cpm-foobar-sandbox",
+            "https://internal-qa.api.service.nhs.uk/foobar-sandbox",
         ),
     ],
 )
