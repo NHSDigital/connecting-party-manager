@@ -2,6 +2,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 import jsonschema
+from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
 from domain.core.timestamp import now
 from pydantic import Field, Json, validator
@@ -15,7 +16,7 @@ class QuestionnaireResponseValidationError(Exception): ...
 class QuestionnaireResponseMissingValue(Exception): ...
 
 
-class Questionnaire(BaseModel):
+class Questionnaire(AggregateRoot):
     name: str
     version: str
     json_schema: Json

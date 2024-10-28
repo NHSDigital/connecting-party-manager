@@ -28,7 +28,7 @@ def read_schema(path: Path) -> str:
 class QuestionnaireRepository:
 
     def read(self, name: str) -> Questionnaire:
-        path = get_latest_schema_path_by_name(name=name)
+        path = get_latest_schema_path_by_name(name=name.lower())
         if not path:
             raise ItemNotFound(name, item_type=Questionnaire)
         version = version_from_file_path(path)
