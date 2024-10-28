@@ -79,7 +79,9 @@ class CpmProduct(AggregateRoot):
             product_team_id=self.product_team_id,
             ods_code=self.ods_code,
         )
-        event = DeviceReferenceDataCreatedEvent(**device_reference_data.dict())
+        event = DeviceReferenceDataCreatedEvent(
+            **device_reference_data.dict(exclude={"questionnaire_responses"})
+        )
         self.add_event(event)
         device_reference_data.add_event(event)
         return device_reference_data

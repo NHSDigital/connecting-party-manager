@@ -72,3 +72,43 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
             product_id=product_id,
             device_reference_data_id=device_reference_data_id,
         )
+
+
+@pytest.mark.integration
+def test__cpm_device_reference_data_repository__search_empty(
+    repository: DeviceReferenceDataRepository,
+):
+    results = repository.search(product_team_id="foo", product_id="bar")
+    assert results == []
+
+
+def test__cpm_device_reference_data_repository__search_empty_local(
+    repository: DeviceReferenceDataRepository,
+):
+    results = repository.search(product_team_id="foo", product_id="bar")
+    assert results == []
+
+
+@pytest.mark.integration
+def test__cpm_device_reference_data_repository__search_not_empty(
+    device_reference_data: DeviceReferenceData,
+    repository: DeviceReferenceDataRepository,
+):
+    repository.write(device_reference_data)
+    results = repository.search(
+        product_team_id=device_reference_data.product_team_id,
+        product_id=device_reference_data.product_id,
+    )
+    assert results == [device_reference_data]
+
+
+def test__cpm_device_reference_data_repository__search_not_empty_local(
+    device_reference_data: DeviceReferenceData,
+    repository: DeviceReferenceDataRepository,
+):
+    repository.write(device_reference_data)
+    results = repository.search(
+        product_team_id=device_reference_data.product_team_id,
+        product_id=device_reference_data.product_id,
+    )
+    assert results == [device_reference_data]

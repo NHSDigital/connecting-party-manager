@@ -12,8 +12,8 @@ class ItemNotFound(Exception):
 
 
 class AlreadyExistsError(Exception):
-    def __init__(self):
-        super().__init__("Item already exists")
+    def __init__(self, msg=None):
+        super().__init__(msg or "Item already exists")
 
 
 class UnhandledTransaction(Exception):

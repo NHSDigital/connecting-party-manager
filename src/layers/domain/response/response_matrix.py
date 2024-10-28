@@ -1,6 +1,11 @@
 from http import HTTPStatus
 
 from api_utils.versioning.errors import VersionException
+from domain.core.error import ConfigurationError
+from domain.core.questionnaire.v3 import (
+    QuestionnaireResponseMissingValue,
+    QuestionnaireResponseValidationError,
+)
 from domain.ods import InvalidOdsCodeError
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 from event.status.steps import StatusNotOk
@@ -40,7 +45,10 @@ EXCEPTIONS_TO_SPINE_CODING = {
     InboundValidationError: SpineCoding.VALIDATION_ERROR,
     InboundMissingValue: SpineCoding.MISSING_VALUE,
     InboundJSONDecodeError: SpineCoding.VALIDATION_ERROR,
+    QuestionnaireResponseValidationError: SpineCoding.VALIDATION_ERROR,
+    QuestionnaireResponseMissingValue: SpineCoding.MISSING_VALUE,
     InvalidOdsCodeError: SpineCoding.UNPROCESSABLE_ENTITY,
+    ConfigurationError: SpineCoding.VALIDATION_ERROR,
     VersionException: SpineCoding.ACCESS_DENIED,
     AlreadyExistsError: SpineCoding.VALIDATION_ERROR,
     ItemNotFound: SpineCoding.RESOURCE_NOT_FOUND,
