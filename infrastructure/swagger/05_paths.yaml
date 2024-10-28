@@ -199,11 +199,7 @@ paths:
       responses:
         responses:
         "200":
-          description: Read Product operation successful
-          content:
-            application/fhir+json:
-              schema:
-                $ref: "#/components/schemas/Bundle"
+          $ref: "#/components/responses/ProductResponse"
         "4XX":
           <<: *Response4XX
       x-amazon-apigateway-integration:
