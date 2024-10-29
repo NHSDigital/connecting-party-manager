@@ -155,7 +155,7 @@ def test_index_no_such_device(version):
             "errors": [
                 {
                     "code": "RESOURCE_NOT_FOUND",
-                    "message": f"Could not find Device for key ('{product_team.id}', '{cpm_product.id}', 'does not exist')",
+                    "message": "Could not find Device for key ('does not exist')",  # device saved by pk, sk = device.id still
                 }
             ],
         }
