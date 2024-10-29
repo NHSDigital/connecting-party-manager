@@ -11,7 +11,7 @@
    4. [Other helpful commands](#other-helpful-commands)
 2. [Tests](#tests)
 3. [Workflow](#workflow)
-4. [FHIR, Swagger and FHIR Pydantic models](#fhir-swagger-and-fhir-pydantic-models)
+4. [Swagger](#swagger)
 5. [ETL](#etl)
 
 ---
@@ -257,9 +257,9 @@ This command will also:
 - Update the version in `pyproject.toml` with the release branch version.
 - Update the VERSION file with the release branch version number.
 
-## FHIR, Swagger and FHIR Pydantic models
+## Swagger
 
-This is all done by `make build`. For more details on how to update the Swagger and FHIR Pydantic models, please see [the swagger README](infrastructure/swagger/README.md).
+This is all done by `make build`. For more details on how to update the Swagger, please see [the swagger README](infrastructure/swagger/README.md).
 
 ## Setting Lambda permissions
 
