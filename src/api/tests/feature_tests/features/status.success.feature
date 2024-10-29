@@ -8,8 +8,11 @@ Feature: Status
 
   Scenario: Confirm Status endpoint is active
     When I make a "GET" request with "default" headers to "_status"
-    Then I receive a status code "200"
+    Then I receive a status code "200" with body
+      | path    | value                  |
+      | code    | OK                     |
+      | message | Transaction successful |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 3                |
+      | Content-Length | 51               |

@@ -14,10 +14,15 @@ components:
               message:
                 type: string
     StatusOK:
-      type: string
+      type: object
       properties:
+        code:
+          type: string
         message:
           type: string
+      example:
+        code: "OK"
+        message: "Transaction successful"
     ProductTeamResponse:
       type: object
       properties:

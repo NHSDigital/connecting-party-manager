@@ -15,7 +15,10 @@ TABLE_NAME = "hiya"
 def test__status_check():
     with mock_table(table_name=TABLE_NAME) as client:
         result = _status_check(client=client, table_name=TABLE_NAME)
-    assert result == HTTPStatus.OK
+    assert result == (
+        HTTPStatus.OK,
+        {"code": "OK", "message": "Transaction successful"},
+    )
 
 
 def test__status_check_not_ok():
@@ -38,11 +41,18 @@ def test_index():
 
         result = handler(event={})
 
+    expected_result = json.dumps(
+        {
+            "code": "OK",
+            "message": "Transaction successful",
+        }
+    )
+
     expected = {
         "statusCode": 200,
-        "body": "200",
+        "body": expected_result,
         "headers": {
-            "Content-Length": str(len("200")),
+            "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": "null",
             "Location": None,
