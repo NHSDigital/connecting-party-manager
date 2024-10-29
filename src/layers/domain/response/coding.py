@@ -18,8 +18,8 @@ class IssueSeverity(StrEnum):
 
 
 class Coding(BaseModel):
-    code = str
-    display = str
+    code: str
+    display: str
 
 
 class SpineCoding(StrEnum):
