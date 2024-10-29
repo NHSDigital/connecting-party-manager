@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.api.sds.query import SearchSDSDeviceQueryParams
 from domain.repository.device_repository.v2 import DeviceRepository
