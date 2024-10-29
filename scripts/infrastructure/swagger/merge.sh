@@ -46,7 +46,6 @@ function _02_clean(){
         yq 'del(.paths.*.post.requestBody.content."application/x-www-form-urlencoded")' |
         yq 'del(.x-ibm-configuration)' |
         yq 'del(.components.schemas.*.discriminator)' |
-        yq 'del(.components.requestBodies.Device)' |
         yq 'explode(.)' |
         yq '(.. | select(style == "single")) style |= "double"' |
         # Remove null dead-ends
