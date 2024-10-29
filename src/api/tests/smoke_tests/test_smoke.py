@@ -4,28 +4,124 @@ import os
 import pytest
 import requests
 
-from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID_NO_KEYS
 from test_helpers.terraform import read_terraform_output
 
 from .utils import execute_smoke_test, get_app_key, get_base_url, get_headers
 
 
-def create_and_read_product_team(base_url: str, headers: dict):
-    product_team_body = json.dumps(CPM_PRODUCT_TEAM_NO_ID_NO_KEYS)
-    url = f"{base_url}/ProductTeam"
-    response = requests.post(url=url, headers=headers, data=product_team_body)
-    response_body = response.json()
-    url = f"{base_url}/ProductTeam/{response_body["id"]}"
+def _request(base_url: str, headers: dict, path: str, method: str):
+    url = f"{base_url}{path}"
+    if method == "POST":
+        body = json.dumps({"foo": "bar"})
+        return requests.post(url=url, headers=headers, data=body)
+
     return requests.get(url=url, headers=headers)
 
 
-REQUEST_METHODS = [
-    create_and_read_product_team,
-]
-
-
 @pytest.mark.smoke
-def test_smoke_tests():
+@pytest.mark.parametrize(
+    "request_details",
+    [
+        [
+            "/ProductTeam",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateProductTeamIncomingParams.ods_code: field required",
+                "CreateProductTeamIncomingParams.name: field required",
+                "CreateProductTeamIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
+            "/ProductTeam/123/Product",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateCpmProductIncomingParams.product_name: field required",
+                "CreateCpmProductIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
+            "/ProductTeam/123/Product/Epr",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateCpmProductIncomingParams.product_name: field required",
+                "CreateCpmProductIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
+            "/ProductTeam/123/Product/abc/DeviceReferenceData",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateDeviceReferenceDataParams.name: field required",
+                "CreateDeviceReferenceDataParams.foo: extra fields not permitted",
+            ],
+        ],
+        # ('/ProductTeam/123/Product/abc/Device', 'POST', 400, ['MISSING_VALUE', 'VALIDATION_ERROR']),
+        [
+            "/ProductTeam/123",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        [
+            "/ProductTeam/123/Product",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        [
+            "/ProductTeam/123/Product/abc",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        [
+            "/ProductTeam/123/Product/abc/DeviceReferenceData/xyz",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        # ['/ProductTeam/123/Product/abc/Device/xyz', 404, ['RESOURCE_NOT_FOUND'], ["Could not find ProductTeam for key ('123')"]],
+        [
+            "/Questionnaire/987",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find Questionnaire for key ('987')"],
+        ],
+        [
+            "/searchSdsDevice",
+            "GET",
+            400,
+            ["MISSING_VALUE"],
+            [
+                "SearchSDSDeviceQueryParams.nhs_as_client: field required",
+                "SearchSDSDeviceQueryParams.nhs_as_svc_ia: field required",
+            ],
+        ],
+        [
+            "/searchSdsEndpoint",
+            "GET",
+            400,
+            ["VALIDATION_ERROR"],
+            [
+                "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
+            ],
+        ],
+    ],
+)
+def test_smoke_tests(request_details):
     workspace = os.environ.get("WORKSPACE") or read_terraform_output("workspace.value")
     environment = os.environ.get("ACCOUNT") or read_terraform_output(
         "environment.value"
@@ -34,10 +130,12 @@ def test_smoke_tests():
     headers = get_headers(app_key=app_key)
     base_url = get_base_url(workspace=workspace, environment=environment)
     print(  # noqa: T201
-        f"🏃 Running 🏃 smoke test ({environment}.{workspace} --> {base_url}) - 🤔"
+        f"🏃 Running 🏃 smoke test ({environment}.{workspace} --> {base_url}{request_details[0]}) - 🤔"
     )
 
-    for request_method in REQUEST_METHODS:
-        execute_smoke_test(
-            request_method=request_method, base_url=base_url, headers=headers
-        )
+    execute_smoke_test(
+        request_method=_request,
+        base_url=base_url,
+        headers=headers,
+        request_details=request_details,
+    )
