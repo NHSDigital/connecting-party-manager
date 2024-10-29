@@ -27,7 +27,7 @@ def query_endpoints(data, cache) -> list[dict]:
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     results = device_repo.query_by_tag(**query_params)
-    return [result.state() for result in results]
+    return HTTPStatus.OK, [result.state() for result in results]
 
 
 steps = [
