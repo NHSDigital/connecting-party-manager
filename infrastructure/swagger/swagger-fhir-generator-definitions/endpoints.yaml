@@ -10,4 +10,3 @@
 # described in https://hl7.org/fhir/r4b/http.html
 
 Device: [read] # Remove after device unfhired
-Product: [read]
