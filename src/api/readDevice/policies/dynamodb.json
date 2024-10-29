@@ -1,1 +1,1 @@
-["dynamodb:Query"]
+["dynamodb:Query", "dynamodb:GetItem"]
