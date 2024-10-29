@@ -14,11 +14,10 @@ components:
               message:
                 type: string
     StatusOK:
-      type: object
+      type: string
       properties:
         message:
           type: string
-          enum: ["OK"]
     ProductTeamResponse:
       type: object
       properties:
@@ -183,3 +182,27 @@ components:
           type: string
         deleted_on:
           type: string
+    # DeviceReferenceDataMessageSetResponse:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: string
+    #     name:
+    #       type: string
+    #     product_id:
+    #       type: string
+    #     product_team_id:
+    #       type: string
+    #     ods_code:
+    #       type: string
+    #     created_on:
+    #       type: string
+    #     updated_on:
+    #       type: string
+    #     deleted_on:
+    #       type: string
+    #     questionnaire_responses:
+    #       type: object
+    #       properties:
+    #         spine_mhs_message_sets:
+    #           type: array

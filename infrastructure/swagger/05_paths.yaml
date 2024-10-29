@@ -220,40 +220,23 @@ paths:
       operationId: createDeviceReferenceDataMessageSet
       summary: createDeviceReferenceDataMessageSet endpoint for APIGEE integration
       parameters:
-        - name: product_team_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - name: product_id
-          in: path
-          required: true
-          description: logical identifier
-          schema:
-            type: string
-        - *RequestHeaderVersion
-        - *RequestHeaderRequestId
-        - *RequestHeaderCorrelationId
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                questionnaire_responses:
-                  type: object
-                  description: Questionnaire Responses for MHS Message Set questionnaire
+        $ref: "#/components/requestBodies/DeviceReferenceDataMessageSetCreateRequestBody"
       responses:
-        responses:
         "201":
-          <<: *Response201
-        "4XX":
-          <<: *Response4XX
+          $ref: "#/components/responses/DeviceRefDataMessageSetCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_createDeviceReferenceDataMessageSet}
+        uri: ${ethod_createDeviceReferenceDataMessageSet}
       security:
         - ${authoriser_name}: []
         - app-level0: []
