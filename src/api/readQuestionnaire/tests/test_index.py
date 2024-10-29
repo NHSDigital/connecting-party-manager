@@ -15,18 +15,18 @@ def test_index():
     response = handler(
         event={
             "headers": {"version": "1"},
-            "pathParameters": {"questionnaire_id": "spine_endpoint"},
+            "pathParameters": {"questionnaire_id": "spine_mhs"},
         }
     )
     assert response["statusCode"] == 200
 
     response_body: dict = json_loads(response["body"])
-    questions: dict = response_body.pop("questions")
+    json_schema: dict = response_body.pop("json_schema")
     assert response_body == {
-        "name": "spine_endpoint",
+        "name": "spine_mhs",
         "version": "1",
     }
-    assert len(questions) == 32
+    assert len(json_schema["properties"]) == 25
 
 
 def test_index_no_such_questionnaire():

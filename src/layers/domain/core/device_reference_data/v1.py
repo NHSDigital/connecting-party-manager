@@ -1,10 +1,13 @@
+from collections import defaultdict
 from datetime import datetime
 from uuid import UUID, uuid4
 
 from attr import dataclass
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.aggregate_root import AggregateRoot, event
 from domain.core.cpm_system_id.v1 import ProductId
+from domain.core.device.v2 import DuplicateQuestionnaireResponse
 from domain.core.event import Event
+from domain.core.questionnaire.v3 import QuestionnaireResponse
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field
@@ -22,6 +25,13 @@ class DeviceReferenceDataCreatedEvent(Event):
     deleted_on: str = None
 
 
+@dataclass(kw_only=True, slots=True)
+class QuestionnaireResponseUpdatedEvent(Event):
+    id: str
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    updated_on: str = None
+
+
 class DeviceReferenceData(AggregateRoot):
     """An object to hold boilerplate Device QuestionnaireResponses"""
 
@@ -30,6 +40,33 @@ class DeviceReferenceData(AggregateRoot):
     product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str = Field(immutable=True)
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
+        default_factory=lambda: defaultdict(list)
+    )
     created_on: datetime = Field(default_factory=now, immutable=True)
-    updated_on: datetime = Field(default=None)
-    deleted_on: datetime = Field(default=None)
+    updated_on: datetime | None = Field(default=None)
+    deleted_on: datetime | None = Field(default=None)
+
+    @event
+    def add_questionnaire_response(
+        self, questionnaire_response: QuestionnaireResponse
+    ) -> QuestionnaireResponseUpdatedEvent:
+        questionnaire_id = questionnaire_response.questionnaire_id
+        questionnaire_responses = self.questionnaire_responses[questionnaire_id]
+
+        current_created_ons = {qr.created_on for qr in questionnaire_responses}
+        if questionnaire_response.created_on in current_created_ons:
+            raise DuplicateQuestionnaireResponse(
+                "This Device already contains a "
+                f"response created on {questionnaire_response.created_on.isoformat()}"
+                f"for Questionnaire {questionnaire_id}"
+            )
+        questionnaire_responses.append(questionnaire_response)
+
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            questionnaire_responses={
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
+            },
+        )

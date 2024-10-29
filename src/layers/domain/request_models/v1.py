@@ -1,3 +1,6 @@
+from collections import defaultdict
+from typing import Literal
+
 from domain.core.product_team_key import ProductTeamKey
 from pydantic import BaseModel, Extra, Field
 
@@ -32,6 +35,12 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
 
 class CreateDeviceReferenceDataParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
+
+
+class CreateDeviceReferenceMessageSetsDataParams(BaseModel, extra=Extra.forbid):
+    questionnaire_responses: dict[Literal["spine_mhs_message_sets"], list[dict]] = (
+        Field(default_factory=lambda: defaultdict(list))
+    )
 
 
 class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):

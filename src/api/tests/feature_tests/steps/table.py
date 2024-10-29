@@ -10,7 +10,10 @@ FN_REGEX = re.compile(r"\${\s([a-zA-Z_]\w*)\(([^)]*)\)\s}")
 JSON_PATH_PATTERN = re.compile(r"\.([^\.\[\]]+|\d+)")
 EMPTY_TYPES_AS_STRING = {
     "[]": list,
+    "{}": dict,
 }
+
+NUMERIC_FN_REGEX = re.compile(r"\${\sinteger\(([^)]*)\)\s}")
 
 
 EXPAND_FUNCTIONS = {
@@ -48,6 +51,11 @@ def expand_macro(value: str, *, context: Context):
     if value in EMPTY_TYPES_AS_STRING:
         return EMPTY_TYPES_AS_STRING[value]()
 
+    _numeric_match = NUMERIC_FN_REGEX.match(value)
+    if _numeric_match:
+        (_value,) = _numeric_match.groups()
+        return int(_value)
+
     _match: list[tuple[str, str]] = FN_REGEX.findall(value)
     for fn_name, _args in _match:
         value_to_replace = f"${{ {fn_name}({_args}) }}"
@@ -82,6 +90,7 @@ def _unpack_nested_lists(obj: Any | dict[str, any], context: Context):
     """Recursively convert any dict to a list where all keys are integer-like"""
     if not isinstance(obj, dict) or not obj:
         return expand_macro(obj, context=context)
+
     if all(key.isdigit() for key in obj):
         unpacked_list = [None] * (int(max(obj)) + 1)
         for key, value in obj.items():
