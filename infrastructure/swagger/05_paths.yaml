@@ -14,7 +14,7 @@ x-definitions:
 paths:
   /_status:
     get:
-      summary: _status endpoint for APIGEE integration
+      summary: Retrieve the current Status (GET)
       operationId: status
       responses:
         "200":
@@ -35,7 +35,7 @@ paths:
   /ProductTeam:
     post:
       operationId: createproductteam
-      summary: createProductTeam endpoint for APIGEE integration
+      summary: Create a Product Team resource (POST)
       requestBody:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
@@ -59,7 +59,7 @@ paths:
   /ProductTeam/{product_team_id}:
     get:
       operationId: readproductteam
-      summary: readProductTeam endpoint for APIGEE integration
+      summary: Read a Product Team resource (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -80,7 +80,7 @@ paths:
   /ProductTeam/{product_team_id}/Product:
     get:
       operationId: searchCpmProduct
-      summary: searchCpmProduct endpoint for APIGEE integration
+      summary: Retrieve all Products associated with a Product Team (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -99,7 +99,7 @@ paths:
         - app-level0: []
     post:
       operationId: createproductendpoint
-      summary: createProduct endpoint for APIGEE integration
+      summary: Create a Product resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -124,7 +124,7 @@ paths:
   /ProductTeam/{product_team_id}/Product/{product_id}:
     get:
       operationId: readproductendpoint
-      summary: readProduct endpoint for APIGEE integration
+      summary: Read a Product resource (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -145,7 +145,7 @@ paths:
 
     delete:
       operationId: deleteproductendpoint
-      summary: deleteProduct endpoint for APIGEE integration
+      summary: Delete a Product resource (DELETE)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -167,7 +167,7 @@ paths:
   /ProductTeam/{product_team_id}/Product/Epr:
     post:
       operationId: createproductforeprendpoint
-      summary: createCpmProductForEpr endpoint for APIGEE integration
+      summary: Create an EPR Product resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -192,7 +192,7 @@ paths:
   /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData:
     post:
       operationId: createDeviceReferenceData
-      summary: createDeviceReferenceData endpoint for APIGEE integration
+      summary: Create a Device Reference Data resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -244,7 +244,7 @@ paths:
   ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}
   : get:
       operationId: readDeviceReferenceData
-      summary: readDeviceReferenceData endpoint for APIGEE integration
+      summary: Read a Device Reference Data resource (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -267,7 +267,7 @@ paths:
   /ProductTeam/{product_team_id}/Product/{product_id}/Device:
     post:
       operationId: createDevice
-      summary: createDevice endpoint for APIGEE integration
+      summary: Create a Device resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -293,7 +293,7 @@ paths:
   /ProductTeam/{product_team_id}/Product/{product_id}/Device/{device_id}:
     get:
       operationId: readDevice
-      summary: readDevice endpoint for APIGEE integration
+      summary: Read a Device resource (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -316,7 +316,7 @@ paths:
   /searchSdsDevice:
     get:
       operationId: searchsdsdevice
-      summary: searchSdsDevice endpoint for APIGEE integration
+      summary: Retrieve Device resources for SDS FHIR API (GET)
       parameters:
         - $ref: "#/components/parameters/NhsAsClient"
         - $ref: "#/components/parameters/NhsAsClientInteration"
@@ -340,7 +340,7 @@ paths:
   /searchSdsEndpoint:
     get:
       operationId: searchsdsendpoint
-      summary: searchSdsEndpoint endpoint for APIGEE integration
+      summary: Retrieve Endpoint resources for SDS FHIR API (GET)
       parameters:
         - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsInteration"
@@ -363,7 +363,7 @@ paths:
   /Questionnaire/{questionnaire_id}:
     get:
       operationId: readQuestionnaire
-      summary: readQuestionnaire endpoint for APIGEE integration
+      summary: Read a Questionnaire resource (GET)
       parameters:
         - $ref: "#/components/parameters/QuestionnaireId"
         - $ref: "#/components/parameters/HeaderVersion"
