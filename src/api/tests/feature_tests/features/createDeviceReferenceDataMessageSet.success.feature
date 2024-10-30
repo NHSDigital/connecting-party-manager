@@ -1,5 +1,5 @@
-Feature: Create Device Reference Data - success scenarios
-  These scenarios demonstrate successful Device Reference Data creation
+Feature: Create "Message Set" Device Reference Data - success scenarios
+  These scenarios demonstrate successful "Message Set" Device Reference Data creation
 
   Background:
     Given "default" request headers:

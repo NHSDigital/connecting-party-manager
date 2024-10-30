@@ -59,7 +59,8 @@ def require_no_existing_message_sets_device_reference_data(
     )
     if len(results) > 0:
         raise AlreadyExistsError(
-            "Message Sets Device Reference Data already exists for this Product"
+            "This product already has a 'Message Set' DeviceReferenceData. "
+            "Please update, or delete and recreate if you wish to make changes."
         )
 
 
