@@ -175,6 +175,13 @@ def then_response(context: Context, status_code: str, list_to_check: str, count:
     except JSONDecodeError:
         response_body = context.response.text
     assert len(response_body[list_to_check]) == int(count)
+    if list_to_check == "results":
+        expected_body[list_to_check] = sorted(
+            expected_body[list_to_check], key=lambda x: x["name"]
+        )
+        response_body[list_to_check] = sorted(
+            response_body[list_to_check], key=lambda x: x["name"]
+        )
     assert_many(
         assertions=(
             assert_equal,
