@@ -67,26 +67,26 @@ components:
               - name
           example:
             name: "Sample Device Reference Data"
-    # DeviceReferenceDataMessageSetCreateRequestBody:
-    #   description: Request body to create a Device Reference Data Message Set object
-    #   required: true
-    #   content:
-    #     application/json:
-    #       schema:
-    #         type: object
-    #         properties:
-    #           questionnaire_responses:
-    #             type: object
-    #             description: Questionnaire Responses for MHS Message Set questionnaire
-    #             properties:
-    #               spine_mhs_message_sets:
-    #                 type: array
-    #                 description: List of questionnaires associated with the message set
-    #                 items:
-    #                   type: object
-    #                   description: Questionnaire Responses
-    #         required:
-    #           - questionnaire_responses
+    DeviceReferenceDataMessageSetCreateRequestBody:
+      description: Request body to create a Device Reference Data Message Set object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for MHS Message Set questionnaire
+                properties:
+                  spine_mhs_message_sets:
+                    type: array
+                    description: List of questionnaires associated with the message set
+                    items:
+                      type: object
+                      description: Questionnaire Responses
+            required:
+              - questionnaire_responses
     DeviceCreateRequestBody:
       description: Request body to create a Device object
       required: true
