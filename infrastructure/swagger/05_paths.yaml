@@ -218,7 +218,7 @@ paths:
   ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/MhsMessageSet
   : post:
       operationId: createDeviceReferenceDataMessageSet
-      summary: createDeviceReferenceDataMessageSet endpoint for APIGEE integration
+      summary: Create a Device Reference Data Message Set resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
