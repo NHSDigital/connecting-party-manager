@@ -3,7 +3,6 @@ from http import HTTPStatus
 
 from domain.response.error_response import ErrorResponse
 from domain.response.response_matrix import http_status_from_exception
-from nhs_context_logging import app_logger
 from pydantic import ValidationError
 
 from .aws_lambda_response import AwsLambdaResponse
@@ -14,46 +13,30 @@ from .validators import (
 )
 
 
-def render_response[
-    JsonSerialisable
-](
-    response: JsonSerialisable | HTTPStatus | Exception,
-    id: str = None,  # Deprecated: remove when FHIR is removed
-    version: str = None,
-    location: str = None,
+def _exception_to_response_tuple(exception: Exception) -> tuple[HTTPStatus, object]:
+    _exception = validate_exception(exception)
+    exception_renderer = (
+        ErrorResponse.from_validation_error
+        if isinstance(exception, ValidationError)
+        else ErrorResponse.from_exception
+    )
+    outcome = exception_renderer(exception=_exception).dict()
+    http_status = http_status_from_exception(exception=_exception)
+    return http_status, outcome
+
+
+def render_response(
+    response: Exception | tuple[HTTPStatus, object], version: str = None
 ) -> AwsLambdaResponse:
-    if id is None:
-        id = app_logger.service_name
-
-    if isinstance(response, HTTPStatus):
-        # Convert response to an Exception if it is an invalid http status
-        response = validate_http_status_response(response)
-    elif not isinstance(response, (HTTPStatus, Exception)):
-        # Convert response to an Exception if it isn't JSON serialisable
-        response = validate_json_serialisable_response(response)
-
     if isinstance(response, Exception):
-        response = validate_exception(response)
-
-    if response == HTTPStatus.NO_CONTENT:
-        http_status = response
-        outcome = None
-    elif isinstance(response, ValidationError):
-        # Implicit failure from ValidationError
-        outcome = ErrorResponse.from_validation_error(exception=response).dict()
-        http_status = http_status_from_exception(exception=response)
-    elif isinstance(response, Exception):
-        # Implicit failure from all other Exceptions
-        outcome = ErrorResponse.from_exception(exception=response).dict()
-        http_status = http_status_from_exception(exception=response)
-    elif isinstance(response, tuple):
-        http_status, outcome = response
+        http_status, outcome = _exception_to_response_tuple(exception=response)
     else:
-        # Implicit success (e.g. SEARCH, READ operations)
-        http_status = HTTPStatus.OK
-        outcome = response
+        http_status, outcome = response
+        try:
+            validate_http_status_response(http_status=http_status)
+            validate_json_serialisable_response(item=outcome)
+        except Exception as exception:
+            http_status, outcome = _exception_to_response_tuple(exception=exception)
 
     body = json.dumps(outcome) if outcome is not None else ""
-    return AwsLambdaResponse(
-        statusCode=http_status, body=body, version=version, location=location
-    )
+    return AwsLambdaResponse(statusCode=http_status, body=body, version=version)

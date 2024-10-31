@@ -14,5 +14,5 @@ def _response_assertions(
         assert key in result
         if isinstance(value, dict):
             _response_assertions(result=result.get(key, {}), expected=value)
-        elif key not in {"Location", "headers"}:
+        elif key != "headers":
             _assert_key_value(key, value, result, check_body, check_content_length)

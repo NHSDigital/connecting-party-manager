@@ -10,7 +10,6 @@ class AwsLambdaResponseHeaders(BaseModel):
     )
     content_length: str = Field(alias="Content-Length", regex=r"^[0-9][0-9]*$")
     version: str = Field(alias="Version", regex=r"^(null)|([1-9][0-9]*)$")
-    location: str = Field(default=None, alias="Location")
     host: str = Field(default=None, alias="Host")
 
     class Config:
@@ -24,7 +23,6 @@ class AwsLambdaResponse(BaseModel):
     statusCode: HTTPStatus
     body: str = Field(min_length=0, default="")
     version: None | str = Field(exclude=True)
-    location: None | str = Field(exclude=True, default=None)
     headers: AwsLambdaResponseHeaders = None
 
     @validator("headers", always=True)
@@ -33,11 +31,9 @@ class AwsLambdaResponse(BaseModel):
             return headers
         body: str = values["body"]
         version: None | str = values["version"]
-        location: None | str = values.get("location")
         headers = AwsLambdaResponseHeaders(
             content_length=len(body),
             version="null" if version is None else version,
-            location=location,
             host="foo.co.uk",
         )
         return headers

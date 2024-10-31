@@ -26,5 +26,5 @@ def handler(event: dict, context=None):
     api_chain.run(cache=cache, init=event)
 
     response_chain = StepChain(step_chain=post_steps, step_decorators=step_decorators)
-    response_chain.run(init=(api_chain.result, None, None))
+    response_chain.run(init=(api_chain.result, None))
     return response_chain.result

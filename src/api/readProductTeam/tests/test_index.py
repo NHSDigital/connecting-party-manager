@@ -71,7 +71,6 @@ def test_index(version):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -121,7 +120,6 @@ def test_index_no_such_product_team(version, product_id):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -185,7 +183,6 @@ def test_index_by_alias(version):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(

@@ -28,16 +28,14 @@ class InvalidExceptionRaised(Exception):
 
 def validate_http_status_response(http_status: HTTPStatus):
     if http_status not in SUCCESS_STATUSES:
-        return UnexpectedHttpStatus(http_status=http_status)
-    return http_status
+        raise UnexpectedHttpStatus(http_status=http_status)
 
 
 def validate_json_serialisable_response(item):
     try:
         json.dumps(item)
     except Exception as exception:
-        return NotJsonSerialisable(str(exception))
-    return item
+        raise NotJsonSerialisable(str(exception))
 
 
 def validate_exception(exception):

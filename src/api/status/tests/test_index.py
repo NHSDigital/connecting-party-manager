@@ -55,7 +55,6 @@ def test_index():
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": "null",
-            "Location": None,
         },
     }
     _response_assertions(
@@ -96,7 +95,6 @@ def test_index_not_ok():
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": "null",
-            "Location": None,
         },
     }
     _response_assertions(
