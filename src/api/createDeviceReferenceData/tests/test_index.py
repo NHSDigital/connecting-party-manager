@@ -26,6 +26,7 @@ TABLE_NAME = "hiya"
 DEVICE_REFERENCE_DATA_NAME = "My DeviceReferenceData"
 ODS_CODE = "AAA"
 PRODUCT_ID = ProductId.create()
+PRODUCT_TEAM_NAME = "My Product Team"
 PRODUCT_NAME = "My Product"
 VERSION = 1
 
@@ -33,7 +34,7 @@ VERSION = 1
 @contextmanager
 def mock_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(name=PRODUCT_NAME)
+    product_team = org.create_product_team(name=PRODUCT_TEAM_NAME)
 
     with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,

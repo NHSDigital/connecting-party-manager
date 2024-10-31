@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device_reference_data.v1 import DeviceReferenceData
@@ -49,9 +51,9 @@ def read_device_reference_data(data, cache) -> DeviceReferenceData:
     )
 
 
-def device_reference_data_to_dict(data, cache) -> dict:
+def device_reference_data_to_dict(data, cache) -> tuple[str, dict]:
     device_reference_data: DeviceReferenceData = data[read_device_reference_data]
-    return device_reference_data.state()
+    return HTTPStatus.OK, device_reference_data.state()
 
 
 steps = [

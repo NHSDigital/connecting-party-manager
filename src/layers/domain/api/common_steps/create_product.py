@@ -44,7 +44,7 @@ def create_cpm_product(
 ) -> CpmProduct:
     incoming_product: CreateCpmProductIncomingParams = data[parse_incoming_cpm_product]
     product_team: ProductTeam = data[read_product_team]
-    product = product_team.create_cpm_product(name=incoming_product.product_name)
+    product = product_team.create_cpm_product(name=incoming_product.name)
     return product
 
 

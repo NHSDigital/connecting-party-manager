@@ -4,7 +4,7 @@ from attr import dataclass
 from domain.core import event
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.cpm_system_id.v1 import ProductId
-from domain.core.device.v2 import UPDATED_ON, event
+from domain.core.device.v3 import UPDATED_ON, Device, DeviceCreatedEvent, event
 from domain.core.device_reference_data.v1 import (
     DeviceReferenceData,
     DeviceReferenceDataCreatedEvent,
@@ -71,6 +71,23 @@ class CpmProduct(AggregateRoot):
     updated_on: datetime = Field(default=None)
     deleted_on: datetime = Field(default=None)
     keys: list[ProductKey] = Field(default_factory=list)
+
+    def create_device(
+        self,
+        name: str,
+        status: Status = Status.ACTIVE,
+    ) -> Device:
+        device = Device(
+            name=name,
+            product_team_id=self.product_team_id,
+            product_id=self.id,
+            ods_code=self.ods_code,
+            status=status,
+        )
+        device_created_event = DeviceCreatedEvent(**device.dict())
+        self.add_event(device_created_event)
+        device.add_event(device_created_event)
+        return device
 
     def create_device_reference_data(self, name: str) -> DeviceReferenceData:
         device_reference_data = DeviceReferenceData(

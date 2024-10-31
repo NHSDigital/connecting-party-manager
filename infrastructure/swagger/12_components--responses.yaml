@@ -5,10 +5,10 @@ x-definitions:
     headers: &ResponseHeaders
       X-Correlation-Id:
         schema:
-          $ref: "#/components/schemas/CorrelationId"
+          $ref: "#/components/schemas/HeaderCorrelationId"
       X-Request-Id:
         schema:
-          $ref: "#/components/schemas/RequestId"
+          $ref: "#/components/schemas/HeaderRequestId"
 
 components:
   responses:
@@ -17,127 +17,121 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              message:
-                type: string
-                enum: ["OK"]
+            $ref: "#/components/schemas/StatusOK"
       headers:
         <<: *ResponseHeaders
-
-    Questionnaire:
-      description: Questionnaire response body
+    NotFound:
+      description: Not found.
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              tbc:
-                type: string
-
-    ProductTeamResponse:
-      description: Read Product Team operation successful
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            errors:
+              - code: "RESOURCE_NOT_FOUND"
+                message: "Could not find <ENTITY> for key ('<ID>')"
+    BadRequest:
+      description: Bad request (multiple error types)
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              ods_code:
-                type: string
-              status:
-                type: string
-              created_on:
-                type: string
-              updated_on:
-                type: string
-              deleted_on:
-                type: string
-              keys:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    key_type:
-                      type: string
-                    key_value:
-                      type: string
-            example:
-              id: "F5H1R"
-              name: "Sample Product Team"
-              ods_code: "F5H1R"
-              status: "active"
-              created_on: "2024-10-15T10:00:00Z"
-              updated_on: "2024-10-15T10:00:00Z"
-              deleted_on: "null"
-              keys:
-                - key_type: "product_team_id_alias"
-                  key_value: "FOOBAR"
-    ProductResponse:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            MissingValue:
+              value:
+                errors:
+                  - code: "MISSING_VALUE"
+                    message: "<MISSING_FIELD>: field required"
+            ValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "Item already exists"
+    UnprocessableContent:
+      description: Unprocessable Content
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            errors:
+              - code: "UNPROCESSABLE_ENTITY"
+                message: "Invalid ODS Code: could not resolve 'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/invalid_ods_code'"
+    ProductTeamCreate:
+      description: Create ProductTeam operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductTeamResponse"
+    ProductTeamRead:
+      description: Read ProductTeam operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductTeamResponse"
+    ProductSearch:
+      description: Search Product operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductSearchResponse"
+    ProductCreate:
+      description: Create Product operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductResponse"
+    ProductRead:
       description: Read Product operation successful
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              ods_code:
-                type: string
-              status:
-                type: string
-              created_on:
-                type: string
-              updated_on:
-                type: string
-              deleted_on:
-                type: string
-              keys:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    key_type:
-                      type: string
-                    key_value:
-                      type: string
-            example:
-              id: "123-XXX"
-              name: "Sample Product Team"
-              ods_code: "F5H1R"
-              status: "active"
-              created_on: "2024-10-15T10:00:00Z"
-              updated_on: "2024-10-15T10:00:00Z"
-              deleted_on: "null"
-              keys:
-                - key_type: "product_team_id_alias"
-                  key_value: "FOOBAR"
-    DeviceReferenceDataResponse:
+            $ref: "#/components/schemas/ProductResponse"
+    EprProductCreate:
+      description: Create Epr Product operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductResponse"
+    DeviceRefDataCreate:
+      description: Create Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceReferenceDataResponse"
+    DeviceRefDataRead:
       description: Read Device Reference Data operation successful
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              product_id:
-                type: string
-              product_team_id:
-                type: string
-              ods_code:
-                type: string
-              status:
-                type: string
-              created_on:
-                type: string
-              updated_on:
-                type: string
-              deleted_on:
+            $ref: "#/components/schemas/DeviceReferenceDataResponse"
+    DeviceCreate:
+      description: Create Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceResponse"
+    DeviceRead:
+      description: Read Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceResponse"
+    SdsDeviceSearch:
+      description: Search Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceSearchResponse"
+    SdsEndpointSearch:
+      description: Search Endpoint operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceSearchResponse"
+    QuestionnaireRead:
+      description: Read Questionnaire operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Questionnaire"
