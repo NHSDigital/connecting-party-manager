@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-10-29
+- [PI-565] Add EPR questionnaires
+- [PI-577] Create Message Set Device Reference Data
+- [PI-574] CPM Smoke tests don't write data to DB
+
 ## 2024-10-25
 - [PI-551] Remove FHIR from Read CPM Product flow
 - [PI-553] Remove FHIR from Delete CPM Product flow

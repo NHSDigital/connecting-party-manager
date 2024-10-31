@@ -4,7 +4,7 @@ from typing import ClassVar, Literal, Optional
 from domain.api.sds.query import SearchSDSEndpointQueryParams
 from domain.core.questionnaire.v2 import Questionnaire
 from domain.repository.questionnaire_repository import QuestionnaireRepository
-from domain.repository.questionnaire_repository.questionnaires import (
+from domain.repository.questionnaire_repository.v1.questionnaires import (
     QuestionnaireInstance,
 )
 from pydantic import Field

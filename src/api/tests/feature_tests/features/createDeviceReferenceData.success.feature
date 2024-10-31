@@ -21,32 +21,34 @@ Feature: Create Device Reference Data - success scenarios
       | path | value                    |
       | name | My Device Reference Data |
     Then I receive a status code "201" with body
-      | path            | value                      |
-      | id              | << ignore >>               |
-      | name            | My Device Reference Data   |
-      | product_id      | ${ note(product_id) }      |
-      | product_team_id | ${ note(product_team_id) } |
-      | ods_code        | F5H1R                      |
-      | created_on      | << ignore >>               |
-      | updated_on      | << ignore >>               |
-      | deleted_on      | << ignore >>               |
+      | path                    | value                      |
+      | id                      | << ignore >>               |
+      | name                    | My Device Reference Data   |
+      | product_id              | ${ note(product_id) }      |
+      | product_team_id         | ${ note(product_team_id) } |
+      | ods_code                | F5H1R                      |
+      | created_on              | << ignore >>               |
+      | updated_on              | << ignore >>               |
+      | deleted_on              | << ignore >>               |
+      | questionnaire_responses | {}                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 285              |
+      | Content-Length | 316              |
     And I note the response field "$.id" as "device_reference_data_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
-      | path            | value                               |
-      | id              | ${ note(device_reference_data_id) } |
-      | name            | My Device Reference Data            |
-      | product_id      | ${ note(product_id) }               |
-      | product_team_id | ${ note(product_team_id) }          |
-      | ods_code        | F5H1R                               |
-      | created_on      | << ignore >>                        |
-      | updated_on      | << ignore >>                        |
-      | deleted_on      | << ignore >>                        |
+      | path                    | value                               |
+      | id                      | ${ note(device_reference_data_id) } |
+      | name                    | My Device Reference Data            |
+      | product_id              | ${ note(product_id) }               |
+      | product_team_id         | ${ note(product_team_id) }          |
+      | ods_code                | F5H1R                               |
+      | created_on              | << ignore >>                        |
+      | updated_on              | << ignore >>                        |
+      | deleted_on              | << ignore >>                        |
+      | questionnaire_responses | {}                                  |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 285              |
+      | Content-Length | 316              |

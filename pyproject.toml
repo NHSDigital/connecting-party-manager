@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2024.10.25"
+version = "2024.10.29"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -27,6 +27,7 @@ urllib3 = "<3"
 orjson = "^3.9.15"
 attrs = "^24.2.0"
 locust = "^2.29.1"
+jsonschema = "^4.23.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.0.0"

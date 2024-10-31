@@ -44,3 +44,7 @@ class EventUpdatedError(Exception):
 
 class EventExpected(Exception):
     pass
+
+
+class ConfigurationError(Exception):
+    pass
