@@ -23,10 +23,7 @@ sort_keys = {"product": "name"}
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
     table_headers = parse_table(table=context.table, context=context)
-    apikey_header = {
-        "apikey": context.apikey
-    }  # Hidden here because the value cant be written in the tests
-    context.headers[header_name] = {**table_headers, **apikey_header}
+    context.headers[header_name] = dict(**table_headers, apikey=context.api_key)
 
 
 @given(

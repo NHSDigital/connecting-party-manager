@@ -23,7 +23,7 @@ class Context(BehaveContext):
     workspace: str = None
     environment: str = None
     workspace_type: str = None
-    apikey: str = None
+    api_key: str = None
     notes: dict[str, str] = None
 
     postman_collection: PostmanCollection = None

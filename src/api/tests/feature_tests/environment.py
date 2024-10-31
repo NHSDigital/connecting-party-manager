@@ -3,7 +3,7 @@ from pathlib import Path
 
 from behave import use_fixture
 from behave.model import Feature, Scenario, Step
-from event.aws.client import dynamodb_client, secretsmanager_client
+from event.aws.client import dynamodb_client
 
 from api.tests.feature_tests.feature_test_helpers import TestMode
 from api.tests.feature_tests.steps.context import Context
@@ -17,6 +17,7 @@ from api.tests.feature_tests.steps.postman import (
     PostmanCollection,
     PostmanItem,
 )
+from api.tests.smoke_tests.utils import get_app_key, get_base_url
 from test_helpers.aws_session import aws_session
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.terraform import read_terraform_output
@@ -37,32 +38,26 @@ def before_all(context: Context):
     context.workspace_type = ""
     context.environment = ""
     context.notes = {}
+    context.api_key = ""  # pragma: allowlist secret
 
     if context.test_mode is TestMode.INTEGRATION:
         context.table_name = read_terraform_output("dynamodb_table_name.value")
-        context.base_url = read_terraform_output("certificate_domain_name.value") + "/"
         context.workspace_type = read_terraform_output("workspace_type.value")
         context.workspace = read_terraform_output("workspace.value")
         context.environment = read_terraform_output("environment.value")
+        context.base_url = (
+            get_base_url(workspace=context.workspace, environment=context.environment)
+            + "/"
+        )
         context.session = aws_session
 
         with context.session():
-            client = secretsmanager_client()
-            if context.workspace_type in {"LOCAL", "CI"}:
-                secret_name = f"{context.environment}-apigee-cpm-apikey"  # pragma: allowlist secret
-            else:
-                secret_name = (
-                    f"{context.workspace}-apigee-cpm-apikey"  # pragma: allowlist secret
-                )
-
-            response = client.get_secret_value(SecretId=secret_name)
-            context.apikey = response["SecretString"]
+            context.api_key = get_app_key(environment=context.environment)
 
     if context.test_mode is TestMode.LOCAL:
         use_fixture(mock_environment, context=context, table_name=context.table_name)
         use_fixture(mock_dynamodb, context=context, table_name=context.table_name)
         use_fixture(mock_requests, context=context)
-        context.apikey = "mock"  # pragma: allowlist secret
 
 
 def before_feature(context: Context, feature: Feature):

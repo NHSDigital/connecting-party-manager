@@ -146,17 +146,14 @@ function attach_product(){
 
         token=$(echo "$token_response" | jq -r '.pytest_nhsd_apim_token')
         url=https://api.enterprise.apigee.com/v1/organizations/$_org_name/developers/$email_that_owns_app/apps/$app_name/keys/$client_id
-        echo "$url"
 
-        add_product_response=$(curl -X POST \
+        add_product_response=$(curl --retry 100 -sS -X POST \
             $url \
             -H "Authorization: Bearer $token" \
             -H "Content-type:application/json" \
             -d "{\"apiProducts\": [\"$_product_name\"]}")
 
         status=$(echo "$add_product_response" | jq -r '.status')
-        echo "$status"
-
         if [ -z "$status" ] || [ "$status" != "approved" ]; then
           echo "Failed to add product to the app"
           echo "Response: $add_product_response"
@@ -232,17 +229,14 @@ function detach_product(){
 
         token=$(echo "$token_response" | jq -r '.pytest_nhsd_apim_token')
         url=https://api.enterprise.apigee.com/v1/organizations/$_org_name/developers/$email_that_owns_app/apps/$app_name/keys/$client_id/apiproducts/$_product_name
-        echo "$url"
 
-        detach_product_response=$(curl -X DELETE \
+        detach_product_response=$(curl -sS -X DELETE \
             $url \
             -H "Authorization: Bearer $token" \
             -H "Content-type:application/json" \
             -d "{\"apiProducts\": [\"$_product_name\"]}")
 
         status=$(echo "$detach_product_response" | jq -r '.status')
-        echo "$status"
-
         if [ -z "$status" ] || [ "$status" != "approved" ]; then
           echo "Failed to remove product from the app"
           echo "Response: $detach_product_response"

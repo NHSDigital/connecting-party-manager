@@ -110,6 +110,12 @@ def assert_is_subset(expected: dict, received: dict, path=None):
         path = [""]
 
     for key, expected_value in expected.items():
+
+        # Sometimes AWS remaps keys, but not consistently
+        amzn_remapped_key = f"x-amzn-Remapped-{key}"
+        if key not in received and amzn_remapped_key in received:
+            key = amzn_remapped_key
+
         # Key must exist
         assert key in received, error_message("Could not find key", key, "in", received)
 
