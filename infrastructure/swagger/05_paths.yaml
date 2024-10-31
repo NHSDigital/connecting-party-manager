@@ -229,14 +229,14 @@ paths:
         $ref: "#/components/requestBodies/DeviceReferenceDataMessageSetCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/DeviceRefDataMessageSetCreate"
+          $ref: "#/components/responses/DeviceRefDataCreate"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${ethod_createDeviceReferenceDataMessageSet}
+        uri: ${method_createDeviceReferenceDataMessageSet}
       security:
         - ${authoriser_name}: []
         - app-level0: []
