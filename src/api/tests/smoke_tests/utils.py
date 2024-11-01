@@ -1,3 +1,4 @@
+import time
 from types import FunctionType
 from uuid import uuid4
 
@@ -75,12 +76,20 @@ def raise_smoke_test_error(request_method, status_code, response_content):
 def execute_smoke_test(
     request_method: FunctionType, base_url: str, headers: str, request_details: list
 ):
-    response: requests.Response = request_method(
-        base_url=base_url,
-        headers=headers,
-        path=request_details[0],
-        method=request_details[1],
-    )
+    retries = 0
+
+    while retries < 5:
+        response: requests.Response = request_method(
+            base_url=base_url,
+            headers=headers,
+            path=request_details[0],
+            method=request_details[1],
+        )
+        if response.status_code == 504:
+            retries += 1
+            time.sleep(2)
+        else:
+            return response  # Return on success or any other error code
 
     try:
         response_json: dict = response.json()
