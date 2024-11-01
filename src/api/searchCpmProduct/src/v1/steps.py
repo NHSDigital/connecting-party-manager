@@ -33,7 +33,7 @@ def query_products(data, cache) -> list:
 
 def return_products(data, cache) -> tuple[HTTPStatus, str]:
     products = data[query_products]
-    response = SearchResponse.from_models(products)
+    response = SearchResponse(results=products)
     return HTTPStatus.OK, response.state()
 
 
