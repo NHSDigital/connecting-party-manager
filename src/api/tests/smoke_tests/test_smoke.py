@@ -39,7 +39,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
             [
-                "CreateCpmProductIncomingParams.product_name: field required",
+                "CreateCpmProductIncomingParams.name: field required",
                 "CreateCpmProductIncomingParams.foo: extra fields not permitted",
             ],
         ],
@@ -49,7 +49,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
             [
-                "CreateCpmProductIncomingParams.product_name: field required",
+                "CreateCpmProductIncomingParams.name: field required",
                 "CreateCpmProductIncomingParams.foo: extra fields not permitted",
             ],
         ],
