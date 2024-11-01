@@ -59,8 +59,8 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
             [
-                "CreateDeviceReferenceDataParams.name: field required",
-                "CreateDeviceReferenceDataParams.foo: extra fields not permitted",
+                "CreateDeviceReferenceDataIncomingParams.name: field required",
+                "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
             ],
         ],
         # ('/ProductTeam/123/Product/abc/Device', 'POST', 400, ['MISSING_VALUE', 'VALIDATION_ERROR']),
