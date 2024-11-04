@@ -54,6 +54,11 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
+            "/ProductTeam/123/Product/abc",
+            "DELETE",
+            404,
+        ],
+        [
             "/ProductTeam/123/Product/abc/DeviceReferenceData",
             "POST",
             400,
