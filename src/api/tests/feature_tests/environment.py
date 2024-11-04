@@ -15,6 +15,8 @@ from api.tests.feature_tests.steps.fixtures import (
 from api.tests.feature_tests.steps.postman import (
     BASE_URL,
     PostmanCollection,
+    PostmanEnvironment,
+    PostmanEnvironmentValue,
     PostmanItem,
 )
 from api.tests.smoke_tests.utils import get_app_key, get_base_url
@@ -39,6 +41,12 @@ def before_all(context: Context):
     context.environment = ""
     context.notes = {}
     context.api_key = ""  # pragma: allowlist secret
+    context.postman_environment = PostmanEnvironment(
+        values=[
+            PostmanEnvironmentValue(key="baseUrl", value=""),
+            PostmanEnvironmentValue(key="apiKey", value=""),
+        ]
+    )
 
     if context.test_mode is TestMode.INTEGRATION:
         context.table_name = read_terraform_output("dynamodb_table_name.value")
@@ -53,6 +61,13 @@ def before_all(context: Context):
 
         with context.session():
             context.api_key = get_app_key(environment=context.environment)
+
+        context.postman_environment = PostmanEnvironment(
+            values=[
+                PostmanEnvironmentValue(key="baseUrl", value=context.base_url),
+                PostmanEnvironmentValue(key="apiKey", value=context.api_key),
+            ]
+        )
 
     if context.test_mode is TestMode.LOCAL:
         use_fixture(mock_environment, context=context, table_name=context.table_name)
@@ -78,6 +93,7 @@ def before_scenario(context: Context, scenario: Scenario):
 
 
 def before_step(context: Context, step: Step):
+    context.postman_endpoint = None
     context.postman_step = PostmanItem(
         name=f"{step.keyword.lower().title()} {step.name}", item=None
     )
@@ -102,3 +118,4 @@ def after_feature(context: Context, feature: Feature):
 
 def after_all(context: Context):
     context.postman_collection.save(path=PATH_TO_HERE)
+    context.postman_environment.save(path=PATH_TO_HERE)

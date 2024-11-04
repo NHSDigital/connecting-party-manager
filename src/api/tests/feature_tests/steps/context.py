@@ -7,7 +7,11 @@ from mypy_boto3_dynamodb import DynamoDBClient
 from requests import Response
 
 from api.tests.feature_tests.feature_test_helpers import TestMode
-from api.tests.feature_tests.steps.postman import PostmanCollection, PostmanItem
+from api.tests.feature_tests.steps.postman import (
+    PostmanCollection,
+    PostmanEnvironment,
+    PostmanItem,
+)
 
 
 @dataclass
@@ -25,8 +29,11 @@ class Context(BehaveContext):
     workspace_type: str = None
     api_key: str = None
     notes: dict[str, str] = None
+    postman_endpoint: str = None
 
     postman_collection: PostmanCollection = None
     postman_feature: PostmanItem = None
     postman_scenario: PostmanItem = None
     postman_step: PostmanItem = None
+
+    postman_environment: PostmanEnvironment = None

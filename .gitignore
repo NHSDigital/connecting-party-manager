@@ -78,6 +78,7 @@ dist
 openapi
 
 postman-collection.json
+postman-environment.json
 token_cache.json
 cpm.cdx.json
 
