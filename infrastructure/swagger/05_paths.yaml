@@ -352,7 +352,7 @@ paths:
         "200":
           $ref: "#/components/responses/SdsEndpointSearch"
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/SdsSearchEndpointBadRequest"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_searchSdsEndpoint}
