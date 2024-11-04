@@ -23,6 +23,11 @@ def _request(base_url: str, headers: dict, path: str, method: str):
     "request_details",
     [
         [
+            "/_status",
+            "GET",
+            200,
+        ],
+        [
             "/ProductTeam",
             "POST",
             400,
