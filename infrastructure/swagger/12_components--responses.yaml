@@ -47,6 +47,23 @@ components:
                 errors:
                   - code: "VALIDATION_ERROR"
                     message: "Item already exists"
+    SdsSearchDeviceBadRequest:
+      description: searchSDSDevice Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            MissingValue:
+              value:
+                errors:
+                  - code: "MISSING_VALUE"
+                    message: "SearchSDSDeviceQueryParams.nhs_as_client: field required"
+            ValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchSDSDeviceQueryParams.foo: extra fields not permitted"
     SdsSearchEndpointBadRequest:
       description: searchSDSEndpoint Bad request
       content:

@@ -329,7 +329,7 @@ paths:
         "200":
           $ref: "#/components/responses/SdsDeviceSearch"
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/SdsSearchDeviceBadRequest"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_searchSdsDevice}
