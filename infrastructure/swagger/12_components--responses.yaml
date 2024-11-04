@@ -21,7 +21,7 @@ components:
       headers:
         <<: *ResponseHeaders
     NotFound:
-      description: Not found.
+      description: Not found
       content:
         application/json:
           schema:

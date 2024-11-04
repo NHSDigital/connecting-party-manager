@@ -74,8 +74,8 @@ info:
     | Environment       | Base URL                                                                    |
     | ----------------- | --------------------------------------------------------------------------- |
     | Sandbox           | `https://sandbox.api.service.nhs.uk/connecting-party-manager/`      |
-    | Integration       | `https://int.api.service.nhs.uk/connecting-party-manager/consumer/` |
-    | Production        | `https://api.service.nhs.uk/connecting-party-manager/consumer/`     |
+    | Integration       | `https://int.api.service.nhs.uk/connecting-party-manager/` |
+    | Production        | `https://api.service.nhs.uk/connecting-party-manager/`     |
 
     ### Sandbox and Integration environments
 
