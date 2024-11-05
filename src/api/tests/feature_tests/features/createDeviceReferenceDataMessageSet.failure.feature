@@ -14,8 +14,8 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                            | value                                                     |
@@ -36,8 +36,8 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                                               | value                                                     |
@@ -61,8 +61,8 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                            | value                                                     |
@@ -86,8 +86,8 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                        | value |
@@ -108,8 +108,8 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
@@ -130,8 +130,8 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     Then I receive a status code "400" with body

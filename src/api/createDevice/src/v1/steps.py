@@ -1,78 +1,50 @@
 from http import HTTPStatus
 
-from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.device import Device
-from domain.core.device_id import generate_device_key
-from domain.core.device_key import DeviceKeyType
-from domain.core.product_team.v1 import ProductTeam
-from domain.fhir.r4.cpm_model import SYSTEM
-from domain.fhir.r4.cpm_model import Device as FhirDevice
-from domain.fhir_translation.device import (
-    create_domain_device_from_fhir_device,
-    parse_fhir_device_json,
+from domain.api.common_steps.general import parse_event_body
+from domain.api.common_steps.read_product import (
+    parse_path_params,
+    read_product,
+    read_product_team,
 )
-from domain.repository.device_repository import DeviceRepository
-from domain.repository.product_team_repository.v1 import ProductTeamRepository
-from domain.response.validation_errors import mark_json_decode_errors_as_inbound
-from event.aws.client import dynamodb_client
-from event.step_chain import StepChain
+from domain.core.cpm_product.v1 import CpmProduct
+from domain.core.device.v3 import Device
+from domain.repository.device_repository.v3 import DeviceRepository
+from domain.request_models.v1 import CreateDeviceIncomingParams
+from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 
-@mark_json_decode_errors_as_inbound
-def parse_event_body(data, cache) -> dict:
-    event = APIGatewayProxyEvent(data[StepChain.INIT])
-    return event.json_body if event.body else {}
-
-
-def parse_fhir_device(data, cache) -> FhirDevice:
-    json_body = data[parse_event_body]
-    identifier = json_body.get("identifier", [])
-    identifier.append(
-        dict(
-            system=f"{SYSTEM}/{DeviceKeyType.PRODUCT_ID}",
-            value=generate_device_key(DeviceKeyType.PRODUCT_ID),
-        )
-    )
-    json_body["identifier"] = identifier
-    fhir_device = parse_fhir_device_json(fhir_device_json=json_body)
-    return fhir_device
-
-
-def read_product_team(data, cache) -> ProductTeam:
-    fhir_device: FhirDevice = data[parse_fhir_device]
-    product_team_repo = ProductTeamRepository(
-        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=dynamodb_client()
-    )
-    return product_team_repo.read(id=fhir_device.owner.identifier.value)
+@mark_validation_errors_as_inbound
+def parse_device_payload(data, cache) -> Device:
+    payload: dict = data[parse_event_body]
+    return CreateDeviceIncomingParams(**payload)
 
 
 def create_device(data, cache) -> Device:
-    fhir_device: FhirDevice = data[parse_fhir_device]
-    product_team: ProductTeam = data[read_product_team]
-    device = create_domain_device_from_fhir_device(
-        fhir_device=fhir_device, product_team=product_team
-    )
-    return device
+    product: CpmProduct = data[read_product]
+    payload: CreateDeviceIncomingParams = data[parse_device_payload]
+    return product.create_device(**payload.dict())
 
 
-def save_device(data, cache) -> dict:
-    device = data[create_device]
-    device_repo = DeviceRepository(
+def write_device(data: dict[str, CpmProduct], cache) -> CpmProduct:
+    device: Device = data[create_device]
+    repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.write(entity=device)
+    return repo.write(device)
 
 
 def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
     device: Device = data[create_device]
-    return HTTPStatus.CREATED, str(device.id)
+    return HTTPStatus.CREATED, device.state()
 
 
 steps = [
     parse_event_body,
-    parse_fhir_device,
+    parse_path_params,
+    parse_device_payload,
     read_product_team,
+    read_product,
     create_device,
-    save_device,
+    write_device,
     set_http_status,
 ]

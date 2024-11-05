@@ -1,1 +1,45 @@
 ---
+components:
+  parameters:
+    NhsAsClient:
+      name: nhs_as_client
+      in: query
+      required: true
+      description: "Accredited System Client"
+      schema:
+        type: string
+    NhsAsClientInteration:
+      name: nhs_as_svc_ia
+      in: query
+      required: true
+      description: "Accredited System Client Interaction"
+      schema:
+        type: string
+    NhsMhsManOrg:
+      name: nhs_mhs_manufacturer_org
+      in: query
+      required: false
+      description: "Manufacturer Organisation"
+      schema:
+        type: string
+    NhsMhsPartyKey:
+      name: nhs_mhs_party_key
+      in: query
+      required: false
+      description: "Party Key"
+      schema:
+        type: string
+    NhsIdCode:
+      name: nhs_as_client
+      in: query
+      required: false
+      description: "NHS ID Code"
+      schema:
+        type: string
+    NhsMhsInteration:
+      name: nhs_mhs_svc_ia
+      in: query
+      required: false
+      description: "Endpoint Interaction"
+      schema:
+        type: string

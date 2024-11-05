@@ -92,7 +92,7 @@ def test_index(version):
         ({}, "MISSING_VALUE", 400, "1"),
         (
             {
-                "product_name": "Foobar product",
+                "name": "Foobar product",
                 "foo": "bar",
             },
             "VALIDATION_ERROR",

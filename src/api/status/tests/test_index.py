@@ -5,7 +5,6 @@ from unittest import mock
 
 import pytest
 from event.status.steps import StatusNotOk, _status_check
-from nhs_context_logging import app_logger
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.response_assertions import _response_assertions
@@ -16,7 +15,10 @@ TABLE_NAME = "hiya"
 def test__status_check():
     with mock_table(table_name=TABLE_NAME) as client:
         result = _status_check(client=client, table_name=TABLE_NAME)
-    assert result == HTTPStatus.OK
+    assert result == (
+        HTTPStatus.OK,
+        {"code": "OK", "message": "Transaction successful"},
+    )
 
 
 def test__status_check_not_ok():
@@ -39,39 +41,18 @@ def test_index():
 
         result = handler(event={})
 
-    expected_body = json.dumps(
+    expected_result = json.dumps(
         {
-            "resourceType": "OperationOutcome",
-            "id": app_logger.service_name,
-            "meta": {
-                "profile": [
-                    "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-                ]
-            },
-            "issue": [
-                {
-                    "severity": "information",
-                    "code": "informational",
-                    "details": {
-                        "coding": [
-                            {
-                                "system": "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome",
-                                "code": "OK",
-                                "display": "Transaction successful",
-                            }
-                        ]
-                    },
-                    "diagnostics": "Transaction successful",
-                }
-            ],
+            "code": "OK",
+            "message": "Transaction successful",
         }
     )
 
     expected = {
         "statusCode": 200,
-        "body": expected_body,
+        "body": expected_result,
         "headers": {
-            "Content-Length": str(len(expected_body)),
+            "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": "null",
             "Location": None,

@@ -1,9 +1,6 @@
 from enum import Enum, StrEnum, auto
-from typing import Literal
 
-from domain.fhir.r4 import Coding as _Coding
-
-CODE_SYSTEM = "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
+from pydantic import BaseModel
 
 
 class IssueType(StrEnum):
@@ -20,10 +17,9 @@ class IssueSeverity(StrEnum):
     INFORMATION = "information"
 
 
-class Coding(_Coding):
-    system: Literal[
-        "https://fhir.nhs.uk/StructureDefinition/NHSDigital-OperationOutcome"
-    ] = CODE_SYSTEM
+class Coding(BaseModel):
+    code: str
+    display: str
 
 
 class SpineCoding(StrEnum):

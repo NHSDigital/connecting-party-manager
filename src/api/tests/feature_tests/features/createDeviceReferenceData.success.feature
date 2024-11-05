@@ -14,8 +14,8 @@ Feature: Create Device Reference Data - success scenarios
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
       | path | value                    |

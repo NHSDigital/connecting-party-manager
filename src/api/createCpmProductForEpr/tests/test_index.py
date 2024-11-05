@@ -53,7 +53,7 @@ def test_index():
         response = index.handler(
             event={
                 "headers": {"version": VERSION},
-                "body": json.dumps({"product_name": PRODUCT_NAME}),
+                "body": json.dumps({"name": PRODUCT_NAME}),
                 "pathParameters": {"product_team_id": product_team.id},
             }
         )
@@ -99,19 +99,19 @@ def test_index():
             400,
         ),
         (
-            {"product_name": PRODUCT_NAME},
+            {"name": PRODUCT_NAME},
             {},
             "MISSING_VALUE",
             400,
         ),
         (
-            {"product_name": PRODUCT_NAME, "forbidden_extra_param": "foo"},
+            {"name": PRODUCT_NAME, "forbidden_extra_param": "foo"},
             {"product_team_id": PRODUCT_TEAM_ID},
             "VALIDATION_ERROR",
             400,
         ),
         (
-            {"product_name": PRODUCT_NAME},
+            {"name": PRODUCT_NAME},
             {"product_team_id": "id_that_does_not_exist"},
             "RESOURCE_NOT_FOUND",
             404,

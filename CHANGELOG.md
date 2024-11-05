@@ -1,5 +1,13 @@
 # Changelog
 
+## 2024-10-31
+- [PI-555] Remov fhir from create device endpoint
+- [PI-556] Remov fhir from read device endpoint
+- [PI-559] Remov fhir from make file
+- [PI-530] Clean up fhir
+- [PI-571] Recreate swagger
+- [PI-589] Publish swagger spec int
+
 ## 2024-10-29
 - [PI-565] Add EPR questionnaires
 - [PI-577] Create Message Set Device Reference Data

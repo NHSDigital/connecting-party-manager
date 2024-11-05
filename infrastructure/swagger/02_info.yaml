@@ -1,7 +1,7 @@
 ---
 info:
   version: 1.0.0
-  title: Connecting Party Manager - FHIR API
+  title: Connecting Party Manager
   contact:
     name: NHS Digital API Management
     url: "https://digital.nhs.uk/developer/help-and-support"
@@ -35,20 +35,6 @@ info:
     ## Technology
 
     This API is [RESTful](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#basic-rest).
-
-    It conforms to the [FHIR](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#fhir) global standard for health care data exchange, specifically to [FHIR R4 (v4.0.1)](https://hl7.org/fhir/r4/), except that it does not support the [capabilities](http://hl7.org/fhir/R4/http.html#capabilities) interaction.
-
-    It includes some country-specific FHIR extensions, which conform to [FHIR UK Core](https://digital.nhs.uk/services/fhir-uk-core), specifically [fhir.r4.ukcore.stu1 0.5.1](https://simplifier.net/packages/fhir.r4.ukcore.stu1/0.5.1).
-
-    You do not need to know much about FHIR to use this API - FHIR APIs are just RESTful APIs that follow specific rules.
-
-    In particular:
-
-    * resource names are capitalised and singular, and use US spellings, for example `Organization` not `organisations`
-    * array names are singular, for example `entry` not `entries` for address lines
-    * data items that are country-specific and thus not included in the FHIR global base resources are usually wrapped in an `extension` object
-
-    There are [libraries and SDKs available](https://digital.nhs.uk/developer/guides-and-documentation/api-technologies-at-nhs-digital#fhir-libraries-and-sdks) to help with FHIR API integration.
 
     ## Network access
 
@@ -87,9 +73,9 @@ info:
 
     | Environment       | Base URL                                                                    |
     | ----------------- | --------------------------------------------------------------------------- |
-    | Sandbox           | `https://sandbox.api.service.nhs.uk/connecting-party-manager/FHIR/R4/`      |
-    | Integration       | `https://int.api.service.nhs.uk/connecting-party-manager/consumer/FHIR/R4/` |
-    | Production        | `https://api.service.nhs.uk/connecting-party-manager/consumer/FHIR/R4/`     |
+    | Sandbox           | `https://sandbox.api.service.nhs.uk/connecting-party-manager/`      |
+    | Integration       | `https://int.api.service.nhs.uk/connecting-party-manager/` |
+    | Production        | `https://api.service.nhs.uk/connecting-party-manager/`     |
 
     ### Sandbox and Integration environments
 

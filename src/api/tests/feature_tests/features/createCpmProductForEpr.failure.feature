@@ -7,7 +7,7 @@ Feature: Create CPM Product for EPR - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Cannot create a Cpm Product for EPR with a Cpm Product that is missing fields (no product_name) and has extra param
+  Scenario: Cannot create a Cpm Product for EPR with a Cpm Product that is missing fields (no name) and has extra param
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -16,20 +16,20 @@ Feature: Create CPM Product for EPR - failure scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path | value            |
-      | name | My Great Product |
+      | path       | value            |
+      | extra_name | My Great Product |
     Then I receive a status code "400" with body
-      | path             | value                                                           |
-      | errors.0.code    | MISSING_VALUE                                                   |
-      | errors.0.message | CreateCpmProductIncomingParams.product_name: field required     |
-      | errors.1.code    | VALIDATION_ERROR                                                |
-      | errors.1.message | CreateCpmProductIncomingParams.name: extra fields not permitted |
+      | path             | value                                                                 |
+      | errors.0.code    | MISSING_VALUE                                                         |
+      | errors.0.message | CreateCpmProductIncomingParams.name: field required                   |
+      | errors.1.code    | VALIDATION_ERROR                                                      |
+      | errors.1.message | CreateCpmProductIncomingParams.extra_name: extra fields not permitted |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 221              |
+      | Content-Length | 219              |
 
-  Scenario: Cannot create a Cpm Product for EPR with a Cpm Product that is missing fields (no product_name)
+  Scenario: Cannot create a Cpm Product for EPR with a Cpm Product that is missing fields (no name)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -42,13 +42,13 @@ Feature: Create CPM Product for EPR - failure scenarios
       {}
       """
     Then I receive a status code "400" with body
-      | path             | value                                                       |
-      | errors.0.code    | MISSING_VALUE                                               |
-      | errors.0.message | CreateCpmProductIncomingParams.product_name: field required |
+      | path             | value                                               |
+      | errors.0.code    | MISSING_VALUE                                       |
+      | errors.0.message | CreateCpmProductIncomingParams.name: field required |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 113              |
+      | Content-Length | 105              |
 
   Scenario: Cannot create a Cpm Product for EPR with an invalid body (extra parameter is not allowed)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -59,9 +59,9 @@ Feature: Create CPM Product for EPR - failure scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
-      | foo          | bar              |
+      | path | value            |
+      | name | My Great Product |
+      | foo  | bar              |
     Then I receive a status code "400" with body
       | path             | value                                                          |
       | errors.0.code    | VALIDATION_ERROR                                               |
@@ -94,8 +94,8 @@ Feature: Create CPM Product for EPR - failure scenarios
 
   Scenario: Cannot create a Cpm Product for EPR with a Product Team that does not exist
     When I make a "POST" request with "default" headers to "ProductTeam/${ uuid(1) }/Product/Epr" with body:
-      | path         | value            |
-      | product_name | My Great Product |
+      | path | value            |
+      | name | My Great Product |
     Then I receive a status code "404" with body
       | path             | value                                               |
       | errors.0.code    | RESOURCE_NOT_FOUND                                  |

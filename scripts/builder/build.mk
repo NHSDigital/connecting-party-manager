@@ -11,21 +11,16 @@ THIRD_PARTY_DIST = $(CURDIR)/src/layers/third_party/dist
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml
-FHIR_MODEL_PATH = $(CURDIR)/src/layers/domain/fhir/r4
-NORMAL_MODEL_PATH = $(FHIR_MODEL_PATH)/models.py
-STRICT_MODEL_PATH = $(FHIR_MODEL_PATH)/strict_models.py
 
 BUILD_DEPENDENCIES = $(INIT_TIMESTAMP) \
 					 $(SRC_FILES) \
 				     $(TOOL_VERSIONS_COPY) \
 					 $(POETRY_LOCK) \
 					 $(SWAGGER_PUBLIC) \
-					 $(SWAGGER_AWS) \
-					 $(NORMAL_MODEL_PATH) \
-					 $(STRICT_MODEL_PATH)
+					 $(SWAGGER_AWS)
 
 
-clean: poetry--clean swagger--clean fhir--models--clean terraform--clean ## Complete clear-out of the project installation and artifacts
+clean: poetry--clean swagger--clean terraform--clean ## Complete clear-out of the project installation and artifacts
 	[[ -d $(TIMESTAMP_DIR) ]] && rm -r $(TIMESTAMP_DIR) || :
 	[[ -d $(DOWNLOADS_DIR) ]] && rm -r $(DOWNLOADS_DIR) || :
 	[[ -d $(THIRD_PARTY_DIST) ]] && rm -r $(THIRD_PARTY_DIST) || :
