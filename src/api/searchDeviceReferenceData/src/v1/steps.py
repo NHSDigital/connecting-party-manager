@@ -1,9 +1,13 @@
 from http import HTTPStatus
-from typing import List
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
+from domain.repository.device_reference_data_repository.v1 import (
+    DeviceReferenceDataRepository,
+)
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.request_models.v1 import CpmProductPathParams
+from domain.response.response_models import SearchResponse
 from event.step_chain import StepChain
 
 
@@ -21,26 +25,33 @@ def validate_product_team(data, cache) -> str:
 
 
 def validate_product(data, cache) -> str:
-    product_repo = ProductRepository(
-        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
-    )
-    path_params = data[parse_incoming_path_parameters]
-    return product_repo.read(id=path_params["product_id"])
-
-
-def query_products(data, cache) -> tuple[HTTPStatus, List[dict]]:
-    product_team_id = data[parse_incoming_path_parameters]
     cpm_product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    results = cpm_product_repo.query_products_by_product_team(
-        product_team_id=product_team_id
+    path_params = data[parse_incoming_path_parameters]
+    return cpm_product_repo.read(id=path_params["product_id"])
+
+
+def query_device_ref_data(data, cache) -> list:
+    product_team = data[validate_product_team]
+    product = data[validate_product]
+    drd_repo = DeviceReferenceDataRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return HTTPStatus.OK, [result.state() for result in results]
+    results = drd_repo.search(product_team_id=product_team.id, product_id=product.id)
+    return results
+
+
+def return_device_ref_data(data, cache) -> tuple[HTTPStatus, str]:
+    device_ref_data = data[query_device_ref_data]
+    response = SearchResponse(results=device_ref_data)
+    return HTTPStatus.OK, response.state()
 
 
 steps = [
     parse_incoming_path_parameters,
     validate_product_team,
-    query_products,
+    validate_product,
+    query_device_ref_data,
+    return_device_ref_data,
 ]

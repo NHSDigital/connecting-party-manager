@@ -1,5 +1,5 @@
 Feature: Search Device Reference Data - success scenarios
-  These scenarios demonstrate successful Product Search
+  These scenarios demonstrate successful Device Reference Data Search
 
   Background:
     Given "default" request headers:
@@ -9,18 +9,22 @@ Feature: Search Device Reference Data - success scenarios
 
   Scenario: Successfully search Device Reference Data with no results
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | F5H1R                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
-    Given I note the response field "$.id" as "product_team_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
-    Then I receive a status code "200" with an empty body
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData"
+    Then I receive a status code "200" with body
+      | path    | value |
+      | results | []    |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 2                |
+      | Content-Length | 15               |
 
   Scenario: Successfully search one Device Reference Data
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -31,24 +35,28 @@ Feature: Search Device Reference Data - success scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value               |
-      | product_name | My Great CpmProduct |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
+      | path | value               |
+      | name | My Great CpmProduct |
+    And I note the response field "$.id" as "product_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
+      | path | value                    |
+      | name | My Device Reference Data |
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData"
     Then I receive a status code "200" with body
-      | path              | value                      |
-      | 0.id              | << ignore >>               |
-      | 0.product_team_id | ${ note(product_team_id) } |
-      | 0.name            | My Great CpmProduct        |
-      | 0.ods_code        | F5H1R                      |
-      | 0.status          | active                     |
-      | 0.keys            | []                         |
-      | 0.created_on      | << ignore >>               |
-      | 0.updated_on      | << ignore >>               |
-      | 0.deleted_on      | << ignore >>               |
+      | path                              | value                      |
+      | results.0.id                      | << ignore >>               |
+      | results.0.product_id              | ${ note(product_id) }      |
+      | results.0.product_team_id         | ${ note(product_team_id) } |
+      | results.0.name                    | My Device Reference Data   |
+      | results.0.ods_code                | F5H1R                      |
+      | results.0.created_on              | << ignore >>               |
+      | results.0.updated_on              | << ignore >>               |
+      | results.0.deleted_on              | << ignore >>               |
+      | results.0.questionnaire_responses | {}                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 260              |
+      | Content-Length | 273              |
 
   Scenario: Successfully search more than one Device Reference Data
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -59,45 +67,49 @@ Feature: Search Device Reference Data - success scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value              |
-      | product_name | My Great Product 1 |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value              |
-      | product_name | My Great Product 2 |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path         | value              |
-      | product_name | My Great Product 3 |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
-    Then I receive a status code "200" with a "product" search body response that contains
-      | path              | value                      |
-      | 0.id              | << ignore >>               |
-      | 0.product_team_id | ${ note(product_team_id) } |
-      | 0.name            | My Great Product 1         |
-      | 0.ods_code        | F5H1R                      |
-      | 0.status          | active                     |
-      | 0.keys            | []                         |
-      | 0.created_on      | << ignore >>               |
-      | 0.updated_on      | << ignore >>               |
-      | 0.deleted_on      | << ignore >>               |
-      | 1.id              | << ignore >>               |
-      | 1.product_team_id | ${ note(product_team_id) } |
-      | 1.name            | My Great Product 2         |
-      | 1.ods_code        | F5H1R                      |
-      | 1.status          | active                     |
-      | 1.keys            | []                         |
-      | 1.created_on      | << ignore >>               |
-      | 1.updated_on      | << ignore >>               |
-      | 1.deleted_on      | << ignore >>               |
-      | 2.id              | << ignore >>               |
-      | 2.product_team_id | ${ note(product_team_id) } |
-      | 2.name            | My Great Product 3         |
-      | 2.ods_code        | F5H1R                      |
-      | 2.status          | active                     |
-      | 2.keys            | []                         |
-      | 2.created_on      | << ignore >>               |
-      | 2.updated_on      | << ignore >>               |
-      | 2.deleted_on      | << ignore >>               |
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
+      | path | value                      |
+      | name | My Device Reference Data 1 |
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
+      | path | value                      |
+      | name | My Device Reference Data 2 |
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData" with body:
+      | path | value                      |
+      | name | My Device Reference Data 3 |
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData"
+    Then I receive a status code "200" with body where "results" has a length of "3"
+      | path                              | value                      |
+      | results.0.id                      | << ignore >>               |
+      | results.0.product_id              | ${ note(product_id) }      |
+      | results.0.product_team_id         | ${ note(product_team_id) } |
+      | results.0.name                    | My Device Reference Data 1 |
+      | results.0.ods_code                | F5H1R                      |
+      | results.0.created_on              | << ignore >>               |
+      | results.0.updated_on              | << ignore >>               |
+      | results.0.deleted_on              | << ignore >>               |
+      | results.0.questionnaire_responses | {}                         |
+      | results.1.id                      | << ignore >>               |
+      | results.1.product_id              | ${ note(product_id) }      |
+      | results.1.product_team_id         | ${ note(product_team_id) } |
+      | results.1.name                    | My Device Reference Data 1 |
+      | results.1.ods_code                | F5H1R                      |
+      | results.1.created_on              | << ignore >>               |
+      | results.1.updated_on              | << ignore >>               |
+      | results.1.deleted_on              | << ignore >>               |
+      | results.1.questionnaire_responses | {}                         |
+      | results.2.id                      | << ignore >>               |
+      | results.2.product_id              | ${ note(product_id) }      |
+      | results.2.product_team_id         | ${ note(product_team_id) } |
+      | results.2.name                    | My Device Reference Data 1 |
+      | results.2.ods_code                | F5H1R                      |
+      | results.2.created_on              | << ignore >>               |
+      | results.2.updated_on              | << ignore >>               |
+      | results.2.deleted_on              | << ignore >>               |
+      | results.2.questionnaire_responses | {}                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 777              |
+      | Content-Length | 790              |
