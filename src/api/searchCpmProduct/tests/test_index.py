@@ -76,7 +76,6 @@ def test_no_results(version):
                 "pathParameters": params,
             }
         )
-    result_body = json_loads(result["body"])
     expected_result = json.dumps({"results": []})
     expected = {
         "statusCode": 200,
@@ -91,18 +90,16 @@ def test_no_results(version):
     _response_assertions(
         result=result, expected=expected, check_body=True, check_content_length=True
     )
-    # assert result["statusCode"] == 200
-    # assert len(result_body) == 0
 
 
 @pytest.mark.integration
 @pytest.mark.parametrize(
     "version,product",
     [
-        ("1", {"product_name": "product-name-a"}),
-        ("1", {"product_name": "product-name-b"}),
-        ("1", {"product_name": "product-name-c"}),
-        ("1", {"product_name": "product-name-d"}),
+        ("1", {"name": "product-name-a"}),
+        ("1", {"name": "product-name-b"}),
+        ("1", {"name": "product-name-c"}),
+        ("1", {"name": "product-name-d"}),
     ],
 )
 def test_index(version, product):
