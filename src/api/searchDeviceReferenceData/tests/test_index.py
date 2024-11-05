@@ -6,7 +6,8 @@ import pytest
 from domain.core.cpm_system_id import ProductId
 from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
+
+# from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.aws.client import dynamodb_client
 
 from test_helpers.response_assertions import _response_assertions
@@ -33,7 +34,7 @@ def _create_product(product, product_team):
     generated_product_id = ProductId.create()
     product_id = generated_product_id.id
     cpmproduct = product_team.create_cpm_product(
-        product_id=product_id, name=product["product_name"]
+        product_id=product_id, name=product["name"]
     )
 
     return cpmproduct
@@ -43,7 +44,7 @@ def _create_device_ref_data(device_ref_data, product, product_team):
     generated_product_id = ProductId.create()
     product_id = generated_product_id.id
     cpmproduct = product_team.create_cpm_product(
-        product_id=product_id, name=product["product_name"]
+        product_id=product_id, name=product["name"]
     )
 
     return cpmproduct
@@ -76,12 +77,12 @@ def test_no_results(version):
 
         drd_cache["DYNAMODB_CLIENT"] = client
 
-        pt_repo = ProductTeamRepository(
-            table_name=drd_cache["DYNAMODB_TABLE"],
-            dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
-        )
+        # pt_repo = ProductTeamRepository(
+        #     table_name=drd_cache["DYNAMODB_TABLE"],
+        #     dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
+        # )
 
-        pt_repo.write(entity=product_team)
+        # pt_repo.write(entity=product_team)
 
         p_repo = CpmProductRepository(
             table_name=drd_cache["DYNAMODB_TABLE"],
@@ -116,10 +117,10 @@ def test_no_results(version):
 # @pytest.mark.parametrize(
 #     "version,product",
 #     [
-#         ("1", {"product_name": "product-name-a"}),
-#         ("1", {"product_name": "product-name-b"}),
-#         ("1", {"product_name": "product-name-c"}),
-#         ("1", {"product_name": "product-name-d"}),
+#         ("1", {"name": "product-name-a"}),
+#         ("1", {"name": "product-name-b"}),
+#         ("1", {"name": "product-name-c"}),
+#         ("1", {"name": "product-name-d"}),
 #     ],
 # )
 # def test_index(version, product):
