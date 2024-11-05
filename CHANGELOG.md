@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-11-05
+- [PI-585] PR/release CI builds in dev
+
 ## 2024-10-31
 - [PI-555] Remov fhir from create device endpoint
 - [PI-556] Remov fhir from read device endpoint
