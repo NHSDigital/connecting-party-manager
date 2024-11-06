@@ -5,15 +5,9 @@ source ./scripts/infrastructure/terraform/terraform-constants.sh
 
 function _get_account_name() {
   local account=$1
-  local workspace=$2
 
-  # if account not specified then infer it
   if [[ -z "$account" ]]; then
-    if [[ "$workspace" = "ci-"* ]]; then
-      echo "ref" # ci builds go here
-    else
-      echo "dev" # personal builds co here
-    fi
+      echo "dev"
   else
     echo "$account"
   fi

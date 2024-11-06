@@ -19,7 +19,7 @@ function _terraform() {
     local terraform_role_name="NHSDeploymentRole"
     lowercase_string=$(echo "$TERRAFORM_WORKSPACE" | tr '[:upper:]' '[:lower:]')
 
-    account=$(_get_account_name "$AWS_ACCOUNT" "$lowercase_string") || return 1
+    account=$(_get_account_name "$AWS_ACCOUNT") || return 1
     workspace=$(_get_workspace_name "$account" "$lowercase_string") || return 1
     aws_account_id=$(_get_aws_account_id "$account" "$PROFILE_PREFIX" "$VERSION") || return 1
 
