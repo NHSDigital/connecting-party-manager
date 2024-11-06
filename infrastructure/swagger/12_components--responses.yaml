@@ -139,6 +139,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeviceReferenceDataResponse"
+    DeviceRefDataSearch:
+      description: Search Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceRefDataSearchResponse"
     DeviceCreate:
       description: Create Device operation successful
       content:
