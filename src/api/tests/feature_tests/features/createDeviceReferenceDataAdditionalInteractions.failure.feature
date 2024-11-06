@@ -130,10 +130,10 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     Then I receive a status code "400" with body
-      | path             | value                                                                          |
-      | errors.0.code    | VALIDATION_ERROR                                                               |
-      | errors.0.message | Cannot create Additional Interactions in Product without exactly one Party Key |
+      | path             | value                                                                                              |
+      | errors.0.code    | VALIDATION_ERROR                                                                                   |
+      | errors.0.message | Not an EPR Product: Cannot create Additional Interactions in Product without exactly one Party Key |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 135              |
+      | Content-Length | 155              |
