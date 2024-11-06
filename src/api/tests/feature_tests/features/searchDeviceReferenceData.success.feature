@@ -56,7 +56,7 @@ Feature: Search Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 273              |
+      | Content-Length | 331              |
 
   Scenario: Successfully search more than one Device Reference Data
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -83,27 +83,27 @@ Feature: Search Device Reference Data - success scenarios
     Then I receive a status code "200" with body where "results" has a length of "3"
       | path                              | value                      |
       | results.0.id                      | << ignore >>               |
+      | results.0.name                    | My Device Reference Data 1 |
       | results.0.product_id              | ${ note(product_id) }      |
       | results.0.product_team_id         | ${ note(product_team_id) } |
-      | results.0.name                    | My Device Reference Data 1 |
       | results.0.ods_code                | F5H1R                      |
       | results.0.created_on              | << ignore >>               |
       | results.0.updated_on              | << ignore >>               |
       | results.0.deleted_on              | << ignore >>               |
       | results.0.questionnaire_responses | {}                         |
       | results.1.id                      | << ignore >>               |
+      | results.1.name                    | My Device Reference Data 2 |
       | results.1.product_id              | ${ note(product_id) }      |
       | results.1.product_team_id         | ${ note(product_team_id) } |
-      | results.1.name                    | My Device Reference Data 1 |
       | results.1.ods_code                | F5H1R                      |
       | results.1.created_on              | << ignore >>               |
       | results.1.updated_on              | << ignore >>               |
       | results.1.deleted_on              | << ignore >>               |
       | results.1.questionnaire_responses | {}                         |
       | results.2.id                      | << ignore >>               |
+      | results.2.name                    | My Device Reference Data 3 |
       | results.2.product_id              | ${ note(product_id) }      |
       | results.2.product_team_id         | ${ note(product_team_id) } |
-      | results.2.name                    | My Device Reference Data 1 |
       | results.2.ods_code                | F5H1R                      |
       | results.2.created_on              | << ignore >>               |
       | results.2.updated_on              | << ignore >>               |
@@ -112,4 +112,4 @@ Feature: Search Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 790              |
+      | Content-Length | 973              |

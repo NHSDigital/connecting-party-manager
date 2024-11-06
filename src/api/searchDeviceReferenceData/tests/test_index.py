@@ -6,18 +6,17 @@ import pytest
 from domain.core.cpm_system_id import ProductId
 from domain.core.root.v3 import Root
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-
-# from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.repository.device_reference_data_repository import (
+    DeviceReferenceDataRepository,
+)
+from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.aws.client import dynamodb_client
+from event.json import json_loads
 
 from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
-
-# from event.json import json_loads
-
-
-# from test_helpers.validate_search_response import validate_product_result_body
+from test_helpers.validate_search_response import validate_product_result_body
 
 TABLE_NAME = "hiya"
 
@@ -32,22 +31,17 @@ def _create_org():
 
 def _create_product(product, product_team):
     generated_product_id = ProductId.create()
-    product_id = generated_product_id.id
     cpmproduct = product_team.create_cpm_product(
-        product_id=product_id, name=product["name"]
+        product_id=generated_product_id.id, name=product["name"]
     )
 
     return cpmproduct
 
 
-def _create_device_ref_data(device_ref_data, product, product_team):
-    generated_product_id = ProductId.create()
-    product_id = generated_product_id.id
-    cpmproduct = product_team.create_cpm_product(
-        product_id=product_id, name=product["name"]
-    )
+def _create_device_ref_data(device_ref_data, product):
+    drd = product.create_device_reference_data(name=device_ref_data["name"])
 
-    return cpmproduct
+    return drd
 
 
 @pytest.mark.parametrize(
@@ -59,8 +53,6 @@ def _create_device_ref_data(device_ref_data, product, product_team):
 @pytest.mark.integration
 def test_no_results(version):
     product_team = _create_org()
-    product = _create_product(product={"name": "product-a"}, product_team=product_team)
-    params = {"product_team_id": product_team.id, "product_id": product.id}
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
 
@@ -77,12 +69,15 @@ def test_no_results(version):
 
         drd_cache["DYNAMODB_CLIENT"] = client
 
-        # pt_repo = ProductTeamRepository(
-        #     table_name=drd_cache["DYNAMODB_TABLE"],
-        #     dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
-        # )
+        pt_repo = ProductTeamRepository(
+            table_name=drd_cache["DYNAMODB_TABLE"],
+            dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
+        )
 
-        # pt_repo.write(entity=product_team)
+        pt_repo.write(entity=product_team)
+        product = _create_product(
+            product={"name": "product-a"}, product_team=product_team
+        )
 
         p_repo = CpmProductRepository(
             table_name=drd_cache["DYNAMODB_TABLE"],
@@ -90,7 +85,8 @@ def test_no_results(version):
         )
 
         p_repo.write(entity=product)
-
+        product_state = product.state()
+        params = {"product_team_id": product_team.id, "product_id": product_state["id"]}
         result = drd_handler(
             event={
                 "headers": {"version": 1},
@@ -113,188 +109,256 @@ def test_no_results(version):
     )
 
 
-# @pytest.mark.integration
-# @pytest.mark.parametrize(
-#     "version,product",
-#     [
-#         ("1", {"name": "product-name-a"}),
-#         ("1", {"name": "product-name-b"}),
-#         ("1", {"name": "product-name-c"}),
-#         ("1", {"name": "product-name-d"}),
-#     ],
-# )
-# def test_index(version, product):
-#     table_name = read_terraform_output("dynamodb_table_name.value")
-#     client = dynamodb_client()
-#     product_team = _create_org()
-#     pt_repo = ProductTeamRepository(
-#         table_name=table_name,
-#         dynamodb_client=client,
-#     )
-#     pt_repo.write(entity=product_team)
-#     cpmproduct = _create_product(product=product, product_team=product_team)
-#     params = {"product_team_id": product_team.id}
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "version,device_ref_data",
+    [
+        ("1", {"name": "device-ref-data-name-a"}),
+        ("1", {"name": "device-ref-data-name-b"}),
+        ("1", {"name": "device-ref-data-name-c"}),
+        ("1", {"name": "device-ref-data-name-d"}),
+    ],
+)
+def test_index(version, device_ref_data):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+    product_team = _create_org()
+    pt_repo = ProductTeamRepository(
+        table_name=table_name,
+        dynamodb_client=client,
+    )
+    pt_repo.write(entity=product_team)
+    cpmproduct = _create_product(
+        product={"name": "product-a"}, product_team=product_team
+    )
+    p_repo = CpmProductRepository(table_name=table_name, dynamodb_client=client)
+    p_repo.write(entity=cpmproduct)
+    product_state = cpmproduct.state()
+    drd = _create_device_ref_data(device_ref_data=device_ref_data, product=cpmproduct)
 
-#     with mock.patch.dict(
-#         os.environ,
-#         {
-#             "DYNAMODB_TABLE": table_name,
-#             "AWS_DEFAULT_REGION": "eu-west-2",
-#         },
-#         clear=True,
-#     ):
-#         from api.searchCpmProduct.index import cache as product_cache
-#         from api.searchCpmProduct.index import handler as product_handler
+    params = {"product_team_id": product_team.id, "product_id": product_state["id"]}
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchDeviceReferenceData.index import cache as drd_cache
+        from api.searchDeviceReferenceData.index import handler as drd_handler
 
-#         product_cache["DYNAMODB_CLIENT"] = client
-#         product_repo = CpmProductRepository(
-#             table_name=product_cache["DYNAMODB_TABLE"],
-#             dynamodb_client=product_cache["DYNAMODB_CLIENT"],
-#         )
+        drd_cache["DYNAMODB_CLIENT"] = client
+        drd_repo = DeviceReferenceDataRepository(
+            table_name=drd_cache["DYNAMODB_TABLE"],
+            dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
+        )
 
-#         product_repo.write(entity=cpmproduct)
+        drd_repo.write(entity=drd)
 
-#         result = product_handler(
-#             event={
-#                 "headers": {"version": version},
-#                 "pathParameters": params,
-#             }
-#         )
+        result = drd_handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": params,
+            }
+        )
 
-#     expected_result = json.dumps({"results": [cpmproduct.state()]})
+    expected_result = json.dumps({"results": [drd.state()]})
 
-#     expected = {
-#         "statusCode": 200,
-#         "body": expected_result,
-#         "headers": {
-#             "Content-Length": str(len(expected_result)),
-#             "Content-Type": "application/json",
-#             "Version": version,
-#             "Location": None,
-#         },
-#     }
-#     _response_assertions(
-#         result=result, expected=expected, check_body=True, check_content_length=True
-#     )
-
-
-# @pytest.mark.integration
-# @pytest.mark.parametrize(
-#     "version",
-#     [
-#         "1",
-#     ],
-# )
-# def test_index_no_such_product_team(version):
-#     params = {"product_team_id": "123456"}
-#     table_name = read_terraform_output("dynamodb_table_name.value")
-#     client = dynamodb_client()
-
-#     with mock.patch.dict(
-#         os.environ,
-#         {
-#             "DYNAMODB_TABLE": table_name,
-#             "AWS_DEFAULT_REGION": "eu-west-2",
-#         },
-#         clear=True,
-#     ):
-#         from api.searchCpmProduct.index import cache as product_cache
-#         from api.searchCpmProduct.index import handler as product_handler
-
-#         product_cache["DYNAMODB_CLIENT"] = client
-
-#         CpmProductRepository(
-#             table_name=product_cache["DYNAMODB_TABLE"],
-#             dynamodb_client=product_cache["DYNAMODB_CLIENT"],
-#         )
-
-#         result = product_handler(
-#             event={
-#                 "headers": {"version": version},
-#                 "pathParameters": params,
-#             }
-#         )
-
-#     result_body = json_loads(result["body"])
-
-#     assert result["statusCode"] == 404
-#     assert result_body == {
-#         "errors": [
-#             {
-#                 "code": "RESOURCE_NOT_FOUND",
-#                 "message": "Could not find ProductTeam for key ('123456')",
-#             }
-#         ]
-#     }
+    expected = {
+        "statusCode": 200,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+            "Location": None,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
-# @pytest.mark.integration
-# @pytest.mark.parametrize(
-#     "products",
-#     [
-#         [
-#             {"name": "product-name-a"},
-#             {"name": "product-name-b"},
-#             {"name": "product-name-c"},
-#             {"name": "product-name-d"},
-#         ],
-#     ],
-# )
-# def test_index_multiple_returned(products):
-#     version = 1
-#     table_name = read_terraform_output("dynamodb_table_name.value")
-#     client = dynamodb_client()
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_no_such_product_team(version):
+    params = {"product_team_id": "123456", "product_id": "P.123-321"}
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
 
-#     product_team = _create_org()
-#     pt_repo = ProductTeamRepository(
-#         table_name=table_name,
-#         dynamodb_client=client,
-#     )
-#     pt_repo.write(entity=product_team)
-#     params = {"product_team_id": product_team.id}
-#     cpm_products = []
-#     for product in products:
-#         cpmproduct = _create_product(product=product, product_team=product_team)
-#         with mock.patch.dict(
-#             os.environ,
-#             {
-#                 "DYNAMODB_TABLE": table_name,
-#                 "AWS_DEFAULT_REGION": "eu-west-2",
-#             },
-#             clear=True,
-#         ):
-#             from api.searchCpmProduct.index import cache as product_cache
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchDeviceReferenceData.index import cache as drd_cache
+        from api.searchDeviceReferenceData.index import handler as drd_handler
 
-#             product_cache["DYNAMODB_CLIENT"] = client
-#             product_repo = CpmProductRepository(
-#                 table_name=product_cache["DYNAMODB_TABLE"],
-#                 dynamodb_client=product_cache["DYNAMODB_CLIENT"],
-#             )
+        drd_cache["DYNAMODB_CLIENT"] = client
 
-#             product_repo.write(entity=cpmproduct)
-#         cpm_products.append(cpmproduct)
+        DeviceReferenceDataRepository(
+            table_name=drd_cache["DYNAMODB_TABLE"],
+            dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
+        )
 
-#     with mock.patch.dict(
-#         os.environ,
-#         {
-#             "DYNAMODB_TABLE": table_name,
-#             "AWS_DEFAULT_REGION": "eu-west-2",
-#         },
-#         clear=True,
-#     ):
-#         from api.searchCpmProduct.index import handler as product_handler
+        result = drd_handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": params,
+            }
+        )
 
-#         result = product_handler(
-#             event={
-#                 "headers": {"version": version},
-#                 "pathParameters": params,
-#             }
-#         )
+    result_body = json_loads(result["body"])
 
-#     assert result["statusCode"] == 200
-#     result_body = json_loads(result["body"])
-#     assert "results" in result_body
-#     assert isinstance(result_body["results"], list)
-#     validate_product_result_body(
-#         result_body["results"], [cpm_product.state() for cpm_product in cpm_products]
-#     )
+    assert result["statusCode"] == 404
+    assert result_body == {
+        "errors": [
+            {
+                "code": "RESOURCE_NOT_FOUND",
+                "message": "Could not find ProductTeam for key ('123456')",
+            }
+        ]
+    }
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_no_such_product(version):
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    product_team = _create_org()
+    pt_repo = ProductTeamRepository(
+        table_name=table_name,
+        dynamodb_client=client,
+    )
+    pt_repo.write(entity=product_team)
+
+    params = {"product_team_id": product_team.id, "product_id": "P.123-321"}
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchDeviceReferenceData.index import cache as drd_cache
+        from api.searchDeviceReferenceData.index import handler as drd_handler
+
+        drd_cache["DYNAMODB_CLIENT"] = client
+
+        DeviceReferenceDataRepository(
+            table_name=drd_cache["DYNAMODB_TABLE"],
+            dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
+        )
+
+        result = drd_handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": params,
+            }
+        )
+
+    result_body = json_loads(result["body"])
+
+    assert result["statusCode"] == 404
+    assert result_body == {
+        "errors": [
+            {
+                "code": "RESOURCE_NOT_FOUND",
+                "message": f"Could not find CpmProduct for key ('{product_team.id}', 'P.123-321')",
+            }
+        ]
+    }
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "device_ref_data",
+    [
+        [
+            {"name": "device-ref-data-name-a"},
+            {"name": "device-ref-data-name-b"},
+            {"name": "device-ref-data-name-c"},
+            {"name": "device-ref-data-name-d"},
+        ],
+    ],
+)
+def test_index_multiple_returned(device_ref_data):
+    version = 1
+    table_name = read_terraform_output("dynamodb_table_name.value")
+    client = dynamodb_client()
+
+    product_team = _create_org()
+    pt_repo = ProductTeamRepository(
+        table_name=table_name,
+        dynamodb_client=client,
+    )
+    pt_repo.write(entity=product_team)
+    cpmproduct = _create_product(
+        product={"name": "product-a"}, product_team=product_team
+    )
+    p_repo = CpmProductRepository(table_name=table_name, dynamodb_client=client)
+    p_repo.write(entity=cpmproduct)
+    product_state = cpmproduct.state()
+    params = {"product_team_id": product_team.id, "product_id": product_state["id"]}
+    drds = []
+    for dev_ref_dat in device_ref_data:
+        drd = _create_device_ref_data(device_ref_data=dev_ref_dat, product=cpmproduct)
+        with mock.patch.dict(
+            os.environ,
+            {
+                "DYNAMODB_TABLE": table_name,
+                "AWS_DEFAULT_REGION": "eu-west-2",
+            },
+            clear=True,
+        ):
+            from api.searchDeviceReferenceData.index import cache as drd_cache
+
+            drd_cache["DYNAMODB_CLIENT"] = client
+            drd_repo = DeviceReferenceDataRepository(
+                table_name=drd_cache["DYNAMODB_TABLE"],
+                dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
+            )
+
+            drd_repo.write(entity=drd)
+        drds.append(drd)
+
+    with mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": table_name,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.searchDeviceReferenceData.index import handler as drd_handler
+
+        result = drd_handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": params,
+            }
+        )
+
+    assert result["statusCode"] == 200
+    result_body = json_loads(result["body"])
+    assert "results" in result_body
+    assert isinstance(result_body["results"], list)
+    validate_product_result_body(result_body["results"], [d.state() for d in drds])

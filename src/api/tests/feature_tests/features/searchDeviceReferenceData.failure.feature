@@ -13,8 +13,6 @@ Feature: Search Device Reference Data - failures scenarios
       | path             | value                                                                             |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                |
       | errors.0.message | Could not find ProductTeam for key ('F5H1R.f9518c12-6c83-4544-97db-d9dd1d64da97') |
-      | errors.1.code    | RESOURCE_NOT_FOUND                                                                |
-      | errors.1.message | Could not find Product for key ('P.XXX.YYY')                                      |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
@@ -30,10 +28,10 @@ Feature: Search Device Reference Data - failures scenarios
     Given I note the response field "$.id" as "product_team_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/P.XXX.YYY"
     Then I receive a status code "404" with body
-      | path             | value                                        |
-      | errors.1.code    | RESOURCE_NOT_FOUND                           |
-      | errors.1.message | Could not find Product for key ('P.XXX.YYY') |
+      | path             | value                                                                         |
+      | errors.0.code    | RESOURCE_NOT_FOUND                                                            |
+      | errors.0.message | Could not find CpmProduct for key ('${ note(product_team_id) }', 'P.XXX.YYY') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 140              |
+      | Content-Length | 152              |
