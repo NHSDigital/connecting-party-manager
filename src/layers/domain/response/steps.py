@@ -6,8 +6,8 @@ from .render_response import render_response as _render_response
 
 
 def render_response(data, cache) -> dict:
-    result, version, location = data[StepChain.INIT]
-    response = _render_response(response=result, version=version, location=location)
+    result, version = data[StepChain.INIT]
+    response = _render_response(response=result, version=version)
     return response.dict()
 
 
