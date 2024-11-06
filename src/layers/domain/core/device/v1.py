@@ -20,6 +20,8 @@ from pydantic import Field, root_validator
 
 UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
+MHS_DEVICE_NAME = "Product-MHS"
+AS_DEVICE_NAME = "Product-AS"
 
 
 class QuestionnaireNotFoundError(Exception):

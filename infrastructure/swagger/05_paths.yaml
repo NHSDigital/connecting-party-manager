@@ -385,6 +385,32 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
+  /ProductTeam/{product_team_id}/Product/{product_id}/Device/AccreditedSystem:
+    post:
+      operationId: createDeviceAccreditedSystem
+      summary: Create a Accredited System Device resource (POST)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/AccreditedSystemDeviceCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/AsDeviceCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceAccreditedSystem}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
   /searchSdsDevice:
     get:
       operationId: searchsdsdevice
