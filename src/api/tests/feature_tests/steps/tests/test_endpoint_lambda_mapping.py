@@ -235,6 +235,23 @@ def test_parse_path_create_mhs_device():
     )
 
 
+def test_parse_path_create_as_device():
+    with api_lambda_environment_variables():
+        import api.createDeviceAccreditedSystem.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="POST",
+        path="ProductTeam/123/Product/456/Device/AccreditedSystem",  # pragma: allowlist secret
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == (
+        {"product_team_id": "123", "product_id": "456"},
+        {},
+        api.createDeviceAccreditedSystem.index,
+    )
+
+
 def test_parse_path_error():
     with pytest.raises(EndpointConfigurationError):
         parse_api_path(method="GET", path="ProductTeam/123", endpoint_lambda_mapping={})

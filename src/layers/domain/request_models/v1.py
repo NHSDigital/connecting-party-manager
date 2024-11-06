@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import Literal
 
+from domain.core.device import AS_DEVICE_NAME, MHS_DEVICE_NAME
 from domain.core.product_team_key import ProductTeamKey
 from domain.repository.questionnaire_repository import QuestionnaireInstance
 from pydantic import BaseModel, Extra, Field
@@ -72,9 +73,20 @@ class SpineMhsQuestionnaireRsponse(BaseModel):
     __root__: list[dict] = Field(min_items=1, max_items=1)
 
 
+class SpineAsQuestionnaireResponse(BaseModel):
+    __root__: list[dict] = Field(min_items=1, max_items=1)
+
+
 class CreateMhsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
     questionnaire_responses: dict[
         Literal[QuestionnaireInstance.SPINE_MHS], SpineMhsQuestionnaireRsponse
+    ] = Field(...)
+
+
+class CreateAsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
+    name: str = AS_DEVICE_NAME
+    questionnaire_responses: dict[
+        Literal[QuestionnaireInstance.SPINE_AS], SpineAsQuestionnaireResponse
     ] = Field(...)
 
 
