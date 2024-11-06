@@ -22,15 +22,19 @@
 
 We use `asdf` to fetch the required versions of prerequisite libraries instead of your system's default version. To get it up and running go to https://asdf-vm.com/guide/getting-started.html. You can check it installed properly by using the command `asdf --version`.
 
-If you are using `pyenv` (you can check by typing `pyenv` and seeing whether it returns a nice list of commands) then you should run:
-
-```
-pyenv install $(cat .python-version)
-```
+However, you will also need to install the `docker engine` separately
 
 Additionally you will need `wget` (doing `which wget` will return blank if not installed). Please Google "how to install wget on my operating system", if you don't already have this installed.
 
+Update any dependencies on your system as required.
+
 Otherwise `asdf` should do the work for you.
+
+### Useful tools
+
+`VScode` is useful and we have a workspace file setup to allow easy integration
+
+`Postman` &/or `Newman` Feature tests create a postman.collection which can be used for manual testing.
 
 ### Project build
 
