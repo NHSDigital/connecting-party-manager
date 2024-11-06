@@ -5,6 +5,8 @@ from behave import given as _given
 from behave import then as _then
 from behave import when as _when
 
+from api.tests.feature_tests.steps.context import Context
+from api.tests.feature_tests.steps.postman import notes_as_postman_vars
 from api.tests.feature_tests.steps.table import expand_macro
 
 
@@ -13,9 +15,11 @@ def _behave_decorator(description: str, behave_decorator: FunctionType) -> Funct
 
     def deco(fn):
         @wraps(fn)
-        def wrapper(context, **kwargs):
-            if "endpoint" in kwargs:
-                kwargs["endpoint"] = expand_macro(kwargs["endpoint"], context=context)
+        def wrapper(context: Context, **kwargs):
+            endpoint = kwargs.get("endpoint")
+            if endpoint:
+                context.postman_endpoint = notes_as_postman_vars(endpoint)
+                kwargs["endpoint"] = expand_macro(endpoint, context=context)
             return fn(context, **kwargs)
 
         return _deco(wrapper)

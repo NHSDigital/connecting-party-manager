@@ -218,6 +218,7 @@ jobs:
         test--unit,
         test--feature--local,
         terraform-head-build,
+        apigee--attach-product,
       ]
     runs-on: [self-hosted, ci]
     strategy:
@@ -276,7 +277,13 @@ jobs:
           requires-aws: true
 
   apigee--detach-product:
-    needs: [build-head, test--smoke, apigee--attach-product]
+    needs:
+      [
+        build-head,
+        test--smoke,
+        apigee--attach-product,
+        test--feature--integration,
+      ]
     runs-on: [self-hosted, ci]
     if: ${{ needs.apigee--attach-product.result == 'success' }}
     steps:

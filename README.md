@@ -10,9 +10,12 @@
    3. [AWS SSO Setup](#aws-sso-setup)
    4. [Other helpful commands](#other-helpful-commands)
 2. [Tests](#tests)
-3. [Workflow](#workflow)
-4. [Swagger](#swagger)
-5. [ETL](#etl)
+3. [pytest tests](#pytest-tests)
+4. [End-to-End feature tests](#end-to-end-feature-tests)
+5. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
+6. [Workflow](#workflow)
+7. [Swagger](#swagger)
+8. [ETL](#etl)
 
 ---
 
@@ -223,6 +226,52 @@ The VSCode settings for "Run and Debug" are also set up to run these tests if yo
 
 `make test--sds--matrix` is used for testing responses match in SDS FHIR between CPM and LDAP. You must provide `SDS_PROD_APIKEY` and `SDS_DEV_APIKEY`. There are 3 optional variables `USE_CPM_PROD`, defaults to `FALSE`, `COMPARISON_ENV`, defaults to `local` and `TEST_COUNT`, defaults to `10` and is the number of requests to make.
 Add `PYTEST_FLAGS='-sv'`.
+
+### End-to-End feature tests
+
+The Feature tests use `behave` (rather than `pytest`) to execute cucumber/gherkin-style end-to-end tests of specific features, in principle
+giving full end-to-end test coverage for API operations.
+
+Executing feature tests locally will give you a good idea whether you have implemented a well-behaved feature whilst in development (i.e. no need to redeploy whilst developing).
+
+Executing feature tests in integration mode will then give you confidence that the feature is ready to deploy in production, but has a much slower development cycle as it will need a full redeploy after codebase or infrastructure changes are implemented.
+
+#### Local
+
+To execute the feature tests entirely locally (executing lambdas directly, and otherwise mocking databases and responses to a high standard) you can do:
+
+```shell
+make test--feature-local
+```
+
+If you would like to pass `behave` flags, e.g. to \[stop after the first failure\]:
+
+```shell
+make test--feature-local BEHAVE_FLAGS="--stop"
+```
+
+#### Integration
+
+To execute the feature tests across the entire stack (including Apigee and AWS) you can do
+
+```shell
+make test--feature-integration
+```
+
+### Generate the Feature Test Postman collection
+
+Our [end-to-end feature tests](#end-to-end-feature-tests) also generate working Postman collections. To generate the Postman collection quickly, without Apigee credentials, you can run the local feature tests. If you would like the Apigee
+credentials generating then you should run the integration feature tests. The generated files are:
+
+- `src/api/tests/feature_tests/postman-collection.json`
+- `src/api/tests/feature_tests/postman-environment.json`
+
+You can drag and drop `postman-collection.json` into the `Collections` tab on Postman,
+and `postman-environment.json` on to the `Environments` tab (remember to activate it). If you generated these
+with the local feature tests, then you will need to manually update the Apigee `baseUrl` and `apiKey` fields
+in the environment (but these are filled out already if generated with the integration feature tests).
+
+💡 **The feature tests are only guaranteed to work out-of-the-box with an empty database**
 
 ## Workflow
 

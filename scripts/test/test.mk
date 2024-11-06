@@ -7,6 +7,7 @@ USE_CPM_PROD ?= FALSE
 TEST_COUNT =
 COMPARISON_ENV ?= local
 RUN_SPEEDTEST = ?= FALSE
+PROXYGEN_PRODUCT_TIMESTAMP = $(TIMESTAMP_DIR)/.proxygen-product.stamp
 
 _pytest:
 	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) poetry run python -m pytest $(PYTEST_FLAGS) $(_INTERNAL_FLAGS) $(_CACHE_CLEAR)
@@ -32,7 +33,7 @@ test--smoke: aws--login ## Run end-to-end smoke tests (pytest)
 test--%--rerun: ## Rerun failed integration or unit (pytest) tests
 	$(MAKE) test--$* _INTERNAL_FLAGS="--last-failed --last-failed-no-failures none" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
-test--feature--integration: aws--login ## Run integration feature (gherkin) tests
+test--feature--integration: aws--login $(PROXYGEN_PRODUCT_TIMESTAMP) ## Run integration feature (gherkin) tests
 	$(MAKE) _behave _INTERNAL_FLAGS="--define='test_mode=integration' $(_INTERNAL_FLAGS)" AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
 
 test--feature--local: _behave  ## Run local feature (gherkin) tests

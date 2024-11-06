@@ -4,7 +4,6 @@ PATH_TO_HERE="scripts/infrastructure/apigee"
 APIGEE_DEPLOYMENT_ROLE="NHSDeploymentRole"
 API_NAME="connecting-party-manager"
 PERSISTENT_ENVIRONMENT_BUILD="${2:-false}"
-echo "PERSISTENT_ENVIRONMENT_BUILD is: $PERSISTENT_ENVIRONMENT_BUILD"
 
 
 if [[ -z ${WORKSPACE_OUTPUT_JSON} ]]; then
