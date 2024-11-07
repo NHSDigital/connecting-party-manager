@@ -10,11 +10,6 @@ permissions:
   contents: read
   actions: write
 
-env:
-  BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
-  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
-  TF_CLI_ARGS: -no-color
-
 jobs:
   get-branch-from-workflow-file:
     runs-on: [self-hosted, ci]
