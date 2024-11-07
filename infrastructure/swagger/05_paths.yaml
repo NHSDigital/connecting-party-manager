@@ -206,7 +206,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_searchCpmProduct}
+        uri: ${method_searchDeviceReferenceData}
       security:
         - ${authoriser_name}: []
         - app-level0: []
