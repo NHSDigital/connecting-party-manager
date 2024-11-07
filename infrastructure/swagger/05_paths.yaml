@@ -313,6 +313,32 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/Device/MessageHandlingSystem
+  : post:
+      operationId: createDeviceMessageHandlingSystem
+      summary: Create a Message Handling System Device resource (POST)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/MessageHandlingSystemDeviceCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/MhsDeviceCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceMessageHandlingSystem}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
   /searchSdsDevice:
     get:
       operationId: searchsdsdevice

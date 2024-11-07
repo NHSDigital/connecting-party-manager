@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import pytest
@@ -12,14 +13,13 @@ from domain.core.device.v3 import (
     DeviceTagsClearedEvent,
     DeviceUpdatedEvent,
     DuplicateQuestionnaireResponse,
-    QuestionnaireNotFoundError,
-    QuestionnaireResponseNotFoundError,
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey, DeviceKeyType
 from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
-from domain.core.questionnaire.v2 import Questionnaire, QuestionnaireResponse
+from domain.core.questionnaire.tests.test_questionnaire_v3 import VALID_SCHEMA
+from domain.core.questionnaire.v3 import Questionnaire, QuestionnaireResponse
 
 
 @pytest.fixture
@@ -33,24 +33,24 @@ def device_v3():
 
 
 @pytest.fixture
-def questionnaire_response() -> QuestionnaireResponse:
-    questionnaire = Questionnaire(name="foo", version=2)
-    questionnaire.add_question(name="question1")
-    return questionnaire.respond(responses=[{"question1": ["hi"]}])
+def questionnaire() -> Questionnaire:
+    return Questionnaire(
+        name="my-questionnaire", version="1", json_schema=json.dumps(VALID_SCHEMA)
+    )
 
 
 @pytest.fixture
-def another_good_questionnaire_response() -> QuestionnaireResponse:
-    questionnaire = Questionnaire(name="foo", version=2)
-    questionnaire.add_question(name="question1")
-    return questionnaire.respond(responses=[{"question1": ["bye"]}])
+def questionnaire_response(questionnaire: Questionnaire) -> QuestionnaireResponse:
+    questionnaire_response = questionnaire.validate({"size": 4, "colour": "white"})
+    return questionnaire_response
 
 
 @pytest.fixture
-def another_questionnaire_response() -> QuestionnaireResponse:
-    questionnaire = Questionnaire(name="bar", version=2)
-    questionnaire.add_question(name="question1")
-    return questionnaire.respond(responses=[{"question1": ["bye"]}])
+def another_good_questionnaire_response(
+    questionnaire: Questionnaire,
+) -> QuestionnaireResponse:
+    questionnaire_response = questionnaire.validate({"size": 7, "colour": "black"})
+    return questionnaire_response
 
 
 def test_device_created_with_datetime(device_v3: Device):
@@ -117,10 +117,10 @@ def test_device_add_questionnaire_response(
     event = device_v3.add_questionnaire_response(
         questionnaire_response=questionnaire_response
     )
-    created_on_1 = questionnaire_response.created_on.isoformat()
     original_updated_on = device_v3.updated_on
+
     assert device_v3.questionnaire_responses == {
-        "foo/2": {created_on_1: questionnaire_response}
+        "my-questionnaire/1": [questionnaire_response]
     }
     assert isinstance(event, QuestionnaireResponseUpdatedEvent)
     assert event.updated_on is not None
@@ -129,12 +129,12 @@ def test_device_add_questionnaire_response(
     event_2 = device_v3.add_questionnaire_response(
         questionnaire_response=another_good_questionnaire_response
     )
-    created_on_2 = another_good_questionnaire_response.created_on.isoformat()
+
     assert device_v3.questionnaire_responses == {
-        "foo/2": {
-            created_on_1: questionnaire_response,
-            created_on_2: another_good_questionnaire_response,
-        }
+        "my-questionnaire/1": [
+            questionnaire_response,
+            another_good_questionnaire_response,
+        ]
     }
 
     assert device_v3.updated_on == event_2.updated_on
@@ -152,47 +152,6 @@ def test_device_cannot_add_same_questionnaire_response_twice(
     device_v3.add_questionnaire_response(questionnaire_response=questionnaire_response)
     with pytest.raises(DuplicateQuestionnaireResponse):
         device_v3.add_questionnaire_response(
-            questionnaire_response=questionnaire_response
-        )
-
-
-def test_device_update_questionnaire_response(
-    device_v3: Device,
-    questionnaire_response: QuestionnaireResponse,
-    another_good_questionnaire_response: QuestionnaireResponse,
-):
-    created_on = questionnaire_response.created_on
-    another_good_questionnaire_response.created_on = created_on
-
-    device_v3.add_questionnaire_response(questionnaire_response=questionnaire_response)
-    event = device_v3.update_questionnaire_response(
-        questionnaire_response=another_good_questionnaire_response
-    )
-    assert device_v3.questionnaire_responses == {
-        "foo/2": {created_on.isoformat(): another_good_questionnaire_response}
-    }
-    assert isinstance(event, QuestionnaireResponseUpdatedEvent)
-    assert event.updated_on is not None
-    assert event.updated_on == device_v3.updated_on
-
-
-def test_device_update_questionnaire_response_mismatching_created_on_error(
-    device_v3: Device,
-    questionnaire_response: QuestionnaireResponse,
-    another_good_questionnaire_response: QuestionnaireResponse,
-):
-    device_v3.add_questionnaire_response(questionnaire_response=questionnaire_response)
-    with pytest.raises(QuestionnaireResponseNotFoundError):
-        device_v3.update_questionnaire_response(
-            questionnaire_response=another_good_questionnaire_response
-        )
-
-
-def test_device_update_questionnaire_response_key_error(
-    device_v3: Device, questionnaire_response: QuestionnaireResponse
-):
-    with pytest.raises(QuestionnaireNotFoundError):
-        device_v3.update_questionnaire_response(
             questionnaire_response=questionnaire_response
         )
 

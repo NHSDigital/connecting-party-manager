@@ -14,7 +14,7 @@ components:
               message:
                 type: string
     StatusOK:
-      type: object
+      type: string
       properties:
         code:
           type: string
@@ -160,7 +160,30 @@ components:
                 type: string
         questionnaire_responses:
           type: object
-          properties:
+
+    MhsDeviceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        product_id:
+          type: string
+        product_team_id:
+          type: string
+        ods_code:
+          type: string
+        status:
+          type: string
+        created_on:
+          type: string
+        updated_on:
+          type: string
+        deleted_on:
+          type: string
+        questionnaire_responses:
+          type: object
 
     DeviceSearchResponse:
       type: array

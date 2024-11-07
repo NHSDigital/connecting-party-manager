@@ -151,6 +151,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeviceResponse"
+    MhsDeviceCreate:
+      description: Create Message Handling System Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MhsDeviceResponse"
     SdsDeviceSearch:
       description: Search Device operation successful
       content:
