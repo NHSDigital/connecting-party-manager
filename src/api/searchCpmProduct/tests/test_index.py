@@ -84,7 +84,6 @@ def test_no_results(version):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -149,7 +148,6 @@ def test_index(version, product):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
