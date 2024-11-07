@@ -14,6 +14,8 @@ def _request(base_url: str, headers: dict, path: str, method: str):
     if method == "POST":
         body = json.dumps({"foo": "bar"})
         return requests.post(url=url, headers=headers, data=body)
+    elif method == "DELETE":
+        return requests.delete(url=url, headers=headers)
 
     return requests.get(url=url, headers=headers)
 
