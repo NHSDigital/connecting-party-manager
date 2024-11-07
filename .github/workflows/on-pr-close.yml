@@ -1,4 +1,4 @@
-name: "On PR Close"
+name: "Workflow: PR Close"
 
 permissions:
   id-token: write
