@@ -37,12 +37,11 @@ function _destroy_redundant_workspaces() {
     workspaces=$(aws s3 ls "$bucket" --no-paginate | awk '{print $NF}' | sed 's:/$::')
 
     # get JIRA ID from branch name
+    ENVIRONMENT="dev"
     if [[ $BRANCH_NAME =~ feature\/(PI-[0-9]+)[-_] ]]; then
         workspace_id="${BASH_REMATCH[1]}"
-        ENVIRONMENT="ref"
     elif [[ $BRANCH_NAME == *release/* ]]; then
         workspace_id="${BRANCH_NAME##*release/}"
-        ENVIRONMENT="dev"
     fi
     echo "The workspace ID is: $workspace_id"
     echo "Destroying workspaces in: $ENVIRONMENT"
