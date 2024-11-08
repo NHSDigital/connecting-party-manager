@@ -7,6 +7,7 @@
 - [PI-558] Add search wrapper
 - [PI-591] Better postman
 - [PI-293] E2E tests with apigee
+- [PI-601] Destroy workspaces on PR close
 
 ## 2024-11-05
 - [PI-585] PR/release CI builds in dev
