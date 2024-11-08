@@ -2,14 +2,14 @@ from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
 from domain.api.common_steps.read_product import (
+    get_party_key,
     parse_path_params,
     read_product,
     read_product_team,
 )
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v3 import Device
-from domain.core.error import InvalidSpineMhsResponse, NotEprProductError
-from domain.core.product_key.v1 import ProductKeyType
+from domain.core.error import InvalidSpineMhsResponse
 from domain.core.questionnaire.v3 import Questionnaire, QuestionnaireResponse
 from domain.repository.device_repository.v3 import DeviceRepository
 from domain.repository.questionnaire_repository.v2 import QuestionnaireRepository
@@ -24,22 +24,6 @@ from domain.response.validation_errors import mark_validation_errors_as_inbound
 def parse_mhs_device_payload(data, cache) -> Device:
     payload: dict = data[parse_event_body]
     return CreateMhsDeviceIncomingParams(**payload)
-
-
-def get_party_key(data, cache) -> str:
-    product: CpmProduct = data[read_product]
-    party_keys = (
-        key.key_value
-        for key in product.keys
-        if key.key_type is ProductKeyType.PARTY_KEY
-    )
-    try:
-        (party_key,) = party_keys
-    except ValueError:
-        raise NotEprProductError(
-            "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
-        )
-    return party_key
 
 
 def read_spine_mhs_questionnaire(data, cache) -> Questionnaire:
