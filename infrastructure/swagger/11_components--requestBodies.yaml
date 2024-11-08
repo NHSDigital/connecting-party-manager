@@ -87,6 +87,26 @@ components:
                       description: Questionnaire Responses
             required:
               - questionnaire_responses
+    DeviceReferenceDataAdditionalInteractionsCreateRequestBody:
+      description: Request body to create a Device Reference Data Additional Interactions object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for Additional Interactions questionnaire
+                properties:
+                  spine_as_additional_interactions:
+                    type: array
+                    description: List of questionnaires associated with the additional interactions
+                    items:
+                      type: object
+                      description: Questionnaire Responses
+            required:
+              - questionnaire_responses
     DeviceCreateRequestBody:
       description: Request body to create a Device object
       required: true

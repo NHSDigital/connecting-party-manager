@@ -42,9 +42,9 @@ def test_spine_as_questionnaires_pass(nhs_accredited_system: NhsAccreditedSystem
     assert response.questionnaire_version == "1"
     assert response.data == as_data
 
-    # Answer the additional_interactions questionnaire once per Interaction Id
-    for interaction_id in as_interactions_data["Interaction Id"]:
-        _as_interaction_data = {"Interaction Id": interaction_id}
+    # Answer the additional_interactions questionnaire once per Interaction ID
+    for interaction_id in as_interactions_data["Interaction ID"]:
+        _as_interaction_data = {"Interaction ID": interaction_id}
         response = as_interactions_questionnaire.validate(_as_interaction_data)
         assert (
             response.questionnaire_name
