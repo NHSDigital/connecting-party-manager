@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH_NAME }}
+          ref: ${{ env.BRANCH_NAME || 'main' }}
       - uses: ./.github/actions/make/
         with:
           command: build
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH_NAME }}
+          ref: ${{ env.BRANCH_NAME || 'main' }}
           fetch-depth: 0
       - name: Remove PR workspaces
         uses: ./.github/actions/make/
