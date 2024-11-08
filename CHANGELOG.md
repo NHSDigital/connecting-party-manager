@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-11-08
+- [PI-508] Search DeviceReferenceData
+- [PI-578] Create MHS Device
+- [PI-512] AS Interactions DeviceReferenceData
+
 ## 2024-11-06
 - [PI-593] Readme updates
 - [PI-594] More smoke tests
