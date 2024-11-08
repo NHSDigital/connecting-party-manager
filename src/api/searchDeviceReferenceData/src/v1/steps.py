@@ -36,7 +36,7 @@ def validate_product(data, cache) -> CpmProduct:
     )
 
 
-def query_device_ref_data(data, cache) -> list:
+def query_device_ref_data(data, cache) -> list[dict]:
     product_team: ProductTeam = data[validate_product_team]
     product: CpmProduct = data[validate_product]
     drd_repo = DeviceReferenceDataRepository(
@@ -46,7 +46,7 @@ def query_device_ref_data(data, cache) -> list:
     return results
 
 
-def return_device_ref_data(data, cache) -> tuple[HTTPStatus, str]:
+def return_device_ref_data(data, cache) -> tuple[HTTPStatus, dict]:
     device_ref_data = data[query_device_ref_data]
     response = SearchResponse(results=device_ref_data)
     return HTTPStatus.OK, response.state()
