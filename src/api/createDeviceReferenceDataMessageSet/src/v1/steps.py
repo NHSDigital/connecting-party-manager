@@ -8,7 +8,7 @@ from domain.api.common_steps.read_product import (
 )
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.core.error import ConfigurationError
+from domain.core.error import NotEprProductError
 from domain.core.product_key.v1 import ProductKeyType
 from domain.core.questionnaire.v3 import Questionnaire, QuestionnaireResponse
 from domain.repository.device_reference_data_repository.v1 import (
@@ -33,16 +33,16 @@ def parse_device_reference_data_for_epr_payload(
 
 def get_party_key(data, cache) -> str:
     product: CpmProduct = data[read_product]
-    party_keys = [
+    party_keys = (
         key.key_value
         for key in product.keys
         if key.key_type is ProductKeyType.PARTY_KEY
-    ]
+    )
     try:
         (party_key,) = party_keys
     except ValueError:
-        raise ConfigurationError(
-            "Cannot create Message Set in Product without exactly one Party Key"
+        raise NotEprProductError(
+            "Not an EPR Product: Cannot create Message Set in Product without exactly one Party Key"
         )
     return party_key
 

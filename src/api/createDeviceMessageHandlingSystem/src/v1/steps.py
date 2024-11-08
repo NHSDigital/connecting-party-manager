@@ -28,11 +28,11 @@ def parse_mhs_device_payload(data, cache) -> Device:
 
 def get_party_key(data, cache) -> str:
     product: CpmProduct = data[read_product]
-    party_keys = [
+    party_keys = (
         key.key_value
         for key in product.keys
         if key.key_type is ProductKeyType.PARTY_KEY
-    ]
+    )
     try:
         (party_key,) = party_keys
     except ValueError:
@@ -52,7 +52,7 @@ def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireRespo
     questionnaire_responses = payload.questionnaire_responses
 
     # Ensure there's a questionnaire named 'spine_mhs' in the responses
-    if "spine_mhs" not in questionnaire_responses:
+    if QuestionnaireInstance.SPINE_MHS not in questionnaire_responses:
         raise InvalidSpineMhsResponse(
             "Require a 'spine_mhs' questionnaire response to create a MHS Device"
         )
