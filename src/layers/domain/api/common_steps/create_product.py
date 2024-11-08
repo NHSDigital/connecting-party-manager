@@ -48,14 +48,6 @@ def create_cpm_product(
     return product
 
 
-def write_cpm_product(data: dict[str, CpmProduct], cache) -> CpmProduct:
-    product: CpmProduct = data[create_cpm_product]
-    product_repo = CpmProductRepository(
-        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
-    )
-    return product_repo.write(product)
-
-
 def write_cpm_product(
     data: dict[str, CpmProduct], cache
 ) -> list["TransactWriteItemsOutputTypeDef"]:

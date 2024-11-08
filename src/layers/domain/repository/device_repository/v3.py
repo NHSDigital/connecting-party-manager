@@ -12,11 +12,11 @@ from domain.core.device.v3 import (
     DeviceTagsAddedEvent,
     DeviceTagsClearedEvent,
     DeviceUpdatedEvent,
+    QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
 from domain.core.event import Event
-from domain.core.questionnaire.v2 import QuestionnaireResponseUpdatedEvent
 from domain.repository.compression import pkl_dumps_gzip, pkl_loads_gzip
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys.v3 import TableKey
@@ -432,18 +432,12 @@ class DeviceRepository(Repository[Device]):
 
     def handle_QuestionnaireResponseUpdatedEvent(
         self, event: QuestionnaireResponseUpdatedEvent
-    ):
-        keys = {DeviceKey(**key) for key in event.entity_keys}
-        tags = {DeviceTag(__root__=tag) for tag in event.entity_tags}
-        return update_device_indexes(
-            table_name=self.table_name,
-            id=event.entity_id,
-            keys=keys,
-            tags=tags,
-            data={
-                "questionnaire_responses": event.questionnaire_responses,
-                "updated_on": event.updated_on,
-            },
+    ) -> TransactItem:
+        pk = TableKey.DEVICE.key(event.id)
+        data = asdict(event)
+        data.pop("id")
+        return update_transactions(
+            table_name=self.table_name, primary_keys=[marshall(pk=pk, sk=pk)], data=data
         )
 
     def handle_bulk(self, item: dict) -> list[dict]:

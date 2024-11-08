@@ -59,6 +59,11 @@ class CreateDeviceIncomingParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
 
 
+class CreateMhsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
+    name: str = "Product-MHS"
+    questionnaire_responses: dict[str, list[dict]] = Field(...)
+
+
 class DevicePathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)

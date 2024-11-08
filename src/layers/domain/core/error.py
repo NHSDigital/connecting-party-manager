@@ -48,3 +48,11 @@ class EventExpected(Exception):
 
 class ConfigurationError(Exception):
     pass
+
+
+class NotEprProductError(Exception):
+    pass
+
+
+class InvalidSpineMhsResponse(Exception):
+    pass

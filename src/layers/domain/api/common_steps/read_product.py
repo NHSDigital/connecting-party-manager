@@ -2,6 +2,8 @@ from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product.v1 import CpmProduct
+from domain.core.error import NotEprProductError
+from domain.core.product_key.v1 import ProductKeyType
 from domain.core.product_team.v3 import ProductTeam
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
@@ -35,6 +37,22 @@ def read_product(data, cache) -> CpmProduct:
     return cpm_product
 
 
+def get_party_key(data, cache) -> str:
+    product: CpmProduct = data[read_product]
+    party_keys = (
+        key.key_value
+        for key in product.keys
+        if key.key_type is ProductKeyType.PARTY_KEY
+    )
+    try:
+        (party_key,) = party_keys
+    except ValueError:
+        raise NotEprProductError(
+            "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
+        )
+    return party_key
+
+
 def product_to_dict(data, cache) -> tuple[str, dict]:
     product: CpmProduct = data[read_product]
     return HTTPStatus.OK, product.state()
@@ -45,6 +63,7 @@ before_steps = [
     read_product_team,
     read_product,
 ]
+epr_product_specific_steps = [get_party_key]
 after_steps = [
     product_to_dict,
 ]
