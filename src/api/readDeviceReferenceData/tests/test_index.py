@@ -99,7 +99,6 @@ def test_index(version):
     expected_headers = {
         "Content-Type": "application/json",
         "Version": version,
-        "Location": None,
     }
 
     # Check response headers
@@ -174,7 +173,6 @@ def test_index_no_such_device_reference_data(version):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -238,7 +236,6 @@ def test_index_no_such_product(version):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -292,7 +289,6 @@ def test_index_no_such_product_team(version):
             "Content-Length": str(len(expected_result)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(

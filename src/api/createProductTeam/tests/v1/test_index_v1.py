@@ -58,7 +58,6 @@ def test_index(version):
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -107,7 +106,6 @@ def test_index_bad_payload(version):
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(
@@ -158,7 +156,6 @@ def test_index(version):
             "Content-Length": str(len(expected_body)),
             "Content-Type": "application/json",
             "Version": version,
-            "Location": None,
         },
     }
     _response_assertions(

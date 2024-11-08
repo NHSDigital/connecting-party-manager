@@ -16,11 +16,13 @@ Feature: Search CPM Products - success scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
-    Then I receive a status code "200" with an empty body
+    Then I receive a status code "200" with body
+      | path    | value |
+      | results | []    |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 2                |
+      | Content-Length | 15               |
 
   Scenario: Successfully search one CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -35,20 +37,20 @@ Feature: Search CPM Products - success scenarios
       | name | My Great CpmProduct |
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
     Then I receive a status code "200" with body
-      | path              | value                      |
-      | 0.id              | << ignore >>               |
-      | 0.product_team_id | ${ note(product_team_id) } |
-      | 0.name            | My Great CpmProduct        |
-      | 0.ods_code        | F5H1R                      |
-      | 0.status          | active                     |
-      | 0.keys            | []                         |
-      | 0.created_on      | << ignore >>               |
-      | 0.updated_on      | << ignore >>               |
-      | 0.deleted_on      | << ignore >>               |
+      | path                      | value                      |
+      | results.0.id              | << ignore >>               |
+      | results.0.product_team_id | ${ note(product_team_id) } |
+      | results.0.name            | My Great CpmProduct        |
+      | results.0.ods_code        | F5H1R                      |
+      | results.0.status          | active                     |
+      | results.0.keys            | []                         |
+      | results.0.created_on      | << ignore >>               |
+      | results.0.updated_on      | << ignore >>               |
+      | results.0.deleted_on      | << ignore >>               |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 260              |
+      | Content-Length | 273              |
 
   Scenario: Successfully search more than one CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -68,39 +70,39 @@ Feature: Search CPM Products - success scenarios
       | path | value              |
       | name | My Great Product 3 |
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
-    Then I receive a status code "200" with a "product" search body response that contains
-      | path              | value                      |
-      | 0.id              | << ignore >>               |
-      | 0.product_team_id | ${ note(product_team_id) } |
-      | 0.name            | My Great Product 1         |
-      | 0.ods_code        | F5H1R                      |
-      | 0.status          | active                     |
-      | 0.keys            | []                         |
-      | 0.created_on      | << ignore >>               |
-      | 0.updated_on      | << ignore >>               |
-      | 0.deleted_on      | << ignore >>               |
-      | 1.id              | << ignore >>               |
-      | 1.product_team_id | ${ note(product_team_id) } |
-      | 1.name            | My Great Product 2         |
-      | 1.ods_code        | F5H1R                      |
-      | 1.status          | active                     |
-      | 1.keys            | []                         |
-      | 1.created_on      | << ignore >>               |
-      | 1.updated_on      | << ignore >>               |
-      | 1.deleted_on      | << ignore >>               |
-      | 2.id              | << ignore >>               |
-      | 2.product_team_id | ${ note(product_team_id) } |
-      | 2.name            | My Great Product 3         |
-      | 2.ods_code        | F5H1R                      |
-      | 2.status          | active                     |
-      | 2.keys            | []                         |
-      | 2.created_on      | << ignore >>               |
-      | 2.updated_on      | << ignore >>               |
-      | 2.deleted_on      | << ignore >>               |
+    Then I receive a status code "200" with body where "results" has a length of "3"
+      | path                      | value                      |
+      | results.0.id              | << ignore >>               |
+      | results.0.product_team_id | ${ note(product_team_id) } |
+      | results.0.name            | My Great Product 1         |
+      | results.0.ods_code        | F5H1R                      |
+      | results.0.status          | active                     |
+      | results.0.keys            | []                         |
+      | results.0.created_on      | << ignore >>               |
+      | results.0.updated_on      | << ignore >>               |
+      | results.0.deleted_on      | << ignore >>               |
+      | results.1.id              | << ignore >>               |
+      | results.1.product_team_id | ${ note(product_team_id) } |
+      | results.1.name            | My Great Product 2         |
+      | results.1.ods_code        | F5H1R                      |
+      | results.1.status          | active                     |
+      | results.1.keys            | []                         |
+      | results.1.created_on      | << ignore >>               |
+      | results.1.updated_on      | << ignore >>               |
+      | results.1.deleted_on      | << ignore >>               |
+      | results.2.id              | << ignore >>               |
+      | results.2.product_team_id | ${ note(product_team_id) } |
+      | results.2.name            | My Great Product 3         |
+      | results.2.ods_code        | F5H1R                      |
+      | results.2.status          | active                     |
+      | results.2.keys            | []                         |
+      | results.2.created_on      | << ignore >>               |
+      | results.2.updated_on      | << ignore >>               |
+      | results.2.deleted_on      | << ignore >>               |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 777              |
+      | Content-Length | 790              |
 
   Scenario: Deleted Products not returned in search
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -124,27 +126,27 @@ Feature: Search CPM Products - success scenarios
     And I note the response field "$.id" as "product_id_3"
     And I have already made a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id_2) }"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
-    Then I receive a status code "200" with a "product" search body response that contains
-      | path              | value                      |
-      | 0.id              | ${ note(product_id_1) }    |
-      | 0.product_team_id | ${ note(product_team_id) } |
-      | 0.name            | My Great Product 1         |
-      | 0.ods_code        | F5H1R                      |
-      | 0.status          | active                     |
-      | 0.keys            | []                         |
-      | 0.created_on      | << ignore >>               |
-      | 0.updated_on      | << ignore >>               |
-      | 0.deleted_on      | << ignore >>               |
-      | 1.id              | ${ note(product_id_3) }    |
-      | 1.product_team_id | ${ note(product_team_id) } |
-      | 1.name            | My Great Product 3         |
-      | 1.ods_code        | F5H1R                      |
-      | 1.status          | active                     |
-      | 1.keys            | []                         |
-      | 1.created_on      | << ignore >>               |
-      | 1.updated_on      | << ignore >>               |
-      | 1.deleted_on      | << ignore >>               |
+    Then I receive a status code "200" with body where "results" has a length of "2"
+      | path                      | value                      |
+      | results.0.id              | ${ note(product_id_1) }    |
+      | results.0.product_team_id | ${ note(product_team_id) } |
+      | results.0.name            | My Great Product 1         |
+      | results.0.ods_code        | F5H1R                      |
+      | results.0.status          | active                     |
+      | results.0.keys            | []                         |
+      | results.0.created_on      | << ignore >>               |
+      | results.0.updated_on      | << ignore >>               |
+      | results.0.deleted_on      | << ignore >>               |
+      | results.1.id              | ${ note(product_id_3) }    |
+      | results.1.product_team_id | ${ note(product_team_id) } |
+      | results.1.name            | My Great Product 3         |
+      | results.1.ods_code        | F5H1R                      |
+      | results.1.status          | active                     |
+      | results.1.keys            | []                         |
+      | results.1.created_on      | << ignore >>               |
+      | results.1.updated_on      | << ignore >>               |
+      | results.1.deleted_on      | << ignore >>               |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 518              |
+      | Content-Length | 531              |

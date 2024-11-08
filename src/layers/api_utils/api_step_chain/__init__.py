@@ -45,5 +45,5 @@ def execute_step_chain(
     response_chain = StepChain(
         step_chain=response_steps, step_decorators=STEP_DECORATORS
     )
-    response_chain.run(init=(result, version, None))
+    response_chain.run(init=(result, version))
     return response_chain.result

@@ -15,8 +15,10 @@ from test_helpers.response_assertions import _response_assertions
 NON_SUCCESS_STATUSES = set(HTTPStatus._member_map_.values()) - SUCCESS_STATUSES
 
 
-def test_render_response_of_json_serialisable():
-    aws_lambda_response = render_response(response={"dict": "of things"})
+def test_render_response_of_json_serialisable_ok():
+    aws_lambda_response = render_response(
+        response=(HTTPStatus.OK, {"dict": "of things"})
+    )
     expected = {
         "statusCode": HTTPStatus.OK,
         "body": '{"dict": "of things"}',
@@ -37,9 +39,7 @@ def test_render_response_of_json_serialisable():
 def test_render_response_of_success_http_status_created():
     expected_body = json.dumps({"foo": "bar"})
 
-    aws_lambda_response = render_response(
-        response=(HTTPStatus.CREATED, {"foo": "bar"}),
-    )
+    aws_lambda_response = render_response(response=(HTTPStatus.CREATED, {"foo": "bar"}))
 
     expected = {
         "statusCode": 201,
@@ -75,7 +75,7 @@ def test_render_response_of_non_success_http_status(http_status: HTTPStatus):
             ],
         }
     )
-    aws_lambda_response = render_response(response=http_status, id="foo")
+    aws_lambda_response = render_response(response=(http_status, "some response"))
 
     expected = {
         "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -107,7 +107,7 @@ def test_render_response_of_non_json_serialisable():
         }
     )
 
-    aws_lambda_response = render_response(object(), id="foo")
+    aws_lambda_response = render_response((HTTPStatus.OK, object()))
     expected = {
         "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
         "body": expected_body,
@@ -135,7 +135,7 @@ def test_render_response_of_non_json_serialisable():
     ],
 )
 def test_render_response_of_json_serialisable(response, expected_body):
-    aws_lambda_response = render_response(response, id="foo")
+    aws_lambda_response = render_response((HTTPStatus.OK, response))
     expected = {
         "statusCode": HTTPStatus.OK,
         "body": expected_body,
@@ -154,7 +154,7 @@ def test_render_response_of_json_serialisable(response, expected_body):
 
 
 def test_render_response_of_blank_exception():
-    aws_lambda_response = render_response(response=Exception(), id="foo")
+    aws_lambda_response = render_response(response=Exception())
     expected_body = json.dumps(
         {
             "errors": [
@@ -183,7 +183,7 @@ def test_render_response_of_blank_exception():
 
 
 def test_render_response_of_general_exception():
-    aws_lambda_response = render_response(response=Exception("oops"), id="foo")
+    aws_lambda_response = render_response(response=Exception("oops"))
     expected_body = json.dumps(
         {
             "errors": [
@@ -223,7 +223,7 @@ def test_render_response_of_general_validation_error():
     }
 
     validation_error = _get_validation_error(model_inputs)
-    aws_lambda_response = render_response(response=validation_error, id="foo")
+    aws_lambda_response = render_response(response=validation_error)
     expected_body = {
         "errors": [
             {
@@ -252,7 +252,7 @@ def test_render_response_of_general_validation_error():
 
 def test_render_response_of_internal_validation_error():
     validation_error = _get_inbound_validation_error()
-    aws_lambda_response = render_response(response=validation_error, id="foo")
+    aws_lambda_response = render_response(response=validation_error)
     expected_body = {
         "errors": [
             {

@@ -11,7 +11,6 @@ def test_aws_lambda_response(aws_lambda_response: AwsLambdaResponse):
         "headers": {
             "Content-Type": "application/json",
             "Content-Length": f"{len(aws_lambda_response.body)}",
-            "Location": None,
             "Version": "null",
             "Host": "foo.co.uk",
         },

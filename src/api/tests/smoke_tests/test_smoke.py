@@ -14,6 +14,8 @@ def _request(base_url: str, headers: dict, path: str, method: str):
     if method == "POST":
         body = json.dumps({"foo": "bar"})
         return requests.post(url=url, headers=headers, data=body)
+    elif method == "DELETE":
+        return requests.delete(url=url, headers=headers)
 
     return requests.get(url=url, headers=headers)
 
@@ -22,6 +24,11 @@ def _request(base_url: str, headers: dict, path: str, method: str):
 @pytest.mark.parametrize(
     "request_details",
     [
+        [
+            "/_status",
+            "GET",
+            200,
+        ],
         [
             "/ProductTeam",
             "POST",
@@ -54,7 +61,22 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
+            "/ProductTeam/123/Product/abc",
+            "DELETE",
+            404,
+        ],
+        [
             "/ProductTeam/123/Product/abc/DeviceReferenceData",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateDeviceReferenceDataIncomingParams.name: field required",
+                "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
+            "/ProductTeam/123/Product/abc/DeviceReferenceData/MhsMessageSet",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],

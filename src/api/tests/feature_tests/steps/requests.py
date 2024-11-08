@@ -1,4 +1,5 @@
 import json as _json
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from unittest import mock
@@ -8,6 +9,7 @@ from aws_lambda_powertools.utilities.parser.models import APIGatewayProxyEventMo
 from domain.response.aws_lambda_response import AwsLambdaResponse
 from event.json import json_loads
 from requests import HTTPError, Response, request
+from requests.exceptions import SSLError
 
 from api.tests.feature_tests.steps.data import DUMMY_CONTEXT
 from api.tests.feature_tests.steps.endpoint_lambda_mapping import (
@@ -33,6 +35,21 @@ def _parse_url(base_url: str, endpoint: str) -> str:
     return url
 
 
+@contextmanager
+def retry_on_ssl_error(sleep_time: int = 3, max_retries=5):
+    retries = 0
+    while True:
+        try:
+            yield
+        except SSLError:
+            if retries == max_retries:
+                raise
+            time.sleep(sleep_time)
+            retries += 1
+        finally:
+            break
+
+
 def make_request(
     base_url: str,
     http_method: str,
@@ -44,9 +61,12 @@ def make_request(
     url = _parse_url(base_url=base_url, endpoint=endpoint)
     json = body if type(body) is dict else None
     data = None if type(body) is dict else body
-    response = request(
-        method=http_method, url=url, headers=headers, json=json, data=data
-    )
+
+    with retry_on_ssl_error():
+        response = request(
+            method=http_method, url=url, headers=headers, json=json, data=data
+        )
+
     if raise_for_status:
         try:
             response.raise_for_status()

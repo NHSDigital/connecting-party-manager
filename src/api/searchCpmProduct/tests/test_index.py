@@ -1,3 +1,4 @@
+import json
 import os
 from unittest import mock
 
@@ -9,6 +10,7 @@ from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from event.aws.client import dynamodb_client
 from event.json import json_loads
 
+from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
 from test_helpers.validate_search_response import validate_product_result_body
@@ -34,8 +36,14 @@ def _create_product(product, product_team):
     return cpmproduct
 
 
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
 @pytest.mark.integration
-def test_no_results():
+def test_no_results(version):
     product_team = _create_org()
     product_team_id = product_team.id
     params = {"product_team_id": product_team_id}
@@ -64,26 +72,36 @@ def test_no_results():
 
         result = product_handler(
             event={
-                "headers": {"version": 1},
+                "headers": {"version": version},
                 "pathParameters": params,
             }
         )
-    result_body = json_loads(result["body"])
-    assert result["statusCode"] == 200
-    assert len(result_body) == 0
+    expected_result = json.dumps({"results": []})
+    expected = {
+        "statusCode": 200,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
 @pytest.mark.integration
 @pytest.mark.parametrize(
-    "product",
+    "version,product",
     [
-        {"name": "product-name-a"},
-        {"name": "product-name-b"},
-        {"name": "product-name-c"},
-        {"name": "product-name-d"},
+        ("1", {"name": "product-name-a"}),
+        ("1", {"name": "product-name-b"}),
+        ("1", {"name": "product-name-c"}),
+        ("1", {"name": "product-name-d"}),
     ],
 )
-def test_index(product):
+def test_index(version, product):
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
     product_team = _create_org()
@@ -116,20 +134,35 @@ def test_index(product):
 
         result = product_handler(
             event={
-                "headers": {"version": 1},
+                "headers": {"version": version},
                 "pathParameters": params,
             }
         )
 
-    assert result["statusCode"] == 200
+    expected_result = json.dumps({"results": [cpmproduct.state()]})
 
-    result_body = json_loads(result["body"])
-    assert isinstance(result_body, list)
-    validate_product_result_body(result_body, cpmproduct.state())
+    expected = {
+        "statusCode": 200,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
 
 
 @pytest.mark.integration
-def test_index_no_such_product_team():
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_no_such_product_team(version):
     params = {"product_team_id": "123456"}
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
@@ -154,7 +187,7 @@ def test_index_no_such_product_team():
 
         result = product_handler(
             event={
-                "headers": {"version": 1},
+                "headers": {"version": version},
                 "pathParameters": params,
             }
         )
@@ -185,6 +218,7 @@ def test_index_no_such_product_team():
     ],
 )
 def test_index_multiple_returned(products):
+    version = 1
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
 
@@ -229,15 +263,15 @@ def test_index_multiple_returned(products):
 
         result = product_handler(
             event={
-                "headers": {"version": 1},
+                "headers": {"version": version},
                 "pathParameters": params,
             }
         )
 
     assert result["statusCode"] == 200
-
     result_body = json_loads(result["body"])
-    assert isinstance(result_body, list)
+    assert "results" in result_body
+    assert isinstance(result_body["results"], list)
     validate_product_result_body(
-        result_body, [cpm_product.state() for cpm_product in cpm_products]
+        result_body["results"], [cpm_product.state() for cpm_product in cpm_products]
     )

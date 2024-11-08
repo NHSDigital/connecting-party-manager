@@ -10,7 +10,16 @@ from api.tests.feature_tests.steps.assertion import (
 )
 from api.tests.feature_tests.steps.context import Context
 from api.tests.feature_tests.steps.decorators import given, then, when
-from api.tests.feature_tests.steps.postman import Body, HeaderItem, PostmanRequest, Url
+from api.tests.feature_tests.steps.postman import (
+    Body,
+    Event,
+    HeaderItem,
+    PostmanEnvironmentValue,
+    PostmanRequest,
+    Script,
+    Url,
+    jsonpath_to_javascript_path,
+)
 from api.tests.feature_tests.steps.requests import make_request
 from api.tests.feature_tests.steps.table import (
     extract_from_response_by_jsonpath,
@@ -23,10 +32,7 @@ sort_keys = {"product": "name"}
 @given('"{header_name}" request headers')
 def given_request_headers(context: Context, header_name: str):
     table_headers = parse_table(table=context.table, context=context)
-    apikey_header = {
-        "apikey": context.apikey
-    }  # Hidden here because the value cant be written in the tests
-    context.headers[header_name] = {**table_headers, **apikey_header}
+    context.headers[header_name] = dict(**table_headers, apikey=context.api_key)
 
 
 @given(
@@ -46,13 +52,14 @@ def given_made_request(
     )
     context.postman_step.request = PostmanRequest(
         url=Url(
-            raw=context.response.url,
+            raw=context.base_url + context.postman_endpoint,
             host=[context.base_url.rstrip("/")],
-            path=[endpoint],
+            path=[context.postman_endpoint],
         ),
         method=http_method,
         header=[
-            HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
+            HeaderItem(key=k, value="{{apiKey}}" if k == "apikey" else v)
+            for k, v in context.headers[header_name].items()
         ],
         body=Body(raw=json.dumps(body) if isinstance(body, dict) else body),
     )
@@ -73,13 +80,14 @@ def given_made_request(
     )
     context.postman_step.request = PostmanRequest(
         url=Url(
-            raw=context.response.url,
+            raw=context.base_url + context.postman_endpoint,
             host=[context.base_url.rstrip("/")],
-            path=[endpoint],
+            path=[context.postman_endpoint],
         ),
         method=http_method,
         header=[
-            HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
+            HeaderItem(key=k, value="{{apiKey}}" if k == "apikey" else v)
+            for k, v in context.headers[header_name].items()
         ],
     )
 
@@ -104,13 +112,14 @@ def when_make_request(
     )
     context.postman_step.request = PostmanRequest(
         url=Url(
-            raw=context.response.url,
+            raw=context.base_url + context.postman_endpoint,
             host=[context.base_url.rstrip("/")],
-            path=[endpoint],
+            path=[context.postman_endpoint],
         ),
         method=http_method,
         header=[
-            HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
+            HeaderItem(key=k, value="{{apiKey}}" if k == "apikey" else v)
+            for k, v in context.headers[header_name].items()
         ],
         body=Body(raw=json.dumps(body) if isinstance(body, dict) else body),
     )
@@ -128,13 +137,14 @@ def when_make_request(
     )
     context.postman_step.request = PostmanRequest(
         url=Url(
-            raw=context.response.url,
+            raw=context.base_url + context.postman_endpoint,
             host=[context.base_url.rstrip("/")],
-            path=[endpoint],
+            path=[context.postman_endpoint],
         ),
         method=http_method,
         header=[
-            HeaderItem(key=k, value=v) for k, v in context.headers[header_name].items()
+            HeaderItem(key=k, value="{{apiKey}}" if k == "apikey" else v)
+            for k, v in context.headers[header_name].items()
         ],
     )
 
@@ -175,6 +185,13 @@ def then_response(context: Context, status_code: str, list_to_check: str, count:
     except JSONDecodeError:
         response_body = context.response.text
     assert len(response_body[list_to_check]) == int(count)
+    if list_to_check == "results":
+        expected_body[list_to_check] = sorted(
+            expected_body[list_to_check], key=lambda x: x["name"]
+        )
+        response_body[list_to_check] = sorted(
+            response_body[list_to_check], key=lambda x: x["name"]
+        )
     assert_many(
         assertions=(
             assert_equal,
@@ -260,3 +277,21 @@ for decorator in (given, when, then):
         context.notes[alias] = extract_from_response_by_jsonpath(
             response=context.response.json(), jsonpath=jsonpath
         )
+
+        javascript_path = jsonpath_to_javascript_path(jsonpath)
+        context.postman_scenario.item[-1].event.append(
+            Event(
+                script=Script(
+                    exec=[
+                        "if(pm.response.code >= 200 && pm.response.code < 300){",
+                        f'    pm.environment.set("{alias}", pm.response.json(){javascript_path})',
+                        "}",
+                        "",
+                    ]
+                )
+            )
+        )
+        if alias not in context.postman_environment:
+            context.postman_environment.values.append(
+                PostmanEnvironmentValue(key=alias, value="")
+            )

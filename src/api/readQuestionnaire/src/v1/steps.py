@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.questionnaire.v3 import Questionnaire
 from domain.repository.questionnaire_repository.v2 import QuestionnaireRepository
@@ -18,9 +20,9 @@ def read_questionnaire(data, cache) -> Questionnaire:
     return repo.read(name=path_params.questionnaire_id)
 
 
-def questionnaire_to_dict(data, cache) -> dict:
+def questionnaire_to_dict(data, cache) -> tuple[int, dict]:
     questionnaire: Questionnaire = data[read_questionnaire]
-    return questionnaire.state()
+    return HTTPStatus.OK, questionnaire.state()
 
 
 steps = [
