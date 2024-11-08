@@ -1,0 +1,50 @@
+name: "Workflow: PR Close"
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+env:
+  TF_CLI_ARGS: -no-color
+  CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
+  BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+
+  build-base:
+    runs-on: [self-hosted, ci]
+    needs: [parse-secrets]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
+
+  destroy-pr-workspaces:
+    runs-on: [self-hosted, ci]
+    needs: [parse-secrets, build-base]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+          fetch-depth: 0
+      - name: Remove PR workspaces
+        uses: ./.github/actions/make/
+        with:
+          command: destroy--redundant-workspaces BRANCH_NAME=origin/${{ env.BRANCH_NAME }} DESTROY_ALL_COMMITS_ON_BRANCH=true KILL_ALL=true TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          requires-aws: true
