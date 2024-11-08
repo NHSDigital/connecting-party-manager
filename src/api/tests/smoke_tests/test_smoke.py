@@ -108,6 +108,13 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
+            "/ProductTeam/123/Product/abc/DeviceReferenceData",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        [
             "/ProductTeam/123/Product/abc/DeviceReferenceData/xyz",
             "GET",
             404,
