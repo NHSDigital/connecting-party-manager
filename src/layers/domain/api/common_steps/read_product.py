@@ -32,7 +32,7 @@ def read_product(data, cache) -> CpmProduct:
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     cpm_product = product_repo.read(
-        product_id=path_params.product_id, product_team_id=path_params.product_team_id
+        id=path_params.product_id, product_team_id=path_params.product_team_id
     )
     return cpm_product
 

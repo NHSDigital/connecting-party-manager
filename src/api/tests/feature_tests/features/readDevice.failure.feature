@@ -72,10 +72,10 @@ Feature: Read Device - failure scenarios
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/not-a-device"
     Then I receive a status code "404" with body
-      | path             | value                                          |
-      | errors.0.code    | RESOURCE_NOT_FOUND                             |
-      | errors.0.message | Could not find Device for key ('not-a-device') |
+      | path             | value                                                                                                 |
+      | errors.0.code    | RESOURCE_NOT_FOUND                                                                                    |
+      | errors.0.message | Could not find Device for key ('${ note(product_team_id) }', '${ note(product_id) }', 'not-a-device') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 105              |
+      | Content-Length | 164              |

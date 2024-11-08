@@ -1,5 +1,6 @@
 import json
 
+from domain.repository.device_repository.tests.utils import devices_exactly_equal
 import pytest
 from domain.core.device.v3 import Device
 from domain.core.questionnaire.v3 import Questionnaire
@@ -76,7 +77,14 @@ def test__device_repository__with_questionnaires(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    assert repository.read(device.id) == device
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        )
+        == device
+    )
 
 
 @pytest.mark.integration
@@ -89,4 +97,55 @@ def test__device_repository__with_questionnaires_and_tags(
     """
     device.add_tag(foo="bar")
     repository.write(device)
-    assert repository.read(device.id) == device
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        )
+        == device
+    )
+
+
+@pytest.mark.integration
+def test__device_repository__modify_questionnaire_response_that_has_been_persisted(
+    device: Device, repository: DeviceRepository, shoe_questionnaire: Questionnaire
+):
+    # Persist model before updating model
+    repository.write(device)
+    intermediate_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
+
+    # Update the model
+    questionnaire_responses = intermediate_device.questionnaire_responses
+    assert len(questionnaire_responses["shoe/1"]) == 2
+    (_questionnaire_response, _) = questionnaire_responses["shoe/1"]
+
+    questionnaire_response = shoe_questionnaire.validate(
+        {"foot": "R", "shoe-size": 789}
+    )
+    questionnaire_response.created_on = _questionnaire_response.created_on
+
+    intermediate_device.update_questionnaire_response(
+        questionnaire_response=questionnaire_response
+    )
+
+    # Persist and verify consistency
+    repository.write(intermediate_device)
+    device_from_db = repository.read(
+        product_team_id=intermediate_device.product_team_id,
+        product_id=intermediate_device.product_id,
+        id=intermediate_device.id,
+    )
+    assert devices_exactly_equal(device_from_db, intermediate_device)
+    assert not devices_exactly_equal(device_from_db, device)
+    assert device_from_db.questionnaire_responses["shoe/1"][-1].data == {
+        "foot": ["R"],
+        "shoe-size": [789],
+    }
+
+    assert device_from_db.created_on == device.created_on
+    assert device_from_db.updated_on > device.updated_on

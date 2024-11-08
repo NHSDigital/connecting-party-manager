@@ -79,9 +79,9 @@ def test_repository_raise_already_exists_from_single_transaction(
         (
             "ValidationException: Transaction request cannot include multiple operations on one item",
             f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "prefix:456"}}, "sk": {{"S": "prefix:456"}}, "field": {{"S": "456"}}}}}}}}',
-            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk) AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"}}}}',
+            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk)"}}}}',
             f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "prefix:345"}}, "sk": {{"S": "prefix:345"}}, "field": {{"S": "345"}}}}}}}}',
-            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk) AND attribute_not_exists(sk) AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"}}}}',
+            f'{{"Put": {{"TableName": "{repository.table_name}", "Item": {{"pk": {{"S": "123"}}, "sk": {{"S": "123"}}, "field": {{"S": "123"}}}}, "ConditionExpression": "attribute_not_exists(pk)"}}}}',
         )
     )
 

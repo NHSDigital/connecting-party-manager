@@ -32,7 +32,7 @@ def read_product(data, cache) -> CpmProduct:
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     cpm_product = product_repo.read(
-        product_id=path_params.product_id, product_team_id=path_params.product_team_id
+        id=path_params.product_id, product_team_id=path_params.product_team_id
     )
     return cpm_product
 
@@ -42,7 +42,11 @@ def read_device(data, cache) -> Device:
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return device_repo.read(path_params.device_id)
+    return device_repo.read(
+        product_team_id=path_params.product_team_id,
+        product_id=path_params.product_id,
+        id=path_params.device_id,
+    )
 
 
 def device_to_dict(data, cache) -> tuple[str, dict]:

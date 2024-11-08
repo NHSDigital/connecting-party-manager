@@ -25,9 +25,7 @@ def query_products(data, cache) -> list:
     cpm_product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    results = cpm_product_repo.query_products_by_product_team(
-        product_team_id=product_team_id
-    )
+    results = cpm_product_repo.search(product_team_id=product_team_id)
     return results
 
 

@@ -2,7 +2,6 @@ from collections import defaultdict
 
 import pytest
 from domain.core.device.v3 import Device, DeviceTag
-from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.repository.device_repository.v3 import (
     CannotDropMandatoryFields,
@@ -76,8 +75,22 @@ def _test_add_two_tags(
         DeviceTag(shoe_size="456"),
     }
 
-    assert repository.read(device.id).tags == expected_tags
-    assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == expected_tags
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        ).tags
+        == expected_tags
+    )
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id="P.WWW-XXX",
+        ).tags
+        == expected_tags
+    )
 
     (_device_123,) = repository.query_by_tag(shoe_size=123)
     assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == second_device.dict(
@@ -94,7 +107,11 @@ def _test_add_two_tags(
 @pytest.mark.integration
 def test__device_repository__add_two_tags(device: Device, repository: DeviceRepository):
     repository.write(device)
-    second_device = repository.read(device.id)
+    second_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     second_device.add_tag(shoe_size=123)
     second_device.add_tag(shoe_size=456)
     repository.write(second_device)
@@ -109,7 +126,11 @@ def test__device_repository__add_two_tags_at_once(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    second_device = repository.read(device.id)
+    second_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
     repository.write(second_device)
 
@@ -123,7 +144,11 @@ def test__device_repository__add_two_tags_and_then_clear(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    second_device = repository.read(device.id)
+    second_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
     repository.write(second_device)
 
@@ -131,8 +156,22 @@ def test__device_repository__add_two_tags_and_then_clear(
     second_device.clear_tags()
     repository.write(second_device)
 
-    assert repository.read(device.id).tags == set()
-    assert repository.read(DeviceKeyType.PRODUCT_ID, "P.WWW-XXX").tags == set()
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        ).tags
+        == set()
+    )
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id="P.WWW-XXX",
+        ).tags
+        == set()
+    )
 
     assert repository.query_by_tag(shoe_size=123) == []
     assert repository.query_by_tag(shoe_size=456) == []

@@ -34,20 +34,20 @@ def read_product(data, cache) -> CpmProduct:
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     cpm_product = product_repo.read(
-        product_id=path_params.product_id, product_team_id=path_params.product_team_id
+        id=path_params.product_id, product_team_id=path_params.product_team_id
     )
     return cpm_product
 
 
 def read_device_reference_data(data, cache) -> DeviceReferenceData:
     path_params: DeviceReferenceDataPathParams = data[parse_path_params]
-    product_repo = DeviceReferenceDataRepository(
+    device_reference_data_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    return product_repo.read(
+    return device_reference_data_repo.read(
         product_id=path_params.product_id,
         product_team_id=path_params.product_team_id,
-        device_reference_data_id=path_params.device_reference_data_id,
+        id=path_params.device_reference_data_id,
     )
 
 

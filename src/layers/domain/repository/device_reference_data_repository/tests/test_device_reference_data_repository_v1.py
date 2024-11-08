@@ -17,7 +17,7 @@ def test__cpm_device_reference_data_repository(
     result = repository.read(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
-        device_reference_data_id=device_reference_data.id,
+        id=device_reference_data.id,
     )
     assert result == device_reference_data
 
@@ -43,7 +43,7 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
         repository.read(
             product_team_id=product_team_id,
             product_id=product_id,
-            device_reference_data_id=device_reference_data_id,
+            id=device_reference_data_id,
         )
 
 
@@ -55,7 +55,7 @@ def test__cpm_product_repository_local(
     result = repository.read(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
-        device_reference_data_id=device_reference_data.id,
+        id=device_reference_data.id,
     )
     assert result == device_reference_data
 
@@ -70,7 +70,7 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
         repository.read(
             product_team_id=product_team_id,
             product_id=product_id,
-            device_reference_data_id=device_reference_data_id,
+            id=device_reference_data_id,
         )
 
 

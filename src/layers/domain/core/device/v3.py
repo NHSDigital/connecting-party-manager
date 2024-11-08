@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import StrEnum, auto
 from functools import cached_property
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlencode
 from uuid import UUID, uuid4
 
 import orjson
@@ -23,6 +23,14 @@ UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
 
 
+class QuestionnaireNotFoundError(Exception):
+    pass
+
+
+class QuestionnaireResponseNotFoundError(Exception):
+    pass
+
+
 class DuplicateQuestionnaireResponse(Exception):
     pass
 
@@ -39,7 +47,7 @@ class DeviceCreatedEvent(Event):
     updated_on: str = None
     deleted_on: str = None
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
@@ -55,7 +63,7 @@ class DeviceUpdatedEvent(Event):
     updated_on: str = None
     deleted_on: str = None
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
@@ -71,9 +79,9 @@ class DeviceDeletedEvent(Event):
     updated_on: str = None
     deleted_on: str = None
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
-    deleted_tags: list["DeviceTag"] = None
+    deleted_tags: list[str] = None
 
 
 @dataclass(kw_only=True, slots=True)
@@ -89,7 +97,7 @@ class DeviceKeyAddedEvent(Event):
     updated_on: str = None
     deleted_on: str = None
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
@@ -98,13 +106,13 @@ class DeviceKeyDeletedEvent(Event):
     deleted_key: DeviceKey
     id: str
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     updated_on: str = None
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceTagAddedEvent(Event):
-    new_tag: "DeviceTag"
+    new_tag: str
     id: str
     name: str
     product_team_id: UUID
@@ -115,13 +123,13 @@ class DeviceTagAddedEvent(Event):
     updated_on: str = None
     deleted_on: str = None
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceTagsAddedEvent(Event):
-    new_tags: list["DeviceTag"]
+    new_tags: list[str]
     id: str
     name: str
     product_team_id: UUID
@@ -132,7 +140,7 @@ class DeviceTagsAddedEvent(Event):
     updated_on: str = None
     deleted_on: str = None
     keys: list[DeviceKey]
-    tags: list["DeviceTag"]
+    tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
 
 
@@ -140,7 +148,20 @@ class DeviceTagsAddedEvent(Event):
 class DeviceTagsClearedEvent(Event):
     id: str
     keys: list[dict]
-    deleted_tags: list["DeviceTag"]
+    deleted_tags: list[str]
+    updated_on: str = None
+
+
+@dataclass(kw_only=True, slots=True)
+class QuestionnaireResponseUpdatedEvent(Event):
+    """
+    This is adding the inital questionnaire response from the event body request.
+    """
+
+    id: str
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    keys: list[DeviceKey]
+    tags: list[str]
     updated_on: str = None
 
 
@@ -178,12 +199,20 @@ class DeviceTag(BaseModel):
     def encode_tag(cls, values: dict):
         initialised_with_root = "__root__" in values and len(values) == 1
         item_to_process = values["__root__"] if initialised_with_root else values
-        if initialised_with_root:
-            _components = ((k, v) for k, v in item_to_process)
-        else:  # otherwise initialise directly with key value pairs
-            _components = sorted((k, str(v)) for k, v in item_to_process.items())
 
-        case_insensitive_components = tuple((k, v.lower()) for k, v in _components)
+        # Case 1: query string is provided (__root__="foo=bar")
+        if initialised_with_root and isinstance(item_to_process, str):
+            _components = ((k, v) for k, (v,) in parse_qs(item_to_process).items())
+        # Case 2: query components are provided (__root__=("foo", "bar"))
+        elif initialised_with_root:
+            _components = ((k, v) for k, v in item_to_process)
+        # Case 3: query components are directly provided (("foo", "bar"))
+        else:
+            _components = ((k, str(v)) for k, v in item_to_process.items())
+
+        case_insensitive_components = tuple(
+            sorted((k, v.lower()) for k, v in _components)
+        )
         return {"__root__": case_insensitive_components}
 
     def dict(self, *args, **kwargs):
@@ -206,17 +235,6 @@ class DeviceTag(BaseModel):
 
     def __eq__(self, other: "DeviceTag"):
         return self.hash == other.hash
-
-
-@dataclass(kw_only=True, slots=True)
-class QuestionnaireResponseUpdatedEvent(Event):
-    """
-    This is adding the inital questionnaire response from the event body request.
-    """
-
-    id: str
-    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
-    updated_on: str = None
 
 
 class Device(AggregateRoot):
@@ -266,7 +284,7 @@ class Device(AggregateRoot):
     @event
     def delete(self) -> DeviceDeletedEvent:
         deleted_on = now()
-        deleted_tags = {t.dict() for t in self.tags}
+        deleted_tags = {t.value for t in self.tags}
         device_data = self._update(
             data=dict(
                 status=Status.INACTIVE,
@@ -286,6 +304,7 @@ class Device(AggregateRoot):
             )
         self.keys.append(device_key)
         device_data = self.state()
+        device_data["tags"] = {t.value for t in self.tags}
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
         return DeviceKeyAddedEvent(new_key=device_key, **device_data)
 
@@ -301,7 +320,7 @@ class Device(AggregateRoot):
             deleted_key=device_key,
             id=self.id,
             keys=[k.dict() for k in self.keys],
-            tags=[t.dict() for t in self.tags],
+            tags=[t.value for t in self.tags],
         )
 
     @event
@@ -313,8 +332,9 @@ class Device(AggregateRoot):
             )
         self.tags.add(device_tag)
         device_data = self.state()
+        device_data["tags"] = {t.value for t in self.tags}
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
-        return DeviceTagAddedEvent(new_tag=device_tag, **device_data)
+        return DeviceTagAddedEvent(new_tag=device_tag.value, **device_data)
 
     @event
     def add_tags(self, tags: list[dict]) -> DeviceTagsAddedEvent:
@@ -327,8 +347,11 @@ class Device(AggregateRoot):
             )
         self.tags = self.tags.union(new_tags)
         device_data = self.state()
+        device_data["tags"] = {t.value for t in self.tags}
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
-        return DeviceTagsAddedEvent(new_tags=new_tags, **device_data)
+        return DeviceTagsAddedEvent(
+            new_tags={tag.value for tag in new_tags}, **device_data
+        )
 
     @event
     def clear_tags(self):
@@ -336,7 +359,9 @@ class Device(AggregateRoot):
         self.tags = set()
         device_data = self.state()
         return DeviceTagsClearedEvent(
-            id=device_data["id"], keys=device_data["keys"], deleted_tags=deleted_tags
+            id=device_data["id"],
+            keys=device_data["keys"],
+            deleted_tags={tag.value for tag in deleted_tags},
         )
 
     @event
@@ -345,18 +370,54 @@ class Device(AggregateRoot):
     ) -> QuestionnaireResponseUpdatedEvent:
         questionnaire_id = questionnaire_response.questionnaire_id
         questionnaire_responses = self.questionnaire_responses[questionnaire_id]
+        created_on = questionnaire_response.created_on
 
-        current_created_ons = {qr.created_on for qr in questionnaire_responses}
-        if questionnaire_response.created_on in current_created_ons:
+        current_created_ons = [qr.created_on for qr in questionnaire_responses]
+        if created_on in current_created_ons:
             raise DuplicateQuestionnaireResponse(
                 "This Device already contains a "
-                f"response created on {questionnaire_response.created_on.isoformat()}"
+                f"response created on {created_on.isoformat()}"
                 f"for Questionnaire {questionnaire_id}"
             )
         questionnaire_responses.append(questionnaire_response)
 
         return QuestionnaireResponseUpdatedEvent(
             id=self.id,
+            keys=[k.dict() for k in self.keys],
+            tags=[t.value for t in self.tags],
+            questionnaire_responses={
+                qid: [qr.dict() for qr in qrs]
+                for qid, qrs in self.questionnaire_responses.items()
+            },
+        )
+
+    @event
+    def update_questionnaire_response(
+        self,
+        questionnaire_response: QuestionnaireResponse,
+    ) -> QuestionnaireResponseUpdatedEvent:
+        questionnaire_id = questionnaire_response.questionnaire_id
+        questionnaire_responses = self.questionnaire_responses.get(questionnaire_id)
+        created_on = questionnaire_response.created_on
+
+        if questionnaire_responses is None:
+            raise QuestionnaireNotFoundError(
+                "This device does not contain a Questionnaire "
+                f"with id '{questionnaire_id}'"
+            )
+
+        current_created_ons = [qr.created_on for qr in questionnaire_responses]
+        if created_on in current_created_ons:
+            raise QuestionnaireResponseNotFoundError(
+                "This device does not contain a Questionnaire with a "
+                f"response created on '{created_on.isoformat()}'"
+            )
+        questionnaire_responses.append(questionnaire_response)
+
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            keys=[k.dict() for k in self.keys],
+            tags=[t.value for t in self.tags],
             questionnaire_responses={
                 q_name: [qr.dict() for qr in qrs]
                 for q_name, qrs in self.questionnaire_responses.items()

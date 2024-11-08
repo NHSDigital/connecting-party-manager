@@ -43,23 +43,15 @@ module "table" {
   attributes = [
     { name = "pk", type = "S" },
     { name = "sk", type = "S" },
-    { name = "pk_1", type = "S" },
-    { name = "sk_1", type = "S" },
-    { name = "pk_2", type = "S" },
-    { name = "sk_2", type = "S" }
+    { name = "pk_read", type = "S" },
+    { name = "sk_read", type = "S" },
   ]
 
   global_secondary_indexes = [
     {
-      name            = "idx_gsi_1"
-      hash_key        = "pk_1"
-      range_key       = "sk_1"
-      projection_type = "ALL"
-    },
-    {
-      name            = "idx_gsi_2"
-      hash_key        = "pk_2"
-      range_key       = "sk_2"
+      name            = "idx_gsi_read"
+      hash_key        = "pk_read"
+      range_key       = "sk_read"
       projection_type = "ALL"
     }
   ]
