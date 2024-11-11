@@ -115,7 +115,7 @@ components:
           items:
             $ref: "#/components/schemas/ProductResponse"
       example:
-        result:
+        results:
           - id: "123-XXX"
             name: "Sample Product Team"
             product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
@@ -213,6 +213,18 @@ components:
           type: string
         questionnaire_responses:
           type: object
+      example:
+        id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        name: "Sample DeviceReferenceDataResponse"
+        product_id: "123-XXX"
+        product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        ods_code: "F5H1R"
+        questionnaire_responses:
+          - key_type: "foo"
+            key_value: "bar"
+        created_on: "2025-10-15T10:00:00Z"
+        updated_on: "null"
+        deleted_on: "null"
 
     DeviceRefDataSearchResponse:
       type: object
@@ -222,16 +234,15 @@ components:
           items:
             $ref: "#/components/schemas/DeviceReferenceDataResponse"
       example:
-        result:
+        results:
           - id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
             name: "Sample Device Reference Data"
             product_id: "123-XXX"
             product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
             ods_code: "F5H1R"
-            status: "active"
             questionnaire_responses:
               - key_type: "foo"
                 key_value: "bar"
             created_on: "2024-10-15T10:00:00Z"
-            updated_on: "2024-10-15T10:00:00Z"
+            updated_on: "null"
             deleted_on: "null"
