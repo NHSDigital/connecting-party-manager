@@ -7,18 +7,20 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Successfully create an "MHS Message Set" Device Reference Data, with no questionnaire responses
+  Scenario Outline: Successfully create an "MHS Message Set" Device Reference Data, with no questionnaire responses
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path     | value                 |
-      | name     | My Great Product Team |
-      | ods_code | F5H1R                 |
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/DeviceReferenceData/MhsMessageSet"
     Then I receive a status code "201" with body
       | path                    | value                          |
       | id                      | << ignore >>                   |
@@ -51,6 +53,13 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 322              |
+
+    Examples:
+      | product_team_id            | product_id            |
+      | ${ note(product_team_id) } | ${ note(product_id) } |
+      | ${ note(product_team_id) } | ${ note(party_key) }  |
+      | FOOBAR                     | ${ note(product_id) } |
+      | FOOBAR                     | ${ note(party_key) }  |
 
   Scenario: Successfully create an "MHS Message Set" Device Reference Data, with questionnaire responses
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:

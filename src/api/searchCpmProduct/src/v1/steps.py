@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+from domain.core.product_team.v3 import ProductTeam
 from domain.repository.cpm_product_repository.v3 import CpmProductRepository
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 from domain.response.response_models import SearchResponse
@@ -12,7 +13,7 @@ def parse_incoming_path_parameters(data, cache) -> str:
     return event.path_parameters["product_team_id"]
 
 
-def validate_product_team(data, cache) -> str:
+def read_product_team(data, cache) -> ProductTeam:
     product_team_repo = ProductTeamRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
@@ -21,11 +22,12 @@ def validate_product_team(data, cache) -> str:
 
 
 def query_products(data, cache) -> list:
-    product_team_id = data[parse_incoming_path_parameters]
+    product_team: ProductTeam = data[read_product_team]
+
     cpm_product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    results = cpm_product_repo.search(product_team_id=product_team_id)
+    results = cpm_product_repo.search(product_team_id=product_team.id)
     return results
 
 
@@ -37,7 +39,7 @@ def return_products(data, cache) -> tuple[HTTPStatus, str]:
 
 steps = [
     parse_incoming_path_parameters,
-    validate_product_team,
+    read_product_team,
     query_products,
     return_products,
 ]

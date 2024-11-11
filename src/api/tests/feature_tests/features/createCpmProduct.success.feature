@@ -7,7 +7,7 @@ Feature: Create CPM Product - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Successfully create a CPM Product
+  Scenario Outline: Successfully create a CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -15,7 +15,7 @@ Feature: Create CPM Product - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
@@ -50,3 +50,8 @@ Feature: Create CPM Product - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 255              |
+
+    Examples:
+      | product_team_id            |
+      | ${ note(product_team_id) } |
+      | FOOBAR                     |

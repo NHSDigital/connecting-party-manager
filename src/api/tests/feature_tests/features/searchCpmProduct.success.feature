@@ -52,7 +52,7 @@ Feature: Search CPM Products - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 273              |
 
-  Scenario: Successfully search more than one CPM Product
+  Scenario Outline: Successfully search more than one CPM Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -69,7 +69,7 @@ Feature: Search CPM Products - success scenarios
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 3 |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
+    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product"
     Then I receive a status code "200" with body where "results" has a length of "3"
       | path                      | value                      |
       | results.0.id              | << ignore >>               |
@@ -103,6 +103,11 @@ Feature: Search CPM Products - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 790              |
+
+    Examples:
+      | product_team_id            |
+      | ${ note(product_team_id) } |
+      | FOOBAR                     |
 
   Scenario: Deleted Products not returned in search
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:

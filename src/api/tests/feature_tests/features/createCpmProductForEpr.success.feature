@@ -7,7 +7,7 @@ Feature: Create CPM Product for EPR - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Successfully create a CPM Product for EPR
+  Scenario Outline: Successfully create a CPM Product for EPR
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -15,7 +15,7 @@ Feature: Create CPM Product for EPR - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     Then I receive a status code "201" with body
@@ -52,6 +52,11 @@ Feature: Create CPM Product for EPR - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 339              |
+
+    Examples:
+      | product_team_id            |
+      | ${ note(product_team_id) } |
+      | FOOBAR                     |
 
   Scenario: Successfully create two CPM Products for EPR with the same ProductTeam
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
