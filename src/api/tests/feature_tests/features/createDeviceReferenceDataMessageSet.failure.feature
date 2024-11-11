@@ -135,10 +135,10 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     Then I receive a status code "400" with body
-      | path             | value                                                              |
-      | errors.0.code    | VALIDATION_ERROR                                                   |
-      | errors.0.message | Cannot create Message Set in Product without exactly one Party Key |
+      | path             | value                                                                                  |
+      | errors.0.code    | VALIDATION_ERROR                                                                       |
+      | errors.0.message | Not an EPR Product: Cannot create MHS device for product without exactly one Party Key |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 123              |
+      | Content-Length | 143              |
