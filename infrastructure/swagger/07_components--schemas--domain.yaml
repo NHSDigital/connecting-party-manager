@@ -38,8 +38,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -56,7 +58,7 @@ components:
         status: "active"
         created_on: "2024-10-15T10:00:00Z"
         updated_on: "2024-10-15T10:00:00Z"
-        deleted_on: "null"
+        deleted_on: null
         keys:
           - key_type: "product_team_id_alias"
             key_value: "FOOBAR"
@@ -86,8 +88,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
       example:
         id: "123-XXX"
         name: "Sample Product Team"
@@ -99,7 +103,7 @@ components:
             key_value: "bar"
         created_on: "2024-10-15T10:00:00Z"
         updated_on: "2024-10-15T10:00:00Z"
-        deleted_on: "null"
+        deleted_on: null
 
     Questionnaire:
       type: object
@@ -126,7 +130,7 @@ components:
                 key_value: "bar"
             created_on: "2024-10-15T10:00:00Z"
             updated_on: "2024-10-15T10:00:00Z"
-            deleted_on: "null"
+            deleted_on: null
 
     DeviceResponse:
       type: object
@@ -147,8 +151,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -180,8 +186,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         questionnaire_responses:
           type: object
 
@@ -209,8 +217,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         questionnaire_responses:
           type: object
       example:
@@ -223,8 +233,8 @@ components:
           - key_type: "foo"
             key_value: "bar"
         created_on: "2025-10-15T10:00:00Z"
-        updated_on: "null"
-        deleted_on: "null"
+        updated_on: null
+        deleted_on: null
 
     DeviceRefDataSearchResponse:
       type: object
@@ -244,5 +254,5 @@ components:
               - key_type: "foo"
                 key_value: "bar"
             created_on: "2024-10-15T10:00:00Z"
-            updated_on: "null"
-            deleted_on: "null"
+            updated_on: null
+            deleted_on: null
