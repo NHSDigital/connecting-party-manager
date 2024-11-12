@@ -58,7 +58,7 @@ components:
         status: "active"
         created_on: "2024-10-15T10:00:00Z"
         updated_on: "2024-10-15T10:00:00Z"
-        deleted_on: null
+        deleted_on: "null"
         keys:
           - key_type: "product_team_id_alias"
             key_value: "FOOBAR"
@@ -103,7 +103,7 @@ components:
             key_value: "bar"
         created_on: "2024-10-15T10:00:00Z"
         updated_on: "2024-10-15T10:00:00Z"
-        deleted_on: null
+        deleted_on: "null"
 
     Questionnaire:
       type: object
@@ -130,7 +130,7 @@ components:
                 key_value: "bar"
             created_on: "2024-10-15T10:00:00Z"
             updated_on: "2024-10-15T10:00:00Z"
-            deleted_on: null
+            deleted_on: "null"
 
     DeviceResponse:
       type: object
@@ -233,8 +233,8 @@ components:
           - key_type: "foo"
             key_value: "bar"
         created_on: "2025-10-15T10:00:00Z"
-        updated_on: null
-        deleted_on: null
+        updated_on: "null"
+        deleted_on: "null"
 
     DeviceRefDataSearchResponse:
       type: object
@@ -254,5 +254,5 @@ components:
               - key_type: "foo"
                 key_value: "bar"
             created_on: "2024-10-15T10:00:00Z"
-            updated_on: null
-            deleted_on: null
+            updated_on: "null"
+            deleted_on: "null"
