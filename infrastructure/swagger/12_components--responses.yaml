@@ -42,11 +42,19 @@ components:
                 errors:
                   - code: "MISSING_VALUE"
                     message: "<MISSING_FIELD>: field required"
+                  - code: "MISSING_VALUE"
+                    message: "Failed to validate data against '<QUESTIONNAIRE>': '<MISSING_FIELD>' is a required property"
             ValidationError:
               value:
                 errors:
                   - code: "VALIDATION_ERROR"
                     message: "Item already exists"
+                  - code: "VALIDATION_ERROR"
+                    message: "Expected only one response for the '<QUESTIONNAIRE _NAME>' questionnaire"
+                  - code: "VALIDATION_ERROR"
+                    message: "Require a 'spine_mhs' questionnaire response to create a MHS Device"
+                  - code: "VALIDATION_ERROR"
+                    message: "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
     SdsSearchDeviceBadRequest:
       description: searchSDSDevice Bad request
       content:

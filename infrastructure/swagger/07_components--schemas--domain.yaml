@@ -190,6 +190,15 @@ components:
         deleted_on:
           type: string
           nullable: true
+        keys:
+          type: array
+          items:
+            type: object
+            properties:
+              key_type:
+                type: string
+              key_value:
+                type: string
         questionnaire_responses:
           type: object
 
