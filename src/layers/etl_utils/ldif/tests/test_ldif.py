@@ -5,6 +5,7 @@ import boto3
 import pytest
 from etl_utils.ldif.ldif import (
     DistinguishedName,
+    filter_and_group_ldif_from_s3_by_property,
     filter_ldif_from_s3_by_property,
     ldif_dump,
     parse_ldif,
@@ -247,6 +248,54 @@ PARSED_UPDATE_TRIGGER_LDIF_MODIFY = (
     },
 )
 
+LDIF_TO_FILTER_AND_GROUP_EXAMPLE = """
+dn: uniqueIdentifier=AAA1
+myField: AAA
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB1
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB2
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=AAA2
+myfield: AAA
+myOtherField: 123
+
+dn: uniqueIdentifier=AAA3
+myField: AAA
+myOtherField: 234
+
+dn: uniqueIdentifier=BBB3
+myfield: BBB
+myOtherField: 123
+"""
+
+FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE = """
+dn: uniqueIdentifier=AAA1
+myField: AAA
+myOtherField: 123
+
+dn: uniqueIdentifier=AAA2
+myfield: AAA
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB1
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB2
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB3
+myfield: BBB
+myOtherField: 123
+"""
+
 
 @pytest.mark.parametrize(
     ("raw_distinguished_name", "parsed_distinguished_name"),
@@ -319,6 +368,25 @@ def test_filter_ldif_from_s3_by_property(mocked_open):
 
     assert modify_record in parse_ldif(
         file_opener=StringIO, path_or_data=SAMPLE_LDIF_DATA
+    )
+
+
+@mock.patch(
+    "etl_utils.ldif.ldif._smart_open",
+    return_value=BytesIO(LDIF_TO_FILTER_AND_GROUP_EXAMPLE.encode()),
+)
+def test_filter_and_group_ldif_from_s3_by_property(mocked_open):
+    with mock_aws():
+        s3_client = boto3.client("s3")
+        filtered_ldif = filter_and_group_ldif_from_s3_by_property(
+            s3_client=s3_client,
+            s3_path="s3://dummy_bucket/dummy_key",
+            group_field="myField",
+            filter_terms=[("myOtherField", "123")],
+        )
+    assert (
+        filtered_ldif.tobytes().decode()
+        == FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE
     )
 
 
