@@ -18,7 +18,7 @@ def parse_incoming_path_parameters(data, cache) -> CpmProductPathParams:
     return CpmProductPathParams(**event.path_parameters)
 
 
-def validate_product_team(data, cache) -> ProductTeam:
+def read_product_team(data, cache) -> ProductTeam:
     product_team_repo = ProductTeamRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
@@ -26,19 +26,20 @@ def validate_product_team(data, cache) -> ProductTeam:
     return product_team_repo.read(id=path_params.product_team_id)
 
 
-def validate_product(data, cache) -> CpmProduct:
+def read_product(data, cache) -> CpmProduct:
     cpm_product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
+    product_team: ProductTeam = data[read_product_team]
     path_params: CpmProductPathParams = data[parse_incoming_path_parameters]
     return cpm_product_repo.read(
-        product_team_id=path_params.product_team_id, product_id=path_params.product_id
+        product_team_id=product_team.id, id=path_params.product_id
     )
 
 
 def query_device_ref_data(data, cache) -> list[dict]:
-    product_team: ProductTeam = data[validate_product_team]
-    product: CpmProduct = data[validate_product]
+    product_team: ProductTeam = data[read_product_team]
+    product: CpmProduct = data[read_product]
     drd_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
@@ -54,8 +55,8 @@ def return_device_ref_data(data, cache) -> tuple[HTTPStatus, dict]:
 
 steps = [
     parse_incoming_path_parameters,
-    validate_product_team,
-    validate_product,
+    read_product_team,
+    read_product,
     query_device_ref_data,
     return_device_ref_data,
 ]

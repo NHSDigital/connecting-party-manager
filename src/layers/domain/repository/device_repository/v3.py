@@ -409,11 +409,10 @@ class DeviceRepository(Repository[Device]):
         )
 
         # Update "questionnaire_responses" on the tag-indexed Devices
-        tag_values = {DeviceTag(__root__=tag) for tag in event.tags}
         update_tag_transactions = update_tag_indexes(
             table_name=self.table_name,
             device_id=event.id,
-            tag_values=tag_values,
+            tag_values=event.tags,
             data=data,
         )
         return update_root_and_key_transactions + update_tag_transactions

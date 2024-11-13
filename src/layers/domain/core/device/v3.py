@@ -391,39 +391,6 @@ class Device(AggregateRoot):
             },
         )
 
-    @event
-    def update_questionnaire_response(
-        self,
-        questionnaire_response: QuestionnaireResponse,
-    ) -> QuestionnaireResponseUpdatedEvent:
-        questionnaire_id = questionnaire_response.questionnaire_id
-        questionnaire_responses = self.questionnaire_responses.get(questionnaire_id)
-        created_on = questionnaire_response.created_on
-
-        if questionnaire_responses is None:
-            raise QuestionnaireNotFoundError(
-                "This device does not contain a Questionnaire "
-                f"with id '{questionnaire_id}'"
-            )
-
-        current_created_ons = [qr.created_on for qr in questionnaire_responses]
-        if created_on in current_created_ons:
-            raise QuestionnaireResponseNotFoundError(
-                "This device does not contain a Questionnaire with a "
-                f"response created on '{created_on.isoformat()}'"
-            )
-        questionnaire_responses.append(questionnaire_response)
-
-        return QuestionnaireResponseUpdatedEvent(
-            id=self.id,
-            keys=[k.dict() for k in self.keys],
-            tags=[t.value for t in self.tags],
-            questionnaire_responses={
-                q_name: [qr.dict() for qr in qrs]
-                for q_name, qrs in self.questionnaire_responses.items()
-            },
-        )
-
     def is_active(self):
         return self.status is Status.ACTIVE
 
