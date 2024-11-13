@@ -1,5 +1,11 @@
 # Changelog
 
+## 2024-11-13
+- [PI-617] Stream bulk LDIF into blocks of party key
+- [PI-527] Swagger fix
+- [PI-592] GSI Upgrade
+- [PI-590] Read/write by alias
+
 ## 2024-11-08
 - [PI-508] Search DeviceReferenceData
 - [PI-578] Create MHS Device
