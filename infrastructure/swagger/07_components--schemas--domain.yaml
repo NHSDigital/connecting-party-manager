@@ -14,7 +14,7 @@ components:
               message:
                 type: string
     StatusOK:
-      type: object
+      type: string
       properties:
         code:
           type: string
@@ -38,8 +38,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -86,8 +88,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
       example:
         id: "123-XXX"
         name: "Sample Product Team"
@@ -115,7 +119,7 @@ components:
           items:
             $ref: "#/components/schemas/ProductResponse"
       example:
-        result:
+        results:
           - id: "123-XXX"
             name: "Sample Product Team"
             product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
@@ -147,8 +151,10 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -160,12 +166,47 @@ components:
                 type: string
         questionnaire_responses:
           type: object
-          properties:
+
+    MhsDeviceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        product_id:
+          type: string
+        product_team_id:
+          type: string
+        ods_code:
+          type: string
+        status:
+          type: string
+        created_on:
+          type: string
+        updated_on:
+          type: string
+          nullable: true
+        deleted_on:
+          type: string
+          nullable: true
+        keys:
+          type: array
+          items:
+            type: object
+            properties:
+              key_type:
+                type: string
+              key_value:
+                type: string
+        questionnaire_responses:
+          type: object
 
     DeviceSearchResponse:
       type: array
       items:
         $ref: "#/components/schemas/DeviceResponse"
+
     DeviceReferenceDataResponse:
       type: object
       properties:
@@ -185,7 +226,42 @@ components:
           type: string
         updated_on:
           type: string
+          nullable: true
         deleted_on:
           type: string
+          nullable: true
         questionnaire_responses:
           type: object
+      example:
+        id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        name: "Sample DeviceReferenceDataResponse"
+        product_id: "123-XXX"
+        product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        ods_code: "F5H1R"
+        questionnaire_responses:
+          - key_type: "foo"
+            key_value: "bar"
+        created_on: "2025-10-15T10:00:00Z"
+        updated_on: "null"
+        deleted_on: "null"
+
+    DeviceRefDataSearchResponse:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeviceReferenceDataResponse"
+      example:
+        results:
+          - id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
+            name: "Sample Device Reference Data"
+            product_id: "123-XXX"
+            product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
+            ods_code: "F5H1R"
+            questionnaire_responses:
+              - key_type: "foo"
+                key_value: "bar"
+            created_on: "2024-10-15T10:00:00Z"
+            updated_on: "null"
+            deleted_on: "null"

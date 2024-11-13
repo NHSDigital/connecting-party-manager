@@ -85,7 +85,26 @@ def _request(base_url: str, headers: dict, path: str, method: str):
                 "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
             ],
         ],
-        # ('/ProductTeam/123/Product/abc/Device', 'POST', 400, ['MISSING_VALUE', 'VALIDATION_ERROR']),
+        [
+            "/ProductTeam/123/Product/abc/Device",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateDeviceIncomingParams.name: field required",
+                "CreateDeviceIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
+            "/ProductTeam/123/Product/abc/Device/MessageHandlingSystem",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateMhsDeviceIncomingParams.questionnaire_responses: field required",
+                "CreateMhsDeviceIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
         [
             "/ProductTeam/123",
             "GET",
@@ -108,13 +127,25 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
+            "/ProductTeam/123/Product/abc/DeviceReferenceData",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        [
             "/ProductTeam/123/Product/abc/DeviceReferenceData/xyz",
             "GET",
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],
         ],
-        # ['/ProductTeam/123/Product/abc/Device/xyz', 404, ['RESOURCE_NOT_FOUND'], ["Could not find ProductTeam for key ('123')"]],
+        [
+            "/ProductTeam/123/Product/abc/Device/xyz",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
         [
             "/Questionnaire/987",
             "GET",

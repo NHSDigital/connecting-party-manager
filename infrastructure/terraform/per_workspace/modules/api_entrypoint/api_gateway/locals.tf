@@ -5,7 +5,7 @@ locals {
   }
   methods = [
     for lambda_alias in setsubtract(var.lambdas, ["authoriser"]) :
-    { "method_${lambda_alias}" = "${local.apigateway_lambda_arn_prefix}:${var.assume_account}:function:${var.project}--${replace(terraform.workspace, "_", "-")}--${replace(replace(lambda_alias, "_", "-"), "DeviceReferenceData", "DeviceRefData")}/invocations" }
+    { "method_${lambda_alias}" = "${local.apigateway_lambda_arn_prefix}:${var.assume_account}:function:${var.project}--${replace(terraform.workspace, "_", "-")}--${replace(replace(replace(lambda_alias, "_", "-"), "DeviceReferenceData", "DeviceRefData"), "MessageHandlingSystem", "MHS")}/invocations" }
   ]
   swagger_file = templatefile("${path.root}/../../swagger/dist/aws/swagger.yaml", merge({
     lambda_invoke_arn   = var.authoriser_metadata.lambda_invoke_arn,

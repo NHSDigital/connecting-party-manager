@@ -5,6 +5,7 @@ from functools import cached_property
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
+import orjson
 from attr import dataclass
 from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.base import BaseModel
@@ -13,10 +14,7 @@ from domain.core.device_key.v2 import DeviceKey
 from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
-from domain.core.questionnaire.v2 import (
-    QuestionnaireResponse,
-    QuestionnaireResponseUpdatedEvent,
-)
+from domain.core.questionnaire.v3 import QuestionnaireResponse
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field, root_validator
@@ -25,19 +23,7 @@ UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
 
 
-class QuestionnaireNotFoundError(Exception):
-    pass
-
-
-class QuestionnaireResponseNotFoundError(Exception):
-    pass
-
-
 class DuplicateQuestionnaireResponse(Exception):
-    pass
-
-
-class QuestionNotFoundError(Exception):
     pass
 
 
@@ -222,6 +208,17 @@ class DeviceTag(BaseModel):
         return self.hash == other.hash
 
 
+@dataclass(kw_only=True, slots=True)
+class QuestionnaireResponseUpdatedEvent(Event):
+    """
+    This is adding the inital questionnaire response from the event body request.
+    """
+
+    id: str
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    updated_on: str = None
+
+
 class Device(AggregateRoot):
     """
     An entity in the database.  It could model all sorts of different logical or
@@ -246,9 +243,19 @@ class Device(AggregateRoot):
     deleted_on: datetime = Field(default=None)
     keys: list[DeviceKey] = Field(default_factory=list)
     tags: set[DeviceTag] | list[DeviceTag] = Field(default_factory=set)
-    questionnaire_responses: dict[str, dict[str, QuestionnaireResponse]] = Field(
-        default_factory=lambda: defaultdict(dict)
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
+        default_factory=lambda: defaultdict(list)
     )
+
+    def state_exclude_tags(self) -> dict:
+        """
+        Returns a deepcopy, useful for bulk operations rather than dealing with events.
+
+        Exclude tags as we shouldn't return tags to the user on create.
+        """
+        device_dict = orjson.loads(self.json())
+        device_dict.pop("tags", None)
+        return device_dict
 
     @event
     def update(self, **kwargs) -> DeviceUpdatedEvent:
@@ -336,57 +343,23 @@ class Device(AggregateRoot):
     def add_questionnaire_response(
         self, questionnaire_response: QuestionnaireResponse
     ) -> QuestionnaireResponseUpdatedEvent:
-        questionnaire_id = questionnaire_response.questionnaire.id
+        questionnaire_id = questionnaire_response.questionnaire_id
         questionnaire_responses = self.questionnaire_responses[questionnaire_id]
 
-        created_on_str = questionnaire_response.created_on.isoformat()
-        if created_on_str in questionnaire_responses:
+        current_created_ons = {qr.created_on for qr in questionnaire_responses}
+        if questionnaire_response.created_on in current_created_ons:
             raise DuplicateQuestionnaireResponse(
                 "This Device already contains a "
-                f"response created on {created_on_str}"
+                f"response created on {questionnaire_response.created_on.isoformat()}"
                 f"for Questionnaire {questionnaire_id}"
             )
-        questionnaire_responses[created_on_str] = questionnaire_response
+        questionnaire_responses.append(questionnaire_response)
 
         return QuestionnaireResponseUpdatedEvent(
-            entity_id=self.id,
-            entity_keys=[k.dict() for k in self.keys],
-            entity_tags=[t.dict() for t in self.tags],
+            id=self.id,
             questionnaire_responses={
-                qid: {_created_on: qr.dict() for _created_on, qr in _qr.items()}
-                for qid, _qr in self.questionnaire_responses.items()
-            },
-        )
-
-    @event
-    def update_questionnaire_response(
-        self,
-        questionnaire_response: QuestionnaireResponse,
-    ) -> QuestionnaireResponseUpdatedEvent:
-        questionnaire_id = questionnaire_response.questionnaire.id
-        questionnaire_responses = self.questionnaire_responses.get(questionnaire_id)
-        if questionnaire_responses is None:
-            raise QuestionnaireNotFoundError(
-                "This device does not contain a Questionnaire "
-                f"with id '{questionnaire_id}'"
-            ) from None
-
-        created_on_str = questionnaire_response.created_on.isoformat()
-        if created_on_str not in questionnaire_responses:
-            raise QuestionnaireResponseNotFoundError(
-                "This device does not contain a Questionnaire with a "
-                f"response created on '{created_on_str}'"
-            ) from None
-
-        questionnaire_responses[created_on_str] = questionnaire_response
-
-        return QuestionnaireResponseUpdatedEvent(
-            entity_id=self.id,
-            entity_keys=[k.dict() for k in self.keys],
-            entity_tags=[t.dict() for t in self.tags],
-            questionnaire_responses={
-                qid: {_created_on: qr.dict() for _created_on, qr in _qr.items()}
-                for qid, _qr in self.questionnaire_responses.items()
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
             },
         )
 

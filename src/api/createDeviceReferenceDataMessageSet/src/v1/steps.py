@@ -2,14 +2,13 @@ from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
 from domain.api.common_steps.read_product import (
+    get_party_key,
     parse_path_params,
     read_product,
     read_product_team,
 )
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.core.error import ConfigurationError
-from domain.core.product_key.v1 import ProductKeyType
 from domain.core.questionnaire.v3 import Questionnaire, QuestionnaireResponse
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
@@ -22,6 +21,8 @@ from domain.repository.questionnaire_repository.v2.questionnaires import (
 from domain.request_models.v1 import CreateDeviceReferenceMessageSetsDataParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
+DEVICE_NAME_MARKER = "MHS Message Set"
+
 
 @mark_validation_errors_as_inbound
 def parse_device_reference_data_for_epr_payload(
@@ -29,22 +30,6 @@ def parse_device_reference_data_for_epr_payload(
 ) -> CreateDeviceReferenceMessageSetsDataParams:
     payload: dict = data[parse_event_body]
     return CreateDeviceReferenceMessageSetsDataParams(**payload)
-
-
-def get_party_key(data, cache) -> str:
-    product: CpmProduct = data[read_product]
-    party_keys = [
-        key.key_value
-        for key in product.keys
-        if key.key_type is ProductKeyType.PARTY_KEY
-    ]
-    try:
-        (party_key,) = party_keys
-    except ValueError:
-        raise ConfigurationError(
-            "Cannot create Message Set in Product without exactly one Party Key"
-        )
-    return party_key
 
 
 def require_no_existing_message_sets_device_reference_data(
@@ -57,7 +42,10 @@ def require_no_existing_message_sets_device_reference_data(
     results = repo.search(
         product_team_id=product.product_team_id, product_id=product.id
     )
-    if len(results) > 0:
+    if any(
+        device_reference_data.name.endswith(DEVICE_NAME_MARKER)
+        for device_reference_data in results
+    ):
         raise AlreadyExistsError(
             "This product already has a 'Message Set' DeviceReferenceData. "
             "Please update, or delete and recreate if you wish to make changes."
@@ -82,7 +70,9 @@ def validate_questionnaire_responses(data, cache) -> list[QuestionnaireResponse]
 def create_message_set_device_reference_data(data, cache) -> DeviceReferenceData:
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
-    return product.create_device_reference_data(name=f"{party_key} - MHS Message Set")
+    return product.create_device_reference_data(
+        name=f"{party_key} - {DEVICE_NAME_MARKER}"
+    )
 
 
 def add_questionnaire_response(data, cache) -> list[QuestionnaireResponse]:

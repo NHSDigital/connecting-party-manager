@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot, event
 from domain.core.cpm_system_id.v1 import ProductId
-from domain.core.device.v2 import DuplicateQuestionnaireResponse
+from domain.core.device.v3 import DuplicateQuestionnaireResponse
 from domain.core.event import Event
 from domain.core.questionnaire.v3 import QuestionnaireResponse
 from domain.core.timestamp import now
@@ -27,6 +27,10 @@ class DeviceReferenceDataCreatedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class QuestionnaireResponseUpdatedEvent(Event):
+    """
+    This is adding the inital questionnaire response from the event body request.
+    """
+
     id: str
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     updated_on: str = None

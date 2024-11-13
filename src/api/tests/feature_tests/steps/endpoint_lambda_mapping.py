@@ -24,7 +24,9 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.createCpmProduct.index
     import api.createCpmProductForEpr.index
     import api.createDevice.index
+    import api.createDeviceMessageHandlingSystem.index
     import api.createDeviceReferenceData.index
+    import api.createDeviceReferenceDataASActions.index
     import api.createDeviceReferenceDataMessageSet.index
     import api.createProductTeam.index
     import api.deleteCpmProduct.index
@@ -34,6 +36,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.readProductTeam.index
     import api.readQuestionnaire.index
     import api.searchCpmProduct.index
+    import api.searchDeviceReferenceData.index
     import api.status.index
 
     return {
@@ -42,13 +45,16 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
             "ProductTeam/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData": api.createDeviceReferenceData.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions": api.createDeviceReferenceDataASActions.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/MhsMessageSet": api.createDeviceReferenceDataMessageSet.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/Device": api.createDevice.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/Device/MessageHandlingSystem": api.createDeviceMessageHandlingSystem.index,
         },
         "GET": {
             "ProductTeam/{product_team_id}": api.readProductTeam.index,
             "ProductTeam/{product_team_id}/Product": api.searchCpmProduct.index,
             "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData": api.searchDeviceReferenceData.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}": api.readDeviceReferenceData.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/Device/{device_id}": api.readDevice.index,
             "Questionnaire/{questionnaire_id}": api.readQuestionnaire.index,

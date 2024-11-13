@@ -47,9 +47,7 @@ function _02_clean(){
         yq 'del(.x-ibm-configuration)' |
         yq 'del(.components.schemas.*.discriminator)' |
         yq 'explode(.)' |
-        yq '(.. | select(style == "single")) style |= "double"' |
-        # Remove null dead-ends
-        yq 'del(.. | select(. == null))' \
+        yq '(.. | select(style == "single")) style |= "double"' \
             > ${_02_CLEAN_FILE}
     validate_yaml ${_02_CLEAN_FILE}
 }

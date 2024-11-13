@@ -1,7 +1,11 @@
 from http import HTTPStatus
 
 from api_utils.versioning.errors import VersionException
-from domain.core.error import ConfigurationError
+from domain.core.error import (
+    ConfigurationError,
+    InvalidSpineMhsResponse,
+    NotEprProductError,
+)
 from domain.core.questionnaire.v3 import (
     QuestionnaireResponseMissingValue,
     QuestionnaireResponseValidationError,
@@ -46,6 +50,8 @@ EXCEPTIONS_TO_SPINE_CODING = {
     InboundMissingValue: SpineCoding.MISSING_VALUE,
     InboundJSONDecodeError: SpineCoding.VALIDATION_ERROR,
     QuestionnaireResponseValidationError: SpineCoding.VALIDATION_ERROR,
+    NotEprProductError: SpineCoding.VALIDATION_ERROR,
+    InvalidSpineMhsResponse: SpineCoding.VALIDATION_ERROR,
     QuestionnaireResponseMissingValue: SpineCoding.MISSING_VALUE,
     InvalidOdsCodeError: SpineCoding.UNPROCESSABLE_ENTITY,
     ConfigurationError: SpineCoding.VALIDATION_ERROR,
