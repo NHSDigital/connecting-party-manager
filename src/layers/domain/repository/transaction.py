@@ -10,14 +10,12 @@ from pydantic import BaseModel, Field
 
 from .errors import AlreadyExistsError, UnhandledTransaction
 
-ATTRIBUTE_NOT_EXISTS = "attribute_not_exists({})".format
-
 
 class ConditionExpression(StrEnum):
-    MUST_EXIST = "attribute_exists(pk) and attribute_exists(sk)"
-    MUST_NOT_EXIST = " AND ".join(
-        map(ATTRIBUTE_NOT_EXISTS, ("pk", "sk", "pk_1", "sk_1", "pk_2", "sk_2"))
-    )
+    # NB: confusingly in DynamoDB "pk" in ConditionExpressions means "primary key" ("pk" + "sk")
+    # rather than the individual "pk" field
+    MUST_EXIST = "attribute_exists(pk)"
+    MUST_NOT_EXIST = "attribute_not_exists(pk)"
 
 
 TRANSACTION_ERROR_MAPPING = {
@@ -126,3 +124,18 @@ def update_transactions(
         TransactItem(Update=update_statement(Key=key)) for key in primary_keys
     ]
     return transact_items
+
+
+def dynamodb_projection_expression(updated_fields: list[str]):
+    expression_attribute_names = {}
+    update_clauses = []
+    for field_name in updated_fields:
+        field_name_placeholder = f"#{field_name}"
+        update_clauses.append(field_name_placeholder)
+        expression_attribute_names[field_name_placeholder] = field_name
+    projection_expression = ", ".join(update_clauses)
+
+    return dict(
+        ProjectionExpression=projection_expression,
+        ExpressionAttributeNames=expression_attribute_names,
+    )

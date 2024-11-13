@@ -66,7 +66,7 @@ def test_index():
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
         read_product = repo.read(
-            product_team_id=product_team.id, product_id=created_product["id"]
+            product_team_id=product_team.id, id=created_product["id"]
         ).state()
 
     assert created_product == read_product

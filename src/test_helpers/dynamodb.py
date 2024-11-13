@@ -13,23 +13,20 @@ KEY_SCHEMAS = [
 ]
 GLOBAL_SECONDARY_INDEXES = [
     {
-        "IndexName": f"idx_gsi_{i}",
+        "IndexName": "idx_gsi_read",
         "KeySchema": [
-            {"AttributeName": f"pk_{i}", "KeyType": "HASH"},
-            {"AttributeName": f"sk_{i}", "KeyType": "RANGE"},
+            {"AttributeName": "pk_read", "KeyType": "HASH"},
+            {"AttributeName": "sk_read", "KeyType": "RANGE"},
         ],
         "Projection": {"ProjectionType": "ALL"},
     }
-    for i in range(5)
 ]
-ATTRIBUTE_DEFINITIONS = (
-    [
-        {"AttributeName": "pk", "AttributeType": "S"},
-        {"AttributeName": "sk", "AttributeType": "S"},
-    ]
-    + [{"AttributeName": f"pk_{i}", "AttributeType": "S"} for i in range(5)]
-    + [{"AttributeName": f"sk_{i}", "AttributeType": "S"} for i in range(5)]
-)
+ATTRIBUTE_DEFINITIONS = [
+    {"AttributeName": "pk", "AttributeType": "S"},
+    {"AttributeName": "sk", "AttributeType": "S"},
+    {"AttributeName": "pk_read", "AttributeType": "S"},
+    {"AttributeName": "sk_read", "AttributeType": "S"},
+]
 
 
 def _scan(client: DynamoDBClient, table_name: str) -> Generator[dict, None, None]:

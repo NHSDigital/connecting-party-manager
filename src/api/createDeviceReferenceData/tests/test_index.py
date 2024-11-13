@@ -96,7 +96,7 @@ def test_index() -> None:
         created_device_reference_data = repo.read(
             product_team_id=device_reference_data.product_team_id,
             product_id=device_reference_data.product_id,
-            device_reference_data_id=device_reference_data.id,
+            id=device_reference_data.id,
         )
         assert created_device_reference_data == device_reference_data
 

@@ -15,11 +15,7 @@ COMMANDS = [
         Put=TransactionStatement(
             TableName="table",
             Item={},
-            ConditionExpression=(
-                "attribute_not_exists(pk) AND attribute_not_exists(sk) "
-                "AND attribute_not_exists(pk_1) AND attribute_not_exists(sk_1) "
-                "AND attribute_not_exists(pk_2) AND attribute_not_exists(sk_2)"
-            ),
+            ConditionExpression="attribute_not_exists(pk)",
         )
     )
 ]

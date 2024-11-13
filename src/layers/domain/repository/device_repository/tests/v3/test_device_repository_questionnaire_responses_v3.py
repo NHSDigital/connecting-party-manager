@@ -76,7 +76,14 @@ def test__device_repository__with_questionnaires(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    assert repository.read(device.id) == device
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        )
+        == device
+    )
 
 
 @pytest.mark.integration
@@ -89,4 +96,11 @@ def test__device_repository__with_questionnaires_and_tags(
     """
     device.add_tag(foo="bar")
     repository.write(device)
-    assert repository.read(device.id) == device
+    assert (
+        repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        )
+        == device
+    )

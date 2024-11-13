@@ -24,9 +24,7 @@ def _create_product_team(name: str = "FOOBAR Product Team", ods_code: str = "F5H
 @pytest.mark.integration
 def test__cpm_product_repository(product: CpmProduct, repository: CpmProductRepository):
     repository.write(product)
-    result = repository.read(
-        product_team_id=product.product_team_id, product_id=product.id
-    )
+    result = repository.read(product_team_id=product.product_team_id, id=product.id)
     assert result == product
 
 
@@ -46,16 +44,14 @@ def test__cpm_product_repository__product_does_not_exist(
     product_team_id = consistent_uuid(1)
     product_id = "P.XXX-YYY"
     with pytest.raises(ItemNotFound):
-        repository.read(product_team_id=product_team_id, product_id=product_id)
+        repository.read(product_team_id=product_team_id, id=product_id)
 
 
 def test__cpm_product_repository_local(
     product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)
-    result = repository.read(
-        product_team_id=product.product_team_id, product_id=product.id
-    )
+    result = repository.read(product_team_id=product.product_team_id, id=product.id)
     assert result == product
 
 
@@ -65,7 +61,7 @@ def test__cpm_product_repository__product_does_not_exist_local(
     product_team_id = consistent_uuid(1)
     product_id = "P.XXX-YYY"
     with pytest.raises(ItemNotFound):
-        repository.read(product_team_id=product_team_id, product_id=product_id)
+        repository.read(product_team_id=product_team_id, id=product_id)
 
 
 @pytest.mark.integration
@@ -86,7 +82,7 @@ def test__query_products_by_product_team():
         name="cpm-product-name-2", product_id=product_id.id
     )
     repo.write(cpm_product_2)
-    result = repo.query_products_by_product_team(product_team_id=product_team.id)
+    result = repo.search(product_team_id=product_team.id)
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
     assert isinstance(result[1], CpmProduct)
@@ -118,7 +114,7 @@ def test__query_products_by_product_team_a():
         name="cpm-product-name-3", product_id=product_id.id
     )
     repo.write(cpm_product_3)
-    result = repo.query_products_by_product_team(product_team_id=product_team_a.id)
+    result = repo.search(product_team_id=product_team_a.id)
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
     assert isinstance(result[1], CpmProduct)
@@ -158,7 +154,7 @@ def test__query_products_by_product_team_with_sk_prefix():
     client = dynamodb_client()
     client.put_item(**args)
 
-    result = repo.query_products_by_product_team(product_team_id=product_team.id)
+    result = repo.search(product_team_id=product_team.id)
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
     assert isinstance(result[1], CpmProduct)
@@ -181,6 +177,6 @@ def test__cpm_product_repository_search():
         )
 
         repo.write(cpm_product)
-        result = repo.query_products_by_product_team(product_team_id=product_team.id)
+        result = repo.search(product_team_id=product_team.id)
 
     assert result == [cpm_product]

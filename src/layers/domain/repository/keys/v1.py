@@ -56,16 +56,8 @@ def strip_key_prefix(key: str):
 def remove_keys(
     pk=None,
     sk=None,
-    pk_1=None,
-    sk_1=None,
-    pk_2=None,
-    sk_2=None,
-    pk_3=None,
-    sk_3=None,
-    pk_4=None,
-    sk_4=None,
-    pk_5=None,
-    sk_5=None,
+    pk_read=None,
+    sk_read=None,
     **values,
 ):
     return values

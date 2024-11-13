@@ -28,11 +28,13 @@ def read_product_team(data, cache) -> ProductTeam:
 
 def read_product(data, cache) -> CpmProduct:
     path_params: CpmProductPathParams = data[parse_path_params]
+    product_team: ProductTeam = data[read_product_team]
+
     product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     cpm_product = product_repo.read(
-        product_id=path_params.product_id, product_team_id=path_params.product_team_id
+        product_team_id=product_team.id, id=path_params.product_id
     )
     return cpm_product
 

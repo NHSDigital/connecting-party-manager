@@ -83,15 +83,19 @@ def test_index() -> None:
         assert device.name == DEVICE_NAME
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
-        assert device.updated_on is None
-        assert device.deleted_on is None
+        assert not device.updated_on
+        assert not device.deleted_on
 
         # Retrieve the created resource
         repo = DeviceRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
 
-        created_device = repo.read(device.id)
+        created_device = repo.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        )
         assert created_device == device
 
 

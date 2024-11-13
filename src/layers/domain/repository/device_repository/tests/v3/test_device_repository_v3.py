@@ -3,8 +3,7 @@ from copy import deepcopy
 import pytest
 from attr import asdict
 from domain.core.device.v3 import Device as DeviceV3
-from domain.core.device.v3 import DeviceCreatedEvent, DeviceTag
-from domain.core.device_key.v2 import DeviceKey as DeviceKeyV2
+from domain.core.device.v3 import DeviceCreatedEvent
 from domain.core.device_key.v2 import DeviceKeyType
 from domain.core.enum import Status
 from domain.core.root.v3 import Root
@@ -13,8 +12,7 @@ from domain.repository.device_repository.v3 import (
     DeviceRepository as DeviceRepositoryV3,
 )
 from domain.repository.device_repository.v3 import (
-    _device_non_root_primary_keys,
-    _device_root_primary_key,
+    InactiveDeviceRepository,
     compress_device_fields,
 )
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
@@ -55,37 +53,16 @@ def another_device_with_same_key() -> DeviceV3:
     return device
 
 
-def test__device_root_primary_key():
-    primary_key = _device_root_primary_key(device_id="123")
-    assert primary_key == {"pk": {"S": "D#123"}, "sk": {"S": "D#123"}}
-
-
-def test__device_non_root_primary_keys():
-    primary_keys = _device_non_root_primary_keys(
-        device_id="123",
-        device_keys=[
-            DeviceKeyV2(key_type=DeviceKeyType.PRODUCT_ID, key_value=DEVICE_KEY)
-        ],
-        device_tags=[DeviceTag(foo="bar")],
-    )
-    assert primary_keys == [
-        {
-            "pk": {"S": "D#product_id#P.WWW-XXX"},
-            "sk": {"S": "D#product_id#P.WWW-XXX"},
-        },
-        {
-            "pk": {"S": "DT#foo=bar"},
-            "sk": {"S": "D#123"},
-        },
-    ]
-
-
 @pytest.mark.integration
 def test__device_repository_read_by_id(
     device: DeviceV3, repository: DeviceRepositoryV3
 ):
     repository.write(device)
-    device_from_db = repository.read(device.id)
+    device_from_db = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     assert device_from_db.dict() == device.dict()
 
 
@@ -94,7 +71,11 @@ def test__device_repository_read_by_key(
     device: DeviceV3, repository: DeviceRepositoryV3
 ):
     repository.write(device)
-    device_from_db = repository.read(*device.keys[0].parts)
+    device_from_db = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.keys[0].key_value,
+    )
     assert device_from_db.dict() == device.dict()
 
 
@@ -125,12 +106,16 @@ def test__device_repository_key_already_exists_on_another_device(
 @pytest.mark.integration
 def test__device_repository__device_does_not_exist(repository: DeviceRepositoryV3):
     with pytest.raises(ItemNotFound):
-        repository.read("123")
+        repository.read(product_team_id="foo", product_id="bar", id="123")
 
 
 def test__device_repository_local(device: DeviceV3, repository: DeviceRepositoryV3):
     repository.write(device)
-    device_from_db = repository.read(device.id)
+    device_from_db = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     assert device_from_db.dict() == device.dict()
 
 
@@ -138,7 +123,7 @@ def test__device_repository__device_does_not_exist_local(
     repository: DeviceRepositoryV3,
 ):
     with pytest.raises(ItemNotFound):
-        repository.read("123")
+        repository.read(product_team_id="foo", product_id="bar", id="123")
 
 
 @pytest.mark.integration
@@ -146,12 +131,20 @@ def test__device_repository__update(device: DeviceV3, repository: DeviceReposito
     repository.write(device)
 
     # Retrieve the model and treat this as the initial state
-    intermediate_device = repository.read(device.id)
+    intermediate_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     intermediate_device.update(name="foo-bar")
 
     repository.write(intermediate_device)
 
-    final_device = repository.read(device.id)
+    final_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
 
     assert final_device.name == "foo-bar"
 
@@ -165,17 +158,26 @@ def test__device_repository__delete(
 ):
     repository.write(device_with_tag)
 
+    read_query = dict(
+        product_team_id=device_with_tag.product_team_id,
+        product_id=device_with_tag.product_id,
+        id=device_with_tag.id,
+    )
+
     # Retrieve the model and treat this as the initial state
-    device = repository.read(device_with_tag.id)
+    device = repository.read(**read_query)
     device.delete()
     repository.write(device)
 
     # Attempt to read the original device, expecting an ItemNotFound error
     with pytest.raises(ItemNotFound):
-        repository.read(device_with_tag.id)
+        repository.read(**read_query)
 
     # Read the deleted device
-    deleted_device = repository.read_inactive(device_with_tag.id)
+    inactive_repository = InactiveDeviceRepository(
+        table_name=repository.table_name, dynamodb_client=repository.client
+    )
+    deleted_device = inactive_repository.read(**read_query)
 
     # Assert device is inactive after being deleted
     assert deleted_device is not None
@@ -195,15 +197,28 @@ def test__device_repository__can_delete_second_device_with_same_key(
     device = product.create_device(name="OriginalDevice")
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     repository.write(device)
-    repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)  # passes
+
+    read_query = dict(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=DEVICE_KEY,
+    )
+    repository.read(**read_query)  # passes
 
     device.clear_events()
     device.delete()
     repository.write(device)
     with pytest.raises(ItemNotFound):
-        repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)
+        repository.read(**read_query)
 
-    deleted_device = repository.read_inactive(device.id)
+    inactive_repository = InactiveDeviceRepository(
+        table_name=repository.table_name, dynamodb_client=repository.client
+    )
+    deleted_device = inactive_repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     assert deleted_device.status is Status.INACTIVE
 
     # Can re-add the same product id Key after a previous device is inactive
@@ -211,16 +226,20 @@ def test__device_repository__can_delete_second_device_with_same_key(
         _device = product.create_device(name=f"Device-{i}")
         _device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
         repository.write(_device)
-        repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)  # passes
+        repository.read(**read_query)  # passes
 
         _device.clear_events()
         _device.delete()
         repository.write(_device)
         with pytest.raises(ItemNotFound):
-            repository.read(DeviceKeyType.PRODUCT_ID, DEVICE_KEY)
+            repository.read(**read_query)
 
         # Assert device is inactive after being deleted
-        _deleted_device = repository.read_inactive(_device.id)
+        _deleted_device = inactive_repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=_device.id,
+        )
         assert _deleted_device.status is Status.INACTIVE
 
 
@@ -229,7 +248,11 @@ def test__device_repository__add_key(device: DeviceV3, repository: DeviceReposit
     repository.write(device)
 
     # Retrieve the model and treat this as the initial state
-    intermediate_device = repository.read(device.id)
+    intermediate_device = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=device.id,
+    )
     assert len(intermediate_device.keys) == 1
 
     intermediate_device.add_key(
@@ -239,12 +262,16 @@ def test__device_repository__add_key(device: DeviceV3, repository: DeviceReposit
 
     # Read the same device multiple times, indexed by key and id
     # to verify that they're all the same
-    root_index = [(intermediate_device.id,)]
-    non_root_indexes = [k.parts for k in intermediate_device.keys]
+    root_index = intermediate_device.id
+    non_root_indexes = [k.key_value for k in intermediate_device.keys]
 
     retrieved_devices = []
-    for key_parts in root_index + non_root_indexes:
-        _device = repository.read(*key_parts).dict()
+    for key_value in [root_index] + non_root_indexes:
+        _device = repository.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=key_value,
+        ).dict()
         retrieved_devices.append(_device)
 
     # Assert that there are 2 keys, the device can be retrieved 3 ways from the db,
