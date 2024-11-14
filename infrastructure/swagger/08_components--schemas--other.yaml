@@ -3,7 +3,7 @@ components:
   schemas:
     HeaderVersion:
       type: string
-      pattern: "^[1-9][0-9]*\\.?[0-9]+$"
+      pattern: "^[1-9][0-9]?(\\.[0-9])?$"
 
     HeaderRequestId:
       type: string
