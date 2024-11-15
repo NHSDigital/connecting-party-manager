@@ -49,20 +49,22 @@ def test_TableKeys_filter(table_key: TableKeys, expected):
 )
 def test_TableKeys_filter_and_group(table_key: TableKeys, expected):
     iterable = [
-        {"pk_1": "D#foo", "other_data": "FOO"},
-        {"pk_1": "PT#baz", "other_data": "BAZ"},
-        {"pk_1": "D#bar", "other_data": "BAR"},
+        {"pk_read": "D#foo", "other_data": "FOO"},
+        {"pk_read": "PT#baz", "other_data": "BAZ"},
+        {"pk_read": "D#bar", "other_data": "BAR"},
     ]
-    assert list(table_key.filter_and_group(iterable=iterable, key="pk_1")) == expected
+    assert (
+        list(table_key.filter_and_group(iterable=iterable, key="pk_read")) == expected
+    )
 
 
 def test_group_by_key():
     iterable = [
-        {"pk_1": "D#foo", "other_data": "FOO"},
-        {"pk_1": "PT#baz", "other_data": "BAZ"},
-        {"pk_1": "D#bar", "other_data": "BAR"},
+        {"pk_read": "D#foo", "other_data": "FOO"},
+        {"pk_read": "PT#baz", "other_data": "BAZ"},
+        {"pk_read": "D#bar", "other_data": "BAR"},
     ]
-    assert list(group_by_key(iterable=iterable, key="pk_1")) == [
+    assert list(group_by_key(iterable=iterable, key="pk_read")) == [
         ("foo", {"other_data": "FOO"}),
         ("baz", {"other_data": "BAZ"}),
         ("bar", {"other_data": "BAR"}),
@@ -80,18 +82,10 @@ def test_remove_keys():
         **{
             "pk": "0",
             "sk": "0",
-            "pk_1": "1",
-            "sk_1": "1",
-            "pk_2": "2",
-            "sk_2": "2",
-            "pk_3": "3",
-            "sk_3": "3",
+            "pk_read": "1",
+            "sk_read": "1",
             "foo": "FOO",
-            "pk_4": "4",
             "bar": "BAR",
-            "sk_4": "4",
-            "pk_5": "5",
-            "sk_5": "5",
             "baz": "BAZ",
         }
     )

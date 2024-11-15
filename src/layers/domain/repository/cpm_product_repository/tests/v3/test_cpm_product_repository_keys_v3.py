@@ -19,7 +19,7 @@ def test__product_repository__add_key(
     repository.write(product)
 
     product_by_id = repository.read(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id, id=product.id
     )
     assert product_by_id.keys == [party_key]
 
@@ -32,21 +32,16 @@ def test__product_repository__add_key_then_delete(
     product.add_key(**party_key.dict())
     repository.write(product)
 
-    product_by_id = repository.read(
-        product_team_id=product.product_team_id, product_id=product.id
-    )
-    assert product_by_id.keys == [party_key]
-
-    # Read and delete product
     product_from_db = repository.read(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id, id=product.id
     )
+    assert product_from_db.keys == [party_key]
     product_from_db.delete()
     repository.write(product_from_db)
 
     # No longer retrievable
     with pytest.raises(ItemNotFound):
-        repository.read(product_team_id=product.product_team_id, product_id=product.id)
+        repository.read(product_team_id=product.product_team_id, id=product.id)
 
 
 @pytest.mark.integration

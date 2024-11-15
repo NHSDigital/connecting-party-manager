@@ -10,12 +10,17 @@
    3. [AWS SSO Setup](#aws-sso-setup)
    4. [Other helpful commands](#other-helpful-commands)
 2. [Tests](#tests)
-3. [pytest tests](#pytest-tests)
-4. [End-to-End feature tests](#end-to-end-feature-tests)
-5. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
-6. [Workflow](#workflow)
-7. [Swagger](#swagger)
-8. [ETL](#etl)
+   1. [pytest tests](#pytest-tests)
+   2. [End-to-End feature tests](#end-to-end-feature-tests)
+   3. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
+3. [Data modelling](#data-modelling)
+   1. [Domain models](#domain-models)
+   2. [Database models](#database-models)
+   3. [Response models](#response-models)
+   4. [Request models](#request-models)
+4. [Workflow](#workflow)
+5. [Swagger](#swagger)
+6. [ETL](#etl)
 
 ---
 
@@ -272,6 +277,53 @@ with the local feature tests, then you will need to manually update the Apigee `
 in the environment (but these are filled out already if generated with the integration feature tests).
 
 💡 **The feature tests are only guaranteed to work out-of-the-box with an empty database**
+
+## Data modelling
+
+Modelling in Connecting Party Manager is split into four partially-decoupled components:
+
+- Domain models: The conceptual entities of Connecting Party Manager, without any reference to database indexing, and request / response syntax.
+- Database models: A wrapper on the domain models that we persist to database (DynamoDB), indicating write-integrity (primary keys) and a read/search interface (indexing).
+- Response models: Deviations from the domain model (error handling, search result wrapping, private field exclusion, etc)
+- Request models: API-specific models indicating the expected request bodies of create/update/search operations.
+
+### Domain models
+
+TBC
+
+### Database models
+
+#### Write-integrity (primary keys)
+
+The Partition Key (`pk`) that we use for all objects\* in the database is a unique combination of prefix (aligned with the object type, e.g. `D#` for `Device`) and identifier (generally a UUID). The Sort Key (`sk`) that we use is always exactly equal to the Partition Key. This is opposed to having fully denormalised objects so that attributes are nested under their own `sk`. The reason for doing this is to limit multiple read operations for a given object, and also save I/O in our ETL process by reducing the number of database transactions required per object.
+
+Objects can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object,
+a copy is made in the database with the index being that key, rather
+than the object's identifier. Such copies are referred to as non-root
+objects, whereas the "original" (indexed by identifier) is referred to
+as the root object.
+
+\* In the case of `Device` tags, which sit outside of the standard database model, `pk` is equal to a query string and `sk` is equal to `pk` of the object that is referred to. A tag-indexed `Device` is otherwise a copy of the root `Device`.
+
+#### Read/search interface
+
+We have implemented a Global Secondary Index (GSI) for attributes named `pk_read` and `sk_read`. The pattern that is place is as follows:
+
+- `pk_read`: A concatenation of parent `pk` values (joined with `#`, e.g. `PT#<product_team_id>#P<product_id>`)
+- `sk_read`: Equal to the `pk` of the object itself.
+
+We refer to this as an "ownership" model, as it allows for reads to be
+executed in a way that mirrors the API read operations (GET `grandparent/parent/child`), whilst also giving us the ability to return all objects owned by the object indicated in the `pk_read` - which is a common operation for us.
+
+A `read` and `search` is available on all `Repository` patterns (almost) for free (the base `_read` and `_search` require a shallow wrapper, but most of the work is done for you).
+
+### Response models
+
+TBC
+
+### Request models
+
+TBC
 
 ## Workflow
 

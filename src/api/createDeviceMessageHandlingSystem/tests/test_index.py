@@ -136,7 +136,7 @@ def test_index() -> None:
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()
-        assert device.deleted_on is None
+        assert not device.deleted_on
 
         questionnaire_responses = device.questionnaire_responses["spine_mhs/1"]
         assert len(questionnaire_responses) == 1
@@ -147,7 +147,11 @@ def test_index() -> None:
         repo = DeviceRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
-        created_device = repo.read(device.id)
+        created_device = repo.read(
+            product_team_id=device.product_team_id,
+            product_id=device.product_id,
+            id=device.id,
+        )
 
         # Check party_key is added to tags in the created device
         expected_party_key = (str(ProductKeyType.PARTY_KEY), "abc1234-987654")

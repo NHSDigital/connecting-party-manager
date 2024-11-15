@@ -14,12 +14,12 @@ MARSHALL_FUNCTION_BY_TYPE = {
 }
 
 
-def marshall_value(value):
+def marshall_value(value) -> dict:
     fn = MARSHALL_FUNCTION_BY_TYPE.get(type(value), (lambda x: {"S": str(x)}))
     return fn(value)
 
 
-def marshall(**data):
+def marshall(**data) -> dict:
     return marshall_value(data)["M"]
 
 

@@ -4,14 +4,14 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.cpm_system_id.v1 import ProductId
 from domain.core.enum import Status
 from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
+from domain.repository.cpm_product_repository.v3 import (
+    CpmProductRepository,
+    InactiveCpmProductRepository,
+)
 from domain.repository.errors import ItemNotFound
-from domain.repository.keys.v3 import TableKey
-from domain.repository.marshall import marshall, unmarshall
 from domain.repository.product_team_repository.v2 import ProductTeamRepository
 
 from test_helpers.dynamodb import mock_table
@@ -25,26 +25,6 @@ PRODUCT_TEAM_ID = consistent_uuid(1)
 PRODUCT_ID = "P.AAA-AAA"
 PRODUCT_NAME = "My Product"
 VERSION = 1
-
-
-class MockCpmProductRepository(CpmProductRepository):
-    def read_inactive_product(
-        self, product_team_id: str, product_id: str
-    ) -> CpmProduct:
-        pk = TableKey.CPM_PRODUCT_STATUS.key(Status.INACTIVE, product_team_id)
-        sk = TableKey.CPM_PRODUCT.key(product_id)
-        args = {
-            "TableName": self.table_name,
-            "KeyConditionExpression": "pk = :pk AND sk = :sk",
-            "ExpressionAttributeValues": marshall(**{":pk": pk, ":sk": sk}),
-        }
-        result = self.client.query(**args)
-        items = [unmarshall(i) for i in result["Items"]]
-        if len(items) == 0:
-            raise ItemNotFound(product_team_id, product_id, item_type=CpmProduct)
-        (item,) = items
-
-        return CpmProduct(**item)
 
 
 @contextmanager
@@ -100,13 +80,13 @@ def test_index():
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
         with pytest.raises(ItemNotFound):
-            repo.read(product_team_id=product_team.id, product_id=PRODUCT_ID)
+            repo.read(product_team_id=product_team.id, id=PRODUCT_ID)
 
-        repo = MockCpmProductRepository(
+        repo = InactiveCpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
-        deleted_product = repo.read_inactive_product(
-            product_team_id=product_team.id, product_id=PRODUCT_ID
+        deleted_product = repo.read(
+            product_team_id=product_team.id, id=PRODUCT_ID
         ).dict()
 
     # Sense checks on the deleted resource
