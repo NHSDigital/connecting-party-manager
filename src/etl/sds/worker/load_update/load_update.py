@@ -3,7 +3,7 @@ from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.device.v2 import DeviceEventDeserializer
+from domain.core.device import DeviceEventDeserializer
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open

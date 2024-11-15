@@ -4,7 +4,7 @@ both the load_bulk and load_update workers
 """
 
 import boto3
-from domain.repository.device_repository.v2 import DeviceRepository
+from domain.repository.device_repository import DeviceRepository
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 

@@ -1,5 +1,5 @@
 import pytest
-from domain.request_models.v1 import CreateDeviceReferenceMessageSetsDataParams
+from domain.request_models import CreateDeviceReferenceMessageSetsDataParams
 from pydantic import ValidationError
 
 

@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.api.sds.query import SearchSDSEndpointQueryParams
-from domain.repository.device_repository.v2 import DeviceRepository
+from domain.repository.device_repository import DeviceRepository
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 

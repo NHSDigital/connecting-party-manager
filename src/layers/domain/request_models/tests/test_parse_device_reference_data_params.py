@@ -1,5 +1,5 @@
 import pytest
-from domain.request_models.v1 import CreateDeviceReferenceDataIncomingParams
+from domain.request_models import CreateDeviceReferenceDataIncomingParams
 from pydantic import ValidationError
 
 from test_helpers.sample_data import (

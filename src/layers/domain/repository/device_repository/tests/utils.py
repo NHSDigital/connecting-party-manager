@@ -1,7 +1,7 @@
 from typing import Generator
 
 from domain.core.device import Device
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository import DeviceRepository

@@ -6,12 +6,12 @@ from domain.api.common_steps.read_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.core.cpm_product import CpmProduct
+from domain.core.device_reference_data import DeviceReferenceData
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.request_models.v1 import CreateDeviceReferenceDataIncomingParams
+from domain.request_models import CreateDeviceReferenceDataIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 

@@ -1,11 +1,11 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.product_team.v3 import ProductTeam
-from domain.core.root.v3 import Root
+from domain.core.product_team import ProductTeam
+from domain.core.root import Root
 from domain.ods import validate_ods_code
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
-from domain.request_models.v1 import CreateProductTeamIncomingParams
+from domain.repository.product_team_repository import ProductTeamRepository
+from domain.request_models import CreateProductTeamIncomingParams
 from domain.response.validation_errors import (
     mark_json_decode_errors_as_inbound,
     mark_validation_errors_as_inbound,

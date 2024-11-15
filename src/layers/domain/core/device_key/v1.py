@@ -7,6 +7,16 @@ from domain.core.validation import CpmId, SdsId
 from pydantic import validator
 
 
+def validate_key(key: str, type: "DeviceKeyType"):
+    if type and type.pattern.match(key) is None:
+        raise InvalidKeyPattern(
+            f"Key '{key}' does not match the expected "
+            f"pattern '{type.pattern.pattern}' associated with "
+            f"key type '{type}'"
+        )
+    return key
+
+
 class DeviceKeyType(StrEnum):
     PRODUCT_ID = auto()
     ACCREDITED_SYSTEM_ID = auto()
@@ -30,20 +40,27 @@ class DeviceKey(BaseModel):
     A Device Key is a secondary way of indexing / retrieving Devices
     """
 
-    type: DeviceKeyType
-    key: str
+    key_type: DeviceKeyType
+    key_value: str
 
-    @validator("key", check_fields=True)
-    def validate_key(cls, key: str, values: dict):
-        type: DeviceKeyType = values.get("type")
-        return validate_key(key=key, type=type)
+    @validator("key_value", check_fields=True)
+    def validate_key(cls, key_value: str, values: dict):
+        key_type: DeviceKeyType = values.get("key_type")
+        return validate_key(key_value=key_value, key_type=key_type)
+
+    @property
+    def parts(self):
+        return (self.key_type, self.key_value)
+
+    def __hash__(self):
+        return hash(self.parts)
 
 
-def validate_key(key: str, type: DeviceKeyType):
-    if type and type.pattern.match(key) is None:
+def validate_key(key_value: str, key_type: DeviceKeyType):
+    if key_type and key_type.pattern.match(key_value) is None:
         raise InvalidKeyPattern(
-            f"Key '{key}' does not match the expected "
-            f"pattern '{type.pattern.pattern}' associated with "
-            f"key type '{type}'"
+            f"Key '{key_value}' does not match the expected "
+            f"pattern '{key_type.pattern.pattern}' associated with "
+            f"key type '{key_type}'"
         )
-    return key
+    return key_value

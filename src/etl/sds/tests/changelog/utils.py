@@ -2,7 +2,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
-from domain.core.device.v2 import Device
+from domain.core.device import Device
 from event.json import json_load, json_loads
 
 PATH_TO_HERE = Path(__file__).parent / "changelog_components"

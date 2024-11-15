@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from domain.api.common_steps.read_product import before_steps, read_product
 from domain.core.cpm_product import CpmProduct
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
+from domain.repository.cpm_product_repository import CpmProductRepository
 
 
 def delete_product(data, cache) -> CpmProduct:

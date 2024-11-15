@@ -1,7 +1,5 @@
 import pytest
-from domain.core.cpm_system_id import AsidId, PartyKeyId
-
-from src.layers.domain.core.cpm_system_id.v1 import ProductId
+from domain.core.cpm_system_id import AsidId, PartyKeyId, ProductId
 
 
 def test_party_key_generator_format_key():

@@ -7,16 +7,16 @@ from domain.api.common_steps.read_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device.v3 import Device
+from domain.core.cpm_product import CpmProduct
+from domain.core.device import Device
 from domain.core.error import InvalidSpineMhsResponse
-from domain.core.questionnaire.v3 import Questionnaire, QuestionnaireResponse
-from domain.repository.device_repository.v3 import DeviceRepository
-from domain.repository.questionnaire_repository.v2 import QuestionnaireRepository
-from domain.repository.questionnaire_repository.v2.questionnaires import (
+from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
+from domain.repository.device_repository import DeviceRepository
+from domain.repository.questionnaire_repository import (
     QuestionnaireInstance,
+    QuestionnaireRepository,
 )
-from domain.request_models.v1 import CreateMhsDeviceIncomingParams
+from domain.request_models import CreateMhsDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 

@@ -21,6 +21,6 @@ def test__can_instantiate_ods_organisation(ods_code: str):
         "!@£$%",
     ],
 )
-def test__id_must_be_ods_code(ods_code: str):
+def test__id_must_be_valid_ods_code(ods_code: str):
     with pytest.raises(ValidationError):
         Root.create_ods_organisation(ods_code=ods_code)

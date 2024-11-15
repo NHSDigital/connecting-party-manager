@@ -1,7 +1,7 @@
 import pytest
-from domain.core.cpm_system_id.v1 import AsidId, PartyKeyId
+from domain.core.cpm_system_id import AsidId, PartyKeyId
 from domain.repository.cpm_system_id_repository import CpmSystemIdRepository
-from domain.repository.keys.v3 import TableKey
+from domain.repository.keys import TableKey
 from domain.repository.marshall import marshall_value
 from event.aws.client import dynamodb_client
 

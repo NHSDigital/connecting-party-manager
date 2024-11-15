@@ -4,15 +4,15 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-from domain.core.cpm_system_id.v1 import ProductId
+from domain.core.cpm_system_id import ProductId
 from domain.core.enum import Status
-from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import (
+from domain.core.root import Root
+from domain.repository.cpm_product_repository import (
     CpmProductRepository,
     InactiveCpmProductRepository,
 )
 from domain.repository.errors import ItemNotFound
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.repository.product_team_repository import ProductTeamRepository
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID

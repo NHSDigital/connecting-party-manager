@@ -4,10 +4,10 @@ from uuid import UUID, uuid4
 
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot, event
-from domain.core.cpm_system_id.v1 import ProductId
-from domain.core.device.v3 import DuplicateQuestionnaireResponse
+from domain.core.cpm_system_id import ProductId
+from domain.core.device import DuplicateQuestionnaireResponse
 from domain.core.event import Event
-from domain.core.questionnaire.v3 import QuestionnaireResponse
+from domain.core.questionnaire import QuestionnaireResponse
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
 from pydantic import Field

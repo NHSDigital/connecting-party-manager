@@ -1,18 +1,27 @@
-from uuid import UUID
+from datetime import datetime
 
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.device import Device, DeviceCreatedEvent, DeviceStatus, DeviceType
+from domain.core.cpm_product import CpmProduct, CpmProductCreatedEvent
+from domain.core.cpm_system_id import ProductTeamId
+from domain.core.enum import Status
 from domain.core.event import Event
+from domain.core.product_team_key import ProductTeamKey
+from domain.core.timestamp import now
 from domain.core.validation import ENTITY_NAME_REGEX
-from pydantic import Field
+from pydantic import Field, root_validator
 
 
 @dataclass(kw_only=True, slots=True)
 class ProductTeamCreatedEvent(Event):
-    id: UUID
+    id: str
     name: str
     ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[ProductTeamKey] = Field(default_factory=list)
 
 
 class ProductTeam(AggregateRoot):
@@ -22,25 +31,29 @@ class ProductTeam(AggregateRoot):
     ProductTeams, meaning that `ods_code` is not unique amongst ProductTeams.
     """
 
-    id: UUID
+    id: str = None
     name: str = Field(regex=ENTITY_NAME_REGEX)
     ods_code: str
+    status: Status = Status.ACTIVE
+    created_on: datetime = Field(default_factory=now, immutable=True)
+    updated_on: datetime = Field(default=None)
+    deleted_on: datetime = Field(default=None)
+    keys: list[ProductTeamKey] = Field(default_factory=list)
 
-    def create_device(
-        self,
-        name: str,
-        type: DeviceType,
-        status: DeviceStatus = DeviceStatus.ACTIVE,
-        _trust=False,
-    ) -> Device:
-        device = Device(
-            name=name,
-            type=type,
-            status=status,
-            product_team_id=self.id,
-            ods_code=self.ods_code,
+    @root_validator(pre=True)
+    def set_id(cls, values):
+        ods_code = values.get("ods_code")
+        if ods_code and not values.get("id"):
+            product_team = ProductTeamId.create(ods_code=ods_code)
+            values["id"] = product_team.id
+        return values
+
+    def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:
+        extra_kwargs = {"id": product_id} if product_id is not None else {}
+        product = CpmProduct(
+            product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs
         )
-        device_created_event = DeviceCreatedEvent(**device.dict(), _trust=_trust)
-        device.add_event(device_created_event)
-        self.add_event(device_created_event)
-        return device
+        product_created_event = CpmProductCreatedEvent(**product.dict(exclude={"keys"}))
+        product.add_event(product_created_event)
+        self.add_event(product_created_event)
+        return product
