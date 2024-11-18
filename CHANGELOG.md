@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-11-18
+- [PI-601] Workspace destroy, use main branch if branch no longer exists
+
 ## 2024-11-13
 - [PI-617] Stream bulk LDIF into blocks of party key
 - [PI-527] Swagger fix
