@@ -255,8 +255,6 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I note the response field "$.keys.0.key_type" as "party_key_tag"
-    And I note the response field "$.keys.0.key_value" as "party_key_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     And I note the response field "$.id" as "message_set_drd_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:

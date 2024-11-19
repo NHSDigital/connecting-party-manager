@@ -20,7 +20,7 @@ Feature: Create MHS Device - success scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
-    And I note the response field "$.keys.0.key_value" as "party_key_value"
+    And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                            | value                                                     |
       | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
@@ -80,13 +80,13 @@ Feature: Create MHS Device - success scenarios
       | keys.0.key_type         | interaction_id                                                         |
       | keys.0.key_value        | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | tags.0.0.0              | ${ note(party_key_tag) }                                               |
-      | tags.0.0.1              | ${ note(party_key_value) }                                             |
+      | tags.0.0.1              | ${ note(party_key_tag_value) }                                         |
       | questionnaire_responses | << ignore >>                                                           |
       | device_reference_data   | << ignore >>                                                           |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1338             |
+      | Content-Length | 1717             |
 
     Examples:
       | product_team_id            | product_id            |
