@@ -20,7 +20,7 @@ Feature: Create MHS Device - success scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
-    And I note the response field "$.keys.0.key_value" as "party_key_value"
+    And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                            | value                                                     |
       | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
@@ -67,26 +67,34 @@ Feature: Create MHS Device - success scenarios
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
-      | path                    | value                                                                  |
-      | id                      | ${ note(device_id) }                                                   |
-      | name                    | Product-MHS                                                            |
-      | status                  | active                                                                 |
-      | product_id              | ${ note(product_id) }                                                  |
-      | product_team_id         | ${ note(product_team_id) }                                             |
-      | ods_code                | F5H1R                                                                  |
-      | created_on              | << ignore >>                                                           |
-      | updated_on              | << ignore >>                                                           |
-      | deleted_on              | << ignore >>                                                           |
-      | keys.0.key_type         | interaction_id                                                         |
-      | keys.0.key_value        | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
-      | tags.0.0.0              | ${ note(party_key_tag) }                                               |
-      | tags.0.0.1              | ${ note(party_key_value) }                                             |
-      | questionnaire_responses | << ignore >>                                                           |
-      | device_reference_data   | << ignore >>                                                           |
+      | path             | value                                                                  |
+      | id               | ${ note(device_id) }                                                   |
+      | name             | Product-MHS                                                            |
+      | status           | active                                                                 |
+      | product_id       | ${ note(product_id) }                                                  |
+      | product_team_id  | ${ note(product_team_id) }                                             |
+      | ods_code         | F5H1R                                                                  |
+      | created_on       | << ignore >>                                                           |
+      | updated_on       | << ignore >>                                                           |
+      | deleted_on       | << ignore >>                                                           |
+      | keys.0.key_type  | interaction_id                                                         |
+      | keys.0.key_value | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | tags.0.0.0       | ${ note(party_key_tag) }                                               |
+      <<<<<<< HEAD
+      | tags.0.0.1 | ${ note(party_key_value) } |
+      =======
+      | tags.0.0.1 | ${ note(party_key_tag_value) } |
+      >>>>>>> 894cef9 (feature/PI-582-modify_read_device Read mhs device with drds)
+      | questionnaire_responses | << ignore >> |
+      | device_reference_data   | << ignore >> |
     And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 1338             |
+      | name         | value            |
+      | Content-Type | application/json |
+      <<<<<<< HEAD
+      | Content-Length | 1338 |
+      =======
+      | Content-Length | 1717 |
+    >>>>>>> 894cef9 (feature/PI-582-modify_read_device Read mhs device with drds)
 
     Examples:
       | product_team_id            | product_id            |
