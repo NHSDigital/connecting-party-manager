@@ -26,9 +26,17 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [parse-secrets]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Branch
+        id: checkout-build-branch
+        uses: actions/checkout@v4
+        continue-on-error: true
         with:
-          ref: ${{ env.BRANCH_NAME || 'main' }}
+          ref: ${{ env.BRANCH_NAME }}
+      - name: Fallback to main
+        if: steps.checkout-build-branch.outcome == 'failure'
+        uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: ./.github/actions/make/
         with:
           command: build
@@ -39,9 +47,17 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [parse-secrets, build-base]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Branch for destroy
+        id: checkout-destroy-branch
+        uses: actions/checkout@v4
+        continue-on-error: true
         with:
-          ref: ${{ env.BRANCH_NAME || 'main' }}
+          ref: ${{ env.BRANCH_NAME }}
+      - name: Fallback to main for destroy
+        if: steps.checkout-destroy-branch.outcome == 'failure'
+        uses: actions/checkout@v4
+        with:
+          ref: main
           fetch-depth: 0
       - name: Remove PR workspaces
         uses: ./.github/actions/make/
