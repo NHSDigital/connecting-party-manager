@@ -166,10 +166,6 @@ class SdsBaseModel(BaseModel):
     def export(self) -> dict[str, any]:
         return orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
 
-    def as_questionnaire_response_answers(self, data=None) -> list[dict[str, list]]:
-        data = data or self.export()
-        return [{k: (v if _is_iterable(v) else [v])} for k, v in data.items()]
-
     @classmethod
     def parse_and_validate_field(cls, field: str, value: list | set):
         return _parse_and_validate_field(cls=cls, field=field, value=value)
@@ -177,11 +173,3 @@ class SdsBaseModel(BaseModel):
     @classmethod
     def is_mandatory_field(cls, field: str):
         return cls.__fields__[field].required
-
-    @classmethod
-    def key_fields(cls) -> tuple[str, ...]:
-        raise NotImplementedError()
-
-    @classmethod
-    def is_key_field(cls, field):
-        return field in cls.key_fields()

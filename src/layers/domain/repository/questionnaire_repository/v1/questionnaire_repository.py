@@ -2,6 +2,7 @@ from pathlib import Path
 
 from domain.core.questionnaire import Questionnaire
 from domain.repository.errors import ItemNotFound
+from event.json import json_load
 
 PATH_TO_QUESTIONNAIRES = Path(__file__).parent / "questionnaires"
 
@@ -34,3 +35,7 @@ class QuestionnaireRepository:
         version = version_from_file_path(path)
         schema = read_schema(path=path)
         return Questionnaire(name=name, version=version, json_schema=schema)
+
+    def read_field_mapping(self, name: str) -> dict:
+        with open(PATH_TO_QUESTIONNAIRES / name.lower() / "field_mapping.json") as f:
+            return json_load(f)

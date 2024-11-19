@@ -115,12 +115,13 @@
     "MHS Service Description": {
       "type": "string"
     },
-    "Manufacturer ODS code": {
+    "MHS Manufacturer Organisation": {
       "type": "string"
     }
   },
   "required": [
     "Address",
+    "MHS Manufacturer Organisation",
     "Unique Identifier",
     "Managing Organization",
     "MHS Party key",

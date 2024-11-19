@@ -59,9 +59,7 @@ NHS_MHS_STRATEGY = builds(
     ),
     nhsidcode=from_regex(ODS_CODE_REGEX, fullmatch=True),
     nhsproductname=text(alphabet=ascii_letters + digits + " -_", min_size=1),
-    nhsmhspartykey=from_regex(
-        SdsId.MessageHandlingSystem.PARTY_KEY_REGEX, fullmatch=True
-    ),
+    nhsmhspartykey=from_regex(SdsId.PartyKey.PARTY_KEY_REGEX, fullmatch=True),
     nhsmhssvcia=text(alphabet=ascii_letters + digits + ":", min_size=1),
     nhsmhsendpoint=urls(),
 )

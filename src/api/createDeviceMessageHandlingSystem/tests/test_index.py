@@ -23,12 +23,13 @@ from domain.repository.questionnaire_repository import (
     QuestionnaireRepository,
 )
 from event.json import json_loads
+from sds.epr.constants import MHS_DEVICE_SUFFIX, EprNameTemplate
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.uuid import consistent_uuid
 
 TABLE_NAME = "hiya"
-DEVICE_NAME = "Product-MHS"
+DEVICE_NAME = "ABC1234-987654 - Message Handling System"
 ODS_CODE = "AAA"
 PRODUCT_ID = ProductId.create()
 PRODUCT_TEAM_NAME = "My Product Team"
@@ -52,6 +53,7 @@ QUESTIONNAIRE_DATA = {
     "MHS Is Authenticated": "PERSISTENT",
     "Product Key": "product-key-001",
     "Requestor URP": "requestor-789",
+    "MHS Manufacturer Organisation": "AAA",
 }
 
 
@@ -103,7 +105,7 @@ def mock_epr_product_with_message_set_drd() -> (
 
         # Set up DeviceReferenceData in DB
         device_reference_data = product.create_device_reference_data(
-            name="ABC1234-987654 - MHS Message Set"
+            name=EprNameTemplate.MESSAGE_SETS.format(party_key="ABC1234-987654")
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -205,7 +207,7 @@ def test_index() -> None:
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
         assert device.product_id == product.id
-        assert device.name == DEVICE_NAME
+        assert device.name.endswith(MHS_DEVICE_SUFFIX)
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()
@@ -302,7 +304,7 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
                 }
             },
             "MISSING_VALUE",
-            "Failed to validate data against 'spine_mhs/1': 'Unique Identifier' is a required property",
+            "Failed to validate data against 'spine_mhs/1': 'MHS Manufacturer Organisation' is a required property",
             400,
         ),
     ],

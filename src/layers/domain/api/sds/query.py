@@ -10,7 +10,7 @@ class SearchSDSQueryParams(BaseModel):
 
     @classmethod
     @cache
-    def allowed_field_combinations(cls) -> list[tuple[str]]:
+    def allowed_field_combinations(cls) -> list[set[str]]:
         """
         This method is used to generate all allowed combinations of search fields
         for the given query parameters. Down the line this also used to generate
@@ -31,7 +31,7 @@ class SearchSDSQueryParams(BaseModel):
         )
 
         return [
-            (*mandatory_fields, *_optional_field_combination)
+            {*mandatory_fields, *_optional_field_combination}
             for _optional_field_combination in optional_field_combinations
         ]
 

@@ -7,12 +7,15 @@ from domain.core.validation import CpmId
 
 class ProductTeamKeyType(StrEnum):
     PRODUCT_TEAM_ID_ALIAS = auto()
+    EPR_ID = auto()
 
     @property
     def pattern(self) -> re.Pattern:
         match self:
             case ProductTeamKeyType.PRODUCT_TEAM_ID_ALIAS:
                 return CpmId.ProductTeamIdAlias.ID_PATTERN
+            case ProductTeamKeyType.EPR_ID:
+                return CpmId.EprId.ID_PATTERN
             case _:
                 raise NotImplementedError(f"No ID validation configured for '{self}'")
 

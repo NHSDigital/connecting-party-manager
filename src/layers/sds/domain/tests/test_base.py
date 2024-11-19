@@ -178,22 +178,3 @@ def test__parse_and_validate_field(field, is_mandatory):
         other_field: Optional[str]
 
     assert MyModel.is_mandatory_field(field) is is_mandatory
-
-
-@pytest.mark.parametrize(
-    ["field", "is_key_field"],
-    [
-        ("my_field", True),
-        ("other_field", False),
-    ],
-)
-def test_key_fields(field, is_key_field):
-    class MyModel(SdsBaseModel):
-        my_field: str = Field(alias="myField")
-        other_field: Optional[str]
-
-        @classmethod
-        def key_fields(cls) -> tuple[str, ...]:
-            return ("my_field",)
-
-    assert MyModel.is_key_field(field) is is_key_field

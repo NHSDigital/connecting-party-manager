@@ -9,7 +9,6 @@ from domain.api.common_steps.read_product import (
 )
 from domain.core.cpm_product import CpmProduct
 from domain.core.device import (
-    MHS_DEVICE_NAME,
     Device,
     DeviceKeyAddedEvent,
     DeviceReferenceDataIdAddedEvent,
@@ -31,6 +30,7 @@ from domain.repository.questionnaire_repository import (
 )
 from domain.request_models import CpmProductPathParams, CreateMhsDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
+from sds.epr.constants import EprNameTemplate, SdsDeviceReferenceDataPath, SdsFieldName
 
 
 @mark_validation_errors_as_inbound
@@ -42,13 +42,17 @@ def parse_mhs_device_payload(data, cache) -> CreateMhsDeviceIncomingParams:
 def check_for_existing_mhs(data, cache):
     product_team: ProductTeam = data[read_product_team]
     product: CpmProduct = data[read_product]
+    party_key: str = data[get_party_key]
 
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
 
     devices = device_repo.search(product_team_id=product_team.id, product_id=product.id)
-    if any(device.name == MHS_DEVICE_NAME for device in devices):
+    if any(
+        device.name == EprNameTemplate.MHS_DEVICE.format(party_key=party_key)
+        for device in devices
+    ):
         raise ConfigurationError(
             "There is already an existing MHS Device for this Product"
         )
@@ -65,12 +69,11 @@ def read_device_reference_data(data, cache) -> DeviceReferenceData:
     )
 
     party_key: str = data[get_party_key]
-    # use {QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS}
-    mhs_message_set_drd_name = f"{party_key} - MHS Message Set"
-
     try:
         (device_reference_data,) = filter(
-            lambda drd: drd.name == mhs_message_set_drd_name, device_reference_datas
+            lambda drd: drd.name
+            == EprNameTemplate.MESSAGE_SETS.format(party_key=party_key),
+            device_reference_datas,
         )
     except ValueError:
         raise ConfigurationError(
@@ -98,11 +101,14 @@ def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireRespo
 
 def create_mhs_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
+    party_key: str = data[get_party_key]
     payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
     device_payload = payload.dict(exclude={"questionnaire_responses"})
-    return product.create_device(**device_payload)
+    return product.create_device(
+        name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key), **device_payload
+    )
 
 
 def create_party_key_tag(data, cache) -> DeviceTagAddedEvent:
@@ -114,20 +120,18 @@ def create_cpa_id_keys(data, cache) -> DeviceKeyAddedEvent:
     mhs_device: Device = data[create_mhs_device]
     party_key = data[get_party_key]
     drd: DeviceReferenceData = data[read_device_reference_data]
-    interaction_ids = []
 
-    # Extract Interaction IDs from questionnaire responses
     questionnaire_responses = drd.questionnaire_responses.get(
         f"{QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS}/1", []
     )
-    for response in questionnaire_responses:
-        interaction_ids.append(response.data.get("Interaction ID"))
 
-    # Use cpa_id in furture
+    interaction_ids = [
+        response.data.get(SdsFieldName.INTERACTION_ID)
+        for response in questionnaire_responses
+    ]
+
     for id in interaction_ids:
-        mhs_device.add_key(
-            key_type=DeviceKeyType.INTERACTION_ID, key_value=f"{party_key}:{id}"
-        )
+        mhs_device.add_key(key_type=DeviceKeyType.CPA_ID, key_value=f"{party_key}:{id}")
 
     return mhs_device
 
@@ -136,7 +140,8 @@ def add_device_reference_data_id(data, cache) -> DeviceReferenceDataIdAddedEvent
     mhs_device: Device = data[create_mhs_device]
     drd: DeviceReferenceData = data[read_device_reference_data]
     return mhs_device.add_device_reference_data_id(
-        device_reference_data_id=str(drd.id), path_to_data=["*"]
+        device_reference_data_id=str(drd.id),
+        path_to_data=[SdsDeviceReferenceDataPath.ALL],
     )
 
 
