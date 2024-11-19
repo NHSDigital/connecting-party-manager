@@ -63,7 +63,7 @@ def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
     product: CpmProduct = data[read_product]
     device: Device = data[read_device]
 
-    drds = []
+    device_reference_datas = []
     device_reference_data_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
@@ -73,23 +73,20 @@ def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
             product_id=product.id,
             id=id,
         )
-        drds.append(drd)
+        device_reference_datas.append(drd)
 
-    return drds
+    return device_reference_datas
 
 
 def update_device_with_device_reference_data(data, cache) -> Device:
     device: Device = data[read_device]
     device_reference_datas = data[read_device_reference_data]
 
-    for drd in device_reference_datas:
-        for key, responses in drd.questionnaire_responses.items():
-            if key not in device.questionnaire_responses:
-                # If the key doesn't exist, initialize it with the responses
-                device.questionnaire_responses[key] = responses
-            else:
-                # If the key exists, extend the list with new responses
-                device.questionnaire_responses[key].extend(responses)
+    [
+        device.questionnaire_responses.setdefault(key, []).extend(responses)
+        for drd in device_reference_datas
+        for key, responses in drd.questionnaire_responses.items()
+    ]
 
     return device
 
