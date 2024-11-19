@@ -17,6 +17,7 @@ Feature: Create AS Device - success scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
+    And I note the response field "$.keys.0.key_value" as "party_key"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
