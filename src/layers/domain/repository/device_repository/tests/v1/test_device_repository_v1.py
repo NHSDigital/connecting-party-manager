@@ -292,6 +292,7 @@ def device_created_event():
         keys=[],
         tags=["a", "b", "c"],
         questionnaire_responses={"foo": "bar"},
+        device_reference_data={},
     )
 
 

@@ -38,10 +38,11 @@ Feature: Read Device - success scenarios
       | keys                    | []                         |
       | tags                    | []                         |
       | questionnaire_responses | << ignore >>               |
+      | device_reference_data   | << ignore >>               |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 345              |
+      | Content-Length | 374              |
 
     Examples:
       | product_team_id            |
@@ -80,10 +81,11 @@ Feature: Read Device - success scenarios
       | keys                    | []                         |
       | tags                    | []                         |
       | questionnaire_responses | << ignore >>               |
+      | device_reference_data   | << ignore >>               |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 345              |
+      | Content-Length | 374              |
 
     Examples:
       | product_team_id            | product_id            |

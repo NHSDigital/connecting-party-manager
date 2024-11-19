@@ -1,7 +1,9 @@
 from collections import defaultdict
 from typing import Literal
 
+from domain.core.device import MHS_DEVICE_NAME
 from domain.core.product_team_key import ProductTeamKey
+from domain.repository.questionnaire_repository import QuestionnaireInstance
 from pydantic import BaseModel, Extra, Field
 
 ALPHANUMERIC_SPACES_AND_UNDERSCORES = r"^[a-zA-Z0-9 _]*$"
@@ -38,16 +40,16 @@ class CreateDeviceReferenceDataIncomingParams(BaseModel, extra=Extra.forbid):
 
 
 class CreateDeviceReferenceMessageSetsDataParams(BaseModel, extra=Extra.forbid):
-    questionnaire_responses: dict[Literal["spine_mhs_message_sets"], list[dict]] = (
-        Field(default_factory=lambda: defaultdict(list))
-    )
+    questionnaire_responses: dict[
+        Literal[QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS], list[dict]
+    ] = Field(default_factory=lambda: defaultdict(list))
 
 
 class CreateDeviceReferenceAdditionalInteractionsDataParams(
     BaseModel, extra=Extra.forbid
 ):
     questionnaire_responses: dict[
-        Literal["spine_as_additional_interactions"], list[dict]
+        Literal[QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS], list[dict]
     ] = Field(default_factory=lambda: defaultdict(list))
 
 
@@ -67,9 +69,15 @@ class CreateDeviceIncomingParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
 
 
+class SpineMhsQuestionnaireRsponse(BaseModel):
+    __root__: list[dict] = Field(min_items=1, max_items=1)
+
+
 class CreateMhsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
-    name: str = "Product-MHS"
-    questionnaire_responses: dict[str, list[dict]] = Field(...)
+    name: str = MHS_DEVICE_NAME
+    questionnaire_responses: dict[
+        Literal[QuestionnaireInstance.SPINE_MHS], SpineMhsQuestionnaireRsponse
+    ] = Field(...)
 
 
 class DevicePathParams(BaseModel, extra=Extra.forbid):

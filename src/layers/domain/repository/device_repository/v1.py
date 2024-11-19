@@ -7,6 +7,7 @@ from domain.core.device import (
     DeviceDeletedEvent,
     DeviceKeyAddedEvent,
     DeviceKeyDeletedEvent,
+    DeviceReferenceDataIdAddedEvent,
     DeviceTag,
     DeviceTagAddedEvent,
     DeviceTagsAddedEvent,
@@ -20,7 +21,7 @@ from domain.core.event import Event
 from domain.repository.compression import pkl_dumps_gzip, pkl_loads_gzip
 from domain.repository.keys import TableKey
 from domain.repository.marshall import marshall, marshall_value, unmarshall
-from domain.repository.repository import Repository
+from domain.repository.repository import Repository, TooManyResults
 from domain.repository.transaction import (
     ConditionExpression,
     TransactionStatement,
@@ -160,7 +161,7 @@ class DeviceRepository(Repository[Device]):
     def read(self, product_team_id: str, product_id: str, id: str):
         return super()._read(parent_ids=(product_team_id, product_id), id=id)
 
-    def search(self, product_team_id: str, product_id: str, id: str):
+    def search(self, product_team_id: str, product_id: str):
         return super()._query(parent_ids=(product_team_id, product_id))
 
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent) -> TransactItem:
@@ -394,28 +395,22 @@ class DeviceRepository(Repository[Device]):
         )
         return delete_tags_transactions + update_transactions
 
+    def handle_DeviceReferenceDataIdAddedEvent(
+        self, event: DeviceReferenceDataIdAddedEvent
+    ) -> TransactItem:
+        pk = TableKey.DEVICE.key(event.id)
+        data = asdict(event)
+        data.pop("id")
+        return update_transactions(
+            table_name=self.table_name, primary_keys=[marshall(pk=pk, sk=pk)], data=data
+        )
+
     def handle_QuestionnaireResponseUpdatedEvent(
         self, event: QuestionnaireResponseUpdatedEvent
-    ):
-        data = {
-            "questionnaire_responses": event.questionnaire_responses,
-            "updated_on": event.updated_on,
-        }
-
-        # Update "questionnaire_responses" on the root and key-indexed Devices
-        keys = {DeviceKey(**key).key_value for key in event.keys}
-        update_root_and_key_transactions = self.update_indexes(
-            id=event.id, keys=keys, data=data
-        )
-
-        # Update "questionnaire_responses" on the tag-indexed Devices
-        update_tag_transactions = update_tag_indexes(
-            table_name=self.table_name,
-            device_id=event.id,
-            tag_values=event.tags,
-            data=data,
-        )
-        return update_root_and_key_transactions + update_tag_transactions
+    ) -> TransactItem:
+        data = asdict(event)
+        data.pop("id")
+        return self.update_indexes(id=event.id, keys=[], data=data)
 
     def handle_bulk(self, item: dict) -> list[dict]:
         parent_key = (item["product_team_id"], item["product_id"])

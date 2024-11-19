@@ -50,7 +50,7 @@ def get_party_key(data, cache) -> str:
         (party_key,) = party_keys
     except ValueError:
         raise NotEprProductError(
-            "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
+            "Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key"
         )
     return party_key
 
