@@ -7,16 +7,6 @@ from domain.core.validation import CpmId, SdsId
 from pydantic import validator
 
 
-def validate_key(key: str, type: "DeviceKeyType"):
-    if type and type.pattern.match(key) is None:
-        raise InvalidKeyPattern(
-            f"Key '{key}' does not match the expected "
-            f"pattern '{type.pattern.pattern}' associated with "
-            f"key type '{type}'"
-        )
-    return key
-
-
 class DeviceKeyType(StrEnum):
     PRODUCT_ID = auto()
     ACCREDITED_SYSTEM_ID = auto()
