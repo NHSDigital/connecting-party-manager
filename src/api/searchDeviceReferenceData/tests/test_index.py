@@ -4,12 +4,12 @@ from unittest import mock
 
 import pytest
 from domain.core.cpm_system_id import ProductId
-from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
+from domain.core.root import Root
+from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.repository.product_team_repository import ProductTeamRepository
 from event.aws.client import dynamodb_client
 from event.json import json_loads
 

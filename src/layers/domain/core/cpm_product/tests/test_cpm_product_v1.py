@@ -3,7 +3,7 @@ from uuid import UUID
 
 import pytest
 from domain.core.cpm_product import CpmProduct
-from domain.core.cpm_system_id.v1 import ProductId
+from domain.core.cpm_system_id import ProductId
 
 
 @pytest.fixture

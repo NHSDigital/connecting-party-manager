@@ -1,5 +1,5 @@
 import pytest
-from domain.request_models.v1 import QuestionnairePathParams
+from domain.request_models import QuestionnairePathParams
 from pydantic import ValidationError
 
 

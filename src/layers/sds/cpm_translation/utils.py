@@ -2,7 +2,7 @@ from itertools import product
 from typing import Iterable
 
 from domain.api.sds.query import SearchSDSQueryParams
-from domain.core.device.v2 import Device, DeviceTag
+from domain.core.device import Device, DeviceTag
 from sds.cpm_translation.constants import UNIQUE_IDENTIFIER
 
 

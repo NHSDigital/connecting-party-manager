@@ -1,6 +1,6 @@
 from itertools import chain
 
-from domain.core.device.v2 import Device
+from domain.core.device import Device
 
 
 def export_events(devices: list[Device]) -> list[dict]:

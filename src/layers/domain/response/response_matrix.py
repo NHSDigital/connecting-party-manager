@@ -6,7 +6,7 @@ from domain.core.error import (
     InvalidSpineMhsResponse,
     NotEprProductError,
 )
-from domain.core.questionnaire.v3 import (
+from domain.core.questionnaire import (
     QuestionnaireResponseMissingValue,
     QuestionnaireResponseValidationError,
 )

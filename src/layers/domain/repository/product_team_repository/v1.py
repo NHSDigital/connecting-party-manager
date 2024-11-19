@@ -1,46 +1,37 @@
 from attr import asdict
 from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
-from domain.repository.errors import ItemNotFound
-from domain.repository.keys import TableKeys
-from domain.repository.marshall import marshall, marshall_value, unmarshall
+from domain.core.product_team_key import ProductTeamKey
+from domain.repository.keys import TableKey
 from domain.repository.repository import Repository
-from domain.repository.transaction import (
-    ConditionExpression,
-    TransactionStatement,
-    TransactItem,
-)
 
 
 class ProductTeamRepository(Repository[ProductTeam]):
     def __init__(self, table_name: str, dynamodb_client):
         super().__init__(
-            table_name=table_name, model=ProductTeam, dynamodb_client=dynamodb_client
+            table_name=table_name,
+            model=ProductTeam,
+            dynamodb_client=dynamodb_client,
+            table_key=TableKey.PRODUCT_TEAM,
+            parent_table_keys=(TableKey.PRODUCT_TEAM,),
         )
+
+    def read(self, id: str) -> ProductTeam:
+        return super()._read(parent_ids=(), id=id)
 
     def handle_ProductTeamCreatedEvent(self, event: ProductTeamCreatedEvent):
-        pk = TableKeys.PRODUCT_TEAM.key(event.id)
-        return TransactItem(
-            Put=TransactionStatement(
-                TableName=self.table_name,
-                Item=marshall(pk=pk, sk=pk, **asdict(event)),
-                ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
-            )
+        create_root_transaction = self.create_index(
+            id=event.id, parent_key_parts=(event.id,), data=asdict(event), root=True
         )
 
-    def read(self, id) -> ProductTeam:
-        pk = TableKeys.PRODUCT_TEAM.key(id)
-        args = {
-            "TableName": self.table_name,
-            "KeyConditionExpression": "pk = :pk AND sk = :sk",
-            "ExpressionAttributeValues": {
-                ":pk": marshall_value(pk),
-                ":sk": marshall_value(pk),
-            },
-        }
-        result = self.client.query(**args)
-        items = [unmarshall(i) for i in result["Items"]]
-        if len(items) == 0:
-            raise ItemNotFound(id, item_type=ProductTeam)
-        (item,) = items
+        keys = {ProductTeamKey(**key) for key in event.keys}
+        create_key_transactions = [
+            self.create_index(
+                id=key.key_value,
+                parent_key_parts=(key.key_value,),
+                data=asdict(event),
+                root=True,
+            )
+            for key in keys
+        ]
 
-        return ProductTeam(**item)
+        return [create_root_transaction] + create_key_transactions

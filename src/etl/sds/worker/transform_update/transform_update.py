@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import boto3
 from domain.core.event import ExportedEventTypeDef
-from domain.repository.device_repository.v2 import DeviceRepository
+from domain.repository.device_repository import DeviceRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open

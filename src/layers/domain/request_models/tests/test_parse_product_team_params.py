@@ -1,5 +1,5 @@
 import pytest
-from domain.request_models.v1 import CreateProductTeamIncomingParams
+from domain.request_models import CreateProductTeamIncomingParams
 from pydantic import ValidationError
 
 from test_helpers.sample_data import (

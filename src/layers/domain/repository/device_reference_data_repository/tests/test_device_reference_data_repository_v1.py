@@ -1,6 +1,6 @@
 import pytest
-from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.core.device_reference_data import DeviceReferenceData
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.errors import AlreadyExistsError, ItemNotFound

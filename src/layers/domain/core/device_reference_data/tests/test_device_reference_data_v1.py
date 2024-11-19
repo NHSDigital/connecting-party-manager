@@ -1,10 +1,10 @@
 import json
 
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device_reference_data.v1 import QuestionnaireResponseUpdatedEvent
-from domain.core.questionnaire.tests.test_questionnaire_v3 import VALID_SCHEMA
-from domain.core.questionnaire.v3 import Questionnaire
+from domain.core.cpm_product import CpmProduct
+from domain.core.device_reference_data import QuestionnaireResponseUpdatedEvent
+from domain.core.questionnaire import Questionnaire
+from domain.core.questionnaire.tests.test_questionnaire_v1 import VALID_SCHEMA
 
 from test_helpers.uuid import consistent_uuid
 

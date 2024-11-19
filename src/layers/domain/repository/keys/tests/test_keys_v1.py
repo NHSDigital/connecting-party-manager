@@ -1,12 +1,7 @@
 from uuid import uuid4
 
 import pytest
-from domain.repository.keys import (
-    TableKeys,
-    group_by_key,
-    remove_keys,
-    strip_key_prefix,
-)
+from domain.repository.keys import TableKey, group_by_key, remove_keys, strip_key_prefix
 
 FIXED_UUID = uuid4()
 
@@ -14,22 +9,22 @@ FIXED_UUID = uuid4()
 @pytest.mark.parametrize(
     ("table_key", "args", "expected"),
     [
-        (TableKeys.DEVICE, (FIXED_UUID, "foo", 1), f"D#{FIXED_UUID}#foo#1"),
-        (TableKeys.PRODUCT_TEAM, ("foo",), "PT#foo"),
+        (TableKey.DEVICE, (FIXED_UUID, "foo", 1), f"D#{FIXED_UUID}#foo#1"),
+        (TableKey.PRODUCT_TEAM, ("foo",), "PT#foo"),
     ],
 )
-def test_TableKeys_key(table_key: TableKeys, args, expected):
+def test_TableKeys_key(table_key: TableKey, args, expected):
     assert table_key.key(*args) == expected
 
 
 @pytest.mark.parametrize(
     ("table_key", "expected"),
     [
-        (TableKeys.DEVICE, [{"key": "D#foo"}, {"key": "D#bar"}]),
-        (TableKeys.PRODUCT_TEAM, [{"key": "PT#foo"}]),
+        (TableKey.DEVICE, [{"key": "D#foo"}, {"key": "D#bar"}]),
+        (TableKey.PRODUCT_TEAM, [{"key": "PT#foo"}]),
     ],
 )
-def test_TableKeys_filter(table_key: TableKeys, expected):
+def test_TableKeys_filter(table_key: TableKey, expected):
     iterable = [{"key": "D#foo"}, {"key": "PT#foo"}, {"key": "D#bar"}]
     assert list(table_key.filter(iterable=iterable, key="key")) == expected
 
@@ -38,16 +33,16 @@ def test_TableKeys_filter(table_key: TableKeys, expected):
     ("table_key", "expected"),
     [
         (
-            TableKeys.DEVICE,
+            TableKey.DEVICE,
             [("foo", {"other_data": "FOO"}), ("bar", {"other_data": "BAR"})],
         ),
         (
-            TableKeys.PRODUCT_TEAM,
+            TableKey.PRODUCT_TEAM,
             [("baz", {"other_data": "BAZ"})],
         ),
     ],
 )
-def test_TableKeys_filter_and_group(table_key: TableKeys, expected):
+def test_TableKeys_filter_and_group(table_key: TableKey, expected):
     iterable = [
         {"pk_read": "D#foo", "other_data": "FOO"},
         {"pk_read": "PT#baz", "other_data": "BAZ"},
