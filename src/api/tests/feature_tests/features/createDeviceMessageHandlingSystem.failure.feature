@@ -7,7 +7,7 @@ Feature: Create MHS Device - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Cannot create a MHS Device with a Device body that is missing fields (no questionnaire_responses) and has extra param
+  Scenario: Cannot create a MHS Device with a body that is missing fields (no questionnaire_responses) and has extra param
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path     | value                 |
       | name     | My Great Product Team |
