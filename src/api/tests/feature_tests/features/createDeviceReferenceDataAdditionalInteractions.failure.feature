@@ -88,13 +88,13 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | path                                                        | value |
       | questionnaire_responses.bad_questionnaire_name.0.some_value | 123   |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                                                  |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                                                       |
-      | errors.0.message | CreateDeviceReferenceAdditionalInteractionsDataParams.questionnaire_responses.__key__: unexpected value; permitted: 'spine_as_additional_interactions' |
+      | path             | value                                                                                                                                                                                                            |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                                                                                                 |
+      | errors.0.message | CreateDeviceReferenceAdditionalInteractionsDataParams.questionnaire_responses.__key__: unexpected value; permitted: <QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS: 'spine_as_additional_interactions'> |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 207              |
+      | Content-Length | 265              |
 
   Scenario: Fail to create a second "AS Additional Interactions" Device Reference Data in the same EPR Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:

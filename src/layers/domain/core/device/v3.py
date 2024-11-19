@@ -21,14 +21,7 @@ from pydantic import Field, root_validator
 
 UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
-
-
-class QuestionnaireNotFoundError(Exception):
-    pass
-
-
-class QuestionnaireResponseNotFoundError(Exception):
-    pass
+MHS_DEVICE_NAME = "Product-MHS"
 
 
 class DuplicateQuestionnaireResponse(Exception):
@@ -49,6 +42,7 @@ class DeviceCreatedEvent(Event):
     keys: list[DeviceKey]
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -65,6 +59,7 @@ class DeviceUpdatedEvent(Event):
     keys: list[DeviceKey]
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -82,6 +77,7 @@ class DeviceDeletedEvent(Event):
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
     deleted_tags: list[str] = None
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -99,6 +95,7 @@ class DeviceKeyAddedEvent(Event):
     keys: list[DeviceKey]
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -125,6 +122,7 @@ class DeviceTagAddedEvent(Event):
     keys: list[DeviceKey]
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -142,6 +140,7 @@ class DeviceTagsAddedEvent(Event):
     keys: list[DeviceKey]
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -162,6 +161,12 @@ class QuestionnaireResponseUpdatedEvent(Event):
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     keys: list[DeviceKey]
     tags: list[str]
+
+
+@dataclass(kw_only=True, slots=True)
+class DeviceReferenceDataIdAddedEvent(Event):
+    id: str
+    device_reference_data: dict[str, list[str]]
     updated_on: str = None
 
 
@@ -237,6 +242,17 @@ class DeviceTag(BaseModel):
         return self.hash == other.hash
 
 
+@dataclass(kw_only=True, slots=True)
+class QuestionnaireResponseUpdatedEvent(Event):
+    """
+    This is adding the inital questionnaire response from the event body request.
+    """
+
+    id: str
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    updated_on: str = None
+
+
 class Device(AggregateRoot):
     """
     An entity in the database.  It could model all sorts of different logical or
@@ -262,6 +278,9 @@ class Device(AggregateRoot):
     keys: list[DeviceKey] = Field(default_factory=list)
     tags: set[DeviceTag] | list[DeviceTag] = Field(default_factory=set)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
+        default_factory=lambda: defaultdict(list)
+    )
+    device_reference_data: dict[str, list[str]] = Field(
         default_factory=lambda: defaultdict(list)
     )
 
@@ -383,12 +402,20 @@ class Device(AggregateRoot):
 
         return QuestionnaireResponseUpdatedEvent(
             id=self.id,
-            keys=[k.dict() for k in self.keys],
-            tags=[t.value for t in self.tags],
             questionnaire_responses={
                 qid: [qr.dict() for qr in qrs]
                 for qid, qrs in self.questionnaire_responses.items()
             },
+        )
+
+    @event
+    def add_device_reference_data_id(
+        self, device_reference_data_id: str, path_to_data: list[str]
+    ) -> DeviceReferenceDataIdAddedEvent:
+        self.device_reference_data[device_reference_data_id] = path_to_data
+
+        return DeviceReferenceDataIdAddedEvent(
+            id=self.id, device_reference_data=self.device_reference_data
         )
 
     def is_active(self):
@@ -405,5 +432,6 @@ class DeviceEventDeserializer(EventDeserializer):
         DeviceTagAddedEvent,
         DeviceTagsClearedEvent,
         DeviceTagsAddedEvent,
+        DeviceReferenceDataIdAddedEvent,
         QuestionnaireResponseUpdatedEvent,
     )

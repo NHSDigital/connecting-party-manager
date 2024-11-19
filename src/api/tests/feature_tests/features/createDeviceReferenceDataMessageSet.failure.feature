@@ -93,13 +93,13 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | path                                                        | value |
       | questionnaire_responses.bad_questionnaire_name.0.some_value | 123   |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                             |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                                  |
-      | errors.0.message | CreateDeviceReferenceMessageSetsDataParams.questionnaire_responses.__key__: unexpected value; permitted: 'spine_mhs_message_sets' |
+      | path             | value                                                                                                                                                                             |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                                                                  |
+      | errors.0.message | CreateDeviceReferenceMessageSetsDataParams.questionnaire_responses.__key__: unexpected value; permitted: <QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS: 'spine_mhs_message_sets'> |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 186              |
+      | Content-Length | 234              |
 
   Scenario: Fail to create a second "MHS Message Set" Device Reference Data in the same EPR Product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -137,7 +137,7 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
     Then I receive a status code "400" with body
       | path             | value                                                                                  |
       | errors.0.code    | VALIDATION_ERROR                                                                       |
-      | errors.0.message | Not an EPR Product: Cannot create MHS device for product without exactly one Party Key |
+      | errors.0.message | Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |

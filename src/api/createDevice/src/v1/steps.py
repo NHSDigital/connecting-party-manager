@@ -14,7 +14,7 @@ from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 
 @mark_validation_errors_as_inbound
-def parse_device_payload(data, cache) -> Device:
+def parse_device_payload(data, cache) -> CreateDeviceIncomingParams:
     payload: dict = data[parse_event_body]
     return CreateDeviceIncomingParams(**payload)
 

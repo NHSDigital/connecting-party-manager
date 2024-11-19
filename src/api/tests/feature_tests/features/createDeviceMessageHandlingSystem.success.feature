@@ -15,12 +15,19 @@ Feature: Create MHS Device - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/Device/MessageHandlingSystem" with body:
+    And I note the response field "$.keys.0.key_type" as "party_key_tag"
+    And I note the response field "$.keys.0.key_value" as "party_key_value"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+      | path                                                            | value                                                     |
+      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN         | urn:nhs:names:services:ers                                |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN         | READ_PRACTITIONER_ROLE_R4_V001                            |
+    And I note the response field "$.id" as "message_set_drd_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
       | path                                                               | value              |
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
@@ -39,42 +46,47 @@ Feature: Create MHS Device - success scenarios
       | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
       | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
     Then I receive a status code "201" with body
-      | path                    | value                      |
-      | id                      | << ignore >>               |
-      | name                    | Product-MHS                |
-      | status                  | active                     |
-      | product_id              | ${ note(product_id) }      |
-      | product_team_id         | ${ note(product_team_id) } |
-      | ods_code                | F5H1R                      |
-      | created_on              | << ignore >>               |
-      | updated_on              | << ignore >>               |
-      | deleted_on              | << ignore >>               |
-      | keys                    | []                         |
-      | questionnaire_responses | << ignore >>               |
+      | path                    | value                                                                  |
+      | id                      | << ignore >>                                                           |
+      | name                    | Product-MHS                                                            |
+      | status                  | active                                                                 |
+      | product_id              | ${ note(product_id) }                                                  |
+      | product_team_id         | ${ note(product_team_id) }                                             |
+      | ods_code                | F5H1R                                                                  |
+      | created_on              | << ignore >>                                                           |
+      | updated_on              | << ignore >>                                                           |
+      | deleted_on              | << ignore >>                                                           |
+      | keys.0.key_type         | interaction_id                                                         |
+      | keys.0.key_value        | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses | << ignore >>                                                           |
+      | device_reference_data   | << ignore >>                                                           |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1104             |
+      | Content-Length | 1295             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
-      | path                    | value                      |
-      | id                      | ${ note(device_id) }       |
-      | name                    | Product-MHS                |
-      | status                  | active                     |
-      | product_id              | ${ note(product_id) }      |
-      | product_team_id         | ${ note(product_team_id) } |
-      | ods_code                | F5H1R                      |
-      | created_on              | << ignore >>               |
-      | updated_on              | << ignore >>               |
-      | deleted_on              | << ignore >>               |
-      | keys                    | []                         |
-      | tags                    | << ignore >>               |
-      | questionnaire_responses | << ignore >>               |
+      | path                    | value                                                                  |
+      | id                      | ${ note(device_id) }                                                   |
+      | name                    | Product-MHS                                                            |
+      | status                  | active                                                                 |
+      | product_id              | ${ note(product_id) }                                                  |
+      | product_team_id         | ${ note(product_team_id) }                                             |
+      | ods_code                | F5H1R                                                                  |
+      | created_on              | << ignore >>                                                           |
+      | updated_on              | << ignore >>                                                           |
+      | deleted_on              | << ignore >>                                                           |
+      | keys.0.key_type         | interaction_id                                                         |
+      | keys.0.key_value        | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | tags.0.0.0              | ${ note(party_key_tag) }                                               |
+      | tags.0.0.1              | ${ note(party_key_value) }                                             |
+      | questionnaire_responses | << ignore >>                                                           |
+      | device_reference_data   | << ignore >>                                                           |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1147             |
+      | Content-Length | 1338             |
 
     Examples:
       | product_team_id            | product_id            |
