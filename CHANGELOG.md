@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-11-19
+- [PI-601] Workspace destroy, use main branch as fallback
+
 ## 2024-11-18
 - [PI-601] Workspace destroy, use main branch if branch no longer exists
 
