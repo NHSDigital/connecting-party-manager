@@ -1,11 +1,11 @@
 # Changelog
 
-## 2024-11-19
-- [PI-601] Workspace destroy, use main branch as fallback
-
-## 2024-11-19-a
+## 2024-11-20
 - [PI-528] Collapse versioning to v1
 - [PI-581] MHS Device with Device Reference Data
+
+## 2024-11-19
+- [PI-601] Workspace destroy, use main branch as fallback
 
 ## 2024-11-18
 - [PI-601] Workspace destroy, use main branch if branch no longer exists
