@@ -408,9 +408,7 @@ class DeviceRepository(Repository[Device]):
     def handle_QuestionnaireResponseUpdatedEvent(
         self, event: QuestionnaireResponseUpdatedEvent
     ) -> TransactItem:
-        data = asdict(event)
-        data.pop("id")
-        return self.update_indexes(id=event.id, keys=[], data=data)
+        return self.handle_DeviceUpdatedEvent(event=event)
 
     def handle_bulk(self, item: dict) -> list[dict]:
         parent_key = (item["product_team_id"], item["product_id"])
