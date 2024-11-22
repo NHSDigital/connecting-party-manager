@@ -377,7 +377,7 @@ def test_no_existing_message_set_drd():
 def test_mhs_already_exists() -> None:
     with mock_epr_product_with_message_set_drd() as (index, product):
         # Execute the lambda
-        index.handler(
+        response = index.handler(
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
@@ -389,6 +389,8 @@ def test_mhs_already_exists() -> None:
                 },
             }
         )
+
+        assert response["statusCode"] == 201
 
         # Execute the lambda again
         response = index.handler(
