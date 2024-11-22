@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 import pytest
@@ -50,6 +51,7 @@ def test__device_repository__multiple_devices_with_same_tags(
     repository.write(device)
     repository.write(device_with_asid)
     repository.write(device_with_mhs_id)
+    time.sleep(2)
 
     devices = repository.query_by_tag(bar="foo")
     assert len(devices) == 3
@@ -115,6 +117,7 @@ def test__device_repository__add_two_tags(device: Device, repository: DeviceRepo
     second_device.add_tag(shoe_size=123)
     second_device.add_tag(shoe_size=456)
     repository.write(second_device)
+    time.sleep(1)
 
     assert _test_add_two_tags(
         device=device, second_device=second_device, repository=repository
@@ -133,6 +136,7 @@ def test__device_repository__add_two_tags_at_once(
     )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
     repository.write(second_device)
+    time.sleep(1)
 
     assert _test_add_two_tags(
         device=device, second_device=second_device, repository=repository
@@ -151,10 +155,12 @@ def test__device_repository__add_two_tags_and_then_clear(
     )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
     repository.write(second_device)
+    time.sleep(1)
 
     second_device.clear_events()
     second_device.clear_tags()
     repository.write(second_device)
+    time.sleep(2)
 
     assert (
         repository.read(

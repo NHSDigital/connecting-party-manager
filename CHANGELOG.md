@@ -1,6 +1,6 @@
 # Changelog
 
-## 2024-11-20
+## 2024-11-22
 - [PI-528] Collapse versioning to v1
 - [PI-581] MHS Device with Device Reference Data
 
