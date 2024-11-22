@@ -88,7 +88,6 @@ def create_as_device(
     additional_interactions_id: str,
     as_tags: list[dict],
 ) -> Device:
-    # TODO: need to add asid keys to EPR create APIs!
     as_device = product.create_device(
         name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid)
     )
