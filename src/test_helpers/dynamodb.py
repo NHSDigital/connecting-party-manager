@@ -57,7 +57,7 @@ def clear_dynamodb_table(
         client.transact_write_items(TransactItems=transact_items)
 
     ### DELETE ME
-    items_in_db = _scan(client=client, table_name=table_name)
+    items_in_db = list(_scan(client=client, table_name=table_name))
     print(f"==> There are now {len(items_in_db)} items in the db")  # noqa
 
 
