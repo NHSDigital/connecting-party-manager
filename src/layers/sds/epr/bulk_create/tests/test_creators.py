@@ -246,7 +246,7 @@ def test_create_message_sets(
 
     assert _message_sets == {
         "deleted_on": None,
-        "name": "AAA-123456 - Message Sets",
+        "name": "AAA-123456 - MHS Message Sets",
         "ods_code": "AAA",
         "product_id": str(product.id),
         "product_team_id": product_team.id,
@@ -371,7 +371,7 @@ def test_create_additional_interactions(
 
     assert _additional_interactions == {
         "deleted_on": None,
-        "name": "AAA-123456 - Accredited System Additional Interactions",
+        "name": "AAA-123456 - AS Additional Interactions",
         "ods_code": "AAA",
         "product_id": str(product.id),
         "product_team_id": product_team.id,

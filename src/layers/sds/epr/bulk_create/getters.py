@@ -3,33 +3,29 @@ from domain.api.sds.query import (
     SearchSDSEndpointQueryParams,
 )
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
-from pydantic import BaseModel
-from sds.domain.nhs_accredited_system import NhsAccreditedSystem
-from sds.domain.nhs_mhs import NhsMhs
 from sds.epr.constants import SdsFieldName
 from sds.epr.tags.tags import is_list_like, sds_metadata_to_device_tags
 
 
 def _questionnaire_response_from_field_mapping_subset(
-    obj: BaseModel, questionnaire: Questionnaire, field_mapping: dict
+    obj: dict, questionnaire: Questionnaire, field_mapping: dict
 ) -> QuestionnaireResponse:
     """
     Runs Questionnaire.validate against the subset of fields in 'obj'
     that exist in 'field_mapping'
     """
-    raw_data = obj.dict(exclude_none=True)
     raw_translated_subset = {
         field_mapping[k]: (
             sorted(v) if is_list_like(v) else v
         )  # POSSIBLE ENHANCEMENT: can do sorting on ingestion
-        for k, v in raw_data.items()
-        if k in field_mapping
+        for k, v in obj.items()
+        if k in field_mapping and v is not None
     }
     return questionnaire.validate(raw_translated_subset)
 
 
 def get_mhs_device_data(
-    mhs: NhsMhs,
+    mhs: dict,
     mhs_device_questionnaire: Questionnaire,
     mhs_device_field_mapping: dict,
 ) -> QuestionnaireResponse:
@@ -41,7 +37,7 @@ def get_mhs_device_data(
 
 
 def get_message_set_data(
-    message_handling_systems: list[NhsMhs],
+    message_handling_systems: list[dict],
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
 ) -> list[QuestionnaireResponse]:
@@ -55,24 +51,24 @@ def get_message_set_data(
     ]
 
 
-def get_mhs_tags(message_handling_systems: list[NhsMhs]) -> list[dict]:
+def get_mhs_tags(message_handling_systems: list[dict]) -> list[dict]:
     tags = []
     for mhs in message_handling_systems:
         tags += sds_metadata_to_device_tags(
-            data=mhs.dict(), model=SearchSDSEndpointQueryParams
+            data=mhs, model=SearchSDSEndpointQueryParams
         )
     return [dict(tag) for tag in set(tags)]
 
 
 def get_additional_interactions_data(
-    accredited_systems: list[NhsAccreditedSystem],
+    accredited_systems: list[dict],
     additional_interactions_questionnaire: Questionnaire,
 ):
     unique_interactions_ids = sorted(
         set(
             interaction_id
             for accredited_system in accredited_systems
-            for interaction_id in accredited_system.nhs_as_svc_ia
+            for interaction_id in accredited_system["nhs_as_svc_ia"]
         )
     )
     return [
@@ -84,7 +80,7 @@ def get_additional_interactions_data(
 
 
 def get_accredited_system_device_data(
-    accredited_system: NhsAccreditedSystem,
+    accredited_system: dict,
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
 ):
@@ -96,11 +92,11 @@ def get_accredited_system_device_data(
 
 
 def get_accredited_system_tags(
-    accredited_systems: list[NhsAccreditedSystem],
+    accredited_systems: list[dict],
 ) -> list[dict]:
     tags = []
     for accredited_system in accredited_systems:
         tags += sds_metadata_to_device_tags(
-            data=accredited_system.dict(), model=SearchSDSDeviceQueryParams
+            data=accredited_system, model=SearchSDSDeviceQueryParams
         )
     return [dict(tag) for tag in set(tags)]

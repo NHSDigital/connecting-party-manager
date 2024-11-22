@@ -94,27 +94,6 @@ def create_tag_index(
     )
 
 
-def create_tag_index_batch(device_id: str, tag_value: str, data: dict):
-    """
-    Difference between `create_tag_index` and `create_tag_index_batch`:
-
-    `create_index` is intended for the event-based
-    `handle_TagAddedEvent` which is called by the base
-    `write` method, which expects `TransactItem`s for use with `client.transact_write_items`
-
-    `create_tag_index_batch` is intended for the entity-based handler
-    `handle_bulk` which is called by the base method `write_bulk`, which expects
-    `BatchWriteItem`s which we render as a `dict` for use with `client.batch_write_items`
-    """
-    pk = TableKey.DEVICE_TAG.key(tag_value)
-    sk = TableKey.DEVICE.key(device_id)
-    return {
-        "PutRequest": {
-            "Item": marshall(pk=pk, sk=sk, pk_read=pk, sk_read=sk, root=False, **data)
-        }
-    }
-
-
 def delete_tag_index(table_name: str, device_id: str, tag_value: str) -> TransactItem:
     pk = TableKey.DEVICE_TAG.key(tag_value)
     sk = TableKey.DEVICE.key(device_id)
@@ -158,11 +137,16 @@ class DeviceRepository(Repository[Device]):
             table_key=TableKey.DEVICE,
         )
 
+    def _query(self, parent_ids: tuple[str], id: str = None):
+        return map(
+            decompress_device_fields, super()._query(parent_ids=parent_ids, id=id)
+        )
+
     def read(self, product_team_id: str, product_id: str, id: str):
         return super()._read(parent_ids=(product_team_id, product_id), id=id)
 
     def search(self, product_team_id: str, product_id: str):
-        return super()._query(parent_ids=(product_team_id, product_id))
+        return super()._search(parent_ids=(product_team_id, product_id))
 
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent) -> TransactItem:
         return self.create_index(
@@ -310,7 +294,9 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceTagAddedEvent(
         self, event: DeviceTagAddedEvent
     ) -> list[TransactItem]:
-        data = {"tags": event.tags, "updated_on": event.updated_on}
+        data = compress_device_fields(
+            {"tags": event.tags, "updated_on": event.updated_on}
+        )
 
         # Create a copy of the Device indexed against the new tag
         create_tag_transaction = create_tag_index(
@@ -343,7 +329,9 @@ class DeviceRepository(Repository[Device]):
         )
 
     def handle_DeviceTagsAddedEvent(self, event: DeviceTagsAddedEvent):
-        data = {"tags": event.tags, "updated_on": event.updated_on}
+        data = compress_device_fields(
+            {"tags": event.tags, "updated_on": event.updated_on}
+        )
         _data = compress_device_fields(
             event, fields_to_compress=NON_ROOT_FIELDS_TO_COMPRESS
         )
@@ -390,9 +378,8 @@ class DeviceRepository(Repository[Device]):
         ]
 
         keys = {DeviceKey(**key).key_value for key in event.keys}
-        update_transactions = self.update_indexes(
-            id=event.id, keys=keys, data={"tags": []}
-        )
+        data = compress_device_fields({"tags": []})
+        update_transactions = self.update_indexes(id=event.id, keys=keys, data=data)
         return delete_tags_transactions + update_transactions
 
     def handle_DeviceReferenceDataIdAddedEvent(
@@ -409,39 +396,6 @@ class DeviceRepository(Repository[Device]):
         self, event: QuestionnaireResponseUpdatedEvent
     ) -> TransactItem:
         return self.handle_DeviceUpdatedEvent(event=event)
-
-    def handle_bulk(self, item: dict) -> list[dict]:
-        parent_key = (item["product_team_id"], item["product_id"])
-
-        root_data = compress_device_fields(item)
-        create_device_transaction = self.create_index_batch(
-            id=item["id"], parent_key_parts=parent_key, data=root_data, root=True
-        )
-
-        non_root_data = compress_device_fields(
-            item, fields_to_compress=NON_ROOT_FIELDS_TO_COMPRESS
-        )
-        create_keys_transactions = [
-            self.create_index_batch(
-                id=key["key_value"],
-                parent_key_parts=parent_key,
-                data=non_root_data,
-                root=False,
-            )
-            for key in item["keys"]
-        ]
-
-        create_tags_transactions = [
-            create_tag_index_batch(
-                device_id=item["id"], tag_value=tag, data=non_root_data
-            )
-            for tag in item["tags"]
-        ]
-        return (
-            [create_device_transaction]
-            + create_keys_transactions
-            + create_tags_transactions
-        )
 
     def query_by_tag(
         self,

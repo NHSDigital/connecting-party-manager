@@ -442,7 +442,12 @@ def test_create_complete_epr_product__intermediate(
     as_tags,
     today_string,
 ):
-    party_key_group = [accredited_system_1, mhs_1, mhs_2, accredited_system_2]
+    party_key_group = [
+        accredited_system_1.dict(),
+        mhs_1.dict(),
+        mhs_2.dict(),
+        accredited_system_2.dict(),
+    ]
 
     repo = QuestionnaireRepository()
     mhs_device_questionnaire = repo.read(QuestionnaireInstance.SPINE_MHS)
@@ -469,6 +474,7 @@ def test_create_complete_epr_product__intermediate(
         mhs_device_field_mapping=mhs_device_field_mapping,
         message_set_field_mapping=message_set_field_mapping,
         accredited_system_field_mapping=accredited_system_field_mapping,
+        product_team_ids={},
     )
 
     _additional_interactions = list(
@@ -512,8 +518,12 @@ def test_create_complete_epr_product__intermediate(
 def test_create_complete_epr_product(
     mhs_1, mhs_2, accredited_system_1, accredited_system_2
 ):
-    party_key_group = [accredited_system_1, mhs_1, mhs_2, accredited_system_2]
-
+    party_key_group = [
+        accredited_system_1.dict(),
+        mhs_1.dict(),
+        mhs_2.dict(),
+        accredited_system_2.dict(),
+    ]
     repo = QuestionnaireRepository()
     mhs_device_questionnaire = repo.read(QuestionnaireInstance.SPINE_MHS)
     message_set_questionnaire = repo.read(QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS)
@@ -546,6 +556,7 @@ def test_create_complete_epr_product(
         mhs_device_field_mapping=mhs_device_field_mapping,
         message_set_field_mapping=message_set_field_mapping,
         accredited_system_field_mapping=accredited_system_field_mapping,
+        product_team_ids={},
     )
 
     assert isinstance(product_team, ProductTeam)

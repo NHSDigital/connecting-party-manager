@@ -36,7 +36,7 @@ def test__questionnaire_response_from_field_mapping_subset():
         name="foo", version="1", json_schema=json.dumps(VALID_SCHEMA)
     )
     response = _questionnaire_response_from_field_mapping_subset(
-        obj=Shoe(**data, other_data="something to drop"),
+        obj=Shoe(**data, other_data="something to drop").dict(),
         questionnaire=questionnaire,
         field_mapping=field_mapping,
     )
@@ -54,7 +54,7 @@ def test_get_mhs_device_data(mhs_1: NhsMhs):
         name=QuestionnaireInstance.SPINE_MHS
     )
     mhs_data = get_mhs_device_data(
-        mhs=mhs_1,
+        mhs=mhs_1.dict(),
         mhs_device_questionnaire=mhs_device_questionnaire,
         mhs_device_field_mapping=mhs_device_field_mapping,
     )
@@ -91,7 +91,7 @@ def test_get_as_data(accredited_system_1: NhsAccreditedSystem):
         name=QuestionnaireInstance.SPINE_AS
     )
     as_data = get_accredited_system_device_data(
-        accredited_system=accredited_system_1,
+        accredited_system=accredited_system_1.dict(),
         accredited_system_questionnaire=accredited_system_questionnaire,
         accredited_system_field_mapping=accredited_system_field_mapping,
     )
@@ -113,7 +113,7 @@ def test_get_as_data(accredited_system_1: NhsAccreditedSystem):
 
 
 def test_get_message_set_data(mhs_1: NhsMhs, mhs_2: NhsMhs):
-    message_handling_systems = [mhs_1, mhs_2]
+    message_handling_systems = [mhs_1.dict(), mhs_2.dict()]
     message_set_questionnaire = QuestionnaireRepository().read(
         name=QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
     )
@@ -152,7 +152,7 @@ def test_get_message_set_data(mhs_1: NhsMhs, mhs_2: NhsMhs):
 def test_get_additional_interactions_data(
     accredited_system_1: NhsAccreditedSystem, accredited_system_2: NhsAccreditedSystem
 ):
-    accredited_systems = [accredited_system_1, accredited_system_2]
+    accredited_systems = [accredited_system_1.dict(), accredited_system_2.dict()]
     additional_interactions_questionnaire = QuestionnaireRepository().read(
         name=QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
     )
@@ -179,7 +179,7 @@ def test_get_additional_interactions_data(
 
 
 def test_get_mhs_tags(mhs_1: NhsMhs, mhs_2: NhsMhs):
-    message_handling_systems = [mhs_1, mhs_2]
+    message_handling_systems = [mhs_1.dict(), mhs_2.dict()]
     tags = get_mhs_tags(message_handling_systems=message_handling_systems)
 
     expected_tags = [
@@ -249,7 +249,7 @@ def test_get_mhs_tags(mhs_1: NhsMhs, mhs_2: NhsMhs):
 def test_get_accredited_system_tags(
     accredited_system_1: NhsAccreditedSystem, accredited_system_2: NhsAccreditedSystem
 ):
-    accredited_systems = [accredited_system_1, accredited_system_2]
+    accredited_systems = [accredited_system_1.dict(), accredited_system_2.dict()]
     tags = get_accredited_system_tags(accredited_systems=accredited_systems)
     expected_tags = [
         {

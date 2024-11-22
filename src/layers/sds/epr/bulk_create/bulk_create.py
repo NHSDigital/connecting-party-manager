@@ -1,6 +1,6 @@
 from domain.core.aggregate_root import AggregateRoot
+from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
-from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
 from sds.epr.bulk_create.creators import (
     create_additional_interactions,
@@ -32,8 +32,18 @@ def _create_complete_epr_product(
     additional_interactions_data: list[QuestionnaireResponse],
     as_device_data: list[QuestionnaireResponse],
     as_tags: list[dict],
+    product_team_ids: dict[str, str],
 ) -> list[AggregateRoot]:
-    product_team = create_epr_product_team(ods_code=ods_code)
+    if ods_code in product_team_ids:
+        product_team = ProductTeam(
+            name="placeholder", id=product_team_ids[ods_code], ods_code=ods_code
+        )
+        product_teams_to_create = []
+    else:
+        product_team = create_epr_product_team(ods_code=ods_code)
+        product_team_ids[ods_code] = product_team.id
+        product_teams_to_create = [product_team]
+
     product = create_epr_product(
         product_team=product_team, product_name=product_name, party_key=party_key
     )
@@ -65,8 +75,9 @@ def _create_complete_epr_product(
         )
         for data in as_device_data
     ]
+
     return [
-        product_team,
+        *product_teams_to_create,
         product,
         message_sets,
         additional_interactions,
@@ -76,7 +87,7 @@ def _create_complete_epr_product(
 
 
 def create_complete_epr_product(
-    party_key_group: list[NhsMhs | NhsAccreditedSystem],
+    party_key_group: list[dict],
     mhs_device_questionnaire: Questionnaire,
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
@@ -84,16 +95,17 @@ def create_complete_epr_product(
     additional_interactions_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
     accredited_system_questionnaire: Questionnaire,
+    product_team_ids: dict[str, str],
 ):
     """
     NB: For this to work we will need to have a specific apply_action
     for extract-bulk which buffers objects into party key groups, in the form
     deque[list[MHS | AS]]
     """
-    message_handling_systems: list[NhsMhs] = []
-    accredited_systems: list[NhsAccreditedSystem] = []
+    message_handling_systems: list[dict] = []
+    accredited_systems: list[dict] = []
     for item in party_key_group:
-        if isinstance(item, NhsMhs):
+        if item["object_class"].lower() == NhsMhs.OBJECT_CLASS:
             message_handling_systems.append(item)
         else:
             accredited_systems.append(item)
@@ -130,14 +142,15 @@ def create_complete_epr_product(
     as_tags = get_accredited_system_tags(accredited_systems)
 
     return _create_complete_epr_product(
-        ods_code=first_mhs.nhs_mhs_manufacturer_org,
-        party_key=first_mhs.nhs_mhs_party_key,
-        product_name=first_mhs.nhs_product_name,
+        ods_code=first_mhs["nhs_mhs_manufacturer_org"],
+        party_key=first_mhs["nhs_mhs_party_key"],
+        product_name=first_mhs["nhs_product_name"],
         mhs_device_data=mhs_device_data,
         message_set_data=message_set_data,
-        mhs_cpa_ids=[mhs.nhs_mhs_cpa_id for mhs in message_handling_systems],
+        mhs_cpa_ids=[mhs["nhs_mhs_cpa_id"] for mhs in message_handling_systems],
         mhs_tags=mhs_tags,
         additional_interactions_data=additional_interactions_data,
         as_device_data=as_device_data,
         as_tags=as_tags,
+        product_team_ids=product_team_ids,
     )

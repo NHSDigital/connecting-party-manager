@@ -385,7 +385,7 @@ def test_filter_and_group_ldif_from_s3_by_property(mocked_open):
             filter_terms=[("myOtherField", "123")],
         )
     assert (
-        filtered_ldif.tobytes().decode()
+        "".join(data.tobytes().decode() for data in filtered_ldif)
         == FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE
     )
 
