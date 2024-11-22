@@ -15,6 +15,8 @@ DONT_COMPARE_FIELDS = {"tags"}
 @pytest.mark.integration
 def test__device_repository__tags(device: Device, repository: DeviceRepository):
     repository.write(device)
+    time.sleep(1)
+
     (_device_123,) = repository.query_by_tag(abc=123)
     assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
         exclude=DONT_COMPARE_FIELDS
@@ -37,6 +39,8 @@ def test__device_repository__tag_does_not_exist(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
+    time.sleep(1)
+
     results = repository.query_by_tag(abc=12)
     assert len(results) == 0
 
@@ -109,6 +113,8 @@ def _test_add_two_tags(
 @pytest.mark.integration
 def test__device_repository__add_two_tags(device: Device, repository: DeviceRepository):
     repository.write(device)
+    time.sleep(1)
+
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
@@ -129,6 +135,8 @@ def test__device_repository__add_two_tags_at_once(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
+    time.sleep(1)
+
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
@@ -148,6 +156,8 @@ def test__device_repository__add_two_tags_and_then_clear(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
+    time.sleep(1)
+
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
@@ -222,6 +232,8 @@ def test__device_repository__drop_mandatory_fields(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
+    time.sleep(1)
+
     (_device_123,) = repository.query_by_tag(abc=123)
     assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
         exclude=DONT_COMPARE_FIELDS

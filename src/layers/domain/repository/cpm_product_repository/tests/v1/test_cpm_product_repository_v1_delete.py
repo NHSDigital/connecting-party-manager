@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.error import NotFoundError
@@ -10,11 +12,14 @@ def test__cpm_product_repository_delete(
     product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)  # Create product in DB
+    time.sleep(1)
+
     product_from_db = repository.read(
         product_team_id=product.product_team_id, id=product.id
     )
     product_from_db.delete()
     repository.write(product_from_db)
+    time.sleep(1)
 
     # No longer retrievable
     with pytest.raises(ItemNotFound):

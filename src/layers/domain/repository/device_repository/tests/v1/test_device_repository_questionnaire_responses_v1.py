@@ -1,4 +1,5 @@
 import json
+import time
 
 import pytest
 from domain.core.device import Device
@@ -76,6 +77,8 @@ def test__device_repository__with_questionnaires(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
+    time.sleep(1)
+
     assert (
         repository.read(
             product_team_id=device.product_team_id,
@@ -96,6 +99,8 @@ def test__device_repository__with_questionnaires_and_tags(
     """
     device.add_tag(foo="bar")
     repository.write(device)
+    time.sleep(1)
+
     assert (
         repository.read(
             product_team_id=device.product_team_id,

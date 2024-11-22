@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.repository.device_reference_data_repository import (
@@ -14,6 +16,7 @@ def test__cpm_device_reference_data_repository(
     repository: DeviceReferenceDataRepository,
 ):
     repository.write(device_reference_data)
+    time.sleep(1)
     result = repository.read(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
@@ -28,6 +31,7 @@ def test__cpm_device_reference_data_repository_already_exists(
     repository: DeviceReferenceDataRepository,
 ):
     repository.write(device_reference_data)
+    time.sleep(1)
     with pytest.raises(AlreadyExistsError):
         repository.write(device_reference_data)
 
@@ -52,6 +56,7 @@ def test__cpm_product_repository_local(
     repository: DeviceReferenceDataRepository,
 ):
     repository.write(device_reference_data)
+    time.sleep(1)
     result = repository.read(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
@@ -95,6 +100,7 @@ def test__cpm_device_reference_data_repository__search_not_empty(
     repository: DeviceReferenceDataRepository,
 ):
     repository.write(device_reference_data)
+    time.sleep(1)
     results = repository.search(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,

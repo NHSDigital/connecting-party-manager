@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.product_key import ProductKey, ProductKeyType
@@ -17,6 +19,7 @@ def test__product_repository__add_key(
     party_key = ProductKey(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
     product.add_key(**party_key.dict())
     repository.write(product)
+    time.sleep(1)
 
     product_by_id = repository.read(
         product_team_id=product.product_team_id, id=product.id
@@ -31,6 +34,7 @@ def test__product_repository__add_key_then_delete(
     party_key = ProductKey(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
     product.add_key(**party_key.dict())
     repository.write(product)
+    time.sleep(1)
 
     product_from_db = repository.read(
         product_team_id=product.product_team_id, id=product.id
@@ -38,6 +42,7 @@ def test__product_repository__add_key_then_delete(
     assert product_from_db.keys == [party_key]
     product_from_db.delete()
     repository.write(product_from_db)
+    time.sleep(1)
 
     # No longer retrievable
     with pytest.raises(ItemNotFound):
@@ -53,6 +58,7 @@ def test__product_repository__cannot_add_duplicate_key(
     party_key = ProductKey(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
     product.add_key(**party_key.dict())
     repository.write(product)
+    time.sleep(1)
 
     # Create a second unrelated product
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
