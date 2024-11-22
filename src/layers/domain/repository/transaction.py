@@ -123,6 +123,7 @@ def update_transactions(
     transact_items = [
         TransactItem(Update=update_statement(Key=key)) for key in primary_keys
     ]
+    print(f"ooo> Issuing transactions {transact_items}")  # noqa
     return transact_items
 
 

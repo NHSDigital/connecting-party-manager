@@ -88,10 +88,12 @@ def _split_transactions_by_key(
         item = transaction_statement.Key or transaction_statement.Item
         key = (item["pk"]["S"], item["sk"]["S"])
         if key in keys:
+            print("ooo> Batch writing keys", keys)  # noqa
             yield from batched(buffer, n=n_max)
             buffer, keys = [], set()
         buffer.append(transact_item)
         keys.add(key)
+    print("ooo> Batch writing keys", keys)  # noqa
     yield from batched(buffer, n=n_max)
 
 
@@ -101,6 +103,7 @@ def transact_write_chunk(
     transaction = Transaction(TransactItems=chunk)
     with handle_client_errors(commands=chunk):
         _response = client.transact_write_items(**transaction.dict(exclude_none=True))
+        print("ooo> DB Response", _response)  # noqa
     return _response
 
 
@@ -141,7 +144,7 @@ class Repository[ModelType: AggregateRoot]:
             handler_name = f"handle_{type(event).__name__}"
             handler = getattr(self, handler_name)
             transact_items = handler(event=event)
-
+            print(f"ooo> Handler {handler_name} --> {transact_items}")  # noqa
             if not isinstance(transact_items, list):
                 transact_items = [transact_items]
             return transact_items
