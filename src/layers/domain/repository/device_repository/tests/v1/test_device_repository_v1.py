@@ -121,6 +121,7 @@ def test__device_repository__device_does_not_exist_local(
 
 @pytest.mark.integration
 def test__device_repository__update(device: Device, repository: DeviceRepository):
+    print(f"--> Writing device {device}")  # noqa
     repository.write(device)
 
     # Retrieve the model and treat this as the initial state
@@ -129,8 +130,16 @@ def test__device_repository__update(device: Device, repository: DeviceRepository
         product_id=device.product_id,
         id=device.id,
     )
-    intermediate_device.update(name="foo-bar")
+    intermediate_device_by_key = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=DEVICE_KEY,
+    )
 
+    print(f"--> Got intermediate device {intermediate_device}")  # noqa
+    print(f"--> Got intermediate device by key {intermediate_device_by_key}")  # noqa
+    intermediate_device.update(name="foo-bar")
+    print(f"--> Updated intermediate device {intermediate_device}")  # noqa
     repository.write(intermediate_device)
 
     final_device = repository.read(
@@ -138,6 +147,13 @@ def test__device_repository__update(device: Device, repository: DeviceRepository
         product_id=device.product_id,
         id=device.id,
     )
+    final_device_by_key = repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=DEVICE_KEY,
+    )
+    print(f"--> Got final device {final_device}")  # noqa
+    print(f"--> Got final device by key {final_device_by_key}")  # noqa
 
     assert final_device.name == "foo-bar"
 
