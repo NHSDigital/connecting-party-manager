@@ -2,6 +2,7 @@
 
 ## 2024-11-25
 - [PI-643] Add status to Device Reference Data
+- Dependabot: slack-github-action
 
 ## 2024-11-22
 - [PI-528] Collapse versioning to v1
