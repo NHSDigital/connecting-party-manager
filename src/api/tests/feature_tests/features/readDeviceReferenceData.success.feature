@@ -28,6 +28,7 @@ Feature: Read Device Reference Data - success scenarios
       | path                    | value                               |
       | id                      | ${ note(device_reference_data_id) } |
       | name                    | My Device Reference Data            |
+      | status                  | active                              |
       | product_id              | ${ note(product_id) }               |
       | product_team_id         | ${ note(product_team_id) }          |
       | ods_code                | F5H1R                               |
@@ -38,7 +39,7 @@ Feature: Read Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 316              |
+      | Content-Length | 336              |
 
     Examples:
       | product_team_id            |
@@ -67,6 +68,7 @@ Feature: Read Device Reference Data - success scenarios
       | path                    | value                               |
       | id                      | ${ note(device_reference_data_id) } |
       | name                    | My Device Reference Data            |
+      | status                  | active                              |
       | product_id              | ${ note(product_id) }               |
       | product_team_id         | ${ note(product_team_id) }          |
       | ods_code                | F5H1R                               |
@@ -77,7 +79,7 @@ Feature: Read Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 316              |
+      | Content-Length | 336              |
 
     Examples:
       | product_team_id            | product_id            |
