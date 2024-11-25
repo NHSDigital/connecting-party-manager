@@ -1,6 +1,6 @@
 from domain.core.cpm_system_id import CpmSystemId
 
-from .keys.v3 import TableKey
+from .keys import TableKey
 from .marshall import marshall, marshall_value, unmarshall
 from .repository import Repository
 
@@ -9,7 +9,11 @@ class CpmSystemIdRepository[T](Repository[T]):
 
     def __init__(self, table_name: str, model: type[T], dynamodb_client):
         super().__init__(
-            table_name=table_name, model=model, dynamodb_client=dynamodb_client
+            table_name=table_name,
+            model=model,
+            dynamodb_client=dynamodb_client,
+            parent_table_keys=None,
+            table_key=None,
         )
 
     def read(self) -> T:

@@ -1,13 +1,13 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device.v3 import Device
-from domain.core.product_team.v3 import ProductTeam
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.device_repository.v3 import DeviceRepository
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
-from domain.request_models.v1 import DevicePathParams
+from domain.core.cpm_product import CpmProduct
+from domain.core.device import Device
+from domain.core.product_team import ProductTeam
+from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.device_repository import DeviceRepository
+from domain.repository.product_team_repository import ProductTeamRepository
+from domain.request_models import DevicePathParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
@@ -34,7 +34,7 @@ def read_product(data, cache) -> CpmProduct:
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     cpm_product = product_repo.read(
-        product_team_id=product_team.id, id=path_params.product_id
+        id=path_params.product_id, product_team_id=product_team.id
     )
     return cpm_product
 

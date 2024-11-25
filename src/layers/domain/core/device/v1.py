@@ -1,25 +1,26 @@
 from collections import defaultdict
-from datetime import datetime, timezone
-from enum import StrEnum, auto
-from itertools import chain
-from typing import Any, Optional
+from datetime import datetime
+from functools import cached_property
+from urllib.parse import parse_qs, urlencode
 from uuid import UUID, uuid4
 
-from attr import dataclass, field
-from domain.core.aggregate_root import AggregateRoot
-from domain.core.device_key import DeviceKey, DeviceKeyType
+import orjson
+from attr import dataclass
+from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
+from domain.core.base import BaseModel
+from domain.core.cpm_system_id import ProductId
+from domain.core.device_key import DeviceKey
 from domain.core.enum import Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
-from domain.core.questionnaire import (
-    QuestionnaireInstanceEvent,
-    QuestionnaireResponse,
-    QuestionnaireResponseAddedEvent,
-    QuestionnaireResponseDeletedEvent,
-    QuestionnaireResponseUpdatedEvent,
-)
+from domain.core.questionnaire import QuestionnaireResponse
+from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
-from pydantic import Field
+from pydantic import Field, root_validator
+
+UPDATED_ON = "updated_on"
+DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
+MHS_DEVICE_NAME = "Product-MHS"
 
 
 class QuestionnaireNotFoundError(Exception):
@@ -30,7 +31,7 @@ class QuestionnaireResponseNotFoundError(Exception):
     pass
 
 
-class QuestionNotFoundError(Exception):
+class DuplicateQuestionnaireResponse(Exception):
     pass
 
 
@@ -38,102 +39,198 @@ class QuestionNotFoundError(Exception):
 class DeviceCreatedEvent(Event):
     id: str
     name: str
-    type: "DeviceType"
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
-    status: "DeviceStatus"
+    status: Status
     created_on: str
-    updated_on: Optional[str] = None
-    deleted_on: Optional[str] = None
-    _trust: bool = field(alias="_trust", default=False)
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[DeviceKey]
+    tags: list[str]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceUpdatedEvent(Event):
     id: str
     name: str
-    type: "DeviceType"
     product_team_id: UUID
+    product_id: ProductId
     ods_code: str
-    status: "DeviceStatus"
+    status: Status
     created_on: str
-    updated_on: str
-    deleted_on: Optional[str] = None
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[DeviceKey]
+    tags: list[str]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
+
+
+@dataclass(kw_only=True, slots=True)
+class DeviceDeletedEvent(Event):
+    id: str
+    name: str
+    product_team_id: UUID
+    product_id: ProductId
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[DeviceKey]
+    tags: list[str]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    deleted_tags: list[str] = None
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
+    new_key: DeviceKey
     id: str
-    key: str
-    type: DeviceKeyType
-    _trust: bool = field(alias="_trust", default=False)
+    name: str
+    product_team_id: UUID
+    product_id: ProductId
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[DeviceKey]
+    tags: list[str]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyDeletedEvent(Event):
+    deleted_key: DeviceKey
     id: str
-    key: str
+    keys: list[DeviceKey]
+    tags: list[str]
+    updated_on: str = None
 
 
 @dataclass(kw_only=True, slots=True)
-class DeviceIndexAddedEvent(Event):
+class DeviceTagAddedEvent(Event):
+    new_tag: str
     id: str
-    questionnaire_id: str
-    question_name: str
-    value: str
+    name: str
+    product_team_id: UUID
+    product_id: ProductId
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[DeviceKey]
+    tags: list[str]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
 
 
-class DeviceType(StrEnum):
+@dataclass(kw_only=True, slots=True)
+class DeviceTagsAddedEvent(Event):
+    new_tags: list[str]
+    id: str
+    name: str
+    product_team_id: UUID
+    product_id: ProductId
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str = None
+    deleted_on: str = None
+    keys: list[DeviceKey]
+    tags: list[str]
+    questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
+    device_reference_data: dict[str, list[str]]
+
+
+@dataclass(kw_only=True, slots=True)
+class DeviceTagsClearedEvent(Event):
+    id: str
+    keys: list[dict]
+    deleted_tags: list[str]
+    updated_on: str = None
+
+
+@dataclass(kw_only=True, slots=True)
+class QuestionnaireResponseUpdatedEvent(Event):
     """
-    A Product is to be classified as being one of the following.  These terms
-    were provided by Aubyn Crawford in collaboration with Service Now.
-
-    NOTE:
-        A 'SERVICE' and 'API' is NOT what a developer would expect them to be.
-        These are terms from the problem domain and relate to how Assurance
-        is performed.
+    This is adding the initial questionnaire response from the event body request.
     """
 
-    PRODUCT = auto()
-    ENDPOINT = auto()
-    # SERVICE = auto()
-    # API = auto()
+    id: str
+    questionnaire_responses: dict[str, list[QuestionnaireResponse]]
+    keys: list[DeviceKey]
+    tags: list[str]
+    updated_on: str = None
 
 
-DeviceStatus = Status
+@dataclass(kw_only=True, slots=True)
+class DeviceReferenceDataIdAddedEvent(Event):
+    id: str
+    device_reference_data: dict[str, list[str]]
+    updated_on: str = None
 
 
-def _get_unique_answers(
-    questionnaire_responses: list[QuestionnaireResponse], question_name: str
-):
-    all_responses = chain.from_iterable(
-        _questionnaire_response.responses
-        for _questionnaire_response in questionnaire_responses
-    )
-    matching_responses = filter(
-        lambda response: question_name in response, all_responses
-    )
-    matching_response_answers = (
-        answer for responses in matching_responses for answer in responses.values()
-    )
-    unique_answers = set(chain.from_iterable(matching_response_answers))
-    return unique_answers
+class DeviceTag(BaseModel):
+    """
+    DeviceTag is a mechanism for indexing Device data. In DynamoDB then intention is for this
+    to be translated into a duplicated record in the database, so that Devices with with the
+    same DeviceTag can be queried directly, therefore mimicking efficient search-like behaviour.
+    """
 
+    __root__: list[tuple[str, str]]
 
-def _get_questionnaire_responses(
-    questionnaire_responses: dict[str, list[QuestionnaireResponse]],
-    questionnaire_id: str,
-) -> list[QuestionnaireResponse]:
-    _questionnaire_responses = questionnaire_responses.get(questionnaire_id)
-    if _questionnaire_responses is None:
-        raise QuestionnaireNotFoundError(
-            f"This device does not contain a Questionnaire with id '{questionnaire_id}'"
+    class Config:
+        arbitrary_types_allowed = True
+        keep_untouched = (cached_property,)
+
+    @root_validator(pre=True)
+    def encode_tag(cls, values: dict):
+        initialised_with_root = "__root__" in values and len(values) == 1
+        item_to_process = values["__root__"] if initialised_with_root else values
+
+        # Case 1: query string is provided (__root__="foo=bar")
+        if initialised_with_root and isinstance(item_to_process, str):
+            _components = ((k, v) for k, (v,) in parse_qs(item_to_process).items())
+        # Case 2: query components are provided (__root__=("foo", "bar"))
+        elif initialised_with_root:
+            _components = ((k, v) for k, v in item_to_process)
+        # Case 3: query components are directly provided (("foo", "bar"))
+        else:
+            _components = ((k, str(v)) for k, v in item_to_process.items())
+
+        case_insensitive_components = tuple(
+            sorted((k, v.lower()) for k, v in _components)
         )
-    elif not _questionnaire_responses:
-        raise QuestionnaireResponseNotFoundError(
-            f"This device does not contain a QuestionnaireResponse for Questionnaire with id '{questionnaire_id}'"
-        )
-    return _questionnaire_responses
+        return {"__root__": case_insensitive_components}
+
+    def dict(self, *args, **kwargs):
+        return self.components
+
+    @cached_property
+    def components(self):
+        return tuple(self.__root__)
+
+    @cached_property
+    def hash(self):
+        return hash(self.components)
+
+    @property
+    def value(self) -> str:
+        return urlencode(self.components)
+
+    def __hash__(self):
+        return self.hash
+
+    def __eq__(self, other: "DeviceTag"):
+        return self.hash == other.hash
 
 
 class Device(AggregateRoot):
@@ -151,192 +248,172 @@ class Device(AggregateRoot):
 
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
-    type: DeviceType = Field(immutable=True)
-    status: DeviceStatus = Field(default=DeviceStatus.ACTIVE)
-    product_team_id: UUID
+    status: Status = Field(default=Status.ACTIVE)
+    product_id: ProductId = Field(immutable=True)
+    product_team_id: str = Field(immutable=True)
     ods_code: str
-    created_on: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc), immutable=True
-    )
-    updated_on: Optional[datetime] = Field(default=None)
-    deleted_on: Optional[datetime] = Field(default=None)
-    keys: dict[str, DeviceKey] = Field(default_factory=dict, exclude=True)
+    created_on: datetime = Field(default_factory=now, immutable=True)
+    updated_on: datetime = Field(default=None)
+    deleted_on: datetime = Field(default=None)
+    keys: list[DeviceKey] = Field(default_factory=list)
+    tags: set[DeviceTag] | list[DeviceTag] = Field(default_factory=set)
     questionnaire_responses: dict[str, list[QuestionnaireResponse]] = Field(
-        default_factory=lambda: defaultdict(list), exclude=True
+        default_factory=lambda: defaultdict(list)
     )
-    indexes: set[tuple[str, str, Any]] = Field(default_factory=set, exclude=True)
+    device_reference_data: dict[str, list[str]] = Field(
+        default_factory=lambda: defaultdict(list)
+    )
 
+    def state_exclude_tags(self) -> dict:
+        """
+        Returns a deepcopy, useful for bulk operations rather than dealing with events.
+
+        Exclude tags as we shouldn't return tags to the user on create.
+        """
+        device_dict = orjson.loads(self.json())
+        device_dict.pop("tags", None)
+        return device_dict
+
+    @event
     def update(self, **kwargs) -> DeviceUpdatedEvent:
-        if "updated_on" not in kwargs:
-            kwargs["updated_on"] = datetime.now(timezone.utc)
+        kwargs[UPDATED_ON] = now()
         device_data = self._update(data=kwargs)
-        event = DeviceUpdatedEvent(**device_data)
-        return self.add_event(event)
+        return DeviceUpdatedEvent(**device_data)
 
-    def delete(self) -> DeviceUpdatedEvent:
-        deletion_datetime = datetime.now(timezone.utc)
-        return self.update(
-            status=DeviceStatus.INACTIVE,
-            updated_on=deletion_datetime,
-            deleted_on=deletion_datetime,
-        )
-
-    def add_key(self, type: str, key: str, _trust=False) -> DeviceKeyAddedEvent:
-        if key in self.keys:
-            raise DuplicateError(f"It is forbidden to supply duplicate keys: '{key}'")
-        device_key = DeviceKey(key=key, type=type)
-        self.keys[key] = device_key
-        event = DeviceKeyAddedEvent(id=self.id, _trust=_trust, **device_key.dict())
-        return self.add_event(event)
-
-    def delete_key(self, key: str) -> DeviceKeyDeletedEvent:
-        try:
-            device_key = self.keys.pop(key)
-        except KeyError:
-            raise NotFoundError(f"This device does not contain key '{key}'") from None
-        event = DeviceKeyDeletedEvent(id=self.id, key=device_key.key)
-        return self.add_event(event)
-
-    def add_index(
-        self, questionnaire_id: str, question_name: str
-    ) -> list[DeviceIndexAddedEvent]:
-        questionnaire_responses = _get_questionnaire_responses(
-            questionnaire_responses=self.questionnaire_responses,
-            questionnaire_id=questionnaire_id,
-        )
-        if question_name not in questionnaire_responses[0].questionnaire.questions:
-            raise QuestionNotFoundError(
-                f"Questionnaire '{questionnaire_id}' does not "
-                f"contain question '{question_name}'"
+    @event
+    def delete(self) -> DeviceDeletedEvent:
+        deleted_on = now()
+        deleted_tags = {t.value for t in self.tags}
+        device_data = self._update(
+            data=dict(
+                status=Status.INACTIVE,
+                updated_on=deleted_on,
+                deleted_on=deleted_on,
+                tags=set(),
             )
-        unique_answers = _get_unique_answers(
-            questionnaire_responses=questionnaire_responses,
-            question_name=question_name,
+        )
+        return DeviceDeletedEvent(**device_data, deleted_tags=deleted_tags)
+
+    @event
+    def add_key(self, key_type: str, key_value: str) -> DeviceKeyAddedEvent:
+        device_key = DeviceKey(key_value=key_value, key_type=key_type)
+        if device_key in self.keys:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate keys: '{key_type}':'{key_value}'"
+            )
+        self.keys.append(device_key)
+        device_data = self.state()
+        device_data["tags"] = {t.value for t in self.tags}
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceKeyAddedEvent(new_key=device_key, **device_data)
+
+    @event
+    def delete_key(self, key_type: str, key_value: str) -> DeviceKeyDeletedEvent:
+        device_key = DeviceKey(key_value=key_value, key_type=key_type)
+        if device_key not in self.keys:
+            raise NotFoundError(
+                f"This device does not contain key '{key_type}':'{key_value}'"
+            ) from None
+        self.keys.remove(device_key)
+        return DeviceKeyDeletedEvent(
+            deleted_key=device_key,
+            id=self.id,
+            keys=[k.dict() for k in self.keys],
+            tags=[t.value for t in self.tags],
         )
 
-        events = []
-        for answer in unique_answers:
-            event = DeviceIndexAddedEvent(
-                id=self.id,
-                questionnaire_id=questionnaire_id,
-                question_name=question_name,
-                value=answer,
+    @event
+    def add_tag(self, **kwargs) -> DeviceTagAddedEvent:
+        device_tag = DeviceTag(**kwargs)
+        if device_tag in self.tags:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate tag: '{device_tag.value}'"
             )
-            events.append(event)
-            self.add_event(event)
-            self.indexes.add((questionnaire_id, question_name, answer))
-        return events
+        self.tags.add(device_tag)
+        device_data = self.state()
+        device_data["tags"] = {t.value for t in self.tags}
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceTagAddedEvent(new_tag=device_tag.value, **device_data)
 
+    @event
+    def add_tags(self, tags: list[dict]) -> DeviceTagsAddedEvent:
+        """Optimised bulk equivalent of performing device.add_tag sequentially."""
+        new_tags = {DeviceTag(**tag) for tag in tags}
+        duplicate_tags = self.tags.intersection(new_tags)
+        if duplicate_tags:
+            raise DuplicateError(
+                f"It is forbidden to supply duplicate tags: {[t.value for t in duplicate_tags]}"
+            )
+        self.tags = self.tags.union(new_tags)
+        device_data = self.state()
+        device_data["tags"] = {t.value for t in self.tags}
+        device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
+        return DeviceTagsAddedEvent(
+            new_tags={tag.value for tag in new_tags}, **device_data
+        )
+
+    @event
+    def clear_tags(self):
+        deleted_tags = self.tags
+        self.tags = set()
+        device_data = self.state()
+        return DeviceTagsClearedEvent(
+            id=device_data["id"],
+            keys=device_data["keys"],
+            deleted_tags={tag.value for tag in deleted_tags},
+        )
+
+    @event
     def add_questionnaire_response(
-        self,
-        questionnaire_response: QuestionnaireResponse,
-        _questionnaire: dict = None,
-        _trust=False,
-    ) -> list[QuestionnaireInstanceEvent, QuestionnaireResponseAddedEvent]:
-        _questionnaire = _questionnaire or questionnaire_response.questionnaire.dict()
-
-        questionnaire_responses = self.questionnaire_responses[
-            questionnaire_response.questionnaire.id
-        ]
-        questionnaire_response_index = len(questionnaire_responses)
-        questionnaire_responses.append(questionnaire_response)
-        questionnaire_used_already = questionnaire_response_index > 0
-
-        events = []
-        if not questionnaire_used_already:
-            questionnaire_event = QuestionnaireInstanceEvent(
-                entity_id=self.id,
-                questionnaire_id=questionnaire_response.questionnaire.id,
-                **_questionnaire,
-            )
-            events.append(questionnaire_event)
-            self.add_event(questionnaire_event)
-
-        questionnaire_response_event = QuestionnaireResponseAddedEvent(
-            entity_id=self.id,
-            questionnaire_response_index=questionnaire_response_index,
-            questionnaire_id=questionnaire_response.questionnaire.id,
-            responses=questionnaire_response.responses,
-            _trust=_trust,
-        )
-        events.append(questionnaire_response_event)
-        self.add_event(questionnaire_response_event)
-
-        return events
-
-    def update_questionnaire_response(
-        self,
-        questionnaire_response: QuestionnaireResponse,
-        questionnaire_response_index: int,
+        self, questionnaire_response: QuestionnaireResponse
     ) -> QuestionnaireResponseUpdatedEvent:
-        questionnaire_responses = self.questionnaire_responses.get(
-            questionnaire_response.questionnaire.id
-        )
-        if questionnaire_responses is None:
-            raise QuestionnaireNotFoundError(
-                "This device does not contain a Questionnaire "
-                f"with id '{questionnaire_response.questionnaire.id}'"
-            ) from None
+        questionnaire_id = questionnaire_response.questionnaire_id
+        questionnaire_responses = self.questionnaire_responses[questionnaire_id]
+        created_on = questionnaire_response.created_on
 
-        try:
-            questionnaire_responses[questionnaire_response_index] = (
-                questionnaire_response
+        current_created_ons = [qr.created_on for qr in questionnaire_responses]
+        if created_on in current_created_ons:
+            raise DuplicateQuestionnaireResponse(
+                "This Device already contains a "
+                f"response created on {created_on.isoformat()}"
+                f"for Questionnaire {questionnaire_id}"
             )
-        except IndexError:
-            raise QuestionnaireResponseNotFoundError(
-                "This device does not contain a Questionnaire with a "
-                f"response at index '{questionnaire_response_index}'"
-            ) from None
+        questionnaire_responses.append(questionnaire_response)
 
-        event = QuestionnaireResponseUpdatedEvent(
-            entity_id=self.id,
-            questionnaire_id=questionnaire_response.questionnaire.id,
-            questionnaire_response_index=questionnaire_response_index,
-            responses=questionnaire_response.responses,
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            keys=[k.dict() for k in self.keys],
+            tags=[t.value for t in self.tags],
+            questionnaire_responses={
+                qid: [qr.dict() for qr in qrs]
+                for qid, qrs in self.questionnaire_responses.items()
+            },
         )
-        return self.add_event(event)
 
-    def delete_questionnaire_response(
-        self, questionnaire_id: str, questionnaire_response_index: int
-    ) -> QuestionnaireResponseDeletedEvent:
-        questionnaire_responses = self.questionnaire_responses.get(questionnaire_id)
-        if questionnaire_responses is None:
-            raise QuestionnaireNotFoundError(
-                "This device does not contain a Questionnaire "
-                f"with id '{questionnaire_id}'"
-            ) from None
+    @event
+    def add_device_reference_data_id(
+        self, device_reference_data_id: str, path_to_data: list[str]
+    ) -> DeviceReferenceDataIdAddedEvent:
+        self.device_reference_data[device_reference_data_id] = path_to_data
 
-        try:
-            questionnaire_responses.pop(questionnaire_response_index)
-        except IndexError:
-            raise QuestionnaireResponseNotFoundError(
-                "This device does not contain a Questionnaire with a "
-                f"response at index '{questionnaire_response_index}'"
-            ) from None
-
-        if len(questionnaire_responses) == 0:
-            self.questionnaire_responses.pop(questionnaire_id)
-
-        event = QuestionnaireResponseDeletedEvent(
-            entity_id=self.id,
-            questionnaire_id=questionnaire_id,
-            questionnaire_response_index=questionnaire_response_index,
+        return DeviceReferenceDataIdAddedEvent(
+            id=self.id, device_reference_data=self.device_reference_data
         )
-        return self.add_event(event)
 
     def is_active(self):
-        return self.status is DeviceStatus.ACTIVE
+        return self.status is Status.ACTIVE
 
 
 class DeviceEventDeserializer(EventDeserializer):
     event_types = (
         DeviceCreatedEvent,
         DeviceUpdatedEvent,
+        DeviceDeletedEvent,
         DeviceKeyAddedEvent,
         DeviceKeyDeletedEvent,
-        DeviceIndexAddedEvent,
-        QuestionnaireResponseAddedEvent,
+        DeviceTagAddedEvent,
+        DeviceTagsClearedEvent,
+        DeviceTagsAddedEvent,
+        DeviceReferenceDataIdAddedEvent,
         QuestionnaireResponseUpdatedEvent,
-        QuestionnaireResponseDeletedEvent,
-        QuestionnaireInstanceEvent,
     )

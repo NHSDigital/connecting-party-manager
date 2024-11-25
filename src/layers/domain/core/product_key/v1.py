@@ -1,7 +1,7 @@
 import re
 from enum import StrEnum, auto
 
-from domain.core.device_key.v2 import DeviceKey
+from domain.core.device_key import DeviceKey
 from domain.core.validation import SdsId
 
 

@@ -3,7 +3,7 @@ from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 import boto3
-from domain.core.device.v2 import Device
+from domain.core.device import Device
 from domain.core.event import ExportedEventTypeDef
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_dumps_lz4, pkl_load_lz4

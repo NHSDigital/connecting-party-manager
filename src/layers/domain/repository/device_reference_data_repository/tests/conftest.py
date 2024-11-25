@@ -1,8 +1,8 @@
 from collections.abc import Generator
 
 import pytest
-from domain.core.root.v3 import Root
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.core.root import Root
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.tests.utils import repository_fixture

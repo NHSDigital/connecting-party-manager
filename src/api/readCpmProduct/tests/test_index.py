@@ -3,9 +3,9 @@ import os
 from unittest import mock
 
 import pytest
-from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.core.root import Root
+from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.product_team_repository import ProductTeamRepository
 from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table

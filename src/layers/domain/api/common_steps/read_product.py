@@ -1,13 +1,13 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.cpm_product.v1 import CpmProduct
+from domain.core.cpm_product import CpmProduct
 from domain.core.error import NotEprProductError
-from domain.core.product_key.v1 import ProductKeyType
-from domain.core.product_team.v3 import ProductTeam
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
-from domain.request_models.v1 import CpmProductPathParams
+from domain.core.product_key import ProductKeyType
+from domain.core.product_team import ProductTeam
+from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.product_team_repository import ProductTeamRepository
+from domain.request_models import CpmProductPathParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
@@ -50,7 +50,7 @@ def get_party_key(data, cache) -> str:
         (party_key,) = party_keys
     except ValueError:
         raise NotEprProductError(
-            "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
+            "Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key"
         )
     return party_key
 

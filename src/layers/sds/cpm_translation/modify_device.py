@@ -1,5 +1,5 @@
-from domain.core.device.v2 import Device
-from domain.core.questionnaire.v2 import QuestionnaireResponse
+from domain.core.device import Device
+from domain.core.questionnaire import QuestionnaireResponse
 from sds.domain.constants import ModificationType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs

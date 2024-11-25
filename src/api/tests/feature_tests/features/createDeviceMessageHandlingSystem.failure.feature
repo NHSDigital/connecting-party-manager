@@ -7,7 +7,7 @@ Feature: Create MHS Device - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Cannot create a MHS Device with a Device body that is missing fields (no questionnaire_responses) and has extra param
+  Scenario: Cannot create a MHS Device with a body that is missing fields (no questionnaire_responses) and has extra param
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path     | value                 |
       | name     | My Great Product Team |
@@ -101,11 +101,48 @@ Feature: Create MHS Device - failure scenarios
     Then I receive a status code "400" with body
       | path             | value                                                                                  |
       | errors.0.code    | VALIDATION_ERROR                                                                       |
-      | errors.0.message | Not an EPR Product: Cannot create MHS device for product without exactly one Party Key |
+      | errors.0.message | Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 143              |
+
+  Scenario: Cannot create a MHS Device for a Product that does not have a MessageSet Device Reference Data
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+      | path                                                               | value              |
+      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
+      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
+      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
+      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
+      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
+      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
+      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
+      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
+      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
+      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
+      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
+      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+    Then I receive a status code "400" with body
+      | path             | value                                                                                         |
+      | errors.0.code    | VALIDATION_ERROR                                                                              |
+      | errors.0.message | You must configure exactly one MessageSet Device Reference Data before creating an MHS Device |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 150              |
 
   Scenario: Cannot create a MHS Device with a Device body that has no questionnaire responses for 'spine_mhs'
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -117,17 +154,18 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
       | path                                             | value  |
       | questionnaire_responses.not_spine_mhs.0.Question | Answer |
     Then I receive a status code "400" with body
-      | path             | value                                                               |
-      | errors.0.code    | VALIDATION_ERROR                                                    |
-      | errors.0.message | Require a 'spine_mhs' questionnaire response to create a MHS Device |
+      | path             | value                                                                                                                                      |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                           |
+      | errors.0.message | CreateMhsDeviceIncomingParams.questionnaire_responses.__key__: unexpected value; permitted: <QuestionnaireInstance.SPINE_MHS: 'spine_mhs'> |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 124              |
+      | Content-Length | 195              |
 
   Scenario: Cannot create a MHS Device with a Device body that has multiple questionnaire responses for 'spine_mhs'
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -139,6 +177,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
       | path                                                               | value              |
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
@@ -174,13 +213,13 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.1.Product Key                    | product-key-001    |
       | questionnaire_responses.spine_mhs.1.Requestor URP                  | requestor-789      |
     Then I receive a status code "400" with body
-      | path             | value                                                        |
-      | errors.0.code    | VALIDATION_ERROR                                             |
-      | errors.0.message | Expected only one response for the 'spine_mhs' questionnaire |
+      | path             | value                                                                                                           |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                |
+      | errors.0.message | CreateMhsDeviceIncomingParams.questionnaire_responses.spine_mhs.__root__: ensure this value has at most 1 items |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 117              |
+      | Content-Length | 168              |
 
   Scenario: Cannot create a MHS Device with a Device body that has an invalid questionnaire responses for the questionnaire 'spine_mhs'
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -192,6 +231,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
       | path                                                  | value              |
       | questionnaire_responses.spine_mhs.0.Address           | http://example.com |
@@ -204,3 +244,63 @@ Feature: Create MHS Device - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 147              |
+
+  Scenario: Cannot create a MHS Device with a Product that already has an MHS Device
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    And I note the response field "$.keys.0.key_type" as "party_key_tag"
+    And I note the response field "$.keys.0.key_value" as "party_key_value"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    And I note the response field "$.id" as "message_set_drd_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+      | path                                                               | value              |
+      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
+      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
+      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
+      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
+      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
+      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
+      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
+      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
+      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
+      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
+      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
+      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+    And I note the response field "$.id" as "device_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+      | path                                                               | value              |
+      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
+      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123457             |
+      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-003      |
+      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
+      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
+      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
+      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
+      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
+      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
+      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
+      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
+      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+    Then I receive a status code "400" with body
+      | path             | value                                                    |
+      | errors.0.code    | VALIDATION_ERROR                                         |
+      | errors.0.message | There is already an existing MHS Device for this Product |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 113              |

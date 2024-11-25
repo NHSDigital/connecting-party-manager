@@ -1,5 +1,5 @@
 import pytest
-from domain.request_models.v1 import CreateCpmProductIncomingParams
+from domain.request_models import CreateCpmProductIncomingParams
 from pydantic import ValidationError
 
 from test_helpers.sample_data import CPM_PRODUCT, CPM_PRODUCT_EXTRA_PARAMS

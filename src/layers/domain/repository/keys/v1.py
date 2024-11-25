@@ -24,15 +24,15 @@ class TableKeyAction:
         )
 
 
-class TableKeys(TableKeyAction, StrEnum):
-    DEVICE = "D"
-    DEVICE_KEY = "DK"
-    DEVICE_TYPE = "DT"
-    DEVICE_KEY_TYPE = "DKT"
-    DEVICE_INDEX = "DI"
+class TableKey(TableKeyAction, StrEnum):
     PRODUCT_TEAM = "PT"
-    QUESTIONNAIRE = "Q"
-    QUESTIONNAIRE_RESPONSE = "QR"
+    CPM_SYSTEM_ID = "CSI"
+    CPM_PRODUCT = "P"
+    CPM_PRODUCT_STATUS = "PS"
+    DEVICE_REFERENCE_DATA = "DRD"
+    DEVICE = "D"
+    DEVICE_TAG = "DT"
+    DEVICE_STATUS = "DS"
 
 
 def group_by_key(
@@ -53,11 +53,5 @@ def strip_key_prefix(key: str):
     return tail
 
 
-def remove_keys(
-    pk=None,
-    sk=None,
-    pk_read=None,
-    sk_read=None,
-    **values,
-):
+def remove_keys(pk=None, sk=None, pk_read=None, sk_read=None, **values):
     return values

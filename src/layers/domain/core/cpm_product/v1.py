@@ -3,16 +3,16 @@ from datetime import datetime
 from attr import dataclass
 from domain.core import event
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.cpm_system_id.v1 import ProductId
-from domain.core.device.v3 import UPDATED_ON, Device, DeviceCreatedEvent, event
-from domain.core.device_reference_data.v1 import (
+from domain.core.cpm_system_id import ProductId
+from domain.core.device import UPDATED_ON, Device, DeviceCreatedEvent, event
+from domain.core.device_reference_data import (
     DeviceReferenceData,
     DeviceReferenceDataCreatedEvent,
 )
 from domain.core.enum import Status
 from domain.core.error import DuplicateError
 from domain.core.event import Event
-from domain.core.product_key.v1 import ProductKey
+from domain.core.product_key import ProductKey
 from domain.core.timestamp import now
 from domain.core.validation import CPM_PRODUCT_NAME_REGEX
 from pydantic import Field

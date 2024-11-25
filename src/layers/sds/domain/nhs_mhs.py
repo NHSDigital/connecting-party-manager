@@ -2,11 +2,6 @@ from dataclasses import dataclass
 from typing import ClassVar, Literal, Optional
 
 from domain.api.sds.query import SearchSDSEndpointQueryParams
-from domain.core.questionnaire.v2 import Questionnaire
-from domain.repository.questionnaire_repository import QuestionnaireRepository
-from domain.repository.questionnaire_repository.v1.questionnaires import (
-    QuestionnaireInstance,
-)
 from pydantic import Field
 from sds.domain.constants import (
     Authentication,
@@ -77,11 +72,6 @@ class NhsMhs(SdsBaseModel):
     @classmethod
     def key_fields(cls) -> tuple[str, ...]:
         return KEY_FIELDS
-
-    @classmethod
-    def questionnaire(cls) -> Questionnaire:
-        repo = QuestionnaireRepository()
-        return repo.read(name=QuestionnaireInstance.SPINE_ENDPOINT)
 
     @classmethod
     def query_params_model(cls) -> type[SearchSDSEndpointQueryParams]:

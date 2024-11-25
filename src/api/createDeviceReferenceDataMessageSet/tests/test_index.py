@@ -6,16 +6,16 @@ from types import ModuleType
 from typing import Any, Generator
 from unittest import mock
 
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.cpm_system_id.v1 import PartyKeyId, ProductId
-from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.core.product_key.v1 import ProductKeyType
-from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.core.cpm_product import CpmProduct
+from domain.core.cpm_system_id import PartyKeyId, ProductId
+from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.product_key import ProductKeyType
+from domain.core.root import Root
+from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.repository.product_team_repository import ProductTeamRepository
 from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table

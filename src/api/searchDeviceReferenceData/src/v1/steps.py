@@ -1,14 +1,14 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.product_team.v3 import ProductTeam
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.core.cpm_product import CpmProduct
+from domain.core.product_team import ProductTeam
+from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
-from domain.request_models.v1 import CpmProductPathParams
+from domain.repository.product_team_repository import ProductTeamRepository
+from domain.request_models import CpmProductPathParams
 from domain.response.response_models import SearchResponse
 from event.step_chain import StepChain
 

@@ -7,14 +7,21 @@ from typing import Any, Generator
 from unittest import mock
 
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.cpm_system_id.v1 import ProductId
-from domain.core.device.v3 import Device
-from domain.core.product_key.v1 import ProductKeyType
-from domain.core.root.v3 import Root
-from domain.repository.cpm_product_repository.v3 import CpmProductRepository
-from domain.repository.device_repository.v3 import DeviceRepository
-from domain.repository.product_team_repository.v2 import ProductTeamRepository
+from domain.core.cpm_product import CpmProduct
+from domain.core.cpm_system_id import ProductId
+from domain.core.device import Device
+from domain.core.product_key import ProductKeyType
+from domain.core.root import Root
+from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.device_reference_data_repository import (
+    DeviceReferenceDataRepository,
+)
+from domain.repository.device_repository import DeviceRepository
+from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.questionnaire_repository import (
+    QuestionnaireInstance,
+    QuestionnaireRepository,
+)
 from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table
@@ -49,7 +56,9 @@ QUESTIONNAIRE_DATA = {
 
 
 @contextmanager
-def mock_epr_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
+def mock_epr_product_with_message_set_drd() -> (
+    Generator[tuple[ModuleType, CpmProduct], Any, None]
+):
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
     product_team = org.create_product_team(name=PRODUCT_TEAM_NAME)
 
@@ -71,6 +80,37 @@ def mock_epr_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
             table_name=TABLE_NAME, dynamodb_client=client
         )
         product_repo.write(entity=product)
+
+        # set up questionnaire response
+        mhs_message_set_questionnaire = QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
+        )
+        questionnaire_response = mhs_message_set_questionnaire.validate(
+            data={
+                "Interaction ID": "urn:foo",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+            }
+        )
+
+        questionnaire_response_2 = mhs_message_set_questionnaire.validate(
+            data={
+                "Interaction ID": "urn:foo2",
+                "MHS SN": "bar2",
+                "MHS IN": "baz2",
+            },
+        )
+
+        # Set up DeviceReferenceData in DB
+        device_reference_data = product.create_device_reference_data(
+            name="ABC1234-987654 - MHS Message Set"
+        )
+        device_reference_data.add_questionnaire_response(questionnaire_response)
+        device_reference_data.add_questionnaire_response(questionnaire_response_2)
+        device_reference_data_repo = DeviceReferenceDataRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        device_reference_data_repo.write(device_reference_data)
 
         import api.createDeviceMessageHandlingSystem.index as index
 
@@ -109,8 +149,41 @@ def mock_not_epr_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None
         yield index, product
 
 
+@contextmanager
+def mock_epr_product_without_message_set_drd() -> (
+    Generator[tuple[ModuleType, CpmProduct], Any, None]
+):
+    org = Root.create_ods_organisation(ods_code=ODS_CODE)
+    product_team = org.create_product_team(name=PRODUCT_TEAM_NAME)
+
+    with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {"DYNAMODB_TABLE": TABLE_NAME, "AWS_DEFAULT_REGION": "eu-west-2"},
+        clear=True,
+    ):
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
+        product = product_team.create_cpm_product(
+            name=PRODUCT_NAME, product_id=PRODUCT_ID
+        )
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product_repo = CpmProductRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_repo.write(entity=product)
+
+        import api.createDeviceMessageHandlingSystem.index as index
+
+        index.cache["DYNAMODB_CLIENT"] = client
+
+        yield index, product
+
+
 def test_index() -> None:
-    with mock_epr_product() as (index, product):
+    with mock_epr_product_with_message_set_drd() as (index, product):
         # Execute the lambda
         response = index.handler(
             event={
@@ -194,7 +267,7 @@ def test_index() -> None:
     ],
 )
 def test_incoming_errors(body, path_parameters, error_code, status_code):
-    with mock_epr_product() as (index, _):
+    with mock_epr_product_with_message_set_drd() as (index, _):
         # Execute the lambda
         response = index.handler(
             event={
@@ -219,7 +292,7 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
                 },
             },
             "VALIDATION_ERROR",
-            "Expected only one response for the 'spine_mhs' questionnaire",
+            "CreateMhsDeviceIncomingParams.questionnaire_responses.spine_mhs.__root__: ensure this value has at most 1 items",
             400,
         ),
         (
@@ -237,7 +310,7 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
 def test_questionnaire_response_validation_errors(
     body, error_code, error_message, status_code
 ):
-    with mock_epr_product() as (index, product):
+    with mock_epr_product_with_message_set_drd() as (index, product):
         # Execute the lambda
         response = index.handler(
             event={
@@ -274,6 +347,32 @@ def test_not_epr_product():
 
         assert response["statusCode"] == 400
         expected_error_code = "VALIDATION_ERROR"
-        expected_message_code = "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
+        expected_message_code = "Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key"
         assert expected_error_code in response["body"]
         assert expected_message_code in response["body"]
+
+
+def test_no_existing_message_set_drd():
+    with mock_epr_product_without_message_set_drd() as (index, product):
+        # Execute the lambda
+        response = index.handler(
+            event={
+                "headers": {"version": VERSION},
+                "body": json.dumps(
+                    {"questionnaire_responses": {"spine_mhs": [QUESTIONNAIRE_DATA]}}
+                ),
+                "pathParameters": {
+                    "product_team_id": str(product.product_team_id),
+                    "product_id": str(product.id),
+                },
+            }
+        )
+
+        assert response["statusCode"] == 400
+        expected_error_code = "VALIDATION_ERROR"
+        expected_message_code = "You must configure exactly one MessageSet Device Reference Data before creating an MHS Device"
+        assert expected_error_code in response["body"]
+        assert expected_message_code in response["body"]
+
+
+# add test for already existing mhs device?

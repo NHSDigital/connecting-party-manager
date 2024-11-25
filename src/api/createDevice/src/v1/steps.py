@@ -6,15 +6,15 @@ from domain.api.common_steps.read_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device.v3 import Device
-from domain.repository.device_repository.v3 import DeviceRepository
-from domain.request_models.v1 import CreateDeviceIncomingParams
+from domain.core.cpm_product import CpmProduct
+from domain.core.device import Device
+from domain.repository.device_repository import DeviceRepository
+from domain.request_models import CreateDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 
 
 @mark_validation_errors_as_inbound
-def parse_device_payload(data, cache) -> Device:
+def parse_device_payload(data, cache) -> CreateDeviceIncomingParams:
     payload: dict = data[parse_event_body]
     return CreateDeviceIncomingParams(**payload)
 

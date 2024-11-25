@@ -5,9 +5,9 @@ from datetime import datetime
 from uuid import uuid4
 
 from domain.core.base import BaseModel
-from domain.core.device_key.v1 import validate_key
+from domain.core.device_key import validate_key
 from domain.core.error import InvalidKeyPattern
-from domain.core.product_key.v1 import ProductKeyType
+from domain.core.product_key import ProductKeyType
 from pydantic import validator
 
 FIRST_ASID = 200000099999
@@ -91,7 +91,7 @@ class PartyKeyId(CpmSystemId):
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the party key has the correct format."""
         try:
-            validate_key(key=cpm_system_id, type=ProductKeyType.PARTY_KEY)
+            validate_key(key_value=cpm_system_id, key_type=ProductKeyType.PARTY_KEY)
         except InvalidKeyPattern:
             return False
         return True
