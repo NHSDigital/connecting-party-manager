@@ -199,6 +199,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v2.0.0
         with:
+          webhook-type: webhook-trigger
           payload: |
             {
               "action_url": "${{ format('{0}/{1}/actions/runs/{2}/attempts/{3}', github.server_url, github.repository, github.run_id, github.run_attempt) }}",
