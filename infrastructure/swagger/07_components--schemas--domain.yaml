@@ -235,6 +235,7 @@ components:
       example:
         id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
         name: "Sample DeviceReferenceDataResponse"
+        status: "active"
         product_id: "123-XXX"
         product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
         ods_code: "F5H1R"
@@ -256,6 +257,7 @@ components:
         results:
           - id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
             name: "Sample Device Reference Data"
+            status: "active"
             product_id: "123-XXX"
             product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
             ods_code: "F5H1R"
