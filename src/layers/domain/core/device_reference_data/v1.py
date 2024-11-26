@@ -6,6 +6,7 @@ from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot, event
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import DuplicateQuestionnaireResponse
+from domain.core.enum import Status
 from domain.core.event import Event
 from domain.core.questionnaire import QuestionnaireResponse
 from domain.core.timestamp import now
@@ -17,6 +18,7 @@ from pydantic import Field
 class DeviceReferenceDataCreatedEvent(Event):
     id: str
     name: str
+    status: Status
     product_id: ProductId
     product_team_id: UUID
     ods_code: str
@@ -41,6 +43,7 @@ class DeviceReferenceData(AggregateRoot):
 
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
+    status: Status = Field(default=Status.ACTIVE)
     product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str = Field(immutable=True)

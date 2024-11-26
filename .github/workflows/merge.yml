@@ -68,7 +68,7 @@ jobs:
         uses: ./.github/actions/catch-failed-step
       - name: Send merge result to slack
         id: slack
-        uses: slackapi/slack-github-action@v1.27.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
           payload: |
             {
