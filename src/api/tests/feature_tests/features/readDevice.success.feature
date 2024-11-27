@@ -203,6 +203,7 @@ Feature: Read Device - success scenarios
       | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
       | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
       | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
