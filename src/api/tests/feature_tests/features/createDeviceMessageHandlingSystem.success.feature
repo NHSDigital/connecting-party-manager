@@ -70,7 +70,7 @@ Feature: Create MHS Device - success scenarios
     Then I receive a status code "200" with body
       | path                                                                      | value                                                                  |
       | id                                                                        | ${ note(device_id) }                                                   |
-      | name                                                                      | Product-MHS                                                            |
+      | name                                                                      | F5H1R-850000 - Message Handling System                                 |
       | status                                                                    | active                                                                 |
       | product_id                                                                | ${ note(product_id) }                                                  |
       | product_team_id                                                           | ${ note(product_team_id) }                                             |
@@ -78,7 +78,7 @@ Feature: Create MHS Device - success scenarios
       | created_on                                                                | << ignore >>                                                           |
       | updated_on                                                                | << ignore >>                                                           |
       | deleted_on                                                                | << ignore >>                                                           |
-      | keys.0.key_type                                                           | interaction_id                                                         |
+      | keys.0.key_type                                                           | cpa_id                                                                 |
       | keys.0.key_value                                                          | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | tags.0.0.0                                                                | ${ note(party_key_tag) }                                               |
       | tags.0.0.1                                                                | ${ note(party_key_tag_value) }                                         |
@@ -102,6 +102,7 @@ Feature: Create MHS Device - success scenarios
       | questionnaire_responses.spine_mhs/1.0.data.MHS Is Authenticated           | PERSISTENT                                                             |
       | questionnaire_responses.spine_mhs/1.0.data.Product Key                    | product-key-001                                                        |
       | questionnaire_responses.spine_mhs/1.0.data.Requestor URP                  | requestor-789                                                          |
+      | questionnaire_responses.spine_mhs/1.0.data.MHS Manufacturer Organisation  | AAA                                                                    |
       | questionnaire_responses.spine_mhs_message_sets/1.0.id                     | << ignore >>                                                           |
       | questionnaire_responses.spine_mhs_message_sets/1.0.questionnaire_name     | spine_mhs_message_sets                                                 |
       | questionnaire_responses.spine_mhs_message_sets/1.0.questionnaire_version  | 1                                                                      |
@@ -113,7 +114,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1736             |
+      | Content-Length | 1776             |
 
     Examples:
       | product_team_id            | product_id            |
