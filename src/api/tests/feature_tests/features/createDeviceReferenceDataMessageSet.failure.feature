@@ -115,13 +115,13 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                            |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                                 |
-      | errors.0.message | This product already has a 'Message Set' DeviceReferenceData. Please update, or delete and recreate if you wish to make changes. |
+      | path             | value                                                                                                                             |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                  |
+      | errors.0.message | This product already has a 'Message Sets' DeviceReferenceData. Please update, or delete and recreate if you wish to make changes. |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 185              |
+      | Content-Length | 186              |
 
   Scenario: Fail to create an "MHS Message Set" Device Reference Data in non-EPR product
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:

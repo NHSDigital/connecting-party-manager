@@ -24,7 +24,7 @@ class CpmProductRepository(Repository[CpmProduct]):
         return super()._read(parent_ids=(product_team_id,), id=id)
 
     def search(self, product_team_id: str):
-        return super()._query(parent_ids=(product_team_id,))
+        return super()._search(parent_ids=(product_team_id,))
 
     def handle_CpmProductCreatedEvent(self, event: CpmProductCreatedEvent):
         return self.create_index(

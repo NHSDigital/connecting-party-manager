@@ -70,9 +70,5 @@ class NhsMhs(SdsBaseModel):
     nhs_mhs_service_description: Optional[str] = Field(alias="nhsmhsservicedescription")
 
     @classmethod
-    def key_fields(cls) -> tuple[str, ...]:
-        return KEY_FIELDS
-
-    @classmethod
     def query_params_model(cls) -> type[SearchSDSEndpointQueryParams]:
         return SearchSDSEndpointQueryParams

@@ -32,6 +32,7 @@ Feature: Create MHS Device - success scenarios
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
       | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
       | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
       | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
       | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
@@ -48,7 +49,7 @@ Feature: Create MHS Device - success scenarios
     Then I receive a status code "201" with body
       | path                    | value                                                                  |
       | id                      | << ignore >>                                                           |
-      | name                    | Product-MHS                                                            |
+      | name                    | F5H1R-850000 - Message Handling System                                 |
       | status                  | active                                                                 |
       | product_id              | ${ note(product_id) }                                                  |
       | product_team_id         | ${ note(product_team_id) }                                             |
@@ -56,14 +57,14 @@ Feature: Create MHS Device - success scenarios
       | created_on              | << ignore >>                                                           |
       | updated_on              | << ignore >>                                                           |
       | deleted_on              | << ignore >>                                                           |
-      | keys.0.key_type         | interaction_id                                                         |
+      | keys.0.key_type         | cpa_id                                                                 |
       | keys.0.key_value        | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses | << ignore >>                                                           |
       | device_reference_data   | << ignore >>                                                           |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1295             |
+      | Content-Length | 1354             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -112,7 +113,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1717             |
+      | Content-Length | 1736             |
 
     Examples:
       | product_team_id            | product_id            |

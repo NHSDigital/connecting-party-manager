@@ -21,8 +21,7 @@ from domain.repository.questionnaire_repository import (
 )
 from domain.request_models import CreateDeviceReferenceAdditionalInteractionsDataParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
-
-DEVICE_NAME_MARKER = "AS Additional Interactions"
+from sds.epr.constants import ADDITIONAL_INTERACTIONS_SUFFIX, EprNameTemplate
 
 
 @mark_validation_errors_as_inbound
@@ -60,7 +59,7 @@ def require_no_existing_additional_interactions_device_reference_data(
         product_team_id=product.product_team_id, product_id=product.id
     )
     if any(
-        device_reference_data.name.endswith(DEVICE_NAME_MARKER)
+        device_reference_data.name.endswith(ADDITIONAL_INTERACTIONS_SUFFIX)
         for device_reference_data in results
     ):
         raise AlreadyExistsError(
@@ -91,7 +90,7 @@ def create_additional_interactions_device_reference_data(
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
     return product.create_device_reference_data(
-        name=f"{party_key} - {DEVICE_NAME_MARKER}"
+        name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key)
     )
 
 

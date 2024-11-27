@@ -40,7 +40,8 @@ variable "api_lambda_layers" {
   default = [
     "domain",
     "event",
-    "api_utils"
+    "api_utils",
+    "sds"
   ]
 }
 

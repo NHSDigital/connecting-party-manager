@@ -30,7 +30,7 @@ class DeviceReferenceDataRepository(Repository[DeviceReferenceData]):
         return super()._read(parent_ids=(product_team_id, product_id), id=id)
 
     def search(self, product_team_id: str, product_id: str):
-        return super()._query(parent_ids=(product_team_id, product_id))
+        return super()._search(parent_ids=(product_team_id, product_id))
 
     def handle_DeviceReferenceDataCreatedEvent(
         self, event: DeviceReferenceDataCreatedEvent

@@ -83,7 +83,7 @@ def test_index_without_questionnaire() -> None:
         device_reference_data = DeviceReferenceData(**_device_reference_data)
         assert device_reference_data.product_id == product.id
         assert device_reference_data.product_team_id == product.product_team_id
-        assert device_reference_data.name == "AAA-100001 - MHS Message Set"
+        assert device_reference_data.name == "AAA-100001 - MHS Message Sets"
         assert device_reference_data.ods_code == ODS_CODE
         assert device_reference_data.created_on.date() == datetime.today().date()
         assert device_reference_data.updated_on is None
@@ -136,7 +136,7 @@ def test_index_with_questionnaire() -> None:
         device_reference_data = DeviceReferenceData(**_device_reference_data)
         assert device_reference_data.product_id == product.id
         assert device_reference_data.product_team_id == product.product_team_id
-        assert device_reference_data.name == "AAA-100001 - MHS Message Set"
+        assert device_reference_data.name == "AAA-100001 - MHS Message Sets"
         assert device_reference_data.ods_code == ODS_CODE
         assert device_reference_data.created_on.date() == datetime.today().date()
         assert device_reference_data.updated_on.date() == datetime.today().date()

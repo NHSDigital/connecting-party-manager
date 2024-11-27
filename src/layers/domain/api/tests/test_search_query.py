@@ -106,10 +106,10 @@ def test_allowed_field_combinations():
         bob: Optional[str]
 
     assert MyModel.allowed_field_combinations() == [
-        ("foo",),
-        ("foo", "bar"),
-        ("foo", "bob"),
-        ("foo", "bar", "bob"),
+        {"foo"},
+        {"foo", "bar"},
+        {"foo", "bob"},
+        {"foo", "bar", "bob"},
     ]
 
 
@@ -120,11 +120,17 @@ def test_allowed_field_combinations_all_optional():
         bob: Optional[str]
 
     assert MyModel.allowed_field_combinations() == [
-        ("foo",),
-        ("bar",),
-        ("bob",),
-        ("foo", "bar"),
-        ("foo", "bob"),
-        ("bar", "bob"),
-        ("foo", "bar", "bob"),
+        {
+            "foo",
+        },
+        {
+            "bar",
+        },
+        {
+            "bob",
+        },
+        {"foo", "bar"},
+        {"foo", "bob"},
+        {"bar", "bob"},
+        {"foo", "bar", "bob"},
     ]

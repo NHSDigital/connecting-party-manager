@@ -20,7 +20,6 @@ from pydantic import Field, root_validator
 
 UPDATED_ON = "updated_on"
 DEVICE_UPDATED_ON = f"device_{UPDATED_ON}"
-MHS_DEVICE_NAME = "Product-MHS"
 
 
 class QuestionnaireNotFoundError(Exception):
@@ -394,10 +393,11 @@ class Device(AggregateRoot):
     def add_device_reference_data_id(
         self, device_reference_data_id: str, path_to_data: list[str]
     ) -> DeviceReferenceDataIdAddedEvent:
-        self.device_reference_data[device_reference_data_id] = path_to_data
-
+        self.device_reference_data[str(device_reference_data_id)] = path_to_data
+        device_data = self.state()
         return DeviceReferenceDataIdAddedEvent(
-            id=self.id, device_reference_data=self.device_reference_data
+            id=device_data["id"],
+            device_reference_data=device_data["device_reference_data"],
         )
 
     def is_active(self):

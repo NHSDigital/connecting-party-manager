@@ -23,5 +23,5 @@
   "nhs_product_version": "Product Version",
   "nhs_requestor_urp": "Requestor URP",
   "nhs_mhs_service_description": "MHS Service Description",
-  "nhs_mhs_manufacturer_org": "Manufacturer ODS code"
+  "nhs_mhs_manufacturer_org": "MHS Manufacturer Organisation"
 }

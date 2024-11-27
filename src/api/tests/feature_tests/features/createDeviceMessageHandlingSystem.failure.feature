@@ -237,13 +237,13 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.Address           | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier | 123456             |
     Then I receive a status code "400" with body
-      | path             | value                                                                                         |
-      | errors.0.code    | MISSING_VALUE                                                                                 |
-      | errors.0.message | Failed to validate data against 'spine_mhs/1': 'Managing Organization' is a required property |
+      | path             | value                                                                                                 |
+      | errors.0.code    | MISSING_VALUE                                                                                         |
+      | errors.0.message | Failed to validate data against 'spine_mhs/1': 'MHS Manufacturer Organisation' is a required property |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 147              |
+      | Content-Length | 155              |
 
   Scenario: Cannot create a MHS Device with a Product that already has an MHS Device
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -272,6 +272,7 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
       | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
       | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
       | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
       | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
@@ -291,6 +292,7 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123457             |
       | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
       | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-003      |
       | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
       | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
