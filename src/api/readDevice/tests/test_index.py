@@ -337,8 +337,8 @@ def test_index_mhs_device_adjusted_data(version):
 
         # Set up Device in DB
         device: Device = cpm_product.create_device(name="Product-MHS")
-        device.add_key(key_type="interaction_id", key_value="F5H1R-850000:urn:foo")
-        device.add_key(key_type="interaction_id", key_value="F5H1R-850000:urn:foo2")
+        device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo")
+        device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo2")
         device.add_tag(party_key="f5h1r-850000")
 
         # set up spine mhs questionnaire response
@@ -363,8 +363,10 @@ def test_index_mhs_device_adjusted_data(version):
                 "MHS Is Authenticated": "PERSISTENT",
                 "Product Key": "product-key-001",
                 "Requestor URP": "requestor-789",
+                "MHS Manufacturer Organisation": "AAA",
             }
         )
+
         device.add_questionnaire_response(spine_mhs_questionnaire_response)
 
         device.add_device_reference_data_id(
