@@ -81,7 +81,7 @@ def mock_epr_product_with_message_set_drd() -> (
         )
         product_repo.write(entity=product)
 
-        # set up questionnaire response
+        # set up questionnaire responses
         mhs_message_set_questionnaire = QuestionnaireRepository().read(
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
@@ -92,7 +92,6 @@ def mock_epr_product_with_message_set_drd() -> (
                 "MHS IN": "baz",
             }
         )
-
         questionnaire_response_2 = mhs_message_set_questionnaire.validate(
             data={
                 "Interaction ID": "urn:foo2",
@@ -375,4 +374,42 @@ def test_no_existing_message_set_drd():
         assert expected_message_code in response["body"]
 
 
-# add test for already existing mhs device?
+def test_mhs_already_exists() -> None:
+    with mock_epr_product_with_message_set_drd() as (index, product):
+        # Execute the lambda
+        response = index.handler(
+            event={
+                "headers": {"version": VERSION},
+                "body": json.dumps(
+                    {"questionnaire_responses": {"spine_mhs": [QUESTIONNAIRE_DATA]}}
+                ),
+                "pathParameters": {
+                    "product_team_id": str(product.product_team_id),
+                    "product_id": str(product.id),
+                },
+            }
+        )
+
+        assert response["statusCode"] == 201
+
+        # Execute the lambda again
+        response = index.handler(
+            event={
+                "headers": {"version": VERSION},
+                "body": json.dumps(
+                    {"questionnaire_responses": {"spine_mhs": [QUESTIONNAIRE_DATA]}}
+                ),
+                "pathParameters": {
+                    "product_team_id": str(product.product_team_id),
+                    "product_id": str(product.id),
+                },
+            }
+        )
+
+        assert response["statusCode"] == 400
+        expected_error_code = "VALIDATION_ERROR"
+        expected_message_code = (
+            "There is already an existing MHS Device for this Product"
+        )
+        assert expected_error_code in response["body"]
+        assert expected_message_code in response["body"]
