@@ -3,43 +3,55 @@
   "type": "object",
   "properties": {
     "ASID": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "ODS Code": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
     "Party Key": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "Product Name": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
     "Client ODS Codes": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "system generated": true
     },
     "MHS Manufacturer Organisation": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "Approver URP": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
     "Date Approved": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "Requestor URP": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
     "Date Requested": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "Product Key": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "Product Version": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
     "AS ACF": {
       "type": "array",
@@ -48,10 +60,12 @@
       }
     },
     "Temp UID": {
-      "type": "string"
+      "type": "string",
+      "system generated": true
     },
     "Description": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
     "Category Bag": {
       "type": "array",
@@ -60,16 +74,6 @@
       }
     }
   },
-  "required": [
-    "Party Key",
-    "ODS Code",
-    "Client ODS Codes",
-    "ASID",
-    "Approver URP",
-    "Date Approved",
-    "Requestor URP",
-    "Date Requested",
-    "Product Key"
-  ],
+  "required": ["ODS Code", "Approver URP", "Requestor URP"],
   "additionalProperties": false
 }
