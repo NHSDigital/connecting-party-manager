@@ -250,6 +250,7 @@ def test_create_message_sets(
         "ods_code": "AAA",
         "product_id": str(product.id),
         "product_team_id": product_team.id,
+        "status": "active",
         "questionnaire_responses": {
             "spine_mhs_message_sets/1": [
                 {
@@ -375,6 +376,7 @@ def test_create_additional_interactions(
         "ods_code": "AAA",
         "product_id": str(product.id),
         "product_team_id": product_team.id,
+        "status": "active",
         "questionnaire_responses": {
             "spine_as_additional_interactions/1": [
                 {
