@@ -133,20 +133,13 @@ Feature: Read Device - success scenarios
       | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
       | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
       | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
-<<<<<<< HEAD
       | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
-=======
->>>>>>> 646f315 (AS Device read unit tests)
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                    | value                                                                  |
       | id                      | ${ note(device_id) }                                                   |
-<<<<<<< HEAD
       | name                    | F5H1R-850000 - Message Handling System                                 |
-=======
-      | name                    | Product-MHS                                                            |
->>>>>>> 646f315 (AS Device read unit tests)
       | status                  | active                                                                 |
       | product_id              | ${ note(product_id) }                                                  |
       | product_team_id         | ${ note(product_team_id) }                                             |
@@ -154,11 +147,7 @@ Feature: Read Device - success scenarios
       | created_on              | << ignore >>                                                           |
       | updated_on              | << ignore >>                                                           |
       | deleted_on              | << ignore >>                                                           |
-<<<<<<< HEAD
       | keys.0.key_type         | cpa_id                                                                 |
-=======
-      | keys.0.key_type         | interaction_id                                                         |
->>>>>>> 646f315 (AS Device read unit tests)
       | keys.0.key_value        | F5H1R-850000:urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | tags.0.0.0              | ${ note(party_key_tag) }                                               |
       | tags.0.0.1              | ${ note(party_key_tag_value) }                                         |
@@ -167,10 +156,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-<<<<<<< HEAD
       | Content-Length | 1776             |
-=======
-      | Content-Length | 1717             |
 
     Examples:
       | product_team_id            | product_id            |
@@ -252,8 +238,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1699             |
->>>>>>> 646f315 (AS Device read unit tests)
+      | Content-Length | 1609             |
 
     Examples:
       | product_team_id            | product_id            |
