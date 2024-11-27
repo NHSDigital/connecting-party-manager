@@ -88,7 +88,7 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
     Then I receive a status code "201" with body
       | path                                                                                               | value                                                     |
       | id                                                                                                 | << ignore >>                                              |
-      | name                                                                                               | F5H1R-850000 - MHS Message Sets                            |
+      | name                                                                                               | F5H1R-850000 - MHS Message Sets                           |
       | status                                                                                             | active                                                    |
       | product_id                                                                                         | ${ note(product_id) }                                     |
       | product_team_id                                                                                    | ${ note(product_team_id) }                                |
@@ -122,7 +122,7 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
     Then I receive a status code "200" with body
       | path                                                                                               | value                                                     |
       | id                                                                                                 | ${ note(device_reference_data_id) }                       |
-      | name                                                                                               | F5H1R-850000 - MHS Message Sets                            |
+      | name                                                                                               | F5H1R-850000 - MHS Message Sets                           |
       | status                                                                                             | active                                                    |
       | product_id                                                                                         | ${ note(product_id) }                                     |
       | product_team_id                                                                                    | ${ note(product_team_id) }                                |
