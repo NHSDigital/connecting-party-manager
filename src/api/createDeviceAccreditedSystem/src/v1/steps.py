@@ -6,18 +6,14 @@ from domain.api.common_steps.read_product import (
     read_product,
     read_product_team,
 )
-
-# from domain.core import device
 from domain.core.cpm_product import CpmProduct
-from domain.core.device import (  # DeviceTagAddedEvent,;; DeviceKeyAddedEvent,; DeviceReferenceDataIdAddedEvent,
+from domain.core.device import (
     Device,
     DeviceTagAddedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
-
-# from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
-from domain.core.error import (  # InvalidSpineAsResponse,
+from domain.core.error import (
     AccreditedSystemFatalError,
     ConfigurationError,
     NotEprProductError,
@@ -34,6 +30,7 @@ from domain.repository.questionnaire_repository import (
 )
 from domain.request_models import CpmProductPathParams, CreateAsDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
+from sds.epr.constants import EprNameTemplate
 
 
 @mark_validation_errors_as_inbound
@@ -91,10 +88,14 @@ def validate_spine_as_questionnaire_response(data, cache) -> QuestionnaireRespon
 def create_as_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
+    party_key: str = data[get_party_key]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
+    # Ticket PI-666 adds ASID generation. This will need to be sent across in the arguments instead of an empty string.
     device_payload = payload.dict(exclude={"questionnaire_responses"})
-    return product.create_device(**device_payload)
+    return product.create_device(
+        EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=""), **device_payload
+    )
 
 
 def create_party_key_tag(data, cache) -> DeviceTagAddedEvent:

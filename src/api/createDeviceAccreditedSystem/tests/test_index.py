@@ -425,7 +425,7 @@ def test_index() -> None:
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
         assert device.product_id == product.id
-        assert device.name == DEVICE_NAME
+        assert device.name == "ABC1234-987654/ - Accredited System"
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()
@@ -501,63 +501,6 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
         # Validate that the response indicates that the expected error occured
         assert response["statusCode"] == status_code
         assert error_code in response["body"]
-
-
-# def test_as_already_exists() -> None:
-#     with mock_epr_product_with_message_sets_drd() as (index, product):
-#         # Execute the lambda
-#         response = index.handler(
-#             event={
-#                 "headers": {"version": VERSION},
-#                 "body": json.dumps(
-#                     {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
-#                 ),
-#                 "pathParameters": {
-#                     "product_team_id": str(product.product_team_id),
-#                     "product_id": str(product.id),
-#                 },
-#             }
-#         )
-#
-#         # Validate that the response indicates that a resource was created
-#         assert response["statusCode"] == 201
-#
-#         _device = json_loads(response["body"])
-#         device = Device(**_device)
-#         assert device.product_team_id == product.product_team_id
-#         assert device.product_id == product.id
-#         assert device.name == DEVICE_NAME
-#
-#         response2 = index.handler(
-#             event={
-#                 "headers": {"version": VERSION},
-#                 "body": json.dumps(
-#                     {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
-#                 ),
-#                 "pathParameters": {
-#                     "product_team_id": str(product.product_team_id),
-#                     "product_id": str(product.id),
-#                 },
-#             }
-#         )
-#
-#         assert response2["statusCode"] == 400
-#         expected_error_code = "VALIDATION_ERROR"
-#         expected_message_code = (
-#             "There is already an existing AS Device for this Product"
-#         )
-#         assert expected_error_code in response2["body"]
-#         assert expected_message_code in response2["body"]
-
-# # Retrieve the created resource
-# repo = DeviceRepository(
-#     table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
-# )
-# created_device = repo.read(device.id)
-#
-# # Check party_key is added to tags in the created device
-# expected_party_key = (str(ProductKeyType.PARTY_KEY), "abc1234-987654")
-# assert any(expected_party_key in tag.__root__ for tag in created_device.tags)
 
 
 @pytest.mark.parametrize(
