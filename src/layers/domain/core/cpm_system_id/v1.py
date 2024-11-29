@@ -1,13 +1,16 @@
+import os
 import random
 import re
 from abc import ABC, abstractmethod
 from datetime import datetime
+from pathlib import Path
 from uuid import uuid4
 
 from domain.core.base import BaseModel
 from domain.core.device_key import validate_key
 from domain.core.error import InvalidKeyPattern
 from domain.core.product_key import ProductKeyType
+from event.json import json_load
 from pydantic import validator
 
 FIRST_ASID = 200000099999
@@ -19,6 +22,9 @@ PRODUCT_ID_VALID_CHARS = "ACDEFGHJKLMNPRTUVWXY34679"  # pragma: allowlist secret
 PRODUCT_ID_PATTERN = re.compile(
     rf"^P\.[{PRODUCT_ID_VALID_CHARS}]{{{PRODUCT_ID_PART_LENGTH}}}-[{PRODUCT_ID_VALID_CHARS}]{{{PRODUCT_ID_PART_LENGTH}}}$"
 )
+
+PATH_TO_CPM_SYSTEM_IDS = Path(__file__).parent
+PRODUCT_IDS_GENERATED_FILE = f"{PATH_TO_CPM_SYSTEM_IDS}/generated_ids/product_ids.json"
 PRODUCT_TEAM_ID_PATTERN = re.compile(
     r"^[a-zA-Z0-9]+\.([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
@@ -105,18 +111,28 @@ class PartyKeyId(CpmSystemId):
 class ProductId(CpmSystemId):
     @classmethod
     def create(cls):
-        """No current_id needed, key is generated randomly."""
-        rng = random.Random(datetime.now().timestamp())
-        product_id = "-".join(
-            "".join(rng.choices(PRODUCT_ID_VALID_CHARS, k=PRODUCT_ID_PART_LENGTH))
-            for _ in range(PRODUCT_ID_NUMBER_OF_PARTS)
-        )
-        return cls(__root__=f"P.{product_id}")
+        existing_ids = cls.load_existing_ids()
+        while True:
+            """No current_id needed, key is generated randomly."""
+            rng = random.Random(datetime.now().timestamp())
+            product_id = "-".join(
+                "".join(rng.choices(PRODUCT_ID_VALID_CHARS, k=PRODUCT_ID_PART_LENGTH))
+                for _ in range(PRODUCT_ID_NUMBER_OF_PARTS)
+            )
+            if f"P.{product_id}" not in existing_ids:
+                return cls(__root__=f"P.{product_id}")
 
     @classmethod
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the ProductId has the correct format."""
         return PRODUCT_ID_PATTERN.match(cpm_system_id) is not None
+
+    @staticmethod
+    def load_existing_ids():
+        if os.path.exists(PRODUCT_IDS_GENERATED_FILE):
+            with open(PRODUCT_IDS_GENERATED_FILE, "r") as file:
+                return set(json_load(file))
+        return set()
 
 
 class ProductTeamId(CpmSystemId):
