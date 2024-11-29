@@ -94,7 +94,8 @@ def create_as_device(data, cache) -> Device:
     # Ticket PI-666 adds ASID generation. This will need to be sent across in the arguments instead of an empty string.
     device_payload = payload.dict(exclude={"questionnaire_responses"})
     return product.create_device(
-        EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=""), **device_payload
+        name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=""),
+        **device_payload
     )
 
 
