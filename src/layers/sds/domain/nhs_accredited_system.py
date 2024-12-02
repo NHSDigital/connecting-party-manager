@@ -34,9 +34,5 @@ class NhsAccreditedSystem(SdsBaseModel):
     nhs_as_category_bag: Optional[set[str]] = Field(alias="nhsascategorybag")
 
     @classmethod
-    def key_fields(cls) -> tuple[str, ...]:
-        return ACCREDITED_SYSTEM_KEY_FIELDS
-
-    @classmethod
     def query_params_model(cls) -> type[SearchSDSDeviceQueryParams]:
         return SearchSDSDeviceQueryParams

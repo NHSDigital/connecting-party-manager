@@ -237,13 +237,13 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.Address           | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier | 123456             |
     Then I receive a status code "400" with body
-      | path             | value                                                                                         |
-      | errors.0.code    | MISSING_VALUE                                                                                 |
-      | errors.0.message | Failed to validate data against 'spine_mhs/1': 'Managing Organization' is a required property |
+      | path             | value                                                                                                 |
+      | errors.0.code    | MISSING_VALUE                                                                                         |
+      | errors.0.message | Failed to validate data against 'spine_mhs/1': 'MHS Manufacturer Organisation' is a required property |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 147              |
+      | Content-Length | 155              |
 
   Scenario: Cannot create a MHS Device with a Product that already has an MHS Device
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -255,15 +255,24 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I note the response field "$.keys.0.key_type" as "party_key_tag"
-    And I note the response field "$.keys.0.key_value" as "party_key_value"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+      | path                                                                                        | value                                                     |
+      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID                             | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN                                     | urn:nhs:names:services:ers                                |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN                                     | READ_PRACTITIONER_ROLE_R4_V001                            |
+      | questionnaire_responses.spine_mhs_message_sets.1.Interaction ID                             | urn:nhs:names:services:ebs:PRSC_IN080000UK07              |
+      | questionnaire_responses.spine_mhs_message_sets.1.MHS SN                                     | urn:nhs:names:services:ebs                                |
+      | questionnaire_responses.spine_mhs_message_sets.1.MHS IN                                     | PRSC_IN080000UK07                                         |
+      | questionnaire_responses.spine_mhs_message_sets.1.Reliability Configuration Retry Interval   | PT1M                                                      |
+      | questionnaire_responses.spine_mhs_message_sets.1.Reliability Configuration Retries          | ${ integer(2) }                                           |
+      | questionnaire_responses.spine_mhs_message_sets.1.Reliability Configuration Persist Duration | PT10M                                                     |
     And I note the response field "$.id" as "message_set_drd_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
       | path                                                               | value              |
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
       | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
       | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
       | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
       | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
@@ -283,6 +292,67 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
       | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123457             |
       | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
+      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-003      |
+      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
+      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
+      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
+      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
+      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
+      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
+      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
+      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
+      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+    Then I receive a status code "400" with body
+      | path             | value                                                    |
+      | errors.0.code    | VALIDATION_ERROR                                         |
+      | errors.0.message | There is already an existing MHS Device for this Product |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 113              |
+
+  Scenario: Cannot create a MHS Device with a Product that already has an MHS Device with no questionnaire responses
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    And I note the response field "$.id" as "message_set_drd_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+      | path                                                               | value              |
+      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
+      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
+      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
+      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
+      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
+      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
+      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
+      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
+      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
+      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
+      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
+      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
+      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+    And I note the response field "$.id" as "device_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+      | path                                                               | value              |
+      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
+      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123457             |
+      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
       | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-003      |
       | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
       | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |

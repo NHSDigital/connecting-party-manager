@@ -279,7 +279,7 @@ for decorator in (given, when, then):
         )
 
         # Lowercase if alias is "party_key_value" as tags are always lowercase
-        if alias == "party_key_value" and isinstance(context.notes[alias], str):
+        if alias == "party_key_tag_value" and isinstance(context.notes[alias], str):
             context.notes[alias] = context.notes[alias].lower()
 
         javascript_path = jsonpath_to_javascript_path(jsonpath)

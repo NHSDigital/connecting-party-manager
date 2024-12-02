@@ -201,7 +201,7 @@ jobs:
         with:
           ref: ${{ env.BRANCH_NAME }}
       - run: |
-          poetry add pytest-nhsd-apim
+          poetry add pytest-nhsd-apim==3.4.3
       - uses: ./.github/actions/make/
         with:
           command: apigee--attach-product DEV_BUILD="true"
@@ -290,7 +290,7 @@ jobs:
         with:
           ref: ${{ env.BRANCH_NAME }}
       - run: |
-          poetry add pytest-nhsd-apim
+          poetry add pytest-nhsd-apim==3.4.3
       - uses: ./.github/actions/make/
         with:
           command: apigee--detach-product DEV_BUILD="true"

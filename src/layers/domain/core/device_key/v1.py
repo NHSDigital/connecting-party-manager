@@ -11,7 +11,7 @@ class DeviceKeyType(StrEnum):
     PRODUCT_ID = auto()
     ACCREDITED_SYSTEM_ID = auto()
     MESSAGE_HANDLING_SYSTEM_ID = auto()
-    INTERACTION_ID = auto()
+    CPA_ID = auto()
 
     @property
     def pattern(self) -> re.Pattern:
@@ -20,10 +20,8 @@ class DeviceKeyType(StrEnum):
                 return CpmId.Product.ID_PATTERN
             case DeviceKeyType.ACCREDITED_SYSTEM_ID:
                 return SdsId.AccreditedSystem.ID_PATTERN
-            case DeviceKeyType.MESSAGE_HANDLING_SYSTEM_ID:
-                return SdsId.MessageHandlingSystem.ID_PATTERN
-            case DeviceKeyType.INTERACTION_ID:
-                return re.compile(rf"{SdsId.PartyKey.PARTY_KEY_REGEX[:-1]}:urn:[\w:]+$")
+            case DeviceKeyType.CPA_ID:
+                return SdsId.CpaId.ID_PATTERN
             case _:
                 raise NotImplementedError(f"No ID validation configured for '{self}'")
 

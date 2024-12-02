@@ -3,8 +3,12 @@ from http import HTTPStatus
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
+from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.product_team import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
+from domain.repository.device_reference_data_repository import (
+    DeviceReferenceDataRepository,
+)
 from domain.repository.device_repository import DeviceRepository
 from domain.repository.product_team_repository import ProductTeamRepository
 from domain.request_models import DevicePathParams
@@ -54,6 +58,39 @@ def read_device(data, cache) -> Device:
     )
 
 
+def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
+    product_team: ProductTeam = data[read_product_team]
+    product: CpmProduct = data[read_product]
+    device: Device = data[read_device]
+
+    device_reference_datas = []
+    device_reference_data_repo = DeviceReferenceDataRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+    )
+    for id in device.device_reference_data:
+        drd = device_reference_data_repo.read(
+            product_team_id=product_team.id,
+            product_id=product.id,
+            id=id,
+        )
+        device_reference_datas.append(drd)
+
+    return device_reference_datas
+
+
+def update_device_with_device_reference_data(data, cache) -> Device:
+    device: Device = data[read_device]
+    device_reference_datas = data[read_device_reference_data]
+
+    [
+        device.questionnaire_responses.setdefault(key, []).extend(responses)
+        for drd in device_reference_datas
+        for key, responses in drd.questionnaire_responses.items()
+    ]
+
+    return device
+
+
 def device_to_dict(data, cache) -> tuple[str, dict]:
     device: Device = data[read_device]
     return HTTPStatus.OK, device.state()
@@ -64,5 +101,7 @@ steps = [
     read_product_team,
     read_product,
     read_device,
+    read_device_reference_data,
+    update_device_with_device_reference_data,
     device_to_dict,
 ]

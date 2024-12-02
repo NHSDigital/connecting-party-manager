@@ -170,7 +170,7 @@ def filter_and_group_ldif_from_s3_by_property(
     group_field: str,
     filter_terms: list[tuple[str, str]],
     s3_client: "S3Client",
-) -> memoryview:
+) -> Generator[memoryview, None, None]:
     """
     Efficiently streams a file from S3 directly into a bytes memoryview,
     filtering out any LDIF record without any (attribute_name, attribute_value)
@@ -186,7 +186,5 @@ def filter_and_group_ldif_from_s3_by_property(
     )
     stream_to_block(s3_path=s3_path, s3_client=s3_client, stream_block=stream_block)
 
-    data = BytesIO()
     for group in stream_block.data.values():
-        data.write(group.getbuffer())
-    return data.getbuffer()
+        yield group.getbuffer()

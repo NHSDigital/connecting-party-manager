@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-11-27
+- [PI-605] Bulk ETL (transform layer)
+- [PI-582] Read MHS Device
+
 ## 2024-11-25
 - [PI-643] Add status to Device Reference Data
 - Dependabot: slack-github-action, pydantic

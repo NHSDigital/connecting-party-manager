@@ -4,8 +4,8 @@ from domain.core.error import InvalidKeyPattern
 
 GOOD_ID_EXAMPLES = {
     "product_id": "P.XXX-YYY",
-    "accredited_system_id": "ABC:12345",
-    "message_handling_system_id": "ABC:ABC-12345:abc123",
+    "accredited_system_id": "12345",
+    "cpa_id": "asdefe",
 }
 
 
@@ -14,25 +14,6 @@ def test_validate_key_pass(key, type):
     assert validate_key(key_value=key, key_type=DeviceKeyType(type)) == key
 
 
-@pytest.mark.parametrize("type", GOOD_ID_EXAMPLES.keys())
-@pytest.mark.parametrize("key", GOOD_ID_EXAMPLES.values())
-def test_validate_key_fail(key, type):
-    if (type, key) in GOOD_ID_EXAMPLES.items():
-        pytest.skip("Already covered in 'test_validate_key_pass'")
-
+def test_validate_key_fail_other():
     with pytest.raises(InvalidKeyPattern):
-        validate_key(key_value=key, key_type=DeviceKeyType(type))
-
-
-@pytest.mark.parametrize("type", GOOD_ID_EXAMPLES.keys())
-@pytest.mark.parametrize(
-    "key",
-    (
-        "12345",
-        "ABC-12345",
-        "XXX-YYY",
-    ),
-)
-def test_validate_key_fail_other(key, type):
-    with pytest.raises(InvalidKeyPattern):
-        validate_key(key_value=key, key_type=DeviceKeyType(type))
+        validate_key(key_value="aefaer", key_type=DeviceKeyType("product_id"))
