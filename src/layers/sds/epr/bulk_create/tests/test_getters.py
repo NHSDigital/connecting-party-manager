@@ -246,244 +246,45 @@ def test_get_mhs_tags(mhs_1: NhsMhs, mhs_2: NhsMhs):
     assert len(tags) == len(expected_tags)
 
 
-def test_get_accredited_system_tags(
-    accredited_system_1: NhsAccreditedSystem, accredited_system_2: NhsAccreditedSystem
-):
-    accredited_systems = [accredited_system_1.dict(), accredited_system_2.dict()]
-    tags = get_accredited_system_tags(accredited_systems=accredited_systems)
+def test_get_accredited_system_tags(accredited_system_1: NhsAccreditedSystem):
+    tags = get_accredited_system_tags(accredited_system=accredited_system_1.dict())
     expected_tags = [
         {
-            "nhs_as_client": "CDE",
-            "nhs_as_svc_ia": "interaction-id-1",
+            "nhs_id_code": "AAA",
             "nhs_mhs_manufacturer_org": "AAA",
             "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "CDE",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-4",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-2",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "CDE",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "CDE",
-            "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "EFG",
             "nhs_as_svc_ia": "interaction-id-1",
         },
         {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-1",
+            "nhs_id_code": "AAA",
+            "nhs_mhs_manufacturer_org": "AAA",
+            "nhs_as_svc_ia": "interaction-id-2",
+        },
+        {"nhs_id_code": "AAA", "nhs_as_svc_ia": "interaction-id-1"},
+        {
+            "nhs_id_code": "AAA",
             "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "CDE",
             "nhs_as_svc_ia": "interaction-id-1",
         },
         {
-            "nhs_as_client": "CDE",
-            "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-2",
+            "nhs_id_code": "AAA",
             "nhs_mhs_manufacturer_org": "AAA",
             "nhs_mhs_party_key": "AAA-123456",
+            "nhs_as_svc_ia": "interaction-id-2",
         },
         {
-            "nhs_as_client": "ABC",
+            "nhs_id_code": "AAA",
+            "nhs_mhs_manufacturer_org": "AAA",
             "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_manufacturer_org": "AAA",
         },
+        {"nhs_id_code": "AAA", "nhs_as_svc_ia": "interaction-id-2"},
         {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-4",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-4",
-        },
-        {
-            "nhs_as_client": "CDE",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_manufacturer_org": "AAA",
-        },
-        {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-2",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-2",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-2",
-        },
-        {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-1",
-            "nhs_mhs_manufacturer_org": "AAA",
+            "nhs_id_code": "AAA",
             "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "JKL",
-            "nhs_as_svc_ia": "interaction-id-4",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "EFG",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_party_key": "AAA-123456",
-        },
-        {
-            "nhs_as_client": "LMN",
-            "nhs_as_svc_ia": "interaction-id-2",
-            "nhs_mhs_party_key": "AAA-456789",
-        },
-        {
-            "nhs_as_client": "ABC",
-            "nhs_as_svc_ia": "interaction-id-1",
-        },
-        {
-            "nhs_as_client": "CDE",
             "nhs_as_svc_ia": "interaction-id-2",
         },
     ]
+
     for tag in tags:
         assert tag in expected_tags, f"{tag} not in expected tags"
 
