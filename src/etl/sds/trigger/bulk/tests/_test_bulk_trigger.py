@@ -12,13 +12,15 @@ from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.aws.client import dynamodb_client
 from event.json import json_loads
 
-from test_helpers.dynamodb import clear_dynamodb_table
-from test_helpers.s3 import (
-    _ask_s3,
-    _ask_s3_prefix,
-    _set_etl_content,
-    _set_etl_content_config,
+from etl.sds.trigger.bulk.tests.etl_test_utils.etl_state import (
+    ask_s3,
+    ask_s3_prefix,
+    clear_etl_state,
+    get_etl_config,
 )
+from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
+from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import MockDeviceRepository
+from test_helpers.dynamodb import clear_dynamodb_table
 
 EXPECTED_CHANGELOG_NUMBER = 123
 
@@ -27,16 +29,16 @@ EXPECTED_CHANGELOG_NUMBER = 123
 @pytest.mark.integration
 def test_bulk_trigger():
     # Where the state is located
-    bucket_config = _set_etl_content_config()
+    bucket_config = get_etl_config()
     table_name = bucket_config["table_name"]
 
     client = dynamodb_client()
     repository = MockDeviceRepository(table_name=table_name, dynamodb_client=client)
 
     s3_client = boto3.client("s3")
-    ask_s3 = partial(_ask_s3, s3_client=s3_client, bucket=bucket_config["etl_bucket"])
+    ask_s3 = partial(ask_s3, s3_client=s3_client, bucket=bucket_config["etl_bucket"])
     ask_s3_prefix = partial(
-        _ask_s3_prefix, s3_client=s3_client, bucket=bucket_config["etl_bucket"]
+        ask_s3_prefix, s3_client=s3_client, bucket=bucket_config["etl_bucket"]
     )
 
     was_trigger_key_deleted = lambda: not ask_s3(
@@ -71,7 +73,7 @@ def test_bulk_trigger():
     )
     was_etl_state_lock_removed = lambda: not ask_s3(key=ETL_STATE_LOCK)
 
-    _set_etl_content(s3_client=s3_client, bucket_config=bucket_config)
+    clear_etl_state(s3_client=s3_client, bucket_config=bucket_config)
     s3_client.delete_object(Bucket=bucket_config["etl_bucket"], Key=CHANGELOG_NUMBER)
     s3_client.delete_object(Bucket=bucket_config["etl_bucket"], Key=ETL_STATE_LOCK)
     clear_dynamodb_table(client=client, table_name=bucket_config["table_name"])
