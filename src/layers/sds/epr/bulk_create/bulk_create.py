@@ -31,7 +31,7 @@ def _create_complete_epr_product(
     mhs_tags: list[dict],
     additional_interactions_data: list[QuestionnaireResponse],
     as_device_data: list[QuestionnaireResponse],
-    as_tags: list[dict],
+    as_tags: list[list[dict]],
     product_team_ids: dict[str, str],
 ) -> list[AggregateRoot]:
     if ods_code in product_team_ids:
@@ -50,14 +50,19 @@ def _create_complete_epr_product(
     message_sets = create_message_sets(
         product=product, party_key=party_key, message_set_data=message_set_data
     )
-    mhs_device = create_mhs_device(
-        product=product,
-        party_key=party_key,
-        mhs_device_data=mhs_device_data,
-        cpa_ids=mhs_cpa_ids,
-        message_sets_id=message_sets.id,
-        mhs_tags=mhs_tags,
-    )
+
+    mhs_devices = []
+    if mhs_device_data:
+        mhs_device = create_mhs_device(
+            product=product,
+            party_key=party_key,
+            mhs_device_data=mhs_device_data,
+            cpa_ids=mhs_cpa_ids,
+            message_sets_id=message_sets.id,
+            mhs_tags=mhs_tags,
+        )
+        mhs_devices = [mhs_device]
+
     additional_interactions = create_additional_interactions(
         product=product,
         party_key=party_key,
@@ -71,9 +76,9 @@ def _create_complete_epr_product(
             as_device_data=data,
             additional_interactions_id=additional_interactions.id,
             message_sets_id=message_sets.id,
-            as_tags=as_tags,
+            as_tags=tags,
         )
-        for data in as_device_data
+        for data, tags in zip(as_device_data, as_tags)
     ]
 
     return [
@@ -81,7 +86,7 @@ def _create_complete_epr_product(
         product,
         message_sets,
         additional_interactions,
-        mhs_device,
+        *mhs_devices,
         *as_devices,
     ]
 
@@ -113,12 +118,25 @@ def create_complete_epr_product(
     # !! Assumption: All MHSs with this party key have the same basic metadata.
     # !! Could add a debug test here to ensure all of this metadata is equal
     # !! between MHSs with this party key.
-    first_mhs = message_handling_systems[0]
-    mhs_device_data = get_mhs_device_data(
-        mhs=first_mhs,
-        mhs_device_questionnaire=mhs_device_questionnaire,
-        mhs_device_field_mapping=mhs_device_field_mapping,
-    )
+    ods_code, party_key, product_name = None, None, None
+    mhs_device_data = None
+    if message_handling_systems:
+        first_mhs = message_handling_systems[0]
+        mhs_device_data = get_mhs_device_data(
+            mhs=first_mhs,
+            mhs_device_questionnaire=mhs_device_questionnaire,
+            mhs_device_field_mapping=mhs_device_field_mapping,
+        )
+
+        ods_code = first_mhs["nhs_mhs_manufacturer_org"]
+        party_key = first_mhs["nhs_mhs_party_key"]
+        product_name = first_mhs["nhs_product_name"] or first_mhs["nhs_mhs_cpa_id"]
+    else:
+        first_as = accredited_systems[0]
+        ods_code = first_as["nhs_mhs_manufacturer_org"]
+        party_key = first_as["nhs_mhs_party_key"]
+        product_name = first_as["nhs_product_name"]
+
     as_device_data = [
         get_accredited_system_device_data(
             accredited_system=accredited_system,
@@ -139,15 +157,18 @@ def create_complete_epr_product(
     )
 
     mhs_tags = get_mhs_tags(message_handling_systems)
-    as_tags = get_accredited_system_tags(accredited_systems)
+    as_tags = [
+        get_accredited_system_tags(accredited_system)
+        for accredited_system in accredited_systems
+    ]
 
     return _create_complete_epr_product(
-        ods_code=first_mhs["nhs_mhs_manufacturer_org"],
-        party_key=first_mhs["nhs_mhs_party_key"],
-        product_name=first_mhs["nhs_product_name"],
+        ods_code=ods_code,
+        party_key=party_key,
+        product_name=product_name,
         mhs_device_data=mhs_device_data,
         message_set_data=message_set_data,
-        mhs_cpa_ids=[mhs["nhs_mhs_cpa_id"] for mhs in message_handling_systems],
+        mhs_cpa_ids=[mhs["unique_identifier"] for mhs in message_handling_systems],
         mhs_tags=mhs_tags,
         additional_interactions_data=additional_interactions_data,
         as_device_data=as_device_data,

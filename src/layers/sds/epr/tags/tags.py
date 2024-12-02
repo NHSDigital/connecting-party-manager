@@ -16,7 +16,7 @@ Background:
 from collections.abc import Iterable
 from itertools import product
 
-from domain.api.sds.query import SearchSDSQueryParams
+from domain.api.sds.query import SearchSDSDeviceQueryParams
 
 
 def _valid_tag_exists(tag_fields: set[str], data_fields: Iterable[str]) -> bool:
@@ -47,7 +47,7 @@ def _generate_all_matching_queries(
 
 
 def sds_metadata_to_device_tags(
-    data: dict[str, str | Iterable], model: SearchSDSQueryParams
+    data: dict[str, str | Iterable], model: SearchSDSDeviceQueryParams
 ) -> list[tuple[tuple[str, str]]]:
     """
     tldr;

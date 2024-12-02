@@ -159,10 +159,6 @@ class DeviceTagsClearedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class QuestionnaireResponseUpdatedEvent(Event):
-    """
-    This is adding the initial questionnaire response from the event body request.
-    """
-
     id: str
     questionnaire_responses: dict[str, list[QuestionnaireResponse]]
     keys: list[DeviceKey]
