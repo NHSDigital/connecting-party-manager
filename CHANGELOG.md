@@ -1,5 +1,9 @@
 # Changelog
 
+## 2024-12-02
+- [PI-572] Create an AS Device
+- [PI-582] AS Additional Interations smoke test
+
 ## 2024-11-27
 - [PI-605] Bulk ETL (transform layer)
 - [PI-582] Read MHS Device
