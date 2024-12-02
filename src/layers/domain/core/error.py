@@ -56,3 +56,11 @@ class NotEprProductError(Exception):
 
 class InvalidSpineMhsResponse(Exception):
     pass
+
+
+class InvalidSpineAsResponse(Exception):
+    pass
+
+
+class AccreditedSystemFatalError(Exception):
+    pass

@@ -165,6 +165,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeviceResponse"
+    AsDeviceCreate:
+      description: Create Accredited System Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AsDeviceResponse"
     MhsDeviceCreate:
       description: Create Message Handling System Device operation successful
       content:
