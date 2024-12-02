@@ -77,21 +77,25 @@ def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
     return device_reference_datas
 
 
+def filter_by_jsonpath(data, filters: list) -> dict:
+    response = {}
+    if "*" not in filters:
+        response = {filter_key: data[filter_key] for filter_key in filters}
+        return response
+    return data
+
+
 def filter_device_reference_data(data, cache) -> list[DeviceReferenceData]:
     device: Device = data[read_device]
-    device_reference_data_list = data[read_device_reference_data]
+    device_reference_data_list: list[DeviceReferenceData] = data[
+        read_device_reference_data
+    ]
 
-    for key, filters in device.device_reference_data.items():
-        for drd in device_reference_data_list:
-            if str(drd.id) == key:
-                for responses in drd.questionnaire_responses.values():
-                    for qresponse in responses:
-                        if "*" not in filters:
-                            qresponse.data = {
-                                filter_key: qresponse.data[filter_key]
-                                for filter_key in filters
-                            }
-
+    for drd in device_reference_data_list:
+        filters = device.device_reference_data[str(drd.id)]
+        for questionnaire_response in drd.questionnaire_responses.values():
+            for qr in questionnaire_response:
+                qr.data = filter_by_jsonpath(data=qr.data, filters=filters)
     return device_reference_data_list
 
 
