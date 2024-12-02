@@ -1,3 +1,4 @@
+import json
 import os
 from collections import deque
 from itertools import chain
@@ -5,6 +6,7 @@ from pathlib import Path
 from typing import Callable
 from unittest import mock
 
+import boto3
 import pytest
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
@@ -17,7 +19,7 @@ from domain.repository.device_reference_data_repository.v1 import (
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from etl_utils.constants import WorkerKey
-from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io import pkl_dumps_lz4, pkl_load_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.json import json_load
 from moto import mock_aws
@@ -27,6 +29,7 @@ from sds.epr.constants import AS_DEVICE_SUFFIX, MHS_DEVICE_SUFFIX
 
 from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.dynamodb import mock_table
+from test_helpers.terraform import read_terraform_output
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
@@ -212,3 +215,38 @@ def test_load_worker_pass(
     assert products == input_products
     assert devices == input_devices
     assert device_ref_datas == input_device_ref_data
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("path", (PATH_TO_HERE / "edge_cases").iterdir())
+def test_load_worker_edge_cases(path: str):
+
+    s3_client = boto3.client("s3")
+    lambda_client = boto3.client("lambda")
+    bucket = read_terraform_output("sds_etl.value.bucket")
+    lambda_name = read_terraform_output("sds_etl.value.bulk_load_lambda_arn")
+
+    with open(path) as f:
+        s3_client.put_object(
+            Key=f"{WorkerKey.LOAD}.0",
+            Bucket=bucket,
+            body=pkl_dumps_lz4(deque(json_load(f))),
+        )
+
+    response = lambda_client.invoke(
+        FunctionName=lambda_name,
+        Payload=json.dumps({"s3_input_path": f"s3://{BUCKET_NAME}/{WorkerKey.LOAD}.0"}),
+    )
+    assert json_load(response["Payload"]) == {
+        "stage_name": "load",
+        "processed_records": 10,
+        "unprocessed_records": 0,
+        "error_message": None,
+    }
+
+    # Final state
+    _final_unprocessed_data = s3_client.get_object(
+        Key=f"{WorkerKey.LOAD}.0", Bucket=bucket
+    )["Body"]
+    final_unprocessed_data = pkl_load_lz4(_final_unprocessed_data)
+    assert final_unprocessed_data == deque([])

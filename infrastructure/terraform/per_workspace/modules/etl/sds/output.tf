@@ -29,3 +29,7 @@ output "etl_state_lock_enforcer" {
 output "manual_trigger_arn" {
   value = module.trigger_manual.arn
 }
+
+output "bulk_load_lambda_arn" {
+  value = module.worker_load_bulk.arn
+}
