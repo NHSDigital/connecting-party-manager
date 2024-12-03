@@ -113,4 +113,4 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1781             |
+      | Content-Length | 1697             |

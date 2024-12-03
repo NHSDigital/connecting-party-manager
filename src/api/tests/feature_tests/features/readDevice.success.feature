@@ -231,7 +231,8 @@ Feature: Read Device - success scenarios
       | created_on              | << ignore >>                      |
       | updated_on              | << ignore >>                      |
       | deleted_on              | << ignore >>                      |
-      | keys                    | []                                |
+      | keys.0.key_type         | accredited_system_id              |
+      | keys.0.key_value        | << ignore >>                      |
       | tags.0.0.0              | ${ note(party_key_tag) }          |
       | tags.0.0.1              | ${ note(party_key_tag_value) }    |
       | questionnaire_responses | << ignore >>                      |
@@ -239,7 +240,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1632             |
+      | Content-Length | 1697             |
 
     Examples:
       | product_team_id            | product_id            |
