@@ -7,11 +7,13 @@ from domain.api.common_steps.read_product import (
     read_product_team,
 )
 from domain.core.cpm_product import CpmProduct
+from domain.core.cpm_system_id import AsidId
 from domain.core.device import (
     Device,
     DeviceTagAddedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
+from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.error import (
     AccreditedSystemFatalError,
@@ -20,6 +22,7 @@ from domain.core.error import (
 )
 from domain.core.product_key import ProductKeyType
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
+from domain.repository.cpm_system_id_repository import CpmSystemIdRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -104,9 +107,22 @@ def create_party_key_tag(data, cache) -> DeviceTagAddedEvent:
     return as_device.add_tag(party_key=data[get_party_key])
 
 
+def create_asid(data, cache) -> str:
+    repository = CpmSystemIdRepository[AsidId](
+        table_name=cache["DYNAMODB_TABLE"],
+        dynamodb_client=cache["DYNAMODB_CLIENT"],
+        model=AsidId,
+    )
+    asid = repository.read()
+    new_asid = AsidId.create(current_number=asid.latest_number)
+    return new_asid.__root__
+
+
 def create_device_keys(data, cache) -> Device:
     # We will need to add some keys in the future, ASID?
     as_device: Device = data[create_as_device]
+    asid: str = data[create_asid]
+    as_device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=asid)
     return as_device
 
 
@@ -172,6 +188,7 @@ steps = [
     validate_spine_as_questionnaire_response,
     create_as_device,
     create_party_key_tag,
+    create_asid,
     create_device_keys,
     add_device_reference_data_id,
     add_spine_as_questionnaire_response,
