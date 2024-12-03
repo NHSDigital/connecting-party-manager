@@ -1,0 +1,545 @@
+[
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "DT#nhs_id_code=bbb" },
+        "sk": { "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807" },
+        "pk_read": { "S": "DT#nhs_id_code=bbb" },
+        "sk_read": { "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807" },
+        "root": { "BOOL": false },
+        "id": { "S": "a5c17f6a-560d-4553-af40-9095ab84e807" },
+        "name": { "S": "BBB-111111 - Message Handling System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.017931+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.019737+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "cpa_id" },
+                "key_value": { "S": "00000000000b" }
+              }
+            },
+            {
+              "M": {
+                "key_type": { "S": "cpa_id" },
+                "key_value": { "S": "00000000000c" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WUy46jRhSGs4jyLJEsxWAuthdZQBkwVdxxcZOywIBpmzvYLmA1DzCLKJq8wzzAPEIeLC13J61Rb2aXyVmXTn31nTr/hx///OOnHx7126efP/61ZwdV0L2jqyRgOfvoYPdAF11J9KgWGGtw8TTncqw0y1Ln0AAV52IjNRNxuBtcQJsaIURnNmO/DYp7dKWLgKZWrLOG5hqlOeeWOg7JJmWkFddmydi3ubdHt47fU9Ryjk/DcvRnGE91kIdmh4UgVbtGna9rX2h41DgM3SvMNAWJeDDI1g6mJ2bn1ELInShgo65lhef69dPHL189Y3XNK683BEEZ8ewKnZQQjddZ6ylTwYg099xfBlrv26VDoItL3ukAiRxcAHVRIe083A7srNutFcWlE5S+LSn9XT8ktIJ69uqeh2EsVGDSnXHu0A6P8MjnaKdwUNMLfd7cn48s0G5TG8e1CrW1TnSxcauu2+dCrJzr6Sl/UP8PsNkXbNDpVG29YX/+CnsKVJc0wLaJhCWZyW8pgaHJDtnm3Bw2sthOFFTMO0fA9mJltMgOHTI4fqH3t5rNTs7y6tRFlCAjAevlDReVNVOL41xpnr7XmJM1tU8hFFjCQlFZpGMjhnhIxWNIcyzrtjZ1bwAfMrEhU+nNIgLnpy1dF68f4/d3hp0ePQyvUB1bB8L5GI+LBCSBHCX1WLGtnU1bdLbALW9kLwsrrhs8b4xLOYouyC68Fh9lH1dt7gY0wJU8uX6EoppLY1le4JrT42Blu8EqysOdXRqeZAli7ljF9uHvW+zZJv9f2fMwC3nmO7FHXuyhnA1q+GqvfIeU9dK/K6Mm68fKXPTSuhRLGHhoxxguviLsQcCqUr6R2VyTmitCN3PG063e7gUxCrBBfBHFXZMJppwVT9B4ue5b8lH+HvMxFOiu5P7Jx8M7a3EP3wZpq1z1OkgsnzEuy9M+6rjIzvrOLaBM73R4fs6CfC8oA1EXOfViR3vX1u13b20dwq2e266yagSnuuUdk/dl0y26uGi7RiRiboqQQPKaK9kvfwP9sqYTnQYAAA=="
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/31SXY8SMRTVBYOyLH7EfTHR9MFEE8PQgQF3eGNBI1FYBNb4siGF6UADdMZOxwSTTfwBfawv/lpvy8fu+tV5md5ze++5557v2R8/M7fsudTqMIkZp+PVPCm7+kJf6pfqgAVaPa8EYRBWX4elWpXWS151Qks+8esl36tiWvHq2CNTrR59SWkiWcQ5YYKOOVlRre7ta2p1fDPhKxUJXLS67WqVDYgktmWhGcciAhCdD/pa5VfrXUCrZ62IS0GmEvVFFFMh12hEV/GSSIre07VWB66n1VHb3LevgH+xgnHl6tPqoU1o94b/SyrapAG1pP+aUbhWQfzG9EGHS2qYwoRotI5Bimw4Z4AcdwknM8Zn6EzMCGffiLQqZE5PT7V6MaBLRiZsyWA2mDZks1TYDNScLq7TucPppm333RC1+k3UaQMlfHUmWrn/rtZO4yWbbv7fLNmK8S2PXd1cMwgETWBvT+ZSxkmjXJbQ2mlVz/zPDp8nTrooa3XXtH/7sd0DWf/AQTQDd/poXyyHHftp9dhCCWqmck65NGTMXFkecVDrqUFBqjQEEVMBdtjIlexofhj2sVm2yesTY4WFcUAeZCy59oCjwSZBCnax5sjYWGEX61mDFrtrBE/QNqrV/R3+aefPHCy+5piNH231j7bmPFyt9xGY/5wzuKBOYMYJmVHx5kJSlZ8KauYcm8IIbOQB2VIFj1zcqHkN13ewi0/8k1cYNzDWKUmcXzS0XuOlAwAA"
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": { "L": [{ "S": "*" }] }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": true },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "M": {
+            "spine_as/1": {
+              "L": [
+                {
+                  "M": {
+                    "id": { "S": "c793754b-1eb9-49d3-99dc-a57e5d2589b1" },
+                    "questionnaire_name": { "S": "spine_as" },
+                    "questionnaire_version": { "S": "1" },
+                    "data": {
+                      "M": {
+                        "Approver URP": { "S": "myApprover" },
+                        "Client ODS Codes": { "L": [{ "S": "BBB" }] },
+                        "Date Approved": { "S": "20020202020202" },
+                        "Date Requested": { "S": "20020202020202" },
+                        "ODS Code": { "S": "BBB" },
+                        "MHS Manufacturer Organisation": { "S": "LSP04" },
+                        "Party Key": { "S": "BBB-111111" },
+                        "Product Key": { "S": "222" },
+                        "Product Name": { "S": "My BBB Product" },
+                        "Product Version": { "S": "2005.02" },
+                        "Requestor URP": { "S": "myRequestor" },
+                        "Temp UID": { "S": "222" },
+                        "ASID": { "S": "000000000002" }
+                      }
+                    },
+                    "created_on": { "S": "2024-11-20T10:54:19.012568+00:00" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "D#000000000002" },
+        "sk": { "S": "D#000000000002" },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+        },
+        "sk_read": { "S": "D#000000000002" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003&nhs_mhs_party_key=bbb-111111"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003&nhs_mhs_party_key=bbb-111111"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02&nhs_mhs_manufacturer_org=lsp04"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02&nhs_mhs_manufacturer_org=lsp04"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002&nhs_mhs_party_key=bbb-111111"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002&nhs_mhs_party_key=bbb-111111"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003&nhs_mhs_manufacturer_org=lsp04"
+        },
+        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "pk_read": {
+          "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003&nhs_mhs_manufacturer_org=lsp04"
+        },
+        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "root": { "BOOL": false },
+        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.LU6-Y7D" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "accredited_system_id" },
+                "key_value": { "S": "000000000002" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/9WVu66cVhiFU6RMm3eIhJQZGGCgcAEbhjvDnQEpxQzXgeF+p8oDuDx5gzxCypR5jJR5kMyxz5FlO5IdKbJPdr21WYv/W+v/+dtfvv/umzfnp4cfXv/Bo51AKc7F5AKw2cKqrldAMSiLBAZK0GF0o10SkTeCcuiYQxntl+3U75UtTzIZBEN1xFAFS4vyCS8QmXPii+P76giGOR8I4LXSclFHl1DJikwtbxnsehueFCPCU+vKYhBXJXhiEBXMezXGABawuT5FpgK5xTGA9whERqfVXWohjwpp6XByhCBBodOJDOVTr5cTdT+vXj28fnjPBtInhd+yFMXN9mpSjRDsZFxBtZZFtSwvldUdfbbSAlg0t7Vh+2J57QYLXRW91qzmZpxurs5w7ahYAcxJLdqb166bc0FSkjq8Np2sJ8r9+kow92+kUjchSt2YBZ6wVCZhSetu3+h6CbLwt7I0IaBy7lnW7x/JClvxS8oSWF9IhFWgI54dVWk7H01z28h2NWZENd7fPU/YrNuceFNNe2NTaYpvT77+JP/TzB5c4uUxC62NLc/vmP3zoylcmiOli9caSShbJ8dT7s8xJ84xLx79oo4WX4+wxsxrUNQLIx/8oJwL72ZFpSFdN1KXcKIbeQXWBI47n28H3y9FnfVpsz04nnujvfv1suJEygC2n3aeji46RRcGICQxOjv1Nchvte3WRsxjRnR/95au16RTLMBINMdLIJVk89pmHay09caYqBBJz1PC2bBokTqTcGbTDPqzvQ+npDxPCZbUXQnRIhj2h03ucmcDgbcccircnaY1DL+N47NvQhzNCibRY+RYd466wnCfqzg4AypDebPldm150PALbuBAyno3y/yyL1gBzR00rQmVMK5FTB1Z/BhP87wIyeWYexTfKH4At5uMyIJhuulR7DTofhU2fYRkFufr1ahog7LnHYl9gu3X920g4h37RxsH2kXIFHOIWbkExh2g+MiAcDnulYvNm3IZwShQs6XgomgT1ggGDYSfKqOPh4hUdkmzncOsKCltk21CMGXsIJPK1oVFaBI1Zqj1WmEJbux5a2CM2k4dzrlFennOx2UpKHSOjSW/NlHy/Ld/+4dIH79spD0hqR4jLYFZksxlfOSkqjVnpsBOVyeXls5NFVHCvmAz03wU/hKayP53TYSBcxBiz0309SPs/ZcRBhYyjPy7CP/1AftHXW+BTs0H+mRnA8+UbDhVh8tY71gH3PMVXqTgVhhnnJjAmknxHORon9REDLRCszBchncdgp+XPSZnSDixdifaGb9ax2Uv2lAO5T1E6x7JzSp0KzTVy40q3fukCmTBE2WSWpABgPM6zcFBMQIKI281UozDznNQiBnbruiPGqueVmuQlnyNBRHZLNMhyxVComl0qcjeIqHaNnlmw+hIduLeQvhZNp1L+/+ziSoWB2dPNj/ZZNuv0mRhii7X00tqMvszm4yjrxLmPjXZJ9fddVhf5LpDxssYN0/rLvrxb6iv4QsgDAAA"
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/22QS0vDQBDH1VasfSmCx8IePAiSutkmtumtj4OitaEPb1K22VUC5uEmEXIo+AH2uH5fpzGxCM6e5j8z//ntfJa/Wgd7WWyUrEah6/MVja519aw26lIeuEzJC6drdbqmsdZ0vrY0w2IdzbKYo1Gzy01GzJ611pU8e094FLuB71NX8JVPPa5kpbBU8vxv/YOLCBIl92G2zGhMs431QRiKAIpoObMByUsLQcnT0ZvL/RhNx3M0ChiPgFKWhsOhorIxpjFHeS9ANwnGZPdAyBpmPKP4t6NS+OamsjW5naMJ9ZMX6sSJAKapeKW+G9E4Iz98mNvYUPLYpiJO0T1PARgmNT0LJWu2CFjixD+lEiGwpV5oj9mBmpMUwQjKVSVPivpTcaAjADXbW8JGjh/k16l56a8C/AvuhWh5Ny5WlQfzbVLHuyAqkVVHcLgFW23NEXzdAGCN4IWO+6bR16021ol507vCuI+xSmjU/gaUmqtVKAIAAA=="
+        },
+        "device_reference_data": {
+          "M": {
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [{ "S": "*.Interaction ID" }]
+            },
+            "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
+              "L": [{ "S": "*.Interaction ID" }]
+            }
+          }
+        }
+      }
+    }
+  }
+]

@@ -4,11 +4,11 @@ from collections import deque
 
 import boto3
 import pytest
+from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
 from etl_utils.constants import ETL_STATE_MACHINE_HISTORY
 from event.json import json_loads
 from mypy_boto3_lambda.type_defs import InvocationResponseTypeDef
 
-from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
 from test_helpers.s3 import _set_etl_content, _set_etl_content_config
 from test_helpers.terraform import read_terraform_output
 
