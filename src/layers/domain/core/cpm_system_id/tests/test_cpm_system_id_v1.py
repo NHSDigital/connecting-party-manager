@@ -10,7 +10,7 @@ PRODUCT_IDS_GENERATED_FILE = f"{PATH_TO_CPM_SYSTEM_IDS}/generated_ids/product_id
 generated_product_ids = set()
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def _get_generated_ids():
     global generated_product_ids
     if os.path.exists(PRODUCT_IDS_GENERATED_FILE):
@@ -88,7 +88,7 @@ def test_asid_generator_increment_number():
 
 
 @pytest.mark.repeat(50)
-def test_product_id_generator_format_key():
+def test_product_id_generator_format_key(_get_generated_ids):
     generator = ProductId.create()
     assert generator.id is not None
     assert generator.id not in generated_product_ids

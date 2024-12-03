@@ -13,14 +13,6 @@ ID_CLASS_MAP = {
 }
 
 
-def save_to_set(id, ids):
-    if id in ids:
-        return False
-
-    ids.add(id)
-    return ids
-
-
 def generator(id_type="product"):
     id_class = ID_CLASS_MAP.get(id_type)
     generator = id_class.create()
@@ -41,13 +33,9 @@ def save_file(ids, id_type="product"):
 
 def bulk_generator(id_count=1, id_type="product"):
     ids = open_file(id_type=id_type)
-    for _ in range(id_count):
-        saved = False
-        while not saved:
-            generated_id = generator()
-            saved = save_to_set(generated_id, ids)
-        ids = saved
-
+    starting_id_count = len(ids)
+    while len(ids) - starting_id_count < id_count:
+        ids.add(generator())
     save_file(ids, id_type)
     return ids
 
