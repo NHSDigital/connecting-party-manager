@@ -5,12 +5,6 @@ from unittest import mock
 
 import pytest
 from domain.core.device import Device
-from etl_utils.constants import WorkerKey
-from etl_utils.io import pkl_dumps_lz4
-from etl_utils.io.test.io_utils import pkl_loads_lz4
-from moto import mock_aws
-from mypy_boto3_s3 import S3Client
-
 from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import (
     BUCKET_NAME,
     TABLE_NAME,
@@ -18,6 +12,12 @@ from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import (
     device_factory,
 )
 from etl.sds.worker.transform_update.utils import export_events
+from etl_utils.constants import WorkerKey
+from etl_utils.io import pkl_dumps_lz4
+from etl_utils.io.test.io_utils import pkl_loads_lz4
+from moto import mock_aws
+from mypy_boto3_s3 import S3Client
+
 from test_helpers.dynamodb import mock_table
 
 

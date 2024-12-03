@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import boto3
 from domain.core.device import Device
 from domain.core.event import ExportedEventTypeDef
+from etl.sds.worker.transform_bulk.utils import smart_open_if_exists
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_dumps_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
@@ -13,8 +14,6 @@ from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.environment import BaseEnvironment
 from sds.cpm_translation import translate
-
-from etl.sds.worker.transform_bulk.utils import smart_open_if_exists
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import boto3
 from domain.core.event import ExportedEventTypeDef
 from domain.repository.device_repository import DeviceRepository
+from etl.sds.worker.transform_update.utils import export_events
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
@@ -14,8 +15,6 @@ from etl_utils.worker.worker_step_chain import execute_step_chain
 from event.aws.client import dynamodb_client
 from event.environment import BaseEnvironment
 from sds.cpm_translation import translate
-
-from etl.sds.worker.transform_update.utils import export_events
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
