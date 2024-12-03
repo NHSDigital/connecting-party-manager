@@ -20,7 +20,9 @@ from event.aws.client import dynamodb_client
 
 from etl.sds.tests.constants import EtlTestDataPath
 from etl.sds.tests.etl_test_utils.ask_s3 import (
-    etl_state_is_clear,
+    extract_is_empty,
+    load_is_empty,
+    transform_is_empty,
     was_changelog_number_updated,
 )
 from etl.sds.tests.etl_test_utils.etl_state import clear_etl_state, get_etl_config
@@ -97,10 +99,6 @@ def test_bulk_without_trigger_short():
 
     # Clean state
     clear_etl_state(s3_client=s3_client, etl_config=etl_config)
-    assert etl_state_is_clear(
-        s3_client=s3_client,
-        bucket=etl_config.bucket,
-    )
     initial_aggregated_data = aggregate_database(
         table_name=etl_config.table_name, dynamodb_client=db_client
     )
@@ -125,10 +123,10 @@ def test_bulk_without_trigger_short():
         bucket=etl_config.bucket,
         new_changelog_number=new_changelog_number,
     )
-    assert etl_state_is_clear(
-        s3_client=s3_client,
-        bucket=etl_config.bucket,
-    )
+    assert extract_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
+    assert transform_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
+    assert load_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
+
     final_aggregated_data = aggregate_database(
         table_name=etl_config.table_name, dynamodb_client=dynamodb_client
     )
@@ -177,10 +175,6 @@ def test_bulk_without_trigger_long():
 
     # Clean state
     clear_etl_state(s3_client=s3_client, etl_config=etl_config)
-    assert etl_state_is_clear(
-        s3_client=s3_client,
-        bucket=etl_config.bucket,
-    )
     initial_aggregated_data = aggregate_database(
         table_name=etl_config.table_name, dynamodb_client=db_client
     )
@@ -205,7 +199,6 @@ def test_bulk_without_trigger_long():
         bucket=etl_config.bucket,
         new_changelog_number=new_changelog_number,
     )
-    assert etl_state_is_clear(
-        s3_client=s3_client,
-        bucket=etl_config.bucket,
-    )
+    assert extract_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
+    assert transform_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
+    assert load_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
