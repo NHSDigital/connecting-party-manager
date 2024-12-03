@@ -90,23 +90,19 @@ def mhs_device(product, party_key, message_sets: DeviceReferenceData, mhs_tags):
     questionnaire = QuestionnaireRepository().read(name=QuestionnaireInstance.SPINE_MHS)
     mhs_device_data = questionnaire.validate(
         data={
+            "Binding": "https://",
             "Address": "my-mhs-endpoint",
             "Approver URP": "approver-123",
-            "Contract Property Template Key": "key-123",
             "DNS Approver": "dns-approver-123",
             "Date Approved": "today",
             "Date DNS Approved": "yesterday",
             "Date Requested": "a week ago",
-            "Interaction Type": "hl7",
             "MHS CPA ID": "1wd354",
             "MHS FQDN": "my-fqdn",
-            "MHS Is Authenticated": "none",
             "MHS Party key": "AAA-123456",
             "Managing Organization": "AAA",
-            "Product Key": "key-123",
             "Product Name": "My EPR Product",
             "Requestor URP": "requester-123",
-            "Unique Identifier": "1wd354",
             "MHS Manufacturer Organisation": "AAA",
         }
     )
@@ -321,23 +317,19 @@ def test_create_mhs_device(
             "spine_mhs/1": [
                 {
                     "data": {
+                        "Binding": "https://",
                         "Address": "my-mhs-endpoint",
                         "Approver URP": "approver-123",
-                        "Contract Property Template Key": "key-123",
                         "DNS Approver": "dns-approver-123",
                         "Date Approved": "today",
                         "Date DNS Approved": "yesterday",
                         "Date Requested": "a week ago",
-                        "Interaction Type": "hl7",
                         "MHS CPA ID": "1wd354",
                         "MHS FQDN": "my-fqdn",
-                        "MHS Is Authenticated": "none",
                         "MHS Party key": "AAA-123456",
                         "Managing Organization": "AAA",
-                        "Product Key": "key-123",
                         "Product Name": "My EPR Product",
                         "Requestor URP": "requester-123",
-                        "Unique Identifier": "1wd354",
                         "MHS Manufacturer Organisation": "AAA",
                     },
                     "questionnaire_name": "spine_mhs",

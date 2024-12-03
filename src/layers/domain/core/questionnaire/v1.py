@@ -51,6 +51,30 @@ class Questionnaire(AggregateRoot):
     def id(self) -> str:
         return f"{self.name}/{self.version}"
 
+    @property
+    def user_provided_fields(self) -> list[str]:
+        """
+        Returns a generator object of fields NOT marked as 'system generated' in the JSON schema.
+        """
+        properties = self.json_schema.get("properties", {})
+        return (
+            field_name
+            for field_name, field_attrs in properties.items()
+            if not field_attrs.get("system generated", False)
+        )
+
+    @property
+    def system_generated_fields(self) -> list[str]:
+        """
+        Returns a list of fields marked as 'system generated' in the JSON schema.
+        """
+        properties = self.json_schema.get("properties", {})
+        return [
+            field_name
+            for field_name, field_attrs in properties.items()
+            if field_attrs.get("system generated") is True
+        ]
+
 
 class QuestionnaireResponse(BaseModel):
     id: UUID = Field(default_factory=uuid4)

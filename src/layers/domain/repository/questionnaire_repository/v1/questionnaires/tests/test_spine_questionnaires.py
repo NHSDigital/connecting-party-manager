@@ -32,6 +32,7 @@ NHS_MHS_STRATEGY = builds(
     nhsmhssvcia=text(alphabet=ascii_letters + digits + ":", min_size=1),
     nhsmhsendpoint=urls(),
     nhsmhsmanufacturerorg=just("AAA"),
+    binding=just("https://"),
 )
 
 NHS_ACCREDITED_SYSTEM_STRATEGY = builds(

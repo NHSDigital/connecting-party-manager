@@ -20,6 +20,7 @@ from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.error import ConfigurationError
 from domain.core.product_team import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
+from domain.core.timestamp import now
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -37,6 +38,30 @@ from sds.epr.constants import EprNameTemplate, SdsDeviceReferenceDataPath, SdsFi
 def parse_mhs_device_payload(data, cache) -> CreateMhsDeviceIncomingParams:
     payload: dict = data[parse_event_body]
     return CreateMhsDeviceIncomingParams(**payload)
+
+
+def read_spine_mhs_questionnaire(data, cache) -> Questionnaire:
+    return QuestionnaireRepository().read(QuestionnaireInstance.SPINE_MHS)
+
+
+def check_expected_questionnaire_response_fields(data, cache):
+    spine_mhs_questionnaire: Questionnaire = data[read_spine_mhs_questionnaire]
+    expected_fields = sorted(spine_mhs_questionnaire.user_provided_fields)
+    payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
+    spine_mhs_questionnaire_response = payload.questionnaire_responses[
+        QuestionnaireInstance.SPINE_MHS
+    ]
+    payload_fields = set(spine_mhs_questionnaire_response.__root__[0].keys())
+
+    # Find unexpected fields
+    unexpected_fields = payload_fields - set(expected_fields)
+    if unexpected_fields:
+        raise ConfigurationError(
+            f"Payload contains unexpected fields: {unexpected_fields}. "
+            f"Expected fields are: {expected_fields}."
+        )
+    # Return questionnaire responses
+    return spine_mhs_questionnaire_response.__root__[0]
 
 
 def check_for_existing_mhs(data, cache):
@@ -82,21 +107,41 @@ def read_device_reference_data(data, cache) -> DeviceReferenceData:
     return device_reference_data
 
 
-def read_spine_mhs_questionnaire(data, cache) -> Questionnaire:
-    return QuestionnaireRepository().read(QuestionnaireInstance.SPINE_MHS)
+def generate_spine_mhs_responses(data, cache) -> list:
+    spine_mhs_questionnaire_responses = data[
+        check_expected_questionnaire_response_fields
+    ]
+
+    missing_fields_used_for_system_generated_fields = [
+        field
+        for field in ["Binding", "MHS FQDN"]
+        if not spine_mhs_questionnaire_responses.get(field)
+    ]
+
+    if missing_fields_used_for_system_generated_fields:
+        raise ConfigurationError(
+            f"The following required fields are missing in the response to spine_mhs: {', '.join(missing_fields_used_for_system_generated_fields)}"
+        )
+
+    # System generated fields:
+    spine_mhs_questionnaire_responses["Address"] = (
+        f"{spine_mhs_questionnaire_responses.get("Binding")}{spine_mhs_questionnaire_responses.get("MHS FQDN")}"
+    )
+    spine_mhs_questionnaire_responses["MHS Party key"] = data[get_party_key]
+    spine_mhs_questionnaire_responses["Managing Organization"] = (
+        spine_mhs_questionnaire_responses["MHS Party key"].split("-")[0]
+    )
+    spine_mhs_questionnaire_responses["Date Approved"] = str(now())
+    spine_mhs_questionnaire_responses["Date Requested"] = str(now())
+    spine_mhs_questionnaire_responses["Date DNS Approved"] = str(None)
+
+    return spine_mhs_questionnaire_responses
 
 
 def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireResponse:
     spine_mhs_questionnaire: Questionnaire = data[read_spine_mhs_questionnaire]
-    payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
-
-    spine_mhs_questionnaire_response = payload.questionnaire_responses[
-        QuestionnaireInstance.SPINE_MHS
-    ]
-
-    return spine_mhs_questionnaire.validate(
-        data=spine_mhs_questionnaire_response.__root__[0]
-    )
+    spine_mhs_response = data[generate_spine_mhs_responses]
+    return spine_mhs_questionnaire.validate(spine_mhs_response)
 
 
 def create_mhs_device(data, cache) -> Device:
@@ -173,12 +218,14 @@ steps = [
     parse_event_body,
     parse_path_params,
     parse_mhs_device_payload,
+    read_spine_mhs_questionnaire,
+    check_expected_questionnaire_response_fields,
     read_product_team,
     read_product,
     get_party_key,
     check_for_existing_mhs,
     read_device_reference_data,
-    read_spine_mhs_questionnaire,
+    generate_spine_mhs_responses,
     validate_spine_mhs_questionnaire_response,
     create_mhs_device,
     create_party_key_tag,

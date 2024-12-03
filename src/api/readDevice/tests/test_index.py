@@ -190,21 +190,16 @@ def test_index_mhs_device(version):
         )
         spine_mhs_questionnaire_response = mhs_message_set_questionnaire.validate(
             data={
-                "Address": "http://example.com",
-                "Unique Identifier": "123456",
+                "Binding": "https://",
+                "Address": "https://example.com",
                 "Managing Organization": "Example Org",
                 "MHS Party key": "party-key-001",
-                "MHS CPA ID": "cpa-id-001",
                 "Approver URP": "approver-123",
-                "Contract Property Template Key": "contract-key-001",
                 "Date Approved": "2024-01-01",
                 "Date DNS Approved": "2024-01-02",
                 "Date Requested": "2024-01-03",
                 "DNS Approver": "dns-approver-456",
-                "Interaction Type": "FHIR",
                 "MHS FQDN": "mhs.example.com",
-                "MHS Is Authenticated": "PERSISTENT",
-                "Product Key": "product-key-001",
                 "Requestor URP": "requestor-789",
                 "MHS Manufacturer Organisation": "AAA",
             }
