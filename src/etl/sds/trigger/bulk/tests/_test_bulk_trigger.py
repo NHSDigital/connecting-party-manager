@@ -18,8 +18,6 @@ from etl.sds.trigger.bulk.tests.etl_test_utils.etl_state import (
     clear_etl_state,
     get_etl_config,
 )
-from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
-from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 
 EXPECTED_CHANGELOG_NUMBER = 123
