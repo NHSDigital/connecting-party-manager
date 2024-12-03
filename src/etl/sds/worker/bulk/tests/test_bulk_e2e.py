@@ -128,7 +128,7 @@ def test_bulk_without_trigger_short():
     assert load_is_empty(s3_client=s3_client, bucket=etl_config.bucket)
 
     final_aggregated_data = aggregate_database(
-        table_name=etl_config.table_name, dynamodb_client=dynamodb_client
+        table_name=etl_config.table_name, dynamodb_client=db_client
     )
     assert final_aggregated_data == {
         ProductTeam: {
