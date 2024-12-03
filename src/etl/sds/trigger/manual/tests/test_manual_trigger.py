@@ -4,12 +4,12 @@ from collections import deque
 
 import boto3
 import pytest
-from etl.sds.worker.extract.tests.test_extract_worker import GOOD_SDS_RECORD
 from etl_utils.constants import ETL_STATE_MACHINE_HISTORY
 from event.json import json_loads
 from mypy_boto3_lambda.type_defs import InvocationResponseTypeDef
 
-from test_helpers.s3 import _set_etl_content, _set_etl_content_config
+from etl.sds.tests.etl_test_utils.etl_state import clear_etl_state, get_etl_config
+from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.terraform import read_terraform_output
 
 TEST_DATA_NAME = "123.ldif"
@@ -29,26 +29,29 @@ EMPTY_JSON_DATA = deque()
 )
 def test_manual_trigger(history_object):
     # Where the state is located
-    bucket_config = _set_etl_content_config()
+    etl_config = get_etl_config(f"{EXPECTED_CHANGELOG_NUMBER}.ldif")
     manual_trigger_arn = read_terraform_output("manual_trigger_arn.value")
     expected = history_object.split(".")
     expected_prefix = ".".join(expected[:3])
 
     # Set some questions
     s3_client = boto3.client("s3")
-    _set_etl_content(s3_client=s3_client, bucket_config=bucket_config)
+    clear_etl_state(s3_client=s3_client, etl_config=etl_config)
 
     # Assert history folder empty
     state_machine_bucket_contents = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=f"{ETL_STATE_MACHINE_HISTORY}/"
+        Bucket=etl_config.bucket, Prefix=f"{ETL_STATE_MACHINE_HISTORY}/"
     )
     assert "Contents" not in state_machine_bucket_contents
 
+    with open(PATH_TO_STAGE_DATA / "0.extract_input.ldif") as f:
+        input_data = f.read().encode()
+
     # set up test (add file to history bucket)
     s3_client.put_object(
-        Bucket=bucket_config["etl_bucket"],
+        Bucket=etl_config.bucket,
         Key=f"{ETL_STATE_MACHINE_HISTORY}/{history_object}",
-        Body=GOOD_SDS_RECORD,
+        Body=input_data,
     )
 
     # manually trigger
@@ -78,7 +81,7 @@ def test_manual_trigger(history_object):
         )  # Ensure the latest execution was the rerun expected
 
     state_machine_history_files = s3_client.list_objects(
-        Bucket=bucket_config["etl_bucket"], Prefix=f"{ETL_STATE_MACHINE_HISTORY}/"
+        Bucket=etl_config.bucket, Prefix=f"{ETL_STATE_MACHINE_HISTORY}/"
     )
     item_count = 0
     for item in state_machine_history_files.get("Contents", []):

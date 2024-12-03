@@ -67,7 +67,10 @@ def test_bulk_trigger():
         expected_content=input_data,
     )
     was_changelog_number_updated = partial(
-        _was_changelog_number_updated, s3_client=s3_client, bucket=etl_config.bucket
+        _was_changelog_number_updated,
+        s3_client=s3_client,
+        bucket=etl_config.bucket,
+        new_changelog_number=EXPECTED_CHANGELOG_NUMBER,
     )
     extract_is_empty = partial(
         _extract_is_empty, s3_client=s3_client, bucket=etl_config.bucket
@@ -92,36 +95,36 @@ def test_bulk_trigger():
 
     # Sign-off through the expected lifecycle of the bulk ETL
     while not was_trigger_key_deleted():
-        time.sleep(5)
+        time.sleep(1)
     message("Trigger key deleted")
 
     while not was_queue_history_created():
-        time.sleep(5)
+        time.sleep(1)
     message("Queue history created")
 
     while not was_state_machine_history_created():
-        time.sleep(5)
+        time.sleep(1)
     message("State machine history created")
 
     while not was_changelog_number_updated():
-        time.sleep(5)
+        time.sleep(1)
     message("Changelog number updated")
 
     while not extract_is_empty():
-        time.sleep(5)
+        time.sleep(1)
     message("Extract's input data is now in empty state")
 
     while not transform_is_empty():
-        time.sleep(5)
+        time.sleep(1)
     message("Transform's input data is now in empty state")
 
-    while not load_is_empty():
-        time.sleep(5)
-    message("Load's input data is now in empty state")
-
-    assert database_isnt_empty()
+    while not database_isnt_empty():
+        time.sleep(1)
     message("Database isn't empty")
+
+    assert load_is_empty()
+    message("Load's input data is now in empty state")
 
     while not was_state_lock_removed():
         message("State lock has been removed")
-        time.sleep(5)
+        time.sleep(1)
