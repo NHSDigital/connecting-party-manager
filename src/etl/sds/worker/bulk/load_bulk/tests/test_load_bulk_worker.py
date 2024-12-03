@@ -219,7 +219,9 @@ def test_load_worker_pass(
 
 @pytest.mark.integration
 @pytest.mark.parametrize("path", (PATH_TO_HERE / "edge_cases").iterdir())
-def test_load_worker_edge_cases(path: str):
+def test_load_worker_edge_cases(path: Path):
+    if path.name == "PLACEHOLDER":
+        pytest.skip()
 
     s3_client = boto3.client("s3")
     lambda_client = boto3.client("lambda")
