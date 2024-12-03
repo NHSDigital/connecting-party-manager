@@ -68,7 +68,8 @@ Feature: Create AS Device - success scenarios
       | product_id                                                   | ${ note(product_id) }             |
       | product_team_id                                              | ${ note(product_team_id) }        |
       | ods_code                                                     | F5H1R                             |
-      | keys                                                         | []                                |
+      | keys.0.key_type                                              | accredited_system_id              |
+      | keys.0.key_value                                             | << ignore >>                      |
       | created_on                                                   | << ignore >>                      |
       | updated_on                                                   | << ignore >>                      |
       | deleted_on                                                   | << ignore >>                      |
@@ -89,7 +90,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 979              |
+      | Content-Length | 1044             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -103,7 +104,8 @@ Feature: Create AS Device - success scenarios
       | created_on              | << ignore >>                      |
       | updated_on              | << ignore >>                      |
       | deleted_on              | << ignore >>                      |
-      | keys                    | []                                |
+      | keys.0.key_type         | accredited_system_id              |
+      | keys.0.key_value        | << ignore >>                      |
       | tags.0.0.0              | ${ note(party_key_tag) }          |
       | tags.0.0.1              | ${ note(party_key_tag_value) }    |
       | questionnaire_responses | << ignore >>                      |
