@@ -7,9 +7,9 @@ class SearchSDSDeviceQueryParams(BaseModel, extra=Extra.forbid):
     nhs_mhs_manufacturer_org: str = None
     nhs_mhs_party_key: str = None
 
-    @root_validator
-    def client_to_id(cls, values):
-        nhs_as_client = values.get("nhs_as_client")
+    @root_validator(pre=True)
+    def client_to_id(cls, values: dict):
+        nhs_as_client = values.pop("nhs_as_client", None)
         nhs_id_code = values.get("nhs_id_code")
         if nhs_as_client and not nhs_id_code:
             values["nhs_id_code"] = nhs_as_client

@@ -322,7 +322,7 @@ myfield:: QkJC
 myOtherField: 123
 """
 
-FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE = """
+FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE_BASE_64 = """
 dn: uniqueIdentifier=AAA1
 myField:: QUFB
 myOtherField: 123
@@ -453,7 +453,7 @@ def test_filter_and_group_ldif_from_s3_by_property_with_b64encoded_group(mocked_
         )
     assert (
         "".join(data.tobytes().decode() for data in filtered_ldif)
-        == FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE
+        == FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE_BASE_64
     )
 
 
