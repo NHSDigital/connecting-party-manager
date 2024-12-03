@@ -11,7 +11,6 @@ from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.product_team.v1 import ProductTeam
 from domain.repository.compression import pkl_loads_gzip
-from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
@@ -23,6 +22,8 @@ from sds.epr.bulk_create.bulk_load_fanout import (
     calculate_batch_size,
     count_indexes,
 )
+
+from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"

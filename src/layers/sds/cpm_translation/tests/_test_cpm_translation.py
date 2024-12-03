@@ -9,6 +9,7 @@ from domain.core.questionnaire.v2 import Questionnaire
 from domain.core.root.v2 import Root
 from domain.core.validation import ODS_CODE_REGEX, SdsId
 from domain.repository.device_repository.v2 import DeviceRepository
+from etl.sds.worker.transform_update.utils import export_events
 from etl_utils.ldif.model import DistinguishedName
 from event.aws.client import dynamodb_client
 from event.json import json_load
@@ -26,7 +27,6 @@ from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 
 from etl.sds.tests.constants import EtlTestDataPath
-from etl.sds.worker.transform_update.utils import export_events
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 

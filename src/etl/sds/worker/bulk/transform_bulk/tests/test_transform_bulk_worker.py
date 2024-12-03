@@ -5,7 +5,6 @@ from typing import Callable
 from unittest import mock
 
 import pytest
-from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
@@ -13,6 +12,7 @@ from event.json import json_load
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
 
+from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.dynamodb import mock_table
 from test_helpers.uuid import consistent_uuid
 

@@ -16,7 +16,6 @@ from domain.repository.device_reference_data_repository.v1 import (
 )
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
-from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
@@ -26,6 +25,7 @@ from mypy_boto3_s3 import S3Client
 from sds.epr.bulk_create.bulk_load_fanout import FANOUT
 from sds.epr.constants import AS_DEVICE_SUFFIX, MHS_DEVICE_SUFFIX
 
+from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.dynamodb import mock_table
 
 BUCKET_NAME = "my-bucket"
