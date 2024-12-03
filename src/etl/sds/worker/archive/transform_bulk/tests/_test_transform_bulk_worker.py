@@ -8,14 +8,13 @@ from unittest import mock
 
 import pytest
 from botocore.exceptions import ClientError
+from etl.sds.worker.transform_bulk.utils import smart_open_if_exists
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
 from etl_utils.smart_open import smart_open
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
-
-from etl.sds.worker.transform_bulk.utils import smart_open_if_exists
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
