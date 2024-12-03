@@ -4,8 +4,9 @@ from types import FunctionType
 
 from botocore.exceptions import ClientError
 from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
-from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
+from etl_utils.constants import CHANGELOG_NUMBER, ETL_STATE_LOCK, WorkerKey
 from event.json import json_loads
+from mypy_boto3_dynamodb import DynamoDBClient
 from mypy_boto3_s3 import S3Client
 
 from etl.sds.tests.etl_test_utils.etl_state import EtlConfig
@@ -46,9 +47,31 @@ def ask_s3_prefix(
     return result
 
 
-def was_trigger_key_deleted(s3_client, bucket, etl_config: EtlConfig):
+def was_trigger_key_deleted(s3_client, etl_config: EtlConfig):
     return not ask_s3(
-        s3_client=s3_client, bucket=bucket, key=etl_config.initial_trigger_key
+        s3_client=s3_client,
+        bucket=etl_config.bucket,
+        key=etl_config.initial_trigger_key,
+    )
+
+
+def was_queue_history_created(
+    s3_client, etl_config: EtlConfig, expected_content: bytes
+):
+    return ask_s3_prefix(
+        s3_client=s3_client,
+        key_prefix=f"{etl_config.state_machine_history_key_prefix}/{etl_config.etl_type}",
+        question=lambda x: x == expected_content,
+    )
+
+
+def was_state_machine_history_created(
+    s3_client, etl_config: EtlConfig, expected_content: bytes
+):
+    return ask_s3_prefix(
+        s3_client=s3_client,
+        key_prefix=f"{etl_config.queue_history_key_prefix}/{etl_config.etl_type}",
+        question=lambda x: x == expected_content,
     )
 
 
@@ -61,27 +84,40 @@ def was_changelog_number_updated(s3_client, bucket, new_changelog_number):
     )
 
 
-def etl_state_is_clear(s3_client, bucket) -> bool:
-
-    extract_is_empty = ask_s3(
+def extract_is_empty(s3_client, bucket) -> bool:
+    return ask_s3(
         s3_client=s3_client,
         key=WorkerKey.EXTRACT,
         bucket=bucket,
         question=lambda x: x == EMPTY_LDIF_DATA,
     )
-    transform_is_empty = ask_s3(
+
+
+def transform_is_empty(s3_client, bucket) -> bool:
+    return ask_s3(
         s3_client=s3_client,
         key=WorkerKey.TRANSFORM,
         bucket=bucket,
         question=lambda x: x == EMPTY_JSON_DATA,
     )
-    load_is_empty = ask_s3(
+
+
+def load_is_empty(s3_client, bucket) -> bool:
+    return ask_s3(
         s3_client=s3_client,
         key=WorkerKey.LOAD,
         bucket=bucket,
         question=lambda x: x == EMPTY_JSON_DATA,
     )
-    print(  # noqa
-        f"{{extract, transform, load}} is empty == {{{extract_is_empty, transform_is_empty, load_is_empty}}}"
+
+
+def was_etl_state_lock_removed(s3_client, bucket) -> bool:
+    return ask_s3(
+        s3_client=s3_client,
+        key=ETL_STATE_LOCK,
+        bucket=bucket,
     )
-    return extract_is_empty and transform_is_empty and load_is_empty
+
+
+def database_isnt_empty(db_client: "DynamoDBClient", table_name: str):
+    return db_client.scan(TableName=table_name, Limit=1, Select="COUNT")["Count"] == 1

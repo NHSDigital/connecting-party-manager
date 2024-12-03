@@ -1,7 +1,13 @@
 from collections import deque
 from dataclasses import dataclass
 
-from etl_utils.constants import ETL_QUEUE_HISTORY, ETL_STATE_MACHINE_HISTORY, WorkerKey
+from etl_utils.constants import (
+    CHANGELOG_NUMBER,
+    ETL_QUEUE_HISTORY,
+    ETL_STATE_LOCK,
+    ETL_STATE_MACHINE_HISTORY,
+    WorkerKey,
+)
 from etl_utils.io import pkl_dumps_lz4
 from mypy_boto3_s3 import S3Client
 from sds.epr.bulk_create.bulk_load_fanout import FANOUT
@@ -18,16 +24,18 @@ class EtlConfig:
     initial_trigger_key: str
     queue_history_key_prefix: str
     state_machine_history_key_prefix: str
+    etl_type: str
     table_name: str
 
 
-def get_etl_config(input_filename: str) -> EtlConfig:
+def get_etl_config(input_filename: str, etl_type: str = "") -> EtlConfig:
     bulk_trigger_prefix = read_terraform_output("sds_etl.value.bulk_trigger_prefix")
     return EtlConfig(
         bucket=read_terraform_output("sds_etl.value.bucket"),
         initial_trigger_key=f"{bulk_trigger_prefix}/{input_filename}",
         queue_history_key_prefix=f"{ETL_QUEUE_HISTORY}/",
         state_machine_history_key_prefix=f"{ETL_STATE_MACHINE_HISTORY}/",
+        etl_type=etl_type,
         table_name=read_terraform_output("dynamodb_table_name.value"),
     )
 
@@ -74,3 +82,6 @@ def clear_etl_state(s3_client: S3Client, etl_config: EtlConfig):
         bucket=etl_config.bucket,
         key_prefix=etl_config.state_machine_history_key_prefix,
     )
+
+    s3_client.delete_object(Bucket=etl_config.bucket, Key=CHANGELOG_NUMBER)
+    s3_client.delete_object(Bucket=etl_config.bucket, Key=ETL_STATE_LOCK)
