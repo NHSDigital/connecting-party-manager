@@ -3,6 +3,7 @@ import random
 import re
 from abc import ABC, abstractmethod
 from datetime import datetime
+from functools import cache
 from pathlib import Path
 from uuid import uuid4
 
@@ -28,6 +29,14 @@ PRODUCT_IDS_GENERATED_FILE = f"{PATH_TO_CPM_SYSTEM_IDS}/generated_ids/product_id
 PRODUCT_TEAM_ID_PATTERN = re.compile(
     r"^[a-zA-Z0-9]+\.([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
+
+
+@cache
+def _load_existing_ids():
+    if os.path.exists(PRODUCT_IDS_GENERATED_FILE):
+        with open(PRODUCT_IDS_GENERATED_FILE, "r") as file:
+            return set(json_load(file))
+    return set()
 
 
 class CpmSystemId(BaseModel, ABC):
@@ -111,28 +120,24 @@ class PartyKeyId(CpmSystemId):
 class ProductId(CpmSystemId):
     @classmethod
     def create(cls):
-        existing_ids = cls.load_existing_ids()
-        while True:
-            """No current_id needed, key is generated randomly."""
-            rng = random.Random(datetime.now().timestamp())
-            product_id = "-".join(
-                "".join(rng.choices(PRODUCT_ID_VALID_CHARS, k=PRODUCT_ID_PART_LENGTH))
-                for _ in range(PRODUCT_ID_NUMBER_OF_PARTS)
-            )
-            if f"P.{product_id}" not in existing_ids:
-                return cls(__root__=f"P.{product_id}")
+        """No current_id needed, key is generated randomly."""
+        rng = random.Random(datetime.now().timestamp())
+        product_id = "-".join(
+            "".join(rng.choices(PRODUCT_ID_VALID_CHARS, k=PRODUCT_ID_PART_LENGTH))
+            for _ in range(PRODUCT_ID_NUMBER_OF_PARTS)
+        )
+        if f"P.{product_id}" in cls.load_existing_ids():
+            return cls.create()
+        return cls(__root__=f"P.{product_id}")
 
     @classmethod
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the ProductId has the correct format."""
         return PRODUCT_ID_PATTERN.match(cpm_system_id) is not None
 
-    @staticmethod
-    def load_existing_ids():
-        if os.path.exists(PRODUCT_IDS_GENERATED_FILE):
-            with open(PRODUCT_IDS_GENERATED_FILE, "r") as file:
-                return set(json_load(file))
-        return set()
+    @classmethod
+    def load_existing_ids(cls):
+        return _load_existing_ids()
 
 
 class ProductTeamId(CpmSystemId):
