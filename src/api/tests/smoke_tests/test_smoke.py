@@ -159,7 +159,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             400,
             ["MISSING_VALUE"],
             [
-                "SearchSDSDeviceQueryParams.nhs_as_client: field required",
+                "SearchSDSDeviceQueryParams.nhs_id_code: field required",
                 "SearchSDSDeviceQueryParams.nhs_as_svc_ia: field required",
             ],
         ],

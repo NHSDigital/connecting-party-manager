@@ -48,7 +48,7 @@ def _create_device(
     "params",
     [
         {
-            "nhs_as_client": "5NR",
+            "nhs_id_code": "5NR",
             "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
         },
     ],
@@ -94,14 +94,14 @@ def test_no_results(params):
     [
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
             },
             {"device_key": "P.AAA-CCC", "device_name": "device-name-a"},
         ),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
                 "nhs_mhs_manufacturer_org": "foo",
             },
@@ -109,7 +109,7 @@ def test_no_results(params):
         ),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
                 "nhs_mhs_party_key": "foo",
             },
@@ -117,7 +117,7 @@ def test_no_results(params):
         ),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
                 "nhs_mhs_manufacturer_org": "foo",
                 "nhs_mhs_party_key": "foo",
@@ -173,7 +173,7 @@ def test_index(params, device):
     [
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
             },
             [
@@ -183,7 +183,7 @@ def test_index(params, device):
         ),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
                 "nhs_mhs_manufacturer_org": "foo",
             },
@@ -194,7 +194,7 @@ def test_index(params, device):
         ),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
                 "nhs_mhs_party_key": "foo",
             },
@@ -205,7 +205,7 @@ def test_index(params, device):
         ),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
                 "nhs_mhs_manufacturer_org": "foo",
                 "nhs_mhs_party_key": "foo",
@@ -274,7 +274,7 @@ def test_multiple_returned(params, devices):
 @pytest.mark.parametrize(
     "params, error, status_code",
     [
-        ({"nhs_as_client": "5NR"}, "MISSING_VALUE", 400),
+        ({"nhs_id_code": "5NR"}, "MISSING_VALUE", 400),
         (
             {
                 "nhs_as_svc_ia": "urn:oasis:names:tc:ebxml-msg:service:Acknowledgment",
@@ -286,7 +286,7 @@ def test_multiple_returned(params, devices):
         ({"nhs_mhs_manufacturer_org": "LSP02"}, "MISSING_VALUE", 400),
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:oasis:names:tc:ebxml-msg:service:Acknowledgment",
                 "foo": "bar",
             },
@@ -324,7 +324,7 @@ def test_filter_errors(params, error, status_code):
     [
         (
             {
-                "nhs_as_client": "5NR",
+                "nhs_id_code": "5NR",
                 "nhs_as_svc_ia": "urn:nhs:names:services:mm:PORX_IN090101UK31",
             },
             [

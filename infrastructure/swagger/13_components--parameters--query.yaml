@@ -1,13 +1,6 @@
 ---
 components:
   parameters:
-    NhsAsClient:
-      name: nhs_as_client
-      in: query
-      required: true
-      description: "Accredited System Client"
-      schema:
-        type: string
     NhsAsClientInteration:
       name: nhs_as_svc_ia
       in: query
@@ -30,7 +23,7 @@ components:
       schema:
         type: string
     NhsIdCode:
-      name: nhs_as_client
+      name: nhs_id_code
       in: query
       required: false
       description: "NHS ID Code"
