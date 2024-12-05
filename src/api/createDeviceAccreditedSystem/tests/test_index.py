@@ -426,7 +426,7 @@ def test_index() -> None:
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
         assert device.product_id == product.id
-        assert device.name == "ABC1234-987654/ - Accredited System"
+        assert device.name == "ABC1234-987654/200000100000 - Accredited System"
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()
