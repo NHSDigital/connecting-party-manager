@@ -6,13 +6,13 @@ authors = ["NHS England"]
 license = "LICENSE.md"
 readme = "README.md"
 packages = [
-    { include = "api", from = "src" },
-    { include = "domain", from = "src/layers" },
-    { include = "event", from = "src/layers" },
-    { include = "api_utils", from = "src/layers" },
-    { include = "etl_utils", from = "src/layers" },
-    { include = "sds", from = "src/layers" },
-    { include = "builder", from = "scripts" },
+  { include = "api", from = "src" },
+  { include = "domain", from = "src/layers" },
+  { include = "event", from = "src/layers" },
+  { include = "api_utils", from = "src/layers" },
+  { include = "etl_utils", from = "src/layers" },
+  { include = "sds", from = "src/layers" },
+  { include = "builder", from = "scripts" },
 ]
 
 [tool.poetry.dependencies]
@@ -46,17 +46,18 @@ pyyaml = "^6.0.1"
 proxygen-cli = "^2.1.14"
 moto = "^5.0.1"
 boto3-stubs = { extras = [
-    "dynamodb",
-    "iam",
-    "lambda",
-    "s3",
-    "sqs",
-    "secretsmanager",
-    "stepfunctions",
+  "dynamodb",
+  "iam",
+  "lambda",
+  "s3",
+  "sqs",
+  "secretsmanager",
+  "stepfunctions",
 ], version = "^1.34.37" }
 pytest-timeout = "^2.2.0"
 lz4 = "^4.3.3"
 pytest-repeat = "^0.9.3"
+click = "^8.1.7"
 
 [tool.poetry.group.local]
 optional = true
