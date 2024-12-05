@@ -76,6 +76,16 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
+            "/ProductTeam/123/Product/abc/DeviceReferenceData/AccreditedSystemsAdditionalInteractions",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateDeviceReferenceDataIncomingParams.name: field required",
+                "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
             "/ProductTeam/123/Product/abc/DeviceReferenceData/MhsMessageSet",
             "POST",
             400,
@@ -103,6 +113,16 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             [
                 "CreateMhsDeviceIncomingParams.questionnaire_responses: field required",
                 "CreateMhsDeviceIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
+            "/ProductTeam/123/Product/abc/Device/AccreditedSystem",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateAsDeviceIncomingParams.questionnaire_responses: field required",
+                "CreateAsDeviceIncomingParams.foo: extra fields not permitted",
             ],
         ],
         [

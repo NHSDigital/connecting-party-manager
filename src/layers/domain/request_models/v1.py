@@ -72,9 +72,19 @@ class SpineMhsQuestionnaireRsponse(BaseModel):
     __root__: list[dict] = Field(min_items=1, max_items=1)
 
 
+class SpineAsQuestionnaireResponse(BaseModel):
+    __root__: list[dict] = Field(min_items=1, max_items=1)
+
+
 class CreateMhsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
     questionnaire_responses: dict[
         Literal[QuestionnaireInstance.SPINE_MHS], SpineMhsQuestionnaireRsponse
+    ] = Field(...)
+
+
+class CreateAsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
+    questionnaire_responses: dict[
+        Literal[QuestionnaireInstance.SPINE_AS], SpineAsQuestionnaireResponse
     ] = Field(...)
 
 

@@ -144,3 +144,25 @@ components:
               - questionnaire_responses
           example:
             questionnaire_responses: { "spine_mhs": [{ "question": "answer" }] }
+    AccreditedSystemDeviceCreateRequestBody:
+      description: Request body to create a Accredited System Device object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for AS Device
+                properties:
+                  spine_as:
+                    type: array
+                    description: spine_as questionnaire associated with the as device
+                    items:
+                      type: object
+                      description: spine_as questionnaire response
+            required:
+              - questionnaire_responses
+          example:
+            questionnaire_responses: { "spine_as": [{ "question": "answer" }] }

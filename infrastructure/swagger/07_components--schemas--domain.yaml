@@ -167,6 +167,32 @@ components:
         questionnaire_responses:
           type: object
 
+    AsDeviceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        product_id:
+          type: string
+        product_team_id:
+          type: string
+        ods_code:
+          type: string
+        status:
+          type: string
+        created_on:
+          type: string
+        updated_on:
+          type: string
+          nullable: true
+        deleted_on:
+          type: string
+          nullable: true
+        questionnaire_responses:
+          type: object
+
     MhsDeviceResponse:
       type: object
       properties:
