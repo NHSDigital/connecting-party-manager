@@ -17,6 +17,7 @@ Feature: Create AS Device - success scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
+    And I note the response field "$.keys.0.key_value" as "party_key"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
@@ -88,7 +89,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 983              |
+      | Content-Length | 979              |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -110,7 +111,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1720             |
+      | Content-Length | 1632             |
 
   Scenario: Successfully create a AS Device with MHSMessageSet and ASAdditionalInteractions containing no questionnaire responses
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -168,7 +169,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 987              |
+      | Content-Length | 983              |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -190,7 +191,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1030             |
+      | Content-Length | 1026             |
 
   Scenario: Successfully create multiple AS Devices
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -279,7 +280,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1724             |
+      | Content-Length | 1636             |
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id_2) }"
     Then I receive a status code "200" with body
       | path                    | value                             |
@@ -300,4 +301,4 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1724             |
+      | Content-Length | 1636             |
