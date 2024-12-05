@@ -25,6 +25,14 @@ TRUNCATION_DEPTH = 2000
 TRUNCATED = "[TRUNCATED]\n"
 
 
+def truncate_message(
+    item: str, truncation_depth=TRUNCATION_DEPTH, truncated_note=TRUNCATED
+):
+    if len(item) > truncation_depth:
+        return item[:truncation_depth] + truncated_note
+    return item
+
+
 def _render_exception(exception: Exception) -> str:
     """Concatenates an exception with its notes"""
     _notes = exception.__dict__.get("__notes__", [])
@@ -92,9 +100,11 @@ def render_exception(
 
     _traceback = "".join(TracebackException.from_exception(exception).format())
     if truncation_depth is not None and len(formatted_exception) > truncation_depth:
-        formatted_exception = formatted_exception[:truncation_depth] + TRUNCATED
+        formatted_exception = truncate_message(
+            formatted_exception, truncation_depth=truncation_depth
+        )
 
     if truncation_depth is not None and len(_traceback) > truncation_depth:
-        _traceback = _traceback[:truncation_depth] + TRUNCATED
+        _traceback = truncate_message(_traceback, truncation_depth=truncation_depth)
 
     return f"{indentation}{formatted_exception}\n{_traceback}\n"
