@@ -1,6 +1,8 @@
+import time
 from contextlib import nullcontext
 from pathlib import Path
 
+import click
 from behave import use_fixture
 from behave.model import Feature, Scenario, Step
 from event.aws.client import dynamodb_client
@@ -30,6 +32,8 @@ GENERIC_SCENARIO_DESCRIPTION = "The following steps demonstrate this scenario:"
 
 
 def before_all(context: Context):
+    clear_screen = context.config.userdata.get("clear_screen", "false")
+    context.clear_screen = clear_screen.lower() == "true"
     context.postman_collection = PostmanCollection()
     context.test_mode = TestMode.parse(config=context.config)
     context.table_name = LOCAL_TABLE_NAME
@@ -114,6 +118,9 @@ def after_scenario(context: Context, scenario: Scenario):
 def after_feature(context: Context, feature: Feature):
     if context.postman_feature:
         context.postman_collection.item.append(context.postman_feature)
+    if context.clear_screen:
+        click.clear()
+        time.sleep(0.5)
 
 
 def after_all(context: Context):
