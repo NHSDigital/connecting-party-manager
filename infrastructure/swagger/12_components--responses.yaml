@@ -66,7 +66,7 @@ components:
               value:
                 errors:
                   - code: "MISSING_VALUE"
-                    message: "SearchSDSDeviceQueryParams.nhs_as_client: field required"
+                    message: "SearchSDSDeviceQueryParams.nhs_id_code: field required"
             ValidationError:
               value:
                 errors:

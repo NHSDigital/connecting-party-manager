@@ -37,7 +37,7 @@ class SearchSDSQueryParams(BaseModel):
 
 
 class SearchSDSDeviceQueryParams(SearchSDSQueryParams, extra=Extra.forbid):
-    nhs_as_client: str
+    nhs_id_code: str
     nhs_as_svc_ia: str
     nhs_mhs_manufacturer_org: str = None
     nhs_mhs_party_key: str = None
