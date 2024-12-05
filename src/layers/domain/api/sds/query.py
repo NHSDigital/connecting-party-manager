@@ -27,13 +27,6 @@ class SearchSDSDeviceQueryParams(BaseModel, extra=Extra.forbid):
 
 
 class SearchSDSEndpointQueryParams(BaseModel, extra=Extra.forbid):
-    # can effectively achieve these without tags now
-    # if
-    # 1. nhs_id_code and nhs_mhs_party_key -> only need party key
-    # 2. nhs_id_code and nhs_mhs_svc_ia -> can retrieve all devices for org, and filter on nhs_mhs_svc_ia
-    # 3. nhs_mhs_party_key and nhs_mhs_svc_ia -> can retrieve the mhs device for product, and filter on nhs_mhs_svc_ia  --> possible that can read device directly by cpaid
-    # 4. nhs_id_code and nhs_mhs_party_key and nhs_mhs_svc_ia -> same as 3.
-
     nhs_id_code: str = None
     nhs_mhs_svc_ia: str = None
     nhs_mhs_party_key: str = None

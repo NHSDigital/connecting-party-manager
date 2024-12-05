@@ -220,7 +220,7 @@ def test_load_worker_pass(
 @pytest.mark.integration
 @pytest.mark.parametrize("path", (PATH_TO_HERE / "edge_cases").iterdir())
 def test_load_worker_edge_cases(path: Path):
-    if path.name == "PLACEHOLDER":
+    if path.name == ".gitkeep":
         pytest.skip()
 
     s3_client = boto3.client("s3")
