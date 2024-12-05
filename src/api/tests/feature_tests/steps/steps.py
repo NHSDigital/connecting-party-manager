@@ -278,7 +278,7 @@ for decorator in (given, when, then):
             response=context.response.json(), jsonpath=jsonpath
         )
 
-        # Lowercase if alias is "party_key_value" as tags are always lowercase
+        # Lowercase if alias is "party_key_tag_value" as tags are always lowercase
         if alias == "party_key_tag_value" and isinstance(context.notes[alias], str):
             context.notes[alias] = context.notes[alias].lower()
 

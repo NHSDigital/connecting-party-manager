@@ -61,23 +61,19 @@ def test_get_mhs_device_data(mhs_1: NhsMhs):
     assert mhs_data.questionnaire_name == QuestionnaireInstance.SPINE_MHS
     assert mhs_data.questionnaire_version == "1"
     assert mhs_data.data == {
+        "Binding": "https://",
         "Address": "my-mhs-endpoint",
         "Approver URP": "approver-123",
-        "Contract Property Template Key": "key-123",
         "DNS Approver": "dns-approver-123",
         "Date Approved": "today",
         "Date DNS Approved": "yesterday",
         "Date Requested": "a week ago",
-        "Interaction Type": "hl7",
         "MHS CPA ID": "1wd354",
         "MHS FQDN": "my-fqdn",
-        "MHS Is Authenticated": "none",
         "MHS Party key": "AAA-123456",
         "Managing Organization": "AAA",
-        "Product Key": "key-123",
         "Product Name": "My EPR Product",
         "Requestor URP": "requester-123",
-        "Unique Identifier": "1wd354",
         "MHS Manufacturer Organisation": "AAA",
     }
     assert mhs_data.created_on.date() == now().date()

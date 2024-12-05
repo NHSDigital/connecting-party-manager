@@ -26,7 +26,7 @@ def test_index():
         "name": "spine_mhs",
         "version": "1",
     }
-    assert len(json_schema["properties"]) == 25
+    assert len(json_schema["properties"]) == 16
 
 
 def test_index_no_such_questionnaire():
