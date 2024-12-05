@@ -68,17 +68,13 @@ class CreateDeviceIncomingParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
 
 
-class SpineMhsQuestionnaireRsponse(BaseModel):
-    __root__: list[dict] = Field(min_items=1, max_items=1)
-
-
 class SpineAsQuestionnaireResponse(BaseModel):
     __root__: list[dict] = Field(min_items=1, max_items=1)
 
 
 class CreateMhsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
     questionnaire_responses: dict[
-        Literal[QuestionnaireInstance.SPINE_MHS], SpineMhsQuestionnaireRsponse
+        Literal[QuestionnaireInstance.SPINE_MHS], list[dict]
     ] = Field(...)
 
 
