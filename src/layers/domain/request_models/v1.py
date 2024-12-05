@@ -1,4 +1,5 @@
 from collections import defaultdict
+from enum import Enum
 from typing import Literal
 
 from domain.core.product_team_key import ProductTeamKey
@@ -6,6 +7,14 @@ from domain.repository.questionnaire_repository import QuestionnaireInstance
 from pydantic import BaseModel, Extra, Field
 
 ALPHANUMERIC_SPACES_AND_UNDERSCORES = r"^[a-zA-Z0-9 _]*$"
+
+
+class Environment(str, Enum):
+    DEV = "dev"
+    QA = "qa"
+    REF = "ref"
+    INT = "int"
+    PROD = "prod"
 
 
 class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
@@ -19,6 +28,12 @@ class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+
+
+class CreateDevicePathParams(BaseModel, extra=Extra.forbid):
+    product_id: str = Field(...)
+    product_team_id: str = Field(...)
+    env: Environment
 
 
 class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
@@ -55,6 +70,7 @@ class CreateDeviceReferenceAdditionalInteractionsDataParams(
 class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+    env: Environment
     device_reference_data_id: str = Field(...)
 
 
@@ -81,4 +97,5 @@ class CreateMhsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
 class DevicePathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+    env: Environment
     device_id: str = Field(...)
