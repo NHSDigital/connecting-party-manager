@@ -2,7 +2,9 @@ from http import HTTPStatus
 
 from api_utils.versioning.errors import VersionException
 from domain.core.error import (
+    AccreditedSystemFatalError,
     ConfigurationError,
+    InvalidSpineAsResponse,
     InvalidSpineMhsResponse,
     NotEprProductError,
 )
@@ -52,6 +54,7 @@ EXCEPTIONS_TO_SPINE_CODING = {
     QuestionnaireResponseValidationError: SpineCoding.VALIDATION_ERROR,
     NotEprProductError: SpineCoding.VALIDATION_ERROR,
     InvalidSpineMhsResponse: SpineCoding.VALIDATION_ERROR,
+    InvalidSpineAsResponse: SpineCoding.VALIDATION_ERROR,
     QuestionnaireResponseMissingValue: SpineCoding.MISSING_VALUE,
     InvalidOdsCodeError: SpineCoding.UNPROCESSABLE_ENTITY,
     ConfigurationError: SpineCoding.VALIDATION_ERROR,
@@ -59,6 +62,7 @@ EXCEPTIONS_TO_SPINE_CODING = {
     AlreadyExistsError: SpineCoding.VALIDATION_ERROR,
     ItemNotFound: SpineCoding.RESOURCE_NOT_FOUND,
     StatusNotOk: SpineCoding.SERVICE_UNAVAILABLE,
+    AccreditedSystemFatalError: SpineCoding.VALIDATION_ERROR,
 }
 
 SUCCESS_STATUSES = {*HTTP_STATUS_TO_CPM_CODING.keys(), HTTPStatus.NO_CONTENT}
