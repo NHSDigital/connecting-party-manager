@@ -3,6 +3,7 @@ import time
 
 import pytest
 from domain.core.device import Device
+from domain.core.enum import Environment
 from domain.core.questionnaire import Questionnaire
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
@@ -65,7 +66,7 @@ def device(
     org = Root.create_ods_organisation(ods_code="AB123")
     product_team = org.create_product_team(name="Team")
     product = product_team.create_cpm_product(name="Product")
-    device = product.create_device(name="Device-1")
+    device = product.create_device(name="Device-1", env=Environment.DEV)
     device.add_questionnaire_response(questionnaire_response=shoe_response_1)
     device.add_questionnaire_response(questionnaire_response=shoe_response_2)
     device.add_questionnaire_response(questionnaire_response=health_response)
@@ -83,6 +84,7 @@ def test__device_repository__with_questionnaires(
         repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id=device.id,
         )
         == device
@@ -105,6 +107,7 @@ def test__device_repository__with_questionnaires_and_tags(
         repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id=device.id,
         )
         == device

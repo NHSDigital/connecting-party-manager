@@ -1,13 +1,15 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
 from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.error import ConfigurationError
 from domain.core.product_key import ProductKeyType
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
@@ -53,11 +55,14 @@ def require_no_existing_additional_interactions_device_reference_data(
     data, cache
 ) -> list[QuestionnaireResponse]:
     product: CpmProduct = data[read_product]
+    environment: Environment = data[read_environment]
     repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     results = repo.search(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id,
+        product_id=product.id,
+        environment=environment,
     )
     if any(
         device_reference_data.name.endswith(ADDITIONAL_INTERACTIONS_SUFFIX)
@@ -94,8 +99,10 @@ def create_additional_interactions_device_reference_data(
 ) -> DeviceReferenceData:
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
+    environment: Environment = data[read_environment]
     return product.create_device_reference_data(
-        name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key)
+        name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key),
+        env=environment,
     )
 
 
@@ -130,6 +137,7 @@ def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_device_reference_data_for_epr_payload,
     read_product_team,
     read_product,

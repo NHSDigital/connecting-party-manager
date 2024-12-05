@@ -1,15 +1,21 @@
 from collections import defaultdict
 from typing import Literal
 
+from domain.core.enum import Environment
 from domain.core.product_team_key import ProductTeamKey
 from domain.repository.questionnaire_repository import QuestionnaireInstance
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra, Field, root_validator
 
 ALPHANUMERIC_SPACES_AND_UNDERSCORES = r"^[a-zA-Z0-9 _]*$"
 
 
 class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
     product_team_id: str = Field(...)
+
+    @root_validator(pre=True)
+    def ignore_env(cls, values):
+        values.pop("env", None)
+        return values
 
 
 class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
@@ -19,6 +25,17 @@ class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+
+    @root_validator(pre=True)
+    def ignore_env(cls, values):
+        values.pop("env", None)
+        return values
+
+
+class SubCpmProductPathParams(BaseModel, extra=Extra.forbid):
+    product_id: str = Field(...)
+    product_team_id: str = Field(...)
+    env: Environment
 
 
 class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
@@ -55,6 +72,7 @@ class CreateDeviceReferenceAdditionalInteractionsDataParams(
 class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+    env: Environment
     device_reference_data_id: str = Field(...)
 
 
@@ -87,4 +105,5 @@ class CreateAsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
 class DevicePathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
+    env: Environment
     device_id: str = Field(...)

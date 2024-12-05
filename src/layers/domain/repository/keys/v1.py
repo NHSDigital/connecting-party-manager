@@ -33,6 +33,7 @@ class TableKey(TableKeyAction, StrEnum):
     DEVICE = "D"
     DEVICE_TAG = "DT"
     DEVICE_STATUS = "DS"
+    ENVIRONMENT = "E"
 
 
 def group_by_key(

@@ -2,6 +2,7 @@ from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_key import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.product_key import ProductKeyType
 from domain.core.product_team import ProductTeam
 from domain.core.product_team_key import ProductTeamKey, ProductTeamKeyType
@@ -47,7 +48,8 @@ def create_message_sets(
     message_set_data: list[QuestionnaireResponse],
 ) -> DeviceReferenceData:
     message_sets = product.create_device_reference_data(
-        name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key)
+        name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key),
+        env=Environment.PROD,
     )
     for _message_set in message_set_data:
         message_sets.add_questionnaire_response(_message_set)
@@ -62,7 +64,8 @@ def create_mhs_device(
     message_sets_id: str,
 ) -> Device:
     mhs_device = product.create_device(
-        name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key)
+        name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key),
+        env=Environment.PROD,
     )
     mhs_device.add_questionnaire_response(mhs_device_data)
     for cpa_id in cpa_ids:
@@ -80,7 +83,8 @@ def create_additional_interactions(
     additional_interactions_data: list[QuestionnaireResponse],
 ) -> DeviceReferenceData:
     additional_interactions = product.create_device_reference_data(
-        name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key)
+        name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key),
+        env=Environment.PROD,
     )
     for additional_interaction in additional_interactions_data:
         additional_interactions.add_questionnaire_response(additional_interaction)
@@ -97,7 +101,8 @@ def create_as_device(
     as_tags: list[dict],
 ) -> Device:
     as_device = product.create_device(
-        name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid)
+        name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid),
+        env=Environment.PROD,
     )
     as_device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=asid)
     as_device.add_questionnaire_response(as_device_data)

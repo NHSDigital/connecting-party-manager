@@ -2,6 +2,7 @@ import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.product_team import ProductTeam
 from domain.core.timestamp import now
 from domain.repository.questionnaire_repository import (
@@ -267,6 +268,7 @@ def test_create_message_sets(
         "deleted_on": None,
         "name": "AAA-123456 - MHS Message Sets",
         "ods_code": "AAA",
+        "env": Environment.PROD,
         "product_id": str(product.id),
         "product_team_id": product_team.id,
         "status": "active",
@@ -328,6 +330,7 @@ def test_create_mhs_device(
         "tags": [],
         "name": "AAA-123456 - Message Handling System",
         "ods_code": "AAA",
+        "env": Environment.PROD,
         "product_id": str(product.id),
         "product_team_id": product_team.id,
         "questionnaire_responses": {
@@ -384,6 +387,7 @@ def test_create_additional_interactions(
         "product_id": str(product.id),
         "product_team_id": product_team.id,
         "status": "active",
+        "env": Environment.PROD,
         "questionnaire_responses": {
             "spine_as_additional_interactions/1": [
                 {
@@ -458,6 +462,7 @@ def test_create_as_device(
             {"key_type": "accredited_system_id", "key_value": "123456"},
         ],
         "name": "AAA-123456/123456 - Accredited System",
+        "env": Environment.PROD,
         "ods_code": "AAA",
         "product_id": str(product.id),
         "product_team_id": product_team.id,

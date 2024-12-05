@@ -10,7 +10,7 @@ from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.base import BaseModel
 from domain.core.cpm_system_id import ProductId
 from domain.core.device_key import DeviceKey
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.event import Event, EventDeserializer
 from domain.core.questionnaire import QuestionnaireResponse
@@ -38,6 +38,7 @@ class DuplicateQuestionnaireResponse(Exception):
 class DeviceCreatedEvent(Event):
     id: str
     name: str
+    env: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -55,6 +56,7 @@ class DeviceCreatedEvent(Event):
 class DeviceUpdatedEvent(Event):
     id: str
     name: str
+    env: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -72,6 +74,7 @@ class DeviceUpdatedEvent(Event):
 class DeviceDeletedEvent(Event):
     id: str
     name: str
+    env: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -91,6 +94,7 @@ class DeviceKeyAddedEvent(Event):
     new_key: dict
     id: str
     name: str
+    env: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -118,6 +122,7 @@ class DeviceTagAddedEvent(Event):
     new_tag: str
     id: str
     name: str
+    env: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -136,6 +141,7 @@ class DeviceTagsAddedEvent(Event):
     new_tags: list[str]
     id: str
     name: str
+    env: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -244,6 +250,7 @@ class Device(AggregateRoot):
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     status: Status = Field(default=Status.ACTIVE)
+    env: Environment = Field()
     product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str

@@ -26,6 +26,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -104,6 +107,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -184,6 +190,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -262,6 +271,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -342,6 +354,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -404,7 +419,7 @@
           "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
@@ -420,6 +435,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -558,7 +576,7 @@
           "S": "D#000000000001"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "D#000000000001"
@@ -575,6 +593,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -660,6 +681,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -747,6 +771,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -832,6 +859,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"

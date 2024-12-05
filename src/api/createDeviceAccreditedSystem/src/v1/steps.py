@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
@@ -15,6 +16,7 @@ from domain.core.device import (
 )
 from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.error import (
     AccreditedSystemFatalError,
     ConfigurationError,
@@ -44,12 +46,14 @@ def parse_as_device_payload(data, cache) -> CreateAsDeviceIncomingParams:
 
 def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
     path_params: CpmProductPathParams = data[parse_path_params]
+    environment: Environment = data[read_environment]
     product_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     device_reference_data = product_repo.search(
         product_id=path_params.product_id,
         product_team_id=path_params.product_team_id,
+        environment=environment,
     )
 
     # Only 1 AS DRD and only 1 MHS DRD
@@ -189,6 +193,7 @@ def get_party_key(data, cache) -> str:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_as_device_payload,
     read_product_team,
     read_product,

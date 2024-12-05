@@ -1,5 +1,6 @@
 import pytest
 from domain.core.device_key.v1 import DeviceKeyType
+from domain.core.enum import Environment
 from domain.core.product_key.v1 import ProductKeyType
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.product_team_key.v1 import ProductTeamKey, ProductTeamKeyType
@@ -186,7 +187,7 @@ def test_BulkRepository_handle_Device(dynamodb_client):
     )
     product_team = ProductTeam(name="my-product", ods_code="AAA")
     product = product_team.create_cpm_product(name="my-product")
-    device = product.create_device(name="my-product")
+    device = product.create_device(name="my-product", env=Environment.PROD)
     device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="123456")
     device.add_tag(party_key="123", something_else="456")
     device.clear_events()
@@ -195,8 +196,18 @@ def test_BulkRepository_handle_Device(dynamodb_client):
     transactions = bulk_repo.generate_transaction_statements({"Device": device.state()})
     bulk_repo.write(transactions)
 
-    device_by_id = device_repo.read(product_team.id, product.id, device.id)
-    device_by_key = device_repo.read(product_team.id, product.id, "123456")
+    device_by_id = device_repo.read(
+        product_team.id,
+        product.id,
+        Environment.PROD,
+        device.id,
+    )
+    device_by_key = device_repo.read(
+        product_team.id,
+        product.id,
+        Environment.PROD,
+        "123456",
+    )
     (device_by_tag,) = device_repo.query_by_tag(party_key="123", something_else="456")
     assert device == device_by_id
     assert device == device_by_key
@@ -211,7 +222,9 @@ def test_BulkRepository_handle_DeviceReferenceData(dynamodb_client):
     )
     product_team = ProductTeam(name="my-product", ods_code="AAA")
     product = product_team.create_cpm_product(name="my-product")
-    device_ref_data = product.create_device_reference_data(name="my-product")
+    device_ref_data = product.create_device_reference_data(
+        name="my-product", env=Environment.PROD
+    )
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
     transactions = bulk_repo.generate_transaction_statements(
@@ -220,6 +233,6 @@ def test_BulkRepository_handle_DeviceReferenceData(dynamodb_client):
     bulk_repo.write(transactions)
 
     device_ref_data_by_id = device_ref_data_repo.read(
-        product_team.id, product.id, device_ref_data.id
+        product_team.id, product.id, Environment.PROD, device_ref_data.id
     )
     assert device_ref_data == device_ref_data_by_id

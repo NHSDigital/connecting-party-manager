@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
@@ -22,7 +23,8 @@ def parse_device_payload(data, cache) -> CreateDeviceIncomingParams:
 def create_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateDeviceIncomingParams = data[parse_device_payload]
-    return product.create_device(**payload.dict())
+    environment = data[read_environment]
+    return product.create_device(env=environment, **payload.dict())
 
 
 def write_device(data: dict[str, CpmProduct], cache) -> CpmProduct:
@@ -41,6 +43,7 @@ def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_device_payload,
     read_product_team,
     read_product,

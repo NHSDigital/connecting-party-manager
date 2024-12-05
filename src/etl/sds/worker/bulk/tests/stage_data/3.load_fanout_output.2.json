@@ -5,29 +5,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk01"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk01"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -41,10 +70,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -57,29 +94,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk01&nhs_mhs_party_key=aaa-111111"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk01&nhs_mhs_party_key=aaa-111111"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -93,10 +159,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -109,29 +183,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -145,10 +248,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -161,29 +272,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=aaa-111111"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=aaa-111111"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -197,10 +337,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -213,29 +361,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=aaa-111111"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=aaa-111111"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -249,10 +426,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -265,29 +450,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk01&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=aaa-111111"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk01&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=aaa-111111"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -301,10 +515,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -317,29 +539,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -353,10 +604,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -369,29 +628,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -405,10 +693,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -421,29 +717,58 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04"
         },
-        "sk": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
+        "sk": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04"
         },
-        "sk_read": { "S": "D#44d37e03-1bba-4300-970e-f083604917c0" },
-        "root": { "BOOL": false },
-        "id": { "S": "44d37e03-1bba-4300-970e-f083604917c0" },
-        "name": { "S": "AAA-111111/000000000001 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "44d37e03-1bba-4300-970e-f083604917c0"
+        },
+        "name": {
+          "S": "AAA-111111/000000000001 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.004056+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.005653+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.004056+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.005653+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000001" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000001"
+                }
               }
             }
           ]
@@ -457,10 +782,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -470,30 +803,61 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "sk": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+        "pk": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
         },
-        "sk_read": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "root": { "BOOL": true },
-        "id": { "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "name": { "S": "AAA-111111/000000000004 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
+        },
+        "sk_read": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "root": {
+          "BOOL": true
+        },
+        "id": {
+          "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "name": {
+          "S": "AAA-111111/000000000004 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "env": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.005712+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.007286+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.005712+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.007286+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000004" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000004"
+                }
               }
             }
           ]
@@ -507,27 +871,65 @@
               "L": [
                 {
                   "M": {
-                    "id": { "S": "b9669830-a25d-41ce-9aa4-0f41a65aaf64" },
-                    "questionnaire_name": { "S": "spine_as" },
-                    "questionnaire_version": { "S": "1" },
+                    "id": {
+                      "S": "b9669830-a25d-41ce-9aa4-0f41a65aaf64"
+                    },
+                    "questionnaire_name": {
+                      "S": "spine_as"
+                    },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
-                        "Approver URP": { "S": "myApprover" },
-                        "Client ODS Codes": { "L": [{ "S": "AAA" }] },
-                        "Date Approved": { "S": "20040404040404" },
-                        "Date Requested": { "S": "20040404040404" },
-                        "ODS Code": { "S": "AAA" },
-                        "MHS Manufacturer Organisation": { "S": "LSP04" },
-                        "Party Key": { "S": "AAA-111111" },
-                        "Product Key": { "S": "444" },
-                        "Product Name": { "S": "My AAA Product" },
-                        "Product Version": { "S": "2005.02" },
-                        "Requestor URP": { "S": "myRequestor" },
-                        "Temp UID": { "S": "444" },
-                        "ASID": { "S": "000000000004" }
+                        "Approver URP": {
+                          "S": "myApprover"
+                        },
+                        "Client ODS Codes": {
+                          "L": [
+                            {
+                              "S": "AAA"
+                            }
+                          ]
+                        },
+                        "Date Approved": {
+                          "S": "20040404040404"
+                        },
+                        "Date Requested": {
+                          "S": "20040404040404"
+                        },
+                        "ODS Code": {
+                          "S": "AAA"
+                        },
+                        "MHS Manufacturer Organisation": {
+                          "S": "LSP04"
+                        },
+                        "Party Key": {
+                          "S": "AAA-111111"
+                        },
+                        "Product Key": {
+                          "S": "444"
+                        },
+                        "Product Name": {
+                          "S": "My AAA Product"
+                        },
+                        "Product Version": {
+                          "S": "2005.02"
+                        },
+                        "Requestor URP": {
+                          "S": "myRequestor"
+                        },
+                        "Temp UID": {
+                          "S": "444"
+                        },
+                        "ASID": {
+                          "S": "000000000004"
+                        }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:18.999535+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:18.999535+00:00"
+                    }
                   }
                 }
               ]
@@ -537,10 +939,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }

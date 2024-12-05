@@ -5,7 +5,7 @@ import pytest
 from attr import asdict
 from domain.core.device import Device, DeviceCreatedEvent
 from domain.core.device_key import DeviceKeyType
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.root import Root
 from domain.repository.compression import pkl_loads_gzip
 from domain.repository.device_repository import (
@@ -23,7 +23,8 @@ def device() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
     product_team = org.create_product_team(name="Product Team")
     product = product_team.create_cpm_product(name="Product")
-    device = product.create_device(name="Device-1")
+    env = Environment.DEV
+    device = product.create_device(name="Device-1", env=env)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     return device
 
@@ -33,7 +34,8 @@ def device_with_tag() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
     product_team = org.create_product_team(name="Product Team")
     product = product_team.create_cpm_product(name="Product")
-    device = product.create_device(name="Device-1")
+    env = Environment.DEV
+    device = product.create_device(name="Device-1", env=env)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     device.add_tag(
         nhs_as_client="5NR", nhs_as_svc_ia="urn:nhs:names:services:mm:PORX_IN090101UK31"
@@ -46,7 +48,8 @@ def another_device_with_same_key() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
     product_team = org.create_product_team(name="Product Team")
     product = product_team.create_cpm_product(name="Product")
-    device = product.create_device(name="Device-2")
+    env = Environment.DEV
+    device = product.create_device(name="Device-2", env=env)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     return device
 
@@ -57,6 +60,7 @@ def test__device_repository_read_by_id(device: Device, repository: DeviceReposit
     device_from_db = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.id,
     )
     assert device_from_db.dict() == device.dict()
@@ -68,6 +72,7 @@ def test__device_repository_read_by_key(device: Device, repository: DeviceReposi
     device_from_db = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.keys[0].key_value,
     )
     assert device_from_db.dict() == device.dict()
@@ -100,7 +105,12 @@ def test__device_repository_key_already_exists_on_another_device(
 @pytest.mark.integration
 def test__device_repository__device_does_not_exist(repository: DeviceRepository):
     with pytest.raises(ItemNotFound):
-        repository.read(product_team_id="foo", product_id="bar", id="123")
+        repository.read(
+            product_team_id="foo",
+            product_id="bar",
+            environment=Environment.DEV,
+            id="123",
+        )
 
 
 def test__device_repository_local(device: Device, repository: DeviceRepository):
@@ -108,6 +118,7 @@ def test__device_repository_local(device: Device, repository: DeviceRepository):
     device_from_db = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.id,
     )
     assert device_from_db.dict() == device.dict()
@@ -117,7 +128,12 @@ def test__device_repository__device_does_not_exist_local(
     repository: DeviceRepository,
 ):
     with pytest.raises(ItemNotFound):
-        repository.read(product_team_id="foo", product_id="bar", id="123")
+        repository.read(
+            product_team_id="foo",
+            product_id="bar",
+            environment=Environment.DEV,
+            id="123",
+        )
 
 
 @pytest.mark.integration
@@ -128,6 +144,7 @@ def test__device_repository__update(device: Device, repository: DeviceRepository
     intermediate_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.id,
     )
     intermediate_device.update(name="foo-bar")
@@ -138,6 +155,7 @@ def test__device_repository__update(device: Device, repository: DeviceRepository
     final_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.id,
     )
 
@@ -157,6 +175,7 @@ def test__device_repository__delete(
     read_query = dict(
         product_team_id=device_with_tag.product_team_id,
         product_id=device_with_tag.product_id,
+        environment=device_with_tag.env,
         id=device_with_tag.id,
     )
 
@@ -191,7 +210,7 @@ def test__device_repository__can_delete_second_device_with_same_key(
     org = Root.create_ods_organisation(ods_code="AAA")
     product_team = org.create_product_team(name="MyTeam")
     product = product_team.create_cpm_product(name="Product")
-    device = product.create_device(name="OriginalDevice")
+    device = product.create_device(name="OriginalDevice", env=Environment.DEV)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     repository.write(device)
     time.sleep(1)
@@ -199,6 +218,7 @@ def test__device_repository__can_delete_second_device_with_same_key(
     read_query = dict(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=DEVICE_KEY,
     )
     repository.read(**read_query)  # passes
@@ -217,13 +237,14 @@ def test__device_repository__can_delete_second_device_with_same_key(
     deleted_device = inactive_repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.id,
     )
     assert deleted_device.status is Status.INACTIVE
 
     # Can re-add the same product id Key after a previous device is inactive
     for i in range(5):
-        _device = product.create_device(name=f"Device-{i}")
+        _device = product.create_device(name=f"Device-{i}", env=Environment.DEV)
         _device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
         repository.write(_device)
         time.sleep(1)
@@ -241,6 +262,7 @@ def test__device_repository__can_delete_second_device_with_same_key(
         _deleted_device = inactive_repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id=_device.id,
         )
         assert _deleted_device.status is Status.INACTIVE
@@ -254,6 +276,7 @@ def test__device_repository__add_key(device: Device, repository: DeviceRepositor
     intermediate_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=device.env,
         id=device.id,
     )
     assert len(intermediate_device.keys) == 1
@@ -274,6 +297,7 @@ def test__device_repository__add_key(device: Device, repository: DeviceRepositor
         _device = repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=device.env,
             id=key_value,
         ).dict()
         retrieved_devices.append(_device)
@@ -297,6 +321,7 @@ def device_created_event():
         product_id="123",
         ods_code="abc",
         status="good",
+        env="dev",
         created_on="123",
         updated_on=None,
         deleted_on=None,

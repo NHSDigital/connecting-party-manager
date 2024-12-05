@@ -10,6 +10,7 @@ import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import Device
+from domain.core.enum import Environment
 from domain.core.product_key import ProductKeyType
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
@@ -109,7 +110,8 @@ def mock_epr_product_with_message_set_drd() -> (
 
         # Set up DeviceReferenceData in DB
         device_reference_data = product.create_device_reference_data(
-            name=EprNameTemplate.MESSAGE_SETS.format(party_key=PARTY_KEY)
+            name=EprNameTemplate.MESSAGE_SETS.format(party_key=PARTY_KEY),
+            env=Environment.DEV,
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -200,6 +202,7 @@ def test_index() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -213,6 +216,7 @@ def test_index() -> None:
         assert device.product_id == product.id
         assert is_mhs_device(device)
         assert device.ods_code == ODS_CODE
+        assert device.env == Environment.DEV
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()
         assert not device.deleted_on
@@ -231,6 +235,7 @@ def test_index() -> None:
         created_device = repo.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=device.env,
             id=device.id,
         )
 
@@ -259,7 +264,11 @@ def test_index() -> None:
                 "questionnaire_responses": {"spine_mhs": [QUESTIONNAIRE_DATA]},
                 "forbidden_extra_param": "foo",
             },
-            {"product_id": str(PRODUCT_ID), "product_team_id": consistent_uuid(1)},
+            {
+                "product_id": str(PRODUCT_ID),
+                "product_team_id": consistent_uuid(1),
+                "env": Environment.DEV,
+            },
             "VALIDATION_ERROR",
             400,
         ),
@@ -268,6 +277,7 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": "id_that_does_not_exist",
+                "env": Environment.DEV,
             },
             "RESOURCE_NOT_FOUND",
             404,
@@ -337,6 +347,7 @@ def test_questionnaire_response_validation_errors(
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -359,6 +370,7 @@ def test_not_epr_product():
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -382,6 +394,7 @@ def test_no_existing_message_set_drd():
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -405,6 +418,7 @@ def test_mhs_already_exists() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -421,6 +435,7 @@ def test_mhs_already_exists() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "env": Environment.DEV,
                 },
             }
         )
