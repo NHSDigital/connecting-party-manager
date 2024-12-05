@@ -7,6 +7,7 @@ from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.repository.device_repository import DeviceRepository
 from domain.request_models import CreateDeviceIncomingParams, CreateDevicePathParams
+from domain.request_models.v1 import Environment
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
@@ -23,9 +24,29 @@ def parse_path_params(data, cache) -> CreateDevicePathParams:
     return CreateDevicePathParams(**event.path_parameters)
 
 
+def read_environment(data, cache) -> Environment:
+    path_params: CreateDevicePathParams = data[parse_path_params]
+    env = path_params.env
+    return env
+
+
+def read_product(data, cache) -> CpmProduct:
+    path_params: CreateDevicePathParams = data[parse_path_params]
+    product_team: ProductTeam = data[read_product_team]
+
+    product_repo = CpmProductRepository(
+        table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
+    )
+    cpm_product = product_repo.read(
+        product_team_id=product_team.id, id=path_params.product_id
+    )
+    return cpm_product
+
+
 def create_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateDeviceIncomingParams = data[parse_device_payload]
+    payload["env"]: str = data[read_environment]
     return product.create_device(**payload.dict())
 
 
@@ -47,6 +68,7 @@ steps = [
     parse_path_params,
     parse_device_payload,
     read_product_team,
+    read_environment,
     read_product,
     create_device,
     write_device,

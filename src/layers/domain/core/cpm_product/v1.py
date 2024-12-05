@@ -15,6 +15,7 @@ from domain.core.event import Event
 from domain.core.product_key import ProductKey
 from domain.core.timestamp import now
 from domain.core.validation import CPM_PRODUCT_NAME_REGEX
+from domain.request_models.v1 import Environment
 from pydantic import Field
 
 
@@ -71,6 +72,7 @@ class CpmProduct(AggregateRoot):
     updated_on: datetime = Field(default=None)
     deleted_on: datetime = Field(default=None)
     keys: list[ProductKey] = Field(default_factory=list)
+    env: Environment
 
     def create_device(
         self,
