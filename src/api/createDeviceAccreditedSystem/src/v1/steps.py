@@ -88,20 +88,6 @@ def validate_spine_as_questionnaire_response(data, cache) -> QuestionnaireRespon
     )
 
 
-def create_as_device(data, cache) -> Device:
-    product: CpmProduct = data[read_product]
-    payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
-    party_key: str = data[get_party_key]
-
-    # Create a new Device dictionary excluding 'questionnaire_responses'
-    # Ticket PI-666 adds ASID generation. This will need to be sent across in the arguments instead of an empty string.
-    device_payload = payload.dict(exclude={"questionnaire_responses"})
-    return product.create_device(
-        name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=""),
-        **device_payload
-    )
-
-
 def create_party_key_tag(data, cache) -> DeviceTagAddedEvent:
     as_device: Device = data[create_as_device]
     return as_device.add_tag(party_key=data[get_party_key])
@@ -116,6 +102,21 @@ def create_asid(data, cache) -> str:
     asid = repository.read()
     new_asid = AsidId.create(current_number=asid.latest_number)
     return new_asid.__root__
+
+
+def create_as_device(data, cache) -> Device:
+    product: CpmProduct = data[read_product]
+    asid: str = data[create_asid]
+    payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
+    party_key: str = data[get_party_key]
+
+    # Create a new Device dictionary excluding 'questionnaire_responses'
+    # Ticket PI-666 adds ASID generation. This will need to be sent across in the arguments instead of an empty string.
+    device_payload = payload.dict(exclude={"questionnaire_responses"})
+    return product.create_device(
+        name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid),
+        **device_payload
+    )
 
 
 def create_device_keys(data, cache) -> Device:
@@ -186,9 +187,9 @@ steps = [
     read_device_reference_data,
     read_spine_as_questionnaire,
     validate_spine_as_questionnaire_response,
+    create_asid,
     create_as_device,
     create_party_key_tag,
-    create_asid,
     create_device_keys,
     add_device_reference_data_id,
     add_spine_as_questionnaire_response,
