@@ -239,7 +239,7 @@
           "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6"
@@ -255,6 +255,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -351,7 +354,7 @@
           "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536"
@@ -367,6 +370,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -476,7 +482,7 @@
           "S": "D#192133bc-7077-4163-9387-9856969dd412"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "D#192133bc-7077-4163-9387-9856969dd412"
@@ -492,6 +498,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -548,6 +557,9 @@
                         "Approver URP": {
                           "S": "myApprover"
                         },
+                        "Contract Property Template Key": {
+                          "S": "14"
+                        },
                         "Date Approved": {
                           "S": "20010101010101"
                         },
@@ -560,8 +572,20 @@
                         "DNS Approver": {
                           "S": "myApprover"
                         },
+                        "Interaction Type": {
+                          "S": "fhir"
+                        },
                         "Managing Organization": {
                           "S": "AAA"
+                        },
+                        "Reliability Configuration Ack Requested": {
+                          "S": "never"
+                        },
+                        "MHS CPA ID": {
+                          "S": "00000000000a"
+                        },
+                        "Reliability Configuration Duplication Elimination": {
+                          "S": "never"
                         },
                         "Address": {
                           "S": "https://test.C3O9X.nhs.uk/"
@@ -569,11 +593,20 @@
                         "MHS FQDN": {
                           "S": "test.C3O9X.nhs.uk"
                         },
+                        "MHS IP Address": {
+                          "S": "0.0.0.0"
+                        },
+                        "MHS Is Authenticated": {
+                          "S": "none"
+                        },
                         "MHS Manufacturer Organisation": {
                           "S": "LSP04"
                         },
                         "MHS Party key": {
                           "S": "AAA-111111"
+                        },
+                        "Product Key": {
+                          "S": "111"
                         },
                         "Product Name": {
                           "S": "My AAA Product"
@@ -583,6 +616,9 @@
                         },
                         "Requestor URP": {
                           "S": "myRequestor"
+                        },
+                        "Unique Identifier": {
+                          "S": "00000000000a"
                         }
                       }
                     },
@@ -619,7 +655,7 @@
           "S": "D#00000000000a"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "D#00000000000a"
@@ -636,6 +672,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -715,6 +754,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -793,6 +835,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"

@@ -17,7 +17,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path      | value        |
       | bad_field | Not required |
     Then I receive a status code "400" with body
@@ -41,7 +41,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       """
       {"invalid_array": [}
       """
@@ -55,7 +55,7 @@ Feature: Create MHS Device - failure scenarios
       | Content-Length | 115              |
 
   Scenario: Cannot create a MHS Device with a Product Team that does not exist
-    When I make a "POST" request with "default" headers to "ProductTeam/not-a-product-team/Product/not-a-product/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/not-a-product-team/Product/not-a-product/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -80,7 +80,7 @@ Feature: Create MHS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/not-a-product/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/not-a-product/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -109,7 +109,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -138,7 +138,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -167,8 +167,8 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                             | value  |
       | questionnaire_responses.not_spine_mhs.0.Question | Answer |
     Then I receive a status code "400" with body
@@ -211,8 +211,8 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -249,8 +249,8 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                         | value  |
       | questionnaire_responses.spine_mhs.0.MHS FQDN | 123456 |
     Then I receive a status code "400" with body
@@ -326,7 +326,7 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                                                        | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN                                     | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN                                     | READ_PRACTITIONER_ROLE_R4_V001 |
@@ -336,7 +336,7 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs_message_sets.1.Reliability Configuration Retries          | ${ integer(2) }                |
       | questionnaire_responses.spine_mhs_message_sets.1.Reliability Configuration Persist Duration | PT10M                          |
     And I note the response field "$.id" as "message_set_drd_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -347,7 +347,7 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.DNS Approver                  | UI provided         |
       | questionnaire_responses.spine_mhs.0.Requestor URP                 | UI provided         |
     And I note the response field "$.id" as "device_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -376,9 +376,9 @@ Feature: Create MHS Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
     And I note the response field "$.id" as "message_set_drd_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -389,7 +389,7 @@ Feature: Create MHS Device - failure scenarios
       | questionnaire_responses.spine_mhs.0.DNS Approver                  | UI provided         |
       | questionnaire_responses.spine_mhs.0.Requestor URP                 | UI provided         |
     And I note the response field "$.id" as "device_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |

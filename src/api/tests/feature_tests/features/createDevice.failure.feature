@@ -17,7 +17,7 @@ Feature: Create Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device" with body:
       | path      | value     |
       | bad_field | My Device |
     Then I receive a status code "400" with body
@@ -41,7 +41,7 @@ Feature: Create Device - failure scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device" with body:
       """
       {"invalid_array": [}
       """
@@ -55,7 +55,7 @@ Feature: Create Device - failure scenarios
       | Content-Length | 115              |
 
   Scenario: Cannot create a Device with a Product Team that does not exist
-    When I make a "POST" request with "default" headers to "ProductTeam/not-a-product-team/Product/not-a-product/Device" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/not-a-product-team/Product/not-a-product/dev/Device" with body:
       | path | value     |
       | name | My Device |
     Then I receive a status code "404" with body
@@ -73,7 +73,7 @@ Feature: Create Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/not-a-product/Device" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/not-a-product/dev/Device" with body:
       | path | value     |
       | name | My Device |
     Then I receive a status code "404" with body
@@ -84,3 +84,25 @@ Feature: Create Device - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 156              |
+
+  Scenario: Cannot create a Device with an environment that is not allowed
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/foo/Device" with body:
+      | path | value     |
+      | name | My Device |
+    Then I receive a status code "400" with body
+      | path             | value                                                                                                              |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                   |
+      | errors.0.message | SubCpmProductPathParams.env: value is not a valid enumeration member; permitted: 'dev', 'qa', 'ref', 'int', 'prod' |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 171              |

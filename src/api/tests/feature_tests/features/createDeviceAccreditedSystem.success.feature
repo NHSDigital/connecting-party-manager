@@ -19,12 +19,12 @@ Feature: Create AS Device - success scenarios
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -34,11 +34,11 @@ Feature: Create AS Device - success scenarios
       | questionnaire_responses.spine_mhs.0.Approver URP                  | UI provided         |
       | questionnaire_responses.spine_mhs.0.DNS Approver                  | UI provided         |
       | questionnaire_responses.spine_mhs.0.Requestor URP                 | UI provided         |
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
     And I note the response field "$.id" as "as_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -55,6 +55,7 @@ Feature: Create AS Device - success scenarios
       | name                                                         | F5H1R-850000/200000100000 - Accredited System |
       | status                                                       | active                                        |
       | product_id                                                   | ${ note(product_id) }                         |
+      | env | dev |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |
       | keys.0.key_type                                              | accredited_system_id                          |
@@ -81,12 +82,13 @@ Feature: Create AS Device - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 1060             |
     And I note the response field "$.id" as "device_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                    | value                                         |
       | id                      | ${ note(device_id) }                          |
       | name                    | F5H1R-850000/200000100000 - Accredited System |
       | status                  | active                                        |
+      | env | dev |
       | product_id              | ${ note(product_id) }                         |
       | product_team_id         | ${ note(product_team_id) }                    |
       | ods_code                | F5H1R                                         |
@@ -116,11 +118,11 @@ Feature: Create AS Device - success scenarios
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
     And I note the response field "$.id" as "mhs_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     And I note the response field "$.id" as "as_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -136,6 +138,7 @@ Feature: Create AS Device - success scenarios
       | id                                                           | << ignore >>                                  |
       | name                                                         | F5H1R-850000/200000100000 - Accredited System |
       | status                                                       | active                                        |
+      | env | dev |
       | product_id                                                   | ${ note(product_id) }                         |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |
@@ -163,12 +166,13 @@ Feature: Create AS Device - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 1064             |
     And I note the response field "$.id" as "device_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                    | value                                         |
       | id                      | ${ note(device_id) }                          |
       | name                    | F5H1R-850000/200000100000 - Accredited System |
       | status                  | active                                        |
+      | env | dev |
       | product_id              | ${ note(product_id) }                         |
       | product_team_id         | ${ note(product_team_id) }                    |
       | ods_code                | F5H1R                                         |
@@ -200,12 +204,12 @@ Feature: Create AS Device - success scenarios
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -215,11 +219,11 @@ Feature: Create AS Device - success scenarios
       | questionnaire_responses.spine_mhs.0.Approver URP                  | UI provided         |
       | questionnaire_responses.spine_mhs.0.DNS Approver                  | UI provided         |
       | questionnaire_responses.spine_mhs.0.Requestor URP                 | UI provided         |
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
     And I note the response field "$.id" as "as_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -236,6 +240,7 @@ Feature: Create AS Device - success scenarios
       | id                                                           | << ignore >>                                  |
       | name                                                         | F5H1R-850000/200000100000 - Accredited System |
       | status                                                       | active                                        |
+      | env | dev |
       | product_id                                                   | ${ note(product_id) }                         |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |
@@ -258,7 +263,7 @@ Feature: Create AS Device - success scenarios
       | questionnaire_responses.spine_as/1.0.data.Product Key        | product-key-001                               |
       | questionnaire_responses.spine_as/1.0.created_on              | << ignore >>                                  |
       | device_reference_data                                        | << ignore >>                                  |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/AccreditedSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | F5H1R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | F5H1R           |
@@ -297,47 +302,47 @@ Feature: Create AS Device - success scenarios
       | questionnaire_responses.spine_as/1.0.data.Product Key        | product-key-002                               |
       | questionnaire_responses.spine_as/1.0.created_on              | << ignore >>                                  |
       | device_reference_data                                        | << ignore >>                                  |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
-      | path                    | value                                         |
-      | id                      | ${ note(device_id) }                          |
-      | name                    | F5H1R-850000/200000100000 - Accredited System |
-      | status                  | active                                        |
-      | product_id              | ${ note(product_id) }                         |
-      | product_team_id         | ${ note(product_team_id) }                    |
-      | ods_code                | F5H1R                                         |
-      | created_on              | << ignore >>                                  |
-      | updated_on              | << ignore >>                                  |
-      | deleted_on              | << ignore >>                                  |
-      | keys.0.key_type         | accredited_system_id                          |
-      | keys.0.key_value        | 200000100000                                  |
-      | tags.0.0.0              | ${ note(party_key_tag) }                      |
-      | tags.0.0.1              | ${ note(party_key_tag_value) }                |
-      | questionnaire_responses | << ignore >>                                  |
-      | device_reference_data   | << ignore >>                                  |
+      | path                    | value                             |
+      | id                      | ${ note(device_id) }              |
+      | name                    | F5H1R-850000/ - Accredited System |
+      | status                  | active                            |
+      | env                     | dev                               |
+      | product_id              | ${ note(product_id) }             |
+      | product_team_id         | ${ note(product_team_id) }        |
+      | ods_code                | F5H1R                             |
+      | created_on              | << ignore >>                      |
+      | updated_on              | << ignore >>                      |
+      | deleted_on              | << ignore >>                      |
+      | keys                    | []                                |
+      | tags.0.0.0              | ${ note(party_key_tag) }          |
+      | tags.0.0.1              | ${ note(party_key_tag_value) }    |
+      | questionnaire_responses | << ignore >>                      |
+      | device_reference_data   | << ignore >>                      |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1717             |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id_2) }"
+      | Content-Length | 1738             |
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id_2) }"
     Then I receive a status code "200" with body
-      | path                    | value                                         |
-      | id                      | ${ note(device_id_2) }                        |
-      | name                    | F5H1R-850000/200000100001 - Accredited System |
-      | status                  | active                                        |
-      | product_id              | ${ note(product_id) }                         |
-      | product_team_id         | ${ note(product_team_id) }                    |
-      | ods_code                | F5H1R                                         |
-      | created_on              | << ignore >>                                  |
-      | updated_on              | << ignore >>                                  |
-      | deleted_on              | << ignore >>                                  |
-      | keys.0.key_type         | accredited_system_id                          |
-      | keys.0.key_value        | 200000100001                                  |
-      | tags.0.0.0              | ${ note(party_key_tag) }                      |
-      | tags.0.0.1              | ${ note(party_key_tag_value) }                |
-      | questionnaire_responses | << ignore >>                                  |
-      | device_reference_data   | << ignore >>                                  |
+      | path                    | value                             |
+      | id                      | ${ note(device_id_2) }            |
+      | name                    | F5H1R-850000/ - Accredited System |
+      | status                  | active                            |
+      | env                     | dev                               |
+      | product_id              | ${ note(product_id) }             |
+      | product_team_id         | ${ note(product_team_id) }        |
+      | ods_code                | F5H1R                             |
+      | created_on              | << ignore >>                      |
+      | updated_on              | << ignore >>                      |
+      | deleted_on              | << ignore >>                      |
+      | keys                    | []                                |
+      | tags.0.0.0              | ${ note(party_key_tag) }          |
+      | tags.0.0.1              | ${ note(party_key_tag_value) }    |
+      | questionnaire_responses | << ignore >>                      |
+      | device_reference_data   | << ignore >>                      |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1717             |
+      | Content-Length | 1738             |
