@@ -111,7 +111,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1720             |
+      | Content-Length | 1632             |
 
   Scenario: Successfully create a AS Device with MHSMessageSet and ASAdditionalInteractions containing no questionnaire responses
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -169,7 +169,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 987              |
+      | Content-Length | 983              |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -191,7 +191,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1030             |
+      | Content-Length | 1026             |
 
   Scenario: Successfully create multiple AS Devices
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -280,7 +280,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1724             |
+      | Content-Length | 1636             |
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id_2) }"
     Then I receive a status code "200" with body
       | path                    | value                             |
@@ -301,4 +301,4 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1724             |
+      | Content-Length | 1636             |
