@@ -28,6 +28,8 @@ EMPTY_JSON_DATA = deque()
     ],
 )
 def test_manual_trigger(history_object):
+    time.sleep(10)  # Grace period for any previous Step Functions to complete
+
     # Where the state is located
     etl_config = get_etl_config(f"{EXPECTED_CHANGELOG_NUMBER}.ldif")
     manual_trigger_arn = read_terraform_output("manual_trigger_arn.value")

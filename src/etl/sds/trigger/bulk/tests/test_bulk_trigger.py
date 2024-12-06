@@ -38,7 +38,7 @@ def message(x):
     print(x)  # noqa
 
 
-@pytest.mark.timeout(20)
+@pytest.mark.timeout(40)
 @pytest.mark.integration
 def test_bulk_trigger():
     # Prerequisites
@@ -126,5 +126,6 @@ def test_bulk_trigger():
     message("Load's input data is now in empty state")
 
     while not was_state_lock_removed():
-        message("State lock has been removed")
         time.sleep(1)
+    message("State lock has been removed")
+    time.sleep(10)  # Grace period for Step Function to complete
