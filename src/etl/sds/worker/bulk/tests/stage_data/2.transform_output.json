@@ -1,0 +1,945 @@
+[
+  {
+    "ProductTeam": {
+      "id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "name": "LSP04 (EPR)",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-11-20T10:54:19.001479+00:00",
+      "updated_on": null,
+      "deleted_on": null,
+      "keys": [{ "key_type": "epr_id", "key_value": "EPR-LSP04" }]
+    }
+  },
+  {
+    "CpmProduct": {
+      "id": "P.VNT-MLW",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "name": "My AAA Product",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-11-20T10:54:19.001733+00:00",
+      "updated_on": "2024-11-20T10:54:19.002057+00:00",
+      "deleted_on": null,
+      "keys": [{ "key_type": "party_key", "key_value": "AAA-111111" }]
+    }
+  },
+  {
+    "DeviceReferenceData": {
+      "id": "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6",
+      "name": "AAA-111111 - MHS Message Sets",
+      "product_id": "P.VNT-MLW",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "status": "active",
+      "questionnaire_responses": {
+        "spine_mhs_message_sets/1": [
+          {
+            "id": "5e4cab5e-bcbd-47f6-afa2-7a2b86853ca5",
+            "questionnaire_name": "spine_mhs_message_sets",
+            "questionnaire_version": "1",
+            "data": {
+              "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001",
+              "MHS SN": "urn:nhs:names:services:ers",
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+            },
+            "created_on": "2024-11-20T10:54:19.000224+00:00"
+          }
+        ]
+      },
+      "created_on": "2024-11-20T10:54:19.002130+00:00",
+      "updated_on": "2024-11-20T10:54:19.002249+00:00",
+      "deleted_on": null
+    }
+  },
+  {
+    "DeviceReferenceData": {
+      "id": "d3d0e6b8-8277-4849-8e8d-5cb035af5536",
+      "name": "AAA-111111 - AS Additional Interactions",
+      "product_id": "P.VNT-MLW",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "status": "active",
+      "questionnaire_responses": {
+        "spine_as_additional_interactions/1": [
+          {
+            "id": "170711a5-2e77-453b-a04f-4723cf8e9f87",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+            },
+            "created_on": "2024-11-20T10:54:19.000557+00:00"
+          },
+          {
+            "id": "cb431ce5-5de2-42cd-9430-2e0b0ad91639",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:pds:QUPA_IN040000UK01"
+            },
+            "created_on": "2024-11-20T10:54:19.000872+00:00"
+          },
+          {
+            "id": "36fa5061-f9b7-4980-8cf7-abafdb25f670",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:pds:QUPA_IN040000UK04"
+            },
+            "created_on": "2024-11-20T10:54:19.001186+00:00"
+          }
+        ]
+      },
+      "created_on": "2024-11-20T10:54:19.003795+00:00",
+      "updated_on": "2024-11-20T10:54:19.004000+00:00",
+      "deleted_on": null
+    }
+  },
+  {
+    "Device": {
+      "id": "192133bc-7077-4163-9387-9856969dd412",
+      "name": "AAA-111111 - Message Handling System",
+      "status": "active",
+      "product_id": "P.VNT-MLW",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "created_on": "2024-11-20T10:54:19.002315+00:00",
+      "updated_on": "2024-11-20T10:54:19.003736+00:00",
+      "deleted_on": null,
+      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
+      "tags": [
+        [["nhs_mhs_party_key", "aaa-111111"]],
+        [
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ]
+        ],
+        [["nhs_id_code", "aaa"]],
+        [
+          ["nhs_id_code", "aaa"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_mhs_party_key", "aaa-111111"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ]
+        ],
+        [
+          ["nhs_id_code", "aaa"],
+          ["nhs_mhs_party_key", "aaa-111111"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ]
+        ],
+        [
+          ["nhs_id_code", "aaa"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ]
+        ]
+      ],
+      "questionnaire_responses": {
+        "spine_mhs/1": [
+          {
+            "id": "277d020e-0389-4113-b44f-f659d2b0ee59",
+            "questionnaire_name": "spine_mhs",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Contract Property Template Key": "14",
+              "Date Approved": "20010101010101",
+              "Date DNS Approved": "20010101010101",
+              "Date Requested": "20010101010101",
+              "DNS Approver": "myApprover",
+              "Interaction Type": "fhir",
+              "Managing Organization": "AAA",
+              "Reliability Configuration Ack Requested": "never",
+              "MHS CPA ID": "00000000000a",
+              "Reliability Configuration Duplication Elimination": "never",
+              "Address": "https://test.C3O9X.nhs.uk/",
+              "MHS FQDN": "test.C3O9X.nhs.uk",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
+              "MHS Manufacturer Organisation": "LSP04",
+              "MHS Party key": "AAA-111111",
+              "Product Key": "111",
+              "Product Name": "My AAA Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor",
+              "Unique Identifier": "00000000000a"
+            },
+            "created_on": "2024-11-20T10:54:18.995983+00:00"
+          }
+        ]
+      },
+      "device_reference_data": { "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": ["*"] }
+    }
+  },
+  {
+    "Device": {
+      "id": "44d37e03-1bba-4300-970e-f083604917c0",
+      "name": "AAA-111111/000000000001 - Accredited System",
+      "status": "active",
+      "product_id": "P.VNT-MLW",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "created_on": "2024-11-20T10:54:19.004056+00:00",
+      "updated_on": "2024-11-20T10:54:19.005653+00:00",
+      "deleted_on": null,
+      "keys": [
+        { "key_type": "accredited_system_id", "key_value": "000000000001" }
+      ],
+      "tags": [
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"]
+        ]
+      ],
+      "questionnaire_responses": {
+        "spine_as/1": [
+          {
+            "id": "8e3f6c89-8d86-4827-9168-1866b141d9f3",
+            "questionnaire_name": "spine_as",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Client ODS Codes": ["AAA"],
+              "Date Approved": "20010101010101",
+              "Date Requested": "20010101010101",
+              "ODS Code": "AAA",
+              "MHS Manufacturer Organisation": "LSP04",
+              "Party Key": "AAA-111111",
+              "Product Key": "111",
+              "Product Name": "My AAA Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor",
+              "Temp UID": "111",
+              "ASID": "000000000001"
+            },
+            "created_on": "2024-11-20T10:54:18.997768+00:00"
+          }
+        ]
+      },
+      "device_reference_data": {
+        "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": ["*.Interaction ID"],
+        "d3d0e6b8-8277-4849-8e8d-5cb035af5536": ["*.Interaction ID"]
+      }
+    }
+  },
+  {
+    "Device": {
+      "id": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e",
+      "name": "AAA-111111/000000000004 - Accredited System",
+      "status": "active",
+      "product_id": "P.VNT-MLW",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "created_on": "2024-11-20T10:54:19.005712+00:00",
+      "updated_on": "2024-11-20T10:54:19.007286+00:00",
+      "deleted_on": null,
+      "keys": [
+        { "key_type": "accredited_system_id", "key_value": "000000000004" }
+      ],
+      "tags": [
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk01"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "aaa-111111"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v001"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "aaa"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk04"]
+        ]
+      ],
+      "questionnaire_responses": {
+        "spine_as/1": [
+          {
+            "id": "b9669830-a25d-41ce-9aa4-0f41a65aaf64",
+            "questionnaire_name": "spine_as",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Client ODS Codes": ["AAA"],
+              "Date Approved": "20040404040404",
+              "Date Requested": "20040404040404",
+              "ODS Code": "AAA",
+              "MHS Manufacturer Organisation": "LSP04",
+              "Party Key": "AAA-111111",
+              "Product Key": "444",
+              "Product Name": "My AAA Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor",
+              "Temp UID": "444",
+              "ASID": "000000000004"
+            },
+            "created_on": "2024-11-20T10:54:18.999535+00:00"
+          }
+        ]
+      },
+      "device_reference_data": {
+        "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": ["*.Interaction ID"],
+        "d3d0e6b8-8277-4849-8e8d-5cb035af5536": ["*.Interaction ID"]
+      }
+    }
+  },
+  {
+    "CpmProduct": {
+      "id": "P.LU6-Y7D",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "name": "My BBB Product",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-11-20T10:54:19.017417+00:00",
+      "updated_on": "2024-11-20T10:54:19.017614+00:00",
+      "deleted_on": null,
+      "keys": [{ "key_type": "party_key", "key_value": "BBB-111111" }]
+    }
+  },
+  {
+    "DeviceReferenceData": {
+      "id": "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e",
+      "name": "BBB-111111 - MHS Message Sets",
+      "product_id": "P.LU6-Y7D",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "status": "active",
+      "questionnaire_responses": {
+        "spine_mhs_message_sets/1": [
+          {
+            "id": "719577ca-919e-486d-b0d1-e5e06388051c",
+            "questionnaire_name": "spine_mhs_message_sets",
+            "questionnaire_version": "1",
+            "data": {
+              "MHS IN": "READ_PRACTITIONER_ROLE_R4_V002",
+              "MHS SN": "urn:nhs:names:services:ers",
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002"
+            },
+            "created_on": "2024-11-20T10:54:19.015021+00:00"
+          },
+          {
+            "id": "417fe8ec-2fc1-4a38-80fc-7cb0ab5245e9",
+            "questionnaire_name": "spine_mhs_message_sets",
+            "questionnaire_version": "1",
+            "data": {
+              "MHS IN": "READ_PRACTITIONER_ROLE_R4_V002",
+              "MHS SN": "urn:nhs:names:services:ers",
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V003"
+            },
+            "created_on": "2024-11-20T10:54:19.015692+00:00"
+          }
+        ]
+      },
+      "created_on": "2024-11-20T10:54:19.017673+00:00",
+      "updated_on": "2024-11-20T10:54:19.017837+00:00",
+      "deleted_on": null
+    }
+  },
+  {
+    "DeviceReferenceData": {
+      "id": "b4186163-23ec-41fa-abc2-5fe8b0fe9cab",
+      "name": "BBB-111111 - AS Additional Interactions",
+      "product_id": "P.LU6-Y7D",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "status": "active",
+      "questionnaire_responses": {
+        "spine_as_additional_interactions/1": [
+          {
+            "id": "4fc814dd-6309-4c8f-92ac-ef450292c058",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002"
+            },
+            "created_on": "2024-11-20T10:54:19.016015+00:00"
+          },
+          {
+            "id": "048c60e7-f664-4b02-b1ad-78460c47ba17",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V003"
+            },
+            "created_on": "2024-11-20T10:54:19.016328+00:00"
+          },
+          {
+            "id": "f43844e2-0514-4140-a110-b3cb400e6d9d",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:pds:QUPA_IN040000UK02"
+            },
+            "created_on": "2024-11-20T10:54:19.016638+00:00"
+          },
+          {
+            "id": "4a379a26-65b0-4d2d-9fef-9a92b92df293",
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
+            "data": {
+              "Interaction ID": "urn:nhs:names:services:pds:QUPA_IN040000UK03"
+            },
+            "created_on": "2024-11-20T10:54:19.016947+00:00"
+          }
+        ]
+      },
+      "created_on": "2024-11-20T10:54:19.019795+00:00",
+      "updated_on": "2024-11-20T10:54:19.020066+00:00",
+      "deleted_on": null
+    }
+  },
+  {
+    "Device": {
+      "id": "a5c17f6a-560d-4553-af40-9095ab84e807",
+      "name": "BBB-111111 - Message Handling System",
+      "status": "active",
+      "product_id": "P.LU6-Y7D",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "created_on": "2024-11-20T10:54:19.017931+00:00",
+      "updated_on": "2024-11-20T10:54:19.019737+00:00",
+      "deleted_on": null,
+      "keys": [
+        { "key_type": "cpa_id", "key_value": "00000000000b" },
+        { "key_type": "cpa_id", "key_value": "00000000000c" }
+      ],
+      "tags": [
+        [
+          ["nhs_id_code", "bbb"],
+          ["nhs_mhs_party_key", "bbb-111111"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ]
+        ],
+        [
+          ["nhs_mhs_party_key", "bbb-111111"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ]
+        ],
+        [
+          ["nhs_mhs_party_key", "bbb-111111"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ]
+        ],
+        [
+          ["nhs_id_code", "bbb"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ]
+        ],
+        [
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ]
+        ],
+        [
+          ["nhs_id_code", "bbb"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ]
+        ],
+        [
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ]
+        ],
+        [
+          ["nhs_id_code", "bbb"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_id_code", "bbb"],
+          ["nhs_mhs_party_key", "bbb-111111"],
+          [
+            "nhs_mhs_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ]
+        ],
+        [["nhs_mhs_party_key", "bbb-111111"]],
+        [["nhs_id_code", "bbb"]]
+      ],
+      "questionnaire_responses": {
+        "spine_mhs/1": [
+          {
+            "id": "2dfdf37f-53e6-43be-9a96-9430e24604ac",
+            "questionnaire_name": "spine_mhs",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Contract Property Template Key": "14",
+              "Date Approved": "20020202020202",
+              "Date DNS Approved": "20020202020202",
+              "Date Requested": "20020202020202",
+              "DNS Approver": "myApprover",
+              "Interaction Type": "fhir",
+              "Managing Organization": "BBB",
+              "Reliability Configuration Ack Requested": "never",
+              "MHS CPA ID": "00000000000b",
+              "Reliability Configuration Duplication Elimination": "never",
+              "Address": "https://test.C3O9X.nhs.uk/",
+              "MHS FQDN": "test.C3O9X.nhs.uk",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
+              "MHS Manufacturer Organisation": "LSP04",
+              "MHS Party key": "BBB-111111",
+              "Product Key": "111",
+              "Product Name": "My BBB Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor",
+              "Unique Identifier": "00000000000b"
+            },
+            "created_on": "2024-11-20T10:54:19.010898+00:00"
+          }
+        ]
+      },
+      "device_reference_data": { "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": ["*"] }
+    }
+  },
+  {
+    "Device": {
+      "id": "6924122e-86da-45b3-9c2e-b6a3609b1ed9",
+      "name": "BBB-111111/000000000002 - Accredited System",
+      "status": "active",
+      "product_id": "P.LU6-Y7D",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "created_on": "2024-11-20T10:54:19.020121+00:00",
+      "updated_on": "2024-11-20T10:54:19.021912+00:00",
+      "deleted_on": null,
+      "keys": [
+        { "key_type": "accredited_system_id", "key_value": "000000000002" }
+      ],
+      "tags": [
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ]
+      ],
+      "questionnaire_responses": {
+        "spine_as/1": [
+          {
+            "id": "c793754b-1eb9-49d3-99dc-a57e5d2589b1",
+            "questionnaire_name": "spine_as",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Client ODS Codes": ["BBB"],
+              "Date Approved": "20020202020202",
+              "Date Requested": "20020202020202",
+              "ODS Code": "BBB",
+              "MHS Manufacturer Organisation": "LSP04",
+              "Party Key": "BBB-111111",
+              "Product Key": "222",
+              "Product Name": "My BBB Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor",
+              "Temp UID": "222",
+              "ASID": "000000000002"
+            },
+            "created_on": "2024-11-20T10:54:19.012568+00:00"
+          }
+        ]
+      },
+      "device_reference_data": {
+        "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": ["*.Interaction ID"],
+        "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": ["*.Interaction ID"]
+      }
+    }
+  },
+  {
+    "Device": {
+      "id": "22129a26-6179-421b-9822-e375408b0d08",
+      "name": "BBB-111111/000000000003 - Accredited System",
+      "status": "active",
+      "product_id": "P.LU6-Y7D",
+      "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
+      "ods_code": "LSP04",
+      "created_on": "2024-11-20T10:54:19.021975+00:00",
+      "updated_on": "2024-11-20T10:54:19.023792+00:00",
+      "deleted_on": null,
+      "keys": [
+        { "key_type": "accredited_system_id", "key_value": "000000000003" }
+      ],
+      "tags": [
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk02"],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v003"
+          ]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          ["nhs_as_svc_ia", "urn:nhs:names:services:pds:qupa_in040000uk03"],
+          ["nhs_mhs_party_key", "bbb-111111"]
+        ],
+        [
+          ["nhs_as_client", "bbb"],
+          [
+            "nhs_as_svc_ia",
+            "urn:nhs:names:services:ers:read_practitioner_role_r4_v002"
+          ],
+          ["nhs_mhs_manufacturer_org", "lsp04"]
+        ]
+      ],
+      "questionnaire_responses": {
+        "spine_as/1": [
+          {
+            "id": "1aa1c3db-a8e2-4509-b69f-9627baa4dcf7",
+            "questionnaire_name": "spine_as",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Client ODS Codes": ["BBB"],
+              "Date Approved": "20030303030303",
+              "Date Requested": "20030303030303",
+              "ODS Code": "BBB",
+              "MHS Manufacturer Organisation": "LSP04",
+              "Party Key": "BBB-111111",
+              "Product Key": "333",
+              "Product Name": "My BBB Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor",
+              "Temp UID": "333",
+              "ASID": "000000000003"
+            },
+            "created_on": "2024-11-20T10:54:19.014329+00:00"
+          }
+        ]
+      },
+      "device_reference_data": {
+        "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": ["*.Interaction ID"],
+        "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": ["*.Interaction ID"]
+      }
+    }
+  }
+]

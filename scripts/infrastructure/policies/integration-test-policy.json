@@ -60,7 +60,8 @@
       "Action": ["lambda:InvokeFunction"],
       "Resource": [
         "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--notify",
-        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--manual"
+        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--manual",
+        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*--sds--load_bulk"
       ]
     },
     {

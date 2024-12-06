@@ -1,7 +1,4 @@
-from domain.api.sds.query import (
-    SearchSDSDeviceQueryParams,
-    SearchSDSEndpointQueryParams,
-)
+from domain.api.sds.query import SearchSDSDeviceQueryParams
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from sds.epr.constants import SdsFieldName
 from sds.epr.tags.tags import is_list_like, sds_metadata_to_device_tags
@@ -52,12 +49,7 @@ def get_message_set_data(
 
 
 def get_mhs_tags(message_handling_systems: list[dict]) -> list[dict]:
-    tags = []
-    for mhs in message_handling_systems:
-        tags += sds_metadata_to_device_tags(
-            data=mhs, model=SearchSDSEndpointQueryParams
-        )
-    return [dict(tag) for tag in set(tags)]
+    return []
 
 
 def get_additional_interactions_data(
@@ -91,12 +83,8 @@ def get_accredited_system_device_data(
     )
 
 
-def get_accredited_system_tags(
-    accredited_systems: list[dict],
-) -> list[dict]:
-    tags = []
-    for accredited_system in accredited_systems:
-        tags += sds_metadata_to_device_tags(
-            data=accredited_system, model=SearchSDSDeviceQueryParams
-        )
+def get_accredited_system_tags(accredited_system: dict) -> list[dict]:
+    tags = sds_metadata_to_device_tags(
+        data=accredited_system, model=SearchSDSDeviceQueryParams
+    )
     return [dict(tag) for tag in set(tags)]

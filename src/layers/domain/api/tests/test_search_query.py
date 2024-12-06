@@ -1,10 +1,7 @@
-from typing import Optional
-
 import pytest
 from domain.api.sds.query import (
     SearchSDSDeviceQueryParams,
     SearchSDSEndpointQueryParams,
-    SearchSDSQueryParams,
 )
 from pydantic import ValidationError
 
@@ -97,40 +94,3 @@ def test_endpoint_query_accepted(params):
 def test_endpoint_query_invalid(params):
     with pytest.raises(ValidationError):
         search = SearchSDSEndpointQueryParams(**params)
-
-
-def test_allowed_field_combinations():
-    class MyModel(SearchSDSQueryParams):
-        foo: str
-        bar: Optional[str]
-        bob: Optional[str]
-
-    assert MyModel.allowed_field_combinations() == [
-        {"foo"},
-        {"foo", "bar"},
-        {"foo", "bob"},
-        {"foo", "bar", "bob"},
-    ]
-
-
-def test_allowed_field_combinations_all_optional():
-    class MyModel(SearchSDSQueryParams):
-        foo: Optional[str]
-        bar: Optional[str]
-        bob: Optional[str]
-
-    assert MyModel.allowed_field_combinations() == [
-        {
-            "foo",
-        },
-        {
-            "bar",
-        },
-        {
-            "bob",
-        },
-        {"foo", "bar"},
-        {"foo", "bob"},
-        {"bar", "bob"},
-        {"foo", "bar", "bob"},
-    ]

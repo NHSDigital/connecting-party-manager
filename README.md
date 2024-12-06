@@ -21,6 +21,7 @@
 4. [Workflow](#workflow)
 5. [Swagger](#swagger)
 6. [ETL](#etl)
+7. [Administration](#administration)
 
 ---
 
@@ -428,6 +429,18 @@ and
 ```
 make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210
 ```
+
+## Administration
+
+### Generating Ids
+
+In order to generate a persistent list of Ids across environments then run... (The example given will generate 100 ids.)
+
+```
+make admin--generate-ids--product SET_GENERATOR_COUNT=100
+```
+
+Any previously generated ids will not be overwritten.
 
 ### Documentation
 

@@ -1,7 +1,7 @@
 import random
 import time
 from functools import wraps
-from itertools import batched, chain
+from itertools import batched
 from typing import TYPE_CHECKING
 
 from botocore.exceptions import ClientError
@@ -151,28 +151,23 @@ class BulkRepository:
             table_name=None, dynamodb_client=None
         )
 
-    def write(self, items: list[dict]):
-        def generate_transaction_statements(object_type_name, item):
-            handler_name = f"handle_{object_type_name}"
-            handler = getattr(self, handler_name)
-            batch_write_items = handler(item=item)
+    def generate_transaction_statements(
+        self, item_with_name: dict[str, dict]
+    ) -> list[dict]:
+        ((object_type_name, item),) = item_with_name.items()
+        handler_name = f"handle_{object_type_name}"
+        handler = getattr(self, handler_name)
+        statements = handler(item=item)
+        if not isinstance(statements, list):
+            statements = [statements]
+        return statements
 
-            if not isinstance(batch_write_items, list):
-                batch_write_items = [batch_write_items]
-            return batch_write_items
-
-        batch_write_items = chain.from_iterable(
-            (
-                generate_transaction_statements(object_type_name, item)
-                for _item in items
-                for (object_type_name, item) in _item.items()
-            )
-        )
+    def write(self, transaction_statements: list[dict]):
         responses = [
             batch_write_chunk(
                 client=self.client, table_name=self.table_name, chunk=chunk
             )
-            for chunk in batched(batch_write_items, self.batch_size)
+            for chunk in batched(transaction_statements, self.batch_size)
         ]
         return responses
 

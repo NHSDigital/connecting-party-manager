@@ -27,7 +27,7 @@ class NhsAccreditedSystem(SdsBaseModel):
     nhs_product_name: Optional[str] = Field(alias="nhsproductname")
     nhs_product_version: Optional[str] = Field(alias="nhsproductversion")
     nhs_as_acf: Optional[set[str]] = Field(alias="nhsasacf")
-    nhs_as_client: Optional[set[str]] = Field(alias="nhsasclient")
+    nhs_as_client: Optional[set[str]] = Field(alias="nhsasclient", default_factory=set)
     nhs_as_svc_ia: set[str] = Field(alias="nhsassvcia")
     nhs_temp_uid: Optional[str] = Field(alias="nhstempuid")
     description: Optional[str] = Field(alias="description")
