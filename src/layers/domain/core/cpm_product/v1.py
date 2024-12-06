@@ -9,13 +9,12 @@ from domain.core.device_reference_data import (
     DeviceReferenceData,
     DeviceReferenceDataCreatedEvent,
 )
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.error import DuplicateError
 from domain.core.event import Event
 from domain.core.product_key import ProductKey
 from domain.core.timestamp import now
 from domain.core.validation import CPM_PRODUCT_NAME_REGEX
-from domain.request_models.v1 import Environment
 from pydantic import Field
 
 
@@ -72,12 +71,12 @@ class CpmProduct(AggregateRoot):
     updated_on: datetime = Field(default=None)
     deleted_on: datetime = Field(default=None)
     keys: list[ProductKey] = Field(default_factory=list)
-    env: Environment
 
     def create_device(
         self,
         name: str,
         status: Status = Status.ACTIVE,
+        env: Environment = Environment.PROD,
     ) -> Device:
         device = Device(
             name=name,
@@ -85,6 +84,7 @@ class CpmProduct(AggregateRoot):
             product_id=self.id,
             ods_code=self.ods_code,
             status=status,
+            env=env,
         )
         device_created_event = DeviceCreatedEvent(**device.dict())
         self.add_event(device_created_event)
