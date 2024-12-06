@@ -1,7 +1,0 @@
-The following errors were encountered
-  -- Error 1 (ValidationError) --
-  Failed to parse record 0
-  {'change_type': 'modify', 'modifications': [['add', 'nhsepinteractiontype', ['foo']]], 'object_class': 'modify', 'unique_identifier': '00000a84594b2ef34279'}
-  1 validation error for NhsMhs
-  nhsepinteractiontype
-    value is not a valid enumeration member; permitted: 'fhir', 'hl7', 'ebxml', 'N/A', 'mshsignalsonly' (type=type_error.enum; enum_values=[<InteractionType.FHIR: 'fhir'>, <InteractionType.HL7: 'hl7'>, <InteractionType.EBXML: 'ebxml'>, <InteractionType.NA: 'N/A'>, <InteractionType.MSHSIGNALSONLY: 'mshsignalsonly'>])

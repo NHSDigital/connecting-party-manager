@@ -77,3 +77,33 @@ class DeviceReferenceData(AggregateRoot):
                 for q_name, qrs in self.questionnaire_responses.items()
             },
         )
+
+    @event
+    def remove_questionnaire(
+        self, questionnaire_id: str
+    ) -> QuestionnaireResponseUpdatedEvent:
+        del self.questionnaire_responses[questionnaire_id]
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            questionnaire_responses={
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
+            },
+        )
+
+    @event
+    def remove_questionnaire_response(
+        self, questionnaire_id: str, questionnaire_response_id: str
+    ) -> QuestionnaireResponseUpdatedEvent:
+        self.questionnaire_responses[questionnaire_id] = [
+            qr
+            for qr in self.questionnaire_responses[questionnaire_id]
+            if qr.id != questionnaire_response_id
+        ]
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            questionnaire_responses={
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
+            },
+        )
