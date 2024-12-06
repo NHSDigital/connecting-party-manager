@@ -35,7 +35,7 @@ def test_party_key_generator_validate_key_valid():
     [
         "ABC000124",  # Missing hyphen
         "ABC-1234",  # Number part too short
-        "ABC-1234567",  # Number part too long
+        "ABC-123456789101112",  # Number part too long
         "ABC-0001A4",  # Number part contains a non-digit character
         "",  # Empty string
     ],

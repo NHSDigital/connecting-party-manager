@@ -10,13 +10,15 @@ locals {
     lambda = {
       actions = ["lambda:InvokeFunction"]
       resources = [
-        module.worker_extract.arn,
+        module.worker_extract_bulk.arn,
+        module.worker_extract_update.arn,
         module.worker_transform_bulk.arn,
         module.worker_transform_update.arn,
         module.worker_load_bulk.arn,
         module.worker_load_update.arn,
         module.notify.arn,
-        "${module.worker_extract.arn}:*",
+        "${module.worker_extract_bulk.arn}:*",
+        "${module.worker_extract_update.arn}:*",
         "${module.worker_transform_bulk.arn}:*",
         "${module.worker_transform_update.arn}:*",
         "${module.worker_load_bulk.arn}:*",

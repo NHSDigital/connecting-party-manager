@@ -296,6 +296,54 @@ myfield: BBB
 myOtherField: 123
 """
 
+LDIF_TO_FILTER_AND_GROUP_EXAMPLE_BASE_64 = """
+dn: uniqueIdentifier=AAA1
+myField:: QUFB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB1
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB2
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=AAA2
+myfield: AAA
+myOtherField: 123
+
+dn: uniqueIdentifier=AAA3
+myField: AAA
+myOtherField: 234
+
+dn: uniqueIdentifier=BBB3
+myfield:: QkJC
+myOtherField: 123
+"""
+
+FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE_BASE_64 = """
+dn: uniqueIdentifier=AAA1
+myField:: QUFB
+myOtherField: 123
+
+dn: uniqueIdentifier=AAA2
+myfield: AAA
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB1
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB2
+myfield: BBB
+myOtherField: 123
+
+dn: uniqueIdentifier=BBB3
+myfield:: QkJC
+myOtherField: 123
+"""
+
 
 @pytest.mark.parametrize(
     ("raw_distinguished_name", "parsed_distinguished_name"),
@@ -387,6 +435,25 @@ def test_filter_and_group_ldif_from_s3_by_property(mocked_open):
     assert (
         "".join(data.tobytes().decode() for data in filtered_ldif)
         == FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE
+    )
+
+
+@mock.patch(
+    "etl_utils.ldif.ldif._smart_open",
+    return_value=BytesIO(LDIF_TO_FILTER_AND_GROUP_EXAMPLE_BASE_64.encode()),
+)
+def test_filter_and_group_ldif_from_s3_by_property_with_b64encoded_group(mocked_open):
+    with mock_aws():
+        s3_client = boto3.client("s3")
+        filtered_ldif = filter_and_group_ldif_from_s3_by_property(
+            s3_client=s3_client,
+            s3_path="s3://dummy_bucket/dummy_key",
+            group_field="myField",
+            filter_terms=[("myOtherField", "123")],
+        )
+    assert (
+        "".join(data.tobytes().decode() for data in filtered_ldif)
+        == FILTERED_AND_GROUPED_LDIF_TO_FILTER_AND_GROUP_EXAMPLE_BASE_64
     )
 
 

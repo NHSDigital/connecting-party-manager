@@ -4,7 +4,7 @@ module "lambda_function" {
 
   function_name = "${var.workspace_prefix}--${var.etl_name}--${var.etl_stage}"
   description   = "${replace(var.workspace_prefix, "_", "-")} ${var.etl_name} (${var.etl_stage}) lambda function"
-  handler       = "etl.sds.worker.${var.etl_stage}.${var.etl_stage}.handler"
+  handler       = "etl.sds.worker.${var.etl_type}.${var.etl_stage}.${var.etl_stage}.handler"
   runtime       = var.python_version
   timeout       = 600
   memory_size   = 10240
@@ -26,7 +26,7 @@ module "lambda_function" {
 
 
   create_package         = false
-  local_existing_package = "${path.root}/../../../src/etl/sds/worker/${var.etl_stage}/dist/${var.etl_stage}.zip"
+  local_existing_package = "${path.root}/../../../src/etl/sds/worker/${var.etl_type}/${var.etl_stage}/dist/${var.etl_stage}.zip"
 
   tags = {
     Name = "${var.workspace_prefix}--${var.etl_name}--${var.etl_stage}"
