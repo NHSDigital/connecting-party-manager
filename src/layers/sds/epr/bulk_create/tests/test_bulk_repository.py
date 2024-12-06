@@ -148,7 +148,10 @@ def test_BulkRepository_handle_ProductTeam(dynamodb_client):
     )
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
-    bulk_repo.write([{"ProductTeam": product_team.state()}])
+    transactions = bulk_repo.generate_transaction_statements(
+        {"ProductTeam": product_team.state()}
+    )
+    bulk_repo.write(transactions)
 
     product_team_by_id = product_team_repo.read(product_team.id)
     product_team_by_key = product_team_repo.read("EPR-AAA")
@@ -166,7 +169,10 @@ def test_BulkRepository_handle_CpmProduct(dynamodb_client):
     product.clear_events()
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
-    bulk_repo.write([{"CpmProduct": product.state()}])
+    transactions = bulk_repo.generate_transaction_statements(
+        {"CpmProduct": product.state()}
+    )
+    bulk_repo.write(transactions)
 
     product_by_id = product_repo.read(product_team.id, product.id)
     product_by_key = product_repo.read(product_team.id, "AAA-123456")
@@ -186,7 +192,8 @@ def test_BulkRepository_handle_Device(dynamodb_client):
     device.clear_events()
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
-    bulk_repo.write([{"Device": device.state()}])
+    transactions = bulk_repo.generate_transaction_statements({"Device": device.state()})
+    bulk_repo.write(transactions)
 
     device_by_id = device_repo.read(product_team.id, product.id, device.id)
     device_by_key = device_repo.read(product_team.id, product.id, "123456")
@@ -207,7 +214,10 @@ def test_BulkRepository_handle_DeviceReferenceData(dynamodb_client):
     device_ref_data = product.create_device_reference_data(name="my-product")
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
-    bulk_repo.write([{"DeviceReferenceData": device_ref_data.state()}])
+    transactions = bulk_repo.generate_transaction_statements(
+        {"DeviceReferenceData": device_ref_data.state()}
+    )
+    bulk_repo.write(transactions)
 
     device_ref_data_by_id = device_ref_data_repo.read(
         product_team.id, product.id, device_ref_data.id

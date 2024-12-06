@@ -1,0 +1,475 @@
+[
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "sk": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "pk_read": { "S": "PT#" },
+        "sk_read": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "root": { "BOOL": true },
+        "id": { "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "name": { "S": "LSP04 (EPR)" },
+        "ods_code": { "S": "LSP04" },
+        "status": { "S": "active" },
+        "created_on": { "S": "2024-11-20T10:54:19.001479+00:00" },
+        "updated_on": { "NULL": true },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "epr_id" },
+                "key_value": { "S": "EPR-LSP04" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "PT#EPR-LSP04" },
+        "sk": { "S": "PT#EPR-LSP04" },
+        "pk_read": { "S": "PT#" },
+        "sk_read": { "S": "PT#EPR-LSP04" },
+        "root": { "BOOL": false },
+        "id": { "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "name": { "S": "LSP04 (EPR)" },
+        "ods_code": { "S": "LSP04" },
+        "status": { "S": "active" },
+        "created_on": { "S": "2024-11-20T10:54:19.001479+00:00" },
+        "updated_on": { "NULL": true },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "epr_id" },
+                "key_value": { "S": "EPR-LSP04" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "P#P.VNT-MLW" },
+        "sk": { "S": "P#P.VNT-MLW" },
+        "pk_read": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "sk_read": { "S": "P#P.VNT-MLW" },
+        "root": { "BOOL": true },
+        "id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "name": { "S": "My AAA Product" },
+        "ods_code": { "S": "LSP04" },
+        "status": { "S": "active" },
+        "created_on": { "S": "2024-11-20T10:54:19.001733+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.002057+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "party_key" },
+                "key_value": { "S": "AAA-111111" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "P#AAA-111111" },
+        "sk": { "S": "P#AAA-111111" },
+        "pk_read": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
+        "sk_read": { "S": "P#AAA-111111" },
+        "root": { "BOOL": false },
+        "id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "name": { "S": "My AAA Product" },
+        "ods_code": { "S": "LSP04" },
+        "status": { "S": "active" },
+        "created_on": { "S": "2024-11-20T10:54:19.001733+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.002057+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "party_key" },
+                "key_value": { "S": "AAA-111111" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6" },
+        "sk": { "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6" },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+        },
+        "sk_read": { "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6" },
+        "root": { "BOOL": true },
+        "id": { "S": "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6" },
+        "name": { "S": "AAA-111111 - MHS Message Sets" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "questionnaire_responses": {
+          "M": {
+            "spine_mhs_message_sets/1": {
+              "L": [
+                {
+                  "M": {
+                    "id": { "S": "5e4cab5e-bcbd-47f6-afa2-7a2b86853ca5" },
+                    "questionnaire_name": { "S": "spine_mhs_message_sets" },
+                    "questionnaire_version": { "S": "1" },
+                    "data": {
+                      "M": {
+                        "MHS IN": { "S": "READ_PRACTITIONER_ROLE_R4_V001" },
+                        "MHS SN": { "S": "urn:nhs:names:services:ers" },
+                        "Interaction ID": {
+                          "S": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+                        }
+                      }
+                    },
+                    "created_on": { "S": "2024-11-20T10:54:19.000224+00:00" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "created_on": { "S": "2024-11-20T10:54:19.002130+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.002249+00:00" },
+        "deleted_on": { "NULL": true }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536" },
+        "sk": { "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536" },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+        },
+        "sk_read": { "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536" },
+        "root": { "BOOL": true },
+        "id": { "S": "d3d0e6b8-8277-4849-8e8d-5cb035af5536" },
+        "name": { "S": "AAA-111111 - AS Additional Interactions" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "questionnaire_responses": {
+          "M": {
+            "spine_as_additional_interactions/1": {
+              "L": [
+                {
+                  "M": {
+                    "id": { "S": "170711a5-2e77-453b-a04f-4723cf8e9f87" },
+                    "questionnaire_name": {
+                      "S": "spine_as_additional_interactions"
+                    },
+                    "questionnaire_version": { "S": "1" },
+                    "data": {
+                      "M": {
+                        "Interaction ID": {
+                          "S": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+                        }
+                      }
+                    },
+                    "created_on": { "S": "2024-11-20T10:54:19.000557+00:00" }
+                  }
+                },
+                {
+                  "M": {
+                    "id": { "S": "cb431ce5-5de2-42cd-9430-2e0b0ad91639" },
+                    "questionnaire_name": {
+                      "S": "spine_as_additional_interactions"
+                    },
+                    "questionnaire_version": { "S": "1" },
+                    "data": {
+                      "M": {
+                        "Interaction ID": {
+                          "S": "urn:nhs:names:services:pds:QUPA_IN040000UK01"
+                        }
+                      }
+                    },
+                    "created_on": { "S": "2024-11-20T10:54:19.000872+00:00" }
+                  }
+                },
+                {
+                  "M": {
+                    "id": { "S": "36fa5061-f9b7-4980-8cf7-abafdb25f670" },
+                    "questionnaire_name": {
+                      "S": "spine_as_additional_interactions"
+                    },
+                    "questionnaire_version": { "S": "1" },
+                    "data": {
+                      "M": {
+                        "Interaction ID": {
+                          "S": "urn:nhs:names:services:pds:QUPA_IN040000UK04"
+                        }
+                      }
+                    },
+                    "created_on": { "S": "2024-11-20T10:54:19.001186+00:00" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "created_on": { "S": "2024-11-20T10:54:19.003795+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.004000+00:00" },
+        "deleted_on": { "NULL": true }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "sk": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+        },
+        "sk_read": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "root": { "BOOL": true },
+        "id": { "S": "192133bc-7077-4163-9387-9856969dd412" },
+        "name": { "S": "AAA-111111 - Message Handling System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.002315+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.003736+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "cpa_id" },
+                "key_value": { "S": "00000000000a" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/2WTS46rVhCGIyWLiWQpYJqHPbgDOLzhYDAcXlIGgDHGvB/2AY+ygB5k0NlDhllEVpAVxem+ytVV17j0/V+pqn776Y9/fvzhvX59+/nVU+lJ46GfukoGCGoummTUeV5ZEGW0ie1oTIPQsslAhuQSobo+q/HAxE4+Tp50lLci1Eu3GQqV19hRrmmSf9bb6++fsMfR+Ib1MBN8xYZynLVLQ/dOvu6N0ga3opP9PGqYYfL9JanlOL4aTuX3KJUD1PSFG24BauTVDWIjbplTIssb1DIwCSnHDam4iMSitnzJ5uFlbItL8aFkflJyR/Gb0hEz1FOJypsFnNuePR7YQD540ppV/dAJGIjGxPI6/g/25cvba/0Jl4/SO+7h8oOWcSYLafsKa/taEXroG+KLVUY3A/k6oDWp2Ml0YUrdbBi3wwOtt3av8kIcIgsHgpEMXc5b+ESC2fqw/+tTnD9a/8dJGX6Pu+QaWAzTLcfrtIVjTxyx7kYNexkAjo+oAtqmMcxyunn0Azq9HSf1MawDR1LGO/SyrWKM9OyW07RUGjhsB6scDBEtesoWhqgwugkr+Njdny0bQ9y1VsppuslBzAtdZDyV1XsLSUX5UP77O+VHALHTAegskuCRPbBZWaaQbBLxWdccKrKEueacYH+L1L2S7kIO3sRLFYVdzIwed1+SdeRuL4k+02vGgzPf1Kk2mO6iZh63I0X30l684UDNIWn3DNGQ9/i8zkjsuNRErPZggUnVMtkMOZ4rxWkvvKQ4/obOtK7SDrWgKXkXBrl4sjFIJIzpmH7f9Nvrn9+NsYbaxxhYQpJ8L2bi4vopju572WkKVTTLXlfu9rkCNnXebMsdhOJhzwVq+PJY7UNHUJ23Zn2tzMJeJB/CIyJSj7XzbKpU+2UDESlWhAafDzJWUy7kno679LSEjXscrmDdFGZ8PXVk6Bxogud32y2Jc+frTea//AvgmA8J3QMAAA=="
+        },
+        "questionnaire_responses": {
+          "M": {
+            "spine_mhs/1": {
+              "L": [
+                {
+                  "M": {
+                    "id": { "S": "277d020e-0389-4113-b44f-f659d2b0ee59" },
+                    "questionnaire_name": { "S": "spine_mhs" },
+                    "questionnaire_version": { "S": "1" },
+                    "data": {
+                      "M": {
+                        "Approver URP": { "S": "myApprover" },
+                        "Contract Property Template Key": { "S": "14" },
+                        "Date Approved": { "S": "20010101010101" },
+                        "Date DNS Approved": { "S": "20010101010101" },
+                        "Date Requested": { "S": "20010101010101" },
+                        "DNS Approver": { "S": "myApprover" },
+                        "Interaction Type": { "S": "fhir" },
+                        "Managing Organization": { "S": "AAA" },
+                        "Reliability Configuration Ack Requested": {
+                          "S": "never"
+                        },
+                        "MHS CPA ID": { "S": "00000000000a" },
+                        "Reliability Configuration Duplication Elimination": {
+                          "S": "never"
+                        },
+                        "Address": { "S": "https://test.C3O9X.nhs.uk/" },
+                        "MHS FQDN": { "S": "test.C3O9X.nhs.uk" },
+                        "MHS IP Address": { "S": "0.0.0.0" },
+                        "MHS Is Authenticated": { "S": "none" },
+                        "MHS Manufacturer Organisation": { "S": "LSP04" },
+                        "MHS Party key": { "S": "AAA-111111" },
+                        "Product Key": { "S": "111" },
+                        "Product Name": { "S": "My AAA Product" },
+                        "Product Version": { "S": "2005.02" },
+                        "Requestor URP": { "S": "myRequestor" },
+                        "Unique Identifier": { "S": "00000000000a" }
+                      }
+                    },
+                    "created_on": { "S": "2024-11-20T10:54:18.995983+00:00" }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "device_reference_data": {
+          "M": {
+            "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": { "L": [{ "S": "*" }] }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "D#00000000000a" },
+        "sk": { "S": "D#00000000000a" },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+        },
+        "sk_read": { "S": "D#00000000000a" },
+        "root": { "BOOL": false },
+        "id": { "S": "192133bc-7077-4163-9387-9856969dd412" },
+        "name": { "S": "AAA-111111 - Message Handling System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.002315+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.003736+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "cpa_id" },
+                "key_value": { "S": "00000000000a" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/2WTS46rVhCGIyWLiWQpYJqHPbgDOLzhYDAcXlIGgDHGvB/2AY+ygB5k0NlDhllEVpAVxem+ytVV17j0/V+pqn776Y9/fvzhvX59+/nVU+lJ46GfukoGCGoummTUeV5ZEGW0ie1oTIPQsslAhuQSobo+q/HAxE4+Tp50lLci1Eu3GQqV19hRrmmSf9bb6++fsMfR+Ib1MBN8xYZynLVLQ/dOvu6N0ga3opP9PGqYYfL9JanlOL4aTuX3KJUD1PSFG24BauTVDWIjbplTIssb1DIwCSnHDam4iMSitnzJ5uFlbItL8aFkflJyR/Gb0hEz1FOJypsFnNuePR7YQD540ppV/dAJGIjGxPI6/g/25cvba/0Jl4/SO+7h8oOWcSYLafsKa/taEXroG+KLVUY3A/k6oDWp2Ml0YUrdbBi3wwOtt3av8kIcIgsHgpEMXc5b+ESC2fqw/+tTnD9a/8dJGX6Pu+QaWAzTLcfrtIVjTxyx7kYNexkAjo+oAtqmMcxyunn0Azq9HSf1MawDR1LGO/SyrWKM9OyW07RUGjhsB6scDBEtesoWhqgwugkr+Njdny0bQ9y1VsppuslBzAtdZDyV1XsLSUX5UP77O+VHALHTAegskuCRPbBZWaaQbBLxWdccKrKEueacYH+L1L2S7kIO3sRLFYVdzIwed1+SdeRuL4k+02vGgzPf1Kk2mO6iZh63I0X30l684UDNIWn3DNGQ9/i8zkjsuNRErPZggUnVMtkMOZ4rxWkvvKQ4/obOtK7SDrWgKXkXBrl4sjFIJIzpmH7f9Nvrn9+NsYbaxxhYQpJ8L2bi4vopju572WkKVTTLXlfu9rkCNnXebMsdhOJhzwVq+PJY7UNHUJ23Zn2tzMJeJB/CIyJSj7XzbKpU+2UDESlWhAafDzJWUy7kno679LSEjXscrmDdFGZ8PXVk6Bxogud32y2Jc+frTea//AvgmA8J3QMAAA=="
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/31SXY/SQBTVBYOyiB9xX0w082CiiaFMC7iUtwY0EoWtwBpfDBnoFCbAtLZTE0w28QfM4/jir/XOQNldv6YvnXvv3HvOued78cfPwg1zLpQ8TmPG6XSzTOu2+qwu1At5xAIlnzmnpwF2MK3hRtutNW27UZs1m2EtfNVyA2eGKW25Sj78ktFUsIhzwhI65WRDlbxz6KnkyfWCrzRJ4aLkTVvJYkAEMSMrXhwnESTR+chXsrzZ5gEln3YjLhIyF8hPopgmYosmdBOviaDoHd0qeWQ3lbzb0/f9K8BfdTC2Lz8lH5iC3nD8v6KqKRpRA/qvFZUrHZLfkN7vc0E1UmCIJtsYpCiGSwaZkwHhZMH4Ap0lC8LZNyKMCgXP85R8PqJrRmZszYAbsA3ZIktMBfLmq6twbnG6Gzt4O0Zd30P9HkDCl4coaf+7Wy+L12y++3+9ZhvG9zjyviUvCBKawt4eL4WI0069LmC01W2cuZ8svkytbFVX8rYe/+ZDbwiy/pEH0XS676NDsxK2zKfkI5NKkZeJJeVCg9G8ijzioNYTnQWpshBEzBKww06uNIf5fuxjvWxd5xNthZV2QBlkrNnmgKPBJkEGdjHmKJhYJY8NjUGrgy2CJ2gfVfJenv+Y+7MEi29Z2IFhe/2jvTmPN9tDBPifcwYX1A80nZBpFa8vJJPleUI1z6lujBzsNAFszcETG3dazY7dtly35bYbLzHuYKwyklq/ALwUba+lAwAA"
+        },
+        "device_reference_data": {
+          "M": {
+            "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": { "L": [{ "S": "*" }] }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": { "S": "DT#nhs_mhs_party_key=aaa-111111" },
+        "sk": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "pk_read": { "S": "DT#nhs_mhs_party_key=aaa-111111" },
+        "sk_read": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "root": { "BOOL": false },
+        "id": { "S": "192133bc-7077-4163-9387-9856969dd412" },
+        "name": { "S": "AAA-111111 - Message Handling System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.002315+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.003736+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "cpa_id" },
+                "key_value": { "S": "00000000000a" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/2WTS46rVhCGIyWLiWQpYJqHPbgDOLzhYDAcXlIGgDHGvB/2AY+ygB5k0NlDhllEVpAVxem+ytVV17j0/V+pqn776Y9/fvzhvX59+/nVU+lJ46GfukoGCGoummTUeV5ZEGW0ie1oTIPQsslAhuQSobo+q/HAxE4+Tp50lLci1Eu3GQqV19hRrmmSf9bb6++fsMfR+Ib1MBN8xYZynLVLQ/dOvu6N0ga3opP9PGqYYfL9JanlOL4aTuX3KJUD1PSFG24BauTVDWIjbplTIssb1DIwCSnHDam4iMSitnzJ5uFlbItL8aFkflJyR/Gb0hEz1FOJypsFnNuePR7YQD540ppV/dAJGIjGxPI6/g/25cvba/0Jl4/SO+7h8oOWcSYLafsKa/taEXroG+KLVUY3A/k6oDWp2Ml0YUrdbBi3wwOtt3av8kIcIgsHgpEMXc5b+ESC2fqw/+tTnD9a/8dJGX6Pu+QaWAzTLcfrtIVjTxyx7kYNexkAjo+oAtqmMcxyunn0Azq9HSf1MawDR1LGO/SyrWKM9OyW07RUGjhsB6scDBEtesoWhqgwugkr+Njdny0bQ9y1VsppuslBzAtdZDyV1XsLSUX5UP77O+VHALHTAegskuCRPbBZWaaQbBLxWdccKrKEueacYH+L1L2S7kIO3sRLFYVdzIwed1+SdeRuL4k+02vGgzPf1Kk2mO6iZh63I0X30l684UDNIWn3DNGQ9/i8zkjsuNRErPZggUnVMtkMOZ4rxWkvvKQ4/obOtK7SDrWgKXkXBrl4sjFIJIzpmH7f9Nvrn9+NsYbaxxhYQpJ8L2bi4vopju572WkKVTTLXlfu9rkCNnXebMsdhOJhzwVq+PJY7UNHUJ23Zn2tzMJeJB/CIyJSj7XzbKpU+2UDESlWhAafDzJWUy7kno679LSEjXscrmDdFGZ8PXVk6Bxogud32y2Jc+frTea//AvgmA8J3QMAAA=="
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/31SXY/SQBTVBYOyiB9xX0w082CiiaFMC7iUtwY0EoWtwBpfDBnoFCbAtLZTE0w28QfM4/jir/XOQNldv6YvnXvv3HvOued78cfPwg1zLpQ8TmPG6XSzTOu2+qwu1At5xAIlnzmnpwF2MK3hRtutNW27UZs1m2EtfNVyA2eGKW25Sj78ktFUsIhzwhI65WRDlbxz6KnkyfWCrzRJ4aLkTVvJYkAEMSMrXhwnESTR+chXsrzZ5gEln3YjLhIyF8hPopgmYosmdBOviaDoHd0qeWQ3lbzb0/f9K8BfdTC2Lz8lH5iC3nD8v6KqKRpRA/qvFZUrHZLfkN7vc0E1UmCIJtsYpCiGSwaZkwHhZMH4Ap0lC8LZNyKMCgXP85R8PqJrRmZszYAbsA3ZIktMBfLmq6twbnG6Gzt4O0Zd30P9HkDCl4coaf+7Wy+L12y++3+9ZhvG9zjyviUvCBKawt4eL4WI0069LmC01W2cuZ8svkytbFVX8rYe/+ZDbwiy/pEH0XS676NDsxK2zKfkI5NKkZeJJeVCg9G8ijzioNYTnQWpshBEzBKww06uNIf5fuxjvWxd5xNthZV2QBlkrNnmgKPBJkEGdjHmKJhYJY8NjUGrgy2CJ2gfVfJenv+Y+7MEi29Z2IFhe/2jvTmPN9tDBPifcwYX1A80nZBpFa8vJJPleUI1z6lujBzsNAFszcETG3dazY7dtly35bYbLzHuYKwyklq/ALwUba+lAwAA"
+        },
+        "device_reference_data": {
+          "M": {
+            "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": { "L": [{ "S": "*" }] }
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "pk": {
+          "S": "DT#nhs_mhs_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001"
+        },
+        "sk": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "pk_read": {
+          "S": "DT#nhs_mhs_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001"
+        },
+        "sk_read": { "S": "D#192133bc-7077-4163-9387-9856969dd412" },
+        "root": { "BOOL": false },
+        "id": { "S": "192133bc-7077-4163-9387-9856969dd412" },
+        "name": { "S": "AAA-111111 - Message Handling System" },
+        "status": { "S": "active" },
+        "product_id": { "S": "P.VNT-MLW" },
+        "product_team_id": {
+          "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "ods_code": { "S": "LSP04" },
+        "created_on": { "S": "2024-11-20T10:54:19.002315+00:00" },
+        "updated_on": { "S": "2024-11-20T10:54:19.003736+00:00" },
+        "deleted_on": { "NULL": true },
+        "keys": {
+          "L": [
+            {
+              "M": {
+                "key_type": { "S": "cpa_id" },
+                "key_value": { "S": "00000000000a" }
+              }
+            }
+          ]
+        },
+        "tags": {
+          "S": "H4sIAMVbSGcC/2WTS46rVhCGIyWLiWQpYJqHPbgDOLzhYDAcXlIGgDHGvB/2AY+ygB5k0NlDhllEVpAVxem+ytVV17j0/V+pqn776Y9/fvzhvX59+/nVU+lJ46GfukoGCGoummTUeV5ZEGW0ie1oTIPQsslAhuQSobo+q/HAxE4+Tp50lLci1Eu3GQqV19hRrmmSf9bb6++fsMfR+Ib1MBN8xYZynLVLQ/dOvu6N0ga3opP9PGqYYfL9JanlOL4aTuX3KJUD1PSFG24BauTVDWIjbplTIssb1DIwCSnHDam4iMSitnzJ5uFlbItL8aFkflJyR/Gb0hEz1FOJypsFnNuePR7YQD540ppV/dAJGIjGxPI6/g/25cvba/0Jl4/SO+7h8oOWcSYLafsKa/taEXroG+KLVUY3A/k6oDWp2Ml0YUrdbBi3wwOtt3av8kIcIgsHgpEMXc5b+ESC2fqw/+tTnD9a/8dJGX6Pu+QaWAzTLcfrtIVjTxyx7kYNexkAjo+oAtqmMcxyunn0Azq9HSf1MawDR1LGO/SyrWKM9OyW07RUGjhsB6scDBEtesoWhqgwugkr+Njdny0bQ9y1VsppuslBzAtdZDyV1XsLSUX5UP77O+VHALHTAegskuCRPbBZWaaQbBLxWdccKrKEueacYH+L1L2S7kIO3sRLFYVdzIwed1+SdeRuL4k+02vGgzPf1Kk2mO6iZh63I0X30l684UDNIWn3DNGQ9/i8zkjsuNRErPZggUnVMtkMOZ4rxWkvvKQ4/obOtK7SDrWgKXkXBrl4sjFIJIzpmH7f9Nvrn9+NsYbaxxhYQpJ8L2bi4vopju572WkKVTTLXlfu9rkCNnXebMsdhOJhzwVq+PJY7UNHUJ23Zn2tzMJeJB/CIyJSj7XzbKpU+2UDESlWhAafDzJWUy7kno679LSEjXscrmDdFGZ8PXVk6Bxogud32y2Jc+frTea//AvgmA8J3QMAAA=="
+        },
+        "questionnaire_responses": {
+          "S": "H4sIAMVbSGcC/31SXY/SQBTVBYOyiB9xX0w082CiiaFMC7iUtwY0EoWtwBpfDBnoFCbAtLZTE0w28QfM4/jir/XOQNldv6YvnXvv3HvOued78cfPwg1zLpQ8TmPG6XSzTOu2+qwu1At5xAIlnzmnpwF2MK3hRtutNW27UZs1m2EtfNVyA2eGKW25Sj78ktFUsIhzwhI65WRDlbxz6KnkyfWCrzRJ4aLkTVvJYkAEMSMrXhwnESTR+chXsrzZ5gEln3YjLhIyF8hPopgmYosmdBOviaDoHd0qeWQ3lbzb0/f9K8BfdTC2Lz8lH5iC3nD8v6KqKRpRA/qvFZUrHZLfkN7vc0E1UmCIJtsYpCiGSwaZkwHhZMH4Ap0lC8LZNyKMCgXP85R8PqJrRmZszYAbsA3ZIktMBfLmq6twbnG6Gzt4O0Zd30P9HkDCl4coaf+7Wy+L12y++3+9ZhvG9zjyviUvCBKawt4eL4WI0069LmC01W2cuZ8svkytbFVX8rYe/+ZDbwiy/pEH0XS676NDsxK2zKfkI5NKkZeJJeVCg9G8ijzioNYTnQWpshBEzBKww06uNIf5fuxjvWxd5xNthZV2QBlkrNnmgKPBJkEGdjHmKJhYJY8NjUGrgy2CJ2gfVfJenv+Y+7MEi29Z2IFhe/2jvTmPN9tDBPifcwYX1A80nZBpFa8vJJPleUI1z6lujBzsNAFszcETG3dazY7dtly35bYbLzHuYKwyklq/ALwUba+lAwAA"
+        },
+        "device_reference_data": {
+          "M": {
+            "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": { "L": [{ "S": "*" }] }
+          }
+        }
+      }
+    }
+  }
+]

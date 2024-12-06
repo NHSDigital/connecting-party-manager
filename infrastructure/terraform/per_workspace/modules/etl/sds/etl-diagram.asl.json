@@ -75,7 +75,7 @@
               "OutputPath": "$.Payload",
               "Parameters": {
                 "Payload": {},
-                "FunctionName": "${extract_worker_arn}:$LATEST"
+                "FunctionName": "${extract_worker_bulk_arn}:$LATEST"
               },
               "Retry": [
                 {
@@ -151,7 +151,7 @@
               "OutputPath": "$.Payload",
               "Parameters": {
                 "Payload": {},
-                "FunctionName": "${extract_worker_arn}:$LATEST"
+                "FunctionName": "${extract_worker_update_arn}:$LATEST"
               },
               "Retry": [
                 {

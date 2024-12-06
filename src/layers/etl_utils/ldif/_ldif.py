@@ -203,7 +203,7 @@ class LDIFParser:
             # All values should be valid ascii; we support UTF-8 as a
             # non-official, backwards compatibility layer.
             attr_value = unfolded_line[colon_pos + 1 :].encode("utf-8")
-        return attr_type.lower(), attr_value
+        return attr_type.lower(), attr_value.strip()
 
     def _consume_empty_lines(self):
         """

@@ -1,4 +1,5 @@
 import re
+from base64 import b64decode
 from collections import defaultdict
 from io import BytesIO
 from types import FunctionType
@@ -109,11 +110,16 @@ class GroupedStreamBlock:
             for key, value in filter_terms
         ]
         self.group_filter = re.compile(rf"(?i)^({group_field}): (.*)\n$".encode()).match
+        self.group_filter_base_64 = re.compile(
+            rf"(?i)^({group_field}):: (.*)\n$".encode()
+        ).match
         self.reset()
 
     def flush(self) -> str:
         if self.group is None:
-            raise Exception
+            raise ValueError(
+                f"No group name assigned to the following group:\n{self.buffer}"
+            )
         self.data[self.group].write(self.buffer)
         self.reset()
 
@@ -126,6 +132,11 @@ class GroupedStreamBlock:
         group_match = self.group_filter(line)
         if group_match:
             (_, self.group) = group_match.groups()
+        else:
+            b64_group_match = self.group_filter_base_64(line)
+            if b64_group_match:
+                (_, b64_group) = b64_group_match.groups()
+                self.group = b64decode(b64_group).strip()
 
         if not self.keep and any(filter(line) for filter in self.filters):
             self.keep = True

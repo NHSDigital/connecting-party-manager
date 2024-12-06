@@ -9,6 +9,11 @@ from domain.core.device import DeviceType
 from domain.core.device_key import DeviceKeyType
 from domain.core.enum import Status
 from etl.clear_state_inputs import EMPTY_JSON_DATA, EMPTY_LDIF_DATA
+from etl.sds.worker.extract.tests.test_extract_worker import (
+    ANOTHER_GOOD_SDS_RECORD,
+    GOOD_SDS_RECORD,
+)
+from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import MockDeviceRepository
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.io.test.io_utils import pkl_loads_lz4
@@ -18,11 +23,6 @@ from event.json import json_loads
 from mypy_boto3_stepfunctions.type_defs import StartSyncExecutionOutputTypeDef
 
 from etl.sds.tests.constants import BULK_TEST_CHANGELOG_NUMBER, EtlTestDataPath
-from etl.sds.worker.extract.tests.test_extract_worker import (
-    ANOTHER_GOOD_SDS_RECORD,
-    GOOD_SDS_RECORD,
-)
-from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import MockDeviceRepository
 from test_helpers.dynamodb import clear_dynamodb_table
 from test_helpers.pytest_skips import long_running
 from test_helpers.terraform import read_terraform_output

@@ -32,7 +32,7 @@ clean--build:
 build: $(BUILD_TIMESTAMP) ## Complete project install and build artifacts for deployment
 
 $(BUILD_TIMESTAMP): $(BUILD_DEPENDENCIES)
-	@find $(CURDIR) -name make.py | xargs -I % bash -c 'poetry run python %'
+	@find $(CURDIR) -name make.py | xargs -n 1 -P 8 -I % bash -c 'poetry run python %'
 	touch $(BUILD_TIMESTAMP)
 
 generate--sbom: build
