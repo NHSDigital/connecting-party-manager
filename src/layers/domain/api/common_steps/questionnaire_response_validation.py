@@ -25,12 +25,8 @@ def process_and_validate_questionnaire_response(
     party_key: str,
     instance: QuestionnaireInstance,
 ) -> QuestionnaireResponse:
-    # Check for user-provided fields
     check_expected_questionnaire_response_fields(questionnaire, questionnaire_response)
-
-    # System generated fields
     questionnaire.generate_system_fields(
         questionnaire_response, instance=instance, party_key=party_key
     )
-
     return questionnaire.validate(data=questionnaire_response)

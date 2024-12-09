@@ -104,7 +104,7 @@ def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireRespo
 
     validated_responses = [
         process_and_validate_questionnaire_response(
-            questionnaire, qr, party_key, instance="SPINE_MHS"
+            questionnaire, qr, party_key, instance=QuestionnaireInstance.SPINE_MHS
         )
         for qr in raw_questionnaire_responses
     ]
