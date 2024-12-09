@@ -10,6 +10,7 @@ import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import Device
+from domain.core.device_key.v1 import DeviceKey, DeviceKeyType
 from domain.core.product_key import ProductKeyType
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
@@ -425,7 +426,7 @@ def test_index() -> None:
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
         assert device.product_id == product.id
-        assert device.name == "ABC1234-987654/ - Accredited System"
+        assert device.name == "ABC1234-987654/200000100000 - Accredited System"
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()
@@ -450,6 +451,13 @@ def test_index() -> None:
         # Check party_key is added to tags in the created device
         expected_party_key = (str(ProductKeyType.PARTY_KEY), "abc1234-987654")
         assert any(expected_party_key in tag.__root__ for tag in created_device.tags)
+
+        # Check an ASID is generated and added to the keys.
+        assert isinstance(created_device.keys[0], DeviceKey)
+        assert created_device.keys[0].__dict__ == {
+            "key_type": DeviceKeyType.ACCREDITED_SYSTEM_ID,
+            "key_value": "200000100000",
+        }
 
 
 @pytest.mark.parametrize(
