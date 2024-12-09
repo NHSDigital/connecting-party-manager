@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
@@ -88,6 +89,7 @@ def validate_spine_as_questionnaire_response(data, cache) -> QuestionnaireRespon
 def create_as_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
+    payload.__dict__["env"] = data[read_environment]
     party_key: str = data[get_party_key]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
@@ -163,6 +165,7 @@ def get_party_key(data, cache) -> str:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_as_device_payload,
     read_product_team,
     read_product,

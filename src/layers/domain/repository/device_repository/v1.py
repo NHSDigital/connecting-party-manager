@@ -241,7 +241,7 @@ class DeviceRepository(Repository[Device]):
         )
         create_key_transaction = self.create_index(
             id=event.new_key.key_value,
-            parent_key_parts=(event.product_team_id, event.product_id),
+            parent_key_parts=(event.product_team_id, event.product_id, event.env),
             data=_non_root_data,
             root=False,
         )

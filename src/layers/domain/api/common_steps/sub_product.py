@@ -1,6 +1,8 @@
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product import CpmProduct
 from domain.core.enum import Environment
+from domain.core.error import NotEprProductError
+from domain.core.product_key import ProductKeyType
 from domain.core.product_team import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.product_team_repository import ProductTeamRepository
@@ -39,3 +41,19 @@ def read_product(data, cache) -> CpmProduct:
 def read_environment(data, cache) -> Environment:
     path_params: SubCpmProductPathParams = data[parse_path_params]
     return path_params.env
+
+
+def get_party_key(data, cache) -> str:
+    product: CpmProduct = data[read_product]
+    party_keys = (
+        key.key_value
+        for key in product.keys
+        if key.key_type is ProductKeyType.PARTY_KEY
+    )
+    try:
+        (party_key,) = party_keys
+    except ValueError:
+        raise NotEprProductError(
+            "Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key"
+        )
+    return party_key

@@ -1,9 +1,10 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     get_party_key,
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
@@ -103,6 +104,7 @@ def create_mhs_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
     payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
+    payload.__dict__["env"] = data[read_environment]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
     device_payload = payload.dict(exclude={"questionnaire_responses"})
@@ -172,6 +174,7 @@ def set_http_status(data, cache) -> tuple[HTTPStatus, dict]:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_mhs_device_payload,
     read_product_team,
     read_product,
