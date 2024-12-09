@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 from domain.core.device import Device
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.product_key import ProductKeyType
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
@@ -68,7 +68,7 @@ def test_index(version):
         product_repo.write(cpm_product)
 
         # Set up Device in DB
-        device = cpm_product.create_device(name=DEVICE_NAME)
+        device = cpm_product.create_device(name=DEVICE_NAME, env=Environment.DEV)
         device_repo = DeviceRepository(table_name=TABLE_NAME, dynamodb_client=client)
         device_repo.write(device)
 
@@ -80,6 +80,7 @@ def test_index(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
+                    "env": "dev",
                     "device_id": str(device.id),
                 },
             }
@@ -91,6 +92,7 @@ def test_index(version):
     assert response_body["id"] == str(device.id)
     assert response_body["product_id"] == str(cpm_product.id)
     assert response_body["product_team_id"] == str(product_team.id)
+    assert device.env == Environment.DEV
     assert response_body["name"] == device.name
     assert response_body["ods_code"] == device.ods_code
     assert response_body["updated_on"] is None
@@ -179,7 +181,9 @@ def test_index_mhs_device(version):
         device_reference_data_repo.write(device_reference_data)
 
         # Set up Device in DB
-        device: Device = cpm_product.create_device(name="Product-MHS")
+        device: Device = cpm_product.create_device(
+            name="Product-MHS", env=Environment.DEV
+        )
         device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo")
         device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo2")
         device.add_tag(party_key="f5h1r-850000")
@@ -226,6 +230,7 @@ def test_index_mhs_device(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
+                    "env": "dev",
                     "device_id": str(device.id),
                 },
             }
@@ -237,6 +242,7 @@ def test_index_mhs_device(version):
     assert response_body["id"] == str(device.id)
     assert response_body["product_id"] == str(cpm_product.id)
     assert response_body["product_team_id"] == str(product_team.id)
+    assert response_body["env"] == Environment.DEV
     assert response_body["name"] == device.name
     assert response_body["ods_code"] == device.ods_code
     assert response_body["status"] == Status.ACTIVE
@@ -306,6 +312,7 @@ def test_index_no_such_device(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id),
+                    "env": "dev",
                     "device_id": "does not exist",
                 },
             }
@@ -369,6 +376,7 @@ def test_index_no_such_product(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": "product that doesnt exist",
+                    "env": "dev",
                     "device_id": "does not exist",
                 },
             }
@@ -422,6 +430,7 @@ def test_index_no_such_product_team(version):
                 "pathParameters": {
                     "product_id": str(PRODUCT_ID),
                     "product_team_id": str(PRODUCT_TEAM_ID),
+                    "env": "dev",
                     "device_id": "123",
                 },
             }
