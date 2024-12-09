@@ -109,7 +109,7 @@ def mock_epr_product_with_message_set_drd() -> (
 
         # Set up DeviceReferenceData in DB
         device_reference_data = product.create_device_reference_data(
-            name=EprNameTemplate.MESSAGE_SETS.format(party_key="ABC1234-987654")
+            name=EprNameTemplate.MESSAGE_SETS.format(party_key=PARTY_KEY)
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -175,7 +175,7 @@ def mock_epr_product_without_message_set_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )

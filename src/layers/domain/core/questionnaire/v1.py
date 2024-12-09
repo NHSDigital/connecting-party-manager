@@ -59,8 +59,8 @@ def generate_spine_mhs_message_sets_fields(response: dict, **kwargs):
 
 # Mapping of QuestionnaireInstance to field generation functions
 FIELD_GENERATION_STRATEGIES = {
-    "SPINE_MHS": generate_spine_mhs_fields,
-    "SPINE_MHS_MESSAGE_SETS": generate_spine_mhs_message_sets_fields,
+    "spine_mhs": generate_spine_mhs_fields,
+    "spine_mhs_message_sets": generate_spine_mhs_message_sets_fields,
 }
 
 
