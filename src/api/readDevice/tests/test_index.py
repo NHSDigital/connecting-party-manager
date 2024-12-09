@@ -323,7 +323,7 @@ def test_index_no_such_device(version):
             "errors": [
                 {
                     "code": "RESOURCE_NOT_FOUND",
-                    "message": f"Could not find Device for key ('{product_team.id}', 'P.XXX-YYY', 'does not exist')",
+                    "message": f"Could not find Device for key ('{product_team.id}', 'P.XXX-YYY', 'dev', 'does not exist')",
                 }
             ],
         }
@@ -459,3 +459,82 @@ def test_index_no_such_product_team(version):
     _response_assertions(
         result=result, expected=expected, check_body=True, check_content_length=True
     )
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_incorrect_env(version):
+    org = Root.create_ods_organisation(ods_code=ODS_CODE)
+    product_team = org.create_product_team(
+        name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
+    )
+
+    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        # Set up ProductTeam in DB
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
+        # Set up Product in DB
+        cpm_product = product_team.create_cpm_product(
+            name=PRODUCT_NAME, product_id=PRODUCT_ID
+        )
+        product_repo = CpmProductRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_repo.write(cpm_product)
+
+        # Set up Device in DB
+        device = cpm_product.create_device(name=DEVICE_NAME, env=Environment.DEV)
+        device_repo = DeviceRepository(table_name=TABLE_NAME, dynamodb_client=client)
+        device_repo.write(device)
+
+        from api.readDevice.index import handler
+
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": {
+                    "product_team_id": str(product_team.id),
+                    "product_id": str(cpm_product.id.id),
+                    "env": "prod",
+                    "device_id": str(device.id),
+                },
+            }
+        )
+
+        expected_result = json.dumps(
+            {
+                "errors": [
+                    {
+                        "code": "RESOURCE_NOT_FOUND",
+                        "message": f"Could not find Device for key ('{product_team.id}', '{cpm_product.id.id}', 'prod', '{device.id}')",
+                    }
+                ],
+            }
+        )
+
+        expected = {
+            "statusCode": 404,
+            "body": expected_result,
+            "headers": {
+                "Content-Length": str(len(expected_result)),
+                "Content-Type": "application/json",
+                "Version": version,
+            },
+        }
+        _response_assertions(
+            result=result, expected=expected, check_body=True, check_content_length=True
+        )

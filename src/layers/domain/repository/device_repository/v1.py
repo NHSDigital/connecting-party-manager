@@ -133,7 +133,11 @@ class DeviceRepository(Repository[Device]):
             table_name=table_name,
             model=Device,
             dynamodb_client=dynamodb_client,
-            parent_table_keys=(TableKey.PRODUCT_TEAM, TableKey.CPM_PRODUCT),
+            parent_table_keys=(
+                TableKey.PRODUCT_TEAM,
+                TableKey.CPM_PRODUCT,
+                TableKey.ENVIRONMENT,
+            ),
             table_key=TableKey.DEVICE,
         )
 
@@ -142,8 +146,10 @@ class DeviceRepository(Repository[Device]):
             decompress_device_fields, super()._query(parent_ids=parent_ids, id=id)
         )
 
-    def read(self, product_team_id: str, product_id: str, id: str):
-        return super()._read(parent_ids=(product_team_id, product_id), id=id)
+    def read(self, product_team_id: str, product_id: str, environment: str, id: str):
+        return super()._read(
+            parent_ids=(product_team_id, product_id, environment), id=id
+        )
 
     def search(self, product_team_id: str, product_id: str):
         return super()._search(parent_ids=(product_team_id, product_id))
@@ -151,7 +157,7 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent) -> TransactItem:
         return self.create_index(
             id=event.id,
-            parent_key_parts=(event.product_team_id, event.product_id),
+            parent_key_parts=(event.product_team_id, event.product_id, event.env),
             data=compress_device_fields(event),
             root=True,
         )
