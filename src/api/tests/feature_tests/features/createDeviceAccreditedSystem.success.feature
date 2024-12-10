@@ -307,58 +307,58 @@ Feature: Create AS Device - success scenarios
       | questionnaire_responses.spine_as/1.0.id                      | << ignore >>                                  |
       | questionnaire_responses.spine_as/1.0.questionnaire_name      | spine_as                                      |
       | questionnaire_responses.spine_as/1.0.questionnaire_version   | 1                                             |
-      | questionnaire_responses.spine_as/1.0.data.ODS Code           | FH15R                                         |
-      | questionnaire_responses.spine_as/1.0.data.Client ODS Codes.0 | FH15R                                         |
+      | questionnaire_responses.spine_as/1.0.data.ODS Code           | F5H1R                                         |
+      | questionnaire_responses.spine_as/1.0.data.Client ODS Codes.0 | F5H1R                                         |
       | questionnaire_responses.spine_as/1.0.data.ASID               | Foobar                                        |
-      | questionnaire_responses.spine_as/1.0.data.Party Key          | party-key-001                                 |
+      | questionnaire_responses.spine_as/1.0.data.Party Key          | party-key-002                                 |
       | questionnaire_responses.spine_as/1.0.data.Approver URP       | approver-123                                  |
       | questionnaire_responses.spine_as/1.0.data.Date Approved      | 2024-01-01                                    |
       | questionnaire_responses.spine_as/1.0.data.Requestor URP      | requestor-789                                 |
       | questionnaire_responses.spine_as/1.0.data.Date Requested     | 2024-01-03                                    |
-      | questionnaire_responses.spine_as/1.0.data.Product Key        | product-key-001                               |
+      | questionnaire_responses.spine_as/1.0.data.Product Key        | product-key-002                               |
       | questionnaire_responses.spine_as/1.0.created_on              | << ignore >>                                  |
       | device_reference_data                                        | << ignore >>                                  |
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
-      | path                    | value                             |
-      | id                      | ${ note(device_id) }              |
-      | name                    | F5H1R-850000/ - Accredited System |
-      | status                  | active                            |
-      | product_id              | ${ note(product_id) }             |
-      | product_team_id         | ${ note(product_team_id) }        |
-      | ods_code                | F5H1R                             |
-      | created_on              | << ignore >>                      |
-      | updated_on              | << ignore >>                      |
-      | deleted_on              | << ignore >>                      |
-      | keys.0.key_type         | accredited_system_id              |
-      | keys.0.key_value        | 200000100000                      |
-      | tags.0.0.0              | ${ note(party_key_tag) }          |
-      | tags.0.0.1              | ${ note(party_key_tag_value) }    |
-      | questionnaire_responses | << ignore >>                      |
-      | device_reference_data   | << ignore >>                      |
+      | path                    | value                                         |
+      | id                      | ${ note(device_id) }                          |
+      | name                    | F5H1R-850000/200000100000 - Accredited System |
+      | status                  | active                                        |
+      | product_id              | ${ note(product_id) }                         |
+      | product_team_id         | ${ note(product_team_id) }                    |
+      | ods_code                | F5H1R                                         |
+      | created_on              | << ignore >>                                  |
+      | updated_on              | << ignore >>                                  |
+      | deleted_on              | << ignore >>                                  |
+      | keys.0.key_type         | accredited_system_id                          |
+      | keys.0.key_value        | 200000100000                                  |
+      | tags.0.0.0              | ${ note(party_key_tag) }                      |
+      | tags.0.0.1              | ${ note(party_key_tag_value) }                |
+      | questionnaire_responses | << ignore >>                                  |
+      | device_reference_data   | << ignore >>                                  |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1636             |
+      | Content-Length | 1713             |
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id_2) }"
     Then I receive a status code "200" with body
-      | path                    | value                             |
-      | id                      | ${ note(device_id_2) }            |
-      | name                    | F5H1R-850000/ - Accredited System |
-      | status                  | active                            |
-      | product_id              | ${ note(product_id) }             |
-      | product_team_id         | ${ note(product_team_id) }        |
-      | ods_code                | F5H1R                             |
-      | created_on              | << ignore >>                      |
-      | updated_on              | << ignore >>                      |
-      | deleted_on              | << ignore >>                      |
-      | keys.0.key_type         | accredited_system_id              |
-      | keys.0.key_value        | 200000100001                      |
-      | tags.0.0.0              | ${ note(party_key_tag) }          |
-      | tags.0.0.1              | ${ note(party_key_tag_value) }    |
-      | questionnaire_responses | << ignore >>                      |
-      | device_reference_data   | << ignore >>                      |
+      | path                    | value                                         |
+      | id                      | ${ note(device_id_2) }                        |
+      | name                    | F5H1R-850000/200000100001 - Accredited System |
+      | status                  | active                                        |
+      | product_id              | ${ note(product_id) }                         |
+      | product_team_id         | ${ note(product_team_id) }                    |
+      | ods_code                | F5H1R                                         |
+      | created_on              | << ignore >>                                  |
+      | updated_on              | << ignore >>                                  |
+      | deleted_on              | << ignore >>                                  |
+      | keys.0.key_type         | accredited_system_id                          |
+      | keys.0.key_value        | 200000100001                                  |
+      | tags.0.0.0              | ${ note(party_key_tag) }                      |
+      | tags.0.0.1              | ${ note(party_key_tag_value) }                |
+      | questionnaire_responses | << ignore >>                                  |
+      | device_reference_data   | << ignore >>                                  |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1636             |
+      | Content-Length | 1713             |
