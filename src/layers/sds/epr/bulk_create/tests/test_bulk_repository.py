@@ -192,13 +192,13 @@ def test_BulkRepository_handle_Device(dynamodb_client):
     device_by_id = device_repo.read(
         product_team.id,
         product.id,
-        str(Environment.DEV),
+        Environment.DEV,
         device.id,
     )
     device_by_key = device_repo.read(
         product_team.id,
         product.id,
-        str(Environment.DEV),
+        Environment.DEV,
         "123456",
     )
     (device_by_tag,) = device_repo.query_by_tag(party_key="123", something_else="456")
