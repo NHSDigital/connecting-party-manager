@@ -157,6 +157,16 @@ def write_device(data: dict[str, Device], cache) -> Device:
     return repo.write(as_device)
 
 
+def write_asid(data: dict[str, AsidId], cache) -> str:
+    repository = CpmSystemIdRepository[AsidId](
+        table_name=cache["DYNAMODB_TABLE"],
+        dynamodb_client=cache["DYNAMODB_CLIENT"],
+        model=AsidId,
+    )
+    asid: AsidId = data[create_asid]
+    return repository.create_or_update(asid)
+
+
 def set_http_status(data, cache) -> tuple[HTTPStatus, dict]:
     as_device: Device = data[create_as_device]
     return HTTPStatus.CREATED, as_device.state_exclude_tags()
@@ -195,5 +205,6 @@ steps = [
     add_device_reference_data_id,
     add_spine_as_questionnaire_response,
     write_device,
+    write_asid,
     set_http_status,
 ]
