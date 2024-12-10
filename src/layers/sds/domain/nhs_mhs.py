@@ -47,19 +47,20 @@ class NhsMhs(SdsBaseModel):
     nhs_mhs_duplicate_elimination: Optional[YesNoAnswer] = Field(
         alias="nhsmhsduplicateelimination"
     )
+    binding: Optional[str] = Field(alias="binding")
     nhs_mhs_end_point: str = Field(alias="nhsmhsendpoint")
     nhs_mhs_fqdn: str = Field(alias="nhsmhsfqdn")
     nhs_mhs_in: str = Field(alias="nhsmhsin")
     nhs_mhs_ip_address: Optional[str] = Field(alias="nhsmhsipaddress")
     nhs_mhs_is_authenticated: Authentication = Field(alias="nhsmhsisauthenticated")
-    nhs_mhs_manufacturer_org: Optional[str] = Field(alias="nhsmhsmanufacturerorg")
+    nhs_mhs_manufacturer_org: str = Field(alias="nhsmhsmanufacturerorg")
     nhs_mhs_party_key: str = Field(alias="nhsmhspartykey")
     nhs_mhs_sn: str = Field(alias="nhsmhssn")
     nhs_mhs_svc_ia: str = Field(alias="nhsmhssvcia")
     nhs_mhs_sync_reply_mode: Optional[SyncReplyModel] = Field(
         alias="nhsmhssyncreplymode"
     )
-    nhs_product_key: str = Field(alias="nhsproductkey")
+    nhs_product_key: Optional[str] = Field(alias="nhsproductkey")
     nhs_product_name: Optional[str] = Field(alias="nhsproductname")
     nhs_product_version: Optional[str] = Field(alias="nhsproductversion")
     nhs_requestor_urp: str = Field(alias="nhsrequestorurp")

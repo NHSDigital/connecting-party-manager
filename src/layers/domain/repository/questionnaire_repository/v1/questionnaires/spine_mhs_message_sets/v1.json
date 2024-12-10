@@ -2,25 +2,119 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
-    "Interaction ID": {
-      "type": "string"
+    "MHS IN": {
+      "type": "string",
+      "system generated": false
     },
     "MHS SN": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     },
-    "MHS IN": {
-      "type": "string"
+    "Reliability Configuration Reply Mode": {
+      "type": "string",
+      "system generated": false,
+      "enum": [
+        "MSHSIGNALSONLY",
+        "NEVER",
+        "NONE",
+        "SIGNALSANDRESPONSE",
+        "mshsignalsonly",
+        "never",
+        "none",
+        "signalsandresponse"
+      ]
     },
-    "Reliability Configuration Retry Interval": {
-      "type": "string"
+    "Reliability Configuration Ack Requested": {
+      "type": "string",
+      "system generated": false,
+      "enum": ["ALWAYS", "NEVER", "always", "never"]
     },
-    "Reliability Configuration Retries": {
-      "type": "integer"
+    "Reliability Configuration Duplication Elimination": {
+      "type": "string",
+      "system generated": false,
+      "enum": ["ALWAYS", "NEVER", "always", "never"]
+    },
+    "Reliability Configuration Actor": {
+      "type": "string",
+      "system generated": false,
+      "enum": [
+        "urn:oasis:names:tc:ebxml-msg:actor:topartymsh",
+        "urn:oasis:names:tc:ebxml-msg:actor:nextmsh",
+        "ignored",
+        "IGNORED"
+      ]
     },
     "Reliability Configuration Persist Duration": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
+    },
+    "Reliability Configuration Retries": {
+      "type": "integer",
+      "system generated": false
+    },
+    "Reliability Configuration Retry Interval": {
+      "type": "string",
+      "system generated": false
+    },
+    "Interaction Type": {
+      "type": "string",
+      "system generated": false,
+      "enum": [
+        "FHIR",
+        "HL7",
+        "EBXML",
+        "N/A",
+        "MSHSIGNALSONLY",
+        "fhir",
+        "hl7",
+        "ebxml",
+        "n/a",
+        "mshsignalsonly"
+      ]
+    },
+    "Contract Property Template Key": {
+      "type": "string",
+      "system generated": false
+    },
+    "MHS Is Authenticated": {
+      "type": "string",
+      "system generated": false,
+      "enum": [
+        "NONE",
+        "TRANSIENT",
+        "PERSISTENT",
+        "none",
+        "transient",
+        "persistent"
+      ]
+    },
+    "MHS IP Address": {
+      "type": "string",
+      "system generated": false
+    },
+    "Product Key": {
+      "type": "string",
+      "system generated": false
+    },
+    "Interaction ID": {
+      "type": "string",
+      "system generated": true
+    },
+    "MHS CPA ID": {
+      "type": "string",
+      "system generated": true
+    },
+    "Unique Identifier": {
+      "type": "string",
+      "system generated": true
     }
   },
-  "required": ["MHS IN", "Interaction ID", "MHS SN"],
+  "required": [
+    "MHS IN",
+    "MHS SN",
+    "Interaction ID",
+    "MHS CPA ID",
+    "Unique Identifier"
+  ],
   "additionalProperties": false
 }

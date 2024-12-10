@@ -7,7 +7,7 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Fail to create an "MHS Message Set" Device Reference Data, with incomplete questionnaire response
+  Scenario: Fail to create an "MHS Message Set" Device Reference Data, thbecuase it has not answered fields requried for the system generated fields
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path     | value                 |
       | name     | My Great Product Team |
@@ -18,16 +18,16 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
-      | path                                                            | value                                                     |
-      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | path                                                    | value                      |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers |
     Then I receive a status code "400" with body
       | path             | value                                                                                       |
-      | errors.0.code    | MISSING_VALUE                                                                               |
-      | errors.0.message | Failed to validate data against 'spine_mhs_message_sets/1': 'MHS IN' is a required property |
+      | errors.0.code    | VALIDATION_ERROR                                                                            |
+      | errors.0.message | The following required fields are missing in the response to spine_mhs_message_sets: MHS IN |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 145              |
+      | Content-Length | 148              |
 
   Scenario: Fail to create an "MHS Message Set" Device Reference Data, with invalid questionnaire response (bad value)
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -40,11 +40,10 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
-      | path                                                                               | value                                                     |
-      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID                    | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN                            | urn:nhs:names:services:ers                                |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN                            | READ_PRACTITIONER_ROLE_R4_V001                            |
-      | questionnaire_responses.spine_mhs_message_sets.0.Reliability Configuration Retries | two                                                       |
+      | path                                                                               | value                          |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN                            | urn:nhs:names:services:ers     |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN                            | READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses.spine_mhs_message_sets.0.Reliability Configuration Retries | two                            |
     Then I receive a status code "400" with body
       | path             | value                                                                                      |
       | errors.0.code    | VALIDATION_ERROR                                                                           |
@@ -65,19 +64,18 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
-      | path                                                            | value                                                     |
-      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN         | urn:nhs:names:services:ers                                |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN         | READ_PRACTITIONER_ROLE_R4_V001                            |
-      | questionnaire_responses.spine_mhs_message_sets.0.unknown_field  | 123                                                       |
+      | path                                                           | value                          |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN        | urn:nhs:names:services:ers     |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN        | READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses.spine_mhs_message_sets.0.unknown_field | 123                            |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                              |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                                   |
-      | errors.0.message | Failed to validate data against 'spine_mhs_message_sets/1': Additional properties are not allowed ('unknown_field' was unexpected) |
+      | path             | value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+      | errors.0.message | Payload contains unexpected fields: {'unknown_field'}. Expected fields are: ['Contract Property Template Key', 'Interaction Type', 'MHS IN', 'MHS IP Address', 'MHS Is Authenticated', 'MHS SN', 'Product Key', 'Reliability Configuration Ack Requested', 'Reliability Configuration Actor', 'Reliability Configuration Duplication Elimination', 'Reliability Configuration Persist Duration', 'Reliability Configuration Reply Mode', 'Reliability Configuration Retries', 'Reliability Configuration Retry Interval']. |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 187              |
+      | Content-Length | 563              |
 
   Scenario: Fail to create an "MHS Message Set" Device Reference Data, with invalid questionnaire name
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
