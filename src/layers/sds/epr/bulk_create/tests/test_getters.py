@@ -61,23 +61,18 @@ def test_get_mhs_device_data(mhs_1: NhsMhs):
     assert mhs_data.questionnaire_name == QuestionnaireInstance.SPINE_MHS
     assert mhs_data.questionnaire_version == "1"
     assert mhs_data.data == {
-        "Address": "my-mhs-endpoint",
+        "Binding": "https://",
+        "Address": "https://my-fqdn",
         "Approver URP": "approver-123",
-        "Contract Property Template Key": "key-123",
         "DNS Approver": "dns-approver-123",
         "Date Approved": "today",
         "Date DNS Approved": "yesterday",
         "Date Requested": "a week ago",
-        "Interaction Type": "hl7",
-        "MHS CPA ID": "1wd354",
         "MHS FQDN": "my-fqdn",
-        "MHS Is Authenticated": "none",
         "MHS Party key": "AAA-123456",
         "Managing Organization": "AAA",
-        "Product Key": "key-123",
         "Product Name": "My EPR Product",
         "Requestor URP": "requester-123",
-        "Unique Identifier": "1wd354",
         "MHS Manufacturer Organisation": "AAA",
     }
     assert mhs_data.created_on.date() == now().date()
@@ -126,6 +121,7 @@ def test_get_message_set_data(mhs_1: NhsMhs, mhs_2: NhsMhs):
         message_set_field_mapping=message_set_field_mapping,
     )
     data = []
+    # where get this data from?
     for message_set in message_sets:
         data.append(message_set.data)
         assert (
@@ -137,14 +133,24 @@ def test_get_message_set_data(mhs_1: NhsMhs, mhs_2: NhsMhs):
 
     assert data == [
         {
-            "Interaction ID": "my-interaction-id",
+            "Unique Identifier": "AAA-123456:sn-123:in-123",
+            "Contract Property Template Key": "key-123",
+            "Interaction Type": "hl7",
+            "MHS CPA ID": "AAA-123456:sn-123:in-123",
             "MHS IN": "in-123",
+            "MHS Is Authenticated": "none",
             "MHS SN": "sn-123",
+            "Interaction ID": "sn-123:in-123",
         },
         {
-            "Interaction ID": "my-other-interaction-id",
+            "Unique Identifier": "BBB-123456:sn-456:in-456",
+            "Contract Property Template Key": "key-456",
+            "Interaction Type": "hl7",
+            "MHS CPA ID": "BBB-123456:sn-456:in-456",
             "MHS IN": "in-456",
+            "MHS Is Authenticated": "none",
             "MHS SN": "sn-456",
+            "Interaction ID": "sn-456:in-456",
         },
     ]
 
@@ -187,14 +193,14 @@ def test_get_mhs_tags(mhs_1: NhsMhs, mhs_2: NhsMhs):
             "nhs_id_code": "AAA",
         },
         {
-            "nhs_mhs_svc_ia": "my-interaction-id",
+            "nhs_mhs_svc_ia": "sn-123:in-123",
         },
         {
             "nhs_mhs_party_key": "AAA-123456",
         },
         {
             "nhs_id_code": "AAA",
-            "nhs_mhs_svc_ia": "my-interaction-id",
+            "nhs_mhs_svc_ia": "sn-123:in-123",
         },
         {
             "nhs_id_code": "AAA",
@@ -202,25 +208,25 @@ def test_get_mhs_tags(mhs_1: NhsMhs, mhs_2: NhsMhs):
         },
         {
             "nhs_mhs_party_key": "AAA-123456",
-            "nhs_mhs_svc_ia": "my-interaction-id",
+            "nhs_mhs_svc_ia": "sn-123:in-123",
         },
         {
             "nhs_id_code": "AAA",
             "nhs_mhs_party_key": "AAA-123456",
-            "nhs_mhs_svc_ia": "my-interaction-id",
+            "nhs_mhs_svc_ia": "sn-123:in-123",
         },
         {
             "nhs_id_code": "BBB",
         },
         {
-            "nhs_mhs_svc_ia": "my-other-interaction-id",
+            "nhs_mhs_svc_ia": "sn-456:in-456",
         },
         {
             "nhs_mhs_party_key": "BBB-123456",
         },
         {
             "nhs_id_code": "BBB",
-            "nhs_mhs_svc_ia": "my-other-interaction-id",
+            "nhs_mhs_svc_ia": "sn-456:in-456",
         },
         {
             "nhs_id_code": "BBB",
@@ -228,12 +234,12 @@ def test_get_mhs_tags(mhs_1: NhsMhs, mhs_2: NhsMhs):
         },
         {
             "nhs_mhs_party_key": "BBB-123456",
-            "nhs_mhs_svc_ia": "my-other-interaction-id",
+            "nhs_mhs_svc_ia": "sn-456:in-456",
         },
         {
             "nhs_id_code": "BBB",
             "nhs_mhs_party_key": "BBB-123456",
-            "nhs_mhs_svc_ia": "my-other-interaction-id",
+            "nhs_mhs_svc_ia": "sn-456:in-456",
         },
     ]
 

@@ -2,8 +2,20 @@ from enum import StrEnum
 
 
 class SdsFieldName(StrEnum):
-    INTERACTION_ID = "Interaction ID"
     ASID = "ASID"
+    CPA_ID = "MHS CPA ID"
+    BINDING = "Binding"
+    MHS_FQDN = "MHS FQDN"
+    ADDRESS = "Address"
+    PARTY_KEY = "MHS Party key"
+    MANAGING_ORGANIZATION = "Managing Organization"
+    DATE_REQUESTED = "Date Requested"
+    DATE_APPROVED = "Date Approved"
+    DATE_DNS_APPROVED = "Date DNS Approved"
+    MHS_SN = "MHS SN"
+    MHS_IN = "MHS IN"
+    INTERACTION_ID = "Interaction ID"
+    UNIQUE_IDENTIFIER = "Unique Identifier"
 
 
 class SdsDeviceReferenceDataPath(StrEnum):
