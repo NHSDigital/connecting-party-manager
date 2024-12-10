@@ -13,5 +13,7 @@
   "nhs_mhs_is_authenticated": "MHS Is Authenticated",
   "nhs_mhs_svc_ia": "Interaction ID",
   "nhs_mhs_cpa_id": "MHS CPA ID",
-  "unique_identifier": "Unique Identifier"
+  "unique_identifier": "Unique Identifier",
+  "nhs_mhs_ip_address": "MHS IP Address",
+  "nhs_product_key": "Product Key"
 }

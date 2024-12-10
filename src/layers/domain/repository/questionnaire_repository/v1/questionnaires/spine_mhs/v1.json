@@ -4,7 +4,7 @@
   "properties": {
     "Binding": {
       "type": "string",
-      "enum": ["https://", "http://"],
+      "enum": ["https://"],
       "system generated": false
     },
     "MHS FQDN": {

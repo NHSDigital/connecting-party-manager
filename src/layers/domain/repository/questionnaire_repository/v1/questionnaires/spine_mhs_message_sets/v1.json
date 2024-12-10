@@ -88,6 +88,14 @@
         "persistent"
       ]
     },
+    "MHS IP Address": {
+      "type": "string",
+      "system generated": false
+    },
+    "Product Key": {
+      "type": "string",
+      "system generated": false
+    },
     "Interaction ID": {
       "type": "string",
       "system generated": true
