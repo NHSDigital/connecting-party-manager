@@ -18,6 +18,7 @@ from domain.core.device import (
 )
 from domain.core.device_key import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.error import ConfigurationError
 from domain.core.product_team import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
@@ -43,13 +44,16 @@ def parse_mhs_device_payload(data, cache) -> CreateMhsDeviceIncomingParams:
 def check_for_existing_mhs(data, cache):
     product_team: ProductTeam = data[read_product_team]
     product: CpmProduct = data[read_product]
+    environment: Environment = data[read_environment]
     party_key: str = data[get_party_key]
 
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
 
-    devices = device_repo.search(product_team_id=product_team.id, product_id=product.id)
+    devices = device_repo.search(
+        product_team_id=product_team.id, product_id=product.id, environment=environment
+    )
     if any(
         device.name == EprNameTemplate.MHS_DEVICE.format(party_key=party_key)
         for device in devices
@@ -61,12 +65,14 @@ def check_for_existing_mhs(data, cache):
 
 def read_device_reference_data(data, cache) -> DeviceReferenceData:
     path_params: CpmProductPathParams = data[parse_path_params]
+    environment: Environment = data[read_environment]
     drd_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     device_reference_datas = drd_repo.search(
         product_id=path_params.product_id,
         product_team_id=path_params.product_team_id,
+        environment=environment,
     )
 
     party_key: str = data[get_party_key]
@@ -104,12 +110,15 @@ def create_mhs_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
     payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
-    payload.__dict__["env"] = data[read_environment]
+    environment: Environment = data[read_environment]
+    # payload.__dict__["env"] = data[read_environment]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
     device_payload = payload.dict(exclude={"questionnaire_responses"})
     return product.create_device(
-        name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key), **device_payload
+        name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key),
+        env=environment,
+        **device_payload,
     )
 
 

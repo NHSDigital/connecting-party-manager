@@ -92,7 +92,7 @@ def test_index(version):
     assert response_body["id"] == str(device.id)
     assert response_body["product_id"] == str(cpm_product.id)
     assert response_body["product_team_id"] == str(product_team.id)
-    assert device.env == Environment.DEV
+    assert response_body["env"] == Environment.DEV
     assert response_body["name"] == device.name
     assert response_body["ods_code"] == device.ods_code
     assert response_body["updated_on"] is None
@@ -171,7 +171,7 @@ def test_index_mhs_device(version):
 
         # Set up DeviceReferenceData in DB
         device_reference_data = cpm_product.create_device_reference_data(
-            name="ABC1234-987654 - MHS Message Set"
+            name="ABC1234-987654 - MHS Message Set", env=Environment.DEV
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)

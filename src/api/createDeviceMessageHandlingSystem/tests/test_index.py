@@ -105,7 +105,8 @@ def mock_epr_product_with_message_set_drd() -> (
 
         # Set up DeviceReferenceData in DB
         device_reference_data = product.create_device_reference_data(
-            name=EprNameTemplate.MESSAGE_SETS.format(party_key="ABC1234-987654")
+            name=EprNameTemplate.MESSAGE_SETS.format(party_key="ABC1234-987654"),
+            env=Environment.DEV,
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -196,7 +197,7 @@ def test_index() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": str("dev"),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -259,7 +260,7 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": consistent_uuid(1),
-                "env": "dev",
+                "env": Environment.DEV,
             },
             "VALIDATION_ERROR",
             400,
@@ -269,7 +270,7 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": "id_that_does_not_exist",
-                "env": "dev",
+                "env": Environment.DEV,
             },
             "RESOURCE_NOT_FOUND",
             404,
@@ -284,7 +285,6 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
                 "headers": {"version": VERSION},
                 "body": json.dumps(body),
                 "pathParameters": path_parameters,
-                "env": str("dev"),
             }
         )
 
@@ -330,7 +330,7 @@ def test_questionnaire_response_validation_errors(
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": str("dev"),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -353,7 +353,7 @@ def test_not_epr_product():
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": str("dev"),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -377,7 +377,7 @@ def test_no_existing_message_set_drd():
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": str("dev"),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -401,7 +401,7 @@ def test_mhs_already_exists() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": str("dev"),
+                    "env": Environment.DEV,
                 },
             }
         )
@@ -418,7 +418,7 @@ def test_mhs_already_exists() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": str("dev"),
+                    "env": Environment.DEV,
                 },
             }
         )

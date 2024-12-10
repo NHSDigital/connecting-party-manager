@@ -50,6 +50,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/MhsMessageSet": api.createDeviceReferenceDataMessageSet.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device": api.createDevice.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/MessageHandlingSystem": api.createDeviceMessageHandlingSystem.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/AccreditedSystem": api.createDeviceAccreditedSystem.index,
         },
         "GET": {
             "ProductTeam/{product_team_id}": api.readProductTeam.index,

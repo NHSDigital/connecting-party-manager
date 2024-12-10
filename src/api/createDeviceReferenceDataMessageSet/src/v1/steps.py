@@ -1,14 +1,16 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     get_party_key,
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
 from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
@@ -35,11 +37,14 @@ def require_no_existing_message_sets_device_reference_data(
     data, cache
 ) -> list[QuestionnaireResponse]:
     product: CpmProduct = data[read_product]
+    environment: Environment = data[read_environment]
     repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     results = repo.search(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id,
+        product_id=product.id,
+        environment=environment,
     )
     if any(
         device_reference_data.name.endswith(MESSAGE_SETS_SUFFIX)
@@ -69,8 +74,9 @@ def validate_questionnaire_responses(data, cache) -> list[QuestionnaireResponse]
 def create_message_set_device_reference_data(data, cache) -> DeviceReferenceData:
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
+    environment: Environment = data[read_environment]
     return product.create_device_reference_data(
-        name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key)
+        name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key), env=environment
     )
 
 
@@ -105,6 +111,7 @@ def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_device_reference_data_for_epr_payload,
     read_product_team,
     read_product,

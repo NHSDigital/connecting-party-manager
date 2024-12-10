@@ -151,8 +151,8 @@ class DeviceRepository(Repository[Device]):
             parent_ids=(product_team_id, product_id, environment), id=id
         )
 
-    def search(self, product_team_id: str, product_id: str):
-        return super()._search(parent_ids=(product_team_id, product_id))
+    def search(self, product_team_id: str, product_id: str, environment: str):
+        return super()._search(parent_ids=(product_team_id, product_id, environment))
 
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent) -> TransactItem:
         return self.create_index(
@@ -216,7 +216,7 @@ class DeviceRepository(Repository[Device]):
         # Create copy of original device and indexes with new pk and sk
         root_copy_transaction = self.create_index(
             id=event.id,
-            parent_key_parts=(event.product_team_id, event.product_id),
+            parent_key_parts=(event.product_team_id, event.product_id, event.env),
             data=inactive_data,
             table_key=TableKey.DEVICE_STATUS,
             root=True,
@@ -453,9 +453,13 @@ class InactiveDeviceRepository(Repository[Device]):
             table_name=table_name,
             model=Device,
             dynamodb_client=dynamodb_client,
-            parent_table_keys=(TableKey.PRODUCT_TEAM, TableKey.CPM_PRODUCT),
+            parent_table_keys=(
+                TableKey.PRODUCT_TEAM,
+                TableKey.CPM_PRODUCT,
+                TableKey.ENVIRONMENT,
+            ),
             table_key=TableKey.DEVICE_STATUS,
         )
 
-    def read(self, product_team_id: str, product_id: str, id: str):
-        return self._read(parent_ids=(product_team_id, product_id), id=id)
+    def read(self, product_team_id: str, product_id: str, environment: str, id: str):
+        return self._read(parent_ids=(product_team_id, product_id, environment), id=id)

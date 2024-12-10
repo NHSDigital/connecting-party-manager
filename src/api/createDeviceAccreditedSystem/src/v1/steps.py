@@ -14,6 +14,7 @@ from domain.core.device import (
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.error import (
     AccreditedSystemFatalError,
     ConfigurationError,
@@ -42,12 +43,14 @@ def parse_as_device_payload(data, cache) -> CreateAsDeviceIncomingParams:
 
 def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
     path_params: CpmProductPathParams = data[parse_path_params]
+    environment: Environment = data[read_environment]
     product_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     device_reference_data = product_repo.search(
         product_id=path_params.product_id,
         product_team_id=path_params.product_team_id,
+        environment=environment,
     )
 
     # Only 1 AS DRD and only 1 MHS DRD
@@ -89,7 +92,7 @@ def validate_spine_as_questionnaire_response(data, cache) -> QuestionnaireRespon
 def create_as_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
-    payload.__dict__["env"] = data[read_environment]
+    environment: Environment = data[read_environment]
     party_key: str = data[get_party_key]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
@@ -97,6 +100,7 @@ def create_as_device(data, cache) -> Device:
     device_payload = payload.dict(exclude={"questionnaire_responses"})
     return product.create_device(
         name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=""),
+        env=environment,
         **device_payload
     )
 

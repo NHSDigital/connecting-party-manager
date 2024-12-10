@@ -254,7 +254,7 @@ class Device(AggregateRoot):
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     status: Status = Field(default=Status.ACTIVE)
-    env: Environment = Field(default=Environment.PROD)
+    env: Environment = Field()
     product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str
