@@ -74,14 +74,34 @@ def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
             id=id,
         )
         device_reference_datas.append(drd)
-
     return device_reference_datas
+
+
+def filter_by_jsonpath(data, filters: list) -> dict:
+    response = {}
+    if "*" not in filters:
+        response = {filter_key: data[filter_key] for filter_key in filters}
+        return response
+    return data
+
+
+def filter_device_reference_data(data, cache) -> list[DeviceReferenceData]:
+    device: Device = data[read_device]
+    device_reference_data_list: list[DeviceReferenceData] = data[
+        read_device_reference_data
+    ]
+
+    for drd in device_reference_data_list:
+        filters = device.device_reference_data[str(drd.id)]
+        for questionnaire_response in drd.questionnaire_responses.values():
+            for qr in questionnaire_response:
+                qr.data = filter_by_jsonpath(data=qr.data, filters=filters)
+    return device_reference_data_list
 
 
 def update_device_with_device_reference_data(data, cache) -> Device:
     device: Device = data[read_device]
     device_reference_datas = data[read_device_reference_data]
-
     [
         device.questionnaire_responses.setdefault(key, []).extend(responses)
         for drd in device_reference_datas
@@ -102,6 +122,7 @@ steps = [
     read_product,
     read_device,
     read_device_reference_data,
+    filter_device_reference_data,
     update_device_with_device_reference_data,
     device_to_dict,
 ]
