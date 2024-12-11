@@ -110,7 +110,6 @@ def create_as_device(data, cache) -> Device:
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
     party_key: str = data[get_party_key]
 
-    # Create a new Device dictionary excluding 'questionnaire_responses'
     device_payload = payload.dict(exclude={"questionnaire_responses"})
     return product.create_device(
         name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid.__root__),
@@ -119,7 +118,6 @@ def create_as_device(data, cache) -> Device:
 
 
 def create_device_keys(data, cache) -> Device:
-    # We will need to add some keys in the future, ASID?
     as_device: Device = data[create_as_device]
     asid: AsidId = data[create_asid]
     as_device.add_key(
