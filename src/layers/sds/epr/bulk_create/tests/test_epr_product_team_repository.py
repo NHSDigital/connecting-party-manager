@@ -40,9 +40,13 @@ def test_get_all_epr_product_teams_local(dynamodb_client):
     product_teams = [*epr_product_teams, *non_epr_product_teams]
     shuffle(product_teams)
 
-    BulkRepository(table_name="my-table", dynamodb_client=dynamodb_client).write(
-        [{"ProductTeam": product_team.state()} for product_team in product_teams]
-    )
+    repo = BulkRepository(table_name="my-table", dynamodb_client=dynamodb_client)
+    transactions = []
+    for product_team in product_teams:
+        transactions += repo.generate_transaction_statements(
+            {"ProductTeam": product_team.state()}
+        )
+    repo.write(transactions)
 
     epr_product_team_repo = EprProductTeamRepository(
         table_name="my-table", dynamodb_client=dynamodb_client
@@ -76,9 +80,14 @@ def test_get_all_epr_product_teams():
     product_teams = [*epr_product_teams, *non_epr_product_teams]
     shuffle(product_teams)
 
-    BulkRepository(table_name=table_name, dynamodb_client=client).write(
-        [{"ProductTeam": product_team.state()} for product_team in product_teams]
-    )
+    repo = BulkRepository(table_name=table_name, dynamodb_client=client)
+    transactions = []
+    for product_team in product_teams:
+        transactions += repo.generate_transaction_statements(
+            {"ProductTeam": product_team.state()}
+        )
+    repo.write(transactions)
+
     epr_product_team_repo = EprProductTeamRepository(
         table_name=table_name, dynamodb_client=client
     )

@@ -1,5 +1,21 @@
+import os
+from pathlib import Path
+
 import pytest
 from domain.core.cpm_system_id import AsidId, PartyKeyId, ProductId
+from event.json import json_load
+
+PATH_TO_CPM_SYSTEM_IDS = Path(__file__).parent.parent
+PRODUCT_IDS_GENERATED_FILE = f"{PATH_TO_CPM_SYSTEM_IDS}/generated_ids/product_ids.json"
+generated_product_ids = set()
+
+
+@pytest.fixture(scope="module")
+def _get_generated_ids():
+    global generated_product_ids
+    if os.path.exists(PRODUCT_IDS_GENERATED_FILE):
+        with open(PRODUCT_IDS_GENERATED_FILE, "r") as file:
+            generated_product_ids = set(json_load(file))
 
 
 def test_party_key_generator_format_key():
@@ -19,7 +35,7 @@ def test_party_key_generator_validate_key_valid():
     [
         "ABC000124",  # Missing hyphen
         "ABC-1234",  # Number part too short
-        "ABC-1234567",  # Number part too long
+        "ABC-123456789101112",  # Number part too long
         "ABC-0001A4",  # Number part contains a non-digit character
         "",  # Empty string
     ],
@@ -71,9 +87,11 @@ def test_asid_generator_increment_number():
     assert generator.id == "223456789013"
 
 
-def test_product_id_generator_format_key():
+@pytest.mark.repeat(50)
+def test_product_id_generator_format_key(_get_generated_ids):
     generator = ProductId.create()
     assert generator.id is not None
+    assert generator.id not in generated_product_ids
 
 
 @pytest.mark.parametrize(

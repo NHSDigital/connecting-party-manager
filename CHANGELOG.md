@@ -1,5 +1,10 @@
 # Changelog
 
+## 2024-12-05
+- [PI-631] Generate Product Ids
+- [PI-691] Allow devs to clear terminal after each Feature Test
+- [PI-618] Bulk ETL
+
 ## 2024-12-02
 - [PI-572] Create an AS Device
 - [PI-582] AS Additional Interations smoke test

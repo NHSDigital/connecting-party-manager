@@ -6,6 +6,10 @@ variable "etl_name" {
   type = string
 }
 
+variable "etl_type" {
+  type = string
+}
+
 variable "etl_stage" {
   type = string
 }
