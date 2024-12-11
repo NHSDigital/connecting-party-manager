@@ -1,5 +1,0 @@
-The following errors were encountered
-  -- Error 1 (CannotDeleteMandatoryField) --
-  Failed to parse record 0
-  {'object_class': 'modify', 'change_type': 'modify', 'modifications': [['delete', 'nhsassvcia', []]], 'unique_identifier': '000173655515'}
-  Field 'nhs_as_svc_ia' cannot be deleted

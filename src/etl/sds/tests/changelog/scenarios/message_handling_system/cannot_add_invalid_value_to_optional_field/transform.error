@@ -1,7 +1,0 @@
-The following errors were encountered
-  -- Error 1 (ValidationError) --
-  Failed to parse record 0
-  {'change_type': 'modify', 'modifications': [['add', 'nhsmhsackrequested', ['foo']]], 'object_class': 'modify', 'unique_identifier': '00000a84594b2ef34279'}
-  1 validation error for NhsMhs
-  nhsmhsackrequested
-    value is not a valid enumeration member; permitted: 'always', 'never' (type=type_error.enum; enum_values=[<YesNoAnswer.ALWAYS: 'always'>, <YesNoAnswer.NEVER: 'never'>])
