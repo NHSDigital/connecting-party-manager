@@ -14,7 +14,6 @@ from mypy_boto3_s3 import S3Client
 
 from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.dynamodb import mock_table
-from test_helpers.uuid import consistent_uuid
 
 BUCKET_NAME = "my-bucket"
 TABLE_NAME = "my-table"
@@ -51,21 +50,6 @@ def get_object(mock_s3_client: S3Client) -> bytes:
     return lambda key: (
         mock_s3_client.get_object(Bucket=BUCKET_NAME, Key=key)["Body"].read()
     )
-
-
-class ConsistentUUID:
-    def __init__(self):
-        self.seed = 1
-
-    def create(self):
-        uuid = consistent_uuid(self.seed)
-        self.seed += 1
-        return uuid
-
-
-class MockId:
-    def __init__(self, id):
-        self.id = id
 
 
 def _assert_domain_object_equal(a, b):

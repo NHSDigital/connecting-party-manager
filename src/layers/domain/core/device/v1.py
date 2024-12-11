@@ -88,7 +88,7 @@ class DeviceDeletedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyAddedEvent(Event):
-    new_key: DeviceKey
+    new_key: dict
     id: str
     name: str
     product_team_id: UUID
@@ -106,9 +106,9 @@ class DeviceKeyAddedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class DeviceKeyDeletedEvent(Event):
-    deleted_key: DeviceKey
+    deleted_key: dict
     id: str
-    keys: list[DeviceKey]
+    keys: list[dict]
     tags: list[str]
     updated_on: str = None
 
@@ -125,7 +125,7 @@ class DeviceTagAddedEvent(Event):
     created_on: str
     updated_on: str = None
     deleted_on: str = None
-    keys: list[DeviceKey]
+    keys: list[dict]
     tags: list[str]
     questionnaire_responses: dict[str, dict[str, "QuestionnaireResponse"]]
     device_reference_data: dict[str, list[str]]
@@ -300,7 +300,7 @@ class Device(AggregateRoot):
         device_data = self.state()
         device_data["tags"] = {t.value for t in self.tags}
         device_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
-        return DeviceKeyAddedEvent(new_key=device_key, **device_data)
+        return DeviceKeyAddedEvent(new_key=device_key.dict(), **device_data)
 
     @event
     def delete_key(self, key_type: str, key_value: str) -> DeviceKeyDeletedEvent:
@@ -311,7 +311,7 @@ class Device(AggregateRoot):
             ) from None
         self.keys.remove(device_key)
         return DeviceKeyDeletedEvent(
-            deleted_key=device_key,
+            deleted_key=device_key.dict(),
             id=self.id,
             keys=[k.dict() for k in self.keys],
             tags=[t.value for t in self.tags],

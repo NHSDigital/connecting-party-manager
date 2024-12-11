@@ -2,15 +2,29 @@ from collections import deque
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
+import boto3
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
 from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
-from sds.worker.load import LoadWorkerCache
+from event.aws.client import dynamodb_client
+from sds.epr.bulk_create.bulk_repository import BulkRepository
+from sds.worker.load import LoadWorkerEnvironment
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
+
+
+class LoadWorkerCache:
+    def __init__(self):
+        self.S3_CLIENT = boto3.client("s3")
+        self.ENVIRONMENT = LoadWorkerEnvironment.build()
+        self.REPOSITORY = BulkRepository(
+            table_name=self.ENVIRONMENT.TABLE_NAME, dynamodb_client=dynamodb_client()
+        )
+        self.MAX_RECORDS = 150_000
+
 
 CACHE = LoadWorkerCache()
 

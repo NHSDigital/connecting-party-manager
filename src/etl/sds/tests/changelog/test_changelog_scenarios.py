@@ -1,86 +1,17 @@
-from copy import deepcopy
-from typing import Generator
-
 import pytest
-from domain.core.device import Device, DeviceTag
-from domain.repository.device_repository import DeviceRepository
-from domain.repository.keys import TableKey
-from domain.repository.marshall import unmarshall
-from etl.sds.worker.load_bulk.tests._test_load_bulk_worker import MockDeviceRepository
 from etl_utils.io import pkl_load_lz4
 from event.aws.client import dynamodb_client as get_dynamodb_client
 from mypy_boto3_s3 import S3Client
+from sds.epr.updates.tests.test_process_request_to_add_mhs import equivalent
 
 from test_helpers.terraform import read_terraform_output
 
 from .conftest import ETL_BUCKET, parametrize_over_scenarios
-from .utils import Handler, Scenario, convert_list_likes, device_as_json_dict
-
-
-def get_first_key(device: dict[str, list[dict[str, str]]]):
-    return tuple(device["keys"][0].values())
-
-
-def sort_tags(tags: list[dict[str, list[list[str]]]]):
-    if tags and isinstance(tags[0], dict):
-        _tags = [
-            DeviceTag(**{k: v for k, v in tag["components"]}).value for tag in tags
-        ]
-    else:
-        _tags = [DeviceTag(__root__=tag).value for tag in tags]
-    return sorted(_tags)
-
-
-def sort_devices(devices: list[dict]):
-    devices_without_dates = []
-    for device in devices:
-        _device = deepcopy(device)
-        _device.pop("created_on", None)
-        _device.pop("deleted_on", None)
-        _device.pop("updated_on", None)
-        _device["tags"] = sort_tags(tags=_device["tags"])
-        devices_without_dates.append(_device)
-
-    sorted_devices = sorted(
-        devices_without_dates,
-        key=lambda device: (
-            device.get("name"),
-            device.get("ods_code"),
-            get_first_key(device),
-        ),
-    )
-
-    responses = [
-        response
-        for device in sorted_devices
-        for questionnaire_responses in device.get(
-            "questionnaire_responses", {}
-        ).values()
-        for questionnaire_response in questionnaire_responses
-        for response in questionnaire_response["answers"]
-    ]
-    for response in responses:
-        ((field, answers),) = response.items()
-        response[field] = sorted(answers)
-
-    return sorted_devices
+from .utils import Handler, Scenario, as_domain_object, convert_list_likes, read_all
 
 
 class EtlError(Exception):
     pass
-
-
-class MockDeviceRepository(DeviceRepository):
-    def all_devices(self) -> Generator[Device, None, None]:
-        response = self.client.scan(TableName=self.table_name)
-        items = list(map(unmarshall, response["Items"]))
-        devices = list(TableKey.DEVICE.filter(items, key="sk"))
-        for device in devices:
-            if device.get("root"):
-                try:
-                    yield self.read(device["id"])
-                except:
-                    yield self.read_inactive(device["id"])
 
 
 @parametrize_over_scenarios()
@@ -147,7 +78,24 @@ def test_transform_and_load(
 
     dynamodb_client = get_dynamodb_client()
     table_name = read_terraform_output("dynamodb_table_name.value")
-    repo = MockDeviceRepository(table_name=table_name, dynamodb_client=dynamodb_client)
-    devices = list(map(device_as_json_dict, repo.all_devices()))
-    assert len(devices) == len(scenario.load_output), devices
-    assert sort_devices(devices) == sort_devices(scenario.load_output), devices
+    created_objs = list(read_all(table_name=table_name, db_client=dynamodb_client))
+    expected_objs = list(map(as_domain_object, scenario.load_output))
+
+    for created_obj in created_objs:
+        found_match = False
+        expected_objs_with_matching_type = list(
+            filter(lambda o: type(o) is type(created_obj), expected_objs)
+        )
+        for expected_obj in expected_objs_with_matching_type:
+            try:
+                assert equivalent(created_obj, expected_obj)
+            except AssertionError:
+                pass
+            else:
+                found_match = True
+                break
+
+        if not found_match:
+            raise ValueError(
+                f"Could not find match in expected output for {created_obj}"
+            )

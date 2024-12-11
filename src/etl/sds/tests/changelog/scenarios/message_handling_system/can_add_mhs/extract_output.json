@@ -18,7 +18,7 @@
     "nhs_mhs_in": "READ_PRACTITIONER_ROLE_R4_V001",
     "nhs_mhs_ip_address": null,
     "nhs_mhs_is_authenticated": "none",
-    "nhs_mhs_manufacturer_org": null,
+    "nhs_mhs_manufacturer_org": "C3O9X",
     "nhs_mhs_party_key": "C3O9X-823610",
     "nhs_mhs_persist_duration": null,
     "nhs_mhs_retries": null,
@@ -32,12 +32,6 @@
     "nhs_product_version": "Mar2023",
     "nhs_requestor_urp": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
     "object_class": "nhsMhs",
-    "unique_identifier": "00000a84594b2ef34279"
-  },
-  {
-    "change_type": "modify",
-    "modifications": [["add", "nhsmhsackrequested", ["never"]]],
-    "object_class": "modify",
     "unique_identifier": "00000a84594b2ef34279"
   }
 ]

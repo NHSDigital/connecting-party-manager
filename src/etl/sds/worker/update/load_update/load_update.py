@@ -2,18 +2,33 @@ from collections import deque
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
-from domain.core.aggregate_root import AggregateRoot
-from domain.core.device import DeviceEventDeserializer
+import boto3
+from domain.core.event_deserializer import deserialize_event
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dump_lz4, pkl_load_lz4
 from etl_utils.smart_open import smart_open
 from etl_utils.worker.action import apply_action
 from etl_utils.worker.model import WorkerActionResponse, WorkerEvent
 from etl_utils.worker.worker_step_chain import execute_step_chain
-from sds.worker.load import LoadWorkerCache
+from event.aws.client import dynamodb_client
+from sds.epr.updates.etl_update_repository import EtlUpdateRepository
+from sds.worker.load import LoadWorkerEnvironment
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
+
+ENVIRONMENT = LoadWorkerEnvironment.build()
+
+
+class LoadWorkerCache:
+    def __init__(self):
+        self.S3_CLIENT = boto3.client("s3")
+        self.ENVIRONMENT = ENVIRONMENT
+        self.REPOSITORY = EtlUpdateRepository(
+            table_name=ENVIRONMENT.TABLE_NAME, dynamodb_client=dynamodb_client()
+        )
+        self.MAX_RECORDS = 150_000
+
 
 CACHE = LoadWorkerCache()
 
@@ -33,7 +48,7 @@ def load(
     exception = apply_action(
         unprocessed_records=unprocessed_records,
         processed_records=processed_records,
-        action=lambda record: DeviceEventDeserializer.parse(exported_event=record),
+        action=lambda record: deserialize_event(record),
         max_records=max_records,
     )
 
@@ -55,9 +70,7 @@ def handler(event: dict, context):
         s3_input_path=CACHE.ENVIRONMENT.s3_path(WorkerKey.LOAD),
         s3_output_path=None,
         unprocessed_dumper=pkl_dump_lz4,
-        processed_dumper=lambda events: CACHE.REPOSITORY.write(
-            AggregateRoot(events=events)
-        ),
+        processed_dumper=CACHE.REPOSITORY.write,
         max_records=max_records,
     )
     return asdict(response)

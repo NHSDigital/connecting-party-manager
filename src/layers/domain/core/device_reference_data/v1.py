@@ -7,7 +7,7 @@ from domain.core.aggregate_root import AggregateRoot, event
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import DuplicateQuestionnaireResponse
 from domain.core.enum import Status
-from domain.core.event import Event
+from domain.core.event import Event, EventDeserializer
 from domain.core.questionnaire import QuestionnaireResponse
 from domain.core.timestamp import now
 from domain.core.validation import DEVICE_NAME_REGEX
@@ -77,3 +77,40 @@ class DeviceReferenceData(AggregateRoot):
                 for q_name, qrs in self.questionnaire_responses.items()
             },
         )
+
+    @event
+    def remove_questionnaire(
+        self, questionnaire_id: str
+    ) -> QuestionnaireResponseUpdatedEvent:
+        self.questionnaire_responses[questionnaire_id] = []
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            questionnaire_responses={
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
+            },
+        )
+
+    @event
+    def remove_questionnaire_response(
+        self, questionnaire_id: str, questionnaire_response_id: str
+    ) -> QuestionnaireResponseUpdatedEvent:
+        self.questionnaire_responses[questionnaire_id] = [
+            qr
+            for qr in self.questionnaire_responses[questionnaire_id]
+            if qr.id != questionnaire_response_id
+        ]
+        return QuestionnaireResponseUpdatedEvent(
+            id=self.id,
+            questionnaire_responses={
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
+            },
+        )
+
+
+class DeviceReferenceDataEventDeserializer(EventDeserializer):
+    event_types = (
+        DeviceReferenceDataCreatedEvent,
+        QuestionnaireResponseUpdatedEvent,
+    )
