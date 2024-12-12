@@ -8,6 +8,7 @@ from domain.repository.questionnaire_repository import (
     QuestionnaireInstance,
     QuestionnaireRepository,
 )
+from pydantic import ValidationError
 from sds.epr.bulk_create.creators import (
     create_additional_interactions,
     create_as_device,
@@ -16,6 +17,7 @@ from sds.epr.bulk_create.creators import (
     create_message_sets,
     create_mhs_device,
 )
+from sds.epr.constants import EXCEPTIONAL_ODS_CODES
 
 
 @pytest.fixture(scope="module")
@@ -201,6 +203,34 @@ def test_create_epr_product_team(product_team: ProductTeam, today_string: str):
         "status": "active",
         "updated_on": None,
     }
+
+
+@pytest.mark.parametrize("ods_code", EXCEPTIONAL_ODS_CODES)
+def test_create_epr_product_team_exceptional_ods_codes(
+    ods_code: str, today_string: str
+):
+    product_team = create_epr_product_team(ods_code)
+    _product_team = product_team.state()
+    assert _product_team.pop("created_on").startswith(today_string)
+    assert _product_team.pop("id").startswith(f"{ods_code}.")
+    assert _product_team == {
+        "deleted_on": None,
+        "keys": [
+            {
+                "key_type": "epr_id",
+                "key_value": f"EPR-{ods_code}",
+            },
+        ],
+        "name": f"{ods_code} (EPR)",
+        "ods_code": ods_code,
+        "status": "active",
+        "updated_on": None,
+    }
+
+
+def test_create_epr_product_team_bad_ods_codes():
+    with pytest.raises(ValidationError):
+        create_epr_product_team("21h32jh4282")
 
 
 def test_create_epr_product(
