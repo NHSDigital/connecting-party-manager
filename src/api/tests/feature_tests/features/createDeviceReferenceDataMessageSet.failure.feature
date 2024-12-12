@@ -140,3 +140,31 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 143              |
+
+  Scenario: Fail to create an "MHS Message Set" Device Reference Data, with questionnaire responses with duplicate interaction IDs
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    And I note the response field "$.keys.0.key_value" as "party_key"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+      | path                                                            | value                                                     |
+      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN         | urn:nhs:names:services:ers                                |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN         | READ_PRACTITIONER_ROLE_R4_V001                            |
+      | questionnaire_responses.spine_mhs_message_sets.1.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
+      | questionnaire_responses.spine_mhs_message_sets.1.MHS SN         | urn:nhs:names:services:ers                                |
+      | questionnaire_responses.spine_mhs_message_sets.1.MHS IN         | READ_PRACTITIONER_ROLE_R4_V001                            |
+    Then I receive a status code "400" with body
+      | path             | value                                                                                                                               |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                    |
+      | errors.0.message | Duplicate 'Interaction ID' provided: value 'urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001' occurs 2 times in the input. |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 188              |
