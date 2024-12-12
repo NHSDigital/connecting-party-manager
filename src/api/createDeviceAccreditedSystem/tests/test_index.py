@@ -35,6 +35,7 @@ PRODUCT_ID = ProductId.create()
 PRODUCT_TEAM_NAME = "My Product Team"
 PRODUCT_NAME = "My Product"
 VERSION = 1
+PARTY_KEY = "ABC1234-987654"
 
 QUESTIONNAIRE_DATA = {
     "ODS Code": "FH15R",
@@ -69,7 +70,7 @@ def mock_epr_product_with_one_message_set_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -79,10 +80,22 @@ def mock_epr_product_with_one_message_set_drd() -> (
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
         questionnaire_response_1 = mhs_message_set_questionnaire.validate(
-            data={"Interaction ID": "urn:foo1", "MHS SN": "bar", "MHS IN": "baz"}
+            data={
+                "Interaction ID": "bar:baz",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
+            }
         )
         questionnaire_response_2 = mhs_message_set_questionnaire.validate(
-            data={"Interaction ID": "urn:foo2", "MHS SN": "bar2", "MHS IN": "baz2"}
+            data={
+                "Interaction ID": "bar2:baz2",
+                "MHS SN": "bar2",
+                "MHS IN": "baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
+            }
         )
 
         # Set up DeviceReferenceData in DB
@@ -124,7 +137,7 @@ def mock_epr_product_with_message_sets_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -135,10 +148,22 @@ def mock_epr_product_with_message_sets_drd() -> (
         )
 
         questionnaire_response_1 = mhs_message_set_questionnaire.validate(
-            data={"Interaction ID": "urn:foo1", "MHS SN": "bar", "MHS IN": "baz"}
+            data={
+                "Interaction ID": "bar:baz",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
+            }
         )
         questionnaire_response_2 = mhs_message_set_questionnaire.validate(
-            data={"Interaction ID": "urn:foo2", "MHS SN": "bar2", "MHS IN": "baz2"}
+            data={
+                "Interaction ID": "bar2:baz2",
+                "MHS SN": "bar2",
+                "MHS IN": "baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
+            }
         )
         # Set up DeviceReferenceData in DB
         device_reference_data_mhs = product.create_device_reference_data(
@@ -197,7 +222,7 @@ def mock_epr_product_with_more_than_two_message_sets_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -207,10 +232,22 @@ def mock_epr_product_with_more_than_two_message_sets_drd() -> (
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
         questionnaire_response_1 = mhs_message_set_questionnaire_1.validate(
-            data={"Interaction ID": "urn:foo1", "MHS SN": "bar", "MHS IN": "baz"}
+            data={
+                "Interaction ID": "bar:baz",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
+            }
         )
         questionnaire_response_2 = mhs_message_set_questionnaire_1.validate(
-            data={"Interaction ID": "urn:foo2", "MHS SN": "bar2", "MHS IN": "baz2"}
+            data={
+                "Interaction ID": "bar2:baz2",
+                "MHS SN": "bar2",
+                "MHS IN": "baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
+            }
         )
 
         # Set up DeviceReferenceData in DB
@@ -224,10 +261,22 @@ def mock_epr_product_with_more_than_two_message_sets_drd() -> (
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
         questionnaire_response_3 = mhs_message_set_questionnaire_2.validate(
-            data={"Interaction ID": "urn:foo3", "MHS SN": "bar3", "MHS IN": "baz3"}
+            data={
+                "Interaction ID": "bar3:baz3",
+                "MHS SN": "bar3",
+                "MHS IN": "baz3",
+                "MHS CPA ID": f"{PARTY_KEY}:bar3:baz3",
+                "Unique Identifier": f"{PARTY_KEY}:bar3:baz3",
+            }
         )
         questionnaire_response_4 = mhs_message_set_questionnaire_2.validate(
-            data={"Interaction ID": "urn:foo4", "MHS SN": "bar4", "MHS IN": "baz4"}
+            data={
+                "Interaction ID": "bar4:baz4",
+                "MHS SN": "bar4",
+                "MHS IN": "baz4",
+                "MHS CPA ID": f"{PARTY_KEY}:bar4:baz4",
+                "Unique Identifier": f"{PARTY_KEY}:bar4:baz4",
+            }
         )
 
         # Set up DeviceReferenceData in DB
@@ -287,7 +336,7 @@ def mock_epr_product_with_two_message_sets_the_same_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -297,10 +346,22 @@ def mock_epr_product_with_two_message_sets_the_same_drd() -> (
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
         questionnaire_response_1 = mhs_message_set_questionnaire_1.validate(
-            data={"Interaction ID": "urn:foo1", "MHS SN": "bar", "MHS IN": "baz"}
+            data={
+                "Interaction ID": "bar:baz",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
+            }
         )
         questionnaire_response_2 = mhs_message_set_questionnaire_1.validate(
-            data={"Interaction ID": "urn:foo2", "MHS SN": "bar2", "MHS IN": "baz2"}
+            data={
+                "Interaction ID": "bar2:baz2",
+                "MHS SN": "ba2r",
+                "MHS IN": "baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
+            }
         )
 
         # Set up DeviceReferenceData in DB
@@ -314,10 +375,22 @@ def mock_epr_product_with_two_message_sets_the_same_drd() -> (
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
         questionnaire_response_3 = mhs_message_set_questionnaire_2.validate(
-            data={"Interaction ID": "urn:foo3", "MHS SN": "bar3", "MHS IN": "baz3"}
+            data={
+                "Interaction ID": "bar3:baz3",
+                "MHS SN": "bar3",
+                "MHS IN": "baz3",
+                "MHS CPA ID": f"{PARTY_KEY}:bar3:baz3",
+                "Unique Identifier": f"{PARTY_KEY}:bar3:baz3",
+            }
         )
         questionnaire_response_4 = mhs_message_set_questionnaire_2.validate(
-            data={"Interaction ID": "urn:foo4", "MHS SN": "bar4", "MHS IN": "baz4"}
+            data={
+                "Interaction ID": "bar4:baz4",
+                "MHS SN": "bar4",
+                "MHS IN": "baz4",
+                "MHS CPA ID": f"{PARTY_KEY}:bar4:baz4",
+                "Unique Identifier": f"{PARTY_KEY}:bar4:baz4",
+            }
         )
 
         # Set up DeviceReferenceData in DB
@@ -390,7 +463,7 @@ def mock_epr_product_without_message_set_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -449,7 +522,7 @@ def test_index() -> None:
         )
 
         # Check party_key is added to tags in the created device
-        expected_party_key = (str(ProductKeyType.PARTY_KEY), "abc1234-987654")
+        expected_party_key = (str(ProductKeyType.PARTY_KEY), PARTY_KEY.lower())
         assert any(expected_party_key in tag.__root__ for tag in created_device.tags)
 
         # Check an ASID is generated and added to the keys.

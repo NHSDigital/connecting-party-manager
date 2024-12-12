@@ -1,6 +1,9 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
+from domain.api.common_steps.questionnaire_response_validation import (
+    process_and_validate_questionnaire_response,
+)
 from domain.api.common_steps.read_product import (
     get_party_key,
     parse_path_params,
@@ -51,19 +54,31 @@ def require_no_existing_message_sets_device_reference_data(
         )
 
 
-def read_questionnaire(data, cache) -> Questionnaire:
+def read_spine_mhs_message_sets_questionnaire(data, cache) -> Questionnaire:
     return QuestionnaireRepository().read(QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS)
 
 
 def validate_questionnaire_responses(data, cache) -> list[QuestionnaireResponse]:
-    questionnaire: Questionnaire = data[read_questionnaire]
+    questionnaire: Questionnaire = data[read_spine_mhs_message_sets_questionnaire]
     payload: CreateDeviceReferenceMessageSetsDataParams = data[
         parse_device_reference_data_for_epr_payload
     ]
     raw_questionnaire_responses = payload.questionnaire_responses[
         QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
     ]
-    return [questionnaire.validate(data=qr) for qr in raw_questionnaire_responses]
+    party_key = data[get_party_key]
+
+    validated_responses = [
+        process_and_validate_questionnaire_response(
+            questionnaire,
+            qr,
+            party_key,
+            instance=QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS,
+        )
+        for qr in raw_questionnaire_responses
+    ]
+
+    return validated_responses
 
 
 def create_message_set_device_reference_data(data, cache) -> DeviceReferenceData:
@@ -110,7 +125,7 @@ steps = [
     read_product,
     get_party_key,
     require_no_existing_message_sets_device_reference_data,
-    read_questionnaire,
+    read_spine_mhs_message_sets_questionnaire,
     validate_questionnaire_responses,
     create_message_set_device_reference_data,
     add_questionnaire_response,

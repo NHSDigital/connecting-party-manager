@@ -35,21 +35,15 @@ def mhs_data():
         "questionnaire_name": "spine_mhs",
         "questionnaire_version": "1",
         "data": {
-            "Unique Identifier": "1wd354",
             "Approver URP": "approver-123",
-            "Contract Property Template Key": "key-123",
             "Date Approved": "today",
             "Date DNS Approved": "yesterday",
             "Date Requested": "a week ago",
             "DNS Approver": "dns-approver-123",
-            "Interaction Type": "hl7",
             "Managing Organization": "AAA",
-            "MHS CPA ID": "1wd354",
-            "Address": "my-mhs-endpoint",
+            "Address": "https://my-fqdn",
             "MHS FQDN": "my-fqdn",
-            "MHS Is Authenticated": "none",
             "MHS Party key": "AAA-123456",
-            "Product Key": "key-123",
             "Product Name": "My EPR Product",
             "Requestor URP": "requester-123",
             "MHS Manufacturer Organisation": "AAA",
@@ -64,18 +58,28 @@ def message_set_data():
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
+                "Unique Identifier": "AAA-123456:sn-123:in-123",
+                "Contract Property Template Key": "key-123",
+                "Interaction Type": "hl7",
+                "MHS CPA ID": "AAA-123456:sn-123:in-123",
                 "MHS IN": "in-123",
+                "MHS Is Authenticated": "none",
                 "MHS SN": "sn-123",
-                "Interaction ID": "my-interaction-id",
+                "Interaction ID": "sn-123:in-123",
             },
         },
         {
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
+                "Unique Identifier": "BBB-123456:sn-456:in-456",
+                "Contract Property Template Key": "key-456",
+                "Interaction Type": "hl7",
+                "MHS CPA ID": "BBB-123456:sn-456:in-456",
                 "MHS IN": "in-456",
+                "MHS Is Authenticated": "none",
                 "MHS SN": "sn-456",
-                "Interaction ID": "my-other-interaction-id",
+                "Interaction ID": "sn-456:in-456",
             },
         },
     ]
@@ -83,7 +87,7 @@ def message_set_data():
 
 @pytest.fixture
 def mhs_cpa_ids():
-    return ["1wd354", "h0394j"]
+    return ["AAA-123456:sn-123:in-123", "BBB-123456:sn-456:in-456"]
 
 
 @pytest.fixture

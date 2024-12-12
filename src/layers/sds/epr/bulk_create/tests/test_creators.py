@@ -49,14 +49,18 @@ def message_sets(product, party_key):
         questionnaire.validate(data=_raw_message_set_data)
         for _raw_message_set_data in (
             {
-                "Interaction ID": "my-interaction-id",
-                "MHS IN": "in-123",
                 "MHS SN": "sn-123",
+                "MHS IN": "in-123",
+                "Interaction ID": "sn-123:in-123",
+                "MHS CPA ID": "AAA-123456:sn-123:in-123",
+                "Unique Identifier": "AAA-123456:sn-123:in-123",
             },
             {
-                "Interaction ID": "my-other-interaction-id",
-                "MHS IN": "in-456",
                 "MHS SN": "sn-456",
+                "MHS IN": "in-456",
+                "Interaction ID": "sn-456:in-456",
+                "MHS CPA ID": "AAA-123456:sn-456:in-456",
+                "Unique Identifier": "AAA-123456:sn-456:in-456",
             },
         )
     ]
@@ -92,21 +96,15 @@ def mhs_device(product, party_key, message_sets: DeviceReferenceData, mhs_tags):
         data={
             "Address": "my-mhs-endpoint",
             "Approver URP": "approver-123",
-            "Contract Property Template Key": "key-123",
             "DNS Approver": "dns-approver-123",
             "Date Approved": "today",
             "Date DNS Approved": "yesterday",
             "Date Requested": "a week ago",
-            "Interaction Type": "hl7",
-            "MHS CPA ID": "1wd354",
             "MHS FQDN": "my-fqdn",
-            "MHS Is Authenticated": "none",
             "MHS Party key": "AAA-123456",
             "Managing Organization": "AAA",
-            "Product Key": "key-123",
             "Product Name": "My EPR Product",
             "Requestor URP": "requester-123",
-            "Unique Identifier": "1wd354",
             "MHS Manufacturer Organisation": "AAA",
         }
     )
@@ -255,18 +253,22 @@ def test_create_message_sets(
             "spine_mhs_message_sets/1": [
                 {
                     "data": {
-                        "Interaction ID": "my-interaction-id",
-                        "MHS IN": "in-123",
                         "MHS SN": "sn-123",
+                        "MHS IN": "in-123",
+                        "Interaction ID": "sn-123:in-123",
+                        "MHS CPA ID": "AAA-123456:sn-123:in-123",
+                        "Unique Identifier": "AAA-123456:sn-123:in-123",
                     },
                     "questionnaire_name": "spine_mhs_message_sets",
                     "questionnaire_version": "1",
                 },
                 {
                     "data": {
-                        "Interaction ID": "my-other-interaction-id",
-                        "MHS IN": "in-456",
                         "MHS SN": "sn-456",
+                        "MHS IN": "in-456",
+                        "Interaction ID": "sn-456:in-456",
+                        "MHS CPA ID": "AAA-123456:sn-456:in-456",
+                        "Unique Identifier": "AAA-123456:sn-456:in-456",
                     },
                     "questionnaire_name": "spine_mhs_message_sets",
                     "questionnaire_version": "1",
@@ -323,21 +325,15 @@ def test_create_mhs_device(
                     "data": {
                         "Address": "my-mhs-endpoint",
                         "Approver URP": "approver-123",
-                        "Contract Property Template Key": "key-123",
                         "DNS Approver": "dns-approver-123",
                         "Date Approved": "today",
                         "Date DNS Approved": "yesterday",
                         "Date Requested": "a week ago",
-                        "Interaction Type": "hl7",
-                        "MHS CPA ID": "1wd354",
                         "MHS FQDN": "my-fqdn",
-                        "MHS Is Authenticated": "none",
                         "MHS Party key": "AAA-123456",
                         "Managing Organization": "AAA",
-                        "Product Key": "key-123",
                         "Product Name": "My EPR Product",
                         "Requestor URP": "requester-123",
-                        "Unique Identifier": "1wd354",
                         "MHS Manufacturer Organisation": "AAA",
                     },
                     "questionnaire_name": "spine_mhs",

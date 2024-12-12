@@ -17,34 +17,23 @@ Feature: Create AS Device - success scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I note the response field "$.keys.0.key_value" as "party_key"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
-      | path                                                            | value                                                     |
-      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN         | urn:nhs:names:services:ers                                |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN         | READ_PRACTITIONER_ROLE_R4_V001                            |
+      | path                                                    | value                          |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
-      | path                                                               | value              |
-      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
-      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
-      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
-      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
-      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
-      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
-      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
-      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
-      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
-      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
-      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
-      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
-      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
-      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
-      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
-      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
-      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+      | path                                                              | value               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
+      | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation | F5H1R               |
+      | questionnaire_responses.spine_mhs.0.Product Name                  | Product Name        |
+      | questionnaire_responses.spine_mhs.0.Product Version               | 1                   |
+      | questionnaire_responses.spine_mhs.0.Approver URP                  | UI provided         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                  | UI provided         |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                 | UI provided         |
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
@@ -212,30 +201,20 @@ Feature: Create AS Device - success scenarios
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
-      | path                                                            | value                                                     |
-      | questionnaire_responses.spine_mhs_message_sets.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN         | urn:nhs:names:services:ers                                |
-      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN         | READ_PRACTITIONER_ROLE_R4_V001                            |
+      | path                                                    | value                          |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
+      | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
-      | path                                                               | value              |
-      | questionnaire_responses.spine_mhs.0.Address                        | http://example.com |
-      | questionnaire_responses.spine_mhs.0.Unique Identifier              | 123456             |
-      | questionnaire_responses.spine_mhs.0.Managing Organization          | Example Org        |
-      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation  | AAA                |
-      | questionnaire_responses.spine_mhs.0.MHS Party key                  | party-key-001      |
-      | questionnaire_responses.spine_mhs.0.MHS CPA ID                     | cpa-id-001         |
-      | questionnaire_responses.spine_mhs.0.Approver URP                   | approver-123       |
-      | questionnaire_responses.spine_mhs.0.Contract Property Template Key | contract-key-001   |
-      | questionnaire_responses.spine_mhs.0.Date Approved                  | 2024-01-01         |
-      | questionnaire_responses.spine_mhs.0.Date DNS Approved              | 2024-01-02         |
-      | questionnaire_responses.spine_mhs.0.Date Requested                 | 2024-01-03         |
-      | questionnaire_responses.spine_mhs.0.DNS Approver                   | dns-approver-456   |
-      | questionnaire_responses.spine_mhs.0.Interaction Type               | FHIR               |
-      | questionnaire_responses.spine_mhs.0.MHS FQDN                       | mhs.example.com    |
-      | questionnaire_responses.spine_mhs.0.MHS Is Authenticated           | PERSISTENT         |
-      | questionnaire_responses.spine_mhs.0.Product Key                    | product-key-001    |
-      | questionnaire_responses.spine_mhs.0.Requestor URP                  | requestor-789      |
+      | path                                                              | value               |
+      | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
+      | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
+      | questionnaire_responses.spine_mhs.0.MHS Manufacturer Organisation | F5H1R               |
+      | questionnaire_responses.spine_mhs.0.Product Name                  | Product Name        |
+      | questionnaire_responses.spine_mhs.0.Product Version               | 1                   |
+      | questionnaire_responses.spine_mhs.0.Approver URP                  | UI provided         |
+      | questionnaire_responses.spine_mhs.0.DNS Approver                  | UI provided         |
+      | questionnaire_responses.spine_mhs.0.Requestor URP                 | UI provided         |
     And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |

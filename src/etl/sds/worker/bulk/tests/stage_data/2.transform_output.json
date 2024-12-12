@@ -8,7 +8,12 @@
       "created_on": "2024-11-20T10:54:19.001479+00:00",
       "updated_on": null,
       "deleted_on": null,
-      "keys": [{ "key_type": "epr_id", "key_value": "EPR-LSP04" }]
+      "keys": [
+        {
+          "key_type": "epr_id",
+          "key_value": "EPR-LSP04"
+        }
+      ]
     }
   },
   {
@@ -21,7 +26,12 @@
       "created_on": "2024-11-20T10:54:19.001733+00:00",
       "updated_on": "2024-11-20T10:54:19.002057+00:00",
       "deleted_on": null,
-      "keys": [{ "key_type": "party_key", "key_value": "AAA-111111" }]
+      "keys": [
+        {
+          "key_type": "party_key",
+          "key_value": "AAA-111111"
+        }
+      ]
     }
   },
   {
@@ -41,7 +51,16 @@
             "data": {
               "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001",
               "MHS SN": "urn:nhs:names:services:ers",
-              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
+              "Contract Property Template Key": "14",
+              "Interaction Type": "fhir",
+              "Reliability Configuration Ack Requested": "never",
+              "MHS CPA ID": "00000000000a",
+              "Reliability Configuration Duplication Elimination": "never",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
+              "Product Key": "111",
+              "Unique Identifier": "00000000000a"
             },
             "created_on": "2024-11-20T10:54:19.000224+00:00"
           }
@@ -107,7 +126,12 @@
       "created_on": "2024-11-20T10:54:19.002315+00:00",
       "updated_on": "2024-11-20T10:54:19.003736+00:00",
       "deleted_on": null,
-      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
+      "keys": [
+        {
+          "key_type": "cpa_id",
+          "key_value": "00000000000a"
+        }
+      ],
       "tags": [
         [["nhs_mhs_party_key", "aaa-111111"]],
         [
@@ -152,33 +176,26 @@
             "questionnaire_version": "1",
             "data": {
               "Approver URP": "myApprover",
-              "Contract Property Template Key": "14",
               "Date Approved": "20010101010101",
               "Date DNS Approved": "20010101010101",
               "Date Requested": "20010101010101",
               "DNS Approver": "myApprover",
-              "Interaction Type": "fhir",
               "Managing Organization": "AAA",
-              "Reliability Configuration Ack Requested": "never",
-              "MHS CPA ID": "00000000000a",
-              "Reliability Configuration Duplication Elimination": "never",
               "Address": "https://test.C3O9X.nhs.uk/",
               "MHS FQDN": "test.C3O9X.nhs.uk",
-              "MHS IP Address": "0.0.0.0",
-              "MHS Is Authenticated": "none",
               "MHS Manufacturer Organisation": "LSP04",
               "MHS Party key": "AAA-111111",
-              "Product Key": "111",
               "Product Name": "My AAA Product",
               "Product Version": "2005.02",
-              "Requestor URP": "myRequestor",
-              "Unique Identifier": "00000000000a"
+              "Requestor URP": "myRequestor"
             },
             "created_on": "2024-11-20T10:54:18.995983+00:00"
           }
         ]
       },
-      "device_reference_data": { "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": ["*"] }
+      "device_reference_data": {
+        "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": ["*"]
+      }
     }
   },
   {
@@ -193,7 +210,10 @@
       "updated_on": "2024-11-20T10:54:19.005653+00:00",
       "deleted_on": null,
       "keys": [
-        { "key_type": "accredited_system_id", "key_value": "000000000001" }
+        {
+          "key_type": "accredited_system_id",
+          "key_value": "000000000001"
+        }
       ],
       "tags": [
         [
@@ -312,7 +332,10 @@
       "updated_on": "2024-11-20T10:54:19.007286+00:00",
       "deleted_on": null,
       "keys": [
-        { "key_type": "accredited_system_id", "key_value": "000000000004" }
+        {
+          "key_type": "accredited_system_id",
+          "key_value": "000000000004"
+        }
       ],
       "tags": [
         [
@@ -429,7 +452,12 @@
       "created_on": "2024-11-20T10:54:19.017417+00:00",
       "updated_on": "2024-11-20T10:54:19.017614+00:00",
       "deleted_on": null,
-      "keys": [{ "key_type": "party_key", "key_value": "BBB-111111" }]
+      "keys": [
+        {
+          "key_type": "party_key",
+          "key_value": "BBB-111111"
+        }
+      ]
     }
   },
   {
@@ -449,7 +477,16 @@
             "data": {
               "MHS IN": "READ_PRACTITIONER_ROLE_R4_V002",
               "MHS SN": "urn:nhs:names:services:ers",
-              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002"
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002",
+              "Contract Property Template Key": "14",
+              "Interaction Type": "fhir",
+              "Reliability Configuration Ack Requested": "never",
+              "MHS CPA ID": "00000000000b",
+              "Reliability Configuration Duplication Elimination": "never",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
+              "Product Key": "111",
+              "Unique Identifier": "00000000000b"
             },
             "created_on": "2024-11-20T10:54:19.015021+00:00"
           },
@@ -458,9 +495,18 @@
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
-              "MHS IN": "READ_PRACTITIONER_ROLE_R4_V002",
+              "MHS IN": "READ_PRACTITIONER_ROLE_R4_V003",
               "MHS SN": "urn:nhs:names:services:ers",
-              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V003"
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V003",
+              "Contract Property Template Key": "14",
+              "Interaction Type": "fhir",
+              "Reliability Configuration Ack Requested": "never",
+              "MHS CPA ID": "00000000000c",
+              "Reliability Configuration Duplication Elimination": "never",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
+              "Product Key": "111",
+              "Unique Identifier": "00000000000c"
             },
             "created_on": "2024-11-20T10:54:19.015692+00:00"
           }
@@ -536,8 +582,14 @@
       "updated_on": "2024-11-20T10:54:19.019737+00:00",
       "deleted_on": null,
       "keys": [
-        { "key_type": "cpa_id", "key_value": "00000000000b" },
-        { "key_type": "cpa_id", "key_value": "00000000000c" }
+        {
+          "key_type": "cpa_id",
+          "key_value": "00000000000b"
+        },
+        {
+          "key_type": "cpa_id",
+          "key_value": "00000000000c"
+        }
       ],
       "tags": [
         [
@@ -611,33 +663,26 @@
             "questionnaire_version": "1",
             "data": {
               "Approver URP": "myApprover",
-              "Contract Property Template Key": "14",
               "Date Approved": "20020202020202",
               "Date DNS Approved": "20020202020202",
               "Date Requested": "20020202020202",
               "DNS Approver": "myApprover",
-              "Interaction Type": "fhir",
               "Managing Organization": "BBB",
-              "Reliability Configuration Ack Requested": "never",
-              "MHS CPA ID": "00000000000b",
-              "Reliability Configuration Duplication Elimination": "never",
               "Address": "https://test.C3O9X.nhs.uk/",
               "MHS FQDN": "test.C3O9X.nhs.uk",
-              "MHS IP Address": "0.0.0.0",
-              "MHS Is Authenticated": "none",
               "MHS Manufacturer Organisation": "LSP04",
               "MHS Party key": "BBB-111111",
-              "Product Key": "111",
               "Product Name": "My BBB Product",
               "Product Version": "2005.02",
-              "Requestor URP": "myRequestor",
-              "Unique Identifier": "00000000000b"
+              "Requestor URP": "myRequestor"
             },
             "created_on": "2024-11-20T10:54:19.010898+00:00"
           }
         ]
       },
-      "device_reference_data": { "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": ["*"] }
+      "device_reference_data": {
+        "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": ["*"]
+      }
     }
   },
   {
@@ -652,7 +697,10 @@
       "updated_on": "2024-11-20T10:54:19.021912+00:00",
       "deleted_on": null,
       "keys": [
-        { "key_type": "accredited_system_id", "key_value": "000000000002" }
+        {
+          "key_type": "accredited_system_id",
+          "key_value": "000000000002"
+        }
       ],
       "tags": [
         [
@@ -803,7 +851,10 @@
       "updated_on": "2024-11-20T10:54:19.023792+00:00",
       "deleted_on": null,
       "keys": [
-        { "key_type": "accredited_system_id", "key_value": "000000000003" }
+        {
+          "key_type": "accredited_system_id",
+          "key_value": "000000000003"
+        }
       ],
       "tags": [
         [

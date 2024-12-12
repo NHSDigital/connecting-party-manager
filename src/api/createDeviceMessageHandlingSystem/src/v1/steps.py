@@ -1,6 +1,9 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
+from domain.api.common_steps.questionnaire_response_validation import (
+    process_and_validate_questionnaire_response,
+)
 from domain.api.common_steps.read_product import (
     get_party_key,
     parse_path_params,
@@ -77,7 +80,7 @@ def read_device_reference_data(data, cache) -> DeviceReferenceData:
         )
     except ValueError:
         raise ConfigurationError(
-            "You must configure exactly one MessageSet Device Reference Data before creating an MHS Device"
+            "You must configure exactly one MessageSet Device Reference Data before creating an MHS Device."
         )
     return device_reference_data
 
@@ -87,16 +90,26 @@ def read_spine_mhs_questionnaire(data, cache) -> Questionnaire:
 
 
 def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireResponse:
-    spine_mhs_questionnaire: Questionnaire = data[read_spine_mhs_questionnaire]
+    questionnaire: Questionnaire = data[read_spine_mhs_questionnaire]
     payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
-
-    spine_mhs_questionnaire_response = payload.questionnaire_responses[
+    raw_questionnaire_responses = payload.questionnaire_responses[
         QuestionnaireInstance.SPINE_MHS
     ]
 
-    return spine_mhs_questionnaire.validate(
-        data=spine_mhs_questionnaire_response.__root__[0]
-    )
+    if len(raw_questionnaire_responses) != 1:
+        raise ConfigurationError(
+            "You must provide exactly one spine_mhs questionnaire response to create an MHS Device."
+        )
+    party_key = data[get_party_key]
+
+    validated_responses = [
+        process_and_validate_questionnaire_response(
+            questionnaire, qr, party_key, instance=QuestionnaireInstance.SPINE_MHS
+        )
+        for qr in raw_questionnaire_responses
+    ]
+
+    return validated_responses
 
 
 def create_mhs_device(data, cache) -> Device:
@@ -118,20 +131,18 @@ def create_party_key_tag(data, cache) -> DeviceTagAddedEvent:
 
 def create_cpa_id_keys(data, cache) -> DeviceKeyAddedEvent:
     mhs_device: Device = data[create_mhs_device]
-    party_key = data[get_party_key]
     drd: DeviceReferenceData = data[read_device_reference_data]
 
     questionnaire_responses = drd.questionnaire_responses.get(
         f"{QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS}/1", []
     )
 
-    interaction_ids = [
-        response.data.get(SdsFieldName.INTERACTION_ID)
-        for response in questionnaire_responses
+    cpa_ids = [
+        response.data.get(SdsFieldName.CPA_ID) for response in questionnaire_responses
     ]
 
-    for id in interaction_ids:
-        mhs_device.add_key(key_type=DeviceKeyType.CPA_ID, key_value=f"{party_key}:{id}")
+    for id in cpa_ids:
+        mhs_device.add_key(key_type=DeviceKeyType.CPA_ID, key_value=id)
 
     return mhs_device
 
@@ -148,12 +159,13 @@ def add_device_reference_data_id(data, cache) -> DeviceReferenceDataIdAddedEvent
 def add_spine_mhs_questionnaire_response(
     data, cache
 ) -> QuestionnaireResponseUpdatedEvent:
-    spine_mhs_questionnaire_response: QuestionnaireResponse = data[
+    spine_mhs_questionnaire_response: list[QuestionnaireResponse] = data[
         validate_spine_mhs_questionnaire_response
     ]
     mhs_device: Device = data[create_mhs_device]
 
-    return mhs_device.add_questionnaire_response(spine_mhs_questionnaire_response)
+    for qr in spine_mhs_questionnaire_response:
+        mhs_device.add_questionnaire_response(qr)
 
 
 def write_device(data: dict[str, Device], cache) -> Device:
@@ -177,8 +189,8 @@ steps = [
     read_product,
     get_party_key,
     check_for_existing_mhs,
-    read_device_reference_data,
     read_spine_mhs_questionnaire,
+    read_device_reference_data,
     validate_spine_mhs_questionnaire_response,
     create_mhs_device,
     create_party_key_tag,

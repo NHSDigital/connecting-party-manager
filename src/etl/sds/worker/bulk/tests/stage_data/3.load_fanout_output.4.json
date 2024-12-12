@@ -5,29 +5,55 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
+        "sk": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk_read": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "root": { "BOOL": false },
-        "id": { "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "name": { "S": "AAA-111111/000000000004 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "name": {
+          "S": "AAA-111111/000000000004 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.005712+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.007286+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.005712+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.007286+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000004" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000004"
+                }
               }
             }
           ]
@@ -41,10 +67,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -57,29 +91,55 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
+        "sk": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v001&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk_read": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "root": { "BOOL": false },
-        "id": { "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "name": { "S": "AAA-111111/000000000004 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "name": {
+          "S": "AAA-111111/000000000004 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.005712+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.007286+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.005712+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.007286+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000004" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000004"
+                }
               }
             }
           ]
@@ -93,10 +153,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -109,29 +177,55 @@
         "pk": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04"
         },
-        "sk": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
+        "sk": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=aaa&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk04"
         },
-        "sk_read": { "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "root": { "BOOL": false },
-        "id": { "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e" },
-        "name": { "S": "AAA-111111/000000000004 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.VNT-MLW" },
+        "sk_read": {
+          "S": "D#4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e"
+        },
+        "name": {
+          "S": "AAA-111111/000000000004 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.VNT-MLW"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.005712+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.007286+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.005712+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.007286+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000004" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000004"
+                }
               }
             }
           ]
@@ -145,10 +239,18 @@
         "device_reference_data": {
           "M": {
             "3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "d3d0e6b8-8277-4849-8e8d-5cb035af5536": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -158,27 +260,55 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "P#P.LU6-Y7D" },
-        "sk": { "S": "P#P.LU6-Y7D" },
-        "pk_read": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
-        "sk_read": { "S": "P#P.LU6-Y7D" },
-        "root": { "BOOL": true },
-        "id": { "S": "P.LU6-Y7D" },
+        "pk": {
+          "S": "P#P.LU6-Y7D"
+        },
+        "sk": {
+          "S": "P#P.LU6-Y7D"
+        },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "sk_read": {
+          "S": "P#P.LU6-Y7D"
+        },
+        "root": {
+          "BOOL": true
+        },
+        "id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "name": { "S": "My BBB Product" },
-        "ods_code": { "S": "LSP04" },
-        "status": { "S": "active" },
-        "created_on": { "S": "2024-11-20T10:54:19.017417+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.017614+00:00" },
-        "deleted_on": { "NULL": true },
+        "name": {
+          "S": "My BBB Product"
+        },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "status": {
+          "S": "active"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.017417+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.017614+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "party_key" },
-                "key_value": { "S": "BBB-111111" }
+                "key_type": {
+                  "S": "party_key"
+                },
+                "key_value": {
+                  "S": "BBB-111111"
+                }
               }
             }
           ]
@@ -189,27 +319,55 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "P#BBB-111111" },
-        "sk": { "S": "P#BBB-111111" },
-        "pk_read": { "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441" },
-        "sk_read": { "S": "P#BBB-111111" },
-        "root": { "BOOL": false },
-        "id": { "S": "P.LU6-Y7D" },
+        "pk": {
+          "S": "P#BBB-111111"
+        },
+        "sk": {
+          "S": "P#BBB-111111"
+        },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
+        },
+        "sk_read": {
+          "S": "P#BBB-111111"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "name": { "S": "My BBB Product" },
-        "ods_code": { "S": "LSP04" },
-        "status": { "S": "active" },
-        "created_on": { "S": "2024-11-20T10:54:19.017417+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.017614+00:00" },
-        "deleted_on": { "NULL": true },
+        "name": {
+          "S": "My BBB Product"
+        },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "status": {
+          "S": "active"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.017417+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.017614+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "party_key" },
-                "key_value": { "S": "BBB-111111" }
+                "key_type": {
+                  "S": "party_key"
+                },
+                "key_value": {
+                  "S": "BBB-111111"
+                }
               }
             }
           ]
@@ -220,98 +378,222 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e" },
-        "sk": { "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e" },
+        "pk": {
+          "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
+        },
+        "sk": {
+          "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
+        },
         "pk_read": {
           "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
         },
-        "sk_read": { "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e" },
-        "root": { "BOOL": true },
-        "id": { "S": "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e" },
-        "name": { "S": "BBB-111111 - MHS Message Sets" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
+        },
+        "root": {
+          "BOOL": true
+        },
+        "id": {
+          "S": "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
+        },
+        "name": {
+          "S": "BBB-111111 - MHS Message Sets"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
+        "ods_code": {
+          "S": "LSP04"
+        },
         "questionnaire_responses": {
           "M": {
             "spine_mhs_message_sets/1": {
               "L": [
                 {
                   "M": {
-                    "id": { "S": "719577ca-919e-486d-b0d1-e5e06388051c" },
-                    "questionnaire_name": { "S": "spine_mhs_message_sets" },
-                    "questionnaire_version": { "S": "1" },
+                    "id": {
+                      "S": "719577ca-919e-486d-b0d1-e5e06388051c"
+                    },
+                    "questionnaire_name": {
+                      "S": "spine_mhs_message_sets"
+                    },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
-                        "MHS IN": { "S": "READ_PRACTITIONER_ROLE_R4_V002" },
-                        "MHS SN": { "S": "urn:nhs:names:services:ers" },
+                        "MHS IN": {
+                          "S": "READ_PRACTITIONER_ROLE_R4_V002"
+                        },
+                        "MHS SN": {
+                          "S": "urn:nhs:names:services:ers"
+                        },
                         "Interaction ID": {
                           "S": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002"
+                        },
+                        "Contract Property Template Key": {
+                          "S": "14"
+                        },
+                        "Interaction Type": {
+                          "S": "fhir"
+                        },
+                        "Reliability Configuration Ack Requested": {
+                          "S": "never"
+                        },
+                        "MHS CPA ID": {
+                          "S": "00000000000b"
+                        },
+                        "Reliability Configuration Duplication Elimination": {
+                          "S": "never"
+                        },
+                        "MHS IP Address": {
+                          "S": "0.0.0.0"
+                        },
+                        "MHS Is Authenticated": {
+                          "S": "none"
+                        },
+                        "Product Key": {
+                          "S": "111"
+                        },
+                        "Unique Identifier": {
+                          "S": "00000000000b"
                         }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.015021+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.015021+00:00"
+                    }
                   }
                 },
                 {
                   "M": {
-                    "id": { "S": "417fe8ec-2fc1-4a38-80fc-7cb0ab5245e9" },
-                    "questionnaire_name": { "S": "spine_mhs_message_sets" },
-                    "questionnaire_version": { "S": "1" },
+                    "id": {
+                      "S": "417fe8ec-2fc1-4a38-80fc-7cb0ab5245e9"
+                    },
+                    "questionnaire_name": {
+                      "S": "spine_mhs_message_sets"
+                    },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
-                        "MHS IN": { "S": "READ_PRACTITIONER_ROLE_R4_V002" },
-                        "MHS SN": { "S": "urn:nhs:names:services:ers" },
+                        "MHS IN": {
+                          "S": "READ_PRACTITIONER_ROLE_R4_V003"
+                        },
+                        "MHS SN": {
+                          "S": "urn:nhs:names:services:ers"
+                        },
                         "Interaction ID": {
                           "S": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V003"
+                        },
+                        "Contract Property Template Key": {
+                          "S": "14"
+                        },
+                        "Interaction Type": {
+                          "S": "fhir"
+                        },
+                        "Reliability Configuration Ack Requested": {
+                          "S": "never"
+                        },
+                        "MHS CPA ID": {
+                          "S": "00000000000c"
+                        },
+                        "Reliability Configuration Duplication Elimination": {
+                          "S": "never"
+                        },
+                        "MHS IP Address": {
+                          "S": "0.0.0.0"
+                        },
+                        "MHS Is Authenticated": {
+                          "S": "none"
+                        },
+                        "Product Key": {
+                          "S": "111"
+                        },
+                        "Unique Identifier": {
+                          "S": "00000000000c"
                         }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.015692+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.015692+00:00"
+                    }
                   }
                 }
               ]
             }
           }
         },
-        "created_on": { "S": "2024-11-20T10:54:19.017673+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.017837+00:00" },
-        "deleted_on": { "NULL": true }
+        "created_on": {
+          "S": "2024-11-20T10:54:19.017673+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.017837+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        }
       }
     }
   },
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab" },
-        "sk": { "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab" },
+        "pk": {
+          "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
+        },
+        "sk": {
+          "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
+        },
         "pk_read": {
           "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
         },
-        "sk_read": { "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab" },
-        "root": { "BOOL": true },
-        "id": { "S": "b4186163-23ec-41fa-abc2-5fe8b0fe9cab" },
-        "name": { "S": "BBB-111111 - AS Additional Interactions" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
+        },
+        "root": {
+          "BOOL": true
+        },
+        "id": {
+          "S": "b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
+        },
+        "name": {
+          "S": "BBB-111111 - AS Additional Interactions"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
+        "ods_code": {
+          "S": "LSP04"
+        },
         "questionnaire_responses": {
           "M": {
             "spine_as_additional_interactions/1": {
               "L": [
                 {
                   "M": {
-                    "id": { "S": "4fc814dd-6309-4c8f-92ac-ef450292c058" },
+                    "id": {
+                      "S": "4fc814dd-6309-4c8f-92ac-ef450292c058"
+                    },
                     "questionnaire_name": {
                       "S": "spine_as_additional_interactions"
                     },
-                    "questionnaire_version": { "S": "1" },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
                         "Interaction ID": {
@@ -319,16 +601,22 @@
                         }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.016015+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.016015+00:00"
+                    }
                   }
                 },
                 {
                   "M": {
-                    "id": { "S": "048c60e7-f664-4b02-b1ad-78460c47ba17" },
+                    "id": {
+                      "S": "048c60e7-f664-4b02-b1ad-78460c47ba17"
+                    },
                     "questionnaire_name": {
                       "S": "spine_as_additional_interactions"
                     },
-                    "questionnaire_version": { "S": "1" },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
                         "Interaction ID": {
@@ -336,16 +624,22 @@
                         }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.016328+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.016328+00:00"
+                    }
                   }
                 },
                 {
                   "M": {
-                    "id": { "S": "f43844e2-0514-4140-a110-b3cb400e6d9d" },
+                    "id": {
+                      "S": "f43844e2-0514-4140-a110-b3cb400e6d9d"
+                    },
                     "questionnaire_name": {
                       "S": "spine_as_additional_interactions"
                     },
-                    "questionnaire_version": { "S": "1" },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
                         "Interaction ID": {
@@ -353,16 +647,22 @@
                         }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.016638+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.016638+00:00"
+                    }
                   }
                 },
                 {
                   "M": {
-                    "id": { "S": "4a379a26-65b0-4d2d-9fef-9a92b92df293" },
+                    "id": {
+                      "S": "4a379a26-65b0-4d2d-9fef-9a92b92df293"
+                    },
                     "questionnaire_name": {
                       "S": "spine_as_additional_interactions"
                     },
-                    "questionnaire_version": { "S": "1" },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
                         "Interaction ID": {
@@ -370,52 +670,92 @@
                         }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.016947+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.016947+00:00"
+                    }
                   }
                 }
               ]
             }
           }
         },
-        "created_on": { "S": "2024-11-20T10:54:19.019795+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.020066+00:00" },
-        "deleted_on": { "NULL": true }
+        "created_on": {
+          "S": "2024-11-20T10:54:19.019795+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.020066+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        }
       }
     }
   },
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807" },
-        "sk": { "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807" },
+        "pk": {
+          "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
+        },
+        "sk": {
+          "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
+        },
         "pk_read": {
           "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
         },
-        "sk_read": { "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807" },
-        "root": { "BOOL": true },
-        "id": { "S": "a5c17f6a-560d-4553-af40-9095ab84e807" },
-        "name": { "S": "BBB-111111 - Message Handling System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
+        },
+        "root": {
+          "BOOL": true
+        },
+        "id": {
+          "S": "a5c17f6a-560d-4553-af40-9095ab84e807"
+        },
+        "name": {
+          "S": "BBB-111111 - Message Handling System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.017931+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.019737+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.017931+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.019737+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "cpa_id" },
-                "key_value": { "S": "00000000000b" }
+                "key_type": {
+                  "S": "cpa_id"
+                },
+                "key_value": {
+                  "S": "00000000000b"
+                }
               }
             },
             {
               "M": {
-                "key_type": { "S": "cpa_id" },
-                "key_value": { "S": "00000000000c" }
+                "key_type": {
+                  "S": "cpa_id"
+                },
+                "key_value": {
+                  "S": "00000000000c"
+                }
               }
             }
           ]
@@ -429,40 +769,61 @@
               "L": [
                 {
                   "M": {
-                    "id": { "S": "2dfdf37f-53e6-43be-9a96-9430e24604ac" },
-                    "questionnaire_name": { "S": "spine_mhs" },
-                    "questionnaire_version": { "S": "1" },
+                    "id": {
+                      "S": "2dfdf37f-53e6-43be-9a96-9430e24604ac"
+                    },
+                    "questionnaire_name": {
+                      "S": "spine_mhs"
+                    },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
-                        "Approver URP": { "S": "myApprover" },
-                        "Contract Property Template Key": { "S": "14" },
-                        "Date Approved": { "S": "20020202020202" },
-                        "Date DNS Approved": { "S": "20020202020202" },
-                        "Date Requested": { "S": "20020202020202" },
-                        "DNS Approver": { "S": "myApprover" },
-                        "Interaction Type": { "S": "fhir" },
-                        "Managing Organization": { "S": "BBB" },
-                        "Reliability Configuration Ack Requested": {
-                          "S": "never"
+                        "Approver URP": {
+                          "S": "myApprover"
                         },
-                        "MHS CPA ID": { "S": "00000000000b" },
-                        "Reliability Configuration Duplication Elimination": {
-                          "S": "never"
+                        "Date Approved": {
+                          "S": "20020202020202"
                         },
-                        "Address": { "S": "https://test.C3O9X.nhs.uk/" },
-                        "MHS FQDN": { "S": "test.C3O9X.nhs.uk" },
-                        "MHS IP Address": { "S": "0.0.0.0" },
-                        "MHS Is Authenticated": { "S": "none" },
-                        "MHS Manufacturer Organisation": { "S": "LSP04" },
-                        "MHS Party key": { "S": "BBB-111111" },
-                        "Product Key": { "S": "111" },
-                        "Product Name": { "S": "My BBB Product" },
-                        "Product Version": { "S": "2005.02" },
-                        "Requestor URP": { "S": "myRequestor" },
-                        "Unique Identifier": { "S": "00000000000b" }
+                        "Date DNS Approved": {
+                          "S": "20020202020202"
+                        },
+                        "Date Requested": {
+                          "S": "20020202020202"
+                        },
+                        "DNS Approver": {
+                          "S": "myApprover"
+                        },
+                        "Managing Organization": {
+                          "S": "BBB"
+                        },
+                        "Address": {
+                          "S": "https://test.C3O9X.nhs.uk/"
+                        },
+                        "MHS FQDN": {
+                          "S": "test.C3O9X.nhs.uk"
+                        },
+                        "MHS Manufacturer Organisation": {
+                          "S": "LSP04"
+                        },
+                        "MHS Party key": {
+                          "S": "BBB-111111"
+                        },
+                        "Product Name": {
+                          "S": "My BBB Product"
+                        },
+                        "Product Version": {
+                          "S": "2005.02"
+                        },
+                        "Requestor URP": {
+                          "S": "myRequestor"
+                        }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.010898+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.010898+00:00"
+                    }
                   }
                 }
               ]
@@ -471,7 +832,13 @@
         },
         "device_reference_data": {
           "M": {
-            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": { "L": [{ "S": "*" }] }
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [
+                {
+                  "S": "*"
+                }
+              ]
+            }
           }
         }
       }
@@ -480,36 +847,68 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "D#00000000000b" },
-        "sk": { "S": "D#00000000000b" },
+        "pk": {
+          "S": "D#00000000000b"
+        },
+        "sk": {
+          "S": "D#00000000000b"
+        },
         "pk_read": {
           "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
         },
-        "sk_read": { "S": "D#00000000000b" },
-        "root": { "BOOL": false },
-        "id": { "S": "a5c17f6a-560d-4553-af40-9095ab84e807" },
-        "name": { "S": "BBB-111111 - Message Handling System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#00000000000b"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "a5c17f6a-560d-4553-af40-9095ab84e807"
+        },
+        "name": {
+          "S": "BBB-111111 - Message Handling System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.017931+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.019737+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.017931+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.019737+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "cpa_id" },
-                "key_value": { "S": "00000000000b" }
+                "key_type": {
+                  "S": "cpa_id"
+                },
+                "key_value": {
+                  "S": "00000000000b"
+                }
               }
             },
             {
               "M": {
-                "key_type": { "S": "cpa_id" },
-                "key_value": { "S": "00000000000c" }
+                "key_type": {
+                  "S": "cpa_id"
+                },
+                "key_value": {
+                  "S": "00000000000c"
+                }
               }
             }
           ]
@@ -518,11 +917,17 @@
           "S": "H4sIAMVbSGcC/9WUy46jRhSGs4jyLJEsxWAuthdZQBkwVdxxcZOywIBpmzvYLmA1DzCLKJq8wzzAPEIeLC13J61Rb2aXyVmXTn31nTr/hx///OOnHx7126efP/61ZwdV0L2jqyRgOfvoYPdAF11J9KgWGGtw8TTncqw0y1Ln0AAV52IjNRNxuBtcQJsaIURnNmO/DYp7dKWLgKZWrLOG5hqlOeeWOg7JJmWkFddmydi3ubdHt47fU9Ryjk/DcvRnGE91kIdmh4UgVbtGna9rX2h41DgM3SvMNAWJeDDI1g6mJ2bn1ELInShgo65lhef69dPHL189Y3XNK683BEEZ8ewKnZQQjddZ6ylTwYg099xfBlrv26VDoItL3ukAiRxcAHVRIe083A7srNutFcWlE5S+LSn9XT8ktIJ69uqeh2EsVGDSnXHu0A6P8MjnaKdwUNMLfd7cn48s0G5TG8e1CrW1TnSxcauu2+dCrJzr6Sl/UP8PsNkXbNDpVG29YX/+CnsKVJc0wLaJhCWZyW8pgaHJDtnm3Bw2sthOFFTMO0fA9mJltMgOHTI4fqH3t5rNTs7y6tRFlCAjAevlDReVNVOL41xpnr7XmJM1tU8hFFjCQlFZpGMjhnhIxWNIcyzrtjZ1bwAfMrEhU+nNIgLnpy1dF68f4/d3hp0ePQyvUB1bB8L5GI+LBCSBHCX1WLGtnU1bdLbALW9kLwsrrhs8b4xLOYouyC68Fh9lH1dt7gY0wJU8uX6EoppLY1le4JrT42Blu8EqysOdXRqeZAli7ljF9uHvW+zZJv9f2fMwC3nmO7FHXuyhnA1q+GqvfIeU9dK/K6Mm68fKXPTSuhRLGHhoxxguviLsQcCqUr6R2VyTmitCN3PG063e7gUxCrBBfBHFXZMJppwVT9B4ue5b8lH+HvMxFOiu5P7Jx8M7a3EP3wZpq1z1OkgsnzEuy9M+6rjIzvrOLaBM73R4fs6CfC8oA1EXOfViR3vX1u13b20dwq2e266yagSnuuUdk/dl0y26uGi7RiRiboqQQPKaK9kvfwP9sqYTnQYAAA=="
         },
         "questionnaire_responses": {
-          "S": "H4sIAMVbSGcC/31SXY8SMRTVBYOyLH7EfTHR9MFEE8PQgQF3eGNBI1FYBNb4siGF6UADdMZOxwSTTfwBfawv/lpvy8fu+tV5md5ze++5557v2R8/M7fsudTqMIkZp+PVPCm7+kJf6pfqgAVaPa8EYRBWX4elWpXWS151Qks+8esl36tiWvHq2CNTrR59SWkiWcQ5YYKOOVlRre7ta2p1fDPhKxUJXLS67WqVDYgktmWhGcciAhCdD/pa5VfrXUCrZ62IS0GmEvVFFFMh12hEV/GSSIre07VWB66n1VHb3LevgH+xgnHl6tPqoU1o94b/SyrapAG1pP+aUbhWQfzG9EGHS2qYwoRotI5Bimw4Z4AcdwknM8Zn6EzMCGffiLQqZE5PT7V6MaBLRiZsyWA2mDZks1TYDNScLq7TucPppm333RC1+k3UaQMlfHUmWrn/rtZO4yWbbv7fLNmK8S2PXd1cMwgETWBvT+ZSxkmjXJbQ2mlVz/zPDp8nTrooa3XXtH/7sd0DWf/AQTQDd/poXyyHHftp9dhCCWqmck65NGTMXFkecVDrqUFBqjQEEVMBdtjIlexofhj2sVm2yesTY4WFcUAeZCy59oCjwSZBCnax5sjYWGEX61mDFrtrBE/QNqrV/R3+aefPHCy+5piNH231j7bmPFyt9xGY/5wzuKBOYMYJmVHx5kJSlZ8KauYcm8IIbOQB2VIFj1zcqHkN13ewi0/8k1cYNzDWKUmcXzS0XuOlAwAA"
+          "S": "H4sIAGTgWmcC/2WQS0/CQBSFfWB88DCasDExmYULE9MyfYCUnUiMC0EUNW4MGelAG0PBmalJTUz8AXd5/b8OtYDG6WrOOZ1z7/eZ+zpdW0nPB0JeTsOI98eBrFj4hB94DGuhj3Bk+0N/6JwOjarDa4brPHPDY17N8FyHctutUZcNEPZfYy5VOIkiFgrej9iYI2wv3kQo/w28cSH1BWHVQsj5TLG0snA2nYqJNsn9bRdhZ5zMBYRiiylOsruerGRTai8/hL000Or0lqFgF0qpesvT/h+p8CsjMChCuc0iNgqjEbkWIxaF70ylw603m02EzTPfF1zqJQ4CpaayUako/ZZ57lx7j2YUSDN+qSBstS975OKm1dGT/PMRDme27omHbKBioVf86ZJZ18ZVr0tdveYs12VCJeSFJ5qBnsGw0oNQ6IqJHw8U6aSAS+2EaJtkKsLu3H+Y893UlKrmDE8xYzDJ4ObHyULBGHYGgmtSfn/2F9FAXd1q2PTOoo2q27A8k1q07tVPKG1QijGT5jdCorV0QgIAAA=="
         },
         "device_reference_data": {
           "M": {
-            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": { "L": [{ "S": "*" }] }
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [
+                {
+                  "S": "*"
+                }
+              ]
+            }
           }
         }
       }
@@ -531,36 +936,68 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "D#00000000000c" },
-        "sk": { "S": "D#00000000000c" },
+        "pk": {
+          "S": "D#00000000000c"
+        },
+        "sk": {
+          "S": "D#00000000000c"
+        },
         "pk_read": {
           "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
         },
-        "sk_read": { "S": "D#00000000000c" },
-        "root": { "BOOL": false },
-        "id": { "S": "a5c17f6a-560d-4553-af40-9095ab84e807" },
-        "name": { "S": "BBB-111111 - Message Handling System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#00000000000c"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "a5c17f6a-560d-4553-af40-9095ab84e807"
+        },
+        "name": {
+          "S": "BBB-111111 - Message Handling System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.017931+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.019737+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.017931+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.019737+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "cpa_id" },
-                "key_value": { "S": "00000000000b" }
+                "key_type": {
+                  "S": "cpa_id"
+                },
+                "key_value": {
+                  "S": "00000000000b"
+                }
               }
             },
             {
               "M": {
-                "key_type": { "S": "cpa_id" },
-                "key_value": { "S": "00000000000c" }
+                "key_type": {
+                  "S": "cpa_id"
+                },
+                "key_value": {
+                  "S": "00000000000c"
+                }
               }
             }
           ]
@@ -569,11 +1006,17 @@
           "S": "H4sIAMVbSGcC/9WUy46jRhSGs4jyLJEsxWAuthdZQBkwVdxxcZOywIBpmzvYLmA1DzCLKJq8wzzAPEIeLC13J61Rb2aXyVmXTn31nTr/hx///OOnHx7126efP/61ZwdV0L2jqyRgOfvoYPdAF11J9KgWGGtw8TTncqw0y1Ln0AAV52IjNRNxuBtcQJsaIURnNmO/DYp7dKWLgKZWrLOG5hqlOeeWOg7JJmWkFddmydi3ubdHt47fU9Ryjk/DcvRnGE91kIdmh4UgVbtGna9rX2h41DgM3SvMNAWJeDDI1g6mJ2bn1ELInShgo65lhef69dPHL189Y3XNK683BEEZ8ewKnZQQjddZ6ylTwYg099xfBlrv26VDoItL3ukAiRxcAHVRIe083A7srNutFcWlE5S+LSn9XT8ktIJ69uqeh2EsVGDSnXHu0A6P8MjnaKdwUNMLfd7cn48s0G5TG8e1CrW1TnSxcauu2+dCrJzr6Sl/UP8PsNkXbNDpVG29YX/+CnsKVJc0wLaJhCWZyW8pgaHJDtnm3Bw2sthOFFTMO0fA9mJltMgOHTI4fqH3t5rNTs7y6tRFlCAjAevlDReVNVOL41xpnr7XmJM1tU8hFFjCQlFZpGMjhnhIxWNIcyzrtjZ1bwAfMrEhU+nNIgLnpy1dF68f4/d3hp0ePQyvUB1bB8L5GI+LBCSBHCX1WLGtnU1bdLbALW9kLwsrrhs8b4xLOYouyC68Fh9lH1dt7gY0wJU8uX6EoppLY1le4JrT42Blu8EqysOdXRqeZAli7ljF9uHvW+zZJv9f2fMwC3nmO7FHXuyhnA1q+GqvfIeU9dK/K6Mm68fKXPTSuhRLGHhoxxguviLsQcCqUr6R2VyTmitCN3PG063e7gUxCrBBfBHFXZMJppwVT9B4ue5b8lH+HvMxFOiu5P7Jx8M7a3EP3wZpq1z1OkgsnzEuy9M+6rjIzvrOLaBM73R4fs6CfC8oA1EXOfViR3vX1u13b20dwq2e266yagSnuuUdk/dl0y26uGi7RiRiboqQQPKaK9kvfwP9sqYTnQYAAA=="
         },
         "questionnaire_responses": {
-          "S": "H4sIAMVbSGcC/31SXY8SMRTVBYOyLH7EfTHR9MFEE8PQgQF3eGNBI1FYBNb4siGF6UADdMZOxwSTTfwBfawv/lpvy8fu+tV5md5ze++5557v2R8/M7fsudTqMIkZp+PVPCm7+kJf6pfqgAVaPa8EYRBWX4elWpXWS151Qks+8esl36tiWvHq2CNTrR59SWkiWcQ5YYKOOVlRre7ta2p1fDPhKxUJXLS67WqVDYgktmWhGcciAhCdD/pa5VfrXUCrZ62IS0GmEvVFFFMh12hEV/GSSIre07VWB66n1VHb3LevgH+xgnHl6tPqoU1o94b/SyrapAG1pP+aUbhWQfzG9EGHS2qYwoRotI5Bimw4Z4AcdwknM8Zn6EzMCGffiLQqZE5PT7V6MaBLRiZsyWA2mDZks1TYDNScLq7TucPppm333RC1+k3UaQMlfHUmWrn/rtZO4yWbbv7fLNmK8S2PXd1cMwgETWBvT+ZSxkmjXJbQ2mlVz/zPDp8nTrooa3XXtH/7sd0DWf/AQTQDd/poXyyHHftp9dhCCWqmck65NGTMXFkecVDrqUFBqjQEEVMBdtjIlexofhj2sVm2yesTY4WFcUAeZCy59oCjwSZBCnax5sjYWGEX61mDFrtrBE/QNqrV/R3+aefPHCy+5piNH231j7bmPFyt9xGY/5wzuKBOYMYJmVHx5kJSlZ8KauYcm8IIbOQB2VIFj1zcqHkN13ewi0/8k1cYNzDWKUmcXzS0XuOlAwAA"
+          "S": "H4sIAGTgWmcC/2WQS0/CQBSFfWB88DCasDExmYULE9MyfYCUnUiMC0EUNW4MGelAG0PBmalJTUz8AXd5/b8OtYDG6WrOOZ1z7/eZ+zpdW0nPB0JeTsOI98eBrFj4hB94DGuhj3Bk+0N/6JwOjarDa4brPHPDY17N8FyHctutUZcNEPZfYy5VOIkiFgrej9iYI2wv3kQo/w28cSH1BWHVQsj5TLG0snA2nYqJNsn9bRdhZ5zMBYRiiylOsruerGRTai8/hL000Or0lqFgF0qpesvT/h+p8CsjMChCuc0iNgqjEbkWIxaF70ylw603m02EzTPfF1zqJQ4CpaayUako/ZZ57lx7j2YUSDN+qSBstS975OKm1dGT/PMRDme27omHbKBioVf86ZJZ18ZVr0tdveYs12VCJeSFJ5qBnsGw0oNQ6IqJHw8U6aSAS+2EaJtkKsLu3H+Y893UlKrmDE8xYzDJ4ObHyULBGHYGgmtSfn/2F9FAXd1q2PTOoo2q27A8k1q07tVPKG1QijGT5jdCorV0QgIAAA=="
         },
         "device_reference_data": {
           "M": {
-            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": { "L": [{ "S": "*" }] }
+            "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
+              "L": [
+                {
+                  "S": "*"
+                }
+              ]
+            }
           }
         }
       }
