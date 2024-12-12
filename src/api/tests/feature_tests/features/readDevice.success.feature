@@ -240,7 +240,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1709             |
+      | Content-Length | 1713             |
 
     Examples:
       | product_team_id            | product_id            |
