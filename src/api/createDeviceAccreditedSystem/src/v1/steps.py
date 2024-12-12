@@ -131,7 +131,7 @@ def add_device_reference_data_id(data, cache) -> Device:
     device_reference_data: DeviceReferenceData = data[read_device_reference_data]
     for drd in device_reference_data:
         as_device.add_device_reference_data_id(
-            device_reference_data_id=str(drd.id), path_to_data=["Interaction ID"]
+            device_reference_data_id=str(drd.id), path_to_data=["*.Interaction ID"]
         )
     return as_device
 

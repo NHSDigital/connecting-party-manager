@@ -80,7 +80,10 @@ def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
 def filter_by_jsonpath(data, filters: list) -> dict:
     response = {}
     if "*" not in filters:
-        response = {filter_key: data[filter_key] for filter_key in filters}
+        response = {
+            filter_key.lstrip("*."): data[filter_key.lstrip("*.")]
+            for filter_key in filters
+        }
         return response
     return data
 
