@@ -30,6 +30,7 @@ PRODUCT_ID = "P.XXX-YYY"
 PRODUCT_NAME = "cpm-product-name"
 PRODUCT_TEAM_KEYS = [{"key_type": "product_team_id_alias", "key_value": "BAR"}]
 DEVICE_NAME = "device"
+PARTY_KEY = "F5H1R-850000"
 
 
 @pytest.mark.parametrize(
@@ -142,7 +143,7 @@ def test_index_mhs_device(version):
         cpm_product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        cpm_product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="F5H1R-850000")
+        cpm_product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -154,16 +155,20 @@ def test_index_mhs_device(version):
         )
         questionnaire_response = mhs_message_set_questionnaire.validate(
             data={
-                "Interaction ID": "urn:foo",
                 "MHS SN": "bar",
                 "MHS IN": "baz",
+                "Interaction ID": "bar:baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
             }
         )
         questionnaire_response_2 = mhs_message_set_questionnaire.validate(
             data={
-                "Interaction ID": "urn:foo2",
                 "MHS SN": "bar2",
                 "MHS IN": "baz2",
+                "Interaction ID": "bar2:baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
             },
         )
 
@@ -180,9 +185,9 @@ def test_index_mhs_device(version):
 
         # Set up Device in DB
         device: Device = cpm_product.create_device(name="Product-MHS")
-        device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo")
-        device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo2")
-        device.add_tag(party_key="f5h1r-850000")
+        device.add_key(key_type="cpa_id", key_value=f"{PARTY_KEY}:bar:baz")
+        device.add_key(key_type="cpa_id", key_value=f"{PARTY_KEY}:bar2:baz2")
+        device.add_tag(party_key=PARTY_KEY)
 
         # set up spine mhs questionnaire response
         mhs_message_set_questionnaire = QuestionnaireRepository().read(
@@ -190,21 +195,15 @@ def test_index_mhs_device(version):
         )
         spine_mhs_questionnaire_response = mhs_message_set_questionnaire.validate(
             data={
-                "Address": "http://example.com",
-                "Unique Identifier": "123456",
+                "Address": "https://example.com",
                 "Managing Organization": "Example Org",
                 "MHS Party key": "party-key-001",
-                "MHS CPA ID": "cpa-id-001",
                 "Approver URP": "approver-123",
-                "Contract Property Template Key": "contract-key-001",
                 "Date Approved": "2024-01-01",
                 "Date DNS Approved": "2024-01-02",
                 "Date Requested": "2024-01-03",
                 "DNS Approver": "dns-approver-456",
-                "Interaction Type": "FHIR",
                 "MHS FQDN": "mhs.example.com",
-                "MHS Is Authenticated": "PERSISTENT",
-                "Product Key": "product-key-001",
                 "Requestor URP": "requestor-789",
                 "MHS Manufacturer Organisation": "AAA",
             }
@@ -251,6 +250,356 @@ def test_index_mhs_device(version):
 
     # Assert drd questionnaire responses have been added
     assert "spine_mhs_message_sets/1" in response_body["questionnaire_responses"]
+
+    for resp in response_body["questionnaire_responses"]["spine_mhs_message_sets/1"]:
+        assert "MHS SN" in resp["data"]
+        assert "MHS IN" in resp["data"]
+        assert "Interaction ID" in resp["data"]
+
+    expected_headers = {
+        "Content-Type": "application/json",
+        "Version": version,
+    }
+
+    # Check response headers
+    assert result["statusCode"] == 200
+    assert result["headers"]["Content-Length"] == str(len(result["body"]))
+    for key, value in expected_headers.items():
+        assert result["headers"][key] == value
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_mhs_device_adjusted_data(version):
+    org = Root.create_ods_organisation(ods_code=ODS_CODE)
+    product_team = org.create_product_team(
+        name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
+    )
+
+    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        # Set up ProductTeam in DB
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
+        # Set up EPR Product in DB
+        cpm_product = product_team.create_cpm_product(
+            name=PRODUCT_NAME, product_id=PRODUCT_ID
+        )
+        cpm_product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="F5H1R-850000")
+        product_repo = CpmProductRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_repo.write(cpm_product)
+
+        # set up mhs message set questionnaire responses
+        mhs_message_set_questionnaire = QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
+        )
+        questionnaire_response = mhs_message_set_questionnaire.validate(
+            data={
+                "Interaction ID": "bar:baz",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
+            }
+        )
+        questionnaire_response_2 = mhs_message_set_questionnaire.validate(
+            data={
+                "Interaction ID": "bar2:baz2",
+                "MHS SN": "bar2",
+                "MHS IN": "baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
+            },
+        )
+
+        # Set up DeviceReferenceData in DB
+        device_reference_data = cpm_product.create_device_reference_data(
+            name="ABC1234-987654 - MHS Message Set"
+        )
+        device_reference_data.add_questionnaire_response(questionnaire_response)
+        device_reference_data.add_questionnaire_response(questionnaire_response_2)
+        device_reference_data_repo = DeviceReferenceDataRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        device_reference_data_repo.write(device_reference_data)
+
+        # Set up Device in DB
+        device: Device = cpm_product.create_device(name="Product-MHS")
+        device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo")
+        device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo2")
+        device.add_tag(party_key="f5h1r-850000")
+
+        # set up spine mhs questionnaire response
+        spine_mhs_questionnaire = QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_MHS
+        )
+        spine_mhs_questionnaire_response = spine_mhs_questionnaire.validate(
+            data={
+                "Address": "http://example.com",
+                "Managing Organization": "Example Org",
+                "MHS Party key": "party-key-001",
+                "Approver URP": "approver-123",
+                "Date Approved": "2024-01-01",
+                "Date DNS Approved": "2024-01-02",
+                "Date Requested": "2024-01-03",
+                "DNS Approver": "dns-approver-456",
+                "MHS FQDN": "mhs.example.com",
+                "Requestor URP": "requestor-789",
+                "MHS Manufacturer Organisation": "AAA",
+            }
+        )
+
+        device.add_questionnaire_response(spine_mhs_questionnaire_response)
+
+        device.add_device_reference_data_id(
+            device_reference_data_id=str(device_reference_data.id),
+            path_to_data=["Interaction ID", "MHS IN"],
+        )
+
+        device_repo = DeviceRepository(table_name=TABLE_NAME, dynamodb_client=client)
+        device_repo.write(device)
+
+        from api.readDevice.index import handler
+
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": {
+                    "product_team_id": str(product_team.id),
+                    "product_id": str(cpm_product.id.id),
+                    "device_id": str(device.id),
+                },
+            }
+        )
+
+    response_body = json_loads(result["body"])
+
+    # Assertions for fields that must exactly match
+    assert response_body["id"] == str(device.id)
+    assert response_body["product_id"] == str(cpm_product.id)
+    assert response_body["product_team_id"] == str(product_team.id)
+    assert response_body["name"] == device.name
+    assert response_body["ods_code"] == device.ods_code
+    assert response_body["status"] == Status.ACTIVE
+    assert response_body["deleted_on"] is None
+    assert response_body["keys"] is not None
+    assert response_body["tags"] is not None
+    assert response_body["device_reference_data"] is not None
+
+    # Assertions for fields that only need to be included
+    assert "created_on" in response_body
+    assert "spine_mhs/1" in response_body["questionnaire_responses"]
+
+    # Assert drd questionnaire responses have been added
+    assert "spine_mhs_message_sets/1" in response_body["questionnaire_responses"]
+
+    for resp in response_body["questionnaire_responses"]["spine_mhs_message_sets/1"]:
+        assert "MHS SN" not in resp["data"]
+        assert "MHS IN" in resp["data"]
+        assert "Interaction ID" in resp["data"]
+
+    expected_headers = {
+        "Content-Type": "application/json",
+        "Version": version,
+    }
+
+    # Check response headers
+    assert result["statusCode"] == 200
+    assert result["headers"]["Content-Length"] == str(len(result["body"]))
+    for key, value in expected_headers.items():
+        assert result["headers"][key] == value
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_as_device(version):
+    org = Root.create_ods_organisation(ods_code=ODS_CODE)
+    product_team = org.create_product_team(
+        name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
+    )
+
+    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        # Set up ProductTeam in DB
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
+        # Set up EPR Product in DB
+        cpm_product = product_team.create_cpm_product(
+            name=PRODUCT_NAME, product_id=PRODUCT_ID
+        )
+        cpm_product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="F5H1R-850000")
+        product_repo = CpmProductRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_repo.write(cpm_product)
+
+        # set up mhs message set questionnaire responses
+        mhs_message_set_questionnaire = QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
+        )
+        questionnaire_response = mhs_message_set_questionnaire.validate(
+            data={
+                "Interaction ID": "bar:baz",
+                "MHS SN": "bar",
+                "MHS IN": "baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
+            }
+        )
+        questionnaire_response_2 = mhs_message_set_questionnaire.validate(
+            data={
+                "Interaction ID": "bar2:baz2",
+                "MHS SN": "bar2",
+                "MHS IN": "baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
+            },
+        )
+
+        # Set up DeviceReferenceData in DB
+        device_reference_data = cpm_product.create_device_reference_data(
+            name="ABC1234-987654 - MHS Message Set"
+        )
+        device_reference_data.add_questionnaire_response(questionnaire_response)
+        device_reference_data.add_questionnaire_response(questionnaire_response_2)
+
+        as_additional_interactions_questionnaire = QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
+        )
+        questionnaire_response_3 = as_additional_interactions_questionnaire.validate(
+            data={
+                "Interaction ID": "urn:foo3",
+            }
+        )
+        questionnaire_response_4 = as_additional_interactions_questionnaire.validate(
+            data={
+                "Interaction ID": "urn:foo4",
+            },
+        )
+
+        # Set up DeviceReferenceData in DB
+        device_reference_data_as = cpm_product.create_device_reference_data(
+            name="ABC1234-987654 - AS Additional Interactions"
+        )
+        device_reference_data_as.add_questionnaire_response(questionnaire_response_3)
+        device_reference_data_as.add_questionnaire_response(questionnaire_response_4)
+
+        device_reference_data_repo = DeviceReferenceDataRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        device_reference_data_repo.write(device_reference_data)
+        device_reference_data_repo.write(device_reference_data_as)
+
+        # Set up Device in DB
+        device: Device = cpm_product.create_device(name="Product-AS")
+        device.add_tag(party_key="f5h1r-850000")
+
+        # set up spine as questionnaire response
+        spine_as_questionnaire = QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_AS
+        )
+        spine_as_questionnaire_response = spine_as_questionnaire.validate(
+            data={
+                "ODS Code": "FH15R",
+                "Client ODS Codes": ["FH15R"],
+                "ASID": "foobar",
+                "Party Key": "P.123-XXX",
+                "Approver URP": "approver-123",
+                "Date Approved": "2024-01-01",
+                "Requestor URP": "requestor-789",
+                "Date Requested": "2024-01-03",
+                "Product Key": "product-key-001",
+            }
+        )
+        device.add_questionnaire_response(spine_as_questionnaire_response)
+
+        device.add_device_reference_data_id(
+            device_reference_data_id=str(device_reference_data.id),
+            path_to_data=["Interaction ID"],
+        )
+        device.add_device_reference_data_id(
+            device_reference_data_id=str(device_reference_data_as.id),
+            path_to_data=["Interaction ID"],
+        )
+
+        device_repo = DeviceRepository(table_name=TABLE_NAME, dynamodb_client=client)
+        device_repo.write(device)
+
+        from api.readDevice.index import handler
+
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": {
+                    "product_team_id": str(product_team.id),
+                    "product_id": str(cpm_product.id.id),
+                    "device_id": str(device.id),
+                },
+            }
+        )
+
+    response_body = json_loads(result["body"])
+    # Assertions for fields that must exactly match
+    assert response_body["id"] == str(device.id)
+    assert response_body["product_id"] == str(cpm_product.id)
+    assert response_body["product_team_id"] == str(product_team.id)
+    assert response_body["name"] == device.name
+    assert response_body["ods_code"] == device.ods_code
+    assert response_body["status"] == Status.ACTIVE
+    assert response_body["deleted_on"] is None
+    assert response_body["keys"] is not None
+    assert response_body["tags"] is not None
+    assert response_body["device_reference_data"] is not None
+
+    # Assertions for fields that only need to be included
+    assert "created_on" in response_body
+    assert "spine_as/1" in response_body["questionnaire_responses"]
+
+    # Assert drd questionnaire responses have been added
+    assert "spine_mhs_message_sets/1" in response_body["questionnaire_responses"]
+    for resp in response_body["questionnaire_responses"]["spine_mhs_message_sets/1"]:
+        assert "MHS SN" not in resp["data"]
+        assert "MHS IN" not in resp["data"]
+        assert "Interaction ID" in resp["data"]
+
+    assert (
+        "spine_as_additional_interactions/1" in response_body["questionnaire_responses"]
+    )
+
+    for resp in response_body["questionnaire_responses"][
+        "spine_as_additional_interactions/1"
+    ]:
+        assert "MHS SN" not in resp["data"]
+        assert "MHS IN" not in resp["data"]
+        assert "Interaction ID" in resp["data"]
 
     expected_headers = {
         "Content-Type": "application/json",

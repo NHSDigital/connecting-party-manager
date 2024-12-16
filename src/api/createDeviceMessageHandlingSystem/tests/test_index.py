@@ -35,25 +35,25 @@ PRODUCT_ID = ProductId.create()
 PRODUCT_TEAM_NAME = "My Product Team"
 PRODUCT_NAME = "My Product"
 VERSION = 1
+PARTY_KEY = "ABC1234-987654"
 
 QUESTIONNAIRE_DATA = {
-    "Address": "http://example.com",
-    "Unique Identifier": "123456",
-    "Managing Organization": "Example Org",
-    "MHS Party key": "party-key-001",
-    "MHS CPA ID": "cpa-id-001",
-    "Approver URP": "approver-123",
-    "Contract Property Template Key": "contract-key-001",
-    "Date Approved": "2024-01-01",
-    "Date DNS Approved": "2024-01-02",
-    "Date Requested": "2024-01-03",
-    "DNS Approver": "dns-approver-456",
-    "Interaction Type": "FHIR",
     "MHS FQDN": "mhs.example.com",
-    "MHS Is Authenticated": "PERSISTENT",
-    "Product Key": "product-key-001",
-    "Requestor URP": "requestor-789",
-    "MHS Manufacturer Organisation": "AAA",
+    "MHS Service Description": "Example Description",
+    "MHS Manufacturer Organisation": "F5H1R",
+    "Product Name": "Product Name",
+    "Product Version": "1",
+    "Approver URP": "UI provided",
+    "DNS Approver": "UI provided",
+    "Requestor URP": "UI provided",
+}
+QUESTIONNAIRE_DATA_SYSTEM_GENERATED_FIELDS = {
+    "Address": "https://mhs.example.com",
+    "MHS Party key": PARTY_KEY,
+    "Date Approved": "datetime",
+    "Date DNS Approved": "None",
+    "Date Requested": "datetime",
+    "Managing Organization": "ABC1234",
 }
 
 
@@ -77,34 +77,38 @@ def mock_epr_product_with_message_set_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
         product_repo.write(entity=product)
 
-        # set up questionnaire responses
+        # set up mhs drd questionnaire responses
         mhs_message_set_questionnaire = QuestionnaireRepository().read(
             QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
         )
         questionnaire_response = mhs_message_set_questionnaire.validate(
             data={
-                "Interaction ID": "urn:foo",
                 "MHS SN": "bar",
                 "MHS IN": "baz",
+                "Interaction ID": "bar:baz",
+                "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+                "Unique Identifier": f"{PARTY_KEY}:bar:baz",
             }
         )
         questionnaire_response_2 = mhs_message_set_questionnaire.validate(
             data={
-                "Interaction ID": "urn:foo2",
                 "MHS SN": "bar2",
                 "MHS IN": "baz2",
+                "Interaction ID": "bar2:baz2",
+                "MHS CPA ID": f"{PARTY_KEY}:bar2:baz2",
+                "Unique Identifier": f"{PARTY_KEY}:bar2:baz2",
             },
         )
 
         # Set up DeviceReferenceData in DB
         device_reference_data = product.create_device_reference_data(
-            name=EprNameTemplate.MESSAGE_SETS.format(party_key="ABC1234-987654")
+            name=EprNameTemplate.MESSAGE_SETS.format(party_key=PARTY_KEY)
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -170,7 +174,7 @@ def mock_epr_product_without_message_set_drd() -> (
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="ABC1234-987654")
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY)
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -215,7 +219,9 @@ def test_index() -> None:
         questionnaire_responses = device.questionnaire_responses["spine_mhs/1"]
         assert len(questionnaire_responses) == 1
         questionnaire_response = questionnaire_responses[0]
-        assert questionnaire_response.data == QUESTIONNAIRE_DATA
+        assert len(questionnaire_response.data) == len(QUESTIONNAIRE_DATA) + len(
+            QUESTIONNAIRE_DATA_SYSTEM_GENERATED_FIELDS
+        )
 
         # Retrieve the created resource
         repo = DeviceRepository(
@@ -293,17 +299,27 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
                 },
             },
             "VALIDATION_ERROR",
-            "CreateMhsDeviceIncomingParams.questionnaire_responses.spine_mhs.__root__: ensure this value has at most 1 items",
+            "You must provide exactly one spine_mhs questionnaire response to create an MHS Device.",
             400,
         ),
         (
             {
                 "questionnaire_responses": {
-                    "spine_mhs": [{"Address": "http://example.com"}]
+                    "spine_mhs": [{"MHS FQDN": "mhs.example.com"}]
                 }
             },
             "MISSING_VALUE",
             "Failed to validate data against 'spine_mhs/1': 'MHS Manufacturer Organisation' is a required property",
+            400,
+        ),
+        (
+            {
+                "questionnaire_responses": {
+                    "spine_mhs": [{"MHS Manufacturer Organisation": "F5H1R"}]
+                }
+            },
+            "VALIDATION_ERROR",
+            "The following required fields are missing in the response to spine_mhs: MHS FQDN",
             400,
         ),
     ],

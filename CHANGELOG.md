@@ -1,5 +1,11 @@
 # Changelog
 
+## 2024-12-11
+- [PI-650] Modify the Read Device endpoint for AS Devices
+- [PI-666] Create an ASID for AS Device and add as a DeviceKey
+- [PI-603] Update the spine_mhs questionnaire
+- [PI-645] Update the spine_mhs_message_sets questionnaire
+
 ## 2024-12-05
 - [PI-631] Generate Product Ids
 - [PI-691] Allow devs to clear terminal after each Feature Test

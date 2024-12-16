@@ -247,13 +247,13 @@ Executing feature tests in integration mode will then give you confidence that t
 To execute the feature tests entirely locally (executing lambdas directly, and otherwise mocking databases and responses to a high standard) you can do:
 
 ```shell
-make test--feature-local
+make test--feature--local
 ```
 
 If you would like to pass `behave` flags, e.g. to \[stop after the first failure\]:
 
 ```shell
-make test--feature-local BEHAVE_FLAGS="--stop"
+make test--feature--local BEHAVE_FLAGS="--stop"
 ```
 
 #### Integration
@@ -261,7 +261,7 @@ make test--feature-local BEHAVE_FLAGS="--stop"
 To execute the feature tests across the entire stack (including Apigee and AWS) you can do
 
 ```shell
-make test--feature-integration
+make test--feature--integration
 ```
 
 ### Generate the Feature Test Postman collection

@@ -7,7 +7,7 @@ from typing import Any, Generator
 from unittest import mock
 
 from domain.core.cpm_product import CpmProduct
-from domain.core.cpm_system_id import PartyKeyId, ProductId
+from domain.core.cpm_system_id import ProductId
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.product_key import ProductKeyType
 from domain.core.root import Root
@@ -26,6 +26,7 @@ ODS_CODE = "AAA"
 PRODUCT_ID = ProductId.create()
 PRODUCT_NAME = "My Product"
 VERSION = 1
+PARTY_KEY = "AAA-100001"
 
 
 @contextmanager
@@ -46,10 +47,8 @@ def mock_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
         product = product_team.create_cpm_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product.add_key(
-            key_type=ProductKeyType.PARTY_KEY,
-            key_value=str(PartyKeyId.create(current_number=100000, ods_code="AAA")),
-        )
+        product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=PARTY_KEY),
+
         product_repo = CpmProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
@@ -105,9 +104,15 @@ def test_index_without_questionnaire() -> None:
 
 def test_index_with_questionnaire() -> None:
     questionnaire_data = {
-        "Interaction ID": "foo",
         "MHS SN": "bar",
         "MHS IN": "baz",
+    }
+    questionnaire_data_with_generated_fields = {
+        "MHS SN": "bar",
+        "MHS IN": "baz",
+        "Interaction ID": "bar:baz",
+        "MHS CPA ID": f"{PARTY_KEY}:bar:baz",
+        "Unique Identifier": f"{PARTY_KEY}:bar:baz",
     }
 
     with mock_product() as (index, product):
@@ -147,7 +152,7 @@ def test_index_with_questionnaire() -> None:
         ]
         assert len(questionnaire_responses) == 1
         questionnaire_response = questionnaire_responses[0]
-        assert questionnaire_response.data == questionnaire_data
+        assert questionnaire_response.data == questionnaire_data_with_generated_fields
 
         # Retrieve the created resource
         repo = DeviceReferenceDataRepository(

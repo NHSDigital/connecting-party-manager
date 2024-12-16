@@ -186,7 +186,7 @@
       "nhs_mhs_duplicate_elimination": "never",
       "nhs_mhs_end_point": "https://test.C3O9X.nhs.uk/",
       "nhs_mhs_fqdn": "test.C3O9X.nhs.uk",
-      "nhs_mhs_in": "READ_PRACTITIONER_ROLE_R4_V002",
+      "nhs_mhs_in": "READ_PRACTITIONER_ROLE_R4_V003",
       "nhs_mhs_ip_address": "0.0.0.0",
       "nhs_mhs_is_authenticated": "none",
       "nhs_mhs_manufacturer_org": "LSP04",

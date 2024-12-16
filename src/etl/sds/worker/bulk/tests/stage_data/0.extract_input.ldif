@@ -149,7 +149,7 @@ nhsMhsCPAId: 00000000000c
 nhsMHSDuplicateElimination: never
 nhsMHSEndPoint: https://test.C3O9X.nhs.uk/
 nhsMhsFQDN: test.C3O9X.nhs.uk
-nhsMHsIN: READ_PRACTITIONER_ROLE_R4_V002
+nhsMHsIN: READ_PRACTITIONER_ROLE_R4_V003
 nhsMhsIPAddress: 0.0.0.0
 nhsMhsManufacturerOrg: LSP04
 nhsMHSPartyKey: BBB-111111
