@@ -156,10 +156,10 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.1.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                               |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                                    |
-      | errors.0.message | Duplicate 'Interaction ID' provided: value 'urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001' occurs 2 times in the input. |
+      | path             | value                                                                                                                                                |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                                                     |
+      | errors.0.message | Duplicate 'Interaction ID' provided: value 'urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001' occurs 2 times in the questionnaire response. |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 188              |
+      | Content-Length | 205              |

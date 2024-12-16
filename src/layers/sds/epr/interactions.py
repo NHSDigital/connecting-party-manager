@@ -16,5 +16,6 @@ def check_no_duplicate_interactions(
         if count > 1:
             raise DuplicateInteractionIdError(
                 f"Duplicate '{SdsFieldName.INTERACTION_ID}' provided: "
-                f"value '{interaction}' occurs {count} times in the input."
+                f"value '{interaction}' occurs {count} times in the "
+                "questionnaire response."
             )
