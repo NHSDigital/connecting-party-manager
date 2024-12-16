@@ -1,3 +1,5 @@
+from typing import Literal
+
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
@@ -91,6 +93,22 @@ def _create_complete_epr_product(
     ]
 
 
+def _impute_manufacturer_org(
+    item: dict[Literal["nhs_mhs_manufacturer_org", "nhs_id_code"], str]
+):
+    """
+    Impute nhs_mhs_manufacturer_org if it is clearly invalid (not alphanumeric)
+    or does not exist by replacing it with the nhs_id_code
+    """
+    manufacturer_org = item["nhs_mhs_manufacturer_org"]
+    item["nhs_mhs_manufacturer_org"] = (
+        manufacturer_org
+        if manufacturer_org is not None and manufacturer_org.isalnum()
+        else item["nhs_id_code"]
+    )
+    return item
+
+
 def create_complete_epr_product(
     party_key_group: list[dict],
     mhs_device_questionnaire: Questionnaire,
@@ -110,6 +128,7 @@ def create_complete_epr_product(
     message_handling_systems: list[dict] = []
     accredited_systems: list[dict] = []
     for item in party_key_group:
+        item = _impute_manufacturer_org(item)
         if item["object_class"].lower() == NhsMhs.OBJECT_CLASS:
             message_handling_systems.append(item)
         else:
@@ -127,7 +146,6 @@ def create_complete_epr_product(
             mhs_device_questionnaire=mhs_device_questionnaire,
             mhs_device_field_mapping=mhs_device_field_mapping,
         )
-
         ods_code = first_mhs["nhs_mhs_manufacturer_org"]
         party_key = first_mhs["nhs_mhs_party_key"]
         product_name = first_mhs["nhs_product_name"] or first_mhs["nhs_mhs_cpa_id"]

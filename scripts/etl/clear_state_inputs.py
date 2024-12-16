@@ -10,8 +10,8 @@ from collections import deque
 import boto3
 from etl_utils.constants import CHANGELOG_NUMBER, WorkerKey
 from etl_utils.io import pkl_dumps_lz4
-from sds.epr.bulk_create.bulk_load_fanout import FANOUT
 
+from etl.sds.tests.etl_test_utils.etl_state import _delete_objects_by_prefix
 from test_helpers.aws_session import aws_session
 from test_helpers.terraform import read_terraform_output
 
@@ -38,12 +38,9 @@ def main(changelog_number, workspace):
         s3_client.put_object(
             Bucket=etl_bucket, Key=WorkerKey.LOAD, Body=EMPTY_JSON_DATA
         )
-        for i in range(FANOUT):
-            s3_client.put_object(
-                Bucket=etl_bucket,
-                Key=f"{WorkerKey.LOAD}.{i}",
-                Body=pkl_dumps_lz4(EMPTY_JSON_DATA),
-            )
+        _delete_objects_by_prefix(
+            s3_client=s3_client, bucket=etl_bucket, key_prefix=f"{WorkerKey.LOAD}."
+        )
         s3_client.delete_object(Bucket=etl_bucket, Key=CHANGELOG_NUMBER)
 
     if changelog_number:

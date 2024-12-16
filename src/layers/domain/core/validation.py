@@ -31,7 +31,7 @@ class SdsId:
         ID_PATTERN = re.compile(rf"^[a-zA-Z-0-9]+$")
 
     class PartyKey:
-        PARTY_KEY_REGEX = rf"^{_ODS_CODE_REGEX}-[0-9]{{6,9}}$"
+        PARTY_KEY_REGEX = rf"^{_ODS_CODE_REGEX}-[0-9]{{5,9}}$"
         ID_PATTERN = re.compile(PARTY_KEY_REGEX)
 
     class CpaId:
