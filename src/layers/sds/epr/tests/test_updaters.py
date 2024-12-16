@@ -105,8 +105,8 @@ def test_update_message_sets(message_sets: DeviceReferenceData):
         questionnaire.validate(
             {
                 str(SdsFieldName.INTERACTION_ID): interaction_id,
-                "MHS SN": "",
-                "MHS IN": "",
+                "MHS SN": "the new value",
+                "MHS IN": "the new value",
             }
         )
         for interaction_id in ("foo", "bar")
@@ -119,17 +119,31 @@ def test_update_message_sets(message_sets: DeviceReferenceData):
     qid = f"{QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS}/1"
     assert final_state.pop("updated_on") > initial_state.pop("updated_on")
     questionnaire_responses = final_state.pop("questionnaire_responses")[qid]
-    assert len(questionnaire_responses) == 2
-    assert questionnaire_responses[0]["data"] == {
-        str(SdsFieldName.INTERACTION_ID): "foo",
-        "MHS SN": "",
-        "MHS IN": "",
-    }
-    assert questionnaire_responses[1]["data"] == {
-        str(SdsFieldName.INTERACTION_ID): "bar",
-        "MHS SN": "",
-        "MHS IN": "",
-    }
+    assert len(questionnaire_responses) == 4
+
+    qr_data = [qr["data"] for qr in questionnaire_responses]
+    assert qr_data == [
+        {
+            "Interaction ID": "baz",
+            "MHS IN": "",
+            "MHS SN": "",
+        },
+        {
+            "Interaction ID": "bob",
+            "MHS IN": "",
+            "MHS SN": "",
+        },
+        {
+            "Interaction ID": "foo",  # replaced old "foo"
+            "MHS IN": "the new value",
+            "MHS SN": "the new value",
+        },
+        {
+            "Interaction ID": "bar",
+            "MHS IN": "the new value",
+            "MHS SN": "the new value",
+        },
+    ]
 
     del initial_state["questionnaire_responses"]
     assert initial_state == final_state

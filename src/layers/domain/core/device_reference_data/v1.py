@@ -6,6 +6,7 @@ from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot, event
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import DuplicateQuestionnaireResponse
+from domain.core.device.v1 import QuestionnaireResponseNotFoundError
 from domain.core.enum import Status
 from domain.core.event import Event, EventDeserializer
 from domain.core.questionnaire import QuestionnaireResponse
@@ -95,11 +96,20 @@ class DeviceReferenceData(AggregateRoot):
     def remove_questionnaire_response(
         self, questionnaire_id: str, questionnaire_response_id: str
     ) -> QuestionnaireResponseUpdatedEvent:
-        self.questionnaire_responses[questionnaire_id] = [
-            qr
-            for qr in self.questionnaire_responses[questionnaire_id]
-            if qr.id != questionnaire_response_id
+        qid_to_remove = str(questionnaire_response_id)
+        questionnaire_response_ids = [
+            str(qr.id) for qr in self.questionnaire_responses[questionnaire_id]
         ]
+
+        try:
+            idx_to_remove = questionnaire_response_ids.index(qid_to_remove)
+        except ValueError:
+            raise QuestionnaireResponseNotFoundError(
+                f"Could not find QuestionnaireResponse {qid_to_remove}"
+            )
+        else:
+            self.questionnaire_responses[questionnaire_id].pop(idx_to_remove)
+
         return QuestionnaireResponseUpdatedEvent(
             id=self.id,
             questionnaire_responses={

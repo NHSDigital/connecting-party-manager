@@ -21,12 +21,25 @@ def remove_erroneous_additional_interactions(
 
 
 def update_message_sets(
-    message_sets: DeviceReferenceData, message_set_data: QuestionnaireResponse
+    message_sets: DeviceReferenceData, message_set_data: list[QuestionnaireResponse]
 ) -> DeviceReferenceData:
-    if message_sets.questionnaire_responses:
-        (questionnaire_id,) = message_sets.questionnaire_responses.keys()
-        message_sets.remove_questionnaire(questionnaire_id)
+    """
+    Updates the MessageSets questionnaire responses with the provided message_set_data,
+    with any replacements based on matching by interaction id.
+    """
+    interaction_id_to_qid = {
+        msg_set.data[SdsFieldName.INTERACTION_ID]: msg_set.id
+        for msg_sets in message_sets.questionnaire_responses.values()
+        for msg_set in msg_sets
+    }
 
     for _message_set in message_set_data:
+        new_interaction_id = _message_set.data[SdsFieldName.INTERACTION_ID]
+        qid_to_remove = interaction_id_to_qid.get(new_interaction_id)
+        if qid_to_remove:
+            message_sets.remove_questionnaire_response(
+                questionnaire_id=_message_set.questionnaire_id,
+                questionnaire_response_id=qid_to_remove,
+            )
         message_sets.add_questionnaire_response(_message_set)
     return message_sets

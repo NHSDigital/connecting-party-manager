@@ -1,6 +1,9 @@
 from typing import Literal
 
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.cpm_product.v1 import CpmProduct
+from domain.core.device.v1 import Device
+from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire import Questionnaire
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
@@ -13,6 +16,7 @@ from sds.domain.nhs_mhs import NhsMhs
 from sds.domain.parse import UnknownSdsModel
 from sds.domain.sds_deletion_request import SdsDeletionRequest
 from sds.domain.sds_modification_request import SdsModificationRequest
+from sds.epr.constants import BAD_UNIQUE_IDENTIFIERS
 from sds.epr.updates.change_request_processors import (
     process_request_to_add_as,
     process_request_to_add_mhs,
@@ -25,28 +29,6 @@ from sds.epr.updates.modification_request_routing import (
     route_mhs_modification_request,
 )
 from sds.epr.utils import is_as_device, is_mhs_device
-
-EXCEPTIONAL_ODS_CODES = {  # TODO: use these
-    "696B001",
-    "TESTEBS1",
-    "TESTLSP0",
-    "TESTLSP1",
-    "TESTLSP3",
-    "TMSAsync1",
-    "TMSAsync2",
-    "TMSAsync3",
-    "TMSAsync4",
-    "TMSAsync5",
-    "TMSAsync6",
-    "TMSEbs2",
-}
-
-BAD_UNIQUE_IDENTIFIERS = {  # TODO: put these somewhere
-    "31af51067f47f1244d38",  # pragma: allowlist secret
-    "a83e1431f26461894465",  # pragma: allowlist secret
-    "S2202584A2577603",
-    "S100049A300185",
-}
 
 
 def process_change_request(
@@ -63,7 +45,7 @@ def process_change_request(
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
-) -> list[AggregateRoot]:
+) -> list[ProductTeam | CpmProduct | Device | DeviceReferenceData]:
     unique_identifier = record["unique_identifier"]
     if unique_identifier in BAD_UNIQUE_IDENTIFIERS:
         return []
