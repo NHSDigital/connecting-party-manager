@@ -22,6 +22,7 @@ from domain.repository.questionnaire_repository import (
 from domain.request_models import CreateDeviceReferenceAdditionalInteractionsDataParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from sds.epr.constants import ADDITIONAL_INTERACTIONS_SUFFIX, EprNameTemplate
+from sds.epr.interactions import check_no_duplicate_interactions
 
 
 @mark_validation_errors_as_inbound
@@ -84,6 +85,10 @@ def validate_questionnaire_responses(data, cache) -> list[QuestionnaireResponse]
     return [questionnaire.validate(data=qr) for qr in raw_questionnaire_responses]
 
 
+def require_unique_interactions(data, cache):
+    check_no_duplicate_interactions(data[validate_questionnaire_responses])
+
+
 def create_additional_interactions_device_reference_data(
     data, cache
 ) -> DeviceReferenceData:
@@ -132,6 +137,7 @@ steps = [
     require_no_existing_additional_interactions_device_reference_data,
     read_questionnaire,
     validate_questionnaire_responses,
+    require_unique_interactions,
     create_additional_interactions_device_reference_data,
     add_questionnaire_response,
     write_device_reference_data,
