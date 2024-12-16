@@ -67,6 +67,7 @@
     },
     "Map": {
       "Type": "Map",
+      "MaxConcurrency": 10,
       "ItemProcessor": {
         "ProcessorConfig": {
           "Mode": "INLINE"

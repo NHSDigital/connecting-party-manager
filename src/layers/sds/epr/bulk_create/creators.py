@@ -7,7 +7,11 @@ from domain.core.product_team import ProductTeam
 from domain.core.product_team_key import ProductTeamKey, ProductTeamKeyType
 from domain.core.questionnaire import QuestionnaireResponse
 from domain.core.root import Root
-from sds.epr.constants import EprNameTemplate, SdsDeviceReferenceDataPath
+from sds.epr.constants import (
+    EXCEPTIONAL_ODS_CODES,
+    EprNameTemplate,
+    SdsDeviceReferenceDataPath,
+)
 
 
 def create_epr_product_team(ods_code: str) -> ProductTeam:
@@ -15,6 +19,13 @@ def create_epr_product_team(ods_code: str) -> ProductTeam:
         key_type=ProductTeamKeyType.EPR_ID,
         key_value=EprNameTemplate.PRODUCT_TEAM_KEY.format(ods_code=ods_code),
     )
+
+    if ods_code in EXCEPTIONAL_ODS_CODES:
+        return ProductTeam(
+            name=EprNameTemplate.PRODUCT_TEAM.format(ods_code=ods_code),
+            ods_code=ods_code,
+            keys=[product_team_key],
+        )
 
     org = Root.create_ods_organisation(ods_code=ods_code)
     return org.create_product_team(

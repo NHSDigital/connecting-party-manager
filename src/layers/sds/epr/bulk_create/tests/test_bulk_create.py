@@ -11,7 +11,10 @@ from domain.repository.questionnaire_repository import (
     QuestionnaireRepository,
 )
 from event.json import json_loads
-from sds.epr.bulk_create.bulk_create import create_complete_epr_product
+from sds.epr.bulk_create.bulk_create import (
+    _impute_manufacturer_org,
+    create_complete_epr_product,
+)
 
 
 @pytest.fixture
@@ -356,3 +359,28 @@ def test_create_complete_epr_product(
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(mhs_device, Device)
     assert all(isinstance(device, Device) for device in as_devices)
+
+
+@pytest.mark.parametrize(
+    ["item", "expectation"],
+    (
+        [
+            {"nhs_mhs_manufacturer_org": "foo", "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "foo", "nhs_id_code": "bar"},
+        ],
+        [
+            {"nhs_mhs_manufacturer_org": "foo123", "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "foo123", "nhs_id_code": "bar"},
+        ],
+        [
+            {"nhs_mhs_manufacturer_org": None, "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "bar", "nhs_id_code": "bar"},
+        ],
+        [
+            {"nhs_mhs_manufacturer_org": "has spaces", "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "bar", "nhs_id_code": "bar"},
+        ],
+    ),
+)
+def test__impute_manufacturer_org(item, expectation):
+    assert _impute_manufacturer_org(item) == expectation

@@ -1,5 +1,21 @@
 from enum import StrEnum
 
+EXCEPTIONAL_ODS_CODES = {
+    "696B001",
+    "TESTEBS1",
+    "TESTLSP0",
+    "TESTLSP1",
+    "TESTLSP3",
+    "TMSAsync1",
+    "TMSAsync2",
+    "TMSAsync3",
+    "TMSAsync4",
+    "TMSAsync5",
+    "TMSAsync6",
+    "TMSEbs2",
+    "SPINE",
+}
+
 
 class SdsFieldName(StrEnum):
     ASID = "ASID"
