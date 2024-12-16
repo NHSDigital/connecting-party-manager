@@ -78,28 +78,13 @@ paths:
         - app-level0: []
 
   /ProductTeam/{product_team_id}/Product:
-    get:
-      operationId: searchCpmProduct
-      summary: Retrieve all Products associated with a Product Team (GET)
-      parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
-        - $ref: "#/components/parameters/HeaderVersion"
-        - $ref: "#/components/parameters/HeaderRequestId"
-        - $ref: "#/components/parameters/HeaderCorrelationId"
-      responses:
-        "200":
-          $ref: "#/components/responses/ProductSearch"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_searchCpmProduct}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
     post:
       operationId: createproductendpoint
       summary: Create a Product resource (POST)
+      description: |
+        This endpoint creates a new Product resource for the specified Product Team.
+        **Requirements:**
+        - A valid Product Team must exist
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -117,6 +102,25 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    get:
+      operationId: searchCpmProduct
+      summary: Retrieve all Products associated with a Product Team (GET)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchCpmProduct}
       security:
         - ${authoriser_name}: []
         - app-level0: []
@@ -142,7 +146,6 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-
     delete:
       operationId: deleteproductendpoint
       summary: Delete a Product resource (DELETE)
@@ -168,6 +171,10 @@ paths:
     post:
       operationId: createproductforeprendpoint
       summary: Create an EPR Product resource (POST)
+      description: |
+        This endpoint creates a new EPR Product resource for the specified Product Team.
+        **Requirements:**
+        - A valid Product Team must exist
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -190,29 +197,10 @@ paths:
         - app-level0: []
 
   /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData:
-    get:
-      operationId: searchDeviceReferenceData
-      summary: Retrieve all Data Reference Data resources associated with a Product (GET)
-      parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
-        - $ref: "#/components/parameters/ProductId"
-        - $ref: "#/components/parameters/HeaderVersion"
-        - $ref: "#/components/parameters/HeaderRequestId"
-        - $ref: "#/components/parameters/HeaderCorrelationId"
-      responses:
-        "200":
-          $ref: "#/components/responses/DeviceRefDataSearch"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_searchDeviceReferenceData}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
     post:
       operationId: createDeviceReferenceData
       summary: Create a Device Reference Data resource (POST)
+      description: This endpoint has not yet been configured. Do not use.
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -234,11 +222,37 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
+    get:
+      operationId: searchDeviceReferenceData
+      summary: Retrieve all Data Reference Data resources associated with a Product (GET)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeviceRefDataSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchDeviceReferenceData}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
 
   ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/MhsMessageSet
   : post:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
+      description: |
+        This endpoint creates a Device Reference Data Message Set resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid EPR Product must already exist under the Product Team
+        - There can be no existing MHS MessageSet DRD for the EPR Product already
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -265,6 +279,12 @@ paths:
   : post:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
+      description: |
+        This endpoint creates a Device Reference Data Additional Interactions resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid EPR Product must already exist under the Product Team
+        - There can be no existing AS AdditionalInteractions DRD for the EPR Product already
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -314,6 +334,8 @@ paths:
     post:
       operationId: createDevice
       summary: Create a Device resource (POST)
+      description: |
+        This endpoint has not yet been configured. Do not use.
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -363,6 +385,14 @@ paths:
   : post:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
+      description: |
+        This endpoint creates a new Message Handling System Device resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid Product must exist under the Product Team
+        - One existing MHS Message Set Device Reference Data must be present for the Product
+        - No existing MHS device for the product
+        - Must provide a spine_mhs questionnaire response
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -389,6 +419,14 @@ paths:
     post:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)
+      description: |
+        This endpoint creates a new Accredited System Device resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid Product must exist under the Product Team
+        - One existing MHS Message Set Device Reference Data must be present for the Product
+        - One existing AS Additional Interactions Device Reference Data must be present for the Product
+        - Must provide a spine_as questionnaire response
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
