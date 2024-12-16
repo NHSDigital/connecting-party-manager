@@ -81,11 +81,11 @@ def extract_handler(scenario: Scenario, s3_client: S3Client):
         {"ETL_BUCKET": ETL_BUCKET, "AWS_DEFAULT_REGION": "us-east-1"},
         clear=True,
     ):
-        from etl.sds.worker.extract import extract
+        from etl.sds.worker.update.extract_update import extract_update
 
-        extract.ENVIRONMENT = WorkerEnvironment.build()
-        extract.S3_CLIENT = s3_client
-        yield extract.handler
+        extract_update.ENVIRONMENT = WorkerEnvironment.build()
+        extract_update.S3_CLIENT = s3_client
+        yield extract_update.handler
 
 
 @pytest.fixture
@@ -97,7 +97,7 @@ def transform_handler(scenario: Scenario):
     os.environ["ETL_BUCKET"] = etl_bucket
     os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_table_name.value")
 
-    from etl.sds.worker.transform_update import transform_update
+    from etl.sds.worker.update.transform_update import transform_update
 
     transform_update.S3_CLIENT.put_object(
         Bucket=etl_bucket,
@@ -122,7 +122,7 @@ def load_handler(scenario: Scenario):
     os.environ["ETL_BUCKET"] = read_terraform_output("sds_etl.value.bucket")
     os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_table_name.value")
 
-    from etl.sds.worker.load_update import load_update
+    from etl.sds.worker.update.load_update import load_update
 
     yield load_update.handler
     os.environ = original_environ

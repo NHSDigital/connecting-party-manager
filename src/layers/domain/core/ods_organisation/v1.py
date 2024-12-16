@@ -16,7 +16,7 @@ class OdsOrganisation(AggregateRoot):
     def create_product_team(self, name: str, keys: list = None) -> ProductTeam:
         keys = keys or []
         product_team = ProductTeam(name=name, ods_code=self.ods_code, keys=keys)
-        event = ProductTeamCreatedEvent(**product_team.dict())
+        event = ProductTeamCreatedEvent(**product_team.state())
         product_team.add_event(event)
         self.add_event(event=event)
         return product_team

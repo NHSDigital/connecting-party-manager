@@ -36,8 +36,9 @@ class CpmProductRepository(Repository[CpmProduct]):
 
     def handle_CpmProductKeyAddedEvent(self, event: CpmProductKeyAddedEvent):
         # Create a copy of the Product indexed against the new key
+        new_key = ProductKey(**event.new_key)
         create_transaction = self.create_index(
-            id=event.new_key.key_value,
+            id=new_key.key_value,
             parent_key_parts=(event.product_team_id,),
             data=asdict(event),
             root=False,
@@ -45,7 +46,7 @@ class CpmProductRepository(Repository[CpmProduct]):
 
         # Update the value of "keys" on all other copies of this Device
         product_keys = {ProductKey(**key) for key in event.keys}
-        product_keys_before_update = product_keys - {event.new_key}
+        product_keys_before_update = product_keys - {new_key}
         update_transactions = self.update_indexes(
             id=event.id,
             keys=product_keys_before_update,
