@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-12-16
+- [PI-681] EPR endpoints requirements
+
 ## 2024-12-11
 - [PI-650] Modify the Read Device endpoint for AS Devices
 - [PI-666] Create an ASID for AS Device and add as a DeviceKey
