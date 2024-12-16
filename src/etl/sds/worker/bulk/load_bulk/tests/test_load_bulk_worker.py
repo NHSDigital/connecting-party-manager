@@ -24,7 +24,7 @@ from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.json import json_load
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
-from sds.epr.constants import AS_DEVICE_SUFFIX, MHS_DEVICE_SUFFIX
+from sds.epr.utils import is_as_device, is_mhs_device
 
 from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.dynamodb import mock_table
@@ -150,8 +150,8 @@ def test_load_worker_pass(
                 for product in products
             )
         )
-        mhs_devices = [d for d in devices if d.name.endswith(MHS_DEVICE_SUFFIX)]
-        as_devices = [d for d in devices if d.name.endswith(AS_DEVICE_SUFFIX)]
+        mhs_devices = [d for d in devices if is_mhs_device(d)]
+        as_devices = [d for d in devices if is_as_device(d)]
         assert len(devices) == len(mhs_devices) + len(as_devices)
         assert len(mhs_devices) == 2
         assert len(as_devices) == 4

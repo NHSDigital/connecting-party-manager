@@ -1,5 +1,0 @@
-The following errors were encountered
-  -- Error 1 (InvalidModificationRequest) --
-  Failed to parse record 0
-  {'object_class': 'modify', 'change_type': 'modify', 'modifications': [['delete', 'nhsasclient', []]], 'unique_identifier': '000173655515'}
-  Forbidden to delete NhsAccreditedSystem.nhs_as_client

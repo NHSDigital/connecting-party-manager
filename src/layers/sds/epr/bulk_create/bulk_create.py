@@ -4,7 +4,8 @@ from domain.core.aggregate_root import AggregateRoot
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from sds.domain.nhs_mhs import NhsMhs
-from sds.epr.bulk_create.creators import (
+from sds.epr.constants import SdsFieldName
+from sds.epr.creators import (
     create_additional_interactions,
     create_as_device,
     create_epr_product,
@@ -12,7 +13,7 @@ from sds.epr.bulk_create.creators import (
     create_message_sets,
     create_mhs_device,
 )
-from sds.epr.bulk_create.getters import (
+from sds.epr.getters import (
     get_accredited_system_device_data,
     get_accredited_system_tags,
     get_additional_interactions_data,
@@ -20,7 +21,6 @@ from sds.epr.bulk_create.getters import (
     get_mhs_device_data,
     get_mhs_tags,
 )
-from sds.epr.constants import SdsFieldName
 
 
 def _create_complete_epr_product(
@@ -61,7 +61,6 @@ def _create_complete_epr_product(
             mhs_device_data=mhs_device_data,
             cpa_ids=mhs_cpa_ids,
             message_sets_id=message_sets.id,
-            mhs_tags=mhs_tags,
         )
         mhs_devices = [mhs_device]
 
