@@ -60,9 +60,18 @@
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
+              "Contract Property Template Key": "14",
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
+              "Interaction Type": "fhir",
+              "MHS CPA ID": "00000000000a",
               "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
               "MHS SN": "urn:nhs:names:services:ers",
-              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+              "Product Key": "111",
+              "Reliability Configuration Ack Requested": "never",
+              "Reliability Configuration Duplication Elimination": "never",
+              "Unique Identifier": "00000000000a"
             },
             "created_on": "2024-12-10T11:05:46.699256+00:00"
           }
@@ -99,27 +108,18 @@
             "questionnaire_version": "1",
             "data": {
               "Approver URP": "myApprover",
-              "Contract Property Template Key": "14",
               "Date Approved": "20010101010101",
               "Date DNS Approved": "20010101010101",
               "Date Requested": "20010101010101",
               "DNS Approver": "myApprover",
-              "Interaction Type": "fhir",
               "Managing Organization": "AAA",
-              "Reliability Configuration Ack Requested": "never",
-              "MHS CPA ID": "00000000000a",
-              "Reliability Configuration Duplication Elimination": "never",
               "Address": "https://test.C3O9X.nhs.uk/",
               "MHS FQDN": "test.C3O9X.nhs.uk",
-              "MHS IP Address": "0.0.0.0",
-              "MHS Is Authenticated": "none",
               "MHS Manufacturer Organisation": "LSP04",
               "MHS Party key": "AAA-111111",
-              "Product Key": "111",
               "Product Name": "My AAA Product",
               "Product Version": "2005.02",
-              "Requestor URP": "myRequestor",
-              "Unique Identifier": "00000000000a"
+              "Requestor URP": "myRequestor"
             },
             "created_on": "2024-12-10T11:05:46.702846+00:00"
           }
@@ -152,27 +152,18 @@
             "questionnaire_version": "1",
             "data": {
               "Approver URP": "myApprover",
-              "Contract Property Template Key": "14",
               "Date Approved": "20010101010101",
               "Date DNS Approved": "20010101010101",
               "Date Requested": "20010101010101",
               "DNS Approver": "myApprover",
-              "Interaction Type": "fhir",
               "Managing Organization": "AAA",
-              "Reliability Configuration Ack Requested": "never",
-              "MHS CPA ID": "00000000000a",
-              "Reliability Configuration Duplication Elimination": "never",
               "Address": "https://test.C3O9X.nhs.uk/",
               "MHS FQDN": "test.C3O9X.nhs.uk",
-              "MHS IP Address": "0.0.0.0",
-              "MHS Is Authenticated": "none",
               "MHS Manufacturer Organisation": "LSP04",
               "MHS Party key": "AAA-111111",
-              "Product Key": "111",
               "Product Name": "My AAA Product",
               "Product Version": "2005.02",
-              "Requestor URP": "myRequestor",
-              "Unique Identifier": "00000000000a"
+              "Requestor URP": "myRequestor"
             },
             "created_on": "2024-12-10T11:05:46.702846+00:00"
           }

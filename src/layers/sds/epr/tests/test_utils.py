@@ -61,7 +61,13 @@ def test_get_interaction_ids_from_additional_interactions(product: CpmProduct):
 def test_get_interaction_ids_from_message_sets(product: CpmProduct):
     interaction_ids = {"foo", "bar"}
     message_handling_systems = [
-        {"nhs_mhs_svc_ia": interaction_id, "nhs_mhs_in": "", "nhs_mhs_sn": ""}
+        {
+            "nhs_mhs_svc_ia": interaction_id,
+            "nhs_mhs_in": "",
+            "nhs_mhs_sn": "",
+            "nhs_mhs_cpa_id": f"123-{interaction_id}",
+            "unique_identifier": f"123-{interaction_id}",
+        }
         for interaction_id in interaction_ids
     ]
     message_set_questionnaire = QuestionnaireRepository().read(

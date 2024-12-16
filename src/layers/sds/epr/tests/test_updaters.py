@@ -47,6 +47,8 @@ def message_sets(product: CpmProduct):
                 str(SdsFieldName.INTERACTION_ID): interaction_id,
                 "MHS SN": "",
                 "MHS IN": "",
+                "MHS CPA ID": f"1234-{interaction_id}",
+                "Unique Identifier": f"1234-{interaction_id}",
             }
         )
         for interaction_id in ("foo", "baz", "bob")
@@ -107,6 +109,8 @@ def test_update_message_sets(message_sets: DeviceReferenceData):
                 str(SdsFieldName.INTERACTION_ID): interaction_id,
                 "MHS SN": "the new value",
                 "MHS IN": "the new value",
+                "MHS CPA ID": f"1234-{interaction_id}",
+                "Unique Identifier": f"1234-{interaction_id}",
             }
         )
         for interaction_id in ("foo", "bar")
@@ -127,21 +131,29 @@ def test_update_message_sets(message_sets: DeviceReferenceData):
             "Interaction ID": "baz",
             "MHS IN": "",
             "MHS SN": "",
+            "MHS CPA ID": "1234-baz",
+            "Unique Identifier": "1234-baz",
         },
         {
             "Interaction ID": "bob",
             "MHS IN": "",
             "MHS SN": "",
+            "MHS CPA ID": "1234-bob",
+            "Unique Identifier": "1234-bob",
         },
         {
             "Interaction ID": "foo",  # replaced old "foo"
             "MHS IN": "the new value",
             "MHS SN": "the new value",
+            "MHS CPA ID": "1234-foo",
+            "Unique Identifier": "1234-foo",
         },
         {
             "Interaction ID": "bar",
             "MHS IN": "the new value",
             "MHS SN": "the new value",
+            "MHS CPA ID": "1234-bar",
+            "Unique Identifier": "1234-bar",
         },
     ]
 

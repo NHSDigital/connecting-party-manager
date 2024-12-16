@@ -40,23 +40,17 @@
           "questionnaire_version": "1",
           "data": {
             "Managing Organization": "C3O9X",
-            "Contract Property Template Key": "14",
-            "Interaction Type": "fhir",
             "Address": "https://test.C3O9X.nhs.uk/",
             "DNS Approver": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
             "MHS Party key": "C3O9X-823610",
-            "Product Key": "11929",
             "Date Approved": "20231030092939",
             "Product Version": "Mar2023",
             "Approver URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
             "Date DNS Approved": "20231030092939",
             "Requestor URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
-            "MHS Is Authenticated": "none",
-            "MHS CPA ID": "00000a84594b2ef34279",
             "Date Requested": "20231030092906",
-            "Unique Identifier": "00000a84594b2ef34279",
-            "MHS FQDN": "test.C3O9X.nhs.uk",
-            "MHS Manufacturer Organisation": "C3O9X"
+            "MHS Manufacturer Organisation": "C3O9X",
+            "MHS FQDN": "test.C3O9X.nhs.uk"
           },
           "created_on": "2024-12-11T11:18:53.456536+00:00"
         }
@@ -80,7 +74,13 @@
           "data": {
             "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
             "MHS SN": "urn:nhs:names:services:ers",
-            "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001"
+            "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001",
+            "Contract Property Template Key": "14",
+            "Interaction Type": "fhir",
+            "Product Key": "11929",
+            "MHS Is Authenticated": "none",
+            "MHS CPA ID": "00000a84594b2ef34279",
+            "Unique Identifier": "00000a84594b2ef34279"
           },
           "created_on": "2024-12-11T11:18:53.409854+00:00"
         }

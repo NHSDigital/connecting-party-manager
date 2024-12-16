@@ -16,6 +16,13 @@ EXCEPTIONAL_ODS_CODES = {
     "SPINE",
 }
 
+BAD_UNIQUE_IDENTIFIERS = {
+    "31af51067f47f1244d38",  # pragma: allowlist secret
+    "a83e1431f26461894465",  # pragma: allowlist secret
+    "S2202584A2577603",
+    "S100049A300185",
+}
+
 
 class SdsFieldName(StrEnum):
     ASID = "ASID"
