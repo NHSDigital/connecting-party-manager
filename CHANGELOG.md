@@ -2,6 +2,8 @@
 
 ## 2024-12-16
 - [PI-681] EPR endpoints requirements
+- [PI-702] Prod bulk tweak
+- [PI-653] EPR create endpoints - forbid duplicate interactions
 
 ## 2024-12-11
 - [PI-650] Modify the Read Device endpoint for AS Devices
