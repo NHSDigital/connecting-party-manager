@@ -26,6 +26,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -112,6 +115,9 @@
         "status": {
           "S": "active"
         },
+        "env": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -197,6 +203,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -385,7 +394,7 @@
           "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
@@ -398,6 +407,9 @@
         },
         "name": {
           "S": "BBB-111111 - MHS Message Sets"
+        },
+        "env": {
+          "S": "prod"
         },
         "status": {
           "S": "active"
@@ -485,7 +497,7 @@
                     "data": {
                       "M": {
                         "MHS IN": {
-                          "S": "READ_PRACTITIONER_ROLE_R4_V003"
+                          "S": "READ_PRACTITIONER_ROLE_R4_V002"
                         },
                         "MHS SN": {
                           "S": "urn:nhs:names:services:ers"
@@ -553,7 +565,7 @@
           "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
@@ -569,6 +581,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -701,7 +716,7 @@
           "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
@@ -717,6 +732,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -783,6 +801,9 @@
                         "Approver URP": {
                           "S": "myApprover"
                         },
+                        "Contract Property Template Key": {
+                          "S": "14"
+                        },
                         "Date Approved": {
                           "S": "20020202020202"
                         },
@@ -795,8 +816,20 @@
                         "DNS Approver": {
                           "S": "myApprover"
                         },
+                        "Interaction Type": {
+                          "S": "fhir"
+                        },
                         "Managing Organization": {
                           "S": "BBB"
+                        },
+                        "Reliability Configuration Ack Requested": {
+                          "S": "never"
+                        },
+                        "MHS CPA ID": {
+                          "S": "00000000000b"
+                        },
+                        "Reliability Configuration Duplication Elimination": {
+                          "S": "never"
                         },
                         "Address": {
                           "S": "https://test.C3O9X.nhs.uk/"
@@ -804,11 +837,20 @@
                         "MHS FQDN": {
                           "S": "test.C3O9X.nhs.uk"
                         },
+                        "MHS IP Address": {
+                          "S": "0.0.0.0"
+                        },
+                        "MHS Is Authenticated": {
+                          "S": "none"
+                        },
                         "MHS Manufacturer Organisation": {
                           "S": "LSP04"
                         },
                         "MHS Party key": {
                           "S": "BBB-111111"
+                        },
+                        "Product Key": {
+                          "S": "111"
                         },
                         "Product Name": {
                           "S": "My BBB Product"
@@ -818,6 +860,9 @@
                         },
                         "Requestor URP": {
                           "S": "myRequestor"
+                        },
+                        "Unique Identifier": {
+                          "S": "00000000000b"
                         }
                       }
                     },
@@ -854,7 +899,7 @@
           "S": "D#00000000000b"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#00000000000b"
@@ -870,6 +915,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -943,7 +991,7 @@
           "S": "D#00000000000c"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#00000000000c"
@@ -959,6 +1007,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "env": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"

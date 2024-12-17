@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import pytest
 from domain.core.device import Device, DeviceTag
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.repository.device_repository import (
     CannotDropMandatoryFields,
     DeviceRepository,
@@ -85,6 +85,7 @@ def _test_add_two_tags(
         repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id=device.id,
         ).tags
         == expected_tags
@@ -93,6 +94,7 @@ def _test_add_two_tags(
         repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id="P.WWW-XXX",
         ).tags
         == expected_tags
@@ -118,6 +120,7 @@ def test__device_repository__add_two_tags(device: Device, repository: DeviceRepo
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id=device.id,
     )
     second_device.add_tag(shoe_size=123)
@@ -140,6 +143,7 @@ def test__device_repository__add_two_tags_at_once(
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id=device.id,
     )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
@@ -161,6 +165,7 @@ def test__device_repository__add_two_tags_and_then_clear(
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id=device.id,
     )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
@@ -176,6 +181,7 @@ def test__device_repository__add_two_tags_and_then_clear(
         repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id=device.id,
         ).tags
         == set()
@@ -184,6 +190,7 @@ def test__device_repository__add_two_tags_and_then_clear(
         repository.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id="P.WWW-XXX",
         ).tags
         == set()

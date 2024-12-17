@@ -189,13 +189,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData:
+  /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData:
     get:
       operationId: searchDeviceReferenceData
       summary: Retrieve all Data Reference Data resources associated with a Product (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
@@ -216,6 +217,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
@@ -235,13 +237,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/MhsMessageSet
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/MhsMessageSet
   : post:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
@@ -261,13 +264,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
   : post:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
@@ -287,13 +291,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/DeviceReferenceData/{device_reference_data_id}
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/{device_reference_data_id}
   : get:
       operationId: readDeviceReferenceData
       summary: Read a Device Reference Data resource (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/DeviceReferenceDataId"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
@@ -310,13 +315,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/Device:
+  /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device:
     post:
       operationId: createDevice
       summary: Create a Device resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
@@ -336,13 +342,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/Device/{device_id}:
+  /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/{device_id}:
     get:
       operationId: readDevice
       summary: Read a Device resource (GET)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/DeviceId"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
@@ -359,13 +366,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/Device/MessageHandlingSystem
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/MessageHandlingSystem
   : post:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
@@ -385,13 +393,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/Device/AccreditedSystem:
-    post:
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/AccreditedSystem
+  : post:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
