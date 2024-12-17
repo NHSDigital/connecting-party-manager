@@ -113,10 +113,12 @@ def create_as_device(data, cache) -> Device:
     asid: AsidId = data[create_asid]
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
     party_key: str = data[get_party_key]
+    environment: Environment = data[read_environment]
 
     device_payload = payload.dict(exclude={"questionnaire_responses"})
     return product.create_device(
         name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid.__root__),
+        env=environment,
         **device_payload
     )
 
