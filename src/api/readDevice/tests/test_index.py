@@ -186,7 +186,9 @@ def test_index_mhs_device(version):
         device_reference_data_repo.write(device_reference_data)
 
         # Set up Device in DB
-        device: Device = cpm_product.create_device(name="Product-MHS", env=Environment.DEV)
+        device: Device = cpm_product.create_device(
+            name="Product-MHS", env=Environment.DEV
+        )
         device.add_key(key_type="cpa_id", key_value=f"{PARTY_KEY}:bar:baz")
         device.add_key(key_type="cpa_id", key_value=f"{PARTY_KEY}:bar2:baz2")
         device.add_tag(party_key=PARTY_KEY)
@@ -333,7 +335,7 @@ def test_index_mhs_device_adjusted_data(version):
 
         # Set up DeviceReferenceData in DB
         device_reference_data = cpm_product.create_device_reference_data(
-            name="ABC1234-987654 - MHS Message Set"
+            name="ABC1234-987654 - MHS Message Set", env=Environment.DEV
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -343,7 +345,9 @@ def test_index_mhs_device_adjusted_data(version):
         device_reference_data_repo.write(device_reference_data)
 
         # Set up Device in DB
-        device: Device = cpm_product.create_device(name="Product-MHS")
+        device: Device = cpm_product.create_device(
+            name="Product-MHS", env=Environment.DEV
+        )
         device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo")
         device.add_key(key_type="cpa_id", key_value="F5H1R-850000:urn:foo2")
         device.add_tag(party_key="f5h1r-850000")
@@ -386,6 +390,7 @@ def test_index_mhs_device_adjusted_data(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
+                    "env": "dev",
                     "device_id": str(device.id),
                 },
             }
@@ -490,7 +495,7 @@ def test_index_as_device(version):
 
         # Set up DeviceReferenceData in DB
         device_reference_data = cpm_product.create_device_reference_data(
-            name="ABC1234-987654 - MHS Message Set"
+            name="ABC1234-987654 - MHS Message Set", env=Environment.DEV
         )
         device_reference_data.add_questionnaire_response(questionnaire_response)
         device_reference_data.add_questionnaire_response(questionnaire_response_2)
@@ -511,7 +516,7 @@ def test_index_as_device(version):
 
         # Set up DeviceReferenceData in DB
         device_reference_data_as = cpm_product.create_device_reference_data(
-            name="ABC1234-987654 - AS Additional Interactions"
+            name="ABC1234-987654 - AS Additional Interactions", env=Environment.DEV
         )
         device_reference_data_as.add_questionnaire_response(questionnaire_response_3)
         device_reference_data_as.add_questionnaire_response(questionnaire_response_4)
@@ -523,7 +528,9 @@ def test_index_as_device(version):
         device_reference_data_repo.write(device_reference_data_as)
 
         # Set up Device in DB
-        device: Device = cpm_product.create_device(name="Product-AS")
+        device: Device = cpm_product.create_device(
+            name="Product-AS", env=Environment.DEV
+        )
         device.add_tag(party_key="f5h1r-850000")
 
         # set up spine as questionnaire response
@@ -565,6 +572,7 @@ def test_index_as_device(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
+                    "env": "dev",
                     "device_id": str(device.id),
                 },
             }
