@@ -21,3 +21,8 @@ variable "updated_date" {
 variable "workspace_type" {
   default = "PERSISTENT"
 }
+
+variable "budget_limit" {
+  default = "475"
+  type    = string
+}

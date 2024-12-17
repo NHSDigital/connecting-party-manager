@@ -27,6 +27,12 @@ JSON
   }
 }
 
+module "budget" {
+  source      = "../modules/billing_alarms"
+  limit       = var.budget_limit
+  environment = var.environment
+}
+
 module "iam__api-gateway-to-cloudwatch" {
   source  = "../modules/iam__api-gateway-to-cloudwatch"
   project = local.project
