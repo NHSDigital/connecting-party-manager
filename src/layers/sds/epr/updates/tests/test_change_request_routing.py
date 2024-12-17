@@ -64,21 +64,15 @@ def mhs_device_data():
     raw_mhs_device_data = {
         "Address": "my-mhs-endpoint",
         "Approver URP": "approver-123",
-        "Contract Property Template Key": "key-123",
         "DNS Approver": "dns-approver-123",
         "Date Approved": "today",
         "Date DNS Approved": "yesterday",
         "Date Requested": "a week ago",
-        "Interaction Type": "hl7",
-        "MHS CPA ID": "1wd354",
         "MHS FQDN": "my-fqdn",
-        "MHS Is Authenticated": "none",
         "MHS Party key": "AAA-123456",
         "Managing Organization": "AAA",
-        "Product Key": "key-123",
         "Product Name": "My EPR Product",
         "Requestor URP": "requester-123",
-        "Unique Identifier": "1wd354",
         "MHS Manufacturer Organisation": "AAA",
     }
     return questionnaire.validate(data=raw_mhs_device_data)
