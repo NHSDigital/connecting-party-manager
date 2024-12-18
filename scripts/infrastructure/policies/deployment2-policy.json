@@ -257,7 +257,14 @@
         "resource-groups:ListGroups",
         "lambda:ListEventSourceMappings",
         "iam:ListRoles",
-        "budgets:ModifyBudget"
+        "SNS:GetTopicAttributes",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:ListTagsForResource",
+        "SNS:ListTagsForResource",
+        "budgets:ModifyBudget",
+        "budgets:ViewBudget",
+        "SNS:DeleteTopic"
       ],
       "Resource": ["*"]
     }
