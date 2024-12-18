@@ -10,7 +10,7 @@ module "notify_slack" {
 }
 
 resource "aws_budgets_budget" "cpm_budget" {
-  name         = "nhse-cpm-monthly-budget"
+  name         = "nhse-cpm-monthly-budget-${var.environment}"
   budget_type  = "COST"
   limit_amount = var.limit
   limit_unit   = "USD"
@@ -22,8 +22,7 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
     subscriber_email_addresses = var.email_subscribers
-    # subscriber_sns_topic_arns  = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
-    subscriber_sns_topic_arns = [module.notify_slack.slack_topic_arn]
+    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
   }
 
   notification {
@@ -32,9 +31,7 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
     subscriber_email_addresses = var.email_subscribers
-    # subscriber_sns_topic_arns  = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
-    subscriber_sns_topic_arns = [module.notify_slack.slack_topic_arn]
-    # subscriber_sns_topic_arns = module.notify_slack.slack_topic_arn
+    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
   }
 
   notification {
@@ -43,9 +40,7 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
     subscriber_email_addresses = var.email_subscribers
-    # subscriber_sns_topic_arns  = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
-    subscriber_sns_topic_arns = [module.notify_slack.slack_topic_arn]
-    # subscriber_sns_topic_arns = module.notify_slack.slack_topic_arn
+    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
   }
 
   notification {
@@ -54,8 +49,6 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
     subscriber_email_addresses = var.email_subscribers
-    # subscriber_sns_topic_arns  = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
-    subscriber_sns_topic_arns = [module.notify_slack.slack_topic_arn]
-    # subscriber_sns_topic_arns = module.notify_slack.slack_topic_arn
+    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
   }
 }
