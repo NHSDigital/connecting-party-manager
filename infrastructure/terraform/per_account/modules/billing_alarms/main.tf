@@ -22,12 +22,8 @@ resource "aws_budgets_budget" "billing_alert_10" {
     threshold_type      = "PERCENTAGE"
     notification_type   = "ACTUAL"
     # subscriber_email_addresses = var.email_subscribers
-    subscriber_sns_topic_arns = "arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"
+    subscriber_sns_topic_arns = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
     # subscriber_sns_topic_arns = module.notify_slack.slack_topic_arn
-  }
-
-  tags = {
-    Environment = var.environment
   }
 }
 
@@ -44,12 +40,8 @@ resource "aws_budgets_budget" "billing_alert_50" {
     threshold_type      = "PERCENTAGE"
     notification_type   = "ACTUAL"
     # subscriber_email_addresses = var.email_subscribers
-    subscriber_sns_topic_arns = "arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"
+    subscriber_sns_topic_arns = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
     # subscriber_sns_topic_arns = module.notify_slack.slack_topic_arn
-  }
-
-  tags = {
-    Environment = var.environment
   }
 }
 
@@ -65,13 +57,9 @@ resource "aws_budgets_budget" "billing_alert_75" {
     threshold                 = 75
     threshold_type            = "PERCENTAGE"
     notification_type         = "ACTUAL"
-    subscriber_sns_topic_arns = "arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"
+    subscriber_sns_topic_arns = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
     # subscriber_email_addresses = var.email_subscribers
     # subscriber_sns_topic_arns  = module.notify_slack.slack_topic_arn
-  }
-
-  tags = {
-    Environment = var.environment
   }
 }
 
@@ -87,13 +75,9 @@ resource "aws_budgets_budget" "billing_alert_90" {
     threshold                 = 90
     threshold_type            = "PERCENTAGE"
     notification_type         = "ACTUAL"
-    subscriber_sns_topic_arns = "arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"
+    subscriber_sns_topic_arns = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
     # subscriber_email_addresses = var.email_subscribers
     # subscriber_sns_topic_arns  = module.notify_slack.slack_topic_arn
-  }
-
-  tags = {
-    Environment = var.environment
   }
 }
 
@@ -109,12 +93,8 @@ resource "aws_budgets_budget" "billing_alert_100" {
     threshold                 = 100
     threshold_type            = "PERCENTAGE"
     notification_type         = "ACTUAL"
-    subscriber_sns_topic_arns = "arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"
+    subscriber_sns_topic_arns = ["arn:aws:sns:eu-west-2:660842439611:test-dev-billing-alarm"]
     # subscriber_email_addresses = var.email_subscribers
     # subscriber_sns_topic_arns  = module.notify_slack.slack_topic_arn
-  }
-
-  tags = {
-    Environment = var.environment
   }
 }
