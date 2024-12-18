@@ -12,6 +12,8 @@ from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from sds.epr.constants import EprNameTemplate
 from sds.epr.creators import (
+    create_additional_interactions,
+    create_as_device,
     create_epr_product,
     create_epr_product_team,
     create_message_sets,
@@ -19,6 +21,7 @@ from sds.epr.creators import (
 )
 from sds.epr.utils import (
     is_additional_interactions_device_reference_data,
+    is_as_device,
     is_message_set_device_reference_data,
     is_mhs_device,
 )
@@ -52,10 +55,12 @@ def read_or_create_epr_product(
 
 
 def read_additional_interactions_if_exists(
-    device_reference_data_repository: DeviceReferenceDataRepository, product: CpmProduct
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    product_team_id: str,
+    product_id: str,
 ) -> DeviceReferenceData | None:
     device_reference_datas = device_reference_data_repository.search(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product_team_id, product_id=product_id
     )
 
     additional_interactions = None
@@ -111,3 +116,50 @@ def read_or_create_mhs_device(
             message_sets_id=message_sets.id,
         )
     return mhs_device
+
+
+def read_or_create_empty_additional_interactions(
+    product: CpmProduct,
+    party_key: str,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+) -> DeviceReferenceData:
+    device_reference_datas = device_reference_data_repository.search(
+        product_team_id=product.product_team_id, product_id=product.id
+    )
+
+    try:
+        (additional_interactions,) = filter(
+            is_additional_interactions_device_reference_data, device_reference_datas
+        )
+    except ValueError:
+        additional_interactions = create_additional_interactions(
+            product=product, party_key=party_key, additional_interactions_data=[]
+        )
+    return additional_interactions
+
+
+def read_or_create_as_device(
+    device_repository: DeviceRepository,
+    asid: str,
+    party_key: str,
+    product_team: ProductTeam,
+    product: CpmProduct,
+    message_sets: DeviceReferenceData,
+    additional_interactions: DeviceReferenceData,
+    accredited_system_device_data: QuestionnaireResponse,
+) -> Device:
+    devices = device_repository.search(
+        product_team_id=product_team.id, product_id=product.id
+    )
+    try:
+        (as_device,) = filter(is_as_device, devices)
+    except ValueError:
+        as_device = create_as_device(
+            product=product,
+            party_key=party_key,
+            asid=asid,
+            as_device_data=accredited_system_device_data,
+            message_sets_id=message_sets.id,
+            additional_interactions_id=additional_interactions.id,
+        )
+    return as_device
