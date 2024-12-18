@@ -30,6 +30,7 @@ def mhs_1() -> NhsMhs:
         nhsmhsin="in-123",
         nhsmhsisauthenticated="none",
         nhsmhssn="sn-123",
+        nhsproductkey="key-123",
         nhsrequestorurp="requester-123",
         nhsmhsmanufacturerorg="AAA",
     )
@@ -60,6 +61,7 @@ def mhs_2() -> NhsMhs:
         nhsmhsin="in-456",
         nhsmhsisauthenticated="none",
         nhsmhssn="sn-456",
+        nhsproductkey="key-456",
         nhsrequestorurp="requester-456",
         nhsmhsmanufacturerorg="AAA",
     )
