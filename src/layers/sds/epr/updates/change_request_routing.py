@@ -69,10 +69,9 @@ def process_change_request(
             product_team_repository=product_team_repository,
             product_repository=product_repository,
             device_reference_data_repository=device_reference_data_repository,
+            device_repository=device_repository,
             accredited_system_questionnaire=accredited_system_questionnaire,
             accredited_system_field_mapping=accredited_system_field_mapping,
-            message_set_questionnaire=message_set_questionnaire,
-            message_set_field_mapping=message_set_field_mapping,
             additional_interactions_questionnaire=additional_interactions_questionnaire,
         )
 

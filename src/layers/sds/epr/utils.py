@@ -32,7 +32,15 @@ def is_as_device(device: Device) -> bool:
 def get_interaction_ids(
     message_sets_or_additional_interactions: DeviceReferenceData,
 ) -> set[str]:
-    (questionnaire_responses,) = (
+    questionnaire_responses = (
         message_sets_or_additional_interactions.questionnaire_responses.values()
     )
-    return {qr.data[SdsFieldName.INTERACTION_ID] for qr in questionnaire_responses}
+
+    # Handle the case where questionnaire_responses is empty
+    if not questionnaire_responses:
+        return set()
+
+    return {
+        qr.data[SdsFieldName.INTERACTION_ID]
+        for qr in next(iter(questionnaire_responses), [])
+    }
