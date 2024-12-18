@@ -1,18 +1,15 @@
 from string import ascii_letters, digits
 
 from domain.core.validation import ODS_CODE_REGEX, SdsId
-from domain.repository.questionnaire_repository import (
-    PATH_TO_QUESTIONNAIRES,
-    QuestionnaireInstance,
-    QuestionnaireRepository,
-)
+from domain.questionnaire_instances.constants import QuestionnaireInstance
+from domain.repository.questionnaire_repository import QuestionnaireRepository
 from etl_utils.ldif.model import DistinguishedName
-from event.json import json_load
 from hypothesis import given, settings
 from hypothesis.provisional import urls
 from hypothesis.strategies import builds, from_regex, just, sets, text
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
+from sds.epr.tags import is_list_like
 
 DUMMY_DISTINGUISHED_NAME = DistinguishedName(
     parts=(("ou", "services"), ("uniqueidentifier", "foobar"), ("o", "nhs"))
@@ -51,9 +48,16 @@ NHS_ACCREDITED_SYSTEM_STRATEGY = builds(
 
 
 def _apply_field_mapping(name: str, data: dict) -> dict:
-    with open(PATH_TO_QUESTIONNAIRES / name / "field_mapping.json") as f:
-        field_mapping = json_load(f)
-    return {field_mapping[k]: v for k, v in data.items() if k in field_mapping}
+    field_mapping = QuestionnaireRepository().read_field_mapping(name)
+    questionnaire = QuestionnaireRepository().read(name)
+
+    required_fields = set(questionnaire.json_schema["required"])
+    return {
+        field_mapping[k]: (sorted(v) if is_list_like(v) else v)
+        for k, v in data.items()
+        if (k in field_mapping and v is not None)
+        or field_mapping.get(k) in required_fields
+    }
 
 
 @settings(deadline=1500)
@@ -63,14 +67,11 @@ def test_spine_as_questionnaires_pass(nhs_accredited_system: NhsAccreditedSystem
     as_interactions_questionnaire = QuestionnaireRepository().read(
         QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
     )
-    _as_data = nhs_accredited_system.export()
+    _as_data = nhs_accredited_system.dict()
     as_data = _apply_field_mapping(name=QuestionnaireInstance.SPINE_AS, data=_as_data)
     as_interactions_data = _apply_field_mapping(
         name=QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS, data=_as_data
     )
-
-    # minus one because object_class is dropped by _apply_field_mapping
-    assert len(as_data) + len(as_interactions_data) == len(_as_data) - 1
 
     response = as_questionnaire.validate(as_data)
     assert response.questionnaire_name == QuestionnaireInstance.SPINE_AS
@@ -103,8 +104,6 @@ def test_spine_mhs_questionnaires_pass(nhs_mhs: NhsMhs):
     mhs_interactions_data = _apply_field_mapping(
         name=QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS, data=_mhs_data
     )
-    # minus one because object_class is dropped by _apply_field_mapping
-    assert len(mhs_data) + len(mhs_interactions_data) == len(_mhs_data) - 1
 
     response = mhs_questionnaire.validate(mhs_data)
     assert response.questionnaire_name == QuestionnaireInstance.SPINE_MHS

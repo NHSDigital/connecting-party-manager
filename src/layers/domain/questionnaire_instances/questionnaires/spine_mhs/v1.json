@@ -39,7 +39,7 @@
       "format": "url",
       "system generated": true
     },
-    "MHS Party key": {
+    "MHS Party Key": {
       "type": "string",
       "system generated": true
     },
@@ -48,7 +48,7 @@
       "system generated": true
     },
     "Date DNS Approved": {
-      "type": "string",
+      "type": ["string", "null"],
       "system generated": true
     },
     "Date Requested": {
@@ -65,7 +65,7 @@
     "MHS Manufacturer Organisation",
     "Address",
     "Managing Organization",
-    "MHS Party key",
+    "MHS Party Key",
     "Approver URP",
     "Date Approved",
     "Date DNS Approved",

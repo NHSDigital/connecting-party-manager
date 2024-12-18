@@ -1,6 +1,6 @@
 {
   "nhs_mhs_manufacturer_org": "MHS Manufacturer Organisation",
-  "nhs_mhs_party_key": "Party Key",
+  "nhs_mhs_party_key": "MHS Party Key",
   "nhs_id_code": "ODS Code",
   "nhs_product_name": "Product Name",
   "unique_identifier": "ASID",

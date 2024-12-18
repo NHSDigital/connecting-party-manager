@@ -25,6 +25,8 @@ from domain.core.enum import Environment
 from domain.core.error import ConfigurationError
 from domain.core.product_team import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
+from domain.core.timestamp import now
+from domain.questionnaire_instances.strategies import generate_spine_mhs_fields
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -107,10 +109,16 @@ def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireRespo
             "You must provide exactly one spine_mhs questionnaire response to create an MHS Device."
         )
     party_key = data[get_party_key]
+    mhs_device: Device = data[create_mhs_device]
 
     validated_responses = [
         process_and_validate_questionnaire_response(
-            questionnaire, qr, party_key, instance=QuestionnaireInstance.SPINE_MHS
+            questionnaire=questionnaire,
+            questionnaire_response=qr,
+            generation_strategy=generate_spine_mhs_fields,
+            ods_code=mhs_device.ods_code,
+            party_key=party_key,
+            today=now().isoformat(),
         )
         for qr in raw_questionnaire_responses
     ]
@@ -201,10 +209,10 @@ steps = [
     check_for_existing_mhs,
     read_spine_mhs_questionnaire,
     read_device_reference_data,
-    validate_spine_mhs_questionnaire_response,
     create_mhs_device,
     create_party_key_tag,
     create_cpa_id_keys,
+    validate_spine_mhs_questionnaire_response,
     add_device_reference_data_id,
     add_spine_mhs_questionnaire_response,
     write_device,

@@ -15,6 +15,9 @@ from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
+from domain.questionnaire_instances.strategies import (
+    generate_spine_mhs_message_sets_fields,
+)
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -76,10 +79,10 @@ def validate_questionnaire_responses(data, cache) -> list[QuestionnaireResponse]
 
     validated_responses = [
         process_and_validate_questionnaire_response(
-            questionnaire,
-            qr,
-            party_key,
-            instance=QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS,
+            questionnaire=questionnaire,
+            questionnaire_response=qr,
+            generation_strategy=generate_spine_mhs_message_sets_fields,
+            party_key=party_key,
         )
         for qr in raw_questionnaire_responses
     ]

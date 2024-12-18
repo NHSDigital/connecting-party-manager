@@ -118,7 +118,7 @@
               "Address": "https://test.C3O9X.nhs.uk/",
               "MHS FQDN": "test.C3O9X.nhs.uk",
               "MHS Manufacturer Organisation": "LSP04",
-              "MHS Party key": "AAA-111111",
+              "MHS Party Key": "AAA-111111",
               "Product Name": "My AAA Product",
               "Product Version": "2005.02",
               "Requestor URP": "myRequestor"
@@ -163,7 +163,7 @@
               "Address": "https://test.C3O9X.nhs.uk/",
               "MHS FQDN": "test.C3O9X.nhs.uk",
               "MHS Manufacturer Organisation": "LSP04",
-              "MHS Party key": "AAA-111111",
+              "MHS Party Key": "AAA-111111",
               "Product Name": "My AAA Product",
               "Product Version": "2005.02",
               "Requestor URP": "myRequestor"

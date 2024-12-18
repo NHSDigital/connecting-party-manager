@@ -1,6 +1,9 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
+from domain.api.common_steps.questionnaire_response_validation import (
+    process_and_validate_questionnaire_response,
+)
 from domain.api.common_steps.sub_product import (
     parse_path_params,
     read_environment,
@@ -24,6 +27,8 @@ from domain.core.error import (
 )
 from domain.core.product_key import ProductKeyType
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
+from domain.core.timestamp import now
+from domain.questionnaire_instances.strategies import generate_spine_as_fields
 from domain.repository.cpm_system_id_repository import CpmSystemIdRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
@@ -84,11 +89,22 @@ def read_spine_as_questionnaire(data, cache) -> Questionnaire:
 def validate_spine_as_questionnaire_response(data, cache) -> QuestionnaireResponse:
     spine_as_questionnaire: Questionnaire = data[read_spine_as_questionnaire]
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
-    spine_as_questionnaire_response = payload.questionnaire_responses[
+    (spine_as_questionnaire_response,) = payload.questionnaire_responses[
         QuestionnaireInstance.SPINE_AS
-    ]
-    return spine_as_questionnaire.validate(
-        data=spine_as_questionnaire_response.__root__[0]
+    ].__root__
+    as_device: Device = data[create_as_device]
+    party_key = data[get_party_key]
+    asid = data[create_asid]
+
+    return process_and_validate_questionnaire_response(
+        questionnaire=spine_as_questionnaire,
+        questionnaire_response=spine_as_questionnaire_response,
+        generation_strategy=generate_spine_as_fields,
+        ods_code=as_device.ods_code,
+        party_key=str(party_key),
+        product_id=str(as_device.product_id),
+        asid=str(asid),
+        today=now().isoformat(),
     )
 
 
@@ -202,11 +218,11 @@ steps = [
     get_party_key,
     read_device_reference_data,
     read_spine_as_questionnaire,
-    validate_spine_as_questionnaire_response,
     create_asid,
     create_as_device,
     create_party_key_tag,
     create_device_keys,
+    validate_spine_as_questionnaire_response,
     add_device_reference_data_id,
     add_spine_as_questionnaire_response,
     write_device,

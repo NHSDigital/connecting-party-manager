@@ -75,7 +75,7 @@ def mhs_device_data():
         "Date DNS Approved": "yesterday",
         "Date Requested": "a week ago",
         "MHS FQDN": "my-fqdn",
-        "MHS Party key": "AAA-123456",
+        "MHS Party Key": "AAA-123456",
         "Managing Organization": "AAA",
         "Product Name": "My EPR Product",
         "Requestor URP": "requester-123",
