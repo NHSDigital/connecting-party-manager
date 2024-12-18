@@ -11,6 +11,7 @@ variable "environment" {
 variable "email_subscribers" {
   type = set(string)
   default = [
+    "james.linnell@burendo.com",
     "james.linnell2@nhs.net",
     "rowan.gill1@nhs.net"
   ]
