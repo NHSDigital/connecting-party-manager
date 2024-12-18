@@ -1,6 +1,7 @@
 from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.core.questionnaire.v1 import QuestionnaireResponse
+from domain.core.questionnaire.v1 import Questionnaire, QuestionnaireResponse
 from sds.epr.constants import SdsFieldName
+from sds.epr.getters import get_additional_interactions_data
 from sds.epr.utils import get_interaction_ids
 
 
@@ -43,3 +44,31 @@ def update_message_sets(
             )
         message_sets.add_questionnaire_response(_message_set)
     return message_sets
+
+
+def update_new_additional_interactions(
+    incoming_accredited_system_interactions: set[str],
+    additional_interactions: DeviceReferenceData,
+    message_sets: DeviceReferenceData,
+    additional_interactions_questionnaire: Questionnaire,
+) -> DeviceReferenceData:
+    """
+    Updates the AdditionalInteractions DRD with new interactions that don't already exist
+    and are not already in MessageSets DRD
+    """
+    mhs_interaction_ids = get_interaction_ids(message_sets)
+    accredited_system_interaction_ids = get_interaction_ids(additional_interactions)
+
+    existing_interactions = mhs_interaction_ids.union(accredited_system_interaction_ids)
+    new_additional_interactions = (
+        set(incoming_accredited_system_interactions) - existing_interactions
+    )
+
+    additional_interactions_data = get_additional_interactions_data(
+        [{"nhs_as_svc_ia": new_additional_interactions}],
+        additional_interactions_questionnaire=additional_interactions_questionnaire,
+    )
+    for interaction in additional_interactions_data:
+        additional_interactions.add_questionnaire_response(interaction)
+
+    return additional_interactions
