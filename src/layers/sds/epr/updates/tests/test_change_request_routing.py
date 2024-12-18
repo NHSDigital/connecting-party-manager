@@ -69,7 +69,7 @@ def mhs_device_data():
         "Date DNS Approved": "yesterday",
         "Date Requested": "a week ago",
         "MHS FQDN": "my-fqdn",
-        "MHS Party key": "AAA-123456",
+        "MHS Party Key": "AAA-123456",
         "Managing Organization": "AAA",
         "Product Name": "My EPR Product",
         "Requestor URP": "requester-123",
@@ -116,9 +116,12 @@ def as_device(
             "Date Approved": "today",
             "Date Requested": "a week ago",
             "ODS Code": "AAA",
-            "Party Key": "AAA-123456",
+            "MHS Party Key": "AAA-123456",
             "Product Key": "key-123",
             "Requestor URP": "requester-123",
+            "Product Name": None,
+            "Product Version": None,
+            "Temp UID": None,
         }
     )
     return create_as_device(

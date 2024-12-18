@@ -278,10 +278,6 @@ for decorator in (given, when, then):
             response=context.response.json(), jsonpath=jsonpath
         )
 
-        # Lowercase if alias is "party_key_tag_value" as tags are always lowercase
-        if alias == "party_key_tag_value" and isinstance(context.notes[alias], str):
-            context.notes[alias] = context.notes[alias].lower()
-
         javascript_path = jsonpath_to_javascript_path(jsonpath)
         context.postman_scenario.item[-1].event.append(
             Event(
