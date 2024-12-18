@@ -23,6 +23,6 @@ variable "workspace_type" {
 }
 
 variable "budget_limit" {
-  default = "100"
+  default = "700"
   type    = string
 }
