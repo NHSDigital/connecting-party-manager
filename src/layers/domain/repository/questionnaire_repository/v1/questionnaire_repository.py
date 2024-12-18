@@ -1,10 +1,9 @@
 from pathlib import Path
 
 from domain.core.questionnaire import Questionnaire
+from domain.questionnaire_instances.constants import PATH_TO_QUESTIONNAIRES
 from domain.repository.errors import ItemNotFound
 from event.json import json_load
-
-PATH_TO_QUESTIONNAIRES = Path(__file__).parent / "questionnaires"
 
 
 def version_from_file_path(file_path: Path) -> int:

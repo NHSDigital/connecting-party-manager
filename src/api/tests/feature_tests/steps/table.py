@@ -8,10 +8,7 @@ from test_helpers.uuid import consistent_uuid
 
 FN_REGEX = re.compile(r"\${\s([a-zA-Z_]\w*)\(([^)]*)\)\s}")
 JSON_PATH_PATTERN = re.compile(r"\.([^\.\[\]]+|\d+)")
-EMPTY_TYPES_AS_STRING = {
-    "[]": list,
-    "{}": dict,
-}
+EMPTY_TYPES_AS_STRING = {"[]": list, "{}": dict, "null": lambda: None}
 
 NUMERIC_FN_REGEX = re.compile(r"\${\sinteger\(([^)]*)\)\s}")
 
@@ -20,6 +17,8 @@ EXPAND_FUNCTIONS = {
     # macros here
     "uuid": lambda *args, **kwargs: consistent_uuid(*args),
     "note": lambda alias, context: context.notes[alias],
+    "lower_note": lambda alias, context: context.notes[alias].lower(),
+    "literal": lambda *args, **kwargs: str(*args),
     # behave formatter workarounds here:
     "dollar": lambda context: "$",
     "pipe": lambda context: "|",

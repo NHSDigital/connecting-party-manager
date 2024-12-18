@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "ASID": {
+      "type": "string",
+      "system generated": true
+    },
+    "ODS Code": {
+      "type": "string",
+      "system generated": false
+    },
+    "MHS Party Key": {
+      "type": "string",
+      "system generated": true
+    },
+    "Product Name": {
+      "type": ["string", "null"],
+      "system generated": false
+    },
+    "Client ODS Codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "system generated": true
+    },
+    "MHS Manufacturer Organisation": {
+      "type": "string",
+      "system generated": true
+    },
+    "Approver URP": {
+      "type": "string",
+      "system generated": false
+    },
+    "Date Approved": {
+      "type": "string",
+      "system generated": true
+    },
+    "Requestor URP": {
+      "type": "string",
+      "system generated": false
+    },
+    "Date Requested": {
+      "type": "string",
+      "system generated": true
+    },
+    "Product Key": {
+      "type": "string",
+      "system generated": true
+    },
+    "Product Version": {
+      "type": ["string", "null"],
+      "system generated": false
+    },
+    "AS ACF": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "system generated": false
+    },
+    "Temp UID": {
+      "type": ["string", "null"],
+      "system generated": true
+    },
+    "Description": {
+      "type": "string",
+      "system generated": false
+    },
+    "Category Bag": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "system generated": false
+    }
+  },
+  "required": [
+    "MHS Manufacturer Organisation",
+    "MHS Party Key",
+    "ASID",
+    "ODS Code",
+    "Client ODS Codes",
+    "Product Key",
+    "Product Name",
+    "Product Version",
+    "Requestor URP",
+    "Approver URP",
+    "Date Approved",
+    "Date Requested",
+    "Temp UID"
+  ],
+  "additionalProperties": false
+}
