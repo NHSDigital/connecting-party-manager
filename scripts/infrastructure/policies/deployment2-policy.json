@@ -256,7 +256,8 @@
         "acm:ListCertificates",
         "resource-groups:ListGroups",
         "lambda:ListEventSourceMappings",
-        "iam:ListRoles"
+        "iam:ListRoles",
+        "budgets:ModifyBudget"
       ],
       "Resource": ["*"]
     }
