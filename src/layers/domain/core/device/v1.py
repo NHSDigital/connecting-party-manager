@@ -175,6 +175,8 @@ class QuestionnaireResponseUpdatedEvent(Event):
 @dataclass(kw_only=True, slots=True)
 class DeviceReferenceDataIdAddedEvent(Event):
     id: str
+    keys: list[DeviceKey]
+    tags: list[str]
     device_reference_data: dict[str, list[str]]
     updated_on: str = None
 
@@ -319,7 +321,7 @@ class Device(AggregateRoot):
         self.keys.remove(device_key)
         return DeviceKeyDeletedEvent(
             deleted_key=device_key.dict(),
-            id=self.id,
+            id=str(self.id),
             keys=[k.dict() for k in self.keys],
             tags=[t.value for t in self.tags],
         )
@@ -400,6 +402,8 @@ class Device(AggregateRoot):
         device_data = self.state()
         return DeviceReferenceDataIdAddedEvent(
             id=device_data["id"],
+            keys=device_data["keys"],
+            tags=[t.value for t in self.tags],
             device_reference_data=device_data["device_reference_data"],
         )
 

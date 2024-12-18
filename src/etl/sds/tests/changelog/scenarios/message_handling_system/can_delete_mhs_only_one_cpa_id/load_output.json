@@ -1,0 +1,38 @@
+[
+  {
+    "id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "name": "C3O9X (EPR)",
+    "ods_code": "C3O9X",
+    "status": "active",
+    "created_on": "2024-12-11T11:18:53.365591+00:00",
+    "updated_on": null,
+    "deleted_on": null,
+    "keys": [{ "key_type": "epr_id", "key_value": "EPR-C3O9X" }]
+  },
+  {
+    "id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "name": "00000a84594b2ef34279",
+    "ods_code": "C3O9X",
+    "status": "active",
+    "created_on": "2024-12-11T11:18:53.407960+00:00",
+    "updated_on": "2024-12-11T11:18:53.408432+00:00",
+    "deleted_on": null,
+    "keys": [{ "key_type": "party_key", "key_value": "C3O9X-823610" }]
+  },
+  {
+    "id": "68cd98db-5d8d-45dc-ba9a-09e892535d83",
+    "name": "C3O9X-823610 - MHS Message Sets",
+    "status": "active",
+    "product_id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "ods_code": "C3O9X",
+    "environment": "prod",
+    "questionnaire_responses": {
+      "spine_mhs_message_sets/1": []
+    },
+    "created_on": "2024-12-11T11:18:53.452472+00:00",
+    "updated_on": "2024-12-11T11:18:53.452853+00:00",
+    "deleted_on": null
+  }
+]

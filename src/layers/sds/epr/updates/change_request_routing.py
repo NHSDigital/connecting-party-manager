@@ -88,15 +88,14 @@ def process_change_request(
     if is_deletion_request and is_mhs:
         return process_request_to_delete_mhs(
             device=device,
+            cpa_id_to_delete=unique_identifier,
             device_reference_data_repository=device_reference_data_repository,
-            message_set_questionnaire=message_set_questionnaire,
-            message_set_field_mapping=message_set_field_mapping,
         )
     elif is_deletion_request and is_as:
         return process_request_to_delete_as(
             device=device,
+            device_repository=device_repository,
             device_reference_data_repository=device_reference_data_repository,
-            additional_interactions_questionnaire=additional_interactions_questionnaire,
         )
     elif is_modification_request and is_mhs:
         return route_mhs_modification_request(

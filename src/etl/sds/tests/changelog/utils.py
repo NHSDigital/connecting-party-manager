@@ -143,6 +143,10 @@ ADD_MESSAGE_HANDLING_SYSTEM = read_ldif("add/message_handling_system.ldif")
 DELETE_MESSAGE_HANDLING_SYSTEM = read_ldif("delete/message_handling_system.ldif")
 DELETE_UNKNOWN_ENTITY = read_ldif("delete/unknown_entity.ldif")
 MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
+
+ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM = read_ldif(
+    "add/message_handling_system.AnotherWithDifferentUniqueIdentifier.ldif"
+)
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_WITH_SAME_UNIQUE_IDENTIFIER = read_ldif(
     "add/message_handling_system.AnotherWithSameUniqueIdentifier.ldif"
 )

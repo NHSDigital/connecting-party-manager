@@ -53,11 +53,13 @@ def read_or_create_epr_product(
 
 
 def read_additional_interactions_if_exists(
-    device_reference_data_repository: DeviceReferenceDataRepository, product: CpmProduct
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    product_team_id: str,
+    product_id: str,
 ) -> DeviceReferenceData | None:
     device_reference_datas = device_reference_data_repository.search(
-        product_team_id=product.product_team_id,
-        product_id=product.id,
+        product_team_id=product_team_id,
+        product_id=product_id,
         environment=Environment.PROD,
     )
 
