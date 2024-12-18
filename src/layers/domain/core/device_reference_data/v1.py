@@ -72,7 +72,7 @@ class DeviceReferenceData(AggregateRoot):
         questionnaire_responses.append(questionnaire_response)
 
         return QuestionnaireResponseUpdatedEvent(
-            id=self.id,
+            id=str(self.id),
             questionnaire_responses={
                 q_name: [qr.dict() for qr in qrs]
                 for q_name, qrs in self.questionnaire_responses.items()
@@ -80,12 +80,12 @@ class DeviceReferenceData(AggregateRoot):
         )
 
     @event
-    def remove_questionnaire(
+    def clear_questionnaire_responses(
         self, questionnaire_id: str
     ) -> QuestionnaireResponseUpdatedEvent:
         self.questionnaire_responses[questionnaire_id] = []
         return QuestionnaireResponseUpdatedEvent(
-            id=self.id,
+            id=str(self.id),
             questionnaire_responses={
                 q_name: [qr.dict() for qr in qrs]
                 for q_name, qrs in self.questionnaire_responses.items()
@@ -111,7 +111,7 @@ class DeviceReferenceData(AggregateRoot):
             self.questionnaire_responses[questionnaire_id].pop(idx_to_remove)
 
         return QuestionnaireResponseUpdatedEvent(
-            id=self.id,
+            id=str(self.id),
             questionnaire_responses={
                 q_name: [qr.dict() for qr in qrs]
                 for q_name, qrs in self.questionnaire_responses.items()
