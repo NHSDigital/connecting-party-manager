@@ -138,6 +138,11 @@ def read_or_create_empty_additional_interactions(
     return additional_interactions
 
 
+def asid_equals(as_device: Device, asid: str) -> bool:
+    (_asid,) = (k.key_value for k in as_device.keys)
+    return _asid == asid
+
+
 def read_or_create_as_device(
     device_repository: DeviceRepository,
     asid: str,
@@ -152,7 +157,8 @@ def read_or_create_as_device(
         product_team_id=product_team.id, product_id=product.id
     )
     try:
-        (as_device,) = filter(is_as_device, devices)
+        as_devices = filter(is_as_device, devices)
+        (as_device,) = filter(lambda d: asid_equals(d, asid), as_devices)
     except ValueError:
         as_device = create_as_device(
             product=product,

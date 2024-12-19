@@ -178,7 +178,8 @@ def process_request_to_add_as(
 
     if str(message_sets.id) not in accredited_system_device.device_reference_data:
         accredited_system_device.add_device_reference_data_id(
-            message_sets.id, path_to_data=[SdsDeviceReferenceDataPath.ALL]
+            message_sets.id,
+            path_to_data=[SdsDeviceReferenceDataPath.ALL_INTERACTION_IDS],
         )
     if (
         str(additional_interactions.id)
