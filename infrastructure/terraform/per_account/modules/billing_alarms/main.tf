@@ -1,16 +1,14 @@
-module "notify_slack" {
-  source  = "terraform-aws-modules/notify-slack/aws"
-  version = "~> 5.0"
+resource "aws_ssm_parameter" "billing_alert_subscribers" {
+  name = "${var.project}-billing-subscribers"
+  type = "StringList"
+}
 
-  sns_topic_name = "billing-alert-slack-topic"
-
-  slack_webhook_url = "https://hooks.slack.com/services/AAA/BBB/CCC"
-  slack_channel     = "aws-notification"
-  slack_username    = "reporter"
+data "aws_ssm_parameter" "billing_alert_subscribers" {
+  name = aws_ssm_parameter.billing_alert_subscribers.name
 }
 
 resource "aws_budgets_budget" "cpm_budget" {
-  name         = "nhse-cpm-monthly-budget-${var.environment}"
+  name         = "${var.project}-monthly-budget-${var.environment}"
   budget_type  = "COST"
   limit_amount = var.limit
   limit_unit   = "USD"
@@ -21,8 +19,7 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold                  = 50
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.email_subscribers
-    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
+    subscriber_email_addresses = split(",", data.aws_ssm_parameter.billing_alert_subscribers.value)
   }
 
   notification {
@@ -30,8 +27,7 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold                  = 75
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.email_subscribers
-    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
+    subscriber_email_addresses = split(",", data.aws_ssm_parameter.billing_alert_subscribers.value)
   }
 
   notification {
@@ -39,8 +35,7 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold                  = 90
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.email_subscribers
-    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
+    subscriber_email_addresses = split(",", data.aws_ssm_parameter.billing_alert_subscribers.value)
   }
 
   notification {
@@ -48,7 +43,6 @@ resource "aws_budgets_budget" "cpm_budget" {
     threshold                  = 100
     threshold_type             = "PERCENTAGE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.email_subscribers
-    subscriber_sns_topic_arns  = [module.notify_slack.slack_topic_arn]
+    subscriber_email_addresses = split(",", data.aws_ssm_parameter.billing_alert_subscribers.value)
   }
 }
