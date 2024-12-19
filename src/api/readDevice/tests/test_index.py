@@ -869,7 +869,7 @@ def test_index_incorrect_env(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
-                    "env": "prod",
+                    "environment": "prod",
                     "device_id": str(device.id),
                 },
             }
