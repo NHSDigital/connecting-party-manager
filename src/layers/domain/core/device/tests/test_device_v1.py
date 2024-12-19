@@ -16,7 +16,7 @@ from domain.core.device import (
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key import DeviceKey, DeviceKeyType
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.error import DuplicateError, NotFoundError
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from domain.core.questionnaire.tests.test_questionnaire_v1 import VALID_SCHEMA
@@ -28,6 +28,7 @@ def device():
         name="Foo",
         ods_code="ABC123",
         product_team_id="18934119-5780-4d28-b9be-0e6dff3908ba",
+        environment=Environment.DEV,
         product_id="P.XXX-YYY",
     )
 
@@ -51,6 +52,10 @@ def another_good_questionnaire_response(
 ) -> QuestionnaireResponse:
     questionnaire_response = questionnaire.validate({"size": 7, "colour": "black"})
     return questionnaire_response
+
+
+def test_device_created_with_env(device: Device):
+    assert device.environment == "dev"
 
 
 def test_device_created_with_datetime(device: Device):

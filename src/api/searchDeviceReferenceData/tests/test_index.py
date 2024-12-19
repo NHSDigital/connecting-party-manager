@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 from domain.core.cpm_system_id import ProductId
+from domain.core.enum import Environment
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
@@ -39,7 +40,9 @@ def _create_product(product, product_team):
 
 
 def _create_device_ref_data(device_ref_data, product):
-    drd = product.create_device_reference_data(name=device_ref_data["name"])
+    drd = product.create_device_reference_data(
+        name=device_ref_data["name"], environment=Environment.DEV
+    )
 
     return drd
 
@@ -86,7 +89,11 @@ def test_no_results(version):
 
         p_repo.write(entity=product)
         product_state = product.state()
-        params = {"product_team_id": product_team.id, "product_id": product_state["id"]}
+        params = {
+            "product_team_id": product_team.id,
+            "product_id": product_state["id"],
+            "environment": Environment.DEV,
+        }
         result = drd_handler(
             event={
                 "headers": {"version": 1},
@@ -135,7 +142,11 @@ def test_index(version, device_ref_data):
     product_state = cpmproduct.state()
     drd = _create_device_ref_data(device_ref_data=device_ref_data, product=cpmproduct)
 
-    params = {"product_team_id": product_team.id, "product_id": product_state["id"]}
+    params = {
+        "product_team_id": product_team.id,
+        "product_id": product_state["id"],
+        "environment": Environment.DEV,
+    }
     with mock.patch.dict(
         os.environ,
         {
@@ -186,7 +197,11 @@ def test_index(version, device_ref_data):
     ],
 )
 def test_index_no_such_product_team(version):
-    params = {"product_team_id": "123456", "product_id": "P.123-321"}
+    params = {
+        "product_team_id": "123456",
+        "product_id": "P.123-321",
+        "environment": Environment.DEV,
+    }
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
 
@@ -246,7 +261,11 @@ def test_index_no_such_product(version):
     )
     pt_repo.write(entity=product_team)
 
-    params = {"product_team_id": product_team.id, "product_id": "P.123-321"}
+    params = {
+        "product_team_id": product_team.id,
+        "product_id": "P.123-321",
+        "environment": Environment.DEV,
+    }
 
     with mock.patch.dict(
         os.environ,
@@ -315,7 +334,11 @@ def test_index_multiple_returned(device_ref_data):
     p_repo = CpmProductRepository(table_name=table_name, dynamodb_client=client)
     p_repo.write(entity=cpmproduct)
     product_state = cpmproduct.state()
-    params = {"product_team_id": product_team.id, "product_id": product_state["id"]}
+    params = {
+        "product_team_id": product_team.id,
+        "product_id": product_state["id"],
+        "environment": Environment.DEV,
+    }
     drds = []
     for dev_ref_dat in device_ref_data:
         drd = _create_device_ref_data(device_ref_data=dev_ref_dat, product=cpmproduct)

@@ -5,29 +5,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -41,10 +70,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -57,29 +94,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02&nhs_mhs_party_key=bbb-111111"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02&nhs_mhs_party_key=bbb-111111"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -93,10 +159,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -109,29 +183,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -145,10 +248,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -161,29 +272,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk02&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -197,10 +337,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -213,29 +361,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -249,10 +426,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -265,29 +450,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002&nhs_mhs_manufacturer_org=lsp04&nhs_mhs_party_key=bbb-111111"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -301,10 +515,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -317,29 +539,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v003"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -353,10 +604,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -369,29 +628,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03&nhs_mhs_party_key=bbb-111111"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Apds%3Aqupa_in040000uk03&nhs_mhs_party_key=bbb-111111"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -405,10 +693,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -421,29 +717,58 @@
         "pk": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
+        "sk": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
         "pk_read": {
           "S": "DT#nhs_as_client=bbb&nhs_as_svc_ia=urn%3Anhs%3Anames%3Aservices%3Aers%3Aread_practitioner_role_r4_v002&nhs_mhs_manufacturer_org=lsp04"
         },
-        "sk_read": { "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "root": { "BOOL": false },
-        "id": { "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9" },
-        "name": { "S": "BBB-111111/000000000002 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk_read": {
+          "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "root": {
+          "BOOL": false
+        },
+        "id": {
+          "S": "6924122e-86da-45b3-9c2e-b6a3609b1ed9"
+        },
+        "name": {
+          "S": "BBB-111111/000000000002 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.020121+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.021912+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.020121+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.021912+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000002" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000002"
+                }
               }
             }
           ]
@@ -457,10 +782,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }
@@ -470,30 +803,61 @@
   {
     "PutRequest": {
       "Item": {
-        "pk": { "S": "D#22129a26-6179-421b-9822-e375408b0d08" },
-        "sk": { "S": "D#22129a26-6179-421b-9822-e375408b0d08" },
-        "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+        "pk": {
+          "S": "D#22129a26-6179-421b-9822-e375408b0d08"
         },
-        "sk_read": { "S": "D#22129a26-6179-421b-9822-e375408b0d08" },
-        "root": { "BOOL": true },
-        "id": { "S": "22129a26-6179-421b-9822-e375408b0d08" },
-        "name": { "S": "BBB-111111/000000000003 - Accredited System" },
-        "status": { "S": "active" },
-        "product_id": { "S": "P.LU6-Y7D" },
+        "sk": {
+          "S": "D#22129a26-6179-421b-9822-e375408b0d08"
+        },
+        "pk_read": {
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
+        },
+        "sk_read": {
+          "S": "D#22129a26-6179-421b-9822-e375408b0d08"
+        },
+        "root": {
+          "BOOL": true
+        },
+        "id": {
+          "S": "22129a26-6179-421b-9822-e375408b0d08"
+        },
+        "name": {
+          "S": "BBB-111111/000000000003 - Accredited System"
+        },
+        "status": {
+          "S": "active"
+        },
+        "environment": {
+          "S": "prod"
+        },
+        "product_id": {
+          "S": "P.LU6-Y7D"
+        },
         "product_team_id": {
           "S": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441"
         },
-        "ods_code": { "S": "LSP04" },
-        "created_on": { "S": "2024-11-20T10:54:19.021975+00:00" },
-        "updated_on": { "S": "2024-11-20T10:54:19.023792+00:00" },
-        "deleted_on": { "NULL": true },
+        "ods_code": {
+          "S": "LSP04"
+        },
+        "created_on": {
+          "S": "2024-11-20T10:54:19.021975+00:00"
+        },
+        "updated_on": {
+          "S": "2024-11-20T10:54:19.023792+00:00"
+        },
+        "deleted_on": {
+          "NULL": true
+        },
         "keys": {
           "L": [
             {
               "M": {
-                "key_type": { "S": "accredited_system_id" },
-                "key_value": { "S": "000000000003" }
+                "key_type": {
+                  "S": "accredited_system_id"
+                },
+                "key_value": {
+                  "S": "000000000003"
+                }
               }
             }
           ]
@@ -507,27 +871,65 @@
               "L": [
                 {
                   "M": {
-                    "id": { "S": "1aa1c3db-a8e2-4509-b69f-9627baa4dcf7" },
-                    "questionnaire_name": { "S": "spine_as" },
-                    "questionnaire_version": { "S": "1" },
+                    "id": {
+                      "S": "1aa1c3db-a8e2-4509-b69f-9627baa4dcf7"
+                    },
+                    "questionnaire_name": {
+                      "S": "spine_as"
+                    },
+                    "questionnaire_version": {
+                      "S": "1"
+                    },
                     "data": {
                       "M": {
-                        "Approver URP": { "S": "myApprover" },
-                        "Client ODS Codes": { "L": [{ "S": "BBB" }] },
-                        "Date Approved": { "S": "20030303030303" },
-                        "Date Requested": { "S": "20030303030303" },
-                        "ODS Code": { "S": "BBB" },
-                        "MHS Manufacturer Organisation": { "S": "LSP04" },
-                        "Party Key": { "S": "BBB-111111" },
-                        "Product Key": { "S": "333" },
-                        "Product Name": { "S": "My BBB Product" },
-                        "Product Version": { "S": "2005.02" },
-                        "Requestor URP": { "S": "myRequestor" },
-                        "Temp UID": { "S": "333" },
-                        "ASID": { "S": "000000000003" }
+                        "Approver URP": {
+                          "S": "myApprover"
+                        },
+                        "Client ODS Codes": {
+                          "L": [
+                            {
+                              "S": "BBB"
+                            }
+                          ]
+                        },
+                        "Date Approved": {
+                          "S": "20030303030303"
+                        },
+                        "Date Requested": {
+                          "S": "20030303030303"
+                        },
+                        "ODS Code": {
+                          "S": "BBB"
+                        },
+                        "MHS Manufacturer Organisation": {
+                          "S": "LSP04"
+                        },
+                        "Party Key": {
+                          "S": "BBB-111111"
+                        },
+                        "Product Key": {
+                          "S": "333"
+                        },
+                        "Product Name": {
+                          "S": "My BBB Product"
+                        },
+                        "Product Version": {
+                          "S": "2005.02"
+                        },
+                        "Requestor URP": {
+                          "S": "myRequestor"
+                        },
+                        "Temp UID": {
+                          "S": "333"
+                        },
+                        "ASID": {
+                          "S": "000000000003"
+                        }
                       }
                     },
-                    "created_on": { "S": "2024-11-20T10:54:19.014329+00:00" }
+                    "created_on": {
+                      "S": "2024-11-20T10:54:19.014329+00:00"
+                    }
                   }
                 }
               ]
@@ -537,10 +939,18 @@
         "device_reference_data": {
           "M": {
             "b362b7c1-317c-4e1f-86e4-d8cbd0f9524e": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             },
             "b4186163-23ec-41fa-abc2-5fe8b0fe9cab": {
-              "L": [{ "S": "*.Interaction ID" }]
+              "L": [
+                {
+                  "S": "*.Interaction ID"
+                }
+              ]
             }
           }
         }

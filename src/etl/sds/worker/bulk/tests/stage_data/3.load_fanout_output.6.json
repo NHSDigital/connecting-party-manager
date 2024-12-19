@@ -26,6 +26,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.LU6-Y7D"
         },
@@ -98,7 +101,7 @@
           "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#6924122e-86da-45b3-9c2e-b6a3609b1ed9"
@@ -114,6 +117,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -252,7 +258,7 @@
           "S": "D#000000000002"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#000000000002"
@@ -269,6 +275,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.LU6-Y7D"
         },
@@ -354,6 +363,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -441,6 +453,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.LU6-Y7D"
         },
@@ -526,6 +541,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -613,6 +631,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.LU6-Y7D"
         },
@@ -698,6 +719,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -785,6 +809,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.LU6-Y7D"
         },
@@ -870,6 +897,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
