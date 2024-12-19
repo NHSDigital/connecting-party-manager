@@ -95,8 +95,8 @@ def process_change_request(
     elif is_deletion_request and is_as:
         return process_request_to_delete_as(
             device=device,
+            device_repository=device_repository,
             device_reference_data_repository=device_reference_data_repository,
-            additional_interactions_questionnaire=additional_interactions_questionnaire,
         )
     elif is_modification_request and is_mhs:
         return route_mhs_modification_request(

@@ -1,5 +1,5 @@
-dn: uniqueIdentifier=000173655515,ou=Services,o=nhs
+dn: uniqueIdentifier=000000000001,ou=Services,o=nhs
 objectClass: delete
 objectClass: top
 changeType: delete
-uniqueIdentifier: 000173655515
+uniqueIdentifier: 000000000001
