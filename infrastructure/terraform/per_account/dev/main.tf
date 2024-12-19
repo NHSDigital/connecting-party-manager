@@ -31,7 +31,7 @@ module "billing_alarms" {
   source      = "../modules/billing_alarms"
   project     = local.project
   limit       = var.budget_limit
-  environment = var.environment
+  environment = terraform.workspace
 }
 
 module "iam__api-gateway-to-cloudwatch" {
