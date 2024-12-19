@@ -127,7 +127,7 @@ def process_request_to_delete_mhs(
 ) -> list[EtlDevice | DeviceReferenceData]:
     """
     * MHS Device has been passed in by CPA ID
-    * Deletes the Questionnaire Response that corresponds to this CPA ID
+    * Deletes the Message Sets Questionnaire Response that corresponds to this CPA ID
     * Deletes the Device key corresponding to the CPA ID
     * If no more keys left in this Device then hard delete the Device
     """

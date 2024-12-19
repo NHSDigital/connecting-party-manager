@@ -178,6 +178,8 @@
   {
     "device_reference_data_id_added_event": {
       "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
+      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
+      "tags": [],
       "device_reference_data": {
         "3b66cdef-a172-4cb2-8cea-cec6e2e78f47": ["*"]
       },

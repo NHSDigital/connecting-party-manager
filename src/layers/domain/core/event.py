@@ -51,4 +51,6 @@ class EventDeserializer(ABC):
         for event_type in cls.event_types:
             if event_name == event_type.public_name:
                 return event_type(**event_data)
-        raise NotImplementedError(f"Not implemented parsing of {event_name}")
+        raise NotImplementedError(
+            f"{cls.__name__}: not implemented parsing of {event_name}"
+        )
