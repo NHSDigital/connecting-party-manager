@@ -26,7 +26,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -115,7 +115,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -204,7 +204,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -408,7 +408,7 @@
         "name": {
           "S": "BBB-111111 - MHS Message Sets"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "status": {
@@ -582,7 +582,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -733,7 +733,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -916,7 +916,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -1008,7 +1008,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {

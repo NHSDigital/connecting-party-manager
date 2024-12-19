@@ -219,7 +219,11 @@ class BulkRepository:
         return [create_root_transaction, *create_keys_transactions]
 
     def handle_Device(self, item: dict):
-        parent_key = (item["product_team_id"], item["product_id"], item["env"].upper())
+        parent_key = (
+            item["product_team_id"],
+            item["product_id"],
+            item["environment"].upper(),
+        )
 
         root_data = compress_device_fields(item)
         create_device_transaction = create_index_batch(
@@ -266,7 +270,7 @@ class BulkRepository:
             parent_key_parts=(
                 item["product_team_id"],
                 item["product_id"],
-                item["env"].upper(),
+                item["environment"].upper(),
             ),
             data=item,
             root=True,

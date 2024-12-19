@@ -196,8 +196,8 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData:
-    get:
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData
+  : get:
       operationId: searchDeviceReferenceData
       summary: Retrieve all Data Reference Data resources associated with a Product (GET)
       parameters:
@@ -265,7 +265,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/MhsMessageSet
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
   : post:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
@@ -298,7 +298,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
   : post:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
@@ -331,7 +331,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/DeviceReferenceData/{device_reference_data_id}
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}
   : get:
       operationId: readDeviceReferenceData
       summary: Read a Device Reference Data resource (GET)
@@ -355,7 +355,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device:
+  /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device:
     post:
       operationId: createDevice
       summary: Create a Device resource (POST)
@@ -384,8 +384,8 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/{device_id}:
-    get:
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/{device_id}
+  : get:
       operationId: readDevice
       summary: Read a Device resource (GET)
       parameters:
@@ -408,7 +408,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/MessageHandlingSystem
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/MessageHandlingSystem
   : post:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
@@ -443,7 +443,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{env}/Device/AccreditedSystem
+  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/AccreditedSystem
   : post:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)

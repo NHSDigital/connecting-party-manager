@@ -38,7 +38,7 @@ class DuplicateQuestionnaireResponse(Exception):
 class DeviceCreatedEvent(Event):
     id: str
     name: str
-    env: Environment
+    environment: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -56,7 +56,7 @@ class DeviceCreatedEvent(Event):
 class DeviceUpdatedEvent(Event):
     id: str
     name: str
-    env: Environment
+    environment: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -74,7 +74,7 @@ class DeviceUpdatedEvent(Event):
 class DeviceDeletedEvent(Event):
     id: str
     name: str
-    env: Environment
+    environment: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -94,7 +94,7 @@ class DeviceKeyAddedEvent(Event):
     new_key: dict
     id: str
     name: str
-    env: Environment
+    environment: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -122,7 +122,7 @@ class DeviceTagAddedEvent(Event):
     new_tag: str
     id: str
     name: str
-    env: Environment
+    environment: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -141,7 +141,7 @@ class DeviceTagsAddedEvent(Event):
     new_tags: list[str]
     id: str
     name: str
-    env: Environment
+    environment: Environment
     product_team_id: UUID
     product_id: ProductId
     ods_code: str
@@ -250,7 +250,7 @@ class Device(AggregateRoot):
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     status: Status = Field(default=Status.ACTIVE)
-    env: Environment = Field()
+    environment: Environment = Field()
     product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str

@@ -75,7 +75,7 @@ class CpmProduct(AggregateRoot):
     def create_device(
         self,
         name: str,
-        env: Environment,
+        environment: Environment,
         status: Status = Status.ACTIVE,
     ) -> Device:
         device = Device(
@@ -84,21 +84,21 @@ class CpmProduct(AggregateRoot):
             product_id=self.id,
             ods_code=self.ods_code,
             status=status,
-            env=env,
+            environment=environment,
         )
         device_created_event = DeviceCreatedEvent(**device.dict())
         device.add_event(device_created_event)
         return device
 
     def create_device_reference_data(
-        self, name: str, env: Environment
+        self, name: str, environment: Environment
     ) -> DeviceReferenceData:
         device_reference_data = DeviceReferenceData(
             name=name,
             product_id=self.id,
             product_team_id=self.product_team_id,
             ods_code=self.ods_code,
-            env=env,
+            environment=environment,
         )
         event = DeviceReferenceDataCreatedEvent(
             **device_reference_data.dict(exclude={"questionnaire_responses"})

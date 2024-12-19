@@ -256,7 +256,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -371,7 +371,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -499,7 +499,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -672,7 +672,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -754,7 +754,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {
@@ -836,7 +836,7 @@
         "status": {
           "S": "active"
         },
-        "env": {
+        "environment": {
           "S": "prod"
         },
         "product_id": {

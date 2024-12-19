@@ -53,7 +53,7 @@ def read_device_reference_data(data, cache) -> DeviceReferenceData:
     return device_reference_data_repo.read(
         product_team_id=product_team.id,
         product_id=product.id,
-        environment=path_params.env,
+        environment=path_params.environment,
         id=path_params.device_reference_data_id,
     )
 

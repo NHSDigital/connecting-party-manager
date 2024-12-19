@@ -18,12 +18,12 @@ from domain.response.response_models import SearchResponse
 def query_device_ref_data(data, cache) -> list[dict]:
     product_team: ProductTeam = data[read_product_team]
     product: CpmProduct = data[read_product]
-    env: Environment = data[read_environment]
+    environment: Environment = data[read_environment]
     drd_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     results = drd_repo.search(
-        product_team_id=product_team.id, product_id=product.id, environment=env
+        product_team_id=product_team.id, product_id=product.id, environment=environment
     )
     return results
 

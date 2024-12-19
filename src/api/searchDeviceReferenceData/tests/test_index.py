@@ -41,7 +41,7 @@ def _create_product(product, product_team):
 
 def _create_device_ref_data(device_ref_data, product):
     drd = product.create_device_reference_data(
-        name=device_ref_data["name"], env=Environment.DEV
+        name=device_ref_data["name"], environment=Environment.DEV
     )
 
     return drd
@@ -92,7 +92,7 @@ def test_no_results(version):
         params = {
             "product_team_id": product_team.id,
             "product_id": product_state["id"],
-            "env": Environment.DEV,
+            "environment": Environment.DEV,
         }
         result = drd_handler(
             event={
@@ -145,7 +145,7 @@ def test_index(version, device_ref_data):
     params = {
         "product_team_id": product_team.id,
         "product_id": product_state["id"],
-        "env": Environment.DEV,
+        "environment": Environment.DEV,
     }
     with mock.patch.dict(
         os.environ,
@@ -200,7 +200,7 @@ def test_index_no_such_product_team(version):
     params = {
         "product_team_id": "123456",
         "product_id": "P.123-321",
-        "env": Environment.DEV,
+        "environment": Environment.DEV,
     }
     table_name = read_terraform_output("dynamodb_table_name.value")
     client = dynamodb_client()
@@ -264,7 +264,7 @@ def test_index_no_such_product(version):
     params = {
         "product_team_id": product_team.id,
         "product_id": "P.123-321",
-        "env": Environment.DEV,
+        "environment": Environment.DEV,
     }
 
     with mock.patch.dict(
@@ -337,7 +337,7 @@ def test_index_multiple_returned(device_ref_data):
     params = {
         "product_team_id": product_team.id,
         "product_id": product_state["id"],
-        "env": Environment.DEV,
+        "environment": Environment.DEV,
     }
     drds = []
     for dev_ref_dat in device_ref_data:

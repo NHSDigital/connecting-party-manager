@@ -54,7 +54,7 @@ def read_device(data, cache) -> Device:
     return device_repo.read(
         product_team_id=product_team.id,
         product_id=product.id,
-        environment=path_params.env,
+        environment=path_params.environment,
         id=path_params.device_id,
     )
 
@@ -73,7 +73,7 @@ def read_device_reference_data(data, cache) -> list[DeviceReferenceData]:
         drd = device_reference_data_repo.read(
             product_team_id=product_team.id,
             product_id=product.id,
-            environment=path_params.env,
+            environment=path_params.environment,
             id=id,
         )
         device_reference_datas.append(drd)

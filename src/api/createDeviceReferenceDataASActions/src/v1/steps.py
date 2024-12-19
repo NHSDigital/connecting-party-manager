@@ -102,7 +102,7 @@ def create_additional_interactions_device_reference_data(
     environment: Environment = data[read_environment]
     return product.create_device_reference_data(
         name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key),
-        env=environment,
+        environment=environment,
     )
 
 

@@ -96,7 +96,8 @@ def create_message_set_device_reference_data(data, cache) -> DeviceReferenceData
     party_key: str = data[get_party_key]
     environment: Environment = data[read_environment]
     return product.create_device_reference_data(
-        name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key), env=environment
+        name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key),
+        environment=environment,
     )
 
 

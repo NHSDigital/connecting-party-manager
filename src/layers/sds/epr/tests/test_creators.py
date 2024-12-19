@@ -268,7 +268,7 @@ def test_create_message_sets(
         "deleted_on": None,
         "name": "AAA-123456 - MHS Message Sets",
         "ods_code": "AAA",
-        "env": Environment.PROD,
+        "environment": Environment.PROD,
         "product_id": str(product.id),
         "product_team_id": product_team.id,
         "status": "active",
@@ -330,7 +330,7 @@ def test_create_mhs_device(
         "tags": [],
         "name": "AAA-123456 - Message Handling System",
         "ods_code": "AAA",
-        "env": Environment.PROD,
+        "environment": Environment.PROD,
         "product_id": str(product.id),
         "product_team_id": product_team.id,
         "questionnaire_responses": {
@@ -387,7 +387,7 @@ def test_create_additional_interactions(
         "product_id": str(product.id),
         "product_team_id": product_team.id,
         "status": "active",
-        "env": Environment.PROD,
+        "environment": Environment.PROD,
         "questionnaire_responses": {
             "spine_as_additional_interactions/1": [
                 {
@@ -462,7 +462,7 @@ def test_create_as_device(
             {"key_type": "accredited_system_id", "key_value": "123456"},
         ],
         "name": "AAA-123456/123456 - Accredited System",
-        "env": Environment.PROD,
+        "environment": Environment.PROD,
         "ods_code": "AAA",
         "product_id": str(product.id),
         "product_team_id": product_team.id,

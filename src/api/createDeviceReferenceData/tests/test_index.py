@@ -72,7 +72,7 @@ def test_index() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
-                    "env": Environment.DEV,
+                    "environment": Environment.DEV,
                 },
             }
         )
@@ -125,7 +125,7 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": consistent_uuid(1),
-                "env": Environment.DEV,
+                "environment": Environment.DEV,
             },
             "VALIDATION_ERROR",
             400,
@@ -135,7 +135,7 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": "id_that_does_not_exist",
-                "env": Environment.DEV,
+                "environment": Environment.DEV,
             },
             "RESOURCE_NOT_FOUND",
             404,

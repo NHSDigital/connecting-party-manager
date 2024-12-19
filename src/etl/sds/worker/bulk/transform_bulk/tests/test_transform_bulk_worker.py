@@ -57,7 +57,7 @@ def _assert_domain_object_equal(a, b):
         "id",
         "product_id",
         "product_team_id",
-        "env",
+        "environment",
         "device_reference_data",
         "questionnaire_responses",
         "created_on",

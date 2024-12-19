@@ -157,7 +157,7 @@ class DeviceRepository(Repository[Device]):
         )
 
     def handle_DeviceCreatedEvent(self, event: DeviceCreatedEvent) -> TransactItem:
-        environment = event.env
+        environment = event.environment
         return self.create_index(
             id=event.id,
             parent_key_parts=(
@@ -221,7 +221,7 @@ class DeviceRepository(Repository[Device]):
         original_keys = {DeviceKey(**key).key_value for key in event.keys}
 
         # Create copy of original device and indexes with new pk and sk
-        environment = event.env
+        environment = event.environment
         root_copy_transaction = self.create_index(
             id=event.id,
             parent_key_parts=(
@@ -253,7 +253,7 @@ class DeviceRepository(Repository[Device]):
         _non_root_data = compress_device_fields(
             event, fields_to_compress=NON_ROOT_FIELDS_TO_COMPRESS
         )
-        environment = event.env
+        environment = event.environment
         create_key_transaction = self.create_index(
             id=new_key.key_value,
             parent_key_parts=(

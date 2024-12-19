@@ -26,7 +26,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | id                      | << ignore >>                              |
       | name                    | F5H1R-850000 - AS Additional Interactions |
       | status                  | active                                    |
-      | env                     | dev                                       |
+      | environment             | dev                                       |
       | product_id              | ${ note(product_id) }                     |
       | product_team_id         | ${ note(product_team_id) }                |
       | ods_code                | F5H1R                                     |
@@ -45,7 +45,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | id                      | ${ note(device_reference_data_id) }       |
       | name                    | F5H1R-850000 - AS Additional Interactions |
       | status                  | active                                    |
-      | env                     | dev                                       |
+      | environment             | dev                                       |
       | product_id              | ${ note(product_id) }                     |
       | product_team_id         | ${ note(product_team_id) }                |
       | ods_code                | F5H1R                                     |
@@ -87,7 +87,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | id                                                                                 | << ignore >>                                              |
       | name                                                                               | F5H1R-850000 - AS Additional Interactions                 |
       | status                                                                             | active                                                    |
-      | env                                                                                | dev                                                       |
+      | environment                                                                        | dev                                                       |
       | product_id                                                                         | ${ note(product_id) }                                     |
       | product_team_id                                                                    | ${ note(product_team_id) }                                |
       | ods_code                                                                           | F5H1R                                                     |
@@ -115,7 +115,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | id                                                                                 | ${ note(device_reference_data_id) }                       |
       | name                                                                               | F5H1R-850000 - AS Additional Interactions                 |
       | status                                                                             | active                                                    |
-      | env                                                                                | dev                                                       |
+      | environment                                                                        | dev                                                       |
       | product_id                                                                         | ${ note(product_id) }                                     |
       | product_team_id                                                                    | ${ note(product_team_id) }                                |
       | ods_code                                                                           | F5H1R                                                     |

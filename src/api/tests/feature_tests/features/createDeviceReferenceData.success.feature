@@ -27,7 +27,7 @@ Feature: Create Device Reference Data - success scenarios
       | id                      | << ignore >>               |
       | name                    | My Device Reference Data   |
       | status                  | active                     |
-      | env                     | dev                        |
+      | environment             | dev                        |
       | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
@@ -46,7 +46,7 @@ Feature: Create Device Reference Data - success scenarios
       | id                      | ${ note(device_reference_data_id) } |
       | name                    | My Device Reference Data            |
       | status                  | active                              |
-      | env                     | dev                                 |
+      | environment             | dev                                 |
       | product_id              | ${ note(product_id) }               |
       | product_team_id         | ${ note(product_team_id) }          |
       | ods_code                | F5H1R                               |
@@ -85,7 +85,7 @@ Feature: Create Device Reference Data - success scenarios
       | id                      | << ignore >>               |
       | name                    | My Device Reference Data   |
       | status                  | active                     |
-      | env                     | dev                        |
+      | environment             | dev                        |
       | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
@@ -104,7 +104,7 @@ Feature: Create Device Reference Data - success scenarios
       | id                      | ${ note(device_reference_data_id) } |
       | name                    | My Device Reference Data            |
       | status                  | active                              |
-      | env                     | dev                                 |
+      | environment             | dev                                 |
       | product_id              | ${ note(product_id) }               |
       | product_team_id         | ${ note(product_team_id) }          |
       | ods_code                | F5H1R                               |

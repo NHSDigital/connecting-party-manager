@@ -187,7 +187,7 @@ def test_BulkRepository_handle_Device(dynamodb_client):
     )
     product_team = ProductTeam(name="my-product", ods_code="AAA")
     product = product_team.create_cpm_product(name="my-product")
-    device = product.create_device(name="my-product", env=Environment.PROD)
+    device = product.create_device(name="my-product", environment=Environment.PROD)
     device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="123456")
     device.add_tag(party_key="123", something_else="456")
     device.clear_events()
@@ -223,7 +223,7 @@ def test_BulkRepository_handle_DeviceReferenceData(dynamodb_client):
     product_team = ProductTeam(name="my-product", ods_code="AAA")
     product = product_team.create_cpm_product(name="my-product")
     device_ref_data = product.create_device_reference_data(
-        name="my-product", env=Environment.PROD
+        name="my-product", environment=Environment.PROD
     )
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)

@@ -20,7 +20,7 @@ class DeviceReferenceDataCreatedEvent(Event):
     id: str
     name: str
     status: Status
-    env: Environment
+    environment: Environment
     product_id: ProductId
     product_team_id: UUID
     ods_code: str
@@ -46,7 +46,7 @@ class DeviceReferenceData(AggregateRoot):
     id: UUID = Field(default_factory=uuid4, immutable=True)
     name: str = Field(regex=DEVICE_NAME_REGEX)
     status: Status = Field(default=Status.ACTIVE)
-    env: Environment = Field()
+    environment: Environment = Field()
     product_id: ProductId = Field(immutable=True)
     product_team_id: str = Field(immutable=True)
     ods_code: str = Field(immutable=True)

@@ -14,7 +14,7 @@ class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
 
     @root_validator(pre=True)
     def ignore_env(cls, values):
-        values.pop("env", None)
+        values.pop("environment", None)
         return values
 
 
@@ -28,14 +28,14 @@ class CpmProductPathParams(BaseModel, extra=Extra.forbid):
 
     @root_validator(pre=True)
     def ignore_env(cls, values):
-        values.pop("env", None)
+        values.pop("environment", None)
         return values
 
 
 class SubCpmProductPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
-    env: Environment
+    environment: Environment
 
 
 class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
@@ -72,7 +72,7 @@ class CreateDeviceReferenceAdditionalInteractionsDataParams(
 class DeviceReferenceDataPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
-    env: Environment
+    environment: Environment
     device_reference_data_id: str = Field(...)
 
 
@@ -105,5 +105,5 @@ class CreateAsDeviceIncomingParams(BaseModel, extra=Extra.forbid):
 class DevicePathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
-    env: Environment
+    environment: Environment
     device_id: str = Field(...)
