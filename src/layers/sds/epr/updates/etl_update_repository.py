@@ -17,6 +17,8 @@ from domain.repository.repository.v1 import (
     _split_transactions_by_key,
     transact_write_chunk,
 )
+from sds.epr.updates.etl_device import EtlDeviceEventDeserializer
+from sds.epr.updates.etl_device_repository import EtlDeviceRepository
 
 if TYPE_CHECKING:
     from mypy_boto3_dynamodb import DynamoDBClient
@@ -48,6 +50,9 @@ class EtlUpdateRepository:
                 table_name=table_name, dynamodb_client=dynamodb_client
             ),
             DeviceReferenceDataEventDeserializer: DeviceReferenceDataRepository(
+                table_name=table_name, dynamodb_client=dynamodb_client
+            ),
+            EtlDeviceEventDeserializer: EtlDeviceRepository(
                 table_name=table_name, dynamodb_client=dynamodb_client
             ),
         }
