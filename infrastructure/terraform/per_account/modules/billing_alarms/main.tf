@@ -5,7 +5,7 @@ resource "aws_ssm_parameter" "billing_alert_subscribers" {
 }
 
 data "aws_ssm_parameter" "billing_alert_subscribers" {
-  name = aws_ssm_parameter.billing_alert_subscribers.name
+  name = "${var.project}-billing-subscribers"
 }
 
 resource "aws_budgets_budget" "cpm_budget" {
