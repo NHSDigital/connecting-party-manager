@@ -123,7 +123,7 @@ function _terraform_plan() {
       -var "layers=${layers}" \
       -var "third_party_layers=${third_party_layers}" || return 1
   else
-    terraform plan -refresh-only $args \
+    terraform plan $args \
       -out="$plan_file" \
       -var-file="$var_file" \
       -var "assume_account=${aws_account_id}" \
@@ -140,7 +140,7 @@ function _terraform_apply() {
 
   terraform init || return 1
   terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-  terraform apply -refresh-only $args "$plan_file" || return 1
+  terraform apply $args "$plan_file" || return 1
   terraform output -json >output.json || return 1
 }
 
