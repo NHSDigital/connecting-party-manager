@@ -99,7 +99,8 @@ def accredited_system(accredited_system_1: NhsMhs):
 
 @pytest.fixture
 def another_accredited_system(accredited_system):
-    accredited_system["nhs_mhs_svc_ia"] = "another-interaction-id"
+    accredited_system["nhs_as_svc_ia"] = ["another-interaction-id"]
+    accredited_system["unique_identifier"] = "456789"
     return accredited_system
 
 
@@ -130,6 +131,7 @@ def empty_message_sets(accredited_system_1: NhsMhs, initial_product):
 
 @pytest.fixture
 def non_empty_message_sets(mhs: dict, accredited_system_1: NhsMhs, initial_product):
+    mhs["nhs_mhs_svc_ia"] = "interaction-id-1"
     message_set_data = get_message_set_data(
         message_handling_systems=[mhs],
         message_set_questionnaire=QuestionnaireRepository().read(
@@ -192,6 +194,34 @@ def initial_accredited_system_device(
 
 
 @pytest.fixture
+def another_accredited_system_device(
+    another_accredited_system: dict,
+    accredited_system_1: NhsMhs,
+    initial_product,
+    initial_additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+):
+    accredited_system_device_data = get_accredited_system_device_data(
+        accredited_system=another_accredited_system,
+        accredited_system_questionnaire=QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_AS
+        ),
+        accredited_system_field_mapping=QuestionnaireRepository().read_field_mapping(
+            QuestionnaireInstance.SPINE_AS
+        ),
+    )
+
+    return create_as_device(
+        product=initial_product,
+        party_key=accredited_system_1.nhs_mhs_party_key,
+        asid=another_accredited_system["unique_identifier"],
+        as_device_data=accredited_system_device_data,
+        message_sets_id=empty_message_sets.id,
+        additional_interactions_id=initial_additional_interactions.id,
+    )
+
+
+@pytest.fixture
 def expected_product_team(initial_product_team):
     return initial_product_team
 
@@ -219,6 +249,11 @@ def expected_additional_interactions(initial_additional_interactions):
 @pytest.fixture
 def expected_device(initial_accredited_system_device):
     return initial_accredited_system_device
+
+
+@pytest.fixture
+def expected_additional_device(another_accredited_system_device):
+    return another_accredited_system_device
 
 
 def equivalent_questionnaire_responses[
@@ -518,7 +553,6 @@ def test_process_request_to_add_device_message_set_exists(
     (
         accredited_system_device_ref_data_created_event,
         accredited_system_device_ref_data_questionnaire_updated_event_1,
-        accredited_system_device_ref_data_questionnaire_updated_event_2,
     ) = additional_interactions.events
     (
         device_created_event,
@@ -534,10 +568,6 @@ def test_process_request_to_add_device_message_set_exists(
         accredited_system_device_ref_data_questionnaire_updated_event_1,
         DrdQuestionnaireUpdatedEvent,
     )
-    assert isinstance(
-        accredited_system_device_ref_data_questionnaire_updated_event_2,
-        DrdQuestionnaireUpdatedEvent,
-    )
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
@@ -551,11 +581,7 @@ def test_process_request_to_add_device_message_set_exists(
     assert product_team == initial_product_team
     assert product == initial_product
     assert message_sets == non_empty_message_sets
-    assert equivalent(additional_interactions, expected_additional_interactions)
     assert equivalent(accredited_system_device, expected_device)
-
-    # for interaction in additional_interactions.questionnaire_responses.:
-    #     assert interaction not in message_sets.interactions
 
 
 def test_process_request_to_add_device_additional_interactions_exists(
@@ -620,82 +646,81 @@ def test_process_request_to_add_device_additional_interactions_exists(
     assert equivalent(accredited_system_device, expected_device)
 
 
-# add test for additonal interaction drd existing and new interactions coming through the device
-# assert additional_interactions != initial_additional_interactions
-# assert (
-#     additional_interactions.updated_on > initial_additional_interactions.updated_on
-# )
+def test_process_request_to_add_as_device_exists(
+    another_accredited_system: dict,
+    repository: dict[str, Repository],
+    input_questionnaires: dict,
+    initial_product_team: ProductTeam,
+    initial_product: CpmProduct,
+    empty_message_sets: DeviceReferenceData,
+    initial_additional_interactions: DeviceReferenceData,
+    initial_accredited_system_device: Device,
+    expected_additional_device,
+):
+    repository["product_team_repository"].write(initial_product_team)
+    repository["product_repository"].write(initial_product)
+    repository["device_reference_data_repository"].write(empty_message_sets)
+    repository["device_reference_data_repository"].write(
+        initial_additional_interactions
+    )
+    repository["device_repository"].write(initial_accredited_system_device)
 
-# add test for message set existing and as device trying to add interactions that already exist there
+    (
+        product_team,
+        product,
+        message_sets,
+        additional_interactions,
+        accredited_system_device,
+    ) = process_request_to_add_as(
+        accredited_system=another_accredited_system,
+        **input_questionnaires,
+        **repository,
+    )
+    assert isinstance(product_team, ProductTeam)
+    assert isinstance(product, CpmProduct)
+    assert isinstance(message_sets, DeviceReferenceData)
+    assert isinstance(additional_interactions, DeviceReferenceData)
+    assert isinstance(accredited_system_device, Device)
 
-# def test_process_request_to_add_mhs_device_exists(
-#     another_mhs: dict,
-#     repository: dict[str, Repository],
-#     input_questionnaires: dict,
-#     initial_product_team: ProductTeam,
-#     initial_product: CpmProduct,
-#     initial_message_sets: DeviceReferenceData,
-#     initial_mhs_device: Device,
-# ):
-#     repository["product_team_repository"].write(initial_product_team)
-#     repository["product_repository"].write(initial_product)
-#     repository["device_reference_data_repository"].write(initial_message_sets)
-#     repository["device_repository"].write(initial_mhs_device)
+    assert product_team.events == []
+    assert product.events == []
+    assert message_sets.events == []
 
-#     product_team, product, message_sets, additional_interactions, mhs_device = (
-#         process_request_to_add_mhs(
-#             mhs=another_mhs, **input_questionnaires, **repository
-#         )
-#     )
-#     assert isinstance(product_team, ProductTeam)
-#     assert isinstance(product, CpmProduct)
-#     assert isinstance(message_sets, DeviceReferenceData)
-#     assert additional_interactions is None
-#     assert isinstance(mhs_device, Device)
+    (accredited_system_device_ref_data_questionnaire_updated_event_1,) = (
+        additional_interactions.events
+    )
+    (
+        device_created_event,
+        device_key_added_event,
+        device_questionnaire_updated,
+        device_ref_data_added_event_message_sets,
+        device_ref_data_added_event_additional_interactions,
+    ) = accredited_system_device.events
 
-#     assert product_team.events == []
-#     assert product.events == []
-#     (
-#         mhs_device_ref_data_questionnaire_deleted_event,
-#         mhs_device_ref_data_questionnaire_updated_event,
-#     ) = message_sets.events
-#     (device_key_added_event,) = mhs_device.events
+    assert isinstance(
+        accredited_system_device_ref_data_questionnaire_updated_event_1,
+        DrdQuestionnaireUpdatedEvent,
+    )
+    assert isinstance(device_created_event, DeviceCreatedEvent)
+    assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
+    assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(
+        device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
+    )
+    assert isinstance(
+        device_ref_data_added_event_additional_interactions,
+        DeviceReferenceDataIdAddedEvent,
+    )
+    assert product_team == initial_product_team
+    assert product == initial_product
+    assert message_sets == empty_message_sets
 
-#     assert isinstance(
-#         mhs_device_ref_data_questionnaire_deleted_event, DrdQuestionnaireUpdatedEvent
-#     )
-#     assert isinstance(
-#         mhs_device_ref_data_questionnaire_updated_event, DrdQuestionnaireUpdatedEvent
-#     )
-#     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert additional_interactions != initial_additional_interactions
+    assert (
+        additional_interactions.updated_on > initial_additional_interactions.updated_on
+    )
 
-#     assert product_team == initial_product_team
-#     assert product == initial_product
-
-#     # Message sets are nearly equal: questionnaire response ids are different
-#     # and updated on timestamp is different, and events are different
-#     assert equivalent_questionnaire_responses(message_sets, initial_message_sets)
-#     assert message_sets.updated_on > initial_message_sets.updated_on
-#     # Clear the attributes which are known to be different
-#     message_sets.updated_on = None
-#     message_sets.questionnaire_responses.clear()
-#     message_sets.clear_events()
-#     initial_message_sets.updated_on = None
-#     initial_message_sets.questionnaire_responses.clear()
-#     initial_message_sets.clear_events()
-#     # And check that they are otherwise equal
-#     assert message_sets == initial_message_sets
-
-#     # MHS Devices are nearly equal: only the keys, timestamp and events are different
-#     assert len(mhs_device.keys) == len(initial_mhs_device.keys) + 1
-#     assert all(k in mhs_device.keys for k in initial_mhs_device.keys)
-#     assert mhs_device.updated_on > initial_mhs_device.updated_on
-#     # Clear the attributes which are known to be different
-#     mhs_device.updated_on = None
-#     mhs_device.keys.clear()
-#     mhs_device.clear_events()
-#     initial_mhs_device.updated_on = None
-#     initial_mhs_device.keys.clear()
-#     initial_mhs_device.clear_events()
-#     # And check that they are otherwise equal
-#     assert mhs_device == initial_mhs_device
+    # Each as deviced should have 1 key each of it's corresponding ASID
+    assert len(initial_accredited_system_device.keys) == 1
+    assert len(accredited_system_device.keys) == 1
+    assert equivalent(accredited_system_device, expected_additional_device)

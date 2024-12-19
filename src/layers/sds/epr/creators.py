@@ -102,7 +102,7 @@ def create_as_device(
     as_device.add_questionnaire_response(as_device_data)
     as_device.add_device_reference_data_id(
         device_reference_data_id=message_sets_id,
-        path_to_data=[SdsDeviceReferenceDataPath.ALL],
+        path_to_data=[SdsDeviceReferenceDataPath.ALL_INTERACTION_IDS],
     )
     as_device.add_device_reference_data_id(
         device_reference_data_id=additional_interactions_id,
