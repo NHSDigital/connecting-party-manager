@@ -113,3 +113,15 @@ def read_or_create_mhs_device(
             message_sets_id=message_sets.id,
         )
     return mhs_device
+
+
+def read_message_sets_from_mhs_device(
+    mhs_device: Device,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+):
+    (message_sets_id,) = mhs_device.device_reference_data.keys()
+    return device_reference_data_repository.read(
+        product_team_id=mhs_device.product_team_id,
+        product_id=mhs_device.product_id,
+        id=message_sets_id,
+    )

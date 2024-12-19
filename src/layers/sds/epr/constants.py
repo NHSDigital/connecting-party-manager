@@ -38,6 +38,15 @@ class SdsFieldName(StrEnum):
     MHS_IN = "MHS IN"
     INTERACTION_ID = "Interaction ID"
     UNIQUE_IDENTIFIER = "Unique Identifier"
+    MANUFACTURING_ORG = "MHS Manufacturer Organisation"
+
+
+CPM_MHS_IMMUTABLE_FIELDS = {
+    SdsFieldName.MANUFACTURING_ORG,
+    SdsFieldName.PARTY_KEY,
+    SdsFieldName.CPA_ID,
+    SdsFieldName.UNIQUE_IDENTIFIER,
+}
 
 
 class SdsDeviceReferenceDataPath(StrEnum):

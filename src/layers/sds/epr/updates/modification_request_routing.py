@@ -18,6 +18,7 @@ from sds.epr.updates.change_request_processors import (
 
 def route_mhs_modification_request(
     device: Device,
+    cpa_id_to_modify: str,
     request: dict,
     device_reference_data_repository: DeviceReferenceDataRepository,
     mhs_device_questionnaire: Questionnaire,
@@ -30,6 +31,7 @@ def route_mhs_modification_request(
 
     common_payload = dict(
         device=device,
+        cpa_id_to_modify=cpa_id_to_modify,
         device_reference_data_repository=device_reference_data_repository,
         mhs_device_questionnaire=mhs_device_questionnaire,
         mhs_device_field_mapping=mhs_device_field_mapping,
