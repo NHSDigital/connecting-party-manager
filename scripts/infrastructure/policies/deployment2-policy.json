@@ -264,7 +264,13 @@
         "SNS:ListTagsForResource",
         "budgets:ModifyBudget",
         "budgets:ViewBudget",
-        "SNS:DeleteTopic"
+        "SNS:DeleteTopic",
+        "SNS:CreateTopic",
+        "SNS:TagResource",
+        "SNS:SetTopicAttributes",
+        "SNS:Subscribe",
+        "SNS:GetSubscriptionAttributes",
+        "SNS:Unsubscribe"
       ],
       "Resource": ["*"]
     }
