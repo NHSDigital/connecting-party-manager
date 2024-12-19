@@ -6,6 +6,9 @@ from domain.core.product_team.v1 import ProductTeamEventDeserializer
 from sds.epr.updates.etl_device import EtlDeviceEventDeserializer
 
 
+class EventDeserializationError(Exception): ...
+
+
 def deserialize_event(event: ExportedEventTypeDef) -> Event:
     for deserializer in (
         ProductTeamEventDeserializer,
@@ -16,6 +19,7 @@ def deserialize_event(event: ExportedEventTypeDef) -> Event:
     ):
         try:
             return (deserializer, deserializer.parse(event))
-        except Exception as exception:
+        except Exception:
             pass
-    return exception
+
+    raise EventDeserializationError("Could not parse event of this type")
