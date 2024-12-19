@@ -27,6 +27,13 @@ JSON
   }
 }
 
+module "billing_alarms" {
+  source      = "../modules/billing_alarms"
+  project     = local.project
+  limit       = var.budget_limit
+  environment = terraform.workspace
+}
+
 module "route53" {
   source    = "./modules/route53"
   workspace = terraform.workspace

@@ -256,7 +256,21 @@
         "acm:ListCertificates",
         "resource-groups:ListGroups",
         "lambda:ListEventSourceMappings",
-        "iam:ListRoles"
+        "iam:ListRoles",
+        "SNS:GetTopicAttributes",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:ListTagsForResource",
+        "SNS:ListTagsForResource",
+        "budgets:ModifyBudget",
+        "budgets:ViewBudget",
+        "SNS:DeleteTopic",
+        "SNS:CreateTopic",
+        "SNS:TagResource",
+        "SNS:SetTopicAttributes",
+        "SNS:Subscribe",
+        "SNS:GetSubscriptionAttributes",
+        "SNS:Unsubscribe"
       ],
       "Resource": ["*"]
     }
