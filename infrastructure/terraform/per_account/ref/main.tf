@@ -27,8 +27,9 @@ JSON
   }
 }
 
-module "budget" {
+module "billing_alarms" {
   source      = "../modules/billing_alarms"
+  project     = local.project
   limit       = var.budget_limit
   environment = var.environment
 }
