@@ -1,6 +1,7 @@
 resource "aws_ssm_parameter" "billing_alert_subscribers" {
-  name = "${var.project}-billing-subscribers"
-  type = "StringList"
+  name  = "${var.project}-billing-subscribers"
+  type  = "StringList"
+  value = ""
 }
 
 data "aws_ssm_parameter" "billing_alert_subscribers" {
