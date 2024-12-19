@@ -10,7 +10,6 @@ from etl_utils.constants import (
 )
 from etl_utils.io import pkl_dumps_lz4
 from mypy_boto3_s3 import S3Client
-from sds.epr.bulk_create.bulk_load_fanout import FANOUT
 
 from test_helpers.terraform import read_terraform_output
 
@@ -40,10 +39,28 @@ def get_etl_config(input_filename: str, etl_type: str = "") -> EtlConfig:
     )
 
 
-def _delete_objects_by_prefix(s3_client: S3Client, bucket: str, key_prefix: str):
-    response = s3_client.list_objects(Bucket=bucket, Prefix=key_prefix)
-    for item in response.get("Contents", []):
-        s3_client.delete_object(Bucket=bucket, Key=item["Key"])
+def _delete_objects_by_prefix(
+    s3_client: S3Client, bucket: str, key_prefix: str, **kwargs
+):
+    # Delete objects if any found
+    response = s3_client.list_objects_v2(Bucket=bucket, Prefix=key_prefix, **kwargs)
+    try:
+        contents = response["Contents"]
+    except KeyError:
+        return
+    else:
+        for item in contents:
+            s3_client.delete_object(Bucket=bucket, Key=item["Key"])
+
+    # Repeat if required
+    continuation_token = response.get("ContinuationToken")
+    if continuation_token:
+        return _delete_objects_by_prefix(
+            s3_client=s3_client,
+            bucket=bucket,
+            key_prefix=key_prefix,
+            ContinuationToken=continuation_token,
+        )
 
 
 def clear_etl_state(s3_client: S3Client, etl_config: EtlConfig):
@@ -61,12 +78,12 @@ def clear_etl_state(s3_client: S3Client, etl_config: EtlConfig):
         Key=WorkerKey.LOAD,
         Body=pkl_dumps_lz4(EMPTY_JSON_DATA),
     )
-    for i in range(FANOUT):
-        s3_client.put_object(
-            Bucket=etl_config.bucket,
-            Key=f"{WorkerKey.LOAD}.{i}",
-            Body=pkl_dumps_lz4(EMPTY_JSON_DATA),
-        )
+
+    # Delete load-fanout files, if they exist
+    _delete_objects_by_prefix(
+        s3_client=s3_client, bucket=etl_config.bucket, key_prefix=f"{WorkerKey.LOAD}."
+    )
+
     s3_client.delete_object(
         Bucket=etl_config.bucket, Key=etl_config.initial_trigger_key
     )

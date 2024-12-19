@@ -1,9 +1,20 @@
 from collections import deque
 from pathlib import Path
-from typing import Any, Literal, Protocol
+from typing import Any, Generator, Literal, Protocol
 
-from domain.core.device import Device
-from event.json import json_load, json_loads
+from domain.repository.cpm_product_repository.v1 import CpmProduct, CpmProductRepository
+from domain.repository.device_reference_data_repository.v1 import (
+    DeviceReferenceData,
+    DeviceReferenceDataRepository,
+)
+from domain.repository.device_repository.v1 import Device, DeviceRepository
+from domain.repository.product_team_repository.v1 import (
+    ProductTeam,
+    ProductTeamRepository,
+)
+from event.json import json_load
+from mypy_boto3_dynamodb import DynamoDBClient
+from pydantic import ValidationError
 
 PATH_TO_HERE = Path(__file__).parent / "changelog_components"
 
@@ -88,22 +99,37 @@ def convert_list_likes(obj):
     return _obj
 
 
-def device_as_json_dict(device: Device) -> dict:
-    _device: dict = device.state()
-    _device.pop("id")
-    _device["questionnaire_responses"] = {
-        k: [
-            json_loads(questionnaire_response.json())
-            for _, questionnaire_response in questionnaire_responses.items()
-        ]
-        for k, questionnaire_responses in device.questionnaire_responses.items()
-    }
+def as_domain_object(
+    obj: dict,
+) -> ProductTeam | CpmProduct | Device | DeviceReferenceData:
+    for model in (ProductTeam, CpmProduct, Device, DeviceReferenceData):
+        try:
+            instance = model(**obj)
+            if instance.state() == obj:
+                return instance
+        except ValidationError:
+            pass
+    raise ValueError(f"Could not find a model for {obj}")
 
-    for questionnaire_responses in _device["questionnaire_responses"].values():
-        for questionnaire_response in questionnaire_responses:
-            questionnaire_response["created_on"] = "CREATED_ON"
 
-    return _device
+def read_all(
+    table_name: str, db_client: "DynamoDBClient"
+) -> Generator[ProductTeam | CpmProduct | Device | DeviceReferenceData, None, None]:
+    product_team_repo = ProductTeamRepository(table_name, db_client)
+    product_repo = CpmProductRepository(table_name, db_client)
+    device_repo = DeviceRepository(table_name, db_client)
+    drd_repo = DeviceReferenceDataRepository(table_name, db_client)
+
+    for product_team in product_team_repo.search():
+        yield product_team
+        for product in product_repo.search(product_team_id=product_team.id):
+            yield product
+            yield from device_repo.search(
+                product_team_id=product_team.id, product_id=product.id
+            )
+            yield from drd_repo.search(
+                product_team_id=product_team.id, product_id=product.id
+            )
 
 
 ADD_ACCREDITED_SYSTEM = read_ldif("add/accredited_system.ldif")
@@ -114,4 +140,10 @@ DELETE_UNKNOWN_ENTITY = read_ldif("delete/unknown_entity.ldif")
 MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_WITH_SAME_UNIQUE_IDENTIFIER = read_ldif(
     "add/message_handling_system.AnotherWithSameUniqueIdentifier.ldif"
+)
+ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT = read_ldif(
+    "add/message_handling_system.SameProduct.ldif"
+)
+ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
+    "add/message_handling_system.SameProductTeam.DifferentProduct.ldif"
 )

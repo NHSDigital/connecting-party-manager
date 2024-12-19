@@ -11,7 +11,10 @@ from domain.repository.questionnaire_repository import (
     QuestionnaireRepository,
 )
 from event.json import json_loads
-from sds.epr.bulk_create.bulk_create import create_complete_epr_product
+from sds.epr.bulk_create.bulk_create import (
+    _impute_manufacturer_org,
+    create_complete_epr_product,
+)
 
 
 @pytest.fixture
@@ -65,6 +68,7 @@ def message_set_data():
                 "MHS IN": "in-123",
                 "MHS Is Authenticated": "none",
                 "MHS SN": "sn-123",
+                "Product Key": "key-123",
                 "Interaction ID": "sn-123:in-123",
             },
         },
@@ -79,6 +83,7 @@ def message_set_data():
                 "MHS IN": "in-456",
                 "MHS Is Authenticated": "none",
                 "MHS SN": "sn-456",
+                "Product Key": "key-456",
                 "Interaction ID": "sn-456:in-456",
             },
         },
@@ -356,3 +361,28 @@ def test_create_complete_epr_product(
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(mhs_device, Device)
     assert all(isinstance(device, Device) for device in as_devices)
+
+
+@pytest.mark.parametrize(
+    ["item", "expectation"],
+    (
+        [
+            {"nhs_mhs_manufacturer_org": "foo", "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "foo", "nhs_id_code": "bar"},
+        ],
+        [
+            {"nhs_mhs_manufacturer_org": "foo123", "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "foo123", "nhs_id_code": "bar"},
+        ],
+        [
+            {"nhs_mhs_manufacturer_org": None, "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "bar", "nhs_id_code": "bar"},
+        ],
+        [
+            {"nhs_mhs_manufacturer_org": "has spaces", "nhs_id_code": "bar"},
+            {"nhs_mhs_manufacturer_org": "bar", "nhs_id_code": "bar"},
+        ],
+    ),
+)
+def test__impute_manufacturer_org(item, expectation):
+    assert _impute_manufacturer_org(item) == expectation

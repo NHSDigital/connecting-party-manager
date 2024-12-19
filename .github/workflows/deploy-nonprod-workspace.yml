@@ -11,7 +11,7 @@ on:
         options:
           - dev
           - qa
-          # - int
+          - int
           - ref
       sandbox:
         description: Do you want to deploy the sandbox version?

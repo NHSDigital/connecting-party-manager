@@ -64,3 +64,7 @@ class InvalidSpineAsResponse(Exception):
 
 class AccreditedSystemFatalError(Exception):
     pass
+
+
+class DuplicateInteractionIdError(Exception):
+    pass

@@ -24,8 +24,7 @@ from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.json import json_load
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
-from sds.epr.bulk_create.bulk_load_fanout import FANOUT
-from sds.epr.constants import AS_DEVICE_SUFFIX, MHS_DEVICE_SUFFIX
+from sds.epr.utils import is_as_device, is_mhs_device
 
 from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 from test_helpers.dynamodb import mock_table
@@ -73,31 +72,33 @@ def test_load_worker_pass(
     from etl.sds.worker.bulk.load_bulk import load_bulk
 
     # Initial state
-    for i in range(FANOUT):
-        with open(PATH_TO_STAGE_DATA / f"3.load_fanout_output.{i}.json") as f:
+    input_paths = sorted(PATH_TO_STAGE_DATA.glob(f"3.load_fanout_output.*.json"))
+    load_fanout_keys = []
+    for i, path in enumerate(input_paths):
+        with open(path) as f:
             input_data = json_load(f)
 
+        fanout_key = f"{WorkerKey.LOAD}.{i}"
         put_object(
-            key=f"{WorkerKey.LOAD}.{i}",
+            key=fanout_key,
             body=pkl_dumps_lz4(deque(input_data)),
         )
+        load_fanout_keys.append(fanout_key)
 
     # Execute the load worker
     with mock_table(TABLE_NAME) as dynamodb_client:
         load_bulk.CACHE.REPOSITORY.client = dynamodb_client
 
         responses = []
-        for i in range(FANOUT):
+        for fanout_key in load_fanout_keys:
             response = load_bulk.handler(
-                event={"s3_input_path": f"s3://{BUCKET_NAME}/{WorkerKey.LOAD}.{i}"},
+                event={"s3_input_path": f"s3://{BUCKET_NAME}/{fanout_key}"},
                 context=None,
             )
             responses.append(response)
 
             # Final state
-            final_unprocessed_data = pkl_loads_lz4(
-                get_object(key=f"{WorkerKey.LOAD}.{i}")
-            )
+            final_unprocessed_data = pkl_loads_lz4(get_object(key=fanout_key))
             assert final_unprocessed_data == deque([])
 
         assert responses == [
@@ -107,7 +108,7 @@ def test_load_worker_pass(
                 "unprocessed_records": 0,
                 "error_message": None,
             }
-        ] * (FANOUT - 1) + [
+        ] * (len(load_fanout_keys) - 1) + [
             {
                 "stage_name": "load",
                 "processed_records": 7,
@@ -149,8 +150,8 @@ def test_load_worker_pass(
                 for product in products
             )
         )
-        mhs_devices = [d for d in devices if d.name.endswith(MHS_DEVICE_SUFFIX)]
-        as_devices = [d for d in devices if d.name.endswith(AS_DEVICE_SUFFIX)]
+        mhs_devices = [d for d in devices if is_mhs_device(d)]
+        as_devices = [d for d in devices if is_as_device(d)]
         assert len(devices) == len(mhs_devices) + len(as_devices)
         assert len(mhs_devices) == 2
         assert len(as_devices) == 4

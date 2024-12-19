@@ -22,7 +22,6 @@ from etl_utils.worker.worker_step_chain import (
 )
 from event.environment import BaseEnvironment
 from event.step_chain import StepChain
-from sds.epr.bulk_create.bulk_load_fanout import FANOUT, calculate_batch_size
 from sds.epr.bulk_create.bulk_repository import BulkRepository
 
 if TYPE_CHECKING:
@@ -38,6 +37,7 @@ class TransformWorkerEnvironment(BaseEnvironment):
 
 ENVIRONMENT = TransformWorkerEnvironment.build()
 S3_CLIENT = boto3.client("s3")
+EACH_FANOUT_BATCH_SIZE = 10000
 
 
 def execute_step_chain(
@@ -72,11 +72,8 @@ def execute_step_chain(
 
         count_unprocessed_records = len(action_chain.result.unprocessed_records)
 
-        batch_size = calculate_batch_size(
-            sequence=action_chain.result.processed_records, n_batches=FANOUT
-        )
         for i, batch in enumerate(
-            batched(action_chain.result.processed_records, n=batch_size)
+            batched(action_chain.result.processed_records, n=EACH_FANOUT_BATCH_SIZE)
         ):
             count_processed_records = len(batch)
             _action_response = WorkerActionResponse(

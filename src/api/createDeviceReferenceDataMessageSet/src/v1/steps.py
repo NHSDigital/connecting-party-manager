@@ -24,6 +24,7 @@ from domain.repository.questionnaire_repository import (
 from domain.request_models import CreateDeviceReferenceMessageSetsDataParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from sds.epr.constants import MESSAGE_SETS_SUFFIX, EprNameTemplate
+from sds.epr.interactions import check_no_duplicate_interactions
 
 
 @mark_validation_errors_as_inbound
@@ -81,6 +82,10 @@ def validate_questionnaire_responses(data, cache) -> list[QuestionnaireResponse]
     return validated_responses
 
 
+def require_unique_interactions(data, cache):
+    check_no_duplicate_interactions(data[validate_questionnaire_responses])
+
+
 def create_message_set_device_reference_data(data, cache) -> DeviceReferenceData:
     product: CpmProduct = data[read_product]
     party_key: str = data[get_party_key]
@@ -127,6 +132,7 @@ steps = [
     require_no_existing_message_sets_device_reference_data,
     read_spine_mhs_message_sets_questionnaire,
     validate_questionnaire_responses,
+    require_unique_interactions,
     create_message_set_device_reference_data,
     add_questionnaire_response,
     write_device_reference_data,

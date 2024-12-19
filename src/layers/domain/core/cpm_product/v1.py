@@ -11,7 +11,7 @@ from domain.core.device_reference_data import (
 )
 from domain.core.enum import Status
 from domain.core.error import DuplicateError
-from domain.core.event import Event
+from domain.core.event import Event, EventDeserializer
 from domain.core.product_key import ProductKey
 from domain.core.timestamp import now
 from domain.core.validation import CPM_PRODUCT_NAME_REGEX
@@ -32,7 +32,7 @@ class CpmProductCreatedEvent(Event):
 
 @dataclass(kw_only=True, slots=True)
 class CpmProductKeyAddedEvent(Event):
-    new_key: ProductKey
+    new_key: dict
     id: str
     product_team_id: str
     name: str
@@ -41,7 +41,7 @@ class CpmProductKeyAddedEvent(Event):
     created_on: str
     updated_on: str = None
     deleted_on: str = None
-    keys: list[ProductKey]
+    keys: list[dict]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -85,7 +85,6 @@ class CpmProduct(AggregateRoot):
             status=status,
         )
         device_created_event = DeviceCreatedEvent(**device.dict())
-        self.add_event(device_created_event)
         device.add_event(device_created_event)
         return device
 
@@ -99,7 +98,6 @@ class CpmProduct(AggregateRoot):
         event = DeviceReferenceDataCreatedEvent(
             **device_reference_data.dict(exclude={"questionnaire_responses"})
         )
-        self.add_event(event)
         device_reference_data.add_event(event)
         return device_reference_data
 
@@ -113,7 +111,7 @@ class CpmProduct(AggregateRoot):
         self.keys.append(product_key)
         product_data = self.state()
         product_data.pop(UPDATED_ON)  # The @event decorator will handle updated_on
-        return CpmProductKeyAddedEvent(new_key=product_key, **product_data)
+        return CpmProductKeyAddedEvent(new_key=product_key.dict(), **product_data)
 
     @event
     def delete(self):
@@ -124,3 +122,11 @@ class CpmProduct(AggregateRoot):
             )
         )
         return CpmProductDeletedEvent(**product_data)
+
+
+class CpmProductEventDeserializer(EventDeserializer):
+    event_types = (
+        CpmProductCreatedEvent,
+        CpmProductKeyAddedEvent,
+        CpmProductDeletedEvent,
+    )

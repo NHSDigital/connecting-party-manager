@@ -1,6 +1,5 @@
 import os
 from collections import deque
-from itertools import batched
 from pathlib import Path
 from typing import Callable
 from unittest import mock
@@ -17,11 +16,7 @@ from etl_utils.io.test.io_utils import pkl_loads_lz4
 from event.json import json_load
 from moto import mock_aws
 from mypy_boto3_s3 import S3Client
-from sds.epr.bulk_create.bulk_load_fanout import (
-    FANOUT,
-    calculate_batch_size,
-    count_indexes,
-)
+from sds.epr.bulk_create.bulk_load_fanout import count_indexes
 
 from etl.sds.worker.bulk.tests.test_bulk_e2e import PATH_TO_STAGE_DATA
 
@@ -78,29 +73,14 @@ def decompress(obj: dict) -> dict:
     return obj
 
 
-@pytest.mark.parametrize(
-    ("n_batches", "sequence_length", "expected_batch_size", "expected_n_batches"),
-    ((4, 100, 25, 4), (3, 100, 34, 3), (16, 30, 2, 15)),
-)
-def test_calculate_batch_size_general(
-    n_batches: int,
-    sequence_length: int,
-    expected_batch_size: int,
-    expected_n_batches: int,
-):
-    n_batches = n_batches
-    sequence = list(range(sequence_length))
-    batch_size = calculate_batch_size(sequence, n_batches)
-    assert batch_size == expected_batch_size
-
-    batches = list(batched(sequence, batch_size))
-    assert len(batches) == expected_n_batches
-
-
 def test_load_worker_fanout(
-    put_object: Callable[[str], None], get_object: Callable[[str], bytes]
+    put_object: Callable[[str], None],
+    get_object: Callable[[str], bytes],
 ):
+    _EACH_FANOUT_BATCH_SIZE = 10
     from etl.sds.worker.bulk.load_bulk_fanout import load_bulk_fanout
+
+    load_bulk_fanout.EACH_FANOUT_BATCH_SIZE = _EACH_FANOUT_BATCH_SIZE
 
     # Initial state
     with open(PATH_TO_STAGE_DATA / "2.transform_output.json") as f:
@@ -114,31 +94,36 @@ def test_load_worker_fanout(
     # Execute the load worker
     responses = load_bulk_fanout.handler(event={}, context=None)
 
-    assert len(responses) == FANOUT
-    assert responses == [
+    *head_responses, tail_response = responses
+
+    assert len(head_responses) > 1
+
+    expected_head_responses = [
         {
             "stage_name": "load_bulk_fanout",
-            "processed_records": 10,
+            "processed_records": _EACH_FANOUT_BATCH_SIZE,
             "unprocessed_records": 0,
             "s3_input_path": f"s3://my-bucket/input--load/unprocessed.{i}",
             "error_message": None,
         }
-        for i in range(0, FANOUT - 1)
-    ] + [
-        {
-            "stage_name": "load_bulk_fanout",
-            "processed_records": 7,
-            "unprocessed_records": 0,
-            "s3_input_path": f"s3://my-bucket/input--load/unprocessed.{FANOUT - 1}",
-            "error_message": None,
-        },
+        for i in range(len(head_responses))
     ]
+    assert head_responses == expected_head_responses
+
+    tail_processed_records = tail_response.pop("processed_records")
+    assert tail_processed_records <= _EACH_FANOUT_BATCH_SIZE
+    assert tail_response == {
+        "stage_name": "load_bulk_fanout",
+        "unprocessed_records": 0,
+        "s3_input_path": f"s3://my-bucket/input--load/unprocessed.{len(head_responses)}",
+        "error_message": None,
+    }
 
     # Final state
     final_processed_data = pkl_loads_lz4(get_object(key=WorkerKey.LOAD))
     assert final_processed_data == deque([])
     total_size = 0
-    for i in range(10):
+    for i in range(_EACH_FANOUT_BATCH_SIZE):
         final_unprocessed_data = pkl_loads_lz4(get_object(key=f"{WorkerKey.LOAD}.{i}"))
         assert isinstance(final_unprocessed_data, deque)
         total_size += len(final_unprocessed_data)
@@ -164,3 +149,8 @@ def test_load_worker_fanout(
         expected_total_size += count_indexes(obj)
 
     assert total_size == expected_total_size
+
+    total_processed_records_from_response = (
+        tail_processed_records + _EACH_FANOUT_BATCH_SIZE * len(head_responses)
+    )
+    assert total_size == total_processed_records_from_response

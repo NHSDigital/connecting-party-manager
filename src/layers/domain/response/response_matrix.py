@@ -4,6 +4,7 @@ from api_utils.versioning.errors import VersionException
 from domain.core.error import (
     AccreditedSystemFatalError,
     ConfigurationError,
+    DuplicateInteractionIdError,
     InvalidSpineAsResponse,
     InvalidSpineMhsResponse,
     NotEprProductError,
@@ -63,6 +64,7 @@ EXCEPTIONS_TO_SPINE_CODING = {
     ItemNotFound: SpineCoding.RESOURCE_NOT_FOUND,
     StatusNotOk: SpineCoding.SERVICE_UNAVAILABLE,
     AccreditedSystemFatalError: SpineCoding.VALIDATION_ERROR,
+    DuplicateInteractionIdError: SpineCoding.VALIDATION_ERROR,
 }
 
 SUCCESS_STATUSES = {*HTTP_STATUS_TO_CPM_CODING.keys(), HTTPStatus.NO_CONTENT}
