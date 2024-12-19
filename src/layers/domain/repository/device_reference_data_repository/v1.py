@@ -43,7 +43,7 @@ class DeviceReferenceDataRepository(Repository[DeviceReferenceData]):
     def handle_DeviceReferenceDataCreatedEvent(
         self, event: DeviceReferenceDataCreatedEvent
     ) -> TransactItem:
-        environment = event.env
+        environment = event.environment
         return self.create_index(
             id=event.id,
             parent_key_parts=(

@@ -31,7 +31,9 @@ def create_device_reference_data(data, cache) -> DeviceReferenceData:
         parse_device_reference_data_payload
     ]
     environment: Environment = data[read_environment]
-    return product.create_device_reference_data(env=environment, **payload.dict())
+    return product.create_device_reference_data(
+        environment=environment, **payload.dict()
+    )
 
 
 def write_device_reference_data(data: dict[str, CpmProduct], cache) -> CpmProduct:

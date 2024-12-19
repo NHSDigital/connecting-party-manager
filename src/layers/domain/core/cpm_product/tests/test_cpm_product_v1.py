@@ -47,7 +47,7 @@ def test_invalid_product_id(invalid_product_id):
 
 def test_cpm_product_create_device_reference_data(cpm_product: CpmProduct):
     device_reference_data = cpm_product.create_device_reference_data(
-        name="foo", env=Environment.DEV
+        name="foo", environment=Environment.DEV
     )
     assert isinstance(device_reference_data.id, UUID)
     assert device_reference_data.name == "foo"
@@ -57,7 +57,7 @@ def test_cpm_product_create_device_reference_data(cpm_product: CpmProduct):
 
 
 def test_cpm_product_create_device(cpm_product: CpmProduct):
-    device = cpm_product.create_device(name="foo", env=Environment.DEV)
+    device = cpm_product.create_device(name="foo", environment=Environment.DEV)
     assert isinstance(device.id, UUID)
     assert device.name == "foo"
     assert device.product_id == cpm_product.id

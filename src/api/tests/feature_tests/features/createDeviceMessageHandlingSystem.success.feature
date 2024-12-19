@@ -42,7 +42,7 @@ Feature: Create MHS Device - success scenarios
       | id                                                                       | << ignore >>                                                           |
       | name                                                                     | F5H1R-850000 - Message Handling System                                 |
       | status                                                                   | active                                                                 |
-      | env                                                                      | dev                                                                    |
+      | environment                                                              | dev                                                                    |
       | product_id                                                               | ${ note(product_id) }                                                  |
       | product_team_id                                                          | ${ note(product_team_id) }                                             |
       | ods_code                                                                 | F5H1R                                                                  |
@@ -81,7 +81,7 @@ Feature: Create MHS Device - success scenarios
       | id                                                                        | ${ note(device_id) }                                                                 |
       | name                                                                      | F5H1R-850000 - Message Handling System                                               |
       | status                                                                    | active                                                                               |
-      | env                                                                       | dev                                                                                  |
+      | environment                                                               | dev                                                                                  |
       | product_id                                                                | ${ note(product_id) }                                                                |
       | product_team_id                                                           | ${ note(product_team_id) }                                                           |
       | ods_code                                                                  | F5H1R                                                                                |
@@ -163,7 +163,7 @@ Feature: Create MHS Device - success scenarios
       | id                                                                       | << ignore >>                           |
       | name                                                                     | F5H1R-850000 - Message Handling System |
       | status                                                                   | active                                 |
-      | env                                                                      | dev                                    |
+      | environment                                                              | dev                                    |
       | product_id                                                               | ${ note(product_id) }                  |
       | product_team_id                                                          | ${ note(product_team_id) }             |
       | ods_code                                                                 | F5H1R                                  |
@@ -201,7 +201,7 @@ Feature: Create MHS Device - success scenarios
       | id                                                                       | ${ note(device_id) }                   |
       | name                                                                     | F5H1R-850000 - Message Handling System |
       | status                                                                   | active                                 |
-      | env                                                                      | dev                                    |
+      | environment                                                              | dev                                    |
       | product_id                                                               | ${ note(product_id) }                  |
       | product_team_id                                                          | ${ note(product_team_id) }             |
       | ods_code                                                                 | F5H1R                                  |

@@ -137,7 +137,7 @@ def test_parse_path_create_device():
         path="ProductTeam/123/Product/456/dev/Device",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
-        {"product_team_id": "123", "product_id": "456", "env": "dev"},
+        {"product_team_id": "123", "product_id": "456", "environment": "dev"},
         {},
         api.createDevice.index,
     )
@@ -157,7 +157,7 @@ def test_parse_path_read_device():
         {
             "product_team_id": "123",
             "product_id": "456",
-            "env": "dev",
+            "environment": "dev",
             "device_id": "789",
         },
         {},
@@ -176,7 +176,7 @@ def test_parse_path_create_device_reference_data():
         path="ProductTeam/123/Product/456/dev/DeviceReferenceData",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
-        {"product_team_id": "123", "product_id": "456", "env": "dev"},
+        {"product_team_id": "123", "product_id": "456", "environment": "dev"},
         {},
         api.createDeviceReferenceData.index,
     )
@@ -196,7 +196,7 @@ def test_parse_path_read_device_reference_data():
         {
             "product_team_id": "123",
             "product_id": "456",
-            "env": "dev",
+            "environment": "dev",
             "device_reference_data_id": "789",
         },
         {},
@@ -215,7 +215,7 @@ def test_parse_path_search_device_reference_data():
         path="ProductTeam/123/Product/456/dev/DeviceReferenceData",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
-        {"product_team_id": "123", "product_id": "456", "env": "dev"},
+        {"product_team_id": "123", "product_id": "456", "environment": "dev"},
         {},
         api.searchDeviceReferenceData.index,
     )
@@ -232,7 +232,7 @@ def test_parse_path_create_mhs_device():
         path="ProductTeam/123/Product/456/dev/Device/MessageHandlingSystem",  # pragma: allowlist secret
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
-        {"product_team_id": "123", "product_id": "456", "env": "dev"},
+        {"product_team_id": "123", "product_id": "456", "environment": "dev"},
         {},
         api.createDeviceMessageHandlingSystem.index,
     )
@@ -249,7 +249,7 @@ def test_parse_path_create_as_device():
         path="ProductTeam/123/Product/456/dev/Device/AccreditedSystem",  # pragma: allowlist secret
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
-        {"product_team_id": "123", "product_id": "456", "env": "dev"},
+        {"product_team_id": "123", "product_id": "456", "environment": "dev"},
         {},
         api.createDeviceAccreditedSystem.index,
     )

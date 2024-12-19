@@ -62,7 +62,7 @@ def test_index(version):
 
         # Set up DeviceReferenceData in DB
         device_reference_data = cpm_product.create_device_reference_data(
-            name=DEVICE_REFERENCE_DATA_NAME, env=Environment.DEV
+            name=DEVICE_REFERENCE_DATA_NAME, environment=Environment.DEV
         )
         device_reference_data_repo = DeviceReferenceDataRepository(
             table_name=TABLE_NAME, dynamodb_client=client
@@ -77,7 +77,7 @@ def test_index(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
-                    "env": Environment.DEV,
+                    "environment": Environment.DEV,
                     "device_reference_data_id": str(device_reference_data.id),
                 },
             }
@@ -90,7 +90,7 @@ def test_index(version):
     assert response_body["product_id"] == str(cpm_product.id)
     assert response_body["product_team_id"] == str(product_team.id)
     assert response_body["name"] == device_reference_data.name
-    assert response_body["env"] == Environment.DEV
+    assert response_body["environment"] == Environment.DEV
     assert response_body["ods_code"] == device_reference_data.ods_code
     assert response_body["updated_on"] is None
     assert response_body["deleted_on"] is None
@@ -153,7 +153,7 @@ def test_index_no_such_device_reference_data(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id),
-                    "env": Environment.DEV,
+                    "environment": Environment.DEV,
                     "device_reference_data_id": "does not exist",
                 },
             }
@@ -217,7 +217,7 @@ def test_index_no_such_product(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": "product that doesnt exist",
-                    "env": Environment.DEV,
+                    "environment": Environment.DEV,
                     "device_reference_data_id": "does not exist",
                 },
             }
@@ -271,7 +271,7 @@ def test_index_no_such_product_team(version):
                 "pathParameters": {
                     "product_id": str(PRODUCT_ID),
                     "product_team_id": str(PRODUCT_TEAM_ID),
-                    "env": Environment.DEV,
+                    "environment": Environment.DEV,
                     "device_reference_data_id": "123",
                 },
             }
@@ -339,7 +339,7 @@ def test_index_incorrect_env(version):
 
         # Set up DeviceReferenceData in DB
         device_reference_data = cpm_product.create_device_reference_data(
-            name=DEVICE_REFERENCE_DATA_NAME, env=Environment.DEV
+            name=DEVICE_REFERENCE_DATA_NAME, environment=Environment.DEV
         )
         device_reference_data_repo = DeviceReferenceDataRepository(
             table_name=TABLE_NAME, dynamodb_client=client
@@ -355,7 +355,7 @@ def test_index_incorrect_env(version):
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
                     "product_id": str(cpm_product.id.id),
-                    "env": "prod",
+                    "environment": "prod",
                     "device_id": str(device_reference_data.id),
                 },
             }

@@ -99,9 +99,9 @@ Feature: Create Device - failure scenarios
       | path | value     |
       | name | My Device |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                              |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                   |
-      | errors.0.message | SubCpmProductPathParams.env: value is not a valid enumeration member; permitted: 'dev', 'qa', 'ref', 'int', 'prod' |
+      | path             | value                                                                                                                      |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                           |
+      | errors.0.message | SubCpmProductPathParams.environment: value is not a valid enumeration member; permitted: 'dev', 'qa', 'ref', 'int', 'prod' |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |

@@ -124,13 +124,12 @@ def create_mhs_device(data, cache) -> Device:
     party_key: str = data[get_party_key]
     payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
     environment: Environment = data[read_environment]
-    # payload.__dict__["env"] = data[read_environment]
 
     # Create a new Device dictionary excluding 'questionnaire_responses'
     device_payload = payload.dict(exclude={"questionnaire_responses"})
     return product.create_device(
         name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key),
-        env=environment,
+        environment=environment,
         **device_payload,
     )
 

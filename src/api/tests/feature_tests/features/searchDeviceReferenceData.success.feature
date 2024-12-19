@@ -50,7 +50,7 @@ Feature: Search Device Reference Data - success scenarios
       | results.0.product_team_id         | ${ note(product_team_id) }          |
       | results.0.name                    | My Device Reference Data            |
       | results.0.status                  | active                              |
-      | results.0.env                     | dev                                 |
+      | results.0.environment             | dev                                 |
       | results.0.ods_code                | F5H1R                               |
       | results.0.created_on              | << ignore >>                        |
       | results.0.updated_on              | << ignore >>                        |
@@ -91,7 +91,7 @@ Feature: Search Device Reference Data - success scenarios
       | results.0.id                      | ${ note(device_reference_data_id_1) } |
       | results.0.name                    | My Device Reference Data 1            |
       | results.0.status                  | active                                |
-      | results.0.env                     | dev                                   |
+      | results.0.environment             | dev                                   |
       | results.0.product_id              | ${ note(product_id) }                 |
       | results.0.product_team_id         | ${ note(product_team_id) }            |
       | results.0.ods_code                | F5H1R                                 |
@@ -102,7 +102,7 @@ Feature: Search Device Reference Data - success scenarios
       | results.1.id                      | ${ note(device_reference_data_id_2) } |
       | results.1.name                    | My Device Reference Data 2            |
       | results.1.status                  | active                                |
-      | results.1.env                     | dev                                   |
+      | results.1.environment             | dev                                   |
       | results.1.product_id              | ${ note(product_id) }                 |
       | results.1.product_team_id         | ${ note(product_team_id) }            |
       | results.1.ods_code                | F5H1R                                 |
@@ -113,7 +113,7 @@ Feature: Search Device Reference Data - success scenarios
       | results.2.id                      | ${ note(device_reference_data_id_3) } |
       | results.2.name                    | My Device Reference Data 3            |
       | results.2.status                  | active                                |
-      | results.2.env                     | dev                                   |
+      | results.2.environment             | dev                                   |
       | results.2.product_id              | ${ note(product_id) }                 |
       | results.2.product_team_id         | ${ note(product_team_id) }            |
       | results.2.ods_code                | F5H1R                                 |

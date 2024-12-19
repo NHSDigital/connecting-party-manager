@@ -55,7 +55,7 @@ Feature: Create AS Device - success scenarios
       | name                                                         | F5H1R-850000/200000100000 - Accredited System |
       | status                                                       | active                                        |
       | product_id                                                   | ${ note(product_id) }                         |
-      | env                                                          | dev                                           |
+      | environment                                                  | dev                                           |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |
       | keys.0.key_type                                              | accredited_system_id                          |
@@ -88,7 +88,7 @@ Feature: Create AS Device - success scenarios
       | id                      | ${ note(device_id) }                          |
       | name                    | F5H1R-850000/200000100000 - Accredited System |
       | status                  | active                                        |
-      | env                     | dev                                           |
+      | environment             | dev                                           |
       | product_id              | ${ note(product_id) }                         |
       | product_team_id         | ${ note(product_team_id) }                    |
       | ods_code                | F5H1R                                         |
@@ -138,7 +138,7 @@ Feature: Create AS Device - success scenarios
       | id                                                           | << ignore >>                                  |
       | name                                                         | F5H1R-850000/200000100000 - Accredited System |
       | status                                                       | active                                        |
-      | env                                                          | dev                                           |
+      | environment                                                  | dev                                           |
       | product_id                                                   | ${ note(product_id) }                         |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |
@@ -172,7 +172,7 @@ Feature: Create AS Device - success scenarios
       | id                      | ${ note(device_id) }                          |
       | name                    | F5H1R-850000/200000100000 - Accredited System |
       | status                  | active                                        |
-      | env                     | dev                                           |
+      | environment             | dev                                           |
       | product_id              | ${ note(product_id) }                         |
       | product_team_id         | ${ note(product_team_id) }                    |
       | ods_code                | F5H1R                                         |
@@ -240,7 +240,7 @@ Feature: Create AS Device - success scenarios
       | id                                                           | << ignore >>                                  |
       | name                                                         | F5H1R-850000/200000100000 - Accredited System |
       | status                                                       | active                                        |
-      | env                                                          | dev                                           |
+      | environment                                                  | dev                                           |
       | product_id                                                   | ${ note(product_id) }                         |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |
@@ -280,7 +280,7 @@ Feature: Create AS Device - success scenarios
       | id                                                           | << ignore >>                                  |
       | name                                                         | F5H1R-850000/200000100001 - Accredited System |
       | status                                                       | active                                        |
-      | env                                                          | dev                                           |
+      | environment                                                  | dev                                           |
       | product_id                                                   | ${ note(product_id) }                         |
       | product_team_id                                              | ${ note(product_team_id) }                    |
       | ods_code                                                     | F5H1R                                         |

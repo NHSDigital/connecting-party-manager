@@ -28,7 +28,7 @@ def device():
         name="Foo",
         ods_code="ABC123",
         product_team_id="18934119-5780-4d28-b9be-0e6dff3908ba",
-        env=Environment.DEV,
+        environment=Environment.DEV,
         product_id="P.XXX-YYY",
     )
 
@@ -55,7 +55,7 @@ def another_good_questionnaire_response(
 
 
 def test_device_created_with_env(device: Device):
-    assert device.env == "dev"
+    assert device.environment == "dev"
 
 
 def test_device_created_with_datetime(device: Device):

@@ -24,7 +24,7 @@ def create_device(data, cache) -> Device:
     product: CpmProduct = data[read_product]
     payload: CreateDeviceIncomingParams = data[parse_device_payload]
     environment = data[read_environment]
-    return product.create_device(env=environment, **payload.dict())
+    return product.create_device(environment=environment, **payload.dict())
 
 
 def write_device(data: dict[str, CpmProduct], cache) -> CpmProduct:

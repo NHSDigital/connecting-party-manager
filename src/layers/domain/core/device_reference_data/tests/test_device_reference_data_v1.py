@@ -24,7 +24,7 @@ def test_add_questionnaire_response(questionnaire: Questionnaire):
 
     questionnaire_response = questionnaire.validate({"size": 4, "colour": "white"})
     device_reference_data = product.create_device_reference_data(
-        name="my-device-reference-data", env=Environment.DEV
+        name="my-device-reference-data", environment=Environment.DEV
     )
     event = device_reference_data.add_questionnaire_response(
         questionnaire_response=questionnaire_response

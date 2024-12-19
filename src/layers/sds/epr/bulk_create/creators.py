@@ -39,7 +39,7 @@ def create_message_sets(
 ) -> DeviceReferenceData:
     message_sets = product.create_device_reference_data(
         name=EprNameTemplate.MESSAGE_SETS.format(party_key=party_key),
-        env=Environment.PROD,
+        environment=Environment.PROD,
     )
     for _message_set in message_set_data:
         message_sets.add_questionnaire_response(_message_set)
@@ -56,7 +56,7 @@ def create_mhs_device(
 ) -> Device:
     mhs_device = product.create_device(
         name=EprNameTemplate.MHS_DEVICE.format(party_key=party_key),
-        env=Environment.PROD,
+        environment=Environment.PROD,
     )
     mhs_device.add_questionnaire_response(mhs_device_data)
     mhs_device.add_tags(mhs_tags)
@@ -76,7 +76,7 @@ def create_additional_interactions(
 ) -> DeviceReferenceData:
     additional_interactions = product.create_device_reference_data(
         name=EprNameTemplate.ADDITIONAL_INTERACTIONS.format(party_key=party_key),
-        env=Environment.PROD,
+        environment=Environment.PROD,
     )
     for additional_interaction in additional_interactions_data:
         additional_interactions.add_questionnaire_response(additional_interaction)
@@ -94,7 +94,7 @@ def create_as_device(
 ) -> Device:
     as_device = product.create_device(
         name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid),
-        env=Environment.PROD,
+        environment=Environment.PROD,
     )
     as_device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=asid)
     as_device.add_questionnaire_response(as_device_data)

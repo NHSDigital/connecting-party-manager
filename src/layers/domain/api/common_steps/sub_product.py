@@ -40,7 +40,7 @@ def read_product(data, cache) -> CpmProduct:
 
 def read_environment(data, cache) -> Environment:
     path_params: SubCpmProductPathParams = data[parse_path_params]
-    return path_params.env
+    return path_params.environment
 
 
 def get_party_key(data, cache) -> str:
