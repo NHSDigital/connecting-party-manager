@@ -104,7 +104,7 @@ def accredited_system_2() -> NhsMhs:
         nhsmhspartykey="AAA-456789",
         nhsproductkey="key-123",
         nhsasclient={"ABC", "JKL", "LMN"},
-        nhsassvcia={"interaction-id-2", "interaction-id-4"},
+        nhsassvcia={"interaction-id-3", "interaction-id-4"},
         nhsmhsmanufacturerorg="AAA",
     )
 
