@@ -1,7 +1,7 @@
 resource "aws_ssm_parameter" "billing_alert_subscribers" {
   name  = "${var.project}-billing-subscribers"
   type  = "StringList"
-  value = ""
+  value = "james.linnell@burendo.com,rowan.gill1@nhs.net,warran.mavrodaris2@nhs.net"
 }
 
 data "aws_ssm_parameter" "billing_alert_subscribers" {
