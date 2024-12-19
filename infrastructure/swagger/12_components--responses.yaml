@@ -55,6 +55,8 @@ components:
                     message: "Require a 'spine_mhs' questionnaire response to create a MHS Device"
                   - code: "VALIDATION_ERROR"
                     message: "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
+                  - code: "VALIDATION_ERROR"
+                    message: "Duplicate 'Interaction ID' provided: value '<INTERACTION ID>' occurs <N> times in the questionnaire response."
     SdsSearchDeviceBadRequest:
       description: searchSDSDevice Bad request
       content:

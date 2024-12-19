@@ -141,3 +141,9 @@ MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_WITH_SAME_UNIQUE_IDENTIFIER = read_ldif(
     "add/message_handling_system.AnotherWithSameUniqueIdentifier.ldif"
 )
+ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT = read_ldif(
+    "add/message_handling_system.SameProduct.ldif"
+)
+ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
+    "add/message_handling_system.SameProductTeam.DifferentProduct.ldif"
+)
