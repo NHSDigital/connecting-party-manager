@@ -85,7 +85,7 @@ def test_index() -> None:
         assert device_reference_data.product_id == product.id
         assert device_reference_data.product_team_id == product.product_team_id
         assert device_reference_data.name == DEVICE_REFERENCE_DATA_NAME
-        assert device_reference_data.env == Environment.DEV
+        assert device_reference_data.environment == Environment.DEV
         assert device_reference_data.ods_code == ODS_CODE
         assert device_reference_data.created_on.date() == datetime.today().date()
         assert device_reference_data.updated_on is None
@@ -99,7 +99,7 @@ def test_index() -> None:
         created_device_reference_data = repo.read(
             product_team_id=device_reference_data.product_team_id,
             product_id=device_reference_data.product_id,
-            environment=device_reference_data.env,
+            environment=device_reference_data.environment,
             id=device_reference_data.id,
         )
         assert created_device_reference_data == device_reference_data
