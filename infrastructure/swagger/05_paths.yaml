@@ -244,26 +244,6 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    get:
-      operationId: searchDeviceReferenceData
-      summary: Retrieve all Data Reference Data resources associated with a Product (GET)
-      parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
-        - $ref: "#/components/parameters/ProductId"
-        - $ref: "#/components/parameters/HeaderVersion"
-        - $ref: "#/components/parameters/HeaderRequestId"
-        - $ref: "#/components/parameters/HeaderCorrelationId"
-      responses:
-        "200":
-          $ref: "#/components/responses/DeviceRefDataSearch"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_searchDeviceReferenceData}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
 
   ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
   : post:
