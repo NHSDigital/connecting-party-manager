@@ -1,0 +1,92 @@
+[
+  {
+    "id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "name": "C3O9X (EPR)",
+    "ods_code": "C3O9X",
+    "status": "active",
+    "created_on": "2024-12-11T11:18:53.365591+00:00",
+    "updated_on": null,
+    "deleted_on": null,
+    "keys": [{ "key_type": "epr_id", "key_value": "EPR-C3O9X" }]
+  },
+  {
+    "id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "name": "My SPINE Product",
+    "ods_code": "C3O9X",
+    "status": "active",
+    "created_on": "2024-12-11T11:18:53.407960+00:00",
+    "updated_on": "2024-12-11T11:18:53.408432+00:00",
+    "deleted_on": null,
+    "keys": [{ "key_type": "party_key", "key_value": "C3O9X-823610" }]
+  },
+  {
+    "id": "fe15bd58-6897-4566-9a87-aab781fd96b5",
+    "name": "C3O9X-823610 - Message Handling System",
+    "status": "active",
+    "product_id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "ods_code": "C3O9X",
+    "created_on": "2024-12-11T11:18:53.532840+00:00",
+    "updated_on": "2024-12-11T11:18:53.534066+00:00",
+    "deleted_on": null,
+    "keys": [{ "key_type": "cpa_id", "key_value": "00000a84594b2ef34279" }],
+    "tags": [],
+    "questionnaire_responses": {
+      "spine_mhs/1": [
+        {
+          "id": "07dacf01-359a-4276-9dd2-e11ecb07076a",
+          "questionnaire_name": "spine_mhs",
+          "questionnaire_version": "1",
+          "data": {
+            "Managing Organization": "C3O9X",
+            "Address": "https://test.C3O9X.nhs.uk/",
+            "DNS Approver": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
+            "MHS Party key": "C3O9X-823610",
+            "Date Approved": "20231030092939",
+            "Approver URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
+            "Date DNS Approved": "20231030092939",
+            "Requestor URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
+            "Date Requested": "20231030092906",
+            "MHS Manufacturer Organisation": "C3O9X",
+            "MHS FQDN": "test.C3O9X.nhs.uk"
+          },
+          "created_on": "2024-12-11T11:18:53.456536+00:00"
+        }
+      ]
+    },
+    "device_reference_data": { "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*"] }
+  },
+  {
+    "id": "68cd98db-5d8d-45dc-ba9a-09e892535d83",
+    "name": "C3O9X-823610 - MHS Message Sets",
+    "status": "active",
+    "product_id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "ods_code": "C3O9X",
+    "questionnaire_responses": {
+      "spine_mhs_message_sets/1": [
+        {
+          "id": "2071f8ac-a020-4bf3-b413-c205004bfb08",
+          "questionnaire_name": "spine_mhs_message_sets",
+          "questionnaire_version": "1",
+          "data": {
+            "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
+            "MHS SN": "urn:nhs:names:services:ers",
+            "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001",
+            "Contract Property Template Key": "14",
+            "Interaction Type": "fhir",
+            "Product Key": "11929",
+            "MHS Is Authenticated": "none",
+            "MHS CPA ID": "00000a84594b2ef34279",
+            "Unique Identifier": "00000a84594b2ef34279"
+          },
+          "created_on": "2024-12-11T11:18:53.409854+00:00"
+        }
+      ]
+    },
+    "created_on": "2024-12-11T11:18:53.452472+00:00",
+    "updated_on": "2024-12-11T11:18:53.452853+00:00",
+    "deleted_on": null
+  }
+]

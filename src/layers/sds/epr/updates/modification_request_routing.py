@@ -64,7 +64,7 @@ def route_mhs_modification_request(
                 )
             case ModificationType.DELETE:
                 domain_objects += process_request_to_delete_from_mhs(
-                    field_name=field_name, **common_payload
+                    field_name=field_name, new_values=[], **common_payload
                 )
     return domain_objects
 

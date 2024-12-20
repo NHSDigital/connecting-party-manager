@@ -23,6 +23,7 @@ from sds.epr.creators import (
 from sds.epr.updaters import (
     UnexpectedModification,
     ldif_add_to_field_in_questionnaire,
+    ldif_remove_field_from_questionnaire,
     remove_erroneous_additional_interactions,
     update_message_sets,
 )
@@ -232,5 +233,26 @@ def test__ldif_modify_add_to_questionnaire_response__errors(
             field_name="colour",
             new_values=new_colours,
             current_data=current_data,
+            questionnaire=questionnaire,
+        )
+
+
+def test__ldif_remove_field_from_questionnaire(questionnaire):
+    new_questionnaire_response = ldif_remove_field_from_questionnaire(
+        field_name="sizes",
+        new_values=None,
+        current_data={"sizes": [5, 7], "colour": "blue"},
+        questionnaire=questionnaire,
+    )
+    assert new_questionnaire_response.data == {"colour": "blue"}
+
+
+def test__ldif_remove_field_from_questionnaire__errors(questionnaire: Questionnaire):
+    questionnaire.json_schema["required"] = ["sizes"]
+    with pytest.raises(UnexpectedModification):
+        ldif_remove_field_from_questionnaire(
+            field_name="sizes",
+            new_values=None,
+            current_data={"sizes": [5, 7], "colour": "blue"},
             questionnaire=questionnaire,
         )
