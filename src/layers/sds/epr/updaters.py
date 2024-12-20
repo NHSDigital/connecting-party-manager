@@ -1,4 +1,3 @@
-from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.questionnaire.v1 import Questionnaire, QuestionnaireResponse
 from sds.epr.constants import SdsFieldName
@@ -54,30 +53,7 @@ def update_message_sets(
     return message_sets
 
 
-def ldif_add_to_field_in_device_like(
-    device_like: Device | DeviceReferenceData,
-    field_name: str,
-    new_values: list[str],
-    questionnaire: Questionnaire,
-    current_questionnaire_response: QuestionnaireResponse,
-):
-    questionnaire_response = _ldif_modify_add_to_questionnaire_response(
-        new_values=new_values,
-        field_name=field_name,
-        current_data=current_questionnaire_response.data,
-        questionnaire=questionnaire,
-    )
-    device_like.remove_questionnaire_response(
-        questionnaire_id=current_questionnaire_response.questionnaire_id,
-        questionnaire_response_id=current_questionnaire_response.id,
-    )
-    device_like.add_questionnaire_response(
-        questionnaire_response=questionnaire_response
-    )
-    return device_like
-
-
-def _ldif_modify_add_to_questionnaire_response(
+def ldif_add_to_field_in_questionnaire(
     field_name: str,
     new_values: list[str],
     current_data: dict[str, list[str] | str],

@@ -1,9 +1,7 @@
 import json
-from collections.abc import Callable
 
 import pytest
 from domain.core.cpm_product.v1 import CpmProduct
-from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.questionnaire.v1 import (
     Questionnaire,
@@ -24,8 +22,7 @@ from sds.epr.creators import (
 )
 from sds.epr.updaters import (
     UnexpectedModification,
-    _ldif_modify_add_to_questionnaire_response,
-    ldif_add_to_field_in_device_like,
+    ldif_add_to_field_in_questionnaire,
     remove_erroneous_additional_interactions,
     update_message_sets,
 )
@@ -163,36 +160,6 @@ def test_update_message_sets(message_sets: DeviceReferenceData):
     assert initial_state == final_state
 
 
-@pytest.mark.parametrize(
-    "creator", [CpmProduct.create_device, CpmProduct.create_device_reference_data]
-)
-def test_ldif_add_to_field_in_device_like__with_device(
-    questionnaire: Questionnaire,
-    product: CpmProduct,
-    creator: Callable[[CpmProduct, str], Device | DeviceReferenceData],
-):
-    questionnaire_response = questionnaire.validate({})
-
-    device_like: Device | DeviceReferenceData = creator(self=product, name="my device")
-    device_like.add_questionnaire_response(
-        questionnaire_response=questionnaire_response
-    )
-    _device_like = ldif_add_to_field_in_device_like(
-        device_like=device_like,
-        field_name="colour",
-        new_values=["red"],
-        questionnaire=questionnaire,
-        current_questionnaire_response=questionnaire_response,
-    )
-    (updated_questionnaire_response,) = _device_like.questionnaire_responses[
-        questionnaire_response.questionnaire_id
-    ]
-
-    assert device_like is _device_like
-    assert updated_questionnaire_response is not questionnaire_response
-    assert updated_questionnaire_response.data == {"colour": "red"}
-
-
 @pytest.fixture
 def questionnaire():
     return Questionnaire(
@@ -240,7 +207,7 @@ def questionnaire():
 def test__ldif_modify_add_to_questionnaire_response(
     current_data, field_name_to_modify, new_values, updated_data, questionnaire
 ):
-    new_questionnaire_response = _ldif_modify_add_to_questionnaire_response(
+    new_questionnaire_response = ldif_add_to_field_in_questionnaire(
         field_name=field_name_to_modify,
         new_values=new_values,
         current_data=current_data,
@@ -261,7 +228,7 @@ def test__ldif_modify_add_to_questionnaire_response__errors(
     current_data, new_colours, expected_exception, questionnaire
 ):
     with pytest.raises(expected_exception):
-        _ldif_modify_add_to_questionnaire_response(
+        ldif_add_to_field_in_questionnaire(
             field_name="colour",
             new_values=new_colours,
             current_data=current_data,

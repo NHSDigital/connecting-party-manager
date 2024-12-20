@@ -1,10 +1,12 @@
+from typing import Callable
+
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKey, DeviceKeyType
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.error import ImmutableFieldError
 from domain.core.product_team.v1 import ProductTeam
-from domain.core.questionnaire.v1 import Questionnaire
+from domain.core.questionnaire.v1 import Questionnaire, QuestionnaireResponse
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
@@ -23,7 +25,7 @@ from sds.epr.readers import (
 )
 from sds.epr.updaters import (
     UnexpectedModification,
-    ldif_add_to_field_in_device_like,
+    ldif_add_to_field_in_questionnaire,
     remove_erroneous_additional_interactions,
     update_message_sets,
 )
@@ -163,7 +165,7 @@ def process_request_to_delete_as(
     raise NotImplementedError()
 
 
-def process_request_to_add_to_mhs(
+def _process_request_to_modify_mhs(
     device: Device,
     cpa_id_to_modify: str,
     field_name: str,
@@ -173,6 +175,15 @@ def process_request_to_add_to_mhs(
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
+    ldif_modify_field_in_questionnaire: Callable[
+        [
+            str,
+            list[str],
+            Questionnaire,
+            QuestionnaireResponse,
+        ],
+        QuestionnaireResponse,
+    ],
 ) -> list[Device | DeviceReferenceData]:
     """
     * MHS Device has been passed in by CPA ID
@@ -207,21 +218,34 @@ def process_request_to_add_to_mhs(
 
     # Route the operation
     if modify_message_sets:
-        message_sets = ldif_add_to_field_in_device_like(
-            device_like=message_sets,
+        updated_questionnaire_response = ldif_modify_field_in_questionnaire(
             field_name=translated_field,
             new_values=new_values,
+            current_data=message_set_to_modify.data,
             questionnaire=message_set_questionnaire,
-            current_questionnaire_response=message_set_to_modify,
+        )
+        message_sets.remove_questionnaire_response(
+            questionnaire_id=message_set_to_modify.questionnaire_id,
+            questionnaire_response_id=message_set_to_modify.id,
+        )
+        message_sets.add_questionnaire_response(
+            questionnaire_response=updated_questionnaire_response
         )
     elif modify_mhs_device:
-        device = ldif_add_to_field_in_device_like(
-            device_like=device,
+        updated_questionnaire_response = ldif_modify_field_in_questionnaire(
             field_name=translated_field,
             new_values=new_values,
+            current_data=device_questionnaire_to_modify.data,
             questionnaire=mhs_device_questionnaire,
-            current_questionnaire_response=device_questionnaire_to_modify,
         )
+        device.remove_questionnaire_response(
+            questionnaire_id=device_questionnaire_to_modify.questionnaire_id,
+            questionnaire_response_id=device_questionnaire_to_modify.id,
+        )
+        device.add_questionnaire_response(
+            questionnaire_response=updated_questionnaire_response
+        )
+
     else:
         # Should not be reachable, but better to bail to avoid unexpected side-effects
         raise UnexpectedModification(
@@ -231,6 +255,31 @@ def process_request_to_add_to_mhs(
         )
 
     return [device, message_sets]
+
+
+def process_request_to_add_to_mhs(
+    device: Device,
+    cpa_id_to_modify: str,
+    field_name: str,
+    new_values: set[str],
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    mhs_device_questionnaire: Questionnaire,
+    mhs_device_field_mapping: dict,
+    message_set_questionnaire: Questionnaire,
+    message_set_field_mapping: dict,
+) -> list[Device | DeviceReferenceData]:
+    return _process_request_to_modify_mhs(
+        device=device,
+        cpa_id_to_modify=cpa_id_to_modify,
+        field_name=field_name,
+        new_values=new_values,
+        device_reference_data_repository=device_reference_data_repository,
+        mhs_device_questionnaire=mhs_device_questionnaire,
+        mhs_device_field_mapping=mhs_device_field_mapping,
+        message_set_questionnaire=message_set_questionnaire,
+        message_set_field_mapping=message_set_field_mapping,
+        ldif_modify_field_in_questionnaire=ldif_add_to_field_in_questionnaire,
+    )
 
 
 def process_request_to_replace_in_mhs(
@@ -249,13 +298,14 @@ def process_request_to_replace_in_mhs(
 
 def process_request_to_delete_from_mhs(
     device: Device,
+    cpa_id_to_modify: str,
     field_name: str,
+    new_values: set[str],
     device_reference_data_repository: DeviceReferenceDataRepository,
     mhs_device_questionnaire: Questionnaire,
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
-    additional_interactions_questionnaire: Questionnaire,
 ) -> list[Device, DeviceReferenceData, DeviceReferenceData]:
     raise NotImplementedError()
 

@@ -30,7 +30,9 @@ from test_helpers.dynamodb import mock_table
 
 CPA_ID_TO_MODIFY = "123"
 MESSAGE_SET_FIELD_TO_ADD_TO = "nhs_mhs_is_authenticated"
+MESSAGE_SET_FIELD_TO_DELETE = "nhs_contract_property_template_key"
 DEVICE_FIELD_TO_ADD_TO = "nhs_product_version"
+DEVICE_FIELD_TO_DELETE = "nhs_product_name"
 
 
 @pytest.fixture
@@ -159,7 +161,6 @@ def message_sets_correctly_updated(
 ):
     assert final_message_sets["id"] == initial_message_sets["id"]
     assert final_message_sets["created_on"] == initial_message_sets["created_on"]
-    assert final_message_sets["updated_on"] > initial_message_sets["updated_on"]
 
     # Responses should be same length
     initial_responses = initial_message_sets["questionnaire_responses"][
@@ -200,7 +201,6 @@ def mhs_device_correctly_updated(
 ):
     assert final_device["id"] == initial_device["id"]
     assert final_device["created_on"] == initial_device["created_on"]
-    assert final_device["updated_on"] > initial_device["updated_on"]
 
     # Responses should be same length
     initial_responses = initial_device["questionnaire_responses"][
@@ -217,7 +217,9 @@ def mhs_device_correctly_updated(
     (final_responses_data,) = (message_set["data"] for message_set in final_responses)
 
     assert field_name not in initial_responses_data
-    assert final_responses_data.pop(field_name) == new_value
+
+    initial_value = final_responses_data.pop(field_name)
+    assert initial_value == new_value
     assert initial_responses_data == final_responses_data
     return True
 
@@ -259,6 +261,7 @@ def test_process_request_to_add_to_mhs__message_set_add_to_empty_non_list_field_
         field_name=_field_to_modify,
         new_value=new_value,
     )
+    assert final_message_sets["updated_on"] > initial_message_sets["updated_on"]
 
 
 def test_process_request_to_add_to_mhs__message_set_add_to_existing_non_list_field_raises_error(
@@ -302,7 +305,7 @@ def test_process_request_to_add_to_mhs__device_add_to_empty_non_list_field_with_
 ):
     device_reference_data_repository.write(message_sets)
 
-    message_set_field_mapping = QuestionnaireRepository().read_field_mapping(
+    mhs_device_field_mapping = QuestionnaireRepository().read_field_mapping(
         QuestionnaireInstance.SPINE_MHS
     )
 
@@ -310,7 +313,7 @@ def test_process_request_to_add_to_mhs__device_add_to_empty_non_list_field_with_
     initial_message_sets = message_sets.state()
 
     field_to_modify = DEVICE_FIELD_TO_ADD_TO
-    _field_to_modify = message_set_field_mapping[field_to_modify]
+    _field_to_modify = mhs_device_field_mapping[field_to_modify]
     new_value = "2001.01"
 
     _device, _message_sets = process_request_to_add_to_mhs(
@@ -331,6 +334,7 @@ def test_process_request_to_add_to_mhs__device_add_to_empty_non_list_field_with_
         field_name=_field_to_modify,
         new_value=new_value,
     )
+    assert final_device["updated_on"] > initial_device["updated_on"]
 
 
 def test_process_request_to_add_to_mhs__device_add_to_existing_non_list_field_raises_error(
