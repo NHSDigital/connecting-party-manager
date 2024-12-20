@@ -41,7 +41,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 388              |
+      | Content-Length | 396              |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -63,7 +63,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 388              |
+      | Content-Length | 396              |
 
     Examples:
       | product_team_id            |
@@ -105,7 +105,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 388              |
+      | Content-Length | 396              |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -127,7 +127,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 388              |
+      | Content-Length | 396              |
 
     Examples:
       | product_team_id            | product_id            |

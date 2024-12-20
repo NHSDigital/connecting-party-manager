@@ -105,4 +105,4 @@ Feature: Create Device - failure scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 171              |
+      | Content-Length | 179              |
