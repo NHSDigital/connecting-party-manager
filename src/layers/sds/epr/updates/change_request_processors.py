@@ -2,6 +2,7 @@ from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKey, DeviceKeyType
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.error import ImmutableFieldError
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire.v1 import Questionnaire
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
@@ -10,20 +11,24 @@ from domain.repository.device_reference_data_repository.v1 import (
 )
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
-from sds.epr.constants import SdsDeviceReferenceDataPath, SdsFieldName
+from sds.epr.constants import CPM_MHS_IMMUTABLE_FIELDS, SdsDeviceReferenceDataPath
 from sds.epr.getters import get_message_set_data, get_mhs_device_data
 from sds.epr.readers import (
     read_additional_interactions_if_exists,
+    read_message_sets_from_mhs_device,
     read_or_create_empty_message_sets,
     read_or_create_epr_product,
     read_or_create_epr_product_team,
     read_or_create_mhs_device,
 )
 from sds.epr.updaters import (
+    UnexpectedModification,
+    ldif_add_to_field_in_device_like,
     remove_erroneous_additional_interactions,
     update_message_sets,
 )
 from sds.epr.updates.etl_device import EtlDevice
+from sds.epr.utils import filter_message_set_by_cpa_id
 
 
 def process_request_to_add_mhs(
@@ -131,24 +136,18 @@ def process_request_to_delete_mhs(
     * If no more keys left in this Device then hard delete the Device
     """
     etl_device = EtlDevice(**device.state())
-
-    (message_sets_id,) = device.device_reference_data.keys()
-    message_sets = device_reference_data_repository.read(
-        product_team_id=device.product_team_id,
-        product_id=device.product_id,
-        id=message_sets_id,
-    )
-    (message_sets_questionnaire_id,) = message_sets.questionnaire_responses.keys()
-    (message_set_id_to_delete,) = {
-        qr.id
-        for qr in message_sets.questionnaire_responses[message_sets_questionnaire_id]
-        if qr.data[SdsFieldName.CPA_ID] == cpa_id_to_delete
-    }
-
     etl_device.delete_key(key_type=DeviceKeyType.CPA_ID, key_value=cpa_id_to_delete)
+
+    message_sets = read_message_sets_from_mhs_device(
+        device_reference_data_repository=device_reference_data_repository,
+        mhs_device=device,
+    )
+    message_set_to_delete = filter_message_set_by_cpa_id(
+        cpa_id=cpa_id_to_delete, message_sets=message_sets
+    )
     message_sets.remove_questionnaire_response(
-        questionnaire_id=message_sets_questionnaire_id,
-        questionnaire_response_id=message_set_id_to_delete,
+        questionnaire_id=message_set_to_delete.questionnaire_id,
+        questionnaire_response_id=message_set_to_delete.id,
     )
     if len(etl_device.keys) == 0:
         etl_device.hard_delete()
@@ -166,6 +165,7 @@ def process_request_to_delete_as(
 
 def process_request_to_add_to_mhs(
     device: Device,
+    cpa_id_to_modify: str,
     field_name: str,
     new_values: set[str],
     device_reference_data_repository: DeviceReferenceDataRepository,
@@ -173,9 +173,64 @@ def process_request_to_add_to_mhs(
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
-    additional_interactions_questionnaire: Questionnaire,
-) -> list[Device, DeviceReferenceData, DeviceReferenceData]:
-    raise NotImplementedError()
+) -> list[Device | DeviceReferenceData]:
+    """
+    * MHS Device has been passed in by CPA ID
+    * Updates EITHER:
+    ** the MHS Device Questionnaire Response, OR
+    ** the Message Sets Questionnaire Response that corresponds to this CPA ID
+    * If the modified field is an interaction ID, then fix-up the Additional Interactions
+      Questionnaire Responses as well
+    """
+    message_set_field = message_set_field_mapping.get(field_name)
+    mhs_device_field = mhs_device_field_mapping.get(field_name)
+    translated_field = message_set_field or mhs_device_field
+
+    if translated_field in CPM_MHS_IMMUTABLE_FIELDS:
+        raise ImmutableFieldError(
+            f"'{field_name}' is an immutable MHS field in the context of EPR in CPM"
+        )
+
+    # Read and filter inputs
+    ((device_questionnaire_to_modify,),) = device.questionnaire_responses.values()
+    message_sets = read_message_sets_from_mhs_device(
+        device_reference_data_repository=device_reference_data_repository,
+        mhs_device=device,
+    )
+    message_set_to_modify = filter_message_set_by_cpa_id(
+        cpa_id=cpa_id_to_modify, message_sets=message_sets
+    )
+
+    # Determine which objects need to be modified
+    modify_message_sets = message_set_field and not mhs_device_field
+    modify_mhs_device = mhs_device_field and not message_set_field
+
+    # Route the operation
+    if modify_message_sets:
+        message_sets = ldif_add_to_field_in_device_like(
+            device_like=message_sets,
+            field_name=translated_field,
+            new_values=new_values,
+            questionnaire=message_set_questionnaire,
+            current_questionnaire_response=message_set_to_modify,
+        )
+    elif modify_mhs_device:
+        device = ldif_add_to_field_in_device_like(
+            device_like=device,
+            field_name=translated_field,
+            new_values=new_values,
+            questionnaire=mhs_device_questionnaire,
+            current_questionnaire_response=device_questionnaire_to_modify,
+        )
+    else:
+        # Should not be reachable, but better to bail to avoid unexpected side-effects
+        raise UnexpectedModification(
+            f"No strategy implemented for field name '{field_name}' given "
+            f"MHS Device fields {list(mhs_device_field_mapping.keys())} and "
+            f"Message Set fields {list(message_set_field_mapping.keys())}"
+        )
+
+    return [device, message_sets]
 
 
 def process_request_to_replace_in_mhs(
