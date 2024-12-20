@@ -11,12 +11,12 @@ def _questionnaire_response_from_field_mapping_subset(
     Runs Questionnaire.validate against the subset of fields in 'obj'
     that exist in 'field_mapping'
     """
+    required_fields = set(questionnaire.json_schema["required"])
     raw_translated_subset = {
-        field_mapping[k]: (
-            sorted(v) if is_list_like(v) else v
-        )  # POSSIBLE ENHANCEMENT: can do sorting on ingestion
+        field_mapping[k]: (sorted(v) if is_list_like(v) else v)
         for k, v in obj.items()
-        if k in field_mapping and v is not None
+        if (k in field_mapping and v is not None)
+        or field_mapping.get(k) in required_fields
     }
     return questionnaire.validate(raw_translated_subset)
 

@@ -4,64 +4,10 @@ from uuid import UUID, uuid4
 import jsonschema
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.base import BaseModel
-from domain.core.error import ConfigurationError
 from domain.core.timestamp import now
 from pydantic import Field, Json, validator
-from sds.epr.constants import SdsFieldName
 
 REQUIRED = "required"
-
-
-# This will be moved as part of a QuestionnaireInstance refactor
-def generate_spine_mhs_fields(response: dict, **kwargs) -> None:
-    required_fields = [SdsFieldName.MHS_FQDN]
-    missing_fields = [field for field in required_fields if not response.get(field)]
-    if missing_fields:
-        # use questionnaire instance for questionnaire name?
-        raise ConfigurationError(
-            f"The following required fields are missing in the response to spine_mhs: {', '.join(missing_fields)}"
-        )
-
-    response[str(SdsFieldName.ADDRESS)] = (
-        f"https://{response.get(SdsFieldName.MHS_FQDN)}"
-    )
-    party_key = kwargs.get("party_key")
-    response[str(SdsFieldName.PARTY_KEY)] = party_key
-    response[str(SdsFieldName.MANAGING_ORGANIZATION)] = party_key.split("-")[0]
-    response[str(SdsFieldName.DATE_APPROVED)] = str(now())
-    response[str(SdsFieldName.DATE_REQUESTED)] = str(now())
-    response[str(SdsFieldName.DATE_DNS_APPROVED)] = str(None)
-
-
-def generate_spine_mhs_message_sets_fields(response: dict, **kwargs):
-    """
-    Generates system fields for a given questionnaire response.
-    """
-
-    # Ensure required fields for system-generated fields are present
-    required_fields = [SdsFieldName.MHS_SN, SdsFieldName.MHS_IN]
-    missing_fields = [field for field in required_fields if not response.get(field)]
-    if missing_fields:
-        raise ConfigurationError(
-            f"The following required fields are missing in the response to spine_mhs_message_sets: {', '.join(missing_fields)}"
-        )
-
-    # Generate system fields
-    response[str(SdsFieldName.INTERACTION_ID)] = (
-        f"{response.get(SdsFieldName.MHS_SN)}:{response.get(SdsFieldName.MHS_IN)}"
-    )
-    party_key = kwargs.get("party_key")
-    response[str(SdsFieldName.CPA_ID)] = (
-        f"{party_key}:{response[SdsFieldName.INTERACTION_ID]}"
-    )
-    response[str(SdsFieldName.UNIQUE_IDENTIFIER)] = response[SdsFieldName.CPA_ID]
-
-
-# Mapping of QuestionnaireInstance to field generation functions
-FIELD_GENERATION_STRATEGIES = {
-    "spine_mhs": generate_spine_mhs_fields,
-    "spine_mhs_message_sets": generate_spine_mhs_message_sets_fields,
-}
 
 
 class QuestionnaireResponseValidationError(Exception): ...
@@ -128,17 +74,6 @@ class Questionnaire(AggregateRoot):
             for field_name, field_attrs in properties.items()
             if field_attrs.get("system generated") is True
         ]
-
-    def generate_system_fields(self, response: dict, instance, **kwargs) -> None:
-        """
-        Delegates system field generation to the appropriate strategy.
-        """
-        strategy = FIELD_GENERATION_STRATEGIES.get(instance)
-        if not strategy:
-            raise NotImplementedError(
-                f"System field generation is not implemented for {instance}"
-            )
-        strategy(response, **kwargs)
 
 
 class QuestionnaireResponse(BaseModel):
