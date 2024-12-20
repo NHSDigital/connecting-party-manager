@@ -9,6 +9,7 @@ from domain.core.device.v1 import (
     DeviceCreatedEvent,
     DeviceKeyAddedEvent,
     DeviceReferenceDataIdAddedEvent,
+    DeviceTagsAddedEvent,
 )
 from domain.core.device.v1 import (
     QuestionnaireResponseUpdatedEvent as DeviceQuestionnaireUpdatedEvent,
@@ -46,6 +47,7 @@ from sds.epr.creators import (
 )
 from sds.epr.getters import (
     get_accredited_system_device_data,
+    get_accredited_system_tags,
     get_additional_interactions_data,
     get_message_set_data,
 )
@@ -98,10 +100,53 @@ def accredited_system(accredited_system_1: NhsMhs):
 
 
 @pytest.fixture
+def as_tags():
+    return [
+        [
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-1",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-1",
+                "nhs_mhs_party_key": "AAA-123456",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-2",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-2",
+                "nhs_mhs_party_key": "AAA-123456",
+            },
+        ]
+    ]
+
+
+@pytest.fixture
 def another_accredited_system(accredited_system):
     accredited_system["nhs_as_svc_ia"] = ["another-interaction-id"]
     accredited_system["unique_identifier"] = "456789"
     return accredited_system
+
+
+@pytest.fixture
+def as_tags_2():
+    return [
+        [
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "another-interaction-id",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "another-interaction-id",
+                "nhs_mhs_party_key": "AAA-123456",
+            },
+        ]
+    ]
 
 
 @pytest.fixture
@@ -182,6 +227,7 @@ def initial_accredited_system_device(
             QuestionnaireInstance.SPINE_AS
         ),
     )
+    as_tags = get_accredited_system_tags(accredited_system)
 
     return create_as_device(
         product=initial_product,
@@ -190,6 +236,7 @@ def initial_accredited_system_device(
         as_device_data=accredited_system_device_data,
         message_sets_id=empty_message_sets.id,
         additional_interactions_id=initial_additional_interactions.id,
+        as_tags=as_tags,
     )
 
 
@@ -210,6 +257,7 @@ def another_accredited_system_device(
             QuestionnaireInstance.SPINE_AS
         ),
     )
+    as_tags = get_accredited_system_tags(another_accredited_system)
 
     return create_as_device(
         product=initial_product,
@@ -218,6 +266,7 @@ def another_accredited_system_device(
         as_device_data=accredited_system_device_data,
         message_sets_id=empty_message_sets.id,
         additional_interactions_id=initial_additional_interactions.id,
+        as_tags=as_tags,
     )
 
 
@@ -252,8 +301,18 @@ def expected_device(initial_accredited_system_device):
 
 
 @pytest.fixture
+def expected_device_tags(as_tags):
+    return as_tags
+
+
+@pytest.fixture
 def expected_additional_device(another_accredited_system_device):
     return another_accredited_system_device
+
+
+@pytest.fixture
+def expected_additional_device_tags(as_tags_2):
+    return as_tags_2
 
 
 def equivalent_questionnaire_responses[
@@ -333,6 +392,7 @@ def test_process_request_to_add_as_no_initial_state(
         device_created_event,
         device_key_added_event,
         device_questionnaire_updated,
+        device_tags_added_event,
         device_ref_data_added_event_message_sets,
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
@@ -356,6 +416,7 @@ def test_process_request_to_add_as_no_initial_state(
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(device_tags_added_event, DeviceTagsAddedEvent)
     assert isinstance(
         device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
     )
@@ -407,6 +468,7 @@ def test_process_request_to_add_device_product_team_exists(
         device_created_event,
         device_key_added_event,
         device_questionnaire_updated,
+        device_tags_added_event,
         device_ref_data_added_event_message_sets,
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
@@ -430,6 +492,7 @@ def test_process_request_to_add_device_product_team_exists(
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(device_tags_added_event, DeviceTagsAddedEvent)
     assert isinstance(
         device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
     )
@@ -484,6 +547,7 @@ def test_process_request_to_add_device_product_exists(
         device_created_event,
         device_key_added_event,
         device_questionnaire_updated,
+        device_tags_added_event,
         device_ref_data_added_event_message_sets,
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
@@ -504,6 +568,7 @@ def test_process_request_to_add_device_product_exists(
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(device_tags_added_event, DeviceTagsAddedEvent)
     assert isinstance(
         device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
     )
@@ -558,6 +623,7 @@ def test_process_request_to_add_device_message_set_exists(
         device_created_event,
         device_key_added_event,
         device_questionnaire_updated,
+        device_tags_added_event,
         device_ref_data_added_event_message_sets,
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
@@ -571,6 +637,7 @@ def test_process_request_to_add_device_message_set_exists(
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(device_tags_added_event, DeviceTagsAddedEvent)
     assert isinstance(
         device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
     )
@@ -622,6 +689,7 @@ def test_process_request_to_add_device_additional_interactions_exists(
         device_created_event,
         device_key_added_event,
         device_questionnaire_updated,
+        device_tags_added_event,
         device_ref_data_added_event_message_sets,
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
@@ -632,6 +700,7 @@ def test_process_request_to_add_device_additional_interactions_exists(
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(device_tags_added_event, DeviceTagsAddedEvent)
     assert isinstance(
         device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
     )
@@ -693,6 +762,7 @@ def test_process_request_to_add_as_device_exists(
         device_created_event,
         device_key_added_event,
         device_questionnaire_updated,
+        device_tags_added_event,
         device_ref_data_added_event_message_sets,
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
@@ -704,6 +774,7 @@ def test_process_request_to_add_as_device_exists(
     assert isinstance(device_created_event, DeviceCreatedEvent)
     assert isinstance(device_questionnaire_updated, DeviceQuestionnaireUpdatedEvent)
     assert isinstance(device_key_added_event, DeviceKeyAddedEvent)
+    assert isinstance(device_tags_added_event, DeviceTagsAddedEvent)
     assert isinstance(
         device_ref_data_added_event_message_sets, DeviceReferenceDataIdAddedEvent
     )

@@ -13,6 +13,7 @@ from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from sds.epr.constants import SdsDeviceReferenceDataPath
 from sds.epr.getters import (
     get_accredited_system_device_data,
+    get_accredited_system_tags,
     get_message_set_data,
     get_mhs_device_data,
 )
@@ -161,6 +162,8 @@ def process_request_to_add_as(
         accredited_system_questionnaire=accredited_system_questionnaire,
         accredited_system_field_mapping=accredited_system_field_mapping,
     )
+    as_tags = get_accredited_system_tags(accredited_system)
+
     accredited_system_device = read_or_create_as_device(
         device_repository=device_repository,
         asid=asid,
@@ -170,6 +173,7 @@ def process_request_to_add_as(
         message_sets=message_sets,
         additional_interactions=additional_interactions,
         accredited_system_device_data=accredited_system_device_data,
+        as_tags=as_tags,
     )
 
     asid_key = DeviceKey(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=asid)

@@ -94,12 +94,14 @@ def create_as_device(
     as_device_data: QuestionnaireResponse,
     message_sets_id: str,
     additional_interactions_id: str,
+    as_tags: list[dict],
 ) -> Device:
     as_device = product.create_device(
         name=EprNameTemplate.AS_DEVICE.format(party_key=party_key, asid=asid)
     )
     as_device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=asid)
     as_device.add_questionnaire_response(as_device_data)
+    as_device.add_tags(tags=as_tags)
     as_device.add_device_reference_data_id(
         device_reference_data_id=message_sets_id,
         path_to_data=[SdsDeviceReferenceDataPath.ALL_INTERACTION_IDS],

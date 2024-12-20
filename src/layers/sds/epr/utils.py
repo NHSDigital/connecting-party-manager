@@ -36,11 +36,15 @@ def get_interaction_ids(
         message_sets_or_additional_interactions.questionnaire_responses.values()
     )
 
-    # Handle the case where questionnaire_responses is empty
-    if not questionnaire_responses:
-        return set()
+    try:
+        (questionnaire_responses,) = (
+            message_sets_or_additional_interactions.questionnaire_responses.values()
+        )
+    except ValueError:
+        interaction_ids = set()
+    else:
+        interaction_ids = {
+            qr.data[SdsFieldName.INTERACTION_ID] for qr in questionnaire_responses
+        }
 
-    return {
-        qr.data[SdsFieldName.INTERACTION_ID]
-        for qr in next(iter(questionnaire_responses), [])
-    }
+    return interaction_ids

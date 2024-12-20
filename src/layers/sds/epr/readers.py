@@ -152,6 +152,7 @@ def read_or_create_as_device(
     message_sets: DeviceReferenceData,
     additional_interactions: DeviceReferenceData,
     accredited_system_device_data: QuestionnaireResponse,
+    as_tags: list[dict],
 ) -> Device:
     devices = device_repository.search(
         product_team_id=product_team.id, product_id=product.id
@@ -167,5 +168,6 @@ def read_or_create_as_device(
             as_device_data=accredited_system_device_data,
             message_sets_id=message_sets.id,
             additional_interactions_id=additional_interactions.id,
+            as_tags=as_tags,
         )
     return as_device
