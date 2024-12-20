@@ -1,7 +1,12 @@
+import json
+
 import pytest
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.repository.device_repository.v1 import DeviceRepository
+from domain.core.questionnaire.v1 import (
+    Questionnaire,
+    QuestionnaireResponseValidationError,
+)
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
     QuestionnaireRepository,
 )
@@ -16,12 +21,12 @@ from sds.epr.creators import (
     create_message_sets,
 )
 from sds.epr.updaters import (
+    UnexpectedModification,
+    ldif_add_to_field_in_questionnaire,
     remove_erroneous_additional_interactions,
     update_message_sets,
 )
 from sds.epr.utils import get_interaction_ids
-
-from test_helpers.dynamodb import mock_table
 
 
 @pytest.fixture
@@ -75,12 +80,6 @@ def additional_interactions(product: CpmProduct):
         party_key=product.keys[0].key_value,
         additional_interactions_data=additional_interactions_data,
     )
-
-
-@pytest.fixture
-def device_repository():
-    with mock_table("foo") as client:
-        yield DeviceRepository(table_name="foo", dynamodb_client=client)
 
 
 def test_remove_erroneous_additional_interactions(
@@ -159,3 +158,79 @@ def test_update_message_sets(message_sets: DeviceReferenceData):
 
     del initial_state["questionnaire_responses"]
     assert initial_state == final_state
+
+
+@pytest.fixture
+def questionnaire():
+    return Questionnaire(
+        name="my questionnaire",
+        version="1",
+        json_schema=json.dumps(
+            {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                    "sizes": {
+                        "type": "array",
+                    },
+                    "colour": {"type": "string"},
+                },
+                "additionalProperties": False,
+            }
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ["current_data", "field_name_to_modify", "new_values", "updated_data"],
+    [
+        (
+            {"sizes": [5, 7], "colour": "blue"},
+            "sizes",
+            [6, 8],
+            {"sizes": [5, 7, 6, 8], "colour": "blue"},
+        ),
+        (
+            {"colour": "blue"},
+            "sizes",
+            [6, 8],
+            {"sizes": [6, 8], "colour": "blue"},
+        ),
+        (
+            {"sizes": [5, 7]},
+            "colour",
+            ["red"],
+            {"sizes": [5, 7], "colour": "red"},
+        ),
+    ],
+)
+def test__ldif_modify_add_to_questionnaire_response(
+    current_data, field_name_to_modify, new_values, updated_data, questionnaire
+):
+    new_questionnaire_response = ldif_add_to_field_in_questionnaire(
+        field_name=field_name_to_modify,
+        new_values=new_values,
+        current_data=current_data,
+        questionnaire=questionnaire,
+    )
+    assert new_questionnaire_response.data == updated_data
+
+
+@pytest.mark.parametrize(
+    ["current_data", "new_colours", "expected_exception"],
+    [
+        ({"colour": "blue"}, ["red"], UnexpectedModification),
+        ({"colour": "blue"}, ["red", "blue"], UnexpectedModification),
+        ({}, [1], QuestionnaireResponseValidationError),  # not a string
+    ],
+)
+def test__ldif_modify_add_to_questionnaire_response__errors(
+    current_data, new_colours, expected_exception, questionnaire
+):
+    with pytest.raises(expected_exception):
+        ldif_add_to_field_in_questionnaire(
+            field_name="colour",
+            new_values=new_colours,
+            current_data=current_data,
+            questionnaire=questionnaire,
+        )
