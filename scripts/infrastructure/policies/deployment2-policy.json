@@ -270,7 +270,8 @@
         "SNS:SetTopicAttributes",
         "SNS:Subscribe",
         "SNS:GetSubscriptionAttributes",
-        "SNS:Unsubscribe"
+        "SNS:Unsubscribe",
+        "ssm:GetParameter"
       ],
       "Resource": ["*"]
     }
