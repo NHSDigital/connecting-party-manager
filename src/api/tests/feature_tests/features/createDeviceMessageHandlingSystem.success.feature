@@ -73,7 +73,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1291             |
+      | Content-Length | 1299             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -123,7 +123,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1896             |
+      | Content-Length | 1904             |
 
     Examples:
       | product_team_id            | product_id            |
@@ -193,7 +193,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1182             |
+      | Content-Length | 1190             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -233,7 +233,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1225             |
+      | Content-Length | 1233             |
 
     Examples:
       | product_team_id            | product_id            |

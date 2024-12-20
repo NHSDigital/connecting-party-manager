@@ -151,7 +151,7 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.1.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |

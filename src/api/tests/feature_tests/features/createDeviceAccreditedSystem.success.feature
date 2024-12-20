@@ -80,7 +80,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1074             |
+      | Content-Length | 1082             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -104,7 +104,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1727             |
+      | Content-Length | 1735             |
 
   Scenario: Successfully create a AS Device with MHSMessageSet and ASAdditionalInteractions containing no questionnaire responses
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -164,7 +164,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1078             |
+      | Content-Length | 1086             |
     And I note the response field "$.id" as "device_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
@@ -188,7 +188,7 @@ Feature: Create AS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1121             |
+      | Content-Length | 1129             |
 
   Scenario: Successfully create multiple AS Devices
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:

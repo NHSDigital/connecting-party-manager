@@ -37,7 +37,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 367              |
+      | Content-Length | 375              |
     And I note the response field "$.id" as "device_reference_data_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
@@ -56,7 +56,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 367              |
+      | Content-Length | 375              |
 
     Examples:
       | product_team_id            | product_id            |
@@ -107,7 +107,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 972              |
+      | Content-Length | 980              |
     And I note the response field "$.id" as "device_reference_data_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
@@ -135,7 +135,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 972              |
+      | Content-Length | 980              |
 
     Examples:
       | product_team_id            | product_id            |

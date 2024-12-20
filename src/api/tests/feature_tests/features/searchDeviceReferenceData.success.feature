@@ -59,7 +59,7 @@ Feature: Search Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 365              |
+      | Content-Length | 373              |
 
   Scenario: Successfully search more than one Device Reference Data
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -124,4 +124,4 @@ Feature: Search Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1075             |
+      | Content-Length | 1099             |

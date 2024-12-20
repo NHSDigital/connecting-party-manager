@@ -43,7 +43,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 388              |
+      | Content-Length | 396              |
 
     Examples:
       | product_team_id            |
@@ -87,7 +87,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 388              |
+      | Content-Length | 396              |
 
     Examples:
       | product_team_id            | product_id                 |
@@ -175,7 +175,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1896             |
+      | Content-Length | 1904             |
 
     Examples:
       | product_team_id            | product_id                 |
@@ -250,7 +250,7 @@ Feature: Read Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1727             |
+      | Content-Length | 1735             |
 
     Examples:
       | product_team_id            | product_id                 |

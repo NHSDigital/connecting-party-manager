@@ -40,7 +40,7 @@ Feature: Read Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 350              |
+      | Content-Length | 358              |
 
     Examples:
       | product_team_id            |
@@ -81,7 +81,7 @@ Feature: Read Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 350              |
+      | Content-Length | 358              |
 
     Examples:
       | product_team_id            | product_id            |

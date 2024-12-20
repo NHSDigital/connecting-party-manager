@@ -37,7 +37,7 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 357              |
+      | Content-Length | 365              |
     And I note the response field "$.id" as "device_reference_data_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
@@ -56,7 +56,7 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 357              |
+      | Content-Length | 365              |
 
     Examples:
       | product_team_id            | product_id            |
@@ -121,7 +121,7 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1574             |
+      | Content-Length | 1582             |
     And I note the response field "$.id" as "device_reference_data_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
@@ -160,4 +160,4 @@ Feature: Create "Message Set" Device Reference Data - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1574             |
+      | Content-Length | 1582             |
