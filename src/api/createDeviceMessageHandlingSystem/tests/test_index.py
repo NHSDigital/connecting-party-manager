@@ -23,7 +23,8 @@ from domain.repository.questionnaire_repository import (
     QuestionnaireRepository,
 )
 from event.json import json_loads
-from sds.epr.constants import MHS_DEVICE_SUFFIX, EprNameTemplate
+from sds.epr.constants import EprNameTemplate
+from sds.epr.utils import is_mhs_device
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.uuid import consistent_uuid
@@ -210,7 +211,7 @@ def test_index() -> None:
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
         assert device.product_id == product.id
-        assert device.name.endswith(MHS_DEVICE_SUFFIX)
+        assert is_mhs_device(device)
         assert device.ods_code == ODS_CODE
         assert device.created_on.date() == datetime.today().date()
         assert device.updated_on.date() == datetime.today().date()

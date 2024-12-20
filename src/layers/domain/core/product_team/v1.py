@@ -5,7 +5,7 @@ from domain.core.aggregate_root import AggregateRoot
 from domain.core.cpm_product import CpmProduct, CpmProductCreatedEvent
 from domain.core.cpm_system_id import ProductTeamId
 from domain.core.enum import Status
-from domain.core.event import Event
+from domain.core.event import Event, EventDeserializer
 from domain.core.product_team_key import ProductTeamKey
 from domain.core.timestamp import now
 from domain.core.validation import ENTITY_NAME_REGEX
@@ -53,7 +53,12 @@ class ProductTeam(AggregateRoot):
         product = CpmProduct(
             product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs
         )
-        product_created_event = CpmProductCreatedEvent(**product.dict(exclude={"keys"}))
+        data = product.state()
+        del data["keys"]
+        product_created_event = CpmProductCreatedEvent(**data)
         product.add_event(product_created_event)
-        self.add_event(product_created_event)
         return product
+
+
+class ProductTeamEventDeserializer(EventDeserializer):
+    event_types = (ProductTeamCreatedEvent,)

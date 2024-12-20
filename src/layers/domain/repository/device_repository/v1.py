@@ -229,12 +229,14 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceKeyAddedEvent(
         self, event: DeviceKeyAddedEvent
     ) -> list[TransactItem]:
+        new_key = DeviceKey(**event.new_key)
+
         # Create a copy of the Device indexed against the new key
         _non_root_data = compress_device_fields(
             event, fields_to_compress=NON_ROOT_FIELDS_TO_COMPRESS
         )
         create_key_transaction = self.create_index(
-            id=event.new_key.key_value,
+            id=new_key.key_value,
             parent_key_parts=(event.product_team_id, event.product_id),
             data=_non_root_data,
             root=False,
@@ -244,7 +246,7 @@ class DeviceRepository(Repository[Device]):
 
         # Update "keys" on the root and key-indexed Devices
         device_keys = {DeviceKey(**key).key_value for key in event.keys}
-        device_keys_before_update = device_keys - {event.new_key.key_value}
+        device_keys_before_update = device_keys - {new_key.key_value}
         update_root_and_key_transactions = self.update_indexes(
             id=event.id, keys=device_keys_before_update, data=data
         )
@@ -266,13 +268,15 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceKeyDeletedEvent(
         self, event: DeviceKeyDeletedEvent
     ) -> list[TransactItem]:
-        delete_key_transaction = self.delete_index(event.deleted_key.key_value)
+        deleted_key = DeviceKey(**event.deleted_key)
+
+        delete_key_transaction = self.delete_index(deleted_key.key_value)
 
         data = {"keys": event.keys, "updated_on": event.updated_on}
 
         # Update "keys" on the root and key-indexed Devices
         device_keys = {DeviceKey(**key).key_value for key in event.keys}
-        device_keys_before_update = device_keys - {event.deleted_key.key_value}
+        device_keys_before_update = device_keys - {deleted_key.key_value}
         update_root_and_key_transactions = self.update_indexes(
             id=event.id, keys=device_keys_before_update, data=data
         )

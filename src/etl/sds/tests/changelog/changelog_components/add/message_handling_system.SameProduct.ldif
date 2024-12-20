@@ -1,0 +1,25 @@
+dn: uniqueIdentifier=00000a84594b2ef34279,ou=Services,o=nhs
+changeType: add
+objectClass: nhsMhs
+objectClass: top
+nhsApproverURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs
+nhsContractPropertyTemplateKey: 14
+nhsDateApproved: 20231030092939
+nhsDateDNSApproved: 20231030092939
+nhsDateRequested: 20231030092906
+nhsDNSApprover: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs
+nhsEPInteractionType: FHIR
+nhsIDCode: C3O9X
+nhsMhsCPAId: 123456
+nhsMHSEndPoint: https://test.C3O9X.nhs.uk/
+nhsMhsFQDN: test.C3O9X.nhs.uk
+nhsMHsIN: READ_PRACTITIONER_ROLE_R4_V002
+nhsMHSIsAuthenticated: none
+nhsMHSPartyKey: C3O9X-823610
+nhsMHsSN: urn:nhs:names:services:ers
+nhsMhsSvcIA: urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002
+nhsProductKey: 11929
+nhsProductVersion: Mar2023
+nhsRequestorURP: uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs
+nhsMhsManufacturerOrg: C3O9X
+uniqueIdentifier: 123456

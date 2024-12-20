@@ -1,0 +1,184 @@
+[
+  {
+    "product_team_created_event": {
+      "id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
+      "name": "LSP04 (EPR)",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-12-10T11:05:46.696830+00:00",
+      "updated_on": null,
+      "deleted_on": null,
+      "keys": [{ "key_type": "epr_id", "key_value": "EPR-LSP04" }]
+    }
+  },
+  {
+    "cpm_product_created_event": {
+      "id": "P.JRH-EVC",
+      "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
+      "name": "My AAA Product",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-12-10T11:05:46.698233+00:00",
+      "updated_on": null,
+      "deleted_on": null
+    }
+  },
+  {
+    "cpm_product_key_added_event": {
+      "new_key": { "key_type": "party_key", "key_value": "AAA-111111" },
+      "id": "P.JRH-EVC",
+      "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
+      "name": "My AAA Product",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-12-10T11:05:46.698233+00:00",
+      "updated_on": "2024-12-10T11:05:46.698475+00:00",
+      "deleted_on": null,
+      "keys": [{ "key_type": "party_key", "key_value": "AAA-111111" }]
+    }
+  },
+  {
+    "device_reference_data_created_event": {
+      "id": "3b66cdef-a172-4cb2-8cea-cec6e2e78f47",
+      "name": "AAA-111111 - MHS Message Sets",
+      "status": "active",
+      "product_id": "P.JRH-EVC",
+      "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
+      "ods_code": "LSP04",
+      "created_on": "2024-12-10T11:05:46.700395+00:00",
+      "updated_on": null,
+      "deleted_on": null
+    }
+  },
+  {
+    "questionnaire_response_updated_event": {
+      "id": "3b66cdef-a172-4cb2-8cea-cec6e2e78f47",
+      "questionnaire_responses": {
+        "spine_mhs_message_sets/1": [
+          {
+            "id": "1bf595a9-0470-42d3-bcda-d2e966bac199",
+            "questionnaire_name": "spine_mhs_message_sets",
+            "questionnaire_version": "1",
+            "data": {
+              "Contract Property Template Key": "14",
+              "Interaction ID": "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
+              "Interaction Type": "fhir",
+              "MHS CPA ID": "00000000000a",
+              "MHS IN": "READ_PRACTITIONER_ROLE_R4_V001",
+              "MHS IP Address": "0.0.0.0",
+              "MHS Is Authenticated": "none",
+              "MHS SN": "urn:nhs:names:services:ers",
+              "Product Key": "111",
+              "Reliability Configuration Ack Requested": "never",
+              "Reliability Configuration Duplication Elimination": "never",
+              "Unique Identifier": "00000000000a"
+            },
+            "created_on": "2024-12-10T11:05:46.699256+00:00"
+          }
+        ]
+      },
+      "updated_on": "2024-12-10T11:05:46.700584+00:00"
+    }
+  },
+  {
+    "device_created_event": {
+      "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
+      "name": "AAA-111111 - Message Handling System",
+      "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
+      "product_id": "P.JRH-EVC",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-12-10T11:05:46.705095+00:00",
+      "updated_on": null,
+      "deleted_on": null,
+      "keys": [],
+      "tags": [],
+      "questionnaire_responses": {},
+      "device_reference_data": {}
+    }
+  },
+  {
+    "questionnaire_response_updated_event": {
+      "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
+      "questionnaire_responses": {
+        "spine_mhs/1": [
+          {
+            "id": "58810629-5aca-412b-a9c2-afa4a73de310",
+            "questionnaire_name": "spine_mhs",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Date Approved": "20010101010101",
+              "Date DNS Approved": "20010101010101",
+              "Date Requested": "20010101010101",
+              "DNS Approver": "myApprover",
+              "Managing Organization": "AAA",
+              "Address": "https://test.C3O9X.nhs.uk/",
+              "MHS FQDN": "test.C3O9X.nhs.uk",
+              "MHS Manufacturer Organisation": "LSP04",
+              "MHS Party key": "AAA-111111",
+              "Product Name": "My AAA Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor"
+            },
+            "created_on": "2024-12-10T11:05:46.702846+00:00"
+          }
+        ]
+      },
+      "keys": [],
+      "tags": [],
+      "updated_on": "2024-12-10T11:05:46.705285+00:00"
+    }
+  },
+  {
+    "device_key_added_event": {
+      "new_key": { "key_type": "cpa_id", "key_value": "00000000000a" },
+      "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
+      "name": "AAA-111111 - Message Handling System",
+      "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
+      "product_id": "P.JRH-EVC",
+      "ods_code": "LSP04",
+      "status": "active",
+      "created_on": "2024-12-10T11:05:46.705095+00:00",
+      "updated_on": "2024-12-10T11:05:46.705545+00:00",
+      "deleted_on": null,
+      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
+      "tags": [],
+      "questionnaire_responses": {
+        "spine_mhs/1": [
+          {
+            "id": "58810629-5aca-412b-a9c2-afa4a73de310",
+            "questionnaire_name": "spine_mhs",
+            "questionnaire_version": "1",
+            "data": {
+              "Approver URP": "myApprover",
+              "Date Approved": "20010101010101",
+              "Date DNS Approved": "20010101010101",
+              "Date Requested": "20010101010101",
+              "DNS Approver": "myApprover",
+              "Managing Organization": "AAA",
+              "Address": "https://test.C3O9X.nhs.uk/",
+              "MHS FQDN": "test.C3O9X.nhs.uk",
+              "MHS Manufacturer Organisation": "LSP04",
+              "MHS Party key": "AAA-111111",
+              "Product Name": "My AAA Product",
+              "Product Version": "2005.02",
+              "Requestor URP": "myRequestor"
+            },
+            "created_on": "2024-12-10T11:05:46.702846+00:00"
+          }
+        ]
+      },
+      "device_reference_data": {}
+    }
+  },
+  {
+    "device_reference_data_id_added_event": {
+      "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
+      "device_reference_data": {
+        "3b66cdef-a172-4cb2-8cea-cec6e2e78f47": ["*"]
+      },
+      "updated_on": "2024-12-10T11:05:46.705743+00:00"
+    }
+  }
+]
