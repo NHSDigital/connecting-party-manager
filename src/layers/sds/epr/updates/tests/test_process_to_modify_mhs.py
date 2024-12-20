@@ -24,7 +24,10 @@ from sds.epr.creators import (
 )
 from sds.epr.getters import get_message_set_data, get_mhs_device_data
 from sds.epr.updaters import UnexpectedModification
-from sds.epr.updates.change_request_processors import process_request_to_add_to_mhs
+from sds.epr.updates.change_request_processors import (
+    process_request_to_add_to_mhs,
+    process_request_to_delete_from_mhs,
+)
 
 from test_helpers.dynamodb import mock_table
 
@@ -158,6 +161,7 @@ def message_sets_correctly_updated(
     final_message_sets: dict,
     field_name: str,
     new_value: str,
+    check_value=True,
 ):
     assert final_message_sets["id"] == initial_message_sets["id"]
     assert final_message_sets["created_on"] == initial_message_sets["created_on"]
@@ -189,7 +193,9 @@ def message_sets_correctly_updated(
         if message_set not in initial_responses_data
     )
     assert message_set_that_has_been_added[SdsFieldName.CPA_ID] == CPA_ID_TO_MODIFY
-    assert message_set_that_has_been_added[field_name] == new_value
+
+    if check_value:
+        assert message_set_that_has_been_added[field_name] == new_value
     return True
 
 
@@ -198,6 +204,7 @@ def mhs_device_correctly_updated(
     final_device: dict,
     field_name: str,
     new_value: str,
+    check_value=True,
 ):
     assert final_device["id"] == initial_device["id"]
     assert final_device["created_on"] == initial_device["created_on"]
@@ -219,7 +226,9 @@ def mhs_device_correctly_updated(
     assert field_name not in initial_responses_data
 
     initial_value = final_responses_data.pop(field_name)
-    assert initial_value == new_value
+    if check_value:
+        assert initial_value == new_value
+
     assert initial_responses_data == final_responses_data
     return True
 
@@ -365,5 +374,120 @@ def test_process_request_to_add_to_mhs__device_add_to_empty_non_list_field_with_
             device=mhs_device,
             field_name=DEVICE_FIELD_TO_ADD_TO,
             new_values=["next-week", "today"],
+            **common_kwargs,
+        )
+
+
+def test_process_request_to_delete_from_mhs__device(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+
+    message_set_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_MHS
+    )
+
+    initial_device = mhs_device.state()
+    initial_message_sets = message_sets.state()
+
+    field_to_modify = DEVICE_FIELD_TO_DELETE
+    _field_to_modify = message_set_field_mapping[field_to_modify]
+
+    _device, _message_sets = process_request_to_delete_from_mhs(
+        device=mhs_device,
+        field_name=field_to_modify,
+        new_values=[],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_message_sets = _message_sets.state()
+
+    # Check only device was modified
+    assert initial_message_sets == final_message_sets
+    # Run this function "in reverse" as a delete is the opposite of an add
+    assert mhs_device_correctly_updated(
+        initial_device=final_device,
+        final_device=initial_device,
+        field_name=_field_to_modify,
+        new_value=None,
+        check_value=False,
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_delete_from_mhs__device_required_field_raises_error(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+    with pytest.raises(UnexpectedModification):
+        process_request_to_delete_from_mhs(
+            device=mhs_device,
+            field_name="nhs_mhs_fqdn",
+            new_values=[],
+            **common_kwargs,
+        )
+
+
+def test_process_request_to_delete_from_mhs__message_sets(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+
+    message_set_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
+    )
+
+    initial_device = mhs_device.state()
+    initial_message_sets = message_sets.state()
+
+    field_to_modify = MESSAGE_SET_FIELD_TO_DELETE
+    _field_to_modify = message_set_field_mapping[field_to_modify]
+
+    _device, _message_sets = process_request_to_delete_from_mhs(
+        device=mhs_device,
+        field_name=field_to_modify,
+        new_values=[],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_message_sets = _message_sets.state()
+
+    # Check only message set was modified
+    assert initial_device == final_device
+
+    # Run this function "in reverse" as a delete is the opposite of an add
+    assert message_sets_correctly_updated(
+        initial_message_sets=final_message_sets,
+        final_message_sets=initial_message_sets,
+        field_name=_field_to_modify,
+        new_value=None,
+        check_value=False,
+    )
+    assert final_message_sets["updated_on"] > initial_message_sets["updated_on"]
+
+
+def test_process_request_to_delete_from_mhs__message_set_required_field_raises_error(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+    with pytest.raises(UnexpectedModification):
+        process_request_to_delete_from_mhs(
+            device=mhs_device,
+            field_name="nhs_mhs_sn",
+            new_values=[],
             **common_kwargs,
         )
