@@ -271,7 +271,12 @@
         "SNS:Subscribe",
         "SNS:GetSubscriptionAttributes",
         "SNS:Unsubscribe",
-        "ssm:GetParameter"
+        "ssm:GetParameter",
+        "ssm:PutParameter",
+        "ssm:AddTagsToResource",
+        "ssm:ListTagsForResource",
+        "ssm:GetParameters",
+        "ssm:DeleteParameter"
       ],
       "Resource": ["*"]
     }
