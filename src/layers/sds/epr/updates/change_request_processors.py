@@ -11,9 +11,16 @@ from domain.repository.device_reference_data_repository.v1 import (
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from sds.epr.constants import SdsDeviceReferenceDataPath
-from sds.epr.getters import get_message_set_data, get_mhs_device_data
+from sds.epr.getters import (
+    get_accredited_system_device_data,
+    get_accredited_system_tags,
+    get_message_set_data,
+    get_mhs_device_data,
+)
 from sds.epr.readers import (
     read_additional_interactions_if_exists,
+    read_or_create_as_device,
+    read_or_create_empty_additional_interactions,
     read_or_create_empty_message_sets,
     read_or_create_epr_product,
     read_or_create_epr_product_team,
@@ -22,6 +29,7 @@ from sds.epr.readers import (
 from sds.epr.updaters import (
     remove_erroneous_additional_interactions,
     update_message_sets,
+    update_new_additional_interactions,
 )
 
 
@@ -74,7 +82,8 @@ def process_request_to_add_mhs(
 
     additional_interactions = read_additional_interactions_if_exists(
         device_reference_data_repository=device_reference_data_repository,
-        product=product,
+        product_team_id=product.product_team_id,
+        product_id=product.id,
     )
     if additional_interactions:
         additional_interactions = remove_erroneous_additional_interactions(
@@ -108,13 +117,90 @@ def process_request_to_add_as(
     product_team_repository: ProductTeamRepository,
     product_repository: CpmProductRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
+    device_repository: DeviceRepository,
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
-    message_set_questionnaire: Questionnaire,
-    message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
 ) -> list[ProductTeam, CpmProduct, DeviceReferenceData, Device]:
-    raise NotImplementedError()
+    asid = accredited_system["unique_identifier"]
+    product_name = accredited_system["nhs_product_name"] or asid
+    party_key = accredited_system["nhs_mhs_party_key"]
+    ods_code = accredited_system["nhs_mhs_manufacturer_org"]
+
+    product_team = read_or_create_epr_product_team(
+        ods_code=ods_code,
+        product_team_repository=product_team_repository,
+    )
+
+    product = read_or_create_epr_product(
+        product_team=product_team,
+        product_name=product_name,
+        party_key=party_key,
+        product_repository=product_repository,
+    )
+
+    message_sets = read_or_create_empty_message_sets(
+        product=product,
+        party_key=party_key,
+        device_reference_data_repository=device_reference_data_repository,
+    )
+
+    additional_interactions = read_or_create_empty_additional_interactions(
+        product=product,
+        party_key=party_key,
+        device_reference_data_repository=device_reference_data_repository,
+    )
+    additional_interactions = update_new_additional_interactions(
+        incoming_accredited_system_interactions=accredited_system["nhs_as_svc_ia"],
+        additional_interactions=additional_interactions,
+        message_sets=message_sets,
+        additional_interactions_questionnaire=additional_interactions_questionnaire,
+    )
+
+    accredited_system_device_data = get_accredited_system_device_data(
+        accredited_system=accredited_system,
+        accredited_system_questionnaire=accredited_system_questionnaire,
+        accredited_system_field_mapping=accredited_system_field_mapping,
+    )
+    as_tags = get_accredited_system_tags(accredited_system)
+
+    accredited_system_device = read_or_create_as_device(
+        device_repository=device_repository,
+        asid=asid,
+        party_key=party_key,
+        product_team=product_team,
+        product=product,
+        message_sets=message_sets,
+        additional_interactions=additional_interactions,
+        accredited_system_device_data=accredited_system_device_data,
+        as_tags=as_tags,
+    )
+
+    asid_key = DeviceKey(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value=asid)
+    if asid_key not in accredited_system_device.keys:
+        accredited_system_device.add_key(**asid_key.dict())
+
+    if str(message_sets.id) not in accredited_system_device.device_reference_data:
+        accredited_system_device.add_device_reference_data_id(
+            message_sets.id,
+            path_to_data=[SdsDeviceReferenceDataPath.ALL_INTERACTION_IDS],
+        )
+    if (
+        str(additional_interactions.id)
+        not in accredited_system_device.device_reference_data
+    ):
+        accredited_system_device.add_device_reference_data_id(
+            additional_interactions.id,
+            path_to_data=[SdsDeviceReferenceDataPath.ALL_INTERACTION_IDS],
+        )
+
+    return [
+        product_team,
+        product,
+        message_sets,
+        additional_interactions,
+        accredited_system_device,
+    ]
 
 
 def process_request_to_delete_mhs(
