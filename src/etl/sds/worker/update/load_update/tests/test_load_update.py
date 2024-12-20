@@ -6,6 +6,7 @@ from typing import Callable
 from unittest import mock
 
 import pytest
+from domain.core.enum import Environment
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
@@ -105,7 +106,9 @@ def test_load_worker_pass(put_object: Callable[[str], None]):
         devices = list(
             chain.from_iterable(
                 device_repo.search(
-                    product_team_id=product_team.id, product_id=product.id
+                    product_team_id=product_team.id,
+                    product_id=product.id,
+                    environment=Environment.PROD,
                 )
                 for product in products
             )
@@ -122,7 +125,9 @@ def test_load_worker_pass(put_object: Callable[[str], None]):
         device_ref_datas = list(
             chain.from_iterable(
                 device_ref_data_repo.search(
-                    product_team_id=product_team.id, product_id=product.id
+                    product_team_id=product_team.id,
+                    product_id=product.id,
+                    environment=Environment.PROD,
                 )
                 for product in products
             )

@@ -8,6 +8,7 @@ from unittest import mock
 from uuid import UUID
 
 import pytest
+from domain.core.enum import Environment
 from domain.core.root import Root
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
@@ -151,7 +152,7 @@ def test__export_events():
 
     devices = []
     for i in range(3):
-        device = product.create_device(name=f"device-{i}")
+        device = product.create_device(name=f"device-{i}", environment=Environment.PROD)
         device.add_tag(foo=str(i))
         devices.append(device)
     events = export_events(devices)

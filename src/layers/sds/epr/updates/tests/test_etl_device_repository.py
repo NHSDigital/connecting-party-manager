@@ -1,3 +1,4 @@
+from domain.core.enum import Environment
 from domain.core.root.v1 import Root
 from domain.repository.device_repository.v1 import DeviceRepository
 from sds.epr.updates.etl_device_repository import EtlDeviceRepository
@@ -9,7 +10,7 @@ def test_EtlDeviceRepository_read_if_exists():
     ods_org = Root.create_ods_organisation(ods_code="AAA")
     product_team = ods_org.create_product_team(name="my product team")
     product = product_team.create_cpm_product(name="my product")
-    device = product.create_device(name="my device")
+    device = product.create_device(name="my device", environment=Environment.PROD)
 
     table_name = "my-table"
     with mock_table(table_name) as client:
@@ -18,6 +19,7 @@ def test_EtlDeviceRepository_read_if_exists():
         device_by_path = standard_repo.read(
             product_team_id=device.product_team_id,
             product_id=str(device.product_id),
+            environment=Environment.PROD,
             id=str(device.id),
         )
 

@@ -10,6 +10,7 @@ import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import Device
+from domain.core.enum import Environment
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_repository import DeviceRepository
@@ -69,31 +70,31 @@ def test_index() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "environment": "dev",
                 },
             }
         )
 
         # Validate that the response indicates that a resource was created
         assert response["statusCode"] == 201
-
         _device = json_loads(response["body"])
         device = Device(**_device)
         assert device.product_team_id == product.product_team_id
         assert device.product_id == product.id
         assert device.name == DEVICE_NAME
         assert device.ods_code == ODS_CODE
+        assert device.environment == Environment.DEV
         assert device.created_on.date() == datetime.today().date()
         assert not device.updated_on
         assert not device.deleted_on
-
         # Retrieve the created resource
         repo = DeviceRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
-
         created_device = repo.read(
             product_team_id=device.product_team_id,
             product_id=device.product_id,
+            environment=Environment.DEV,
             id=device.id,
         )
         assert created_device == device
@@ -116,7 +117,11 @@ def test_index() -> None:
         ),
         (
             {"name": DEVICE_NAME, "forbidden_extra_param": "foo"},
-            {"product_id": str(PRODUCT_ID), "product_team_id": consistent_uuid(1)},
+            {
+                "product_id": str(PRODUCT_ID),
+                "product_team_id": consistent_uuid(1),
+                "environment": "dev",
+            },
             "VALIDATION_ERROR",
             400,
         ),
@@ -125,9 +130,20 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": "id_that_does_not_exist",
+                "environment": "dev",
             },
             "RESOURCE_NOT_FOUND",
             404,
+        ),
+        (
+            {"name": DEVICE_NAME},
+            {
+                "product_id": str(PRODUCT_ID),
+                "product_team_id": consistent_uuid(1),
+                "environment": "FOO",
+            },
+            "VALIDATION_ERROR",
+            400,
         ),
     ],
 )
