@@ -1,5 +1,8 @@
 # Changelog
 
+## 2024-12-23
+- [PI-652] Evironment layers
+
 ## 2024-12-16
 - [PI-681] EPR endpoints requirements
 - [PI-702] Prod bulk tweak
