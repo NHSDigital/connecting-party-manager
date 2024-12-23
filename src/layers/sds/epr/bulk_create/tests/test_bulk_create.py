@@ -116,6 +116,11 @@ def additional_interactions_data():
         {
             "questionnaire_name": "spine_as_additional_interactions",
             "questionnaire_version": "1",
+            "data": {"Interaction ID": "interaction-id-3"},
+        },
+        {
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
             "data": {"Interaction ID": "interaction-id-4"},
         },
     ]
@@ -185,11 +190,11 @@ def as_tags():
         [
             {
                 "nhs_id_code": "BBB",
-                "nhs_as_svc_ia": "interaction-id-2",
+                "nhs_as_svc_ia": "interaction-id-3",
             },
             {
                 "nhs_id_code": "BBB",
-                "nhs_as_svc_ia": "interaction-id-2",
+                "nhs_as_svc_ia": "interaction-id-3",
                 "nhs_mhs_party_key": "AAA-456789",
             },
             {
