@@ -217,6 +217,7 @@ def test_load_worker_pass(
         ),
     )
 
+    # print("INPUT DEVICES", input_devices)
     assert product_team == input_product_team
     assert products == input_products
     assert devices == input_devices

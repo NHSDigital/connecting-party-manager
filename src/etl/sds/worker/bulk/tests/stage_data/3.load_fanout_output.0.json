@@ -557,9 +557,6 @@
                         "Approver URP": {
                           "S": "myApprover"
                         },
-                        "Contract Property Template Key": {
-                          "S": "14"
-                        },
                         "Date Approved": {
                           "S": "20010101010101"
                         },
@@ -572,20 +569,8 @@
                         "DNS Approver": {
                           "S": "myApprover"
                         },
-                        "Interaction Type": {
-                          "S": "fhir"
-                        },
                         "Managing Organization": {
                           "S": "AAA"
-                        },
-                        "Reliability Configuration Ack Requested": {
-                          "S": "never"
-                        },
-                        "MHS CPA ID": {
-                          "S": "00000000000a"
-                        },
-                        "Reliability Configuration Duplication Elimination": {
-                          "S": "never"
                         },
                         "Address": {
                           "S": "https://test.C3O9X.nhs.uk/"
@@ -593,20 +578,11 @@
                         "MHS FQDN": {
                           "S": "test.C3O9X.nhs.uk"
                         },
-                        "MHS IP Address": {
-                          "S": "0.0.0.0"
-                        },
-                        "MHS Is Authenticated": {
-                          "S": "none"
-                        },
                         "MHS Manufacturer Organisation": {
                           "S": "LSP04"
                         },
                         "MHS Party key": {
                           "S": "AAA-111111"
-                        },
-                        "Product Key": {
-                          "S": "111"
                         },
                         "Product Name": {
                           "S": "My AAA Product"
@@ -616,9 +592,6 @@
                         },
                         "Requestor URP": {
                           "S": "myRequestor"
-                        },
-                        "Unique Identifier": {
-                          "S": "00000000000a"
                         }
                       }
                     },
