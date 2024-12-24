@@ -7,17 +7,19 @@ Feature: Search Device Reference Data - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Successfully search Device Reference Data with no results
+  Scenario Outline: Successfully search Device Reference Data with no results
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path     | value                 |
-      | name     | My Great Product Team |
-      | ods_code | F5H1R                 |
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData"
+    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData"
     Then I receive a status code "200" with body
       | path    | value |
       | results | []    |
@@ -26,7 +28,12 @@ Feature: Search Device Reference Data - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 15               |
 
-  Scenario: Successfully search one Device Reference Data
+    Examples:
+      | product_team_id            | product_id            |
+      | ${ note(product_team_id) } | ${ note(product_id) } |
+      | FOOBAR                     | ${ note(product_id) } |
+
+  Scenario Outline: Successfully search more than one Device Reference Data
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -34,58 +41,23 @@ Feature: Search Device Reference Data - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path | value               |
-      | name | My Great CpmProduct |
-    And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
-      | path | value                    |
-      | name | My Device Reference Data |
-    And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData"
-    Then I receive a status code "200" with body
-      | path                              | value                               |
-      | results.0.id                      | ${ note(device_reference_data_id) } |
-      | results.0.product_id              | ${ note(product_id) }               |
-      | results.0.product_team_id         | ${ note(product_team_id) }          |
-      | results.0.name                    | My Device Reference Data            |
-      | results.0.status                  | active                              |
-      | results.0.environment             | dev                                 |
-      | results.0.ods_code                | F5H1R                               |
-      | results.0.created_on              | << ignore >>                        |
-      | results.0.updated_on              | << ignore >>                        |
-      | results.0.deleted_on              | << ignore >>                        |
-      | results.0.questionnaire_responses | {}                                  |
-    And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 373              |
-
-  Scenario: Successfully search more than one Device Reference Data
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | F5H1R                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
-    Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                      |
       | name | My Device Reference Data 1 |
     And I note the response field "$.id" as "device_reference_data_id_1"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                      |
       | name | My Device Reference Data 2 |
     And I note the response field "$.id" as "device_reference_data_id_2"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                      |
       | name | My Device Reference Data 3 |
     And I note the response field "$.id" as "device_reference_data_id_3"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData"
+    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData"
     Then I receive a status code "200" with body where "results" has a length of "3"
       | path                              | value                                 |
       | results.0.id                      | ${ note(device_reference_data_id_1) } |
@@ -125,3 +97,62 @@ Feature: Search Device Reference Data - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 1099             |
+
+    Examples:
+      | product_team_id            | product_id            |
+      | ${ note(product_team_id) } | ${ note(product_id) } |
+      | FOOBAR                     | ${ note(product_id) } |
+
+  Scenario Outline: Successfully search multiple EPR Device Reference Data (Message set & Additional Interactions)
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    And I note the response field "$.id" as "product_team_id"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/Epr" with body:
+      | path | value            |
+      | name | My Great Product |
+    And I note the response field "$.id" as "product_id"
+    And I note the response field "$.keys.0.key_value" as "party_key"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/MhsMessageSet"
+    And I note the response field "$.id" as "device_reference_data_id_msg_set"
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    And I note the response field "$.id" as "device_reference_data_id_additional_interactions"
+    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData"
+    Then I receive a status code "200" with body where "results" has a length of "2"
+      | path                              | value                                                       |
+      | results.0.id                      | ${ note(device_reference_data_id_msg_set) }                 |
+      | results.0.name                    | F5H1R-850000 - MHS Message Sets                             |
+      | results.0.status                  | active                                                      |
+      | results.0.environment             | dev                                                         |
+      | results.0.product_id              | ${ note(product_id) }                                       |
+      | results.0.product_team_id         | ${ note(product_team_id) }                                  |
+      | results.0.ods_code                | F5H1R                                                       |
+      | results.0.questionnaire_responses | {}                                                          |
+      | results.0.created_on              | << ignore >>                                                |
+      | results.0.updated_on              | << ignore >>                                                |
+      | results.0.deleted_on              | << ignore >>                                                |
+      | results.1.id                      | ${ note(device_reference_data_id_additional_interactions) } |
+      | results.1.name                    | F5H1R-850000 - AS Additional Interactions                   |
+      | results.1.status                  | active                                                      |
+      | results.1.environment             | dev                                                         |
+      | results.1.product_id              | ${ note(product_id) }                                       |
+      | results.1.product_team_id         | ${ note(product_team_id) }                                  |
+      | results.1.ods_code                | F5H1R                                                       |
+      | results.1.questionnaire_responses | {}                                                          |
+      | results.1.created_on              | << ignore >>                                                |
+      | results.1.updated_on              | << ignore >>                                                |
+      | results.1.deleted_on              | << ignore >>                                                |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 757              |
+
+    Examples:
+      | product_team_id            | product_id            |
+      | ${ note(product_team_id) } | ${ note(product_id) } |
+      | ${ note(product_team_id) } | ${ note(party_key) }  |
+      | FOOBAR                     | ${ note(product_id) } |
+      | FOOBAR                     | ${ note(party_key) }  |
