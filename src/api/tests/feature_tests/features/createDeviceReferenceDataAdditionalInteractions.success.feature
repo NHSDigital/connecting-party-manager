@@ -20,12 +20,13 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     Then I receive a status code "201" with body
       | path                    | value                                     |
       | id                      | << ignore >>                              |
       | name                    | F5H1R-850000 - AS Additional Interactions |
       | status                  | active                                    |
+      | environment             | dev                                       |
       | product_id              | ${ note(product_id) }                     |
       | product_team_id         | ${ note(product_team_id) }                |
       | ods_code                | F5H1R                                     |
@@ -36,14 +37,15 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 353              |
+      | Content-Length | 375              |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
       | path                    | value                                     |
       | id                      | ${ note(device_reference_data_id) }       |
       | name                    | F5H1R-850000 - AS Additional Interactions |
       | status                  | active                                    |
+      | environment             | dev                                       |
       | product_id              | ${ note(product_id) }                     |
       | product_team_id         | ${ note(product_team_id) }                |
       | ods_code                | F5H1R                                     |
@@ -54,7 +56,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 353              |
+      | Content-Length | 375              |
 
     Examples:
       | product_team_id            | product_id            |
@@ -76,7 +78,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.1.Interaction ID | urn:nhs:names:services:ebs:PRSC_IN080000UK07              |
@@ -85,6 +87,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | id                                                                                 | << ignore >>                                              |
       | name                                                                               | F5H1R-850000 - AS Additional Interactions                 |
       | status                                                                             | active                                                    |
+      | environment                                                                        | dev                                                       |
       | product_id                                                                         | ${ note(product_id) }                                     |
       | product_team_id                                                                    | ${ note(product_team_id) }                                |
       | ods_code                                                                           | F5H1R                                                     |
@@ -104,14 +107,15 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 958              |
+      | Content-Length | 980              |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
       | path                                                                               | value                                                     |
       | id                                                                                 | ${ note(device_reference_data_id) }                       |
       | name                                                                               | F5H1R-850000 - AS Additional Interactions                 |
       | status                                                                             | active                                                    |
+      | environment                                                                        | dev                                                       |
       | product_id                                                                         | ${ note(product_id) }                                     |
       | product_team_id                                                                    | ${ note(product_team_id) }                                |
       | ods_code                                                                           | F5H1R                                                     |
@@ -131,7 +135,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 958              |
+      | Content-Length | 980              |
 
     Examples:
       | product_team_id            | product_id            |

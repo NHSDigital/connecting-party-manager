@@ -3,6 +3,7 @@ import time
 import pytest
 from domain.core.device import Device
 from domain.core.device_key import DeviceKey, DeviceKeyType
+from domain.core.enum import Environment
 from domain.repository.device_repository import DeviceRepository
 
 
@@ -14,6 +15,7 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     second_device = repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id=device.id,
     )
     second_device.add_key(
@@ -25,6 +27,7 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     assert repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id=device.id,
     ).keys == [
         DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-XXX"),
@@ -33,6 +36,7 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     assert repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id="P.WWW-XXX",
     ).keys == [
         DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-XXX"),
@@ -41,6 +45,7 @@ def test__device_repository__add_two_keys(device: Device, repository: DeviceRepo
     assert repository.read(
         product_team_id=device.product_team_id,
         product_id=device.product_id,
+        environment=Environment.DEV,
         id="1234567890",
     ).keys == [
         DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-XXX"),
@@ -60,6 +65,7 @@ def test__device_repository__delete_key(
     intermediate_device = repository.read(
         product_team_id=device_with_asid.product_team_id,
         product_id=device_with_asid.product_id,
+        environment=Environment.DEV,
         id=device_with_asid.id,
     )
     intermediate_device.delete_key(
@@ -71,5 +77,6 @@ def test__device_repository__delete_key(
     assert repository.read(
         product_team_id=device_with_asid.product_team_id,
         product_id=device_with_asid.product_id,
+        environment=Environment.DEV,
         id=device_with_asid.id,
     ).keys == [DeviceKey(key_type=DeviceKeyType.PRODUCT_ID, key_value="P.WWW-CCC")]

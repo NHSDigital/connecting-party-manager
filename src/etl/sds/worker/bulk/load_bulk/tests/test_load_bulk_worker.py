@@ -11,6 +11,7 @@ import pytest
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.product_team.v1 import ProductTeam
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
@@ -145,7 +146,9 @@ def test_load_worker_pass(
         devices = list(
             chain.from_iterable(
                 device_repo.search(
-                    product_team_id=product_team.id, product_id=product.id
+                    product_team_id=product_team.id,
+                    product_id=product.id,
+                    environment=Environment.PROD,
                 )
                 for product in products
             )
@@ -162,7 +165,9 @@ def test_load_worker_pass(
         device_ref_datas = list(
             chain.from_iterable(
                 device_ref_data_repo.search(
-                    product_team_id=product_team.id, product_id=product.id
+                    product_team_id=product_team.id,
+                    product_id=product.id,
+                    environment=Environment.PROD,
                 )
                 for product in products
             )
@@ -212,6 +217,7 @@ def test_load_worker_pass(
         ),
     )
 
+    # print("INPUT DEVICES", input_devices)
     assert product_team == input_product_team
     assert products == input_products
     assert devices == input_devices

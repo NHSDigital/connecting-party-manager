@@ -10,6 +10,7 @@ import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
@@ -71,6 +72,7 @@ def test_index() -> None:
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
                     "product_id": str(product.id),
+                    "environment": Environment.DEV,
                 },
             }
         )
@@ -83,6 +85,7 @@ def test_index() -> None:
         assert device_reference_data.product_id == product.id
         assert device_reference_data.product_team_id == product.product_team_id
         assert device_reference_data.name == DEVICE_REFERENCE_DATA_NAME
+        assert device_reference_data.environment == Environment.DEV
         assert device_reference_data.ods_code == ODS_CODE
         assert device_reference_data.created_on.date() == datetime.today().date()
         assert device_reference_data.updated_on is None
@@ -96,6 +99,7 @@ def test_index() -> None:
         created_device_reference_data = repo.read(
             product_team_id=device_reference_data.product_team_id,
             product_id=device_reference_data.product_id,
+            environment=device_reference_data.environment,
             id=device_reference_data.id,
         )
         assert created_device_reference_data == device_reference_data
@@ -118,7 +122,11 @@ def test_index() -> None:
         ),
         (
             {"name": DEVICE_REFERENCE_DATA_NAME, "forbidden_extra_param": "foo"},
-            {"product_id": str(PRODUCT_ID), "product_team_id": consistent_uuid(1)},
+            {
+                "product_id": str(PRODUCT_ID),
+                "product_team_id": consistent_uuid(1),
+                "environment": Environment.DEV,
+            },
             "VALIDATION_ERROR",
             400,
         ),
@@ -127,6 +135,7 @@ def test_index() -> None:
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": "id_that_does_not_exist",
+                "environment": Environment.DEV,
             },
             "RESOURCE_NOT_FOUND",
             404,

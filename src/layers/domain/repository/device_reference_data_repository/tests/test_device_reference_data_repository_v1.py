@@ -2,6 +2,7 @@ import time
 
 import pytest
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -20,6 +21,7 @@ def test__cpm_device_reference_data_repository(
     result = repository.read(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
+        environment=Environment.DEV,
         id=device_reference_data.id,
     )
     assert result == device_reference_data
@@ -47,6 +49,7 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
         repository.read(
             product_team_id=product_team_id,
             product_id=product_id,
+            environment=Environment.DEV,
             id=device_reference_data_id,
         )
 
@@ -60,6 +63,7 @@ def test__cpm_product_repository_local(
     result = repository.read(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
+        environment=Environment.DEV,
         id=device_reference_data.id,
     )
     assert result == device_reference_data
@@ -75,6 +79,7 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
         repository.read(
             product_team_id=product_team_id,
             product_id=product_id,
+            environment=Environment.DEV,
             id=device_reference_data_id,
         )
 
@@ -83,14 +88,18 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
 def test__cpm_device_reference_data_repository__search_empty(
     repository: DeviceReferenceDataRepository,
 ):
-    results = repository.search(product_team_id="foo", product_id="bar")
+    results = repository.search(
+        product_team_id="foo", product_id="bar", environment=Environment.DEV
+    )
     assert results == []
 
 
 def test__cpm_device_reference_data_repository__search_empty_local(
     repository: DeviceReferenceDataRepository,
 ):
-    results = repository.search(product_team_id="foo", product_id="bar")
+    results = repository.search(
+        product_team_id="foo", product_id="bar", environment=Environment.DEV
+    )
     assert results == []
 
 
@@ -104,6 +113,7 @@ def test__cpm_device_reference_data_repository__search_not_empty(
     results = repository.search(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
+        environment=Environment.DEV,
     )
     assert results == [device_reference_data]
 
@@ -116,5 +126,6 @@ def test__cpm_device_reference_data_repository__search_not_empty_local(
     results = repository.search(
         product_team_id=device_reference_data.product_team_id,
         product_id=device_reference_data.product_id,
+        environment=Environment.DEV,
     )
     assert results == [device_reference_data]

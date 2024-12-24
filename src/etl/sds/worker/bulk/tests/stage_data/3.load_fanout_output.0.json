@@ -239,7 +239,7 @@
           "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "DRD#3dfd9f0b-0cf3-4c3d-92cd-e379adfaecf6"
@@ -255,6 +255,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -351,7 +354,7 @@
           "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "DRD#d3d0e6b8-8277-4849-8e8d-5cb035af5536"
@@ -367,6 +370,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -476,7 +482,7 @@
           "S": "D#192133bc-7077-4163-9387-9856969dd412"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "D#192133bc-7077-4163-9387-9856969dd412"
@@ -492,6 +498,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -619,7 +628,7 @@
           "S": "D#00000000000a"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.VNT-MLW#E#PROD"
         },
         "sk_read": {
           "S": "D#00000000000a"
@@ -636,6 +645,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -715,6 +727,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -793,6 +808,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"

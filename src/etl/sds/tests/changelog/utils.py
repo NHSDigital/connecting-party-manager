@@ -2,6 +2,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any, Generator, Literal, Protocol
 
+from domain.core.enum import Environment
 from domain.repository.cpm_product_repository.v1 import CpmProduct, CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceData,
@@ -125,10 +126,14 @@ def read_all(
         for product in product_repo.search(product_team_id=product_team.id):
             yield product
             yield from device_repo.search(
-                product_team_id=product_team.id, product_id=product.id
+                product_team_id=product_team.id,
+                product_id=product.id,
+                environment=Environment.PROD,
             )
             yield from drd_repo.search(
-                product_team_id=product_team.id, product_id=product.id
+                product_team_id=product_team.id,
+                product_id=product.id,
+                environment=Environment.PROD,
             )
 
 

@@ -57,6 +57,8 @@ components:
                     message: "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
                   - code: "VALIDATION_ERROR"
                     message: "Duplicate 'Interaction ID' provided: value '<INTERACTION ID>' occurs <N> times in the questionnaire response."
+                  - code: "VALIDATION_ERROR"
+                    message: "SubCpmProductPathParams.environment: value is not a valid enumeration member; permitted: 'dev', 'qa', 'ref', 'int', 'prod'"
     SdsSearchDeviceBadRequest:
       description: searchSDSDevice Bad request
       content:

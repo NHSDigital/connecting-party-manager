@@ -1,6 +1,7 @@
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire.v1 import QuestionnaireResponse
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
@@ -55,7 +56,9 @@ def read_additional_interactions_if_exists(
     device_reference_data_repository: DeviceReferenceDataRepository, product: CpmProduct
 ) -> DeviceReferenceData | None:
     device_reference_datas = device_reference_data_repository.search(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id,
+        product_id=product.id,
+        environment=Environment.PROD,
     )
 
     additional_interactions = None
@@ -74,7 +77,9 @@ def read_or_create_empty_message_sets(
     device_reference_data_repository: DeviceReferenceDataRepository,
 ) -> DeviceReferenceData:
     device_reference_datas = device_reference_data_repository.search(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id,
+        product_id=product.id,
+        environment=Environment.PROD,
     )
 
     try:
@@ -98,7 +103,9 @@ def read_or_create_mhs_device(
     mhs_device_data: QuestionnaireResponse,
 ) -> Device:
     devices = device_repository.search(
-        product_team_id=product_team.id, product_id=product.id
+        product_team_id=product_team.id,
+        product_id=product.id,
+        environment=Environment.PROD,
     )
     try:
         (mhs_device,) = filter(is_mhs_device, devices)

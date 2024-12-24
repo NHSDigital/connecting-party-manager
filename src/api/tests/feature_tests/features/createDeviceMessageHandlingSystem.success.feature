@@ -22,12 +22,12 @@ Feature: Create MHS Device - success scenarios
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
     And I note the response field "$.keys.0.key_value" as "party_key_value"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -42,6 +42,7 @@ Feature: Create MHS Device - success scenarios
       | id                                                                       | << ignore >>                                                           |
       | name                                                                     | F5H1R-850000 - Message Handling System                                 |
       | status                                                                   | active                                                                 |
+      | environment                                                              | dev                                                                    |
       | product_id                                                               | ${ note(product_id) }                                                  |
       | product_team_id                                                          | ${ note(product_team_id) }                                             |
       | ods_code                                                                 | F5H1R                                                                  |
@@ -72,14 +73,15 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1277             |
+      | Content-Length | 1299             |
     And I note the response field "$.id" as "device_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                                                                      | value                                                                                |
       | id                                                                        | ${ note(device_id) }                                                                 |
       | name                                                                      | F5H1R-850000 - Message Handling System                                               |
       | status                                                                    | active                                                                               |
+      | environment                                                               | dev                                                                                  |
       | product_id                                                                | ${ note(product_id) }                                                                |
       | product_team_id                                                           | ${ note(product_team_id) }                                                           |
       | ods_code                                                                  | F5H1R                                                                                |
@@ -121,7 +123,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1882             |
+      | Content-Length | 1904             |
 
     Examples:
       | product_team_id            | product_id            |
@@ -144,9 +146,9 @@ Feature: Create MHS Device - success scenarios
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_type" as "party_key_tag"
     And I note the response field "$.keys.0.key_value" as "party_key_tag_value"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/MessageHandlingSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/MessageHandlingSystem" with body:
       | path                                                              | value               |
       | questionnaire_responses.spine_mhs.0.MHS FQDN                      | mhs.example.com     |
       | questionnaire_responses.spine_mhs.0.MHS Service Description       | Example Description |
@@ -161,6 +163,7 @@ Feature: Create MHS Device - success scenarios
       | id                                                                       | << ignore >>                           |
       | name                                                                     | F5H1R-850000 - Message Handling System |
       | status                                                                   | active                                 |
+      | environment                                                              | dev                                    |
       | product_id                                                               | ${ note(product_id) }                  |
       | product_team_id                                                          | ${ note(product_team_id) }             |
       | ods_code                                                                 | F5H1R                                  |
@@ -190,14 +193,15 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1168             |
+      | Content-Length | 1190             |
     And I note the response field "$.id" as "device_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                                                                     | value                                  |
       | id                                                                       | ${ note(device_id) }                   |
       | name                                                                     | F5H1R-850000 - Message Handling System |
       | status                                                                   | active                                 |
+      | environment                                                              | dev                                    |
       | product_id                                                               | ${ note(product_id) }                  |
       | product_team_id                                                          | ${ note(product_team_id) }             |
       | ods_code                                                                 | F5H1R                                  |
@@ -229,7 +233,7 @@ Feature: Create MHS Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1211             |
+      | Content-Length | 1233             |
 
     Examples:
       | product_team_id            | product_id            |

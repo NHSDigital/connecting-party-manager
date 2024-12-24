@@ -36,3 +36,11 @@ components:
       description: Questionnaire identifier
       schema:
         type: string
+    Environment:
+      name: environment
+      in: path
+      required: true
+      description: Environment identifier
+      schema:
+        type: string
+        enum: [dev, qa, ref, int, prod]

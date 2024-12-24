@@ -26,6 +26,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -112,6 +115,9 @@
         "status": {
           "S": "active"
         },
+        "environment": {
+          "S": "prod"
+        },
         "product_id": {
           "S": "P.VNT-MLW"
         },
@@ -197,6 +203,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.VNT-MLW"
@@ -385,7 +394,7 @@
           "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "DRD#b362b7c1-317c-4e1f-86e4-d8cbd0f9524e"
@@ -398,6 +407,9 @@
         },
         "name": {
           "S": "BBB-111111 - MHS Message Sets"
+        },
+        "environment": {
+          "S": "prod"
         },
         "status": {
           "S": "active"
@@ -553,7 +565,7 @@
           "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "DRD#b4186163-23ec-41fa-abc2-5fe8b0fe9cab"
@@ -569,6 +581,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -701,7 +716,7 @@
           "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#a5c17f6a-560d-4553-af40-9095ab84e807"
@@ -717,6 +732,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -854,7 +872,7 @@
           "S": "D#00000000000b"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#00000000000b"
@@ -870,6 +888,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"
@@ -943,7 +964,7 @@
           "S": "D#00000000000c"
         },
         "pk_read": {
-          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D"
+          "S": "PT#LSP04.ec12b569-ea31-4c28-9559-17d533c78441#P#P.LU6-Y7D#E#PROD"
         },
         "sk_read": {
           "S": "D#00000000000c"
@@ -959,6 +980,9 @@
         },
         "status": {
           "S": "active"
+        },
+        "environment": {
+          "S": "prod"
         },
         "product_id": {
           "S": "P.LU6-Y7D"

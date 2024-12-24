@@ -19,7 +19,7 @@ Feature: Create Device - success scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/Device" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/dev/Device" with body:
       | path | value     |
       | name | My Device |
     Then I receive a status code "201" with body
@@ -27,6 +27,7 @@ Feature: Create Device - success scenarios
       | id                      | << ignore >>               |
       | name                    | My Device                  |
       | status                  | active                     |
+      | environment             | dev                        |
       | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
@@ -40,14 +41,15 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 374              |
+      | Content-Length | 396              |
     And I note the response field "$.id" as "device_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                    | value                      |
       | id                      | ${ note(device_id) }       |
       | name                    | My Device                  |
       | status                  | active                     |
+      | environment             | dev                        |
       | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
@@ -61,7 +63,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 374              |
+      | Content-Length | 396              |
 
     Examples:
       | product_team_id            |
@@ -81,7 +83,7 @@ Feature: Create Device - success scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/Device" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/Device" with body:
       | path | value     |
       | name | My Device |
     Then I receive a status code "201" with body
@@ -89,6 +91,7 @@ Feature: Create Device - success scenarios
       | id                      | << ignore >>               |
       | name                    | My Device                  |
       | status                  | active                     |
+      | environment             | dev                        |
       | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
@@ -102,14 +105,15 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 374              |
+      | Content-Length | 396              |
     And I note the response field "$.id" as "device_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/Device/${ note(device_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/${ note(device_id) }"
     Then I receive a status code "200" with body
       | path                    | value                      |
       | id                      | ${ note(device_id) }       |
       | name                    | My Device                  |
       | status                  | active                     |
+      | environment             | dev                        |
       | product_id              | ${ note(product_id) }      |
       | product_team_id         | ${ note(product_team_id) } |
       | ods_code                | F5H1R                      |
@@ -123,7 +127,7 @@ Feature: Create Device - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 374              |
+      | Content-Length | 396              |
 
     Examples:
       | product_team_id            | product_id            |

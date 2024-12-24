@@ -7,6 +7,7 @@ from botocore.config import Config
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.product_team.v1 import ProductTeam
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
@@ -74,14 +75,18 @@ def aggregate_database(table_name, dynamodb_client):
             _product_data[Device] = sorted(
                 device.name
                 for device in device_repo.search(
-                    product_team_id=product_team.id, product_id=product.id
+                    product_team_id=product_team.id,
+                    product_id=product.id,
+                    environment=Environment.PROD,
                 )
             )
 
             _product_data[DeviceReferenceData] = sorted(
                 device_ref_data.name
                 for device_ref_data in device_ref_data_repo.search(
-                    product_team_id=product_team.id, product_id=product.id
+                    product_team_id=product_team.id,
+                    product_id=product.id,
+                    environment=Environment.PROD,
                 )
             )
 

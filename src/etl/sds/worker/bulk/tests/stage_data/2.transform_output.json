@@ -42,6 +42,7 @@
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
       "status": "active",
+      "environment": "prod",
       "questionnaire_responses": {
         "spine_mhs_message_sets/1": [
           {
@@ -79,6 +80,7 @@
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
       "status": "active",
+      "environment": "prod",
       "questionnaire_responses": {
         "spine_as_additional_interactions/1": [
           {
@@ -120,6 +122,7 @@
       "id": "192133bc-7077-4163-9387-9856969dd412",
       "name": "AAA-111111 - Message Handling System",
       "status": "active",
+      "environment": "prod",
       "product_id": "P.VNT-MLW",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
@@ -203,6 +206,7 @@
       "id": "44d37e03-1bba-4300-970e-f083604917c0",
       "name": "AAA-111111/000000000001 - Accredited System",
       "status": "active",
+      "environment": "prod",
       "product_id": "P.VNT-MLW",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
@@ -325,6 +329,7 @@
       "id": "4ec9c8a8-37ff-4085-bf3f-e93e9e3ac23e",
       "name": "AAA-111111/000000000004 - Accredited System",
       "status": "active",
+      "environment": "prod",
       "product_id": "P.VNT-MLW",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
@@ -468,6 +473,7 @@
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
       "status": "active",
+      "environment": "prod",
       "questionnaire_responses": {
         "spine_mhs_message_sets/1": [
           {
@@ -525,6 +531,7 @@
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
       "status": "active",
+      "environment": "prod",
       "questionnaire_responses": {
         "spine_as_additional_interactions/1": [
           {
@@ -575,6 +582,7 @@
       "id": "a5c17f6a-560d-4553-af40-9095ab84e807",
       "name": "BBB-111111 - Message Handling System",
       "status": "active",
+      "environment": "prod",
       "product_id": "P.LU6-Y7D",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
@@ -690,6 +698,7 @@
       "id": "6924122e-86da-45b3-9c2e-b6a3609b1ed9",
       "name": "BBB-111111/000000000002 - Accredited System",
       "status": "active",
+      "environment": "prod",
       "product_id": "P.LU6-Y7D",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",
@@ -844,6 +853,7 @@
       "id": "22129a26-6179-421b-9822-e375408b0d08",
       "name": "BBB-111111/000000000003 - Accredited System",
       "status": "active",
+      "environment": "prod",
       "product_id": "P.LU6-Y7D",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "ods_code": "LSP04",

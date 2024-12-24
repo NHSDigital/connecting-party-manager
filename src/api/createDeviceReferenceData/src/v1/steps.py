@@ -1,13 +1,15 @@
 from http import HTTPStatus
 
 from domain.api.common_steps.general import parse_event_body
-from domain.api.common_steps.read_product import (
+from domain.api.common_steps.sub_product import (
     parse_path_params,
+    read_environment,
     read_product,
     read_product_team,
 )
 from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -28,7 +30,10 @@ def create_device_reference_data(data, cache) -> DeviceReferenceData:
     payload: CreateDeviceReferenceDataIncomingParams = data[
         parse_device_reference_data_payload
     ]
-    return product.create_device_reference_data(**payload.dict())
+    environment: Environment = data[read_environment]
+    return product.create_device_reference_data(
+        environment=environment, **payload.dict()
+    )
 
 
 def write_device_reference_data(data: dict[str, CpmProduct], cache) -> CpmProduct:
@@ -47,6 +52,7 @@ def set_http_status(data, cache) -> tuple[HTTPStatus, str]:
 steps = [
     parse_event_body,
     parse_path_params,
+    read_environment,
     parse_device_reference_data_payload,
     read_product_team,
     read_product,
