@@ -108,7 +108,7 @@ def mock_epr_product_with_message_set_drd() -> (
             },
         )
 
-        # Set up DeviceReferenceData in DB
+        # Set up DeviceReferenceData in DB, for dev
         device_reference_data = product.create_device_reference_data(
             name=EprNameTemplate.MESSAGE_SETS.format(party_key=PARTY_KEY),
             environment=Environment.DEV,
@@ -119,6 +119,15 @@ def mock_epr_product_with_message_set_drd() -> (
             table_name=TABLE_NAME, dynamodb_client=client
         )
         device_reference_data_repo.write(device_reference_data)
+
+        # Set up another DeviceReferenceData in DB, for ref
+        device_reference_data2 = product.create_device_reference_data(
+            name=EprNameTemplate.MESSAGE_SETS.format(party_key=PARTY_KEY),
+            environment=Environment.REF,
+        )
+        device_reference_data2.add_questionnaire_response(questionnaire_response)
+        device_reference_data2.add_questionnaire_response(questionnaire_response_2)
+        device_reference_data_repo.write(device_reference_data2)
 
         import api.createDeviceMessageHandlingSystem.index as index
 
@@ -447,3 +456,75 @@ def test_mhs_already_exists() -> None:
         )
         assert expected_error_code in response["body"]
         assert expected_message_code in response["body"]
+
+
+# Currently this test will break.  But it has been left in for when we decide to fix it.
+# def test_mhs_of_differing_envs_allowed() -> None:
+#     with mock_epr_product_with_message_set_drd() as (index, product):
+#         # Execute the lambda
+#         response1 = index.handler(
+#             event={
+#                 "headers": {"version": VERSION},
+#                 "body": json.dumps(
+#                     {"questionnaire_responses": {"spine_mhs": [QUESTIONNAIRE_DATA]}}
+#                 ),
+#                 "pathParameters": {
+#                     "product_team_id": str(product.product_team_id),
+#                     "product_id": str(product.id),
+#                     "environment": Environment.DEV,
+#                 },
+#             }
+#         )
+#
+#         # Validate that the response indicates that a resource was created
+#         assert response1["statusCode"] == 201
+#
+#         _device1 = json_loads(response1["body"])
+#         device1 = Device(**_device1)
+#         assert device1.environment == Environment.DEV
+#
+#         # Retrieve the created resources
+#         repo = DeviceRepository(
+#             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
+#         )
+#
+#         created_device1 = repo.read(
+#             product_team_id=device1.product_team_id,
+#             product_id=device1.product_id,
+#             environment=device1.environment,
+#             id=device1.id,
+#         )
+#         # print(created_device1)
+#
+#         assert created_device1.environment == "dev"
+#
+#         # Execute the lambda again with ref as the environment
+#         response2 = index.handler(
+#             event={
+#                 "headers": {"version": VERSION},
+#                 "body": json.dumps(
+#                     {"questionnaire_responses": {"spine_mhs": [QUESTIONNAIRE_DATA]}}
+#                 ),
+#                 "pathParameters": {
+#                     "product_team_id": str(product.product_team_id),
+#                     "product_id": str(product.id),
+#                     "environment": Environment.REF,
+#                 },
+#             }
+#         )
+#         # print(response2)
+#         # Validate that the response indicates that a resource was created
+#         assert response2["statusCode"] == 201
+#
+#         _device2 = json_loads(response2["body"])
+#         device2 = Device(**_device2)
+#         assert device2.environment == Environment.REF
+#
+#         created_device2 = repo.read(
+#             product_team_id=device2.product_team_id,
+#             product_id=device2.product_id,
+#             environment=device2.environment,
+#             id=device2.id,
+#         )
+#
+#         assert created_device2.environment == "ref"

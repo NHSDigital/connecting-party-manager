@@ -141,6 +141,8 @@ components:
           type: string
         status:
           type: string
+        environment:
+          type: string
         product_id:
           type: string
         product_team_id:
@@ -166,6 +168,20 @@ components:
                 type: string
         questionnaire_responses:
           type: object
+      example:
+        id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        name: "Sample Device"
+        status: "active"
+        environment: "prod"
+        product_id: "123-XXX"
+        product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        ods_code: "F5H1R"
+        questionnaire_responses:
+          - key_type: "foo"
+            key_value: "bar"
+        created_on: "2025-10-15T10:00:00Z"
+        updated_on: "null"
+        deleted_on: "null"
 
     AsDeviceResponse:
       type: object
@@ -181,6 +197,8 @@ components:
         ods_code:
           type: string
         status:
+          type: string
+        environment:
           type: string
         created_on:
           type: string
@@ -207,6 +225,8 @@ components:
         ods_code:
           type: string
         status:
+          type: string
+        environment:
           type: string
         created_on:
           type: string
@@ -248,6 +268,8 @@ components:
           type: string
         status:
           type: string
+        environment:
+          type: string
         created_on:
           type: string
         updated_on:
@@ -262,6 +284,7 @@ components:
         id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
         name: "Sample DeviceReferenceDataResponse"
         status: "active"
+        environment: "prod"
         product_id: "123-XXX"
         product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
         ods_code: "F5H1R"
@@ -284,6 +307,7 @@ components:
           - id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
             name: "Sample Device Reference Data"
             status: "active"
+            environment: "prod"
             product_id: "123-XXX"
             product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
             ods_code: "F5H1R"

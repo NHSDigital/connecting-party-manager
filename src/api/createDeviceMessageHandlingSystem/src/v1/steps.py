@@ -77,7 +77,6 @@ def read_device_reference_data(data, cache) -> DeviceReferenceData:
         product_team_id=path_params.product_team_id,
         environment=environment,
     )
-
     party_key: str = data[get_party_key]
     try:
         (device_reference_data,) = filter(
