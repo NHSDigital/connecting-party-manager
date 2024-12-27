@@ -12,6 +12,3 @@ class Environment(StrEnum):
     REF = auto()
     INT = auto()
     PROD = auto()
-
-    # def __str__(self) -> str:
-    #     return self.name.upper()

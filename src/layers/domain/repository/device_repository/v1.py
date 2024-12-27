@@ -16,7 +16,7 @@ from domain.core.device import (
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key import DeviceKey
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.event import Event
 from domain.repository.compression import pkl_dumps_gzip, pkl_loads_gzip
 from domain.repository.keys import TableKey
@@ -151,7 +151,7 @@ class DeviceRepository(Repository[Device]):
             parent_ids=(product_team_id, product_id, environment.upper()), id=id
         )
 
-    def search(self, product_team_id: str, product_id: str, environment: str):
+    def search(self, product_team_id: str, product_id: str, environment: Environment):
         return super()._search(
             parent_ids=(product_team_id, product_id, environment.upper())
         )

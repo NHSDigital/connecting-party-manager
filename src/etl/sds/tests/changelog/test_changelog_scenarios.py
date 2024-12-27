@@ -86,16 +86,21 @@ def test_transform_and_load(
         expected_objs_with_matching_type = list(
             filter(lambda o: type(o) is type(created_obj), expected_objs)
         )
+
+        failed_assertions = []
         for expected_obj in expected_objs_with_matching_type:
             try:
                 assert equivalent(created_obj, expected_obj)
-            except AssertionError:
-                pass
+            except AssertionError as error:
+                failed_assertions.append(
+                    f"{type(expected_obj)}:{expected_obj.id}: {error}"
+                )
             else:
                 found_match = True
                 break
 
         if not found_match:
+            msg = "\n\n".join(failed_assertions)
             raise ValueError(
-                f"Could not find match in expected output for {created_obj}"
+                f"Could not find match in expected output for {created_obj}. Tried:\n{msg}"
             )
