@@ -1,18 +1,23 @@
-from typing import TYPE_CHECKING
-
 from domain.core.device.v1 import Device
-from domain.repository.device_repository.v1 import decompress_device_fields
+from domain.repository.device_repository.v1 import (
+    decompress_device_fields,
+    delete_tag_index,
+)
 from domain.repository.keys.v1 import TableKey
 from domain.repository.marshall import marshall, unmarshall
+from domain.repository.repository.v1 import Repository
+from sds.epr.updates.etl_device import DeviceHardDeletedEvent
 
-if TYPE_CHECKING:
-    from mypy_boto3_dynamodb import DynamoDBClient
 
-
-class EtlDeviceRepository:
+class EtlDeviceRepository(Repository):
     def __init__(self, table_name, dynamodb_client):
-        self.table_name = table_name
-        self.client: "DynamoDBClient" = dynamodb_client
+        super().__init__(
+            table_name=table_name,
+            model=Device,
+            dynamodb_client=dynamodb_client,
+            parent_table_keys=(TableKey.PRODUCT_TEAM, TableKey.CPM_PRODUCT),
+            table_key=TableKey.DEVICE,
+        )
 
     def read_if_exists(self, id: str) -> Device | None:
         """
@@ -31,4 +36,17 @@ class EtlDeviceRepository:
             (item,) = map(unmarshall, result["Items"])
         except ValueError:
             return None
-        return Device(**decompress_device_fields(item))
+        return self.model(**decompress_device_fields(item))
+
+    def handle_DeviceHardDeletedEvent(self, event: DeviceHardDeletedEvent):
+        delete_root_index = self.delete_index(event.id)
+        delete_key_indexes = [self.delete_index(key["key_value"]) for key in event.keys]
+        tag_delete_transactions = [
+            delete_tag_index(
+                table_name=self.table_name,
+                device_id=event.id,
+                tag_value=tag,
+            )
+            for tag in event.tags
+        ]
+        return [delete_root_index] + delete_key_indexes + tag_delete_transactions

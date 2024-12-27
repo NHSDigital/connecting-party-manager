@@ -2,6 +2,7 @@ from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKey, DeviceKeyType
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.enum import Environment
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire.v1 import Questionnaire
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
@@ -10,7 +11,7 @@ from domain.repository.device_reference_data_repository.v1 import (
 )
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
-from sds.epr.constants import SdsDeviceReferenceDataPath
+from sds.epr.constants import SdsDeviceReferenceDataPath, SdsFieldName
 from sds.epr.getters import (
     get_accredited_system_device_data,
     get_accredited_system_tags,
@@ -31,6 +32,7 @@ from sds.epr.updaters import (
     update_message_sets,
     update_new_additional_interactions,
 )
+from sds.epr.updates.etl_device import EtlDevice
 
 
 def process_request_to_add_mhs(
@@ -205,15 +207,44 @@ def process_request_to_add_as(
 
 def process_request_to_delete_mhs(
     device: Device,
+    cpa_id_to_delete: str,
     device_reference_data_repository: DeviceReferenceDataRepository,
-    message_set_questionnaire: Questionnaire,
-    message_set_field_mapping: dict,
-) -> list[Device, DeviceReferenceData]:
-    raise NotImplementedError()
+) -> list[EtlDevice | DeviceReferenceData]:
+    """
+    * MHS Device has been passed in by CPA ID
+    * Deletes the Message Sets Questionnaire Response that corresponds to this CPA ID
+    * Deletes the Device key corresponding to the CPA ID
+    * If no more keys left in this Device then hard delete the Device
+    """
+    etl_device = EtlDevice(**device.state())
+
+    (message_sets_id,) = device.device_reference_data.keys()
+    message_sets = device_reference_data_repository.read(
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        id=message_sets_id,
+        environment=Environment.PROD,
+    )
+    (message_sets_questionnaire_id,) = message_sets.questionnaire_responses.keys()
+    (message_set_id_to_delete,) = {
+        qr.id
+        for qr in message_sets.questionnaire_responses[message_sets_questionnaire_id]
+        if qr.data[SdsFieldName.CPA_ID] == cpa_id_to_delete
+    }
+
+    etl_device.delete_key(key_type=DeviceKeyType.CPA_ID, key_value=cpa_id_to_delete)
+    message_sets.remove_questionnaire_response(
+        questionnaire_id=message_sets_questionnaire_id,
+        questionnaire_response_id=message_set_id_to_delete,
+    )
+    if len(etl_device.keys) == 0:
+        etl_device.hard_delete()
+    return [etl_device, message_sets]
 
 
 def process_request_to_delete_as(
     device: Device,
+    device_repository: DeviceRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
     additional_interactions_questionnaire: Questionnaire,
 ) -> list[Device, DeviceReferenceData]:

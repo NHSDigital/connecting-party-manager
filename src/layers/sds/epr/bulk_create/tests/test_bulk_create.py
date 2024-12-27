@@ -61,10 +61,10 @@ def message_set_data():
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
-                "Unique Identifier": "AAA-123456:sn-123:in-123",
+                "Unique Identifier": "1wd354",
                 "Contract Property Template Key": "key-123",
                 "Interaction Type": "hl7",
-                "MHS CPA ID": "AAA-123456:sn-123:in-123",
+                "MHS CPA ID": "1wd354",
                 "MHS IN": "in-123",
                 "MHS Is Authenticated": "none",
                 "MHS SN": "sn-123",
@@ -76,10 +76,10 @@ def message_set_data():
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
-                "Unique Identifier": "BBB-123456:sn-456:in-456",
+                "Unique Identifier": "h0394j",
                 "Contract Property Template Key": "key-456",
                 "Interaction Type": "hl7",
-                "MHS CPA ID": "BBB-123456:sn-456:in-456",
+                "MHS CPA ID": "h0394j",
                 "MHS IN": "in-456",
                 "MHS Is Authenticated": "none",
                 "MHS SN": "sn-456",
@@ -92,7 +92,7 @@ def message_set_data():
 
 @pytest.fixture
 def mhs_cpa_ids():
-    return ["AAA-123456:sn-123:in-123", "BBB-123456:sn-456:in-456"]
+    return ["1wd354", "h0394j"]
 
 
 @pytest.fixture
