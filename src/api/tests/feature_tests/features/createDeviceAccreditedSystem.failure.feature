@@ -297,14 +297,16 @@ Feature: Create AS Device - failure scenarios
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
     And I note the response field "$.id" as "as_message_set_drd_id"
     When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
-      | path                                                 | value              |
-      | questionnaire_responses.spine_as.0.Address           | http://example.com |
-      | questionnaire_responses.spine_as.0.Unique Identifier | 123456             |
+      | path                                               | value             |
+      | questionnaire_responses.spine_as.0.ODS Code        | F5H1R             |
+      | questionnaire_responses.spine_as.0.Product Name    | My SPINE Product  |
+      | questionnaire_responses.spine_as.0.Product Version | 2000.01           |
+      | questionnaire_responses.spine_as.0.Requestor URP   | the-requestor-urp |
     Then I receive a status code "400" with body
-      | path             | value                                                                            |
-      | errors.0.code    | MISSING_VALUE                                                                    |
-      | errors.0.message | Failed to validate data against 'spine_as/1': 'Party Key' is a required property |
+      | path             | value                                                                               |
+      | errors.0.code    | MISSING_VALUE                                                                       |
+      | errors.0.message | Failed to validate data against 'spine_as/1': 'Approver URP' is a required property |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 134              |
+      | Content-Length | 137              |

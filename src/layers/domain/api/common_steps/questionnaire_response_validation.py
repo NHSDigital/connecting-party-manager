@@ -1,8 +1,7 @@
+from types import FunctionType
+
 from domain.core.error import ConfigurationError
 from domain.core.questionnaire.v1 import Questionnaire, QuestionnaireResponse
-from domain.repository.questionnaire_repository.v1.questionnaires import (
-    QuestionnaireInstance,
-)
 
 
 def check_expected_questionnaire_response_fields(
@@ -22,11 +21,11 @@ def check_expected_questionnaire_response_fields(
 def process_and_validate_questionnaire_response(
     questionnaire: Questionnaire,
     questionnaire_response: dict,
-    party_key: str,
-    instance: QuestionnaireInstance,
+    generation_strategy: FunctionType,
+    **generation_strategy_kwargs,
 ) -> QuestionnaireResponse:
-    check_expected_questionnaire_response_fields(questionnaire, questionnaire_response)
-    questionnaire.generate_system_fields(
-        questionnaire_response, instance=instance, party_key=party_key
+    check_expected_questionnaire_response_fields(
+        questionnaire=questionnaire, response=questionnaire_response
     )
+    generation_strategy(response=questionnaire_response, **generation_strategy_kwargs)
     return questionnaire.validate(data=questionnaire_response)

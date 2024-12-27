@@ -203,7 +203,7 @@ def test_index_mhs_device(version):
             data={
                 "Address": "https://example.com",
                 "Managing Organization": "Example Org",
-                "MHS Party key": "party-key-001",
+                "MHS Party Key": "party-key-001",
                 "Approver URP": "approver-123",
                 "Date Approved": "2024-01-01",
                 "Date DNS Approved": "2024-01-02",
@@ -362,7 +362,7 @@ def test_index_mhs_device_adjusted_data(version):
             data={
                 "Address": "http://example.com",
                 "Managing Organization": "Example Org",
-                "MHS Party key": "party-key-001",
+                "MHS Party Key": "party-key-001",
                 "Approver URP": "approver-123",
                 "Date Approved": "2024-01-01",
                 "Date DNS Approved": "2024-01-02",
@@ -545,12 +545,16 @@ def test_index_as_device(version):
                 "ODS Code": "FH15R",
                 "Client ODS Codes": ["FH15R"],
                 "ASID": "foobar",
-                "Party Key": "P.123-XXX",
+                "MHS Party Key": "P.123-XXX",
                 "Approver URP": "approver-123",
                 "Date Approved": "2024-01-01",
                 "Requestor URP": "requestor-789",
                 "Date Requested": "2024-01-03",
                 "Product Key": "product-key-001",
+                "MHS Manufacturer Organisation": "AAA",
+                "Product Name": "my spine product",
+                "Product Version": "2001.01",
+                "Temp UID": None,
             }
         )
         device.add_questionnaire_response(spine_as_questionnaire_response)

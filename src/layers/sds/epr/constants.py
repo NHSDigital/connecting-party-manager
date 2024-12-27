@@ -25,11 +25,12 @@ BAD_UNIQUE_IDENTIFIERS = {
 
 
 class SdsFieldName(StrEnum):
+    ODS_CODE = "ODS Code"
     ASID = "ASID"
     CPA_ID = "MHS CPA ID"
     MHS_FQDN = "MHS FQDN"
     ADDRESS = "Address"
-    PARTY_KEY = "MHS Party key"
+    PARTY_KEY = "MHS Party Key"
     MANAGING_ORGANIZATION = "Managing Organization"
     DATE_REQUESTED = "Date Requested"
     DATE_APPROVED = "Date Approved"
@@ -38,6 +39,10 @@ class SdsFieldName(StrEnum):
     MHS_IN = "MHS IN"
     INTERACTION_ID = "Interaction ID"
     UNIQUE_IDENTIFIER = "Unique Identifier"
+    MANUFACTURING_ORG = "MHS Manufacturer Organisation"
+    PRODUCT_KEY = "Product Key"
+    CLIENT_ODS_CODES = "Client ODS Codes"
+    TEMP_UID = "Temp UID"
 
 
 class SdsDeviceReferenceDataPath(StrEnum):

@@ -38,16 +38,22 @@ PRODUCT_NAME = "My Product"
 VERSION = 1
 PARTY_KEY = "ABC1234-987654"
 
-QUESTIONNAIRE_DATA = {
+INPUT_QUESTIONNAIRE_DATA = {
     "ODS Code": "FH15R",
-    "Client ODS Codes": ["FH15R"],
-    "ASID": "foobar",
-    "Party Key": "P.123-XXX",
     "Approver URP": "approver-123",
-    "Date Approved": "2024-01-01",
     "Requestor URP": "requestor-789",
-    "Date Requested": "2024-01-03",
-    "Product Key": "product-key-001",
+    "Product Name": "my spine product",
+    "Product Version": "2001.01",
+}
+OUTPUT_QUESTIONNAIRE_DATA = {
+    "ASID": "200000100000",
+    "Client ODS Codes": [
+        "FH15R",
+    ],
+    "MHS Manufacturer Organisation": "AAA",
+    "MHS Party Key": "ABC1234-987654",
+    "Temp UID": None,
+    **INPUT_QUESTIONNAIRE_DATA,
 }
 
 
@@ -486,7 +492,11 @@ def test_index() -> None:
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
-                    {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
+                    {
+                        "questionnaire_responses": {
+                            "spine_as": [INPUT_QUESTIONNAIRE_DATA]
+                        }
+                    }
                 ),
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
@@ -509,11 +519,14 @@ def test_index() -> None:
         assert device.updated_on.date() == datetime.today().date()
         assert device.deleted_on is None
 
-        # print(device.questionnaire_responses)
         questionnaire_responses = device.questionnaire_responses["spine_as/1"]
         assert len(questionnaire_responses) == 1
         questionnaire_response = questionnaire_responses[0]
-        assert questionnaire_response.data == QUESTIONNAIRE_DATA
+
+        questionnaire_response.data.pop("Date Requested")
+        questionnaire_response.data.pop("Date Approved")
+        questionnaire_response.data.pop("Product Key")
+        assert questionnaire_response.data == OUTPUT_QUESTIONNAIRE_DATA
 
         # Retrieve the created resource
         repo = DeviceRepository(
@@ -548,14 +561,14 @@ def test_index() -> None:
             400,
         ),
         (
-            {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}},
+            {"questionnaire_responses": {"spine_as": [INPUT_QUESTIONNAIRE_DATA]}},
             {},
             "MISSING_VALUE",
             400,
         ),
         (
             {
-                "questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]},
+                "questionnaire_responses": {"spine_as": [INPUT_QUESTIONNAIRE_DATA]},
                 "forbidden_extra_param": "urn:foo",
             },
             {
@@ -567,7 +580,7 @@ def test_index() -> None:
             400,
         ),
         (
-            {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}},
+            {"questionnaire_responses": {"spine_as": [INPUT_QUESTIONNAIRE_DATA]}},
             {
                 "product_id": str(PRODUCT_ID),
                 "product_team_id": "id_that_does_not_exist",
@@ -600,7 +613,7 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
         (
             {
                 "questionnaire_responses": {
-                    "spine_as": [QUESTIONNAIRE_DATA, QUESTIONNAIRE_DATA]
+                    "spine_as": [INPUT_QUESTIONNAIRE_DATA, INPUT_QUESTIONNAIRE_DATA]
                 },
             },
             "VALIDATION_ERROR",
@@ -608,13 +621,9 @@ def test_incoming_errors(body, path_parameters, error_code, status_code):
             400,
         ),
         (
-            {
-                "questionnaire_responses": {
-                    "spine_as": [{"Address": "http://example.com"}]
-                }
-            },
+            {"questionnaire_responses": {"spine_as": [{"ODS Code": "AAA"}]}},
             "MISSING_VALUE",
-            "Failed to validate data against 'spine_as/1': 'Party Key' is a required property",
+            "Failed to validate data against 'spine_as/1': 'Product Name' is a required property",
             400,
         ),
     ],
@@ -648,7 +657,11 @@ def test_all_mhs_message_sets():
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
-                    {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
+                    {
+                        "questionnaire_responses": {
+                            "spine_as": [INPUT_QUESTIONNAIRE_DATA]
+                        }
+                    }
                 ),
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
@@ -672,7 +685,11 @@ def test_not_epr_product():
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
-                    {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
+                    {
+                        "questionnaire_responses": {
+                            "spine_as": [INPUT_QUESTIONNAIRE_DATA]
+                        }
+                    }
                 ),
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
@@ -696,7 +713,11 @@ def test_no_existing_message_set_drd():
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
-                    {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
+                    {
+                        "questionnaire_responses": {
+                            "spine_as": [INPUT_QUESTIONNAIRE_DATA]
+                        }
+                    }
                 ),
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
@@ -720,7 +741,11 @@ def test_less_than_2_existing_message_set_drd():
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
-                    {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
+                    {
+                        "questionnaire_responses": {
+                            "spine_as": [INPUT_QUESTIONNAIRE_DATA]
+                        }
+                    }
                 ),
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
@@ -744,7 +769,11 @@ def test_too_many_message_sets_drd():
             event={
                 "headers": {"version": VERSION},
                 "body": json.dumps(
-                    {"questionnaire_responses": {"spine_as": [QUESTIONNAIRE_DATA]}}
+                    {
+                        "questionnaire_responses": {
+                            "spine_as": [INPUT_QUESTIONNAIRE_DATA]
+                        }
+                    }
                 ),
                 "pathParameters": {
                     "product_team_id": str(product.product_team_id),
