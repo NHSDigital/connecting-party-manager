@@ -183,9 +183,7 @@
       "device_reference_data": {
         "3b66cdef-a172-4cb2-8cea-cec6e2e78f47": ["*"]
       },
-      "updated_on": "2024-12-10T11:05:46.705743+00:00",
-      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
-      "tags": []
+      "updated_on": "2024-12-10T11:05:46.705743+00:00"
     }
   }
 ]

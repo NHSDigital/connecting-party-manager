@@ -1,7 +1,7 @@
-from domain.core.enum import Environment
 import pytest
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKeyType
+from domain.core.enum import Environment
 from domain.core.root.v1 import Root
 from sds.epr.updates.etl_device import DeviceHardDeletedEvent, EtlDevice
 
