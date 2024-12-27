@@ -1,5 +1,5 @@
+from collections.abc import Generator
 from enum import StrEnum
-from typing import Generator
 
 KEY_SEPARATOR = "#"
 

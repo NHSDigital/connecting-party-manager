@@ -103,14 +103,16 @@ def convert_list_likes(obj):
 def as_domain_object(
     obj: dict,
 ) -> ProductTeam | CpmProduct | Device | DeviceReferenceData:
+    errors = []
     for model in (ProductTeam, CpmProduct, Device, DeviceReferenceData):
         try:
             instance = model(**obj)
-            if instance.state() == obj:
+            if instance.state().keys() == obj.keys():
                 return instance
-        except ValidationError:
-            pass
-    raise ValueError(f"Could not find a model for {obj}")
+        except ValidationError as e:
+            errors.append(str(e))
+    msg = "\n\n".join(errors)
+    raise ValueError(f"Could not find a model for {obj}. Tried the following:\n{msg}")
 
 
 def read_all(

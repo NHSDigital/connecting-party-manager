@@ -131,7 +131,9 @@ def read_or_create_empty_additional_interactions(
     device_reference_data_repository: DeviceReferenceDataRepository,
 ) -> DeviceReferenceData:
     device_reference_datas = device_reference_data_repository.search(
-        product_team_id=product.product_team_id, product_id=product.id
+        product_team_id=product.product_team_id,
+        product_id=product.id,
+        environment=Environment.PROD,
     )
 
     try:
@@ -162,7 +164,9 @@ def read_or_create_as_device(
     as_tags: list[dict],
 ) -> Device:
     devices = device_repository.search(
-        product_team_id=product_team.id, product_id=product.id
+        product_team_id=product_team.id,
+        product_id=product.id,
+        environment=Environment.PROD,
     )
     try:
         as_devices = filter(is_as_device, devices)

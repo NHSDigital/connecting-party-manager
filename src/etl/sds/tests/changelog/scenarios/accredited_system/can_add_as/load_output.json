@@ -37,6 +37,7 @@
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",
+    "environment": "prod",
     "created_on": "2024-12-11T11:18:53.532840+00:00",
     "updated_on": "2024-12-11T11:18:53.534066+00:00",
     "deleted_on": null,
@@ -82,7 +83,7 @@
       ]
     },
     "device_reference_data": {
-      "390fc252-02a2-494e-b6fb-16717eec7168": ["*"],
+      "390fc252-02a2-494e-b6fb-16717eec7168": ["*.Interaction ID"],
       "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*.Interaction ID"]
     }
   },
@@ -93,6 +94,7 @@
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",
+    "environment": "prod",
     "questionnaire_responses": {},
     "created_on": "2024-12-11T11:18:53.452472+00:00",
     "updated_on": null,
@@ -105,6 +107,7 @@
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",
+    "environment": "prod",
     "questionnaire_responses": {
       "spine_as_additional_interactions/1": [
         {

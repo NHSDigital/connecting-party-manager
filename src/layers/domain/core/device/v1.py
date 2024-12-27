@@ -201,15 +201,16 @@ class DeviceTag(BaseModel):
         if initialised_with_root and isinstance(item_to_process, str):
             _components = ((k, v) for k, (v,) in parse_qs(item_to_process).items())
         # Case 2: query components are provided (__root__=("foo", "bar"))
-        elif initialised_with_root:
+        elif initialised_with_root and not isinstance(item_to_process, dict):
             _components = ((k, v) for k, v in item_to_process)
-        # Case 3: query components are directly provided (("foo", "bar"))
+        # Case 3: query components are directly provided (("foo", "bar")) or (__root__=("foo", "bar"))
         else:
             _components = ((k, str(v)) for k, v in item_to_process.items())
 
         case_insensitive_components = tuple(
             sorted((k, v.lower()) for k, v in _components)
         )
+
         return {"__root__": case_insensitive_components}
 
     def dict(self, *args, **kwargs):
