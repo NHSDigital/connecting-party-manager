@@ -258,7 +258,9 @@ def process_request_to_delete_as(
     etl_device.hard_delete()
 
     devices = device_repository.search(
-        product_team_id=device.product_team_id, product_id=device.product_id
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+        environment=Environment.PROD,
     )
     additional_interactions = read_additional_interactions_if_exists(
         device_reference_data_repository=device_reference_data_repository,

@@ -5,6 +5,7 @@ from domain.core.device_reference_data.v1 import (
     DeviceReferenceData,
     QuestionnaireResponseUpdatedEvent,
 )
+from domain.core.enum import Environment
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.root.v1 import Root
 from domain.repository.device_reference_data_repository.v1 import (
@@ -135,6 +136,7 @@ def test_process_request_to_delete_as__there_are_other_as_devices_so_dont_clear_
             product_team_id=as_device_1.product_team_id,
             product_id=as_device_1.product_id,
             id=as_device_1.id,
+            environment=Environment.PROD,
         )
         etl_device, modified_additional_interactions = process_request_to_delete_as(
             device=device_to_delete,
@@ -171,6 +173,7 @@ def test_process_request_to_delete_as__there_are_no_more_as_devices_so_do_clear_
             product_team_id=as_device_1.product_team_id,
             product_id=as_device_1.product_id,
             id=as_device_1.id,
+            environment=Environment.PROD,
         )
         etl_device, modified_additional_interactions = process_request_to_delete_as(
             device=device_to_delete,
