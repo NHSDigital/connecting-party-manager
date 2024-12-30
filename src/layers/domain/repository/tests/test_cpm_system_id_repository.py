@@ -3,8 +3,8 @@ from domain.core.cpm_system_id import AsidId, PartyKeyId
 from domain.repository.cpm_system_id_repository import CpmSystemIdRepository
 from domain.repository.keys import TableKey
 from domain.repository.marshall import marshall_value
-from event.aws.client import dynamodb_client
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from test_helpers.terraform import read_terraform_output
 
 

@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 
 import boto3
@@ -38,6 +39,33 @@ def is_s3(request: FixtureRequest) -> bool:
 
 def is_matrix(request: FixtureRequest) -> bool:
     return request.node.get_closest_marker("matrix") is not None
+
+
+def dynamodb_client_with_sleep():
+    """
+    Since we use GSIs we need to give time for the GSI-projections time
+    to sync with the root table. We have implemented sleeps:
+
+    * after 'write' operations.
+    * before 'query' operations.
+    """
+    client = dynamodb_client()
+    unpatched_transact_write_items = client.transact_write_items
+    unpatched_query = client.query
+
+    def _transact_write_items_with_sleep(*args, **kwargs):
+        response = unpatched_transact_write_items(*args, **kwargs)
+        time.sleep(0.5)
+        return response
+
+    def _query_with_sleep(*args, **kwargs):
+        time.sleep(0.2)
+        response = unpatched_query(*args, **kwargs)
+        return response
+
+    client.transact_write_items = _transact_write_items_with_sleep
+    client.query = _query_with_sleep
+    return client
 
 
 def download_files_from_s3(request: FixtureRequest):

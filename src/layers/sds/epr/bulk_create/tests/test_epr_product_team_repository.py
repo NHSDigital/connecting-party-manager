@@ -3,10 +3,10 @@ from random import shuffle
 import pytest
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.product_team_key.v1 import ProductTeamKey, ProductTeamKeyType
-from event.aws.client import dynamodb_client as _dynamodb_client
 from sds.epr.bulk_create.bulk_repository import BulkRepository
 from sds.epr.bulk_create.epr_product_team_repository import EprProductTeamRepository
 
+from conftest import dynamodb_client_with_sleep as _dynamodb_client
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 

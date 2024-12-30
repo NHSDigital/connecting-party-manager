@@ -7,9 +7,9 @@ from domain.core.cpm_system_id import ProductId
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.product_team_repository import ProductTeamRepository
-from event.aws.client import dynamodb_client
 from event.json import json_loads
 
+from conftest import dynamodb_client_with_sleep
 from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
@@ -48,7 +48,7 @@ def test_no_results(version):
     product_team_id = product_team.id
     params = {"product_team_id": product_team_id}
     table_name = read_terraform_output("dynamodb_table_name.value")
-    client = dynamodb_client()
+    client = dynamodb_client_with_sleep()
 
     with mock.patch.dict(
         os.environ,
@@ -103,7 +103,7 @@ def test_no_results(version):
 )
 def test_index(version, product):
     table_name = read_terraform_output("dynamodb_table_name.value")
-    client = dynamodb_client()
+    client = dynamodb_client_with_sleep()
     product_team = _create_org()
     pt_repo = ProductTeamRepository(
         table_name=table_name,
@@ -165,7 +165,7 @@ def test_index(version, product):
 def test_index_no_such_product_team(version):
     params = {"product_team_id": "123456"}
     table_name = read_terraform_output("dynamodb_table_name.value")
-    client = dynamodb_client()
+    client = dynamodb_client_with_sleep()
 
     with mock.patch.dict(
         os.environ,
@@ -220,7 +220,7 @@ def test_index_no_such_product_team(version):
 def test_index_multiple_returned(products):
     version = 1
     table_name = read_terraform_output("dynamodb_table_name.value")
-    client = dynamodb_client()
+    client = dynamodb_client_with_sleep()
 
     product_team = _create_org()
     pt_repo = ProductTeamRepository(
