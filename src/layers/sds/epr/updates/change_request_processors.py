@@ -33,6 +33,7 @@ from sds.epr.updaters import (
     update_new_additional_interactions,
 )
 from sds.epr.updates.etl_device import EtlDevice
+from sds.epr.utils import is_as_device
 
 
 def process_request_to_add_mhs(
@@ -246,9 +247,35 @@ def process_request_to_delete_as(
     device: Device,
     device_repository: DeviceRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
-    additional_interactions_questionnaire: Questionnaire,
-) -> list[Device, DeviceReferenceData]:
-    raise NotImplementedError()
+) -> list[EtlDevice, DeviceReferenceData]:
+    """
+    * AS Device has been passed in by ASID
+    * Hard deletes the AS Device, using the EtlDevice wrapper
+    * If no more AS Devices in this product then also clears all
+      questionnaire responses from the AS DRD
+    """
+    etl_device = EtlDevice(**device.state())
+    etl_device.hard_delete()
+
+    devices = device_repository.search(
+        product_team_id=device.product_team_id, product_id=device.product_id
+    )
+    additional_interactions = read_additional_interactions_if_exists(
+        device_reference_data_repository=device_reference_data_repository,
+        product_team_id=device.product_team_id,
+        product_id=device.product_id,
+    )
+
+    other_as_devices_in_this_product = (
+        d for d in filter(is_as_device, devices) if d.id != device.id
+    )
+    if not any(other_as_devices_in_this_product):
+        (questionnaire_id,) = additional_interactions.questionnaire_responses.keys()
+        additional_interactions.clear_questionnaire_responses(
+            questionnaire_id=questionnaire_id
+        )
+
+    return [etl_device, additional_interactions]
 
 
 def process_request_to_add_to_mhs(

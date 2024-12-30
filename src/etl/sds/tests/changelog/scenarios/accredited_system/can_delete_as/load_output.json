@@ -1,0 +1,74 @@
+[
+  {
+    "id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "name": "C3O9X (EPR)",
+    "ods_code": "C3O9X",
+    "status": "active",
+    "created_on": "2024-12-11T11:18:53.365591+00:00",
+    "updated_on": null,
+    "deleted_on": null,
+    "keys": [{ "key_type": "epr_id", "key_value": "EPR-C3O9X" }]
+  },
+  {
+    "id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "name": "00000a84594b2ef34279",
+    "ods_code": "C3O9X",
+    "status": "active",
+    "created_on": "2024-12-11T11:18:53.407960+00:00",
+    "updated_on": "2024-12-11T11:18:53.408432+00:00",
+    "deleted_on": null,
+    "keys": [{ "key_type": "party_key", "key_value": "C3O9X-806782" }]
+  },
+  {
+    "id": "fe15bd58-6897-4566-9a87-aab781fd96b5",
+    "name": "C3O9X-806782 - Accredited System",
+    "status": "active",
+    "product_id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "ods_code": "C3O9X",
+    "created_on": "2024-12-11T11:18:53.532840+00:00",
+    "updated_on": "2024-12-11T11:18:53.534066+00:00",
+    "deleted_on": null,
+    "keys": [
+      { "key_type": "accredited_system_id", "key_value": "000000000002" }
+    ],
+    "tags": [],
+    "questionnaire_responses": {
+      "spine_as/1": [
+        {
+          "id": "07dacf01-359a-4276-9dd2-e11ecb07076a",
+          "questionnaire_name": "spine_as",
+          "questionnaire_version": "1",
+          "data": {},
+          "created_on": "2024-12-11T11:18:53.456536+00:00"
+        }
+      ]
+    },
+    "device_reference_data": { "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*"] }
+  },
+  {
+    "id": "68cd98db-5d8d-45dc-ba9a-09e892535d83",
+    "name": "C3O9X-806782 - Additional Interactions",
+    "status": "active",
+    "product_id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "ods_code": "C3O9X",
+    "questionnaire_responses": {
+      "spine_as_additional_interactions/1": [
+        {
+          "id": "2071f8ac-a020-4bf3-b413-c205004bfb08",
+          "questionnaire_name": "spine_as_additional_interactions",
+          "questionnaire_version": "1",
+          "data": {
+            "Interaction ID": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+          },
+          "created_on": "2024-12-11T11:18:53.409854+00:00"
+        }
+      ]
+    },
+    "created_on": "2024-12-11T11:18:53.452472+00:00",
+    "updated_on": "2024-12-11T11:18:53.452853+00:00",
+    "deleted_on": null
+  }
+]
