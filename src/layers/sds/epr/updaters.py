@@ -9,6 +9,7 @@ class UnexpectedModification(Exception): ...
 
 
 JSON_SCHEMA_PROPERTIES_KEYWORD = "properties"
+JSON_SCHEMA_REQUIRED_KEYWORD = "required"
 JSON_SCHEMA_TYPE_KEYWORD = "type"
 JSON_SCHEMA_ARRAY_FIELD_TYPE = "array"
 
@@ -120,4 +121,22 @@ def ldif_add_to_field_in_questionnaire(
     # Copy, update and validate the new data
     updated_data = dict(current_data)
     updated_data[field_name] = updated_value
+    return questionnaire.validate(updated_data)
+
+
+def ldif_remove_field_from_questionnaire(
+    field_name: str,
+    new_values: list[str],  # noqa
+    current_data: dict[str, list[str] | str],
+    questionnaire: Questionnaire,
+):
+    required_fields = set(
+        questionnaire.json_schema.get(JSON_SCHEMA_REQUIRED_KEYWORD, ())
+    )
+    if field_name in required_fields:
+        raise UnexpectedModification(f"Cannot remove required field '{field_name}'")
+
+    # Copy, update and validate the new data
+    updated_data = dict(current_data)
+    updated_data.pop(field_name)
     return questionnaire.validate(updated_data)

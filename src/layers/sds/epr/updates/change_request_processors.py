@@ -33,6 +33,7 @@ from sds.epr.readers import (
 from sds.epr.updaters import (
     UnexpectedModification,
     ldif_add_to_field_in_questionnaire,
+    ldif_remove_field_from_questionnaire,
     remove_erroneous_additional_interactions,
     update_message_sets,
     update_new_additional_interactions,
@@ -392,7 +393,18 @@ def process_request_to_delete_from_mhs(
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
 ) -> list[Device, DeviceReferenceData, DeviceReferenceData]:
-    raise NotImplementedError()
+    return _process_request_to_modify_mhs(
+        device=device,
+        cpa_id_to_modify=cpa_id_to_modify,
+        field_name=field_name,
+        new_values=new_values,
+        device_reference_data_repository=device_reference_data_repository,
+        mhs_device_questionnaire=mhs_device_questionnaire,
+        mhs_device_field_mapping=mhs_device_field_mapping,
+        message_set_questionnaire=message_set_questionnaire,
+        message_set_field_mapping=message_set_field_mapping,
+        ldif_modify_field_in_questionnaire=ldif_remove_field_from_questionnaire,
+    )
 
 
 def process_request_to_add_to_as(
