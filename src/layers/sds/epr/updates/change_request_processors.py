@@ -1,4 +1,5 @@
 from collections.abc import Callable
+
 from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKey, DeviceKeyType
@@ -12,20 +13,18 @@ from domain.repository.device_reference_data_repository.v1 import (
 )
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
-from sds.epr.constants import SdsDeviceReferenceDataPath
 from sds.epr.constants import CPM_MHS_IMMUTABLE_FIELDS, SdsDeviceReferenceDataPath
 from sds.epr.getters import (
-    get_message_set_data,
-    get_mhs_device_data,
     get_accredited_system_device_data,
     get_accredited_system_tags,
+    get_message_set_data,
+    get_mhs_device_data,
 )
-
 from sds.epr.readers import (
     read_additional_interactions_if_exists,
+    read_message_sets_from_mhs_device,
     read_or_create_as_device,
     read_or_create_empty_additional_interactions,
-    read_message_sets_from_mhs_device,
     read_or_create_empty_message_sets,
     read_or_create_epr_product,
     read_or_create_epr_product_team,

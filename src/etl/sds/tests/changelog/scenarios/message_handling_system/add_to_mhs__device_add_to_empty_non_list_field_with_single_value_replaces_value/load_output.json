@@ -27,6 +27,7 @@
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",
+    "environment": "prod",
     "created_on": "2024-12-11T11:18:53.532840+00:00",
     "updated_on": "2024-12-11T11:18:53.534066+00:00",
     "deleted_on": null,
@@ -42,7 +43,7 @@
             "Managing Organization": "C3O9X",
             "Address": "https://test.C3O9X.nhs.uk/",
             "DNS Approver": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
-            "MHS Party key": "C3O9X-823610",
+            "MHS Party Key": "C3O9X-823610",
             "Date Approved": "20231030092939",
             "Product Version": "2001.01",
             "Approver URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
@@ -65,6 +66,7 @@
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",
+    "environment": "prod",
     "questionnaire_responses": {
       "spine_mhs_message_sets/1": [
         {

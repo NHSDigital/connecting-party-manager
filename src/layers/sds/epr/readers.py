@@ -193,4 +193,5 @@ def read_message_sets_from_mhs_device(
         product_team_id=mhs_device.product_team_id,
         product_id=mhs_device.product_id,
         id=message_sets_id,
+        environment=Environment.PROD,
     )
