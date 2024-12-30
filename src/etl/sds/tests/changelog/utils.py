@@ -167,3 +167,9 @@ ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT = read_ldif(
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
     "add/message_handling_system.SameProductTeam.DifferentProduct.ldif"
 )
+MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_DEVICE_FIELD = create_modify_ldif(
+    "add/nhs_product_version.ldif", device_type="message_handling_system"
+)
+MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_MESSAGE_SET_FIELD = create_modify_ldif(
+    "add/nhs_mhs_retries.ldif", device_type="message_handling_system"
+)

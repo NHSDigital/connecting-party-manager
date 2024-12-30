@@ -7,12 +7,7 @@
     "created_on": "2024-12-11T11:18:53.365591+00:00",
     "updated_on": null,
     "deleted_on": null,
-    "keys": [
-      {
-        "key_type": "epr_id",
-        "key_value": "EPR-C3O9X"
-      }
-    ]
+    "keys": [{ "key_type": "epr_id", "key_value": "EPR-C3O9X" }]
   },
   {
     "id": "P.9AN-PJG",
@@ -23,30 +18,19 @@
     "created_on": "2024-12-11T11:18:53.407960+00:00",
     "updated_on": "2024-12-11T11:18:53.408432+00:00",
     "deleted_on": null,
-    "keys": [
-      {
-        "key_type": "party_key",
-        "key_value": "C3O9X-823610"
-      }
-    ]
+    "keys": [{ "key_type": "party_key", "key_value": "C3O9X-823610" }]
   },
   {
     "id": "fe15bd58-6897-4566-9a87-aab781fd96b5",
     "name": "C3O9X-823610 - Message Handling System",
     "status": "active",
-    "environment": "prod",
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",
     "created_on": "2024-12-11T11:18:53.532840+00:00",
     "updated_on": "2024-12-11T11:18:53.534066+00:00",
     "deleted_on": null,
-    "keys": [
-      {
-        "key_type": "cpa_id",
-        "key_value": "00000a84594b2ef34279"
-      }
-    ],
+    "keys": [{ "key_type": "cpa_id", "key_value": "00000a84594b2ef34279" }],
     "tags": [],
     "questionnaire_responses": {
       "spine_mhs/1": [
@@ -58,8 +42,9 @@
             "Managing Organization": "C3O9X",
             "Address": "https://test.C3O9X.nhs.uk/",
             "DNS Approver": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
-            "MHS Party Key": "C3O9X-823610",
+            "MHS Party key": "C3O9X-823610",
             "Date Approved": "20231030092939",
+            "Product Version": "2001.01",
             "Approver URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
             "Date DNS Approved": "20231030092939",
             "Requestor URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
@@ -71,15 +56,12 @@
         }
       ]
     },
-    "device_reference_data": {
-      "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*"]
-    }
+    "device_reference_data": { "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*"] }
   },
   {
     "id": "68cd98db-5d8d-45dc-ba9a-09e892535d83",
     "name": "C3O9X-823610 - MHS Message Sets",
     "status": "active",
-    "environment": "prod",
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
     "ods_code": "C3O9X",

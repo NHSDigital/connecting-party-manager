@@ -24,9 +24,9 @@ def test_route_mhs_modification_request():
         "objectclass": {"modify"},
         "uniqueidentifier": {"123"},
         "modifications": [
-            ["add", "foo", "bar"],
-            ["replace", "foo", "bar"],
-            ["delete", "foo", "bar"],
+            ["add", "nhsproductversion", ["bar"]],
+            ["replace", "nhsproductversion", ["bar"]],
+            ["delete", "nhsproductversion", ""],
         ],
     }
 
@@ -37,6 +37,7 @@ def test_route_mhs_modification_request():
     ):
         assert route_mhs_modification_request(
             request=modification_request,
+            cpa_id_to_modify=None,
             device=None,
             device_reference_data_repository=None,
             mhs_device_questionnaire=None,
@@ -62,9 +63,9 @@ def test_route_as_modification_request():
         "objectclass": {"modify"},
         "uniqueidentifier": {"123"},
         "modifications": [
-            ["add", "foo", "bar"],
-            ["replace", "foo", "bar"],
-            ["delete", "foo", "bar"],
+            ["add", "nhsproductversion", ["bar"]],
+            ["replace", "nhsproductversion", ["bar"]],
+            ["delete", "nhsproductversion", ""],
         ],
     }
 
