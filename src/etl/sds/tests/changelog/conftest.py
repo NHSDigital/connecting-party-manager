@@ -46,7 +46,11 @@ def scenario(request: pytest.FixtureRequest) -> Scenario:
     scenario_path: Path = request.param
     scenario_name = f"{scenario_path.parent.name}/{scenario_path.name}"
 
-    spec = spec_from_file_location(scenario_name, str(scenario_path / "__init__.py"))
+    scenario_config = scenario_path / "__init__.py"
+    if not scenario_config.exists():
+        pytest.skip(f"No config found at{scenario_config}")
+
+    spec = spec_from_file_location(scenario_name, str(scenario_config))
     module = module_from_spec(spec)
     sys.modules[scenario_name] = module
     spec.loader.exec_module(module)
