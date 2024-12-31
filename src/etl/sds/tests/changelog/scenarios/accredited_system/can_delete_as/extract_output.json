@@ -40,5 +40,10 @@
     "nhs_as_acf": null,
     "nhs_as_category_bag": null,
     "description": null
+  },
+  {
+    "change_type": "delete",
+    "object_class": "delete",
+    "unique_identifier": "000000000001"
   }
 ]
