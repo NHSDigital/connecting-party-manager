@@ -1,4 +1,3 @@
-import time
 from copy import deepcopy
 
 import pytest
@@ -150,7 +149,6 @@ def test__device_repository__update(device: Device, repository: DeviceRepository
     intermediate_device.update(name="foo-bar")
 
     repository.write(intermediate_device)
-    time.sleep(1)
 
     final_device = repository.read(
         product_team_id=device.product_team_id,
@@ -170,7 +168,6 @@ def test__device_repository__delete(
     device_with_tag: Device, repository: DeviceRepository
 ):
     repository.write(device_with_tag)
-    time.sleep(1)
 
     read_query = dict(
         product_team_id=device_with_tag.product_team_id,
@@ -183,7 +180,6 @@ def test__device_repository__delete(
     device = repository.read(**read_query)
     device.delete()
     repository.write(device)
-    time.sleep(1)
 
     # Attempt to read the original device, expecting an ItemNotFound error
     with pytest.raises(ItemNotFound):
@@ -213,7 +209,6 @@ def test__device_repository__can_delete_second_device_with_same_key(
     device = product.create_device(name="OriginalDevice", environment=Environment.DEV)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     repository.write(device)
-    time.sleep(1)
 
     read_query = dict(
         product_team_id=device.product_team_id,
@@ -226,7 +221,6 @@ def test__device_repository__can_delete_second_device_with_same_key(
     device.clear_events()
     device.delete()
     repository.write(device)
-    time.sleep(1)
 
     with pytest.raises(ItemNotFound):
         repository.read(**read_query)
@@ -247,14 +241,12 @@ def test__device_repository__can_delete_second_device_with_same_key(
         _device = product.create_device(name=f"Device-{i}", environment=Environment.DEV)
         _device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
         repository.write(_device)
-        time.sleep(1)
 
         repository.read(**read_query)  # passes
 
         _device.clear_events()
         _device.delete()
         repository.write(_device)
-        time.sleep(1)
         with pytest.raises(ItemNotFound):
             repository.read(**read_query)
 
@@ -285,7 +277,6 @@ def test__device_repository__add_key(device: Device, repository: DeviceRepositor
         key_type=DeviceKeyType.PRODUCT_ID, key_value="P.AAA-CCC"
     )
     repository.write(intermediate_device)
-    time.sleep(1)
 
     # Read the same device multiple times, indexed by key and id
     # to verify that they're all the same

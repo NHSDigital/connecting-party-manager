@@ -1,4 +1,3 @@
-import time
 from collections import defaultdict
 
 import pytest
@@ -15,7 +14,6 @@ DONT_COMPARE_FIELDS = {"tags"}
 @pytest.mark.integration
 def test__device_repository__tags(device: Device, repository: DeviceRepository):
     repository.write(device)
-    time.sleep(1)
 
     (_device_123,) = repository.query_by_tag(abc=123)
     assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(
@@ -39,7 +37,6 @@ def test__device_repository__tag_does_not_exist(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    time.sleep(1)
 
     results = repository.query_by_tag(abc=12)
     assert len(results) == 0
@@ -55,7 +52,6 @@ def test__device_repository__multiple_devices_with_same_tags(
     repository.write(device)
     repository.write(device_with_asid)
     repository.write(device_with_mhs_id)
-    time.sleep(2)
 
     devices = repository.query_by_tag(bar="foo")
     assert len(devices) == 3
@@ -115,7 +111,6 @@ def _test_add_two_tags(
 @pytest.mark.integration
 def test__device_repository__add_two_tags(device: Device, repository: DeviceRepository):
     repository.write(device)
-    time.sleep(1)
 
     second_device = repository.read(
         product_team_id=device.product_team_id,
@@ -126,7 +121,6 @@ def test__device_repository__add_two_tags(device: Device, repository: DeviceRepo
     second_device.add_tag(shoe_size=123)
     second_device.add_tag(shoe_size=456)
     repository.write(second_device)
-    time.sleep(1)
 
     assert _test_add_two_tags(
         device=device, second_device=second_device, repository=repository
@@ -138,7 +132,6 @@ def test__device_repository__add_two_tags_at_once(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    time.sleep(1)
 
     second_device = repository.read(
         product_team_id=device.product_team_id,
@@ -148,7 +141,6 @@ def test__device_repository__add_two_tags_at_once(
     )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
     repository.write(second_device)
-    time.sleep(1)
 
     assert _test_add_two_tags(
         device=device, second_device=second_device, repository=repository
@@ -160,7 +152,6 @@ def test__device_repository__add_two_tags_and_then_clear(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    time.sleep(1)
 
     second_device = repository.read(
         product_team_id=device.product_team_id,
@@ -170,12 +161,10 @@ def test__device_repository__add_two_tags_and_then_clear(
     )
     second_device.add_tags([dict(shoe_size=123), dict(shoe_size=456)])
     repository.write(second_device)
-    time.sleep(1)
 
     second_device.clear_events()
     second_device.clear_tags()
     repository.write(second_device)
-    time.sleep(2)
 
     assert (
         repository.read(
@@ -239,7 +228,6 @@ def test__device_repository__drop_mandatory_fields(
     device: Device, repository: DeviceRepository
 ):
     repository.write(device)
-    time.sleep(1)
 
     (_device_123,) = repository.query_by_tag(abc=123)
     assert _device_123.dict(exclude=DONT_COMPARE_FIELDS) == device.dict(

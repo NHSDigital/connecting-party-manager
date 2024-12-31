@@ -16,7 +16,7 @@ from domain.core.device import (
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.device_key import DeviceKey
-from domain.core.enum import Status
+from domain.core.enum import Environment, Status
 from domain.core.event import Event
 from domain.repository.compression import pkl_dumps_gzip, pkl_loads_gzip
 from domain.repository.keys import TableKey
@@ -151,7 +151,7 @@ class DeviceRepository(Repository[Device]):
             parent_ids=(product_team_id, product_id, environment.upper()), id=id
         )
 
-    def search(self, product_team_id: str, product_id: str, environment: str):
+    def search(self, product_team_id: str, product_id: str, environment: Environment):
         return super()._search(
             parent_ids=(product_team_id, product_id, environment.upper())
         )
@@ -412,12 +412,36 @@ class DeviceRepository(Repository[Device]):
     def handle_DeviceReferenceDataIdAddedEvent(
         self, event: DeviceReferenceDataIdAddedEvent
     ) -> TransactItem:
-        pk = TableKey.DEVICE.key(event.id)
         data = asdict(event)
-        data.pop("id")
-        return update_transactions(
-            table_name=self.table_name, primary_keys=[marshall(pk=pk, sk=pk)], data=data
+
+        device_id = data.pop("id")
+        root_pk = self.table_key.key(device_id)
+        key_pks = (
+            self.table_key.key(DeviceKey(**k).key_value) for k in data.pop("keys")
         )
+
+        update_tag_transactions = update_tag_indexes(
+            table_name=self.table_name,
+            device_id=device_id,
+            tag_values=data.pop("tags"),
+            data=data,
+        )
+
+        root_pk = self.table_key.key(event.id)
+        (root_transaction,) = update_transactions(
+            table_name=self.table_name,
+            primary_keys=[marshall(pk=root_pk, sk=root_pk)],
+            data=data,
+        )
+
+        key_pks = (self.table_key.key(DeviceKey(**k).key_value) for k in event.keys)
+        key_transactions = update_transactions(
+            table_name=self.table_name,
+            primary_keys=[marshall(pk=pk, sk=pk) for pk in key_pks],
+            data=data,
+        )
+
+        return [root_transaction] + key_transactions + update_tag_transactions
 
     def handle_QuestionnaireResponseUpdatedEvent(
         self, event: QuestionnaireResponseUpdatedEvent

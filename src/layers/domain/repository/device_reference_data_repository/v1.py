@@ -6,6 +6,7 @@ from domain.core.device_reference_data import (
     DeviceReferenceDataCreatedEvent,
     QuestionnaireResponseUpdatedEvent,
 )
+from domain.core.enum import Environment
 from domain.repository.keys import TableKey
 from domain.repository.repository import Repository
 from domain.repository.transaction import TransactItem
@@ -35,7 +36,7 @@ class DeviceReferenceDataRepository(Repository[DeviceReferenceData]):
             parent_ids=(product_team_id, product_id, environment.upper()), id=id
         )
 
-    def search(self, product_team_id: str, product_id: str, environment: str):
+    def search(self, product_team_id: str, product_id: str, environment: Environment):
         return super()._search(
             parent_ids=(product_team_id, product_id, environment.upper())
         )

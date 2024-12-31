@@ -11,8 +11,8 @@ Feature: Headers - failure scenarios
       | errors.0.code    | MISSING_VALUE                         |
       | errors.0.message | Event.headers.version: field required |
     And the response headers contain:
-      | name    | value |
-      | Version | null  |
+      | name    | value              |
+      | Version | ${ literal(null) } |
 
   Scenario Outline: Version is invalid
     Given "bad" request headers:
@@ -25,8 +25,8 @@ Feature: Headers - failure scenarios
       | errors.0.code    | VALIDATION_ERROR                                    |
       | errors.0.message | Event.headers.version: value is not a valid integer |
     And the response headers contain:
-      | name    | value |
-      | Version | null  |
+      | name    | value              |
+      | Version | ${ literal(null) } |
 
     Examples:
       | version      |
@@ -45,8 +45,8 @@ Feature: Headers - failure scenarios
       | errors.0.code    | ACCESS_DENIED                    |
       | errors.0.message | Version not supported: <version> |
     And the response headers contain:
-      | name    | value |
-      | Version | null  |
+      | name    | value              |
+      | Version | ${ literal(null) } |
 
     Examples:
       | version |

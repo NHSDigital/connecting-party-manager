@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "Interaction ID": {
-      "type": "string"
+      "type": "string",
+      "system generated": false
     }
   },
   "required": ["Interaction ID"],

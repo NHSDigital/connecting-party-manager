@@ -6,9 +6,9 @@ from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository import ProductTeamRepository
 from domain.response.validation_errors import InboundValidationError
-from event.aws.client import dynamodb_client
 from event.step_chain import StepChain
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from test_helpers.dynamodb import mock_table
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 

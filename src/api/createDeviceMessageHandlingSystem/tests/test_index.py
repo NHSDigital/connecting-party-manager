@@ -51,7 +51,7 @@ QUESTIONNAIRE_DATA = {
 }
 QUESTIONNAIRE_DATA_SYSTEM_GENERATED_FIELDS = {
     "Address": "https://mhs.example.com",
-    "MHS Party key": PARTY_KEY,
+    "MHS Party Key": PARTY_KEY,
     "Date Approved": "datetime",
     "Date DNS Approved": "None",
     "Date Requested": "datetime",

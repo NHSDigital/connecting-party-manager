@@ -11,9 +11,9 @@ from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.product_team_repository import ProductTeamRepository
-from event.aws.client import dynamodb_client
 from event.json import json_loads
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output

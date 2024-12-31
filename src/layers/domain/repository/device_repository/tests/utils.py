@@ -1,12 +1,12 @@
-from typing import Generator
+from collections.abc import Generator
 
 from domain.core.device import Device
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository import DeviceRepository
-from event.aws.client import dynamodb_client
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 

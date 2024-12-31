@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-12-27
+- [PI-602] Update spine_as Questionnaire
+- [PI-687] ETL: Delete an MHS
+- [PI-686] ETL: Add an AS
+- [PI-629] Add search DRD tests
+- [PI-700] Sleepy tests
+
 ## 2024-12-23
 - [PI-652] Evironment layers
 

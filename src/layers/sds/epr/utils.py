@@ -32,7 +32,19 @@ def is_as_device(device: Device) -> bool:
 def get_interaction_ids(
     message_sets_or_additional_interactions: DeviceReferenceData,
 ) -> set[str]:
-    (questionnaire_responses,) = (
+    questionnaire_responses = (
         message_sets_or_additional_interactions.questionnaire_responses.values()
     )
-    return {qr.data[SdsFieldName.INTERACTION_ID] for qr in questionnaire_responses}
+
+    try:
+        (questionnaire_responses,) = (
+            message_sets_or_additional_interactions.questionnaire_responses.values()
+        )
+    except ValueError:
+        interaction_ids = set()
+    else:
+        interaction_ids = {
+            qr.data[SdsFieldName.INTERACTION_ID] for qr in questionnaire_responses
+        }
+
+    return interaction_ids

@@ -75,7 +75,7 @@ def mhs_device_data():
         "Date DNS Approved": "yesterday",
         "Date Requested": "a week ago",
         "MHS FQDN": "my-fqdn",
-        "MHS Party key": "AAA-123456",
+        "MHS Party Key": "AAA-123456",
         "Managing Organization": "AAA",
         "Product Name": "My EPR Product",
         "Requestor URP": "requester-123",
@@ -190,7 +190,8 @@ def test_read_additional_interactions_if_exists(
     device_reference_data_repository.write(additional_interactions)
     _additional_interactions = read_additional_interactions_if_exists(
         device_reference_data_repository=device_reference_data_repository,
-        product=product,
+        product_team_id=product.product_team_id,
+        product_id=product.id,
     )
     assert _additional_interactions == additional_interactions
 
@@ -201,7 +202,8 @@ def test_read_additional_interactions_if_exists_default(
 ):
     _additional_interactions = read_additional_interactions_if_exists(
         device_reference_data_repository=device_reference_data_repository,
-        product=product,
+        product_team_id=product.product_team_id,
+        product_id=product.id,
     )
     assert _additional_interactions is None
 

@@ -46,7 +46,7 @@ def mhs_data():
             "Managing Organization": "AAA",
             "Address": "https://my-fqdn",
             "MHS FQDN": "my-fqdn",
-            "MHS Party key": "AAA-123456",
+            "MHS Party Key": "AAA-123456",
             "Product Name": "My EPR Product",
             "Requestor URP": "requester-123",
             "MHS Manufacturer Organisation": "AAA",
@@ -61,10 +61,10 @@ def message_set_data():
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
-                "Unique Identifier": "AAA-123456:sn-123:in-123",
+                "Unique Identifier": "1wd354",
                 "Contract Property Template Key": "key-123",
                 "Interaction Type": "hl7",
-                "MHS CPA ID": "AAA-123456:sn-123:in-123",
+                "MHS CPA ID": "1wd354",
                 "MHS IN": "in-123",
                 "MHS Is Authenticated": "none",
                 "MHS SN": "sn-123",
@@ -76,10 +76,10 @@ def message_set_data():
             "questionnaire_name": "spine_mhs_message_sets",
             "questionnaire_version": "1",
             "data": {
-                "Unique Identifier": "BBB-123456:sn-456:in-456",
+                "Unique Identifier": "h0394j",
                 "Contract Property Template Key": "key-456",
                 "Interaction Type": "hl7",
-                "MHS CPA ID": "BBB-123456:sn-456:in-456",
+                "MHS CPA ID": "h0394j",
                 "MHS IN": "in-456",
                 "MHS Is Authenticated": "none",
                 "MHS SN": "sn-456",
@@ -92,7 +92,7 @@ def message_set_data():
 
 @pytest.fixture
 def mhs_cpa_ids():
-    return ["AAA-123456:sn-123:in-123", "BBB-123456:sn-456:in-456"]
+    return ["1wd354", "h0394j"]
 
 
 @pytest.fixture
@@ -116,6 +116,11 @@ def additional_interactions_data():
         {
             "questionnaire_name": "spine_as_additional_interactions",
             "questionnaire_version": "1",
+            "data": {"Interaction ID": "interaction-id-3"},
+        },
+        {
+            "questionnaire_name": "spine_as_additional_interactions",
+            "questionnaire_version": "1",
             "data": {"Interaction ID": "interaction-id-4"},
         },
     ]
@@ -135,9 +140,12 @@ def as_device_data():
                 "Date Requested": "a week ago",
                 "ODS Code": "AAA",
                 "MHS Manufacturer Organisation": "AAA",
-                "Party Key": "AAA-123456",
+                "MHS Party Key": "AAA-123456",
                 "Product Key": "key-123",
                 "Client ODS Codes": ["ABC", "CDE", "EFG"],
+                "Product Name": None,
+                "Product Version": None,
+                "Temp UID": None,
             },
         },
         {
@@ -151,9 +159,12 @@ def as_device_data():
                 "Date Requested": "a week ago",
                 "ODS Code": "BBB",
                 "MHS Manufacturer Organisation": "AAA",
-                "Party Key": "AAA-456789",
+                "MHS Party Key": "AAA-456789",
                 "Product Key": "key-123",
                 "Client ODS Codes": ["ABC", "JKL", "LMN"],
+                "Product Name": None,
+                "Product Version": None,
+                "Temp UID": None,
             },
         },
     ]
@@ -185,11 +196,11 @@ def as_tags():
         [
             {
                 "nhs_id_code": "BBB",
-                "nhs_as_svc_ia": "interaction-id-2",
+                "nhs_as_svc_ia": "interaction-id-3",
             },
             {
                 "nhs_id_code": "BBB",
-                "nhs_as_svc_ia": "interaction-id-2",
+                "nhs_as_svc_ia": "interaction-id-3",
                 "nhs_mhs_party_key": "AAA-456789",
             },
             {

@@ -13,6 +13,8 @@ from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from sds.epr.constants import EprNameTemplate
 from sds.epr.creators import (
+    create_additional_interactions,
+    create_as_device,
     create_epr_product,
     create_epr_product_team,
     create_message_sets,
@@ -20,6 +22,7 @@ from sds.epr.creators import (
 )
 from sds.epr.utils import (
     is_additional_interactions_device_reference_data,
+    is_as_device,
     is_message_set_device_reference_data,
     is_mhs_device,
 )
@@ -53,11 +56,13 @@ def read_or_create_epr_product(
 
 
 def read_additional_interactions_if_exists(
-    device_reference_data_repository: DeviceReferenceDataRepository, product: CpmProduct
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    product_team_id: str,
+    product_id: str,
 ) -> DeviceReferenceData | None:
     device_reference_datas = device_reference_data_repository.search(
-        product_team_id=product.product_team_id,
-        product_id=product.id,
+        product_team_id=product_team_id,
+        product_id=product_id,
         environment=Environment.PROD,
     )
 
@@ -118,3 +123,62 @@ def read_or_create_mhs_device(
             message_sets_id=message_sets.id,
         )
     return mhs_device
+
+
+def read_or_create_empty_additional_interactions(
+    product: CpmProduct,
+    party_key: str,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+) -> DeviceReferenceData:
+    device_reference_datas = device_reference_data_repository.search(
+        product_team_id=product.product_team_id,
+        product_id=product.id,
+        environment=Environment.PROD,
+    )
+
+    try:
+        (additional_interactions,) = filter(
+            is_additional_interactions_device_reference_data, device_reference_datas
+        )
+    except ValueError:
+        additional_interactions = create_additional_interactions(
+            product=product, party_key=party_key, additional_interactions_data=[]
+        )
+    return additional_interactions
+
+
+def asid_equals(as_device: Device, asid: str) -> bool:
+    (_asid,) = (k.key_value for k in as_device.keys)
+    return _asid == asid
+
+
+def read_or_create_as_device(
+    device_repository: DeviceRepository,
+    asid: str,
+    party_key: str,
+    product_team: ProductTeam,
+    product: CpmProduct,
+    message_sets: DeviceReferenceData,
+    additional_interactions: DeviceReferenceData,
+    accredited_system_device_data: QuestionnaireResponse,
+    as_tags: list[dict],
+) -> Device:
+    devices = device_repository.search(
+        product_team_id=product_team.id,
+        product_id=product.id,
+        environment=Environment.PROD,
+    )
+    try:
+        as_devices = filter(is_as_device, devices)
+        (as_device,) = filter(lambda d: asid_equals(d, asid), as_devices)
+    except ValueError:
+        as_device = create_as_device(
+            product=product,
+            party_key=party_key,
+            asid=asid,
+            as_device_data=accredited_system_device_data,
+            message_sets_id=message_sets.id,
+            additional_interactions_id=additional_interactions.id,
+            as_tags=as_tags,
+        )
+    return as_device

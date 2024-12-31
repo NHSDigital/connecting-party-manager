@@ -103,14 +103,16 @@ def convert_list_likes(obj):
 def as_domain_object(
     obj: dict,
 ) -> ProductTeam | CpmProduct | Device | DeviceReferenceData:
+    errors = []
     for model in (ProductTeam, CpmProduct, Device, DeviceReferenceData):
         try:
             instance = model(**obj)
-            if instance.state() == obj:
+            if instance.state().keys() == obj.keys():
                 return instance
-        except ValidationError:
-            pass
-    raise ValueError(f"Could not find a model for {obj}")
+        except ValidationError as e:
+            errors.append(str(e))
+    msg = "\n\n".join(errors)
+    raise ValueError(f"Could not find a model for {obj}. Tried the following:\n{msg}")
 
 
 def read_all(
@@ -138,11 +140,24 @@ def read_all(
 
 
 ADD_ACCREDITED_SYSTEM = read_ldif("add/accredited_system.ldif")
+ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT = read_ldif(
+    "add/accredited_system.SameProduct.ldif"
+)
+ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
+    "add/accredited_system.SameProductTeam.DifferentProduct.ldif"
+)
+ADD_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_AS_MHS = read_ldif(
+    "add/accredited_system.SameProductAsMhs.ldif"
+)
 DELETE_ACCREDITED_SYSTEM = read_ldif("delete/accredited_system.ldif")
 ADD_MESSAGE_HANDLING_SYSTEM = read_ldif("add/message_handling_system.ldif")
 DELETE_MESSAGE_HANDLING_SYSTEM = read_ldif("delete/message_handling_system.ldif")
 DELETE_UNKNOWN_ENTITY = read_ldif("delete/unknown_entity.ldif")
 MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
+
+ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM = read_ldif(
+    "add/message_handling_system.AnotherWithDifferentUniqueIdentifier.ldif"
+)
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_WITH_SAME_UNIQUE_IDENTIFIER = read_ldif(
     "add/message_handling_system.AnotherWithSameUniqueIdentifier.ldif"
 )

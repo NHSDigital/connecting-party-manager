@@ -1,9 +1,9 @@
 import pytest
 from etl_utils.io import pkl_load_lz4
-from event.aws.client import dynamodb_client as get_dynamodb_client
 from mypy_boto3_s3 import S3Client
 from sds.epr.updates.tests.test_process_request_to_add_mhs import equivalent
 
+from conftest import dynamodb_client_with_sleep as get_dynamodb_client
 from test_helpers.terraform import read_terraform_output
 
 from .conftest import ETL_BUCKET, parametrize_over_scenarios
@@ -86,16 +86,21 @@ def test_transform_and_load(
         expected_objs_with_matching_type = list(
             filter(lambda o: type(o) is type(created_obj), expected_objs)
         )
+
+        failed_assertions = []
         for expected_obj in expected_objs_with_matching_type:
             try:
                 assert equivalent(created_obj, expected_obj)
-            except AssertionError:
-                pass
+            except AssertionError as error:
+                failed_assertions.append(
+                    f"{type(expected_obj)}:{expected_obj.id}: {error}"
+                )
             else:
                 found_match = True
                 break
 
         if not found_match:
+            msg = "\n\n".join(failed_assertions)
             raise ValueError(
-                f"Could not find match in expected output for {created_obj}"
+                f"Could not find match in expected output for {created_obj}. Tried:\n{msg}"
             )
