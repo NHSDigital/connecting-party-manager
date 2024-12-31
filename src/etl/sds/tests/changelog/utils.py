@@ -141,7 +141,13 @@ def read_all(
 
 ADD_ACCREDITED_SYSTEM = read_ldif("add/accredited_system.ldif")
 ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT = read_ldif(
-    "add/accredited_system.AnotherInSameProduct.ldif"
+    "add/accredited_system.SameProduct.ldif"
+)
+ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
+    "add/accredited_system.SameProductTeam.DifferentProduct.ldif"
+)
+ADD_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_AS_MHS = read_ldif(
+    "add/accredited_system.SameProductAsMhs.ldif"
 )
 DELETE_ACCREDITED_SYSTEM = read_ldif("delete/accredited_system.ldif")
 ADD_MESSAGE_HANDLING_SYSTEM = read_ldif("add/message_handling_system.ldif")
