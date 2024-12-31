@@ -17,8 +17,8 @@ from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
 from etl_utils.constants import LDIF_RECORD_DELIMITER, WorkerKey
 from etl_utils.trigger.model import StateMachineInput
-from event.aws.client import dynamodb_client
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from etl.sds.tests.etl_test_utils.ask_s3 import (
     extract_is_empty,
     load_is_empty,

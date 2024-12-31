@@ -1,9 +1,9 @@
 import pytest
 from etl_utils.io import pkl_load_lz4
-from event.aws.client import dynamodb_client as get_dynamodb_client
 from mypy_boto3_s3 import S3Client
 from sds.epr.updates.tests.test_process_request_to_add_mhs import equivalent
 
+from conftest import dynamodb_client_with_sleep as get_dynamodb_client
 from test_helpers.terraform import read_terraform_output
 
 from .conftest import ETL_BUCKET, parametrize_over_scenarios

@@ -8,9 +8,9 @@ from domain.core.product_team import ProductTeam
 from domain.core.questionnaire import Questionnaire
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
-from event.aws.client import dynamodb_client
 from event.json import json_loads
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from test_helpers.dynamodb import mock_table
 from test_helpers.terraform import read_terraform_output
 from test_helpers.uuid import consistent_uuid

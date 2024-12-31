@@ -1,5 +1,3 @@
-import time
-
 import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
@@ -8,8 +6,8 @@ from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 from domain.repository.keys import TableKey
 from domain.repository.marshall import marshall_value
-from event.aws.client import dynamodb_client
 
+from conftest import dynamodb_client_with_sleep as dynamodb_client
 from test_helpers.dynamodb import mock_table
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
@@ -26,7 +24,6 @@ def _create_product_team(name: str = "FOOBAR Product Team", ods_code: str = "F5H
 @pytest.mark.integration
 def test__cpm_product_repository(product: CpmProduct, repository: CpmProductRepository):
     repository.write(product)
-    time.sleep(1)
     result = repository.read(product_team_id=product.product_team_id, id=product.id)
     assert result == product
 
@@ -85,7 +82,6 @@ def test__query_products_by_product_team():
         name="cpm-product-name-2", product_id=product_id.id
     )
     repo.write(cpm_product_2)
-    time.sleep(1)
     result = repo.search(product_team_id=product_team.id)
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
@@ -118,7 +114,6 @@ def test__query_products_by_product_team_a():
         name="cpm-product-name-3", product_id=product_id.id
     )
     repo.write(cpm_product_3)
-    time.sleep(1)
     result = repo.search(product_team_id=product_team_a.id)
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
@@ -159,7 +154,6 @@ def test__query_products_by_product_team_with_sk_prefix():
     client = dynamodb_client()
     client.put_item(**args)
 
-    time.sleep(1)
     result = repo.search(product_team_id=product_team.id)
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
