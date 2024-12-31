@@ -124,6 +124,41 @@ def ldif_add_to_field_in_questionnaire(
     return questionnaire.validate(updated_data)
 
 
+def ldif_modify_field_in_questionnaire(
+    field_name: str,
+    new_values: list[str],
+    current_data: dict[str, list[str] | str],
+    questionnaire: Questionnaire,
+) -> QuestionnaireResponse:
+    _schema = questionnaire.json_schema[JSON_SCHEMA_PROPERTIES_KEYWORD][field_name]
+    expected_type = _schema[JSON_SCHEMA_TYPE_KEYWORD]
+    expect_list_type = expected_type == JSON_SCHEMA_ARRAY_FIELD_TYPE
+
+    # Elaborate the possible logic routes
+    replace_list_type = expect_list_type
+    set_only_value_on_non_list_type = not expect_list_type and len(new_values) == 1
+
+    # Route the operation
+    updated_value = None
+    if replace_list_type:
+        updated_value = list(new_values)
+    elif set_only_value_on_non_list_type:
+        (_new_value,) = new_values
+        updated_value = _new_value
+    else:
+        # Should not be reachable, but better to bail to avoid unexpected side-effects
+        raise UnexpectedModification(
+            f"No strategy implemented for field name '{field_name}' "
+            f"of expected type {expected_type} with "
+            f"values {new_values}.'"
+        )
+
+    # Copy, update and validate the new data
+    updated_data = dict(current_data)
+    updated_data[field_name] = updated_value
+    return questionnaire.validate(updated_data)
+
+
 def ldif_remove_field_from_questionnaire(
     field_name: str,
     new_values: list[str],  # noqa

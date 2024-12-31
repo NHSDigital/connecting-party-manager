@@ -59,7 +59,6 @@ def route_mhs_modification_request(
                 domain_objects += process_request_to_replace_in_mhs(
                     field_name=field_name,
                     new_values=parsed_value,
-                    additional_interactions_questionnaire=additional_interactions_questionnaire,
                     **common_payload,
                 )
             case ModificationType.DELETE:

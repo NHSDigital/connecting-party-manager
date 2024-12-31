@@ -33,6 +33,7 @@ from sds.epr.readers import (
 from sds.epr.updaters import (
     UnexpectedModification,
     ldif_add_to_field_in_questionnaire,
+    ldif_modify_field_in_questionnaire,
     ldif_remove_field_from_questionnaire,
     remove_erroneous_additional_interactions,
     update_message_sets,
@@ -370,6 +371,7 @@ def process_request_to_add_to_mhs(
 
 def process_request_to_replace_in_mhs(
     device: Device,
+    cpa_id_to_modify: str,
     field_name: str,
     new_values: set[str],
     device_reference_data_repository: DeviceReferenceDataRepository,
@@ -377,9 +379,30 @@ def process_request_to_replace_in_mhs(
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
-    additional_interactions_questionnaire: Questionnaire,
-) -> list[Device, DeviceReferenceData, DeviceReferenceData]:
-    raise NotImplementedError()
+) -> list[Device | DeviceReferenceData]:
+    mhs_device, message_sets = _process_request_to_modify_mhs(
+        device=device,
+        cpa_id_to_modify=cpa_id_to_modify,
+        field_name=field_name,
+        new_values=new_values,
+        device_reference_data_repository=device_reference_data_repository,
+        mhs_device_questionnaire=mhs_device_questionnaire,
+        mhs_device_field_mapping=mhs_device_field_mapping,
+        message_set_questionnaire=message_set_questionnaire,
+        message_set_field_mapping=message_set_field_mapping,
+        ldif_modify_field_in_questionnaire=ldif_modify_field_in_questionnaire,
+    )
+
+    additional_interactions = read_additional_interactions_if_exists(
+        device_reference_data_repository=device_reference_data_repository,
+        product_team_id=mhs_device.product_team_id,
+        product_id=mhs_device.product_id,
+    )
+    if additional_interactions:
+        additional_interactions = remove_erroneous_additional_interactions(
+            message_sets=message_sets, additional_interactions=additional_interactions
+        )
+    return mhs_device, message_sets, additional_interactions
 
 
 def process_request_to_delete_from_mhs(

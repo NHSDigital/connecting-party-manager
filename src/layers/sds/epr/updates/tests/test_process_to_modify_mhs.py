@@ -27,6 +27,7 @@ from sds.epr.updaters import UnexpectedModification
 from sds.epr.updates.change_request_processors import (
     process_request_to_add_to_mhs,
     process_request_to_delete_from_mhs,
+    process_request_to_replace_in_mhs,
 )
 
 from test_helpers.dynamodb import mock_table
@@ -205,6 +206,7 @@ def mhs_device_correctly_updated(
     field_name: str,
     new_value: str,
     check_value=True,
+    value_was_replaced=False,
 ):
     assert final_device["id"] == initial_device["id"]
     assert final_device["created_on"] == initial_device["created_on"]
@@ -223,11 +225,17 @@ def mhs_device_correctly_updated(
     )
     (final_responses_data,) = (message_set["data"] for message_set in final_responses)
 
-    assert field_name not in initial_responses_data
-
-    initial_value = final_responses_data.pop(field_name)
-    if check_value:
-        assert initial_value == new_value
+    if not value_was_replaced:
+        assert field_name not in initial_responses_data
+        final_value = final_responses_data.pop(field_name)
+        if check_value:
+            assert final_value == new_value
+    else:
+        assert field_name in initial_responses_data
+        final_value = final_responses_data.pop(field_name)
+        initial_value = initial_responses_data.pop(field_name)
+        assert final_value != initial_value
+        assert final_value == new_value
 
     assert initial_responses_data == final_responses_data
     return True
@@ -489,5 +497,159 @@ def test_process_request_to_delete_from_mhs__message_set_required_field_raises_e
             device=mhs_device,
             field_name="nhs_mhs_sn",
             new_values=[],
+            **common_kwargs,
+        )
+
+
+def test_process_request_to_replace_in_mhs__message_set_replace_in_existing_non_list_field_sets_value(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+
+    message_sets_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
+    )
+
+    initial_device = mhs_device.state()
+    initial_message_sets = message_sets.state()
+
+    field_to_modify = "nhs_mhs_in"
+    _field_to_modify = message_sets_field_mapping[field_to_modify]
+    new_value = "a new value"
+
+    _device, _message_sets, additional_interactions = process_request_to_replace_in_mhs(
+        device=mhs_device,
+        field_name=field_to_modify,
+        new_values=[new_value],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_message_sets = _message_sets.state()
+
+    # Check only device was modified
+    assert initial_device == final_device
+    assert message_sets_correctly_updated(
+        initial_message_sets=initial_message_sets,
+        final_message_sets=final_message_sets,
+        field_name=_field_to_modify,
+        new_value=new_value,
+    )
+    assert final_message_sets["updated_on"] > initial_message_sets["updated_on"]
+
+
+def test_process_request_to_replace_in_mhs__message_set_replace_in_empty_non_list_field_with_multiple_values_raises_error(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+
+    with pytest.raises(UnexpectedModification):
+        process_request_to_replace_in_mhs(
+            device=mhs_device,
+            field_name="nhs_mhs_actor",
+            new_values=["urn:oasis:names:tc:ebxml-msg:actor:topartymsh", "ignored"],
+            **common_kwargs,
+        )
+
+
+def test_process_request_to_replace_in_mhs__device_replace_in_empty_non_list_field_with_single_value_replaces_value(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+
+    mhs_device_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_MHS
+    )
+
+    initial_device = mhs_device.state()
+    initial_message_sets = message_sets.state()
+
+    field_to_modify = DEVICE_FIELD_TO_ADD_TO
+    _field_to_modify = mhs_device_field_mapping[field_to_modify]
+    new_value = "2001.01"
+
+    _device, _message_sets, additional_interactions = process_request_to_replace_in_mhs(
+        device=mhs_device,
+        field_name=field_to_modify,
+        new_values=[new_value],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_message_sets = _message_sets.state()
+
+    # Check only device was modified
+    assert initial_message_sets == final_message_sets
+    assert mhs_device_correctly_updated(
+        initial_device=initial_device,
+        final_device=final_device,
+        field_name=_field_to_modify,
+        new_value=new_value,
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_replace_in_mhs__device_replace_in_existing_non_list_field_raises_error(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+
+    mhs_device_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_MHS
+    )
+
+    initial_device = mhs_device.state()
+    initial_message_sets = message_sets.state()
+
+    field_to_modify = "nhs_requestor_urp"
+    _field_to_modify = mhs_device_field_mapping[field_to_modify]
+    new_value = "another-urp"
+
+    _device, _message_sets, additional_interactions = process_request_to_replace_in_mhs(
+        device=mhs_device,
+        field_name=field_to_modify,
+        new_values=[new_value],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_message_sets = _message_sets.state()
+
+    # Check only device was modified
+    assert initial_message_sets == final_message_sets
+    assert mhs_device_correctly_updated(
+        initial_device=initial_device,
+        final_device=final_device,
+        field_name=_field_to_modify,
+        new_value=new_value,
+        value_was_replaced=True,
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_replace_in_mhs__device_replace_in_empty_non_list_field_with_multiple_values_raises_error(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(message_sets)
+    with pytest.raises(UnexpectedModification):
+        process_request_to_replace_in_mhs(
+            device=mhs_device,
+            field_name=DEVICE_FIELD_TO_ADD_TO,
+            new_values=["next-week", "today"],
             **common_kwargs,
         )

@@ -139,6 +139,7 @@ def read_all(
             )
 
 
+# Adds
 ADD_ACCREDITED_SYSTEM = read_ldif("add/accredited_system.ldif")
 ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT = read_ldif(
     "add/accredited_system.SameProduct.ldif"
@@ -149,12 +150,7 @@ ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
 ADD_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_AS_MHS = read_ldif(
     "add/accredited_system.SameProductAsMhs.ldif"
 )
-DELETE_ACCREDITED_SYSTEM = read_ldif("delete/accredited_system.ldif")
 ADD_MESSAGE_HANDLING_SYSTEM = read_ldif("add/message_handling_system.ldif")
-DELETE_MESSAGE_HANDLING_SYSTEM = read_ldif("delete/message_handling_system.ldif")
-DELETE_UNKNOWN_ENTITY = read_ldif("delete/unknown_entity.ldif")
-MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
-
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM = read_ldif(
     "add/message_handling_system.AnotherWithDifferentUniqueIdentifier.ldif"
 )
@@ -170,6 +166,14 @@ ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
 ADD_MESSAGE_HANDLING_SYSTEM_WITH_PRODUCT_NAME = read_ldif(
     "add/message_handling_system.WithProductName.ldif"
 )
+
+# Deletes
+DELETE_ACCREDITED_SYSTEM = read_ldif("delete/accredited_system.ldif")
+DELETE_MESSAGE_HANDLING_SYSTEM = read_ldif("delete/message_handling_system.ldif")
+DELETE_UNKNOWN_ENTITY = read_ldif("delete/unknown_entity.ldif")
+
+# Modifies
+MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
 MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_DEVICE_FIELD = create_modify_ldif(
     "add/nhs_product_version.ldif", device_type="message_handling_system"
 )
@@ -182,4 +186,10 @@ MODIFY_MESSAGE_HANDLING_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
 MODIFY_MESSAGE_HANDLING_SYSTEM_DELETE_MESSAGE_SETS_FIELD = create_modify_ldif(
     "delete/nhs_contract_property_template_key.ldif",
     device_type="message_handling_system",
+)
+MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_DEVICE_FIELD = create_modify_ldif(
+    "replace/nhs_mhs_fqdn.ldif", device_type="message_handling_system"
+)
+MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_MESSAGE_SETS_FIELD = create_modify_ldif(
+    "replace/nhs_ep_interaction_type.ldif", device_type="message_handling_system"
 )
