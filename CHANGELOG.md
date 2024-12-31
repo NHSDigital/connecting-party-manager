@@ -5,6 +5,7 @@
 - [PI-687] ETL: Delete an MHS
 - [PI-686] ETL: Add an AS
 - [PI-629] Add search DRD tests
+- [PI-700] Sleepy tests
 
 ## 2024-12-23
 - [PI-652] Evironment layers
