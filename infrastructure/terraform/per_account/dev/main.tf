@@ -96,13 +96,6 @@ module "sds_etl_hscn_vpc" {
   prefix      = local.project
 }
 
-module "vpc" {
-  source      = "../modules/vpc"
-  environment = terraform.workspace
-  prefix      = local.project
-}
-
-
 # -------- ROUTE 53 ---------
 
 resource "aws_route53_zone" "dev-ns" {

@@ -95,11 +95,6 @@ module "sds_etl_hscn_vpc" {
   environment = terraform.workspace
   prefix      = local.project
 }
-module "vpc" {
-  source      = "../modules/vpc"
-  environment = terraform.workspace
-  prefix      = local.project
-}
 
 # -------- ROUTE 53 ---------
 
