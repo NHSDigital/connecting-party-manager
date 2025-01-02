@@ -79,7 +79,7 @@
             "ASID": "000000000001",
             "ODS Code": "C3O9X",
             "Temp UID": "10312",
-            "Product Key": "6216",
+            "Product Key": "11929",
             "Product Name": "TPP SystmOne",
             "Product Version": null,
             "Date Requested": "20091016133757",
@@ -127,7 +127,6 @@
             "DNS Approver": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
             "MHS Party Key": "C3O9X-823610",
             "Date Approved": "20231030092939",
-            "Product Version": "Mar2023",
             "Approver URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
             "Date DNS Approved": "20231030092939",
             "Requestor URP": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
@@ -140,7 +139,7 @@
       ]
     },
     "device_reference_data": {
-      "390fc252-02a2-494e-b6fb-16717eec7168": ["*"]
+      "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*"]
     }
   },
   {
