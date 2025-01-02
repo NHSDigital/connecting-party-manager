@@ -45,6 +45,14 @@ class SdsFieldName(StrEnum):
     TEMP_UID = "Temp UID"
 
 
+CPM_MHS_IMMUTABLE_FIELDS = {
+    SdsFieldName.MANUFACTURING_ORG,
+    SdsFieldName.PARTY_KEY,
+    SdsFieldName.CPA_ID,
+    SdsFieldName.UNIQUE_IDENTIFIER,
+}
+
+
 class SdsDeviceReferenceDataPath(StrEnum):
     ALL = "*"
     ALL_INTERACTION_IDS = f"*.{SdsFieldName.INTERACTION_ID}"
