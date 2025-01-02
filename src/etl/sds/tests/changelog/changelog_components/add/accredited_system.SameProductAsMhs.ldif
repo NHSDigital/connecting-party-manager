@@ -4,13 +4,13 @@ objectClass: nhsAs
 objectClass: top
 nhsApproverURP: uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs
 nhsAsClient: C3O9X
-nhsAsSvcIA: urn:nhs:names:services:pdsquery:QUQI_IN010000UK14
 nhsAsSvcIA: urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001
+nhsAsSvcIA: urn:nhs:names:services:pdsquery:QUQI_IN010000UK14
 nhsDateApproved: 20091016133823
 nhsDateRequested: 20091016133757
 nhsIDCode: C3O9X
 nhsMHSPartyKey: C3O9X-823610
-nhsProductKey: 6216
+nhsProductKey: 11929
 nhsProductName: TPP SystmOne
 nhsRequestorURP: uniqueIdentifier=203171972540,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs
 nhsTempUid: 10312

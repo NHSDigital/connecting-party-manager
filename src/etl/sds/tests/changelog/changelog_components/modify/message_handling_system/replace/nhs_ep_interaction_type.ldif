@@ -1,2 +1,2 @@
 replace: nhsEPInteractionType
-nhsEPInteractionType: EBXML
+nhsEPInteractionType: HL7

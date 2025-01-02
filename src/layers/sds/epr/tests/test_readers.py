@@ -25,6 +25,7 @@ from sds.epr.creators import (
 )
 from sds.epr.readers import (
     read_additional_interactions_if_exists,
+    read_message_sets_from_mhs_device,
     read_or_create_empty_message_sets,
     read_or_create_epr_product,
     read_or_create_epr_product_team,
@@ -100,27 +101,29 @@ def mhs_device(
 
 
 @pytest.fixture
-def product_team_repository():
+def db_client():
     with mock_table("foo") as client:
-        yield ProductTeamRepository(table_name="foo", dynamodb_client=client)
+        yield client
 
 
 @pytest.fixture
-def product_repository():
-    with mock_table("foo") as client:
-        yield CpmProductRepository(table_name="foo", dynamodb_client=client)
+def product_team_repository(db_client):
+    yield ProductTeamRepository(table_name="foo", dynamodb_client=db_client)
 
 
 @pytest.fixture
-def device_reference_data_repository():
-    with mock_table("foo") as client:
-        yield DeviceReferenceDataRepository(table_name="foo", dynamodb_client=client)
+def product_repository(db_client):
+    yield CpmProductRepository(table_name="foo", dynamodb_client=db_client)
 
 
 @pytest.fixture
-def device_repository():
-    with mock_table("foo") as client:
-        yield DeviceRepository(table_name="foo", dynamodb_client=client)
+def device_reference_data_repository(db_client):
+    yield DeviceReferenceDataRepository(table_name="foo", dynamodb_client=db_client)
+
+
+@pytest.fixture
+def device_repository(db_client):
+    yield DeviceRepository(table_name="foo", dynamodb_client=db_client)
 
 
 def test_read_or_create_epr_product_team(
@@ -288,3 +291,19 @@ def test_create_or_update_mhs_device_default(
     assert state_1.pop("updated_on") < state_2.pop("updated_on")
     assert state_1.pop("id") != state_2.pop("id")
     assert state_1 == state_2
+
+
+def test_read_message_sets_from_mhs_device(
+    mhs_device: Device,
+    message_sets: DeviceReferenceData,
+    device_repository: DeviceRepository,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+):
+    device_repository.write(mhs_device)
+    device_reference_data_repository.write(message_sets)
+
+    message_sets_from_db = read_message_sets_from_mhs_device(
+        mhs_device=mhs_device,
+        device_reference_data_repository=device_reference_data_repository,
+    )
+    assert message_sets_from_db == message_sets

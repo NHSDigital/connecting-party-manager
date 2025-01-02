@@ -182,3 +182,16 @@ def read_or_create_as_device(
             as_tags=as_tags,
         )
     return as_device
+
+
+def read_message_sets_from_mhs_device(
+    mhs_device: Device,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+) -> DeviceReferenceData:
+    (message_sets_id,) = mhs_device.device_reference_data.keys()
+    return device_reference_data_repository.read(
+        product_team_id=mhs_device.product_team_id,
+        product_id=mhs_device.product_id,
+        id=message_sets_id,
+        environment=Environment.PROD,
+    )

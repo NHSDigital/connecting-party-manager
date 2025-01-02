@@ -1,5 +1,6 @@
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.questionnaire.v1 import QuestionnaireResponse
 from sds.epr.constants import (
     ADDITIONAL_INTERACTIONS_SUFFIX,
     AS_DEVICE_SUFFIX,
@@ -48,3 +49,16 @@ def get_interaction_ids(
         }
 
     return interaction_ids
+
+
+def filter_message_set_by_cpa_id(
+    message_sets: DeviceReferenceData, cpa_id: str
+) -> QuestionnaireResponse:
+    (message_sets_questionnaire_id,) = message_sets.questionnaire_responses.keys()
+    (message_set,) = (
+        qr
+        for qr in message_sets.questionnaire_responses[message_sets_questionnaire_id]
+        if qr.data[SdsFieldName.CPA_ID] == cpa_id
+    )
+
+    return message_set
