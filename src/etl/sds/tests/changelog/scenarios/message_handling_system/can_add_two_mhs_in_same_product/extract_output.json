@@ -29,7 +29,7 @@
     "nhs_mhs_sync_reply_mode": null,
     "nhs_product_key": "11929",
     "nhs_product_name": null,
-    "nhs_product_version": "Mar2023",
+    "nhs_product_version": null,
     "nhs_requestor_urp": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
     "object_class": "nhsMhs",
     "unique_identifier": "00000a84594b2ef34279"
@@ -64,7 +64,7 @@
     "nhs_mhs_sync_reply_mode": null,
     "nhs_product_key": "11929",
     "nhs_product_name": null,
-    "nhs_product_version": "Mar2023",
+    "nhs_product_version": null,
     "nhs_requestor_urp": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
     "object_class": "nhsMhs",
     "unique_identifier": "123456"

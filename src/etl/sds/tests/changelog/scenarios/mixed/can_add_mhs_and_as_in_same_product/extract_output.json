@@ -29,7 +29,7 @@
     "nhs_mhs_sync_reply_mode": null,
     "nhs_product_key": "11929",
     "nhs_product_name": null,
-    "nhs_product_version": "Mar2023",
+    "nhs_product_version": null,
     "nhs_requestor_urp": "uniqueidentifier=555050304105,uniqueidentifier=555008548101,uid=555008545108,ou=people, o=nhs",
     "object_class": "nhsMhs",
     "unique_identifier": "00000a84594b2ef34279"
@@ -38,8 +38,8 @@
     "change_type": "add",
     "nhs_approver_urp": "uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs",
     "nhs_as_svc_ia": [
-      "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14",
-      "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001"
+      "urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001",
+      "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
     ],
     "nhs_date_approved": "20091016133823",
     "nhs_date_requested": "20091016133757",
@@ -47,7 +47,7 @@
     "nhs_id_code": "C3O9X",
     "nhs_mhs_manufacturer_org": "C3O9X",
     "nhs_mhs_party_key": "C3O9X-823610",
-    "nhs_product_key": "6216",
+    "nhs_product_key": "11929",
     "nhs_product_name": "TPP SystmOne",
     "nhs_product_version": null,
     "nhs_requestor_urp": "uniqueIdentifier=203171972540,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs",

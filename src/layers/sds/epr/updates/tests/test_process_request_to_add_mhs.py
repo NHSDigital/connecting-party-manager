@@ -224,6 +224,7 @@ def equivalent[
     assert new_item.name == old_item.name
     assert new_item.created_on > old_item.created_on
     if old_item.updated_on:
+        assert new_item.updated_on is not None
         assert new_item.updated_on > old_item.updated_on
 
     if not isinstance(old_item, DeviceReferenceData):

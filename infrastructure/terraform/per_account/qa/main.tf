@@ -27,6 +27,13 @@ JSON
   }
 }
 
+module "billing_alarms" {
+  source      = "../modules/billing_alarms"
+  project     = local.project
+  limit       = var.budget_limit
+  environment = terraform.workspace
+}
+
 module "iam__api-gateway-to-cloudwatch" {
   source  = "../modules/iam__api-gateway-to-cloudwatch"
   project = local.project

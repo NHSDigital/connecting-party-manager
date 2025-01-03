@@ -108,13 +108,13 @@ def _force_optional(cls: BaseModel):
     return _model
 
 
-def _parse_and_validate_field(cls: "SdsBaseModel", field, value):
+def _parse_and_validate_field(cls: "SdsBaseModel", field, value) -> list:
     _model = _force_optional(cls)
     field_alias = _get_alias_for_field_name(cls=cls, field=field)
     _value = set(value) if isinstance(value, list) else value
     instance = _model(**{field_alias: _value})
     parsed_value = getattr(instance, field)
-    return parsed_value
+    return list(parsed_value) if _is_iterable(parsed_value) else [parsed_value]
 
 
 def _is_iterable(obj):
@@ -167,7 +167,7 @@ class SdsBaseModel(BaseModel):
         return orjson.loads(self.json(exclude_none=True, exclude={"change_type"}))
 
     @classmethod
-    def parse_and_validate_field(cls, field: str, value: list | set):
+    def parse_and_validate_field(cls, field: str, value: list | set) -> list:
         return _parse_and_validate_field(cls=cls, field=field, value=value)
 
     @classmethod

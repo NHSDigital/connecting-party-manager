@@ -6,9 +6,6 @@ from domain.core.product_team.v1 import ProductTeamEventDeserializer
 from sds.epr.updates.etl_device import EtlDeviceEventDeserializer
 
 
-class EventDeserializationError(Exception): ...
-
-
 def deserialize_event(event: ExportedEventTypeDef) -> Event:
     exceptions = []
     for deserializer in (

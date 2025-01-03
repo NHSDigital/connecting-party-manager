@@ -5,6 +5,15 @@ from sds.epr.getters import get_additional_interactions_data
 from sds.epr.utils import get_interaction_ids
 
 
+class UnexpectedModification(Exception): ...
+
+
+JSON_SCHEMA_PROPERTIES_KEYWORD = "properties"
+JSON_SCHEMA_REQUIRED_KEYWORD = "required"
+JSON_SCHEMA_TYPE_KEYWORD = "type"
+JSON_SCHEMA_ARRAY_FIELD_TYPE = "array"
+
+
 def remove_erroneous_additional_interactions(
     message_sets: DeviceReferenceData, additional_interactions: DeviceReferenceData
 ) -> DeviceReferenceData:
@@ -72,3 +81,97 @@ def update_new_additional_interactions(
         additional_interactions.add_questionnaire_response(interaction)
 
     return additional_interactions
+
+
+def ldif_add_to_field_in_questionnaire(
+    field_name: str,
+    new_values: list[str],
+    current_data: dict[str, list[str] | str],
+    questionnaire: Questionnaire,
+) -> QuestionnaireResponse:
+    _schema = questionnaire.json_schema[JSON_SCHEMA_PROPERTIES_KEYWORD][field_name]
+    expected_type = _schema[JSON_SCHEMA_TYPE_KEYWORD]
+    expect_list_type = expected_type == JSON_SCHEMA_ARRAY_FIELD_TYPE
+    current_value = current_data.get(field_name, [])
+
+    # Elaborate the possible logic routes
+    extend_values_on_list_type = expect_list_type and current_value
+    set_values_on_list_type = expect_list_type and not current_value
+    set_only_value_on_non_list_type = (
+        not expect_list_type and not current_value and len(new_values) == 1
+    )
+
+    # Route the operation
+    updated_value = None
+    if extend_values_on_list_type:
+        updated_value = current_value + list(new_values)
+    elif set_values_on_list_type:
+        updated_value = list(new_values)
+    elif set_only_value_on_non_list_type:
+        (_new_value,) = new_values
+        updated_value = _new_value
+    else:
+        # Should not be reachable, but better to bail to avoid unexpected side-effects
+        raise UnexpectedModification(
+            f"No strategy implemented for field name '{field_name}' "
+            f"of expected type {expected_type} with "
+            f"values {new_values}, given current value '{current_value}'"
+        )
+
+    # Copy, update and validate the new data
+    updated_data = dict(current_data)
+    updated_data[field_name] = updated_value
+    return questionnaire.validate(updated_data)
+
+
+def ldif_modify_field_in_questionnaire(
+    field_name: str,
+    new_values: list[str],
+    current_data: dict[str, list[str] | str],
+    questionnaire: Questionnaire,
+) -> QuestionnaireResponse:
+    _schema = questionnaire.json_schema[JSON_SCHEMA_PROPERTIES_KEYWORD][field_name]
+    expected_type = _schema[JSON_SCHEMA_TYPE_KEYWORD]
+    expect_list_type = expected_type == JSON_SCHEMA_ARRAY_FIELD_TYPE
+
+    # Elaborate the possible logic routes
+    replace_list_type = expect_list_type
+    set_only_value_on_non_list_type = not expect_list_type and len(new_values) == 1
+
+    # Route the operation
+    updated_value = None
+    if replace_list_type:
+        updated_value = list(new_values)
+    elif set_only_value_on_non_list_type:
+        (_new_value,) = new_values
+        updated_value = _new_value
+    else:
+        # Should not be reachable, but better to bail to avoid unexpected side-effects
+        raise UnexpectedModification(
+            f"No strategy implemented for field name '{field_name}' "
+            f"of expected type {expected_type} with "
+            f"values {new_values}.'"
+        )
+
+    # Copy, update and validate the new data
+    updated_data = dict(current_data)
+    updated_data[field_name] = updated_value
+    return questionnaire.validate(updated_data)
+
+
+def ldif_remove_field_from_questionnaire(
+    field_name: str,
+    new_values: list[str],  # noqa
+    current_data: dict[str, list[str] | str],
+    questionnaire: Questionnaire,
+):
+    required_fields = set(
+        questionnaire.json_schema.get(JSON_SCHEMA_REQUIRED_KEYWORD, ())
+    )
+    if field_name in required_fields:
+        raise UnexpectedModification(f"Cannot remove required field '{field_name}'")
+
+    # Copy, update and validate the new data
+    updated_data = dict(current_data)
+    updated_data.pop(field_name)
+    return questionnaire.validate(updated_data)
