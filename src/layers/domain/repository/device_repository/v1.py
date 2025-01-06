@@ -471,7 +471,9 @@ class DeviceRepository(Repository[Device]):
         if dropped_mandatory_fields:
             raise CannotDropMandatoryFields(dropped_mandatory_fields)
 
-        tag_value = DeviceTag(**kwargs).value
+        incoming_query_params = kwargs
+        ods_code = incoming_query_params.pop("nhs_mhs_manufacturer_org", None)
+        tag_value = DeviceTag(**incoming_query_params).value
         pk = TableKey.DEVICE_TAG.key(tag_value)
         query_params = {
             "ExpressionAttributeValues": {":pk": marshall_value(pk)},
@@ -486,7 +488,12 @@ class DeviceRepository(Repository[Device]):
         # Convert to Device, sorted by 'pk'
         compressed_devices = map(unmarshall, response["Items"])
         devices_as_dict = map(decompress_device_fields, compressed_devices)
-        return [Device(**d) for d in sorted(devices_as_dict, key=lambda d: d["id"])]
+        devices = [
+            Device(**d)
+            for d in sorted(devices_as_dict, key=lambda d: d["id"])
+            if not ods_code or d["ods_code"] == ods_code
+        ]
+        return devices
 
 
 class InactiveDeviceRepository(Repository[Device]):

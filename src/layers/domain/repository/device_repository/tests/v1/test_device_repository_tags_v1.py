@@ -66,6 +66,72 @@ def test__device_repository__multiple_devices_with_same_tags(
     assert devices == expected_devices
 
 
+@pytest.mark.integration
+def test__device_repository__filter_by_nhs_mhs_manufacturing_org(
+    device: Device,
+    device_with_asid: Device,
+    device_with_mhs_id: Device,
+    repository: DeviceRepository,
+):
+    repository.write(device)
+    repository.write(device_with_asid)
+    repository.write(device_with_mhs_id)
+
+    devices = repository.query_by_tag(bar="foo", nhs_mhs_manufacturer_org="AB123")
+    # assert False
+    assert len(devices) == 3
+
+    expected_devices = sorted(
+        (device, device_with_asid, device_with_mhs_id), key=lambda d: d.id
+    )
+    # Tags are dropped by 'query_by_tag' so re-set these manually for comparison
+    for d1, d2 in zip(devices, expected_devices):
+        d1.tags = d2.tags
+
+    assert devices == expected_devices
+
+
+@pytest.mark.integration
+def test__device_repository__filter_by_nhs_mhs_manufacturing_org_not_found(
+    device: Device,
+    device_with_asid: Device,
+    device_with_mhs_id: Device,
+    repository: DeviceRepository,
+):
+    repository.write(device)
+    repository.write(device_with_asid)
+    repository.write(device_with_mhs_id)
+
+    devices = repository.query_by_tag(bar="foo", nhs_mhs_manufacturer_org="AB321")
+    # assert False
+    assert len(devices) == 0
+
+
+@pytest.mark.integration
+def test__device_repository__no_nhs_mhs_manufacturing_org(
+    device: Device,
+    device_with_asid: Device,
+    device_with_mhs_id: Device,
+    repository: DeviceRepository,
+):
+    repository.write(device)
+    repository.write(device_with_asid)
+    repository.write(device_with_mhs_id)
+
+    devices = repository.query_by_tag(bar="foo")
+    # assert False
+    assert len(devices) == 3
+
+    expected_devices = sorted(
+        (device, device_with_asid, device_with_mhs_id), key=lambda d: d.id
+    )
+    # Tags are dropped by 'query_by_tag' so re-set these manually for comparison
+    for d1, d2 in zip(devices, expected_devices):
+        d1.tags = d2.tags
+
+    assert devices == expected_devices
+
+
 def _test_add_two_tags(
     device: Device, second_device: Device, repository: DeviceRepository
 ):
