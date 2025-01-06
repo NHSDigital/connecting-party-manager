@@ -463,8 +463,7 @@ paths:
       operationId: searchsdsdevice
       summary: Retrieve Device resources for SDS FHIR API (GET)
       parameters:
-        - $ref: "#/components/parameters/NhsAsClient"
-        - $ref: "#/components/parameters/NhsAsClientInteration"
+        - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsManOrg"
         - $ref: "#/components/parameters/NhsMhsPartyKey"
         - $ref: "#/components/parameters/HeaderVersion"
