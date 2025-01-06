@@ -38,6 +38,8 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.readQuestionnaire.index
     import api.searchCpmProduct.index
     import api.searchDeviceReferenceData.index
+    import api.searchSdsDevice.index
+    import api.searchSdsEndpoint.index
     import api.status.index
 
     return {
@@ -60,6 +62,11 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}": api.readDeviceReferenceData.index,
             "ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/{device_id}": api.readDevice.index,
             "Questionnaire/{questionnaire_id}": api.readQuestionnaire.index,
+            "searchSdsDevice?nhs_id_code={nhs_id_code}": api.searchSdsDevice.index,
+            "searchSdsDevice?nhs_as_svc_ia={nhs_as_svc_ia}": api.searchSdsDevice.index,
+            "searchSdsDevice?nhs_id_code={nhs_id_code}&nhs_as_svc_ia={nhs_as_svc_ia}": api.searchSdsDevice.index,
+            "searchSdsDevice?nhs_id_code={nhs_id_code}&nhs_as_svc_ia={nhs_as_svc_ia}&foo={foo}": api.searchSdsDevice.index,
+            "searchSdsEndpoint": api.searchSdsEndpoint.index,
             "_status": api.status.index,
         },
         "DELETE": {

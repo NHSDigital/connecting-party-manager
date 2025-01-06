@@ -255,6 +255,32 @@ def test_parse_path_create_as_device():
     )
 
 
+def test_parse_path_search_sds_device():
+    with api_lambda_environment_variables():
+        import api.searchSdsDevice.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="searchSdsDevice",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({}, {}, api.searchSdsDevice.index)
+
+
+def test_parse_path_search_sds_endpoint():
+    with api_lambda_environment_variables():
+        import api.searchSdsEndpoint.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="searchSdsEndpoint",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({}, {}, api.searchSdsEndpoint.index)
+
+
 def test_parse_path_error():
     with pytest.raises(EndpointConfigurationError):
         parse_api_path(method="GET", path="ProductTeam/123", endpoint_lambda_mapping={})

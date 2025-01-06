@@ -479,7 +479,6 @@ class DeviceRepository(Repository[Device]):
             "TableName": self.table_name,
             **dynamodb_projection_expression(fields_to_return),
         }
-
         response = self.client.query(**query_params)
         if "LastEvaluatedKey" in response:
             raise TooManyResults(f"Too many results for query '{kwargs}'")
