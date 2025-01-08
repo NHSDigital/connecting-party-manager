@@ -1,0 +1,65 @@
+name: "Destroy: Workspace - Nonprod"
+
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        description: Account to destroy
+        required: true
+        default: qa
+        type: choice
+        options:
+          - dev
+          - qa
+      sandbox:
+        description: Do you want to destroy the sandbox version?
+        type: boolean
+        default: false
+
+jobs:
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+
+  get-branch-from-workflow-file:
+    runs-on: [self-hosted, ci]
+    needs: [parse-secrets]
+    outputs:
+      branch_name: ${{ steps.get_branch.outputs.branch_name }}
+    steps:
+      - id: get_branch
+        run: |
+          workflow_ref=${{ github.workflow_ref }}
+          branch_name=${workflow_ref#*refs/heads/}
+          branch_name=${branch_name#*refs/tags/}
+          echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
+
+  build-base:
+    runs-on: [self-hosted, ci]
+    needs: [get-branch-from-workflow-file]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
+
+  destroy_persistent_workspace:
+    runs-on: [self-hosted, ci]
+    needs: [build-base]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - name: Destroy workspace
+        uses: ./.github/actions/make/
+        with:
+          command: terraform--destroy TERRAFORM_WORKSPACE=${{ inputs.account }}${{ inputs.sandbox == true && '-sandbox' || '' }} TF_CLI_ARGS=${{ env.TF_CLI_ARGS }}
+          requires-aws: true
