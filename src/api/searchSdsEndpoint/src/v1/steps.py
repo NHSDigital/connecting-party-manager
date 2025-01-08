@@ -16,15 +16,28 @@ def _parse_event_query(query_params: dict):
 def parse_event_query(data, cache):
     event = APIGatewayProxyEvent(data[StepChain.INIT])
     query_params = _parse_event_query(query_params=event.query_string_parameters or {})
+
     return {
         "query_params": query_params,
         "host": event.multi_value_headers["Host"],
     }
 
 
-def query_endpoints(data, cache) -> list[dict]:
+def sort_query_params(data, cache):
     event_data: dict = data[parse_event_query]
     query_params: dict = event_data.get("query_params")
+    if (
+        "nhs_id_code" in query_params
+        and "nhs_mhs_party_key" in query_params
+        and len(query_params)
+    ):
+        nhs_id_code = query_params.pop("nhs_id_code", None)
+
+    return query_params
+
+
+def query_endpoints(data, cache) -> list[dict]:
+    query_params: dict = data[sort_query_params]
     device_repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
