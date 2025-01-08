@@ -396,6 +396,34 @@ class Device(AggregateRoot):
         )
 
     @event
+    def remove_questionnaire_response(
+        self, questionnaire_id: str, questionnaire_response_id: str
+    ) -> QuestionnaireResponseUpdatedEvent:
+        qid_to_remove = str(questionnaire_response_id)
+        questionnaire_response_ids = [
+            str(qr.id) for qr in self.questionnaire_responses[questionnaire_id]
+        ]
+
+        try:
+            idx_to_remove = questionnaire_response_ids.index(qid_to_remove)
+        except ValueError:
+            raise QuestionnaireResponseNotFoundError(
+                f"Could not find QuestionnaireResponse {qid_to_remove}"
+            )
+        else:
+            self.questionnaire_responses[questionnaire_id].pop(idx_to_remove)
+
+        return QuestionnaireResponseUpdatedEvent(
+            id=str(self.id),
+            keys=[k.dict() for k in self.keys],
+            tags=[t.value for t in self.tags],
+            questionnaire_responses={
+                q_name: [qr.dict() for qr in qrs]
+                for q_name, qrs in self.questionnaire_responses.items()
+            },
+        )
+
+    @event
     def add_device_reference_data_id(
         self, device_reference_data_id: str, path_to_data: list[str]
     ) -> DeviceReferenceDataIdAddedEvent:

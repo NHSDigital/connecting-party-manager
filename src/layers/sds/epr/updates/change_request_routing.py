@@ -99,6 +99,7 @@ def process_change_request(
     elif is_modification_request and is_mhs:
         return route_mhs_modification_request(
             device=device,
+            cpa_id_to_modify=unique_identifier,
             request=record,
             device_reference_data_repository=device_reference_data_repository,
             mhs_device_questionnaire=mhs_device_questionnaire,
