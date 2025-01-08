@@ -1,6 +1,11 @@
 # Changelog
 
+## 2025-01-08
+- [PI-716] Pipeline enhancements
+- [PI-430] Remove Account Wide VPC
+
 ## 2025-01-02
+- [PI-670] Billing Alarms
 - [PI-688] Changelog ETL - delete an AS
 - [PI-690] Changelog ETL - modify / add to an MHS
 - [PI-694] Changelog ETL - modify / remove from an MHS
