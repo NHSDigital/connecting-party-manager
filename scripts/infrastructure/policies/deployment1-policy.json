@@ -164,6 +164,7 @@
         "ec2:DescribeVpcEndpoints",
         "ec2:DescribePrefixLists",
         "ec2:DescribeRouteTables",
+        "ec2:DeleteNetworkInterface",
         "ec2:DisassociateRouteTable"
       ],
       "Resource": ["*"]
