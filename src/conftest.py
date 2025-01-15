@@ -59,7 +59,7 @@ def dynamodb_client_with_sleep():
         return response
 
     def _query_with_sleep(*args, **kwargs):
-        time.sleep(0.5)
+        time.sleep(0.2)
         response = unpatched_query(*args, **kwargs)
         return response
 
