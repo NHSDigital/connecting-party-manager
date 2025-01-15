@@ -180,6 +180,15 @@ MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_DEVICE_FIELD = create_modify_ldif(
 MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_MESSAGE_SETS_FIELD = create_modify_ldif(
     "add/nhs_mhs_retries.ldif", device_type="message_handling_system"
 )
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_DEVICE_FIELD_LIST = create_modify_ldif(
+    "add/nhs_as_client.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_DEVICE_FIELD_NOT_LIST = create_modify_ldif(
+    "add/description.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD = create_modify_ldif(
+    "add/nhs_as_svc_ia.ldif", device_type="accredited_system"
+)
 MODIFY_MESSAGE_HANDLING_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
     "delete/nhs_product_name.ldif", device_type="message_handling_system"
 )
@@ -192,4 +201,7 @@ MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_DEVICE_FIELD = create_modify_ldif(
 )
 MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_MESSAGE_SETS_FIELD = create_modify_ldif(
     "replace/nhs_ep_interaction_type.ldif", device_type="message_handling_system"
+)
+MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_MESSAGE_SETS_FIELD_INTERACTION_ID = (
+    create_modify_ldif("replace/service_ia.ldif", device_type="message_handling_system")
 )

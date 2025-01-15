@@ -4,6 +4,7 @@ from domain.core.questionnaire.v1 import Questionnaire
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
+from domain.repository.device_repository.v1 import DeviceRepository
 from sds.domain.constants import ModificationType
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
@@ -71,23 +72,23 @@ def route_mhs_modification_request(
 def route_as_modification_request(
     device: Device,
     request: dict,
+    device_repository: DeviceRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
-    message_set_questionnaire: Questionnaire,
-    message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
+    additional_interactions_field_mapping: dict,
 ) -> list[Device | DeviceReferenceData]:
     _request = SdsModificationRequest.construct(**request)
 
     common_payload = dict(
         device=device,
+        device_repository=device_repository,
         device_reference_data_repository=device_reference_data_repository,
         accredited_system_questionnaire=accredited_system_questionnaire,
         accredited_system_field_mapping=accredited_system_field_mapping,
-        message_set_questionnaire=message_set_questionnaire,
-        message_set_field_mapping=message_set_field_mapping,
         additional_interactions_questionnaire=additional_interactions_questionnaire,
+        additional_interactions_field_mapping=additional_interactions_field_mapping,
     )
 
     domain_objects = []
