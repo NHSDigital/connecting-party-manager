@@ -97,7 +97,7 @@ def test_spine_mhs_questionnaires_pass(nhs_mhs: NhsMhs):
     mhs_interactions_questionnaire = QuestionnaireRepository().read(
         QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
     )
-    _mhs_data = nhs_mhs.export()
+    _mhs_data = nhs_mhs.dict()
     mhs_data = _apply_field_mapping(
         name=QuestionnaireInstance.SPINE_MHS, data=_mhs_data
     )

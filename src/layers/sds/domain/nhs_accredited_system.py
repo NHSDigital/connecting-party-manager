@@ -21,17 +21,15 @@ class NhsAccreditedSystem(SdsBaseModel):
     nhs_requestor_urp: str = Field(alias="nhsrequestorurp")
     nhs_date_requested: str = Field(alias="nhsdaterequested")
     nhs_id_code: str = Field(alias="nhsidcode")
-    nhs_mhs_manufacturer_org: Optional[str] = Field(alias="nhsmhsmanufacturerorg")
+    nhs_mhs_manufacturer_org: str = Field(alias="nhsmhsmanufacturerorg")
     nhs_mhs_party_key: str = Field(alias="nhsmhspartykey")
     nhs_product_key: str = Field(alias="nhsproductkey")
-    nhs_product_name: Optional[str] = Field(alias="nhsproductname")
-    nhs_product_version: Optional[str] = Field(
-        alias="nhsproductversion"
-    )  # shouldn't be optional?
+    nhs_product_name: str = Field(alias="nhsproductname", default=None)
+    nhs_product_version: str = Field(alias="nhsproductversion", default=None)
     nhs_as_acf: Optional[set[str]] = Field(alias="nhsasacf")
-    nhs_as_client: Optional[set[str]] = Field(alias="nhsasclient", default_factory=set)
+    nhs_as_client: set[str] = Field(alias="nhsasclient", default_factory=set)
     nhs_as_svc_ia: set[str] = Field(alias="nhsassvcia")
-    nhs_temp_uid: Optional[str] = Field(alias="nhstempuid")
+    nhs_temp_uid: str = Field(alias="nhstempuid", default=None)
     description: Optional[str] = Field(alias="description")
     nhs_as_category_bag: Optional[set[str]] = Field(alias="nhsascategorybag")
 

@@ -26,7 +26,7 @@ class NhsMhs(SdsBaseModel):
         alias="nhscontractpropertytemplatekey"
     )
     nhs_date_approved: str = Field(alias="nhsdateapproved")
-    nhs_date_dns_approved: str = Field(alias="nhsdatednsapproved")
+    nhs_date_dns_approved: str = Field(alias="nhsdatednsapproved", default=None)
     nhs_date_requested: str = Field(alias="nhsdaterequested")
     nhs_dns_approver: str = Field(alias="nhsdnsapprover")
     nhs_ep_interaction_type: InteractionType = Field(alias="nhsepinteractiontype")
@@ -41,7 +41,7 @@ class NhsMhs(SdsBaseModel):
     nhs_mhs_in: str = Field(alias="nhsmhsin")
     nhs_mhs_ip_address: Optional[str] = Field(alias="nhsmhsipaddress")
     nhs_mhs_is_authenticated: Authentication = Field(alias="nhsmhsisauthenticated")
-    nhs_mhs_manufacturer_org: Optional[str] = Field(alias="nhsmhsmanufacturerorg")
+    nhs_mhs_manufacturer_org: str = Field(alias="nhsmhsmanufacturerorg")
     nhs_mhs_party_key: str = Field(alias="nhsmhspartykey")
     nhs_mhs_sn: str = Field(alias="nhsmhssn")
     nhs_mhs_svc_ia: str = Field(alias="nhsmhssvcia")
