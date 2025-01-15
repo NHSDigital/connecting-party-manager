@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-01-15
+- [PI-689] Changelog ETL - modify / add to an AS
+
 ## 2025-01-08
 - [PI-716] Pipeline enhancements
 - [PI-430] Remove Account Wide VPC
