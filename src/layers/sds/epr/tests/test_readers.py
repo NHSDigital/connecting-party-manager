@@ -18,6 +18,7 @@ from domain.repository.questionnaire_repository.v1.questionnaires import (
 )
 from sds.epr.creators import (
     create_additional_interactions,
+    create_as_device,
     create_epr_product,
     create_epr_product_team,
     create_message_sets,
@@ -25,6 +26,7 @@ from sds.epr.creators import (
 )
 from sds.epr.readers import (
     read_additional_interactions_if_exists,
+    read_drds_from_as_device,
     read_message_sets_from_mhs_device,
     read_or_create_empty_message_sets,
     read_or_create_epr_product,
@@ -97,6 +99,45 @@ def mhs_device(
         product=product,
         message_sets_id=message_sets.id,
         mhs_device_data=mhs_device_data,
+    )
+
+
+@pytest.fixture
+def as_device_data():
+    questionnaire = QuestionnaireRepository().read(name=QuestionnaireInstance.SPINE_AS)
+    raw_as_device_data = {
+        "MHS Manufacturer Organisation": "AAA",
+        "MHS Party Key": "AAA-123456",
+        "ASID": "12345",
+        "ODS Code": "AAA",
+        "Client ODS Codes": ["BBB"],
+        "Product Key": "6216",
+        "Product Name": "My EPR Product",
+        "Product Version": None,
+        "Requestor URP": "requester-123",
+        "Approver URP": "approver-123",
+        "Date Approved": "today",
+        "Date Requested": "a week ago",
+        "Temp UID": None,
+    }
+    return questionnaire.validate(data=raw_as_device_data)
+
+
+@pytest.fixture
+def as_device(
+    product: CpmProduct,
+    as_device_data: QuestionnaireResponse,
+    additional_interactions: DeviceReferenceData,
+    message_sets: DeviceReferenceData,
+):
+    return create_as_device(
+        product=product,
+        party_key=product.keys[0].key_value,
+        asid="er3243",
+        as_device_data=as_device_data,
+        message_sets_id=message_sets.id,
+        additional_interactions_id=additional_interactions.id,
+        as_tags=[],
     )
 
 
@@ -307,3 +348,22 @@ def test_read_message_sets_from_mhs_device(
         device_reference_data_repository=device_reference_data_repository,
     )
     assert message_sets_from_db == message_sets
+
+
+def test_read_drds_from_as_device(
+    as_device: Device,
+    additional_interactions: DeviceReferenceData,
+    message_sets: DeviceReferenceData,
+    device_repository: DeviceRepository,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+):
+    device_repository.write(as_device)
+    device_reference_data_repository.write(additional_interactions)
+    device_reference_data_repository.write(message_sets)
+
+    message_sets_from_db, additional_interactions_from_db = read_drds_from_as_device(
+        as_device=as_device,
+        device_reference_data_repository=device_reference_data_repository,
+    )
+    assert message_sets_from_db == message_sets
+    assert additional_interactions_from_db == additional_interactions

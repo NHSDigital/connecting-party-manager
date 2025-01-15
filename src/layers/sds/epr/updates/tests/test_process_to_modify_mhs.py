@@ -577,7 +577,7 @@ def test_process_request_to_replace_in_mhs__device_replace_in_empty_non_list_fie
     _field_to_modify = mhs_device_field_mapping[field_to_modify]
     new_value = "2001.01"
 
-    _device, _message_sets, additional_interactions = process_request_to_replace_in_mhs(
+    _device, _message_sets, _ = process_request_to_replace_in_mhs(
         device=mhs_device,
         field_name=field_to_modify,
         new_values=[new_value],
@@ -617,7 +617,7 @@ def test_process_request_to_replace_in_mhs__device_replace_in_existing_non_list_
     _field_to_modify = mhs_device_field_mapping[field_to_modify]
     new_value = "another-urp"
 
-    _device, _message_sets, additional_interactions = process_request_to_replace_in_mhs(
+    _device, _message_sets, _ = process_request_to_replace_in_mhs(
         device=mhs_device,
         field_name=field_to_modify,
         new_values=[new_value],

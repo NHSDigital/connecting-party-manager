@@ -159,6 +159,7 @@ DEFAULT_KWARGS = dict(
     message_set_questionnaire=None,
     message_set_field_mapping=None,
     additional_interactions_questionnaire=None,
+    additional_interactions_field_mapping=None,
 )
 
 

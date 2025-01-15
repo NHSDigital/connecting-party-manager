@@ -45,6 +45,7 @@ def process_change_request(
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
+    additional_interactions_field_mapping: dict,
 ) -> list[ProductTeam | CpmProduct | Device | DeviceReferenceData]:
     unique_identifier = record["unique_identifier"]
     if unique_identifier in BAD_UNIQUE_IDENTIFIERS:
@@ -112,12 +113,12 @@ def process_change_request(
         return route_as_modification_request(
             device=device,
             request=record,
+            device_repository=device_repository,
             device_reference_data_repository=device_reference_data_repository,
             accredited_system_questionnaire=accredited_system_questionnaire,
             accredited_system_field_mapping=accredited_system_field_mapping,
-            message_set_questionnaire=message_set_questionnaire,
-            message_set_field_mapping=message_set_field_mapping,
             additional_interactions_questionnaire=additional_interactions_questionnaire,
+            additional_interactions_field_mapping=additional_interactions_field_mapping,
         )
 
     raise UnknownSdsModel(

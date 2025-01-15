@@ -52,6 +52,12 @@ CPM_MHS_IMMUTABLE_FIELDS = {
     SdsFieldName.UNIQUE_IDENTIFIER,
 }
 
+CPM_ACCREDITED_SYSTEM_IMMUTABLE_FIELDS = {
+    SdsFieldName.MANUFACTURING_ORG,
+    SdsFieldName.PARTY_KEY,
+    SdsFieldName.ASID,
+}
+
 
 class SdsDeviceReferenceDataPath(StrEnum):
     ALL = "*"

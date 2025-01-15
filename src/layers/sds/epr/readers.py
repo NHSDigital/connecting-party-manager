@@ -11,7 +11,7 @@ from domain.repository.device_reference_data_repository.v1 import (
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
-from sds.epr.constants import EprNameTemplate
+from sds.epr.constants import ADDITIONAL_INTERACTIONS_SUFFIX, EprNameTemplate
 from sds.epr.creators import (
     create_additional_interactions,
     create_as_device,
@@ -195,3 +195,29 @@ def read_message_sets_from_mhs_device(
         id=message_sets_id,
         environment=Environment.PROD,
     )
+
+
+def read_drds_from_as_device(
+    as_device: Device,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+) -> tuple[DeviceReferenceData, DeviceReferenceData]:
+    # Relies on message sets drd being added first and additional interation drd id always being added second
+    (message_sets_id, additional_interactions_id) = (
+        as_device.device_reference_data.keys()
+    )
+    message_sets = device_reference_data_repository.read(
+        product_team_id=as_device.product_team_id,
+        product_id=as_device.product_id,
+        id=message_sets_id,
+        environment=Environment.PROD,
+    )
+    additional_interactions = device_reference_data_repository.read(
+        product_team_id=as_device.product_team_id,
+        product_id=as_device.product_id,
+        id=additional_interactions_id,
+        environment=Environment.PROD,
+    )
+    # Conditional to check the drds were returned in the expected order
+    if message_sets.name.endswith(ADDITIONAL_INTERACTIONS_SUFFIX):
+        message_sets, additional_interactions = additional_interactions, message_sets
+    return message_sets, additional_interactions
