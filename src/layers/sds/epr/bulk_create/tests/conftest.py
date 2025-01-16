@@ -81,10 +81,13 @@ def accredited_system_1() -> NhsMhs:
         nhsdateapproved="today",
         nhsidcode="AAA",
         nhsmhspartykey="AAA-123456",
+        nhsproductname="My EPR Product",
         nhsproductkey="key-123",
+        nhsproductversion=None,
         nhsasclient={"ABC", "CDE", "EFG"},
         nhsassvcia={"interaction-id-1", "interaction-id-2"},
         nhsmhsmanufacturerorg="AAA",
+        nhstempuid=None,
     )
 
 
@@ -103,6 +106,7 @@ def accredited_system_2() -> NhsMhs:
         nhsidcode="BBB",
         nhsmhspartykey="AAA-456789",
         nhsproductkey="key-123",
+        nhsproductversion=None,
         nhsasclient={"ABC", "JKL", "LMN"},
         nhsassvcia={"interaction-id-3", "interaction-id-4"},
         nhsmhsmanufacturerorg="AAA",

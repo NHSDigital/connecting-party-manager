@@ -160,7 +160,7 @@ def initial_product_team(accredited_system_1: NhsMhs):
 def initial_product(accredited_system_1: NhsMhs, initial_product_team):
     return create_epr_product(
         product_team=initial_product_team,
-        product_name=accredited_system_1.unique_identifier,
+        product_name=accredited_system_1.nhs_product_name,
         party_key=accredited_system_1.nhs_mhs_party_key,
     )
 

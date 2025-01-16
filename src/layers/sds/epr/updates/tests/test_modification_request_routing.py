@@ -77,12 +77,12 @@ def test_route_as_modification_request():
         assert route_as_modification_request(
             request=modification_request,
             device=None,
+            device_repository=None,
             device_reference_data_repository=None,
             accredited_system_questionnaire=None,
             accredited_system_field_mapping=None,
-            message_set_questionnaire=None,
-            message_set_field_mapping=None,
             additional_interactions_questionnaire=None,
+            additional_interactions_field_mapping=None,
         ) == [
             "called 'process_request_to_add_to_as'",
             "called 'process_request_to_replace_in_as'",

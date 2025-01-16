@@ -74,6 +74,9 @@ QUESTIONNAIRES = dict(
     additional_interactions_questionnaire=QuestionnaireRepository().read(
         QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
     ),
+    additional_interactions_field_mapping=QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
+    ),
 )
 
 

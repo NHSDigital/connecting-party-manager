@@ -100,7 +100,7 @@ def test_changelog_changes_are_valid_ldif(test_data_paths):
         "nhs_date_approved": "20240116173441",
         "nhs_date_requested": "20240116173439",
         "nhs_id_code": "K81045",
-        "nhs_mhs_manufacturer_org": None,
+        "nhs_mhs_manufacturer_org": "K81045",
         "nhs_mhs_party_key": "R3U6M-831547",
         "nhs_product_key": "6255",
         "nhs_product_name": "Continuum Health GPC",

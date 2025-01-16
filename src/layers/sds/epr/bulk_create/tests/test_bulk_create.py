@@ -143,7 +143,7 @@ def as_device_data():
                 "MHS Party Key": "AAA-123456",
                 "Product Key": "key-123",
                 "Client ODS Codes": ["ABC", "CDE", "EFG"],
-                "Product Name": None,
+                "Product Name": "My EPR Product",
                 "Product Version": None,
                 "Temp UID": None,
             },
