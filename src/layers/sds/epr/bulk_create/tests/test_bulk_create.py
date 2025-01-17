@@ -146,6 +146,7 @@ def as_device_data():
                 "Product Name": "My EPR Product",
                 "Product Version": None,
                 "Temp UID": None,
+                "Category Bag": ["example"],
             },
         },
         {
