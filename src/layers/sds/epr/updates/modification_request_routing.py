@@ -111,6 +111,6 @@ def route_as_modification_request(
                 )
             case ModificationType.DELETE:
                 domain_objects += process_request_to_delete_from_as(
-                    field_name=field_name, **common_payload
+                    field_name=field_name, new_values=[], **common_payload
                 )
     return domain_objects

@@ -194,6 +194,9 @@ MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD_ALREADY_EXISTS = (
         "add/nhs_as_svc_ia.Another.ldif", device_type="accredited_system"
     )
 )
+MODIFY_ACCREDITED_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
+    "delete/description.ldif", device_type="accredited_system"
+)
 MODIFY_MESSAGE_HANDLING_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
     "delete/nhs_product_name.ldif", device_type="message_handling_system"
 )

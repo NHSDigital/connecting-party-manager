@@ -150,9 +150,15 @@ def common_kwargs(device_reference_data_repository):
         "unique_identifier",
     ],
 )
-def test_process_request_to_add_to_mhs__immutable_fields(field_name, common_kwargs):
+def test_process_request_to_modify_mhs__immutable_fields(field_name, common_kwargs):
     with pytest.raises(ImmutableFieldError):
         process_request_to_add_to_mhs(
+            field_name=field_name, device=None, new_values=None, **common_kwargs
+        )
+        process_request_to_replace_in_mhs(
+            field_name=field_name, device=None, new_values=None, **common_kwargs
+        )
+        process_request_to_delete_from_mhs(
             field_name=field_name, device=None, new_values=None, **common_kwargs
         )
 
@@ -427,22 +433,6 @@ def test_process_request_to_delete_from_mhs__device(
     assert final_device["updated_on"] > initial_device["updated_on"]
 
 
-def test_process_request_to_delete_from_mhs__device_required_field_raises_error(
-    mhs_device: Device,
-    message_sets: DeviceReferenceData,
-    device_reference_data_repository: DeviceReferenceDataRepository,
-    common_kwargs,
-):
-    device_reference_data_repository.write(message_sets)
-    with pytest.raises(UnexpectedModification):
-        process_request_to_delete_from_mhs(
-            device=mhs_device,
-            field_name="nhs_mhs_fqdn",
-            new_values=[],
-            **common_kwargs,
-        )
-
-
 def test_process_request_to_delete_from_mhs__message_sets(
     mhs_device: Device,
     message_sets: DeviceReferenceData,
@@ -485,18 +475,36 @@ def test_process_request_to_delete_from_mhs__message_sets(
     assert final_message_sets["updated_on"] > initial_message_sets["updated_on"]
 
 
-def test_process_request_to_delete_from_mhs__message_set_required_field_raises_error(
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "nhs_mhs_fqdn",
+        "nhs_mhs_end_point",
+        "nhs_id_code",
+        "nhs_approver_urp",
+        "nhs_date_approved",
+        "nhs_date_dns_approved",
+        "nhs_date_requested",
+        "nhs_dns_approver",
+        "nhs_requestor_urp",
+        "nhs_mhs_in",
+        "nhs_mhs_sn",
+        "nhs_mhs_svc_ia",
+    ],
+)
+def test_process_request_to_delete_from_mhs__required_field_raises_error(
     mhs_device: Device,
     message_sets: DeviceReferenceData,
     device_reference_data_repository: DeviceReferenceDataRepository,
     common_kwargs,
+    field_name,
 ):
     device_reference_data_repository.write(message_sets)
     with pytest.raises(UnexpectedModification):
         process_request_to_delete_from_mhs(
             device=mhs_device,
-            field_name="nhs_mhs_sn",
-            new_values=[],
+            field_name=field_name,
+            new_values=None,
             **common_kwargs,
         )
 
