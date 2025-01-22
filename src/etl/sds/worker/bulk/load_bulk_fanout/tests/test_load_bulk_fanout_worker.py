@@ -5,9 +5,9 @@ from typing import Callable
 from unittest import mock
 
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team.v1 import ProductTeam
 from domain.repository.compression import pkl_loads_gzip
 from etl_utils.constants import WorkerKey
@@ -144,8 +144,8 @@ def test_load_worker_fanout(
                 obj = DeviceReferenceData(**obj_data)
             case "ProductTeam":
                 obj = ProductTeam(**obj_data)
-            case "CpmProduct":
-                obj = CpmProduct(**obj_data)
+            case "EprProduct":
+                obj = EprProduct(**obj_data)
         expected_total_size += count_indexes(obj)
 
     assert total_size == expected_total_size

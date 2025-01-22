@@ -8,14 +8,14 @@ Feature: Create CPM Product - failure scenarios
       | Authorization | letmein |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product that is missing fields (no name) and has extra param
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path       | value            |
       | extra_name | My Great Product |
     Then I receive a status code "400" with body
@@ -30,14 +30,14 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 219              |
 
   Scenario: Cannot create a Cpm Product with a Cpm Product that is missing fields (no name)
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       """
       {}
       """
@@ -51,14 +51,14 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 105              |
 
   Scenario: Cannot create a Cpm Product with an invalid body (extra parameter is not allowed)
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
       | foo  | bar              |
@@ -72,14 +72,14 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 119              |
 
   Scenario: Cannot create a Cpm Product with corrupt body
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       """
       {"invalid_array": [}
       """
@@ -93,7 +93,7 @@ Feature: Create CPM Product - failure scenarios
       | Content-Length | 115              |
 
   Scenario: Cannot create a Cpm Product with a Product Team that does not exist
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/f9518c12-6c83-4544-97db-d9dd1d64da97/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeam/f9518c12-6c83-4544-97db-d9dd1d64da97/Product" with body:
       | path | value            |
       | name | My Great Product |
     Then I receive a status code "404" with body

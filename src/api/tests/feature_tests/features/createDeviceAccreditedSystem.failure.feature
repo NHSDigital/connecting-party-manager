@@ -13,11 +13,11 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path      | value        |
       | bad_field | Not required |
     Then I receive a status code "400" with body
@@ -37,11 +37,11 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       """
       {"invalid_array": [}
       """
@@ -55,7 +55,7 @@ Feature: Create AS Device - failure scenarios
       | Content-Length | 115              |
 
   Scenario: Cannot create a AS Device with a Product Team that does not exist
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/not-a-product-team/Product/not-a-product/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/not-a-product-team/ProductEpr/not-a-product/dev/Device/AccreditedSystem" with body:
       | path                    | value |
       | questionnaire_responses | {}    |
     Then I receive a status code "404" with body
@@ -73,39 +73,17 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/not-a-product/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/not-a-product/dev/Device/AccreditedSystem" with body:
       | path                    | value |
       | questionnaire_responses | {}    |
     Then I receive a status code "404" with body
       | path             | value                                                                             |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                |
-      | errors.0.message | Could not find CpmProduct for key ('${ note(product_team_id) }', 'not-a-product') |
+      | errors.0.message | Could not find EprProduct for key ('${ note(product_team_id) }', 'not-a-product') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 156              |
-
-  Scenario: Cannot create a AS Device with a Product that does not have a party key
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
-      | path     | value                 |
-      | name     | My Great Product Team |
-      | ods_code | F5H1R                 |
-    And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
-      | path | value            |
-      | name | My Great Product |
-    And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
-      | path                    | value |
-      | questionnaire_responses | {}    |
-    Then I receive a status code "400" with body
-      | path             | value                                                                                 |
-      | errors.0.code    | VALIDATION_ERROR                                                                      |
-      | errors.0.message | Not an EPR Product: Cannot create AS device for product without exactly one Party Key |
-    And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 142              |
 
   Scenario: Cannot create a AS Device for a Product that does not have a Any Device Reference Data
     Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
@@ -113,11 +91,11 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -143,16 +121,16 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -178,15 +156,15 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
     And I note the response field "$.id" as "as_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -212,12 +190,12 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                            | value  |
       | questionnaire_responses.not_spine_as.0.Question | Answer |
     Then I receive a status code "400" with body
@@ -235,20 +213,20 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
     And I note the response field "$.id" as "as_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                                  | value           |
       | questionnaire_responses.spine_as.0.ODS Code           | FH15R           |
       | questionnaire_responses.spine_as.0.Client ODS Codes.0 | FH15R           |
@@ -283,20 +261,20 @@ Feature: Create AS Device - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |
     And I note the response field "$.id" as "mhs_message_set_drd_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V002 |
     And I note the response field "$.id" as "as_message_set_drd_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/Device/AccreditedSystem" with body:
       | path                                               | value             |
       | questionnaire_responses.spine_as.0.ODS Code        | F5H1R             |
       | questionnaire_responses.spine_as.0.Product Name    | My SPINE Product  |

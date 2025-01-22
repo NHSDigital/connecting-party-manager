@@ -1,5 +1,5 @@
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team.v1 import ProductTeam
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
     QuestionnaireRepository,
@@ -30,7 +30,7 @@ def product(product_team: ProductTeam):
 
 
 @pytest.fixture
-def additional_interactions(product: CpmProduct):
+def additional_interactions(product: EprProduct):
     return create_additional_interactions(
         product=product,
         party_key=product.keys[0].key_value,
@@ -38,7 +38,7 @@ def additional_interactions(product: CpmProduct):
     )
 
 
-def message_sets_factory(product: CpmProduct, interaction_ids: set[str]):
+def message_sets_factory(product: EprProduct, interaction_ids: set[str]):
     message_handling_systems = [
         {
             "nhs_mhs_svc_ia": interaction_id,
@@ -67,7 +67,7 @@ def message_sets_factory(product: CpmProduct, interaction_ids: set[str]):
     )
 
 
-def test_get_interaction_ids_from_additional_interactions(product: CpmProduct):
+def test_get_interaction_ids_from_additional_interactions(product: EprProduct):
     interaction_ids = {"foo", "bar"}
     accredited_systems = [
         {"nhs_as_svc_ia": [interaction_id]} for interaction_id in interaction_ids
@@ -88,7 +88,7 @@ def test_get_interaction_ids_from_additional_interactions(product: CpmProduct):
     assert get_interaction_ids(additional_interactions) == interaction_ids
 
 
-def test_get_interaction_ids_from_message_sets(product: CpmProduct):
+def test_get_interaction_ids_from_message_sets(product: EprProduct):
     interaction_ids = {"foo", "bar"}
     message_sets = message_sets_factory(
         product=product, interaction_ids=interaction_ids
@@ -97,7 +97,7 @@ def test_get_interaction_ids_from_message_sets(product: CpmProduct):
 
 
 @pytest.mark.parametrize("cpa_id_suffix", ["foo", "bar"])
-def test_filter_message_set_by_cpa_id(product: CpmProduct, cpa_id_suffix):
+def test_filter_message_set_by_cpa_id(product: EprProduct, cpa_id_suffix):
     interaction_ids = {"foo", "bar"}
     message_sets = message_sets_factory(
         product=product, interaction_ids=interaction_ids

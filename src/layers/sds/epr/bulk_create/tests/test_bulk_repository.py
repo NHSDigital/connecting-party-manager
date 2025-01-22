@@ -4,11 +4,11 @@ from domain.core.enum import Environment
 from domain.core.product_key.v1 import ProductKeyType
 from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.product_team_key.v1 import ProductTeamKey, ProductTeamKeyType
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from sds.epr.bulk_create.bulk_repository import (
     BulkRepository,
@@ -160,18 +160,18 @@ def test_BulkRepository_handle_ProductTeam(dynamodb_client):
     assert product_team == product_team_by_key
 
 
-def test_BulkRepository_handle_CpmProduct(dynamodb_client):
-    product_repo = CpmProductRepository(
+def test_BulkRepository_handle_EprProduct(dynamodb_client):
+    product_repo = EprProductRepository(
         table_name=TABLE_NAME, dynamodb_client=dynamodb_client
     )
     product_team = ProductTeam(name="my-product", ods_code="AAA")
-    product = product_team.create_cpm_product(name="my-product")
+    product = product_team.create_epr_product(name="my-product")
     product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value="AAA-123456")
     product.clear_events()
 
     bulk_repo = BulkRepository(table_name=TABLE_NAME, dynamodb_client=dynamodb_client)
     transactions = bulk_repo.generate_transaction_statements(
-        {"CpmProduct": product.state()}
+        {"EprProduct": product.state()}
     )
     bulk_repo.write(transactions)
 
@@ -186,7 +186,7 @@ def test_BulkRepository_handle_Device(dynamodb_client):
         table_name=TABLE_NAME, dynamodb_client=dynamodb_client
     )
     product_team = ProductTeam(name="my-product", ods_code="AAA")
-    product = product_team.create_cpm_product(name="my-product")
+    product = product_team.create_epr_product(name="my-product")
     device = product.create_device(name="my-product", environment=Environment.PROD)
     device.add_key(key_type=DeviceKeyType.ACCREDITED_SYSTEM_ID, key_value="123456")
     device.add_tag(party_key="123", something_else="456")
@@ -221,7 +221,7 @@ def test_BulkRepository_handle_DeviceReferenceData(dynamodb_client):
         table_name=TABLE_NAME, dynamodb_client=dynamodb_client
     )
     product_team = ProductTeam(name="my-product", ods_code="AAA")
-    product = product_team.create_cpm_product(name="my-product")
+    product = product_team.create_epr_product(name="my-product")
     device_ref_data = product.create_device_reference_data(
         name="my-product", environment=Environment.PROD
     )

@@ -2,9 +2,9 @@ from datetime import datetime
 
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.cpm_product import CpmProduct, CpmProductCreatedEvent
 from domain.core.cpm_system_id import ProductTeamId
 from domain.core.enum import Status
+from domain.core.epr_product import EprProduct, EprProductCreatedEvent
 from domain.core.event import Event, EventDeserializer
 from domain.core.product_team_key import ProductTeamKey
 from domain.core.timestamp import now
@@ -48,14 +48,14 @@ class ProductTeam(AggregateRoot):
             values["id"] = product_team.id
         return values
 
-    def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:
+    def create_epr_product(self, name: str, product_id: str = None) -> EprProduct:
         extra_kwargs = {"id": product_id} if product_id is not None else {}
-        product = CpmProduct(
+        product = EprProduct(
             product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs
         )
         data = product.state()
         del data["keys"]
-        product_created_event = CpmProductCreatedEvent(**data)
+        product_created_event = EprProductCreatedEvent(**data)
         product.add_event(product_created_event)
         return product
 

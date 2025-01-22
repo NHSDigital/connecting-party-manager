@@ -14,7 +14,7 @@ def test_device():
     assert product.name == CPM_DEVICE_REFERENCE_DATA["name"]
 
 
-def test_validate_cpm_product_raises_no_extra_fields():
+def test_validate_epr_product_raises_no_extra_fields():
     with pytest.raises(ValidationError) as exc:
         CreateDeviceReferenceDataIncomingParams(
             **CPM_DEVICE_REFERENCE_DATA_EXTRA_PARAMS

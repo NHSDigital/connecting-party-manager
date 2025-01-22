@@ -13,20 +13,20 @@ Feature: Read Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     And I note the response field "$.id" as "device_reference_data_id"
-    And I have already made a "DELETE" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    And I have already made a "DELETE" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "404" with body
       | path             | value                                                                                     |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                        |
-      | errors.0.message | Could not find CpmProduct for key ('${ note(product_team_id) }', '${ note(product_id) }') |
+      | errors.0.message | Could not find EprProduct for key ('${ note(product_team_id) }', '${ note(product_id) }') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
@@ -38,15 +38,15 @@ Feature: Read Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/F5H1R.f63ba1d2-99b3-4e7f-83b4-a98178f1e4fe/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/F5H1R.f63ba1d2-99b3-4e7f-83b4-a98178f1e4fe/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "404" with body
       | path             | value                                                                             |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                |
@@ -62,15 +62,15 @@ Feature: Read Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/not-a-device-reference-data"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/not-a-device-reference-data"
     Then I receive a status code "404" with body
       | path             | value                                                                                                                                    |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                                                                       |

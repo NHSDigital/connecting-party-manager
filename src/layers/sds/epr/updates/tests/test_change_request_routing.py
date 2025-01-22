@@ -1,10 +1,10 @@
 from unittest import mock
 
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.questionnaire.v1 import QuestionnaireResponse
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
@@ -41,7 +41,7 @@ def product(product_team):
 
 
 @pytest.fixture
-def additional_interactions(product: CpmProduct):
+def additional_interactions(product: EprProduct):
     return create_additional_interactions(
         product=product,
         party_key=product.keys[0].key_value,
@@ -50,7 +50,7 @@ def additional_interactions(product: CpmProduct):
 
 
 @pytest.fixture
-def message_sets(product: CpmProduct):
+def message_sets(product: EprProduct):
     return create_message_sets(
         product=product,
         party_key=product.keys[0].key_value,
@@ -80,7 +80,7 @@ def mhs_device_data():
 
 @pytest.fixture
 def mhs_device(
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     mhs_device_data: QuestionnaireResponse,
 ):

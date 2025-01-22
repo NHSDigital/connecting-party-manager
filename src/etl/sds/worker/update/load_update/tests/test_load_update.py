@@ -7,11 +7,11 @@ from unittest import mock
 
 import pytest
 from domain.core.enum import Environment
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4
@@ -91,7 +91,7 @@ def test_load_worker_pass(put_object: Callable[[str], None]):
         assert product_team == product_team_by_key
         assert product_team == product_team_by_id
 
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=dynamodb_client
         )
         products = product_repo.search(product_team_id=product_team.id)

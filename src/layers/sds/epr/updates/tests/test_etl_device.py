@@ -9,8 +9,8 @@ from sds.epr.updates.etl_device import DeviceHardDeletedEvent, EtlDevice
 @pytest.fixture
 def device():
     ods_org = Root.create_ods_organisation(ods_code="AAA")
-    product_team = ods_org.create_product_team(name="my product team")
-    product = product_team.create_cpm_product(name="my product")
+    product_team = ods_org.create_product_team_epr(name="my product team")
+    product = product_team.create_epr_product(name="my product")
     _device = product.create_device(name="my device", environment=Environment.PROD)
     _device.add_key(key_type=DeviceKeyType.CPA_ID, key_value="123456")
     _device.add_tag(foo="bar")

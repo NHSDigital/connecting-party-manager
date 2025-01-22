@@ -82,7 +82,7 @@ def assert_transform_outputs_equal(created_objects, template_output):
         created_item = nested_created_item[object_type_name]
         template_item = nested_template_item[object_type_name]
 
-        if object_type_name == "CpmProduct":
+        if object_type_name == "EprProduct":
             current_product_id = created_item["id"]
             device_reference_data_ids = []
         elif object_type_name == "DeviceReferenceData":

@@ -50,6 +50,10 @@ class ConfigurationError(Exception):
     pass
 
 
+class NotCpmProductError(Exception):
+    pass
+
+
 class NotEprProductError(Exception):
     pass
 

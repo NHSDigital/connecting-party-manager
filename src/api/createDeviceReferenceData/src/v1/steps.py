@@ -7,9 +7,9 @@ from domain.api.common_steps.sub_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
@@ -26,7 +26,7 @@ def parse_device_reference_data_payload(
 
 
 def create_device_reference_data(data, cache) -> DeviceReferenceData:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     payload: CreateDeviceReferenceDataIncomingParams = data[
         parse_device_reference_data_payload
     ]
@@ -36,7 +36,7 @@ def create_device_reference_data(data, cache) -> DeviceReferenceData:
     )
 
 
-def write_device_reference_data(data: dict[str, CpmProduct], cache) -> CpmProduct:
+def write_device_reference_data(data: dict[str, EprProduct], cache) -> EprProduct:
     device_reference_data: DeviceReferenceData = data[create_device_reference_data]
     repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]

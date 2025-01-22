@@ -6,10 +6,10 @@ import pytest
 from domain.core.cpm_system_id import ProductId
 from domain.core.enum import Environment
 from domain.core.root import Root
-from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
+from domain.repository.epr_product_repository import EprProductRepository
 from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
@@ -24,7 +24,7 @@ TABLE_NAME = "hiya"
 
 def _create_org():
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
-    product_team = org.create_product_team(
+    product_team = org.create_product_team_epr(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
     return product_team
@@ -32,7 +32,7 @@ def _create_org():
 
 def _create_product(product, product_team):
     generated_product_id = ProductId.create()
-    cpmproduct = product_team.create_cpm_product(
+    cpmproduct = product_team.create_epr_product(
         product_id=generated_product_id.id, name=product["name"]
     )
 
@@ -82,7 +82,7 @@ def test_no_results(version):
             product={"name": "product-a"}, product_team=product_team
         )
 
-        p_repo = CpmProductRepository(
+        p_repo = EprProductRepository(
             table_name=drd_cache["DYNAMODB_TABLE"],
             dynamodb_client=drd_cache["DYNAMODB_CLIENT"],
         )
@@ -137,7 +137,7 @@ def test_index(version, device_ref_data):
     cpmproduct = _create_product(
         product={"name": "product-a"}, product_team=product_team
     )
-    p_repo = CpmProductRepository(table_name=table_name, dynamodb_client=client)
+    p_repo = EprProductRepository(table_name=table_name, dynamodb_client=client)
     p_repo.write(entity=cpmproduct)
     product_state = cpmproduct.state()
     drd = _create_device_ref_data(device_ref_data=device_ref_data, product=cpmproduct)
@@ -299,7 +299,7 @@ def test_index_no_such_product(version):
         "errors": [
             {
                 "code": "RESOURCE_NOT_FOUND",
-                "message": f"Could not find CpmProduct for key ('{product_team.id}', 'P.123-321')",
+                "message": f"Could not find EprProduct for key ('{product_team.id}', 'P.123-321')",
             }
         ]
     }
@@ -331,7 +331,7 @@ def test_index_multiple_returned(device_ref_data):
     cpmproduct = _create_product(
         product={"name": "product-a"}, product_team=product_team
     )
-    p_repo = CpmProductRepository(table_name=table_name, dynamodb_client=client)
+    p_repo = EprProductRepository(table_name=table_name, dynamodb_client=client)
     p_repo.write(entity=cpmproduct)
     product_state = cpmproduct.state()
     params = {

@@ -1,14 +1,14 @@
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.questionnaire.v1 import QuestionnaireResponse
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from sds.epr.constants import ADDITIONAL_INTERACTIONS_SUFFIX, EprNameTemplate
@@ -44,8 +44,8 @@ def read_or_create_epr_product(
     product_team: ProductTeam,
     product_name: str,
     party_key: str,
-    product_repository: CpmProductRepository,
-) -> CpmProduct:
+    product_repository: EprProductRepository,
+) -> EprProduct:
     try:
         product = product_repository.read(product_team_id=product_team.id, id=party_key)
     except ItemNotFound:
@@ -77,7 +77,7 @@ def read_additional_interactions_if_exists(
 
 
 def read_or_create_empty_message_sets(
-    product: CpmProduct,
+    product: EprProduct,
     party_key: str,
     device_reference_data_repository: DeviceReferenceDataRepository,
 ) -> DeviceReferenceData:
@@ -103,7 +103,7 @@ def read_or_create_mhs_device(
     cpa_id: str,
     party_key: str,
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     mhs_device_data: QuestionnaireResponse,
 ) -> Device:
@@ -126,7 +126,7 @@ def read_or_create_mhs_device(
 
 
 def read_or_create_empty_additional_interactions(
-    product: CpmProduct,
+    product: EprProduct,
     party_key: str,
     device_reference_data_repository: DeviceReferenceDataRepository,
 ) -> DeviceReferenceData:
@@ -157,7 +157,7 @@ def read_or_create_as_device(
     asid: str,
     party_key: str,
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     additional_interactions: DeviceReferenceData,
     accredited_system_device_data: QuestionnaireResponse,

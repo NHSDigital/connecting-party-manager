@@ -8,16 +8,16 @@ from unittest import mock
 
 import boto3
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team_epr.v1 import ProductTeam
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.io import pkl_dumps_lz4, pkl_load_lz4
@@ -128,7 +128,7 @@ def test_load_worker_pass(
         assert product_team == product_team_by_key
         assert product_team == product_team_by_id
 
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=dynamodb_client
         )
         products = product_repo.search(product_team_id=product_team.id)
@@ -186,10 +186,10 @@ def test_load_worker_pass(
 
     input_products = sorted(
         (
-            CpmProduct(**data)
+            EprProduct(**data)
             for item in input_data
             for object_type_name, data in item.items()
-            if object_type_name == "CpmProduct"
+            if object_type_name == "EprProduct"
         ),
         key=lambda product: str(product.id),
     )

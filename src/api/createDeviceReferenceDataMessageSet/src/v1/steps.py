@@ -11,9 +11,9 @@ from domain.api.common_steps.sub_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from domain.questionnaire_instances.strategies import (
     generate_spine_mhs_message_sets_fields,
@@ -43,7 +43,7 @@ def parse_device_reference_data_for_epr_payload(
 def require_no_existing_message_sets_device_reference_data(
     data, cache
 ) -> list[QuestionnaireResponse]:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     environment: Environment = data[read_environment]
     repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
@@ -95,7 +95,7 @@ def require_unique_interactions(data, cache):
 
 
 def create_message_set_device_reference_data(data, cache) -> DeviceReferenceData:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     party_key: str = data[get_party_key]
     environment: Environment = data[read_environment]
     return product.create_device_reference_data(
@@ -115,7 +115,7 @@ def add_questionnaire_response(data, cache) -> list[QuestionnaireResponse]:
         device_reference_data.add_questionnaire_response(qr)
 
 
-def write_device_reference_data(data: dict[str, CpmProduct], cache) -> CpmProduct:
+def write_device_reference_data(data: dict[str, EprProduct], cache) -> EprProduct:
     device_reference_data: DeviceReferenceData = data[
         create_message_set_device_reference_data
     ]

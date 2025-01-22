@@ -20,8 +20,8 @@ def repository(request) -> Generator[DeviceRepository, None, None]:
 @pytest.fixture
 def device() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Team")
+    product = product_team.create_epr_product(name="Product")
     device = product.create_device(name="Device-1", environment=Environment.DEV)
     device.add_tag(abc="123")
     device.add_tag(bar="foo")
@@ -33,8 +33,8 @@ def device() -> Device:
 @pytest.fixture
 def device_with_asid() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Team")
+    product = product_team.create_epr_product(name="Product")
     device = product.create_device(name="Device-1", environment=Environment.DEV)
     device.add_tag(foo="bar", abc="123")
     device.add_tag(bar="foo")
@@ -46,8 +46,8 @@ def device_with_asid() -> Device:
 @pytest.fixture
 def device_with_mhs_id() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Team")
+    product = product_team.create_epr_product(name="Product")
     device = product.create_device(name="Device-2", environment=Environment.DEV)
     device.add_key(key_value="P.WWW-YYY", key_type=DeviceKeyType.PRODUCT_ID)
     device.add_key(

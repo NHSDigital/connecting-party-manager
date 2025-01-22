@@ -15,11 +15,11 @@ Feature: Search Device Reference Data - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData"
     Then I receive a status code "200" with body
       | path    | value |
       | results | []    |
@@ -41,23 +41,23 @@ Feature: Search Device Reference Data - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                      |
       | name | My Device Reference Data 1 |
     And I note the response field "$.id" as "device_reference_data_id_1"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                      |
       | name | My Device Reference Data 2 |
     And I note the response field "$.id" as "device_reference_data_id_2"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                      |
       | name | My Device Reference Data 3 |
     And I note the response field "$.id" as "device_reference_data_id_3"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData"
     Then I receive a status code "200" with body where "results" has a length of "3"
       | path                              | value                                 |
       | results.0.id                      | ${ note(device_reference_data_id_1) } |
@@ -111,16 +111,16 @@ Feature: Search Device Reference Data - success scenarios
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/MhsMessageSet"
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData/MhsMessageSet"
     And I note the response field "$.id" as "device_reference_data_id_msg_set"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     And I note the response field "$.id" as "device_reference_data_id_additional_interactions"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData"
     Then I receive a status code "200" with body where "results" has a length of "2"
       | path                              | value                                                       |
       | results.0.id                      | ${ note(device_reference_data_id_msg_set) }                 |
@@ -163,12 +163,12 @@ Feature: Search Device Reference Data - success scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                                                        | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN                                     | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN                                     | READ_PRACTITIONER_ROLE_R4_V001 |
@@ -215,7 +215,7 @@ Feature: Search Device Reference Data - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 1582             |
     And I note the response field "$.id" as "mhs_device_reference_data_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.1.Interaction ID | urn:nhs:names:services:ebs:PRSC_IN080000UK07              |
@@ -246,7 +246,7 @@ Feature: Search Device Reference Data - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 980              |
     And I note the response field "$.id" as "as_device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData"
     Then I receive a status code "200" with body where "results" has a length of "2"
       | path                                                                                                         | value                                                                          |
       | results.0.id                                                                                                 | << ignore >>                                                                   |

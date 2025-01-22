@@ -50,7 +50,7 @@ def test__cpm_device_reference_data_repository__device_reference_data_does_not_e
         )
 
 
-def test__cpm_product_repository_local(
+def test__epr_product_repository_local(
     device_reference_data: DeviceReferenceData,
     repository: DeviceReferenceDataRepository,
 ):

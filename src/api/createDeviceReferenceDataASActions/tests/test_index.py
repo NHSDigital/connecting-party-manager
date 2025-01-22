@@ -6,16 +6,16 @@ from types import ModuleType
 from typing import Any, Generator
 from unittest import mock
 
-from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import PartyKeyId, ProductId
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.product_key import ProductKeyType
 from domain.core.root import Root
-from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
+from domain.repository.epr_product_repository import EprProductRepository
 from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
@@ -30,9 +30,9 @@ VERSION = 1
 
 
 @contextmanager
-def mock_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
+def mock_product() -> Generator[tuple[ModuleType, EprProduct], Any, None]:
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(name=PRODUCT_NAME)
+    product_team = org.create_product_team_epr(name=PRODUCT_NAME)
 
     with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
@@ -44,14 +44,14 @@ def mock_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
         )
         product_team_repo.write(entity=product_team)
 
-        product = product_team.create_cpm_product(
+        product = product_team.create_epr_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
         product.add_key(
             key_type=ProductKeyType.PARTY_KEY,
             key_value=str(PartyKeyId.create(current_number=100000, ods_code="AAA")),
         )
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
         product_repo.write(entity=product)

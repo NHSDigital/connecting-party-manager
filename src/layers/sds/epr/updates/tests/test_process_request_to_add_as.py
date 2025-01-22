@@ -1,9 +1,4 @@
 import pytest
-from domain.core.cpm_product.v1 import (
-    CpmProduct,
-    CpmProductCreatedEvent,
-    CpmProductKeyAddedEvent,
-)
 from domain.core.device.v1 import (
     Device,
     DeviceCreatedEvent,
@@ -21,12 +16,17 @@ from domain.core.device_reference_data.v1 import (
 from domain.core.device_reference_data.v1 import (
     QuestionnaireResponseUpdatedEvent as DrdQuestionnaireUpdatedEvent,
 )
+from domain.core.epr_product.v1 import (
+    EprProduct,
+    EprProductCreatedEvent,
+    EprProductKeyAddedEvent,
+)
 from domain.core.product_team_epr.v1 import ProductTeam, ProductTeamCreatedEvent
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
     QuestionnaireRepository,
@@ -79,7 +79,7 @@ def repository():
         repo_kwargs = dict(table_name=TABLE_NAME, dynamodb_client=client)
         yield {
             "product_team_repository": ProductTeamRepository(**repo_kwargs),
-            "product_repository": CpmProductRepository(**repo_kwargs),
+            "product_repository": EprProductRepository(**repo_kwargs),
             "device_repository": DeviceRepository(**repo_kwargs),
             "device_reference_data_repository": DeviceReferenceDataRepository(
                 **repo_kwargs
@@ -332,7 +332,7 @@ def equivalent_questionnaire_responses[
 
 
 def equivalent[
-    item_type: ProductTeam | CpmProduct | Device | DeviceReferenceData
+    item_type: ProductTeam | EprProduct | Device | DeviceReferenceData
 ](new_item: item_type, old_item: item_type) -> bool:
     assert new_item.id != old_item.id
     assert new_item.name == old_item.name
@@ -375,7 +375,7 @@ def test_process_request_to_add_as_no_initial_state(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
@@ -397,8 +397,8 @@ def test_process_request_to_add_as_no_initial_state(
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
     assert isinstance(product_team_created_event, ProductTeamCreatedEvent)
-    assert isinstance(product_created_event, CpmProductCreatedEvent)
-    assert isinstance(product_key_added_event, CpmProductKeyAddedEvent)
+    assert isinstance(product_created_event, EprProductCreatedEvent)
+    assert isinstance(product_key_added_event, EprProductKeyAddedEvent)
     assert isinstance(
         mhs_device_ref_data_created_event, DeviceReferenceDataCreatedEvent
     )
@@ -452,7 +452,7 @@ def test_process_request_to_add_device_product_team_exists(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
@@ -473,8 +473,8 @@ def test_process_request_to_add_device_product_team_exists(
         device_ref_data_added_event_additional_interactions,
     ) = accredited_system_device.events
     assert product_team.events == []
-    assert isinstance(product_created_event, CpmProductCreatedEvent)
-    assert isinstance(product_key_added_event, CpmProductKeyAddedEvent)
+    assert isinstance(product_created_event, EprProductCreatedEvent)
+    assert isinstance(product_key_added_event, EprProductKeyAddedEvent)
     assert isinstance(
         mhs_device_ref_data_created_event, DeviceReferenceDataCreatedEvent
     )
@@ -512,7 +512,7 @@ def test_process_request_to_add_device_product_exists(
     repository: dict[str, Repository],
     input_questionnaires: dict,
     initial_product_team: ProductTeam,
-    initial_product: CpmProduct,
+    initial_product: EprProduct,
     expected_empty_message_sets,
     expected_additional_interactions,
     expected_device,
@@ -530,7 +530,7 @@ def test_process_request_to_add_device_product_exists(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
@@ -588,7 +588,7 @@ def test_process_request_to_add_device_message_set_exists(
     repository: dict[str, Repository],
     input_questionnaires: dict,
     initial_product_team: ProductTeam,
-    initial_product: CpmProduct,
+    initial_product: EprProduct,
     non_empty_message_sets: DeviceReferenceData,
     expected_additional_interactions,
     expected_device,
@@ -607,7 +607,7 @@ def test_process_request_to_add_device_message_set_exists(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
@@ -656,7 +656,7 @@ def test_process_request_to_add_device_additional_interactions_exists(
     repository: dict[str, Repository],
     input_questionnaires: dict,
     initial_product_team: ProductTeam,
-    initial_product: CpmProduct,
+    initial_product: EprProduct,
     expected_empty_message_sets: DeviceReferenceData,
     initial_additional_interactions: DeviceReferenceData,
     expected_device,
@@ -677,7 +677,7 @@ def test_process_request_to_add_device_additional_interactions_exists(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
@@ -720,7 +720,7 @@ def test_process_request_to_add_as_device_exists(
     repository: dict[str, Repository],
     input_questionnaires: dict,
     initial_product_team: ProductTeam,
-    initial_product: CpmProduct,
+    initial_product: EprProduct,
     empty_message_sets: DeviceReferenceData,
     initial_additional_interactions: DeviceReferenceData,
     initial_accredited_system_device: Device,
@@ -746,7 +746,7 @@ def test_process_request_to_add_as_device_exists(
         **repository,
     )
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)

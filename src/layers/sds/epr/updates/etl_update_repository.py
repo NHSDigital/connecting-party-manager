@@ -1,15 +1,15 @@
 from itertools import chain
 from typing import TYPE_CHECKING
 
-from domain.core.cpm_product.v1 import CpmProductEventDeserializer
 from domain.core.device.v1 import DeviceEventDeserializer
 from domain.core.device_reference_data.v1 import DeviceReferenceDataEventDeserializer
+from domain.core.epr_product.v1 import EprProductEventDeserializer
 from domain.core.product_team.v1 import ProductTeamEventDeserializer
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from domain.repository.repository.v1 import (
     BATCH_SIZE,
@@ -43,7 +43,7 @@ class EtlUpdateRepository:
             ProductTeamEventDeserializer: ProductTeamRepository(
                 table_name=table_name, dynamodb_client=dynamodb_client
             ),
-            CpmProductEventDeserializer: CpmProductRepository(
+            EprProductEventDeserializer: EprProductRepository(
                 table_name=table_name, dynamodb_client=dynamodb_client
             ),
             DeviceEventDeserializer: DeviceRepository(

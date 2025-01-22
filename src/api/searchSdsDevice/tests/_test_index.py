@@ -20,14 +20,14 @@ TABLE_NAME = "hiya"
 
 def _create_org():
     org = Root.create_ods_organisation(ods_code="ABC")
-    product_team = org.create_product_team(name="product-team-name-a")
+    product_team = org.create_product_team_epr(name="product-team-name-a")
     return product_team
 
 
 def _create_device(
     device_data: dict, product_team: ProductTeam, questionnaire_data: dict[str, str]
 ) -> Device:
-    product = product_team.create_cpm_product(name="my-product")
+    product = product_team.create_epr_product(name="my-product")
 
     device = product.create_device(name=device_data["device_name"])
     device.add_key(

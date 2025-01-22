@@ -147,8 +147,8 @@ def test_transform_worker(
 
 def test__export_events():
     org = Root.create_ods_organisation(ods_code="AAA")
-    product_team = org.create_product_team(name="abc")
-    product = product_team.create_cpm_product(name="product")
+    product_team = org.create_product_team_epr(name="abc")
+    product = product_team.create_epr_product(name="product")
 
     devices = []
     for i in range(3):

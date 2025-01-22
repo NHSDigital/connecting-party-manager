@@ -5,10 +5,10 @@ from unittest import mock
 import pytest
 from domain.core.enum import Environment
 from domain.core.root import Root
-from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
+from domain.repository.epr_product_repository import EprProductRepository
 from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
@@ -33,7 +33,7 @@ DEVICE_REFERENCE_DATA_NAME = "device-reference-data"
 )
 def test_index(version):
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(
+    product_team = org.create_product_team_epr(
         name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
     )
 
@@ -52,16 +52,16 @@ def test_index(version):
         product_team_repo.write(entity=product_team)
 
         # Set up Product in DB
-        cpm_product = product_team.create_cpm_product(
+        epr_product = product_team.create_epr_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
-        product_repo.write(cpm_product)
+        product_repo.write(epr_product)
 
         # Set up DeviceReferenceData in DB
-        device_reference_data = cpm_product.create_device_reference_data(
+        device_reference_data = epr_product.create_device_reference_data(
             name=DEVICE_REFERENCE_DATA_NAME, environment=Environment.DEV
         )
         device_reference_data_repo = DeviceReferenceDataRepository(
@@ -76,7 +76,7 @@ def test_index(version):
                 "headers": {"version": version},
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
-                    "product_id": str(cpm_product.id.id),
+                    "product_id": str(epr_product.id.id),
                     "environment": Environment.DEV,
                     "device_reference_data_id": str(device_reference_data.id),
                 },
@@ -87,7 +87,7 @@ def test_index(version):
 
     # Assertions for fields that must exactly match
     assert response_body["id"] == str(device_reference_data.id)
-    assert response_body["product_id"] == str(cpm_product.id)
+    assert response_body["product_id"] == str(epr_product.id)
     assert response_body["product_team_id"] == str(product_team.id)
     assert response_body["name"] == device_reference_data.name
     assert response_body["environment"] == Environment.DEV
@@ -119,7 +119,7 @@ def test_index(version):
 )
 def test_index_no_such_device_reference_data(version):
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(
+    product_team = org.create_product_team_epr(
         name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
     )
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
@@ -137,13 +137,13 @@ def test_index_no_such_device_reference_data(version):
         product_team_repo.write(entity=product_team)
 
         # Set up Product in DB
-        cpm_product = product_team.create_cpm_product(
+        epr_product = product_team.create_epr_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
-        product_repo.write(cpm_product)
+        product_repo.write(epr_product)
 
         from api.readDeviceReferenceData.index import handler
 
@@ -152,7 +152,7 @@ def test_index_no_such_device_reference_data(version):
                 "headers": {"version": version},
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
-                    "product_id": str(cpm_product.id),
+                    "product_id": str(epr_product.id),
                     "environment": Environment.DEV,
                     "device_reference_data_id": "does not exist",
                 },
@@ -164,7 +164,7 @@ def test_index_no_such_device_reference_data(version):
             "errors": [
                 {
                     "code": "RESOURCE_NOT_FOUND",
-                    "message": f"Could not find DeviceReferenceData for key ('{product_team.id}', '{cpm_product.id}', 'DEV', 'does not exist')",
+                    "message": f"Could not find DeviceReferenceData for key ('{product_team.id}', '{epr_product.id}', 'DEV', 'does not exist')",
                 }
             ],
         }
@@ -192,7 +192,7 @@ def test_index_no_such_device_reference_data(version):
 )
 def test_index_no_such_product(version):
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(
+    product_team = org.create_product_team_epr(
         name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
     )
     with mock_table(TABLE_NAME) as client, mock.patch.dict(
@@ -228,7 +228,7 @@ def test_index_no_such_product(version):
             "errors": [
                 {
                     "code": "RESOURCE_NOT_FOUND",
-                    "message": f"Could not find CpmProduct for key ('{product_team.id}', 'product that doesnt exist')",
+                    "message": f"Could not find EprProduct for key ('{product_team.id}', 'product that doesnt exist')",
                 }
             ],
         }
@@ -310,7 +310,7 @@ def test_index_no_such_product_team(version):
 )
 def test_index_incorrect_env(version):
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(
+    product_team = org.create_product_team_epr(
         name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
     )
 
@@ -329,16 +329,16 @@ def test_index_incorrect_env(version):
         product_team_repo.write(entity=product_team)
 
         # Set up Product in DB
-        cpm_product = product_team.create_cpm_product(
+        epr_product = product_team.create_epr_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
-        product_repo.write(cpm_product)
+        product_repo.write(epr_product)
 
         # Set up DeviceReferenceData in DB
-        device_reference_data = cpm_product.create_device_reference_data(
+        device_reference_data = epr_product.create_device_reference_data(
             name=DEVICE_REFERENCE_DATA_NAME, environment=Environment.DEV
         )
         device_reference_data_repo = DeviceReferenceDataRepository(
@@ -354,7 +354,7 @@ def test_index_incorrect_env(version):
                 "headers": {"version": version},
                 "pathParameters": {
                     "product_team_id": str(product_team.id),
-                    "product_id": str(cpm_product.id.id),
+                    "product_id": str(epr_product.id.id),
                     "environment": "prod",
                     "device_id": str(device_reference_data.id),
                 },
@@ -366,7 +366,7 @@ def test_index_incorrect_env(version):
                 "errors": [
                     {
                         "code": "RESOURCE_NOT_FOUND",
-                        "message": f"Could not find Device for key ('{product_team.id}', '{cpm_product.id.id}', 'PROD', '{device_reference_data.id}')",
+                        "message": f"Could not find Device for key ('{product_team.id}', '{epr_product.id.id}', 'PROD', '{device_reference_data.id}')",
                     }
                 ],
             }

@@ -1,15 +1,15 @@
 from typing import Literal
 
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.questionnaire import Questionnaire
-from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository import DeviceRepository
+from domain.repository.epr_product_repository import EprProductRepository
 from domain.repository.product_team_epr_repository import ProductTeamRepository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
@@ -35,7 +35,7 @@ def process_change_request(
     record: dict[Literal["object_class", "unique_identifier"] | str, str],
     etl_device_repository: EtlDeviceRepository,
     product_team_repository: ProductTeamRepository,
-    product_repository: CpmProductRepository,
+    product_repository: EprProductRepository,
     device_repository: DeviceRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
     mhs_device_questionnaire: Questionnaire,
@@ -46,7 +46,7 @@ def process_change_request(
     message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
     additional_interactions_field_mapping: dict,
-) -> list[ProductTeam | CpmProduct | Device | DeviceReferenceData]:
+) -> list[ProductTeam | EprProduct | Device | DeviceReferenceData]:
     unique_identifier = record["unique_identifier"]
     if unique_identifier in BAD_UNIQUE_IDENTIFIERS:
         return []
