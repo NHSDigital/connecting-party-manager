@@ -86,6 +86,8 @@ def accredited_system_1() -> NhsMhs:
         nhsasclient={"ABC", "CDE", "EFG"},
         nhsassvcia={"interaction-id-1", "interaction-id-2"},
         nhsmhsmanufacturerorg="AAA",
+        nhstempuid=None,
+        nhsascategorybag={"example"},
     )
 
 
