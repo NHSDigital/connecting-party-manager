@@ -229,26 +229,26 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    # delete:
-    #   operationId: deleteproductendpoint
-    #   summary: Delete a Product resource (DELETE)
-    #   parameters:
-    #     - $ref: "#/components/parameters/ProductTeamId"
-    #     - $ref: "#/components/parameters/ProductId"
-    #     - $ref: "#/components/parameters/HeaderVersion"
-    #     - $ref: "#/components/parameters/HeaderRequestId"
-    #     - $ref: "#/components/parameters/HeaderCorrelationId"
-    #   responses:
-    #     "204":
-    #       description: Delete Product operation successful
-    #     "404":
-    #       $ref: "#/components/responses/NotFound"
-    #   x-amazon-apigateway-integration:
-    #     <<: *ApiGatewayIntegration
-    #     uri: ${method_deleteCpmProduct}
-    #   security:
-    #     - ${authoriser_name}: []
-    #     - app-level0: []
+    delete:
+      operationId: deleteproductendpoint
+      summary: Delete a Product resource (DELETE)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "204":
+          description: Delete Product operation successful
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_deleteCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
 
   /ProductTeamEpr/{product_team_id}/ProductEpr:
     post:

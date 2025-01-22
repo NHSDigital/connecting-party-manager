@@ -1,8 +1,18 @@
 import json
 
 import pytest
+<<<<<<< HEAD
+<<<<<<<< HEAD:src/layers/domain/api/common_steps/tests/test_create_cpm_product.py
 from domain.api.common_steps.create_cpm_product import before_steps
 from domain.core.cpm_product import CpmProduct
+========
+from domain.api.common_steps.create_epr_product import before_steps
+from domain.core.epr_product import EprProduct
+>>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one):src/layers/domain/api/common_steps/tests/test_create_epr_product.py
+=======
+from domain.api.common_steps.create_cpm_product import before_steps
+from domain.core.cpm_product import CpmProduct
+>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one)
 from domain.core.root import Root
 from domain.repository.errors import ItemNotFound
 from domain.repository.product_team_repository import ProductTeamRepository
@@ -13,7 +23,11 @@ from domain.response.validation_errors import (
 from event.step_chain import StepChain
 
 from conftest import dynamodb_client_with_sleep as dynamodb_client
+<<<<<<< HEAD
 from test_helpers.dynamodb import mock_table
+=======
+from test_helpers.dynamodb import mock_table_cpm
+>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one)
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 
 TABLE_NAME = "my-table"
@@ -51,7 +65,11 @@ def test_create_product_steps_bad_input(
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
+<<<<<<< HEAD
     with mock_table(table_name=TABLE_NAME):
+=======
+    with mock_table_cpm(table_name=TABLE_NAME):
+>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one)
         step_chain.run(init=event, cache=mocked_cache)
 
     assert isinstance(step_chain.result, expected_exception)
@@ -72,7 +90,11 @@ def test_create_product_steps_good_input():
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
+<<<<<<< HEAD
     with mock_table(table_name=TABLE_NAME):
+=======
+    with mock_table_cpm(table_name=TABLE_NAME):
+>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one)
         product_team_repo = ProductTeamRepository(
             table_name=mocked_cache["DYNAMODB_TABLE"],
             dynamodb_client=mocked_cache["DYNAMODB_CLIENT"],
@@ -80,6 +102,10 @@ def test_create_product_steps_good_input():
         product_team_repo.write(product_team)
         step_chain.run(init=event, cache=mocked_cache)
 
+<<<<<<< HEAD
+    assert isinstance(step_chain.result, EprProduct)
+=======
     assert isinstance(step_chain.result, CpmProduct)
+>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one)
     assert step_chain.result.product_team_id == product_team.id
     assert step_chain.result.ods_code == ods_code

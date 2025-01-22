@@ -139,6 +139,23 @@ def test_parse_path_read_cpm_product():
     ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readCpmProduct.index)
 
 
+def test_parse_path_delete_cpm_product():
+    with api_lambda_environment_variables():
+        import api.deleteCpmProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="DELETE",
+        path="ProductTeam/123/Product/456",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == (
+        {"product_team_id": "123", "product_id": "456"},
+        {},
+        api.deleteCpmProduct.index,
+    )
+
+
 # def test_parse_path_search_cpm_product():
 #     with api_lambda_environment_variables():
 #         import api.searchCpmProduct.index

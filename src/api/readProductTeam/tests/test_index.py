@@ -7,7 +7,7 @@ from domain.core.root import Root
 from domain.repository.product_team_repository import ProductTeamRepository
 from event.json import json_loads
 
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.uuid import consistent_uuid
@@ -27,7 +27,7 @@ def test_index(version):
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -83,7 +83,7 @@ def test_index(version):
     [("1", "123"), ("1", f"F5H1R.{consistent_uuid(1)}")],
 )
 def test_index_no_such_product_team(version, product_id):
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -139,7 +139,7 @@ def test_index_by_alias(version):
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
