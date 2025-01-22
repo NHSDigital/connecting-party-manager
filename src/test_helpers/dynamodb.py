@@ -21,11 +21,37 @@ GLOBAL_SECONDARY_INDEXES = [
         "Projection": {"ProjectionType": "ALL"},
     }
 ]
+GLOBAL_SECONDARY_INDEXES_CPM = [
+    {
+        "IndexName": "idx_gsi_read_1",
+        "KeySchema": [
+            {"AttributeName": "pk_read_1", "KeyType": "HASH"},
+            {"AttributeName": "sk_read_1", "KeyType": "RANGE"},
+        ],
+        "Projection": {"ProjectionType": "ALL"},
+    },
+    {
+        "IndexName": "idx_gsi_read_2",
+        "KeySchema": [
+            {"AttributeName": "pk_read_2", "KeyType": "HASH"},
+            {"AttributeName": "sk_read_2", "KeyType": "RANGE"},
+        ],
+        "Projection": {"ProjectionType": "ALL"},
+    },
+]
 ATTRIBUTE_DEFINITIONS = [
     {"AttributeName": "pk", "AttributeType": "S"},
     {"AttributeName": "sk", "AttributeType": "S"},
     {"AttributeName": "pk_read", "AttributeType": "S"},
     {"AttributeName": "sk_read", "AttributeType": "S"},
+]
+ATTRIBUTE_DEFINITIONS_CPM = [
+    {"AttributeName": "pk", "AttributeType": "S"},
+    {"AttributeName": "sk", "AttributeType": "S"},
+    {"AttributeName": "pk_read_1", "AttributeType": "S"},
+    {"AttributeName": "sk_read_1", "AttributeType": "S"},
+    {"AttributeName": "pk_read_2", "AttributeType": "S"},
+    {"AttributeName": "sk_read_2", "AttributeType": "S"},
 ]
 
 
@@ -91,6 +117,22 @@ def mock_table(table_name: str):
                 AttributeDefinitions=ATTRIBUTE_DEFINITIONS,
                 KeySchema=KEY_SCHEMAS,
                 GlobalSecondaryIndexes=GLOBAL_SECONDARY_INDEXES,
+                BillingMode="PAY_PER_REQUEST",
+            )
+            yield client
+            client.delete_table(TableName=table_name)
+
+
+@contextmanager
+def mock_table_cpm(table_name: str):
+    with mock_aws():
+        client = dynamodb_client()
+        with patch_dynamodb_client(client=client):
+            client.create_table(
+                TableName=table_name,
+                AttributeDefinitions=ATTRIBUTE_DEFINITIONS_CPM,
+                KeySchema=KEY_SCHEMAS,
+                GlobalSecondaryIndexes=GLOBAL_SECONDARY_INDEXES_CPM,
                 BillingMode="PAY_PER_REQUEST",
             )
             yield client

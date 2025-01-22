@@ -4,7 +4,7 @@ from domain.repository.errors import AlreadyExistsError, ItemNotFound
 from domain.repository.product_team_repository import ProductTeamRepository
 
 from conftest import dynamodb_client_with_sleep as dynamodb_client
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
 
@@ -67,7 +67,7 @@ def test__product_team_repository_local():
     )
     team_id = team.id
 
-    with mock_table("my_table") as client:
+    with mock_table_cpm("my_table") as client:
         repo = ProductTeamRepository(
             table_name="my_table",
             dynamodb_client=client,
@@ -81,7 +81,7 @@ def test__product_team_repository_local():
 def test__product_team_repository__product_team_does_not_exist_local():
     team_id = "359e28eb-6e2c-409c-a3ab-a4868ab5c2df"
 
-    with mock_table("my_table") as client:
+    with mock_table_cpm("my_table") as client:
         repo = ProductTeamRepository(
             table_name="my_table",
             dynamodb_client=client,

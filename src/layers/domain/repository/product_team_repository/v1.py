@@ -1,8 +1,8 @@
 from attr import asdict
 from domain.core.product_team import ProductTeam, ProductTeamCreatedEvent
 from domain.core.product_team_key import ProductTeamKey
+from domain.repository.cpm_repository import Repository
 from domain.repository.keys import TableKey
-from domain.repository.repository import Repository
 
 
 class ProductTeamRepository(Repository[ProductTeam]):
@@ -16,7 +16,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         )
 
     def read(self, id: str) -> ProductTeam:
-        return super()._read(parent_ids=("",), id=id)
+        return super()._read(parent_ids=("",), id=id, status="active")
 
     def search(self) -> list[ProductTeam]:
         return super()._search(parent_ids=("",))

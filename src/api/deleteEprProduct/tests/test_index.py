@@ -7,14 +7,18 @@ import pytest
 from domain.core.cpm_system_id import ProductId
 from domain.core.enum import Status
 from domain.core.root import Root
+<<<<<<<< HEAD:src/api/deleteEprProduct/tests/test_index.py
 from domain.repository.epr_product_repository import (
     EprProductRepository,
     InactiveEprProductRepository,
 )
+========
+from domain.repository.cpm_product_repository import CpmProductRepository
+>>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one):src/api/deleteCpmProduct/tests/test_index.py
 from domain.repository.errors import ItemNotFound
-from domain.repository.product_team_epr_repository import ProductTeamRepository
+from domain.repository.product_team_repository import ProductTeamRepository
 
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.uuid import consistent_uuid
 
@@ -34,7 +38,7 @@ def mock_lambda():
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 
-    with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {"DYNAMODB_TABLE": TABLE_NAME, "AWS_DEFAULT_REGION": "eu-west-2"},
         clear=True,
@@ -82,11 +86,14 @@ def test_index():
         with pytest.raises(ItemNotFound):
             repo.read(product_team_id=product_team.id, id=PRODUCT_ID)
 
+<<<<<<<< HEAD:src/api/deleteEprProduct/tests/test_index.py
         repo = InactiveEprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=index.cache["DYNAMODB_CLIENT"]
         )
+========
+>>>>>>>> e9c92c3 (Create a new ProductTeam and rename the old one):src/api/deleteCpmProduct/tests/test_index.py
         deleted_product = repo.read(
-            product_team_id=product_team.id, id=PRODUCT_ID
+            product_team_id=product_team.id, id=PRODUCT_ID, status="inactive"
         ).dict()
 
     # Sense checks on the deleted resource

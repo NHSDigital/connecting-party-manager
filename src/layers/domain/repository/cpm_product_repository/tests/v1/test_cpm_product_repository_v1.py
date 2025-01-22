@@ -8,7 +8,7 @@ from domain.repository.keys import TableKey
 from domain.repository.marshall import marshall_value
 
 from conftest import dynamodb_client_with_sleep as dynamodb_client
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 from test_helpers.terraform import read_terraform_output
 from test_helpers.uuid import consistent_uuid
@@ -170,7 +170,7 @@ def test__cpm_product_repository_search():
         name="cpm-product-name", product_id=product_id
     )
 
-    with mock_table("my_table") as client:
+    with mock_table_cpm("my_table") as client:
         repo = CpmProductRepository(
             table_name="my_table",
             dynamodb_client=client,
