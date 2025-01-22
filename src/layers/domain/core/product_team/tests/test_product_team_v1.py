@@ -97,7 +97,7 @@ def test__create_product_team(
     product_team = ProductTeam(name=name, ods_code=ods_code, keys=keys)
     generated_id = product_team.id
     assert isinstance(product_team, ProductTeam)
-    assert re.match(rf"{ods_code}\.[0-9a-fA-F-]{{36}}", generated_id)
+    assert re.match(r"[0-9a-fA-F-]{36}", generated_id)
     assert product_team.keys == keys
     assert product_team.name == name
     assert product_team.ods_code == ods_code
@@ -156,7 +156,7 @@ def test__create_product_team_provided_id_equals_none_is_ignored(
     product_team = ProductTeam(id=id, name=name, ods_code=ods_code, keys=keys)
     generated_id = product_team.id
     assert isinstance(product_team, ProductTeam)
-    assert re.match(rf"{ods_code}\.[0-9a-fA-F-]{{36}}", generated_id)
+    assert re.match(r"[0-9a-fA-F-]{36}", generated_id)
     assert product_team.keys == keys
     assert product_team.name == name
     assert product_team.ods_code == ods_code
@@ -206,7 +206,7 @@ def test__create_product_team_from_org_no_id(
 
     assert isinstance(result, ProductTeam)
     generated_id = result.id
-    assert re.match(rf"{org.ods_code}\.[0-9a-fA-F-]{{36}}", generated_id)
+    assert re.match(r"[0-9a-fA-F-]{36}", generated_id)
     assert result.keys == keys
     assert result.name == name
     assert result.ods_code == org.ods_code
@@ -214,7 +214,7 @@ def test__create_product_team_from_org_no_id(
     generated_id = event.id
     assert len(result.events) == 1
     assert isinstance(event, ProductTeamCreatedEvent)
-    assert re.match(rf"{org.ods_code}\.[0-9a-fA-F-]{{36}}", generated_id)
+    assert re.match(r"[0-9a-fA-F-]{36}", generated_id)
     assert event.keys == keys
     assert event.name == name
     assert event.ods_code == org.ods_code
@@ -286,8 +286,8 @@ def test__create_product_team_with_incoming_params(
 
     result_generated_id = result.id
     event_generated_id = event.id
-    assert re.match(rf"{params["ods_code"]}\.[0-9a-fA-F-]{{36}}", result_generated_id)
-    assert re.match(rf"{params["ods_code"]}\.[0-9a-fA-F-]{{36}}", event_generated_id)
+    assert re.match(r"[0-9a-fA-F-]{36}", result_generated_id)
+    assert re.match(r"[0-9a-fA-F-]{36}", event_generated_id)
 
     assert result.keys == params["keys"]
     assert result.name == params["name"]

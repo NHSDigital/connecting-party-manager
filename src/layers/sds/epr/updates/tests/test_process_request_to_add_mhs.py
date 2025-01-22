@@ -20,13 +20,13 @@ from domain.core.device_reference_data.v1 import (
 from domain.core.device_reference_data.v1 import (
     QuestionnaireResponseUpdatedEvent as DrdQuestionnaireUpdatedEvent,
 )
-from domain.core.product_team.v1 import ProductTeam, ProductTeamCreatedEvent
+from domain.core.product_team_epr.v1 import ProductTeam, ProductTeamCreatedEvent
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
-from domain.repository.product_team_repository.v1 import ProductTeamRepository
+from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
     QuestionnaireRepository,
 )

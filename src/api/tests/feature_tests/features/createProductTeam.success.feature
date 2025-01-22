@@ -28,7 +28,7 @@ Feature: Create Product Team - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 288              |
+      | Content-Length | 282              |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }"
     Then I receive a status code "200" with body
@@ -68,7 +68,7 @@ Feature: Create Product Team - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 288              |
+      | Content-Length | 282              |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }"
     Then I receive a status code "200" with body
@@ -104,7 +104,7 @@ Feature: Create Product Team - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 288              |
+      | Content-Length | 282              |
     When I make a "GET" request with "default" headers to "ProductTeam/FOOBAR"
     Then I receive a status code "200" with body
       | path             | value                 |

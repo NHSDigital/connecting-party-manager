@@ -19,7 +19,7 @@ from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository import DeviceRepository
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from domain.repository.questionnaire_repository import (
     QuestionnaireInstance,
     QuestionnaireRepository,

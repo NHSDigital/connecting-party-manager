@@ -41,6 +41,17 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
+            "/ProductTeamEpr",
+            "POST",
+            400,
+            ["MISSING_VALUE", "VALIDATION_ERROR"],
+            [
+                "CreateProductTeamIncomingParams.ods_code: field required",
+                "CreateProductTeamIncomingParams.name: field required",
+                "CreateProductTeamIncomingParams.foo: extra fields not permitted",
+            ],
+        ],
+        [
             "/ProductTeam/123/Product",
             "POST",
             400,
@@ -127,6 +138,13 @@ def _request(base_url: str, headers: dict, path: str, method: str):
         ],
         [
             "/ProductTeam/123",
+            "GET",
+            404,
+            ["RESOURCE_NOT_FOUND"],
+            ["Could not find ProductTeam for key ('123')"],
+        ],
+        [
+            "/ProductTeamEpr/123",
             "GET",
             404,
             ["RESOURCE_NOT_FOUND"],

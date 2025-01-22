@@ -23,7 +23,7 @@ from domain.core.device_key import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
 from domain.core.error import ConfigurationError
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from domain.core.timestamp import now
 from domain.questionnaire_instances.strategies import generate_spine_mhs_fields

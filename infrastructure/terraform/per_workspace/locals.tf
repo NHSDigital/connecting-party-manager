@@ -5,7 +5,7 @@ locals {
   workspace_type = var.workspace_type
   permission_resource_map = {
     kms      = ["*"]
-    dynamodb = ["${module.table.dynamodb_table_arn}", "${module.table.dynamodb_table_arn}/*"]
+    dynamodb = ["${module.eprtable.dynamodb_table_arn}", "${module.eprtable.dynamodb_table_arn}/*", "${module.cpmtable.dynamodb_table_arn}", "${module.cpmtable.dynamodb_table_arn}/*"]
   }
   # e.g. api.cpm.dev.national.nhs.uk
   zone = var.domain

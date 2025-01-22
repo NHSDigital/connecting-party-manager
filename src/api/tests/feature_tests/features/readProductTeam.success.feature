@@ -30,7 +30,7 @@ Feature: Read Product Team - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 288              |
+      | Content-Length | 282              |
 
     Examples:
       | product_team_id            |

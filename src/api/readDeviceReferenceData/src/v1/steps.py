@@ -3,12 +3,12 @@ from http import HTTPStatus
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.core.cpm_product import CpmProduct
 from domain.core.device_reference_data import DeviceReferenceData
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from domain.request_models import DeviceReferenceDataPathParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain

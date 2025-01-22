@@ -99,7 +99,7 @@ def transform_handler(scenario: Scenario):
     original_environ = deepcopy(os.environ)
 
     os.environ["ETL_BUCKET"] = etl_bucket
-    os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_table_name.value")
+    os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_epr_table_name.value")
 
     from etl.sds.worker.update.transform_update import transform_update
 
@@ -124,7 +124,7 @@ def load_handler(scenario: Scenario):
     original_environ = deepcopy(os.environ)
 
     os.environ["ETL_BUCKET"] = read_terraform_output("sds_etl.value.bucket")
-    os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_table_name.value")
+    os.environ["TABLE_NAME"] = read_terraform_output("dynamodb_epr_table_name.value")
 
     from etl.sds.worker.update.load_update import load_update
 

@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from domain.api.common_steps.general import parse_event_body
 from domain.core.cpm_product import CpmProduct
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from domain.request_models import CreateCpmProductIncomingParams, ProductTeamPathParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain

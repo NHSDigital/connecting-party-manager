@@ -42,9 +42,8 @@ class ProductTeam(AggregateRoot):
 
     @root_validator(pre=True)
     def set_id(cls, values):
-        ods_code = values.get("ods_code")
-        if ods_code and not values.get("id"):
-            product_team = ProductTeamId.create(ods_code=ods_code)
+        if not values.get("id"):
+            product_team = ProductTeamId.create()
             values["id"] = product_team.id
         return values
 

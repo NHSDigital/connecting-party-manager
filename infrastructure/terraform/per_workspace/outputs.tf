@@ -1,5 +1,9 @@
-output "dynamodb_table_name" {
-  value = module.table.dynamodb_table_name
+output "dynamodb_epr_table_name" {
+  value = module.eprtable.dynamodb_table_name
+}
+
+output "dynamodb_cpm_table_name" {
+  value = module.cpmtable.dynamodb_table_name
 }
 
 output "workspace" {

@@ -8,7 +8,7 @@ from domain.api.common_steps.sub_product import (
 )
 from domain.core.cpm_product import CpmProduct
 from domain.core.enum import Environment
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )

@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 from domain.core.device import Device
 from domain.core.device_key import DeviceKeyType
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.core.questionnaire import Questionnaire
 from domain.core.root import Root
 from domain.repository.device_repository import DeviceRepository
@@ -54,7 +54,7 @@ def _create_device(
     ],
 )
 def test_no_results(params):
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     with mock.patch.dict(
@@ -132,7 +132,7 @@ def test_index(params, device):
         device_data=device, product_team=product_team, questionnaire_data=params
     )
 
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     with mock.patch.dict(
@@ -218,7 +218,7 @@ def test_index(params, device):
     ],
 )
 def test_multiple_returned(params, devices):
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     product_team = _create_org()
@@ -335,7 +335,7 @@ def test_filter_errors(params, error, status_code):
     ],
 )
 def test_only_active_returned(params, devices):
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     product_team = _create_org()

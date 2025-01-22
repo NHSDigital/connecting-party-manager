@@ -12,7 +12,7 @@ from domain.repository.cpm_product_repository import (
     InactiveCpmProductRepository,
 )
 from domain.repository.errors import ItemNotFound
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 
 from test_helpers.dynamodb import mock_table
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
