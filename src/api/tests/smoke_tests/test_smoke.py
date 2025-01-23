@@ -52,7 +52,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product",
+            "/ProductTeamEpr/123/Product",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -62,7 +62,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/Epr",
+            "/ProductTeamEpr/123/Product/Epr",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -72,12 +72,12 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/abc",
+            "/ProductTeamEpr/123/Product/abc",
             "DELETE",
             404,
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/DeviceReferenceData",
+            "/ProductTeamEpr/123/Product/abc/dev/DeviceReferenceData",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -87,7 +87,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions",
+            "/ProductTeamEpr/123/Product/abc/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -97,7 +97,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/DeviceReferenceData/MhsMessageSet",
+            "/ProductTeamEpr/123/Product/abc/dev/DeviceReferenceData/MhsMessageSet",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -107,7 +107,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/Device",
+            "/ProductTeamEpr/123/Product/abc/dev/Device",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -117,7 +117,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/Device/MessageHandlingSystem",
+            "/ProductTeamEpr/123/Product/abc/dev/Device/MessageHandlingSystem",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -127,7 +127,7 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/Device/AccreditedSystem",
+            "/ProductTeamEpr/123/Product/abc/dev/Device/AccreditedSystem",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
@@ -151,35 +151,35 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
-            "/ProductTeam/123/Product",
+            "/ProductTeamEpr/123/Product",
             "GET",
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
-            "/ProductTeam/123/Product/abc",
+            "/ProductTeamEpr/123/Product/abc",
             "GET",
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
-            "/ProductTeam/123/Product/abc/DeviceReferenceData",
+            "/ProductTeamEpr/123/Product/abc/DeviceReferenceData",
             "GET",
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/DeviceReferenceData/xyz",
+            "/ProductTeamEpr/123/Product/abc/dev/DeviceReferenceData/xyz",
             "GET",
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],
         ],
         [
-            "/ProductTeam/123/Product/abc/dev/Device/xyz",
+            "/ProductTeamEpr/123/Product/abc/dev/Device/xyz",
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],

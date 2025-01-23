@@ -53,7 +53,6 @@ def before_all(context: Context):
     )
 
     if context.test_mode is TestMode.INTEGRATION:
-        # context.table_name = read_terraform_output("dynamodb_epr_table_name.value")
         context.workspace_type = read_terraform_output("workspace_type.value")
         context.workspace = read_terraform_output("workspace.value")
         context.environment = read_terraform_output("environment.value")
