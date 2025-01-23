@@ -2,7 +2,7 @@ from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
-from domain.core.product_team.v1 import ProductTeam
+from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.questionnaire.v1 import QuestionnaireResponse
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
@@ -10,7 +10,7 @@ from domain.repository.device_reference_data_repository.v1 import (
 )
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.errors import ItemNotFound
-from domain.repository.product_team_repository.v1 import ProductTeamRepository
+from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from sds.epr.constants import ADDITIONAL_INTERACTIONS_SUFFIX, EprNameTemplate
 from sds.epr.creators import (
     create_additional_interactions,

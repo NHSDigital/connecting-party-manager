@@ -17,7 +17,7 @@ from domain.repository.device_repository.v1 import (
 )
 from domain.repository.keys.v1 import KEY_SEPARATOR, TableKey
 from domain.repository.marshall import marshall
-from domain.repository.product_team_repository.v1 import ProductTeamRepository
+from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from domain.repository.transaction import TransactItem
 
 if TYPE_CHECKING:

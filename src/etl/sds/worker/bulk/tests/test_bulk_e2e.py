@@ -8,9 +8,9 @@ from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
-from domain.core.product_team_epr.v1 import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
