@@ -1,6 +1,8 @@
 ---
 components:
   schemas:
+    Empty:
+      type: "object"
     ErrorResponse:
       type: object
       properties:
