@@ -15,6 +15,7 @@ from domain.repository.device_reference_data_repository.v1 import (
 )
 from domain.repository.device_repository.v1 import DeviceRepository
 from domain.repository.product_team_repository.v1 import ProductTeamRepository
+from sds.domain.constants import ModificationType
 from sds.epr.constants import (
     CPM_ACCREDITED_SYSTEM_IMMUTABLE_FIELDS,
     CPM_MHS_IMMUTABLE_FIELDS,
@@ -39,7 +40,6 @@ from sds.epr.readers import (
 )
 from sds.epr.tags import sds_metadata_to_device_tags
 from sds.epr.updaters import (
-    JSON_SCHEMA_REQUIRED_KEYWORD,
     UnexpectedModification,
     ldif_add_to_field_in_questionnaire,
     ldif_modify_field_in_questionnaire,
@@ -472,6 +472,7 @@ def process_request_to_delete_from_mhs(
 
 
 def _process_request_to_modify_as(
+    modification_type: str,
     device: Device,
     device_repository: DeviceRepository,
     field_name: str,
@@ -531,58 +532,88 @@ def _process_request_to_modify_as(
     # Route the operation
     if modify_additional_interactions:
         # Check if Interaction ID field is being deleted
-        required_fields = set(
-            additional_interactions_questionnaire.json_schema.get(
-                JSON_SCHEMA_REQUIRED_KEYWORD, ()
-            )
-        )
-        if new_values is None and additional_interactions_field in required_fields:
+        if modification_type == ModificationType.DELETE:
             raise UnexpectedModification(f"Cannot remove required field '{field_name}'")
-        # Check each new value not in message set or additional interactions already
-        for new_value in new_values:
-            if (
-                new_value not in additional_interactions_interaction_ids
-                and new_value not in message_sets_interaction_ids
-            ):
-                # Add a new additional interactions response
-                new_questionnaire_response = ldif_modify_field_in_questionnaire(
-                    field_name=translated_field,
-                    new_values=new_values,
-                    current_data={},
-                    questionnaire=additional_interactions_questionnaire,
-                )
-                additional_interactions.add_questionnaire_response(
-                    questionnaire_response=new_questionnaire_response
-                )
-                # Update tags on all AS devices under that product
-                # Construct new tag data
-                spine_as_responses = device.questionnaire_responses.get(
-                    "spine_as/1", []
-                )
-                party_key = spine_as_responses[0].data.get("MHS Party Key")
-                # put them as vaibales?
+
+        # Get Party Key
+        spine_as_responses = device.questionnaire_responses.get("spine_as/1", [])
+        party_key = spine_as_responses[0].data.get("MHS Party Key")
+        # Get all devices that may need updating
+        product_team_id = device.product_team_id
+        product_id = device.product_id
+        devices = device_repository.search(
+            product_team_id=product_team_id,
+            product_id=product_id,
+            environment=Environment.PROD,
+        )
+        as_devices = list(filter(is_as_device, devices))
+
+        if modification_type == ModificationType.ADD:
+            # Check each new value is not present in message set or additional interactions already
+            for new_value in new_values:
+                if (
+                    new_value not in additional_interactions_interaction_ids
+                    and new_value not in message_sets_interaction_ids
+                ):
+                    # Add a new additional interactions response for the new value
+                    new_questionnaire_response = ldif_modify_field_in_questionnaire(
+                        field_name=translated_field,
+                        new_values=[new_value],
+                        current_data={},
+                        questionnaire=additional_interactions_questionnaire,
+                    )
+                    additional_interactions.add_questionnaire_response(
+                        questionnaire_response=new_questionnaire_response
+                    )
+                    # Construct new tag data
+                    data = {
+                        "nhs_as_svc_ia": new_value,
+                        "nhs_id_code": device.ods_code,
+                        "nhs_mhs_party_key": party_key,
+                    }
+                    _new_tags = sds_metadata_to_device_tags(
+                        data=data, model=SearchSDSDeviceQueryParams
+                    )
+                    new_tags = [dict(tag) for tag in set(_new_tags)]
+                    # Update tags on ALL AS devices under the product
+                    for device in as_devices:
+                        device.add_tags(new_tags)
+
+        if modification_type == ModificationType.REPLACE:
+            # Remove all existing additional interactions questionnaire responses
+            (questionnaire_id,) = additional_interactions.questionnaire_responses.keys()
+            additional_interactions.clear_questionnaire_responses(
+                questionnaire_id=questionnaire_id
+            )
+            # Remove existing tags from all AS devices under the product
+            for device in as_devices:
+                device.clear_tags()
+
+            # Update device tags and additional interaction responses for each new value
+            for new_value in new_values:
                 data = {
                     "nhs_as_svc_ia": new_value,
                     "nhs_id_code": device.ods_code,
                     "nhs_mhs_party_key": party_key,
                 }
-
-                # Get all devices that need updating
-                product_team_id = device.product_team_id
-                product_id = device.product_id
-                devices = device_repository.search(
-                    product_team_id=product_team_id,
-                    product_id=product_id,
-                    environment=Environment.PROD,
-                )
-                as_devices = filter(is_as_device, devices)
-
                 _new_tags = sds_metadata_to_device_tags(
                     data=data, model=SearchSDSDeviceQueryParams
                 )
                 new_tags = [dict(tag) for tag in set(_new_tags)]
                 for device in as_devices:
                     device.add_tags(new_tags)
+
+                if new_value not in message_sets_interaction_ids:
+                    # Add additional interactions questionnaire response
+                    new_questionnaire_response = ldif_modify_field_in_questionnaire(
+                        field_name=translated_field,
+                        new_values=[new_value],
+                        current_data={},
+                        questionnaire=additional_interactions_questionnaire,
+                    )
+                    additional_interactions.add_questionnaire_response(
+                        questionnaire_response=new_questionnaire_response
+                    )
 
     elif modify_as_device:
         new_questionnaire_response = ldif_modify_field_in_questionnaire(
@@ -622,6 +653,7 @@ def process_request_to_add_to_as(
     additional_interactions_field_mapping: dict,
 ) -> list[Device | DeviceReferenceData]:
     return _process_request_to_modify_as(
+        modification_type=ModificationType.ADD,
         device=device,
         device_repository=device_repository,
         field_name=field_name,
@@ -637,16 +669,28 @@ def process_request_to_add_to_as(
 
 def process_request_to_replace_in_as(
     device: Device,
+    device_repository: DeviceRepository,
     field_name: str,
     new_values: set[str],
     device_reference_data_repository: DeviceReferenceDataRepository,
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
-    message_set_questionnaire: Questionnaire,
-    message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
+    additional_interactions_field_mapping: dict,
 ) -> list[Device, DeviceReferenceData]:
-    raise NotImplementedError()
+    return _process_request_to_modify_as(
+        modification_type=ModificationType.REPLACE,
+        device=device,
+        device_repository=device_repository,
+        field_name=field_name,
+        new_values=new_values,
+        device_reference_data_repository=device_reference_data_repository,
+        accredited_system_questionnaire=accredited_system_questionnaire,
+        accredited_system_field_mapping=accredited_system_field_mapping,
+        additional_interactions_questionnaire=additional_interactions_questionnaire,
+        additional_interactions_field_mapping=additional_interactions_field_mapping,
+        ldif_modify_field_in_questionnaire=ldif_modify_field_in_questionnaire,
+    )
 
 
 def process_request_to_delete_from_as(
@@ -661,6 +705,7 @@ def process_request_to_delete_from_as(
     additional_interactions_field_mapping: dict,
 ) -> list[Device | DeviceReferenceData]:
     return _process_request_to_modify_as(
+        modification_type=ModificationType.DELETE,
         device=device,
         device_repository=device_repository,
         field_name=field_name,

@@ -1,0 +1,3 @@
+add: nhsAsSvcIA
+nhsAsSvcIA: urn:nhs:names:services:pdsquery:123456
+nhsAsSvcIA: new-interaction-id-2
