@@ -26,10 +26,10 @@ PRODUCT_ID_PATTERN = re.compile(
 
 PATH_TO_CPM_SYSTEM_IDS = Path(__file__).parent
 PRODUCT_IDS_GENERATED_FILE = f"{PATH_TO_CPM_SYSTEM_IDS}/generated_ids/product_ids.json"
-PRODUCT_TEAM_ID_PATTERN = re.compile(
+PRODUCT_TEAM_EPR_ID_PATTERN = re.compile(
     r"^[a-zA-Z0-9]+\.([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
-PRODUCT_TEAM_ID_PATTERN_WITHOUT_ODS = re.compile(
+PRODUCT_TEAM_ID_PATTERN = re.compile(
     r"^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
 
@@ -154,5 +154,5 @@ class ProductTeamId(CpmSystemId):
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the product_team key has the correct format."""
         if "." in cpm_system_id:
-            return PRODUCT_TEAM_ID_PATTERN.match(cpm_system_id) is not None
-        return PRODUCT_TEAM_ID_PATTERN_WITHOUT_ODS.match(cpm_system_id) is not None
+            return PRODUCT_TEAM_EPR_ID_PATTERN.match(cpm_system_id) is not None
+        return PRODUCT_TEAM_ID_PATTERN.match(cpm_system_id) is not None
