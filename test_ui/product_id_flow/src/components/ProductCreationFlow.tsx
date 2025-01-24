@@ -89,7 +89,7 @@ const ProductCreationFlow: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://930f3820.api.cpm.dev.national.nhs.uk/connecting-party-manager/ProductTeam",
+        "https://internal-dev.api.service.nhs.uk/930f3820/ProductTeam",
         {
           method: "POST",
           headers: {
