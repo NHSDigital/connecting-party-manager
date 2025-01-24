@@ -17,7 +17,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "3.12.3"
-pydantic = "1.10.19"
+pydantic = "1.10.21"
 nhs-context-logging = "^0.6.8"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
