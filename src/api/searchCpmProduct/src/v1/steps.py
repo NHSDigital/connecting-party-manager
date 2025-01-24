@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from domain.response.response_models import SearchResponse
 from event.step_chain import StepChain
 

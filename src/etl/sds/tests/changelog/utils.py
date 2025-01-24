@@ -9,7 +9,7 @@ from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import Device, DeviceRepository
-from domain.repository.product_team_repository.v1 import (
+from domain.repository.product_team_epr_repository.v1 import (
     ProductTeam,
     ProductTeamRepository,
 )

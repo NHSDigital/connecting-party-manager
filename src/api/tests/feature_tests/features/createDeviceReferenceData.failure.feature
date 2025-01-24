@@ -8,16 +8,16 @@ Feature: Create Device Reference Data - failure scenarios
       | Authorization | letmein |
 
   Scenario: Cannot create a Device Reference Data with a Device Reference Data that is missing fields (no name) and has extra param
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path      | value                    |
       | bad_field | My Device Reference Data |
     Then I receive a status code "400" with body
@@ -32,16 +32,16 @@ Feature: Create Device Reference Data - failure scenarios
       | Content-Length | 236              |
 
   Scenario: Cannot create a Device Reference Data with a Device Reference Data with a corrupt body
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
       """
       {"invalid_array": [}
       """
@@ -55,7 +55,7 @@ Feature: Create Device Reference Data - failure scenarios
       | Content-Length | 115              |
 
   Scenario: Cannot create a Device Reference Data with a Product Team that does not exist
-    When I make a "POST" request with "default" headers to "ProductTeam/not-a-product-team/Product/not-a-product/dev/DeviceReferenceData" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/not-a-product-team/Product/not-a-product/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     Then I receive a status code "404" with body
@@ -68,12 +68,12 @@ Feature: Create Device Reference Data - failure scenarios
       | Content-Length | 116              |
 
   Scenario: Cannot create a Device Reference Data with a Product that does not exist
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/not-a-product/dev/DeviceReferenceData" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/not-a-product/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     Then I receive a status code "404" with body

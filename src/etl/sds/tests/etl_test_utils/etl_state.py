@@ -35,7 +35,7 @@ def get_etl_config(input_filename: str, etl_type: str = "") -> EtlConfig:
         queue_history_key_prefix=f"{ETL_QUEUE_HISTORY}/",
         state_machine_history_key_prefix=f"{ETL_STATE_MACHINE_HISTORY}/",
         etl_type=etl_type,
-        table_name=read_terraform_output("dynamodb_table_name.value"),
+        table_name=read_terraform_output("dynamodb_epr_table_name.value"),
     )
 
 

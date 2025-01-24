@@ -17,7 +17,7 @@ def repository_fixture[
     T: DeviceRepository | DeviceReferenceDataRepository
 ](is_integration_test: bool, repository_class: type[T]) -> Generator[T, None, None]:
     if is_integration_test:
-        table_name = read_terraform_output("dynamodb_table_name.value")
+        table_name = read_terraform_output("dynamodb_epr_table_name.value")
         client = dynamodb_client()
         yield repository_class(table_name=table_name, dynamodb_client=client)
     else:

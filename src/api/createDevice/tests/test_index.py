@@ -14,7 +14,7 @@ from domain.core.enum import Environment
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_repository import DeviceRepository
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table

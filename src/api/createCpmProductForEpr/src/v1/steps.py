@@ -9,7 +9,7 @@ from domain.api.common_steps.create_product import (
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import PartyKeyId
 from domain.core.product_key import ProductKeyType
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.cpm_system_id_repository import CpmSystemIdRepository
 
 

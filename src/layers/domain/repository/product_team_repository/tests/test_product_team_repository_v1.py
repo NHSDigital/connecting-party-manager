@@ -11,7 +11,7 @@ from test_helpers.terraform import read_terraform_output
 
 @pytest.mark.integration
 def test__product_team_repository():
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
 
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
     team = org.create_product_team(
@@ -31,7 +31,7 @@ def test__product_team_repository():
 
 @pytest.mark.integration
 def test__product_team_repository_already_exists():
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
     team = org.create_product_team(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
@@ -51,7 +51,7 @@ def test__product_team_repository__product_team_does_not_exist():
     team_id = (
         f"{CPM_PRODUCT_TEAM_NO_ID["ods_code"]}.359e28eb-6e2c-409c-a3ab-a4868ab5c2df"
     )
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     repo = ProductTeamRepository(
         table_name=table_name,
         dynamodb_client=dynamodb_client(),

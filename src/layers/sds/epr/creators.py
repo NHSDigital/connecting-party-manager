@@ -4,7 +4,7 @@ from domain.core.device_key import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
 from domain.core.product_key import ProductKeyType
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.core.product_team_key import ProductTeamKey, ProductTeamKeyType
 from domain.core.questionnaire import QuestionnaireResponse
 from domain.core.root import Root
@@ -28,7 +28,7 @@ def create_epr_product_team(ods_code: str) -> ProductTeam:
             ods_code=ods_code,
             keys=[product_team_key],
         )
-    return org.create_product_team(
+    return org.create_product_team_epr(
         name=EprNameTemplate.PRODUCT_TEAM.format(ods_code=ods_code),
         keys=[product_team_key],
     )

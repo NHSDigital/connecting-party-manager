@@ -47,7 +47,7 @@ class MyModel(BaseModel):
 
 class MyRepository(Repository[MyModel]):
     def __init__(self):
-        table_name = read_terraform_output("dynamodb_table_name.value")
+        table_name = read_terraform_output("dynamodb_epr_table_name.value")
         super().__init__(
             table_name=table_name,
             model=MyModel,

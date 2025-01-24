@@ -8,13 +8,13 @@ from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
-from domain.core.product_team.v1 import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
-from domain.repository.device_reference_data_repository.v1 import (
+from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
-from domain.repository.product_team_repository.v1 import ProductTeamRepository
+from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from etl_utils.constants import WorkerKey
 from etl_utils.trigger.model import StateMachineInput
 from event.aws.client import dynamodb_client

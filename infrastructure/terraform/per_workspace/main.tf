@@ -31,9 +31,35 @@ data "aws_secretsmanager_secret" "cpm_apigee_api_key" {
   name = "${var.environment}-apigee-cpm-apikey"
 }
 
-module "table" {
+module "eprtable" {
   source                      = "./modules/api_storage"
-  name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--table"
+  name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--epr-table"
+  environment                 = var.environment
+  deletion_protection_enabled = var.deletion_protection_enabled
+  kms_deletion_window_in_days = 7
+  range_key                   = "sk"
+  hash_key                    = "pk"
+
+  attributes = [
+    { name = "pk", type = "S" },
+    { name = "sk", type = "S" },
+    { name = "pk_read", type = "S" },
+    { name = "sk_read", type = "S" },
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "idx_gsi_read"
+      hash_key        = "pk_read"
+      range_key       = "sk_read"
+      projection_type = "ALL"
+    }
+  ]
+}
+
+module "cpmtable" {
+  source                      = "./modules/api_storage"
+  name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--cpm-table"
   environment                 = var.environment
   deletion_protection_enabled = var.deletion_protection_enabled
   kms_deletion_window_in_days = 7
@@ -95,7 +121,7 @@ module "lambdas" {
     }
   }
   environment_variables = {
-    DYNAMODB_TABLE = module.table.dynamodb_table_name
+    DYNAMODB_TABLE = contains(["createProductTeam", "readProductTeam"], each.key) ? module.cpmtable.dynamodb_table_name : module.eprtable.dynamodb_table_name
   }
   attach_policy_statements = length((fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json"))) > 0
   policy_statements = {
@@ -182,8 +208,8 @@ module "sds_etl" {
   third_party_sds_update_layer_arn = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds_update"], 0).layer_arn
   domain_layer_arn                 = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
   sds_layer_arn                    = element([for instance in module.layers : instance if instance.name == "sds"], 0).layer_arn
-  table_name                       = module.table.dynamodb_table_name
-  table_arn                        = module.table.dynamodb_table_arn
+  table_name                       = module.eprtable.dynamodb_table_name
+  table_arn                        = module.eprtable.dynamodb_table_arn
   is_persistent                    = var.workspace_type == "PERSISTENT"
   truststore_bucket                = data.aws_s3_bucket.truststore_bucket
   etl_snapshot_bucket              = local.etl_snapshot_bucket

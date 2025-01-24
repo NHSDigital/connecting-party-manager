@@ -77,7 +77,7 @@ def test_transform_and_load(
     ), f"{n_expected_errors} errors were expected but none were raised"
 
     dynamodb_client = get_dynamodb_client()
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     created_objs = list(read_all(table_name=table_name, db_client=dynamodb_client))
     expected_objs = list(map(as_domain_object, scenario.load_output))
 

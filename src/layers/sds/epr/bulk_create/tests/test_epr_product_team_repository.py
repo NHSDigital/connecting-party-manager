@@ -57,7 +57,7 @@ def test_get_all_epr_product_teams_local(dynamodb_client):
 
 @pytest.mark.integration
 def test_get_all_epr_product_teams():
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = _dynamodb_client()
 
     epr_ods_codes = [f"AAA{i}" for i in range(103)]
