@@ -2,6 +2,7 @@
 
 ## 2025-01-24
 - [PI-744] Create a Product Team (ProductID)
+- Dependabot: pydantic
 
 ## 2025-01-22
 - [PI-693] Changelog ETL - modify / remove from an AS
