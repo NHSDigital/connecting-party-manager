@@ -606,7 +606,7 @@ def test_process_request_to_replace_in_mhs__device_replace_in_empty_non_list_fie
     assert final_device["updated_on"] > initial_device["updated_on"]
 
 
-def test_process_request_to_replace_in_mhs__device_replace_in_existing_non_list_field_raises_error(
+def test_process_request_to_replace_in_mhs__device_replace_in_existing_non_list_field_with_single_value_replaces_value(
     mhs_device: Device,
     message_sets: DeviceReferenceData,
     device_reference_data_repository: DeviceReferenceDataRepository,
