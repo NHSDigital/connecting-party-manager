@@ -89,11 +89,11 @@ const ProductCreationFlow: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://internal-dev.api.service.nhs.uk/930f3820/ProductTeam",
+        "https://internal-dev.api.service.nhs.uk/connecting-party-manager/ProductTeam",
         {
           method: "POST",
           headers: {
-            Authorization: "g",
+            Authorization: "letmein",
             apikey: `${environmentConfig.apiKey}`,
             version: "1",
             "Content-Type": "application/json",

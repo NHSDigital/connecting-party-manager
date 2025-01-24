@@ -67,6 +67,9 @@ paths:
           application/json: '{"statusCode": 200}'
         passthroughBehavior: "never"
         type: "mock"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
     post:
       operationId: createproductteam
       summary: Create a Product Team resource (POST)
