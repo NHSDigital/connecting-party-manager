@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-01-22
+- [PI-693] Changelog ETL - modify / remove from an AS
+
 ## 2025-01-17
 - [PI-730] Accredited System base model is outdated
 - [PI-704] Refactor searchSdsDevice to use new domain structure

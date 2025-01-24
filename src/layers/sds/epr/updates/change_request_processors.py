@@ -39,6 +39,7 @@ from sds.epr.readers import (
 )
 from sds.epr.tags import sds_metadata_to_device_tags
 from sds.epr.updaters import (
+    JSON_SCHEMA_REQUIRED_KEYWORD,
     UnexpectedModification,
     ldif_add_to_field_in_questionnaire,
     ldif_modify_field_in_questionnaire,
@@ -455,7 +456,7 @@ def process_request_to_delete_from_mhs(
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
-) -> list[Device, DeviceReferenceData, DeviceReferenceData]:
+) -> list[Device | DeviceReferenceData]:
     return _process_request_to_modify_mhs(
         device=device,
         cpa_id_to_modify=cpa_id_to_modify,
@@ -529,7 +530,15 @@ def _process_request_to_modify_as(
 
     # Route the operation
     if modify_additional_interactions:
-        # Check each value not in message set or additional interactions already
+        # Check if Interaction ID field is being deleted
+        required_fields = set(
+            additional_interactions_questionnaire.json_schema.get(
+                JSON_SCHEMA_REQUIRED_KEYWORD, ()
+            )
+        )
+        if new_values is None and additional_interactions_field in required_fields:
+            raise UnexpectedModification(f"Cannot remove required field '{field_name}'")
+        # Check each new value not in message set or additional interactions already
         for new_value in new_values:
             if (
                 new_value not in additional_interactions_interaction_ids
@@ -642,12 +651,24 @@ def process_request_to_replace_in_as(
 
 def process_request_to_delete_from_as(
     device: Device,
+    device_repository: DeviceRepository,
     field_name: str,
+    new_values: set[str],
     device_reference_data_repository: DeviceReferenceDataRepository,
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
-    message_set_questionnaire: Questionnaire,
-    message_set_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
-) -> list[Device, DeviceReferenceData]:
-    raise NotImplementedError()
+    additional_interactions_field_mapping: dict,
+) -> list[Device | DeviceReferenceData]:
+    return _process_request_to_modify_as(
+        device=device,
+        device_repository=device_repository,
+        field_name=field_name,
+        new_values=new_values,
+        device_reference_data_repository=device_reference_data_repository,
+        accredited_system_questionnaire=accredited_system_questionnaire,
+        accredited_system_field_mapping=accredited_system_field_mapping,
+        additional_interactions_questionnaire=additional_interactions_questionnaire,
+        additional_interactions_field_mapping=additional_interactions_field_mapping,
+        ldif_modify_field_in_questionnaire=ldif_remove_field_from_questionnaire,
+    )
