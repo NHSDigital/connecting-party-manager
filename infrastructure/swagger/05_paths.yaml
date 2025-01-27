@@ -11,6 +11,21 @@ x-definitions:
       passthroughBehavior: when_no_match
       contentHandling: CONVERT_TO_TEXT
 
+x-amazon-apigateway-cors:
+  allowOrigins:
+    - "*"
+  allowMethods:
+    - OPTIONS
+    - GET
+    - POST
+    - PUT
+    - DELETE
+  allowHeaders:
+    - "Content-Type"
+    - "authorization"
+    - "version"
+    - "apikey"
+
 paths:
   /_status:
     get:
@@ -33,43 +48,6 @@ paths:
         - app-level0: []
 
   /ProductTeam:
-    options:
-      operationId: createproductteamcors
-      summary: Create a Product Team resource (OPTIONS)
-      responses:
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "200":
-          description: "200 response"
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: "string"
-            Access-Control-Allow-Methods:
-              schema:
-                type: "string"
-            Access-Control-Allow-Headers:
-              schema:
-                type: "string"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Empty"
-      x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
-              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        requestTemplates:
-          application/json: '{"statusCode": 200}'
-        passthroughBehavior: "never"
-        type: "mock"
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
     post:
       operationId: createproductteam
       summary: Create a Product Team resource (POST)
