@@ -63,6 +63,7 @@ function generate_apigee_swagger(){
     _render_template ${_02_CLEAN_FILE} |
         yq 'del(.paths.*.*.x-amazon-apigateway-integration)' |
         yq 'del(.x-definitions)' |
+        yq 'del(.x-amazon-apigateway-cors)' |
         yq 'del(.security)' |
         yq 'del(.tags)' |
         yq 'del(.paths.*.*.tags)' |
