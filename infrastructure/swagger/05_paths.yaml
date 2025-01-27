@@ -61,7 +61,7 @@ paths:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
         requestTemplates:
           application/json: '{"statusCode": 200}'
@@ -84,6 +84,8 @@ paths:
           $ref: "#/components/responses/UnprocessableContent"
       parameters:
         - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       x-amazon-apigateway-integration:
