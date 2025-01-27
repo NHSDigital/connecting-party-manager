@@ -4,6 +4,7 @@ objectClass: nhsAs
 objectClass: top
 nhsApproverURP: uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs
 nhsAsClient: C3O9X
+nhsAsSvcIA: urn:nhs:names:services:pdsquery:QUQI_IN010000UK14
 nhsAsSvcIA: urn:nhs:names:services:pdsquery:QUQI_IN010000UK15
 nhsDateApproved: 20091016133823
 nhsDateRequested: 20091016133757

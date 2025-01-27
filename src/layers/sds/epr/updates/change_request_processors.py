@@ -144,7 +144,7 @@ def process_request_to_add_as(
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
-) -> list[ProductTeam, CpmProduct, DeviceReferenceData, Device]:
+) -> list[ProductTeam, CpmProduct, DeviceReferenceData, Device, Device]:
     asid = accredited_system["unique_identifier"]
     product_name = accredited_system["nhs_product_name"] or asid
     party_key = accredited_system["nhs_mhs_party_key"]
@@ -173,12 +173,39 @@ def process_request_to_add_as(
         party_key=party_key,
         device_reference_data_repository=device_reference_data_repository,
     )
-    additional_interactions = update_new_additional_interactions(
-        incoming_accredited_system_interactions=accredited_system["nhs_as_svc_ia"],
-        additional_interactions=additional_interactions,
-        message_sets=message_sets,
-        additional_interactions_questionnaire=additional_interactions_questionnaire,
+    additional_interactions, new_additional_interactions = (
+        update_new_additional_interactions(
+            incoming_accredited_system_interactions=accredited_system["nhs_as_svc_ia"],
+            additional_interactions=additional_interactions,
+            message_sets=message_sets,
+            additional_interactions_questionnaire=additional_interactions_questionnaire,
+        )
     )
+
+    # Update any existing AS devices with new interactions
+    updated_existing_as_devices = []
+    if new_additional_interactions:
+        devices = device_repository.search(
+            product_team_id=product_team.id,
+            product_id=product.id,
+            environment=Environment.PROD,
+        )
+        as_devices = list(filter(is_as_device, devices))
+        if as_devices:
+            # List to track devices that were updated
+            for new_interaction in new_additional_interactions:
+                data = {
+                    "nhs_as_svc_ia": new_interaction,
+                    "nhs_id_code": ods_code,
+                    "nhs_mhs_party_key": party_key,
+                }
+                _new_tags = sds_metadata_to_device_tags(
+                    data=data, model=SearchSDSDeviceQueryParams
+                )
+                new_tags = [dict(tag) for tag in set(_new_tags)]
+                for device in as_devices:
+                    device.add_tags(new_tags)
+            updated_existing_as_devices.append(device)
 
     accredited_system_device_data = get_accredited_system_device_data(
         accredited_system=accredited_system,
@@ -223,6 +250,7 @@ def process_request_to_add_as(
         message_sets,
         additional_interactions,
         accredited_system_device,
+        updated_existing_as_devices,
     ]
 
 

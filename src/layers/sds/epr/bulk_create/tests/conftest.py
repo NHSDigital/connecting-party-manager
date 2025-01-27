@@ -68,13 +68,13 @@ def mhs_2() -> NhsMhs:
 
 
 @pytest.fixture
-def accredited_system_1() -> NhsMhs:
+def accredited_system_1() -> NhsAccreditedSystem:
     return NhsAccreditedSystem(
         _distinguished_name=DistinguishedName(
             parts=(("ou", "services"), ("uniqueidentifier", "1wd354"), ("o", "nhs"))
         ),
         objectclass={"nhsas"},
-        uniqueidentifier="123456",
+        uniqueidentifier="000001",
         nhsapproverurp="approver-123",
         nhsrequestorurp="requester-123",
         nhsdaterequested="a week ago",
@@ -92,22 +92,27 @@ def accredited_system_1() -> NhsMhs:
 
 
 @pytest.fixture
-def accredited_system_2() -> NhsMhs:
+def accredited_system_2() -> NhsAccreditedSystem:
     return NhsAccreditedSystem(
         _distinguished_name=DistinguishedName(
             parts=(("ou", "services"), ("uniqueidentifier", "1wd354"), ("o", "nhs"))
         ),
         objectclass={"nhsas"},
-        uniqueidentifier="456789",
+        uniqueidentifier="000002",
         nhsapproverurp="approver-456",
         nhsrequestorurp="requester-456",
         nhsdaterequested="a week ago",
         nhsdateapproved="today",
-        nhsidcode="BBB",
-        nhsmhspartykey="AAA-456789",
+        nhsidcode="AAA",
+        nhsmhspartykey="AAA-123456",
         nhsproductkey="key-123",
         nhsasclient={"ABC", "JKL", "LMN"},
-        nhsassvcia={"interaction-id-3", "interaction-id-4"},
+        nhsassvcia={
+            "interaction-id-1",
+            "interaction-id-2",
+            "interaction-id-3",
+            "interaction-id-4",
+        },
         nhsmhsmanufacturerorg="AAA",
     )
 
