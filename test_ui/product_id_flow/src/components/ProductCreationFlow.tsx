@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent } from "react";
-import { CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 interface TeamFormData {
   ods_code: string;
@@ -128,7 +128,7 @@ const ProductCreationFlow: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://internal-${environmentConfig.environment}.api.service.nhs.uk/connecting-party-manager/ProductTeam/${productTeamResponse?.id}`,
+        `https://internal-${environmentConfig.environment}.api.service.nhs.uk/connecting-party-manager/ProductTeam/${productTeamResponse?.id}/Product`,
         {
           method: "POST",
           headers: {
