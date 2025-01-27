@@ -144,7 +144,7 @@ def process_request_to_add_as(
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
-) -> list[ProductTeam, CpmProduct, DeviceReferenceData, Device, Device]:
+) -> list[ProductTeam, CpmProduct, DeviceReferenceData, Device]:
     asid = accredited_system["unique_identifier"]
     product_name = accredited_system["nhs_product_name"] or asid
     party_key = accredited_system["nhs_mhs_party_key"]
@@ -192,7 +192,8 @@ def process_request_to_add_as(
         )
         as_devices = list(filter(is_as_device, devices))
         if as_devices:
-            # List to track devices that were updated
+            # Construct all new tags upfront
+            new_tags = []
             for new_interaction in new_additional_interactions:
                 data = {
                     "nhs_as_svc_ia": new_interaction,
@@ -202,10 +203,12 @@ def process_request_to_add_as(
                 _new_tags = sds_metadata_to_device_tags(
                     data=data, model=SearchSDSDeviceQueryParams
                 )
-                new_tags = [dict(tag) for tag in set(_new_tags)]
-                for device in as_devices:
-                    device.add_tags(new_tags)
-            updated_existing_as_devices.append(device)
+                new_tags_to_append = [dict(tag) for tag in set(_new_tags)]
+                new_tags.extend(new_tags_to_append)
+
+            for device in as_devices:
+                device.add_tags(new_tags)
+                updated_existing_as_devices.append(device)
 
     accredited_system_device_data = get_accredited_system_device_data(
         accredited_system=accredited_system,
@@ -250,7 +253,7 @@ def process_request_to_add_as(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
+        *updated_existing_as_devices,
     ]
 
 
@@ -471,7 +474,7 @@ def process_request_to_replace_in_mhs(
         additional_interactions = remove_erroneous_additional_interactions(
             message_sets=message_sets, additional_interactions=additional_interactions
         )
-    return mhs_device, message_sets, additional_interactions
+    return [mhs_device, message_sets, additional_interactions]
 
 
 def process_request_to_delete_from_mhs(
@@ -557,6 +560,7 @@ def _process_request_to_modify_as(
     )
     modify_as_device = as_device_field and not additional_interactions_field
 
+    updated_existing_as_devices = []
     # Route the operation
     if modify_additional_interactions:
         # Check if Interaction ID field is being deleted
@@ -577,6 +581,7 @@ def _process_request_to_modify_as(
         as_devices = list(filter(is_as_device, devices))
 
         if modification_type == ModificationType.ADD:
+            new_tags = []
             # Check each new value is not present in message set or additional interactions already
             for new_value in new_values:
                 if (
@@ -602,12 +607,16 @@ def _process_request_to_modify_as(
                     _new_tags = sds_metadata_to_device_tags(
                         data=data, model=SearchSDSDeviceQueryParams
                     )
-                    new_tags = [dict(tag) for tag in set(_new_tags)]
+                    new_tags_to_append = [dict(tag) for tag in set(_new_tags)]
+                    new_tags.extend(new_tags_to_append)
                     # Update tags on ALL AS devices under the product
-                    for device in as_devices:
-                        device.add_tags(new_tags)
+            for device in as_devices:
+                if new_tags:
+                    device.add_tags(new_tags)
+                    updated_existing_as_devices.append(device)
 
         if modification_type == ModificationType.REPLACE:
+            new_tags = []
             # Remove all existing additional interactions questionnaire responses
             (questionnaire_id,) = additional_interactions.questionnaire_responses.keys()
             additional_interactions.clear_questionnaire_responses(
@@ -627,9 +636,8 @@ def _process_request_to_modify_as(
                 _new_tags = sds_metadata_to_device_tags(
                     data=data, model=SearchSDSDeviceQueryParams
                 )
-                new_tags = [dict(tag) for tag in set(_new_tags)]
-                for device in as_devices:
-                    device.add_tags(new_tags)
+                new_tags_to_append = [dict(tag) for tag in set(_new_tags)]
+                new_tags.extend(new_tags_to_append)
 
                 if new_value not in message_sets_interaction_ids:
                     # Add additional interactions questionnaire response
@@ -642,6 +650,16 @@ def _process_request_to_modify_as(
                     additional_interactions.add_questionnaire_response(
                         questionnaire_response=new_questionnaire_response
                     )
+            for device in as_devices:
+                device.add_tags(new_tags)
+                updated_existing_as_devices.append(device)
+
+        # If modifying additional interactions, return updated devices and interactions.
+        # This avoids duplicates as 'device' will be part of the updated list.
+        return [
+            additional_interactions,
+            *updated_existing_as_devices,
+        ]
 
     elif modify_as_device:
         new_questionnaire_response = ldif_modify_field_in_questionnaire(
@@ -658,6 +676,11 @@ def _process_request_to_modify_as(
             questionnaire_response=new_questionnaire_response
         )
 
+        return [
+            device,
+            additional_interactions,
+        ]
+
     else:
         # Should not be reachable, but better to bail to avoid unexpected side-effects
         raise UnexpectedModification(
@@ -665,8 +688,6 @@ def _process_request_to_modify_as(
             f"AS Device fields {list(accredited_system_field_mapping.keys())} and "
             f"Additional Interactions fields {list(additional_interactions_field_mapping.keys())}"
         )
-
-    return [device, additional_interactions]
 
 
 def process_request_to_add_to_as(

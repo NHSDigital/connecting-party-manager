@@ -817,6 +817,7 @@ def test_process_request_to_add_as_device_exists(
     assert len(accredited_system_device.keys) == 1
     assert equivalent(accredited_system_device, expected_additional_device)
 
-    # print("initial device after request:", initial_accredited_system_device)
     for device in updated_existing_as_devices:
-        assert len(device.tags) == 8
+        assert (
+            len(device.tags) == 8
+        )  # (2 new interactions added to the original 2. 2 tags per interaction = 8 in total)
