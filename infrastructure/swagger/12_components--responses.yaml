@@ -109,6 +109,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamResponse"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     EPRProductTeamCreate:
       description: Create EPR ProductTeam operation successful
       content:
@@ -139,6 +144,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductResponse"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     ProductRead:
       description: Read Product operation successful
       content:
