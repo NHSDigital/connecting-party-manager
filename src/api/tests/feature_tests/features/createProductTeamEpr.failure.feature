@@ -1,5 +1,5 @@
-Feature: Create Epr Product Team - failure scenarios
-  These scenarios demonstrate failures to create a new Epr Product Team
+Feature: Create EPR Product Team - failure scenarios
+  These scenarios demonstrate failures to create a new EPR Product Team
 
   Background:
     Given "default" request headers:
@@ -7,7 +7,7 @@ Feature: Create Epr Product Team - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Cannot create a ProductTeam with a product_team_id_alias that already exists
+  Scenario: Cannot create an EPR ProductTeam with a product_team_id_alias that already exists
     Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -29,7 +29,7 @@ Feature: Create Epr Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 76               |
 
-  Scenario: Cannot create a ProductTeam with an that is missing fields
+  Scenario: Cannot create an EPR ProductTeam with an that is missing fields
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -44,7 +44,7 @@ Feature: Create Epr Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 110              |
 
-  Scenario: Cannot create a ProductTeam with a syntactically invalid ODS Code
+  Scenario: Cannot create an EPR ProductTeam with a syntactically invalid ODS Code
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -60,7 +60,7 @@ Feature: Create Epr Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 178              |
 
-  Scenario: Cannot create a ProductTeam with an ODS code that is syntatically correct but doesnt exist
+  Scenario: Cannot create an EPR ProductTeam with an ODS code that is syntatically correct but doesnt exist
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -76,7 +76,7 @@ Feature: Create Epr Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 167              |
 
-  Scenario: Cannot create a ProductTeam with corrupt body
+  Scenario: Cannot create an EPR ProductTeam with corrupt body
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       """
       {"invalid_array": [}
