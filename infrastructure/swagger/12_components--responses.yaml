@@ -109,6 +109,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ProductTeamResponse"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     ProductTeamRead:
       description: Read ProductTeam operation successful
       content:
