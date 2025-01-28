@@ -43,7 +43,7 @@ Feature: Create EPR Product Team - success scenarios
       | keys.0.key_type  | product_team_id_alias      |
       | keys.0.key_value | FOOBAR                     |
 
-  Scenario: Successfully create an EPR ProductTeam with duplicated keys
+  Scenario: Successfully create an EPR ProductTeam by removing the duplicated keys
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |

@@ -43,7 +43,7 @@ Feature: Create Product Team - success scenarios
       | keys.0.key_type  | product_team_id_alias      |
       | keys.0.key_value | FOOBAR                     |
 
-  Scenario: Successfully create a ProductTeam with duplicated keys
+  Scenario: Successfully create a ProductTeam by removing the duplicated keys
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |

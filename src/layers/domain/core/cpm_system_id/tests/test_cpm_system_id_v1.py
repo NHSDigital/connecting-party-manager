@@ -2,7 +2,14 @@ import os
 from pathlib import Path
 
 import pytest
-from domain.core.cpm_system_id import AsidId, PartyKeyId, ProductId
+from domain.core.cpm_system_id import (
+    PRODUCT_TEAM_EPR_ID_PATTERN,
+    PRODUCT_TEAM_ID_PATTERN,
+    AsidId,
+    PartyKeyId,
+    ProductId,
+    ProductTeamId,
+)
 from event.json import json_load
 
 PATH_TO_CPM_SYSTEM_IDS = Path(__file__).parent.parent
@@ -16,6 +23,28 @@ def _get_generated_ids():
     if os.path.exists(PRODUCT_IDS_GENERATED_FILE):
         with open(PRODUCT_IDS_GENERATED_FILE, "r") as file:
             generated_product_ids = set(json_load(file))
+
+
+def test_cpm_product_team_id_generator():
+    generator = ProductTeamId.create()
+    assert PRODUCT_TEAM_ID_PATTERN.match(generator.id)
+
+
+def test_epr_product_team_id_generator():
+    generator = ProductTeamId.create(ods_code="ABC")
+    assert PRODUCT_TEAM_EPR_ID_PATTERN.match(generator.id)
+
+
+def test_cpm_product_tema_id_validate_id_valid():
+    valid_key = "3150ac97-45d0-40f6-904f-c6422c46e711"
+    is_valid = ProductTeamId.validate(valid_key)
+    assert is_valid
+
+
+def test_epr_product_tema_id_validate_id_valid():
+    valid_key = "ABC.3150ac97-45d0-40f6-904f-c6422c46e711"
+    is_valid = ProductTeamId.validate(valid_key)
+    assert is_valid
 
 
 def test_party_key_generator_format_key():
