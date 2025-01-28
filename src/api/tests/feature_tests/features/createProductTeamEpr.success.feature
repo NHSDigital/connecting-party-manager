@@ -117,3 +117,73 @@ Feature: Create EPR Product Team - success scenarios
       | deleted_on       | << ignore >>          |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
+
+  Scenario: Successfully create multiple EPR ProductTeams under an organization
+    When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
+      | path             | value                 |
+      | name             | Product Team-1        |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Then I receive a status code "201" with body
+      | path             | key_value             |
+      | id               | << ignore >>          |
+      | name             | Product Team-1        |
+      | ods_code         | F5H1R                 |
+      | status           | active                |
+      | created_on       | << ignore >>          |
+      | updated_on       | << ignore >>          |
+      | deleted_on       | << ignore >>          |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 281              |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }"
+    Then I receive a status code "200" with body
+      | path             | value                      |
+      | id               | ${ note(product_team_id) } |
+      | name             | Product Team-1             |
+      | ods_code         | F5H1R                      |
+      | status           | active                     |
+      | created_on       | << ignore >>               |
+      | updated_on       | << ignore >>               |
+      | deleted_on       | << ignore >>               |
+      | keys.0.key_type  | product_team_id_alias      |
+      | keys.0.key_value | FOOBAR                     |
+    When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
+      | path             | value                 |
+      | name             | Product Team-2        |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | GARPLY                |
+    Then I receive a status code "201" with body
+      | path             | key_value             |
+      | id               | << ignore >>          |
+      | name             | Product Team-2        |
+      | ods_code         | F5H1R                 |
+      | status           | active                |
+      | created_on       | << ignore >>          |
+      | updated_on       | << ignore >>          |
+      | deleted_on       | << ignore >>          |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | GARPLY                |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 281              |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }"
+    Then I receive a status code "200" with body
+      | path             | value                      |
+      | id               | ${ note(product_team_id) } |
+      | name             | Product Team-2             |
+      | ods_code         | F5H1R                      |
+      | status           | active                     |
+      | created_on       | << ignore >>               |
+      | updated_on       | << ignore >>               |
+      | deleted_on       | << ignore >>               |
+      | keys.0.key_type  | product_team_id_alias      |
+      | keys.0.key_value | GARPLY                     |
