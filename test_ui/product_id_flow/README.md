@@ -28,33 +28,26 @@ A modern, accessible web application for creating NHS product teams and products
 
 ### Installation
 
-1. Clone the repository:
+Currently you will need to cd into the `test_ui/product_id_flow` location
 
-   ```bash
-   git clone <repository-url>
-   cd nhs-demo
-   ```
-
-2. Install dependencies:
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. Start the development server:
+2. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:5173](http://localhost:5173) in your browser
+3. Open [http://localhost:5173](http://localhost:5173) in your browser
 
 ## Development
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
 
 ## Project Structure
 
@@ -66,30 +59,3 @@ src/
   ├── App.tsx           # Root component
   └── index.css         # Global styles and Tailwind imports
 ```
-
-## Design System
-
-The application follows the NHS design system guidelines, including:
-
-- NHS color palette
-- Typography using Frutiger font
-- Consistent spacing and layout
-- Accessible form controls
-- Clear error and success states
-
-## Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Run tests and linting
-4. Submit a pull request
-
-## License
-
-This project is private and confidential.
-
-## Acknowledgments
-
-- NHS Digital Design System
-- React Team
-- Tailwind CSS Team
