@@ -19,3 +19,13 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/HeaderCorrelationId"
+    HeaderAuthorization:
+      in: header
+      name: authorization
+      schema:
+        $ref: "#/components/schemas/HeaderAuthorization"
+    HeaderApikey:
+      in: header
+      name: apikey
+      schema:
+        $ref: "#/components/schemas/HeaderApikey"
