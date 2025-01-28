@@ -143,7 +143,7 @@
           "questionnaire_name": "spine_as_additional_interactions",
           "questionnaire_version": "1",
           "data": {
-            "Interaction ID": "new-interaction-id-2"
+            "Interaction ID": "urn:nhs:names:services:pdsquery:123456"
           },
           "created_on": "2024-12-11T11:19:53.409854+00:00"
         },
@@ -152,7 +152,7 @@
           "questionnaire_name": "spine_as_additional_interactions",
           "questionnaire_version": "1",
           "data": {
-            "Interaction ID": "urn:nhs:names:services:pdsquery:123456"
+            "Interaction ID": "new-interaction-id-2"
           },
           "created_on": "2024-12-11T11:19:53.409854+00:00"
         }
