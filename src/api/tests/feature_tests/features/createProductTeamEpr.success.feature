@@ -1,5 +1,5 @@
-Feature: Create Epr Product Team - success scenarios
-  These scenarios demonstrate successful Epr Product Team creation
+Feature: Create EPR Product Team - success scenarios
+  These scenarios demonstrate successful EPR Product Team creation
 
   Background:
     Given "default" request headers:
@@ -7,7 +7,7 @@ Feature: Create Epr Product Team - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Successfully create a ProductTeam
+  Scenario: Successfully create an EPR ProductTeam
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -43,7 +43,7 @@ Feature: Create Epr Product Team - success scenarios
       | keys.0.key_type  | product_team_id_alias      |
       | keys.0.key_value | FOOBAR                     |
 
-  Scenario: Successfully create a ProductTeam with duplicated keys
+  Scenario: Successfully create an EPR ProductTeam with duplicated keys
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
@@ -83,7 +83,7 @@ Feature: Create Epr Product Team - success scenarios
       | updated_on       | << ignore >>               |
       | deleted_on       | << ignore >>               |
 
-  Scenario: Successfully create a ProductTeam and view by alias
+  Scenario: Successfully create an EPR ProductTeam and view by alias
     When I make a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |

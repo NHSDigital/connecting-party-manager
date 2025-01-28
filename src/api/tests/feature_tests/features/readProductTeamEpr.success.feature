@@ -1,5 +1,5 @@
-Feature: Read Epr Product Team - success scenarios
-  These scenarios demonstrate successful reads from the GET Epr Product Team endpoint
+Feature: Read EPR Product Team - success scenarios
+  These scenarios demonstrate successful reads from the GET EPR Product Team endpoint
 
   Background:
     Given "default" request headers:
@@ -7,7 +7,7 @@ Feature: Read Epr Product Team - success scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario Outline: Read an existing ProductTeam
+  Scenario Outline: Read an existing EPR ProductTeam
     Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
