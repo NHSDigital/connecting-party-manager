@@ -374,7 +374,6 @@ def test_process_request_to_add_as_no_initial_state(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
     ) = process_request_to_add_as(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
@@ -383,7 +382,6 @@ def test_process_request_to_add_as_no_initial_state(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
-    assert updated_existing_as_devices == []
 
     (product_team_created_event,) = product_team.events
     (product_created_event, product_key_added_event) = product.events
@@ -453,7 +451,6 @@ def test_process_request_to_add_device_product_team_exists(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
     ) = process_request_to_add_as(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
@@ -462,7 +459,6 @@ def test_process_request_to_add_device_product_team_exists(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
-    assert updated_existing_as_devices == []
 
     (product_created_event, product_key_added_event) = product.events
     (mhs_device_ref_data_created_event,) = message_sets.events
@@ -533,7 +529,6 @@ def test_process_request_to_add_device_product_exists(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
     ) = process_request_to_add_as(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
@@ -542,7 +537,6 @@ def test_process_request_to_add_device_product_exists(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
-    assert updated_existing_as_devices == []
     assert product_team.events == []
     assert product.events == []
 
@@ -612,7 +606,6 @@ def test_process_request_to_add_device_message_set_exists(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
     ) = process_request_to_add_as(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
@@ -621,7 +614,6 @@ def test_process_request_to_add_device_message_set_exists(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
-    assert updated_existing_as_devices == []
     assert product_team.events == []
     assert product.events == []
     assert message_sets.events == []
@@ -684,7 +676,6 @@ def test_process_request_to_add_device_additional_interactions_exists(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
     ) = process_request_to_add_as(
         accredited_system=accredited_system, **repository, **input_questionnaires
     )
@@ -693,7 +684,6 @@ def test_process_request_to_add_device_additional_interactions_exists(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
-    assert updated_existing_as_devices == []
     assert product_team.events == []
     assert product.events == []
 
@@ -753,7 +743,7 @@ def test_process_request_to_add_as_device_exists(
         message_sets,
         additional_interactions,
         accredited_system_device,
-        updated_existing_as_devices,
+        updated_existing_as_device,
     ) = process_request_to_add_as(
         accredited_system=another_accredited_system,
         **input_questionnaires,
@@ -764,8 +754,7 @@ def test_process_request_to_add_as_device_exists(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
-    assert isinstance(updated_existing_as_devices, list)
-    assert len(updated_existing_as_devices) == 1  # (1 existing device updated)
+    assert isinstance(updated_existing_as_device, Device)
 
     assert product_team.events == []
     assert product.events == []
@@ -816,8 +805,7 @@ def test_process_request_to_add_as_device_exists(
     assert len(initial_accredited_system_device.keys) == 1
     assert len(accredited_system_device.keys) == 1
     assert equivalent(accredited_system_device, expected_additional_device)
-
-    for device in updated_existing_as_devices:
-        assert (
-            len(device.tags) == 8
-        )  # (2 new interactions added to the original 2. 2 tags per interaction = 8 in total)
+    assert (
+        len(updated_existing_as_device.tags)
+        == len(initial_accredited_system_device.tags) + 2 * 2
+    )  # (2 new interactions added to the original 2. 2 tags per interaction = 8 in total)
