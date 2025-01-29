@@ -40,7 +40,7 @@ paths:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/ProductTeamCreate"
+          $ref: "#/components/responses/CPMProductTeamCreate"
         "400":
           $ref: "#/components/responses/BadRequest"
         "422":
@@ -67,7 +67,7 @@ paths:
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
-          $ref: "#/components/responses/ProductTeamRead"
+          $ref: "#/components/responses/CPMProductTeamRead"
         "404":
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
@@ -85,7 +85,7 @@ paths:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/ProductTeamCreate"
+          $ref: "#/components/responses/EPRProductTeamCreate"
         "400":
           $ref: "#/components/responses/BadRequest"
         "422":
@@ -112,7 +112,7 @@ paths:
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
-          $ref: "#/components/responses/ProductTeamRead"
+          $ref: "#/components/responses/EPRProductTeamRead"
         "404":
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
