@@ -4,15 +4,18 @@ components:
     HeaderVersion:
       in: header
       name: version
+      required: true
       schema:
         $ref: "#/components/schemas/HeaderVersion"
     HeaderRequestId:
       in: header
       name: x-request-id
+      required: true
       schema:
         $ref: "#/components/schemas/HeaderRequestId"
     HeaderCorrelationId:
       in: header
       name: x-correlation-id
+      required: true
       schema:
         $ref: "#/components/schemas/HeaderCorrelationId"
