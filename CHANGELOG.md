@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-01-29
+- [PI-714] Update Swagger for readibility
+
 ## 2025-01-24
 - [PI-744] Create a Product Team (ProductID)
 - Dependabot: pydantic
