@@ -8,18 +8,18 @@ Feature: Create Device Reference Data - success scenarios
       | Authorization | letmein |
 
   Scenario Outline: Successfully create a Device Reference Data
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     Then I receive a status code "201" with body
@@ -40,7 +40,7 @@ Feature: Create Device Reference Data - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 358              |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
       | path                    | value                               |
       | id                      | ${ note(device_reference_data_id) } |
@@ -65,19 +65,19 @@ Feature: Create Device Reference Data - success scenarios
       | FOOBAR                     |
 
   Scenario Outline: Successfully create a DeviceReferenceData with an EPR Product
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     Then I receive a status code "201" with body
@@ -98,7 +98,7 @@ Feature: Create Device Reference Data - success scenarios
       | Content-Type   | application/json |
       | Content-Length | 358              |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
       | path                    | value                               |
       | id                      | ${ note(device_reference_data_id) } |

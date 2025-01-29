@@ -2,14 +2,14 @@ import pytest
 from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.enum import Environment
 from domain.core.product_key.v1 import ProductKeyType
-from domain.core.product_team.v1 import ProductTeam
+from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.product_team_key.v1 import ProductTeamKey, ProductTeamKeyType
 from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
-from domain.repository.product_team_repository.v1 import ProductTeamRepository
+from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from sds.epr.bulk_create.bulk_repository import (
     BulkRepository,
     exponential_backoff_with_jitter,

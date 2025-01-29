@@ -103,18 +103,30 @@ components:
             errors:
               - code: "UNPROCESSABLE_ENTITY"
                 message: "Invalid ODS Code: could not resolve 'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/invalid_ods_code'"
-    ProductTeamCreate:
+    CPMProductTeamCreate:
       description: Create ProductTeam operation successful
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProductTeamResponse"
-    ProductTeamRead:
+            $ref: "#/components/schemas/CPMProductTeamResponse"
+    EPRProductTeamCreate:
+      description: Create EPR ProductTeam operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EPRProductTeamResponse"
+    CPMProductTeamRead:
       description: Read ProductTeam operation successful
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProductTeamResponse"
+            $ref: "#/components/schemas/CPMProductTeamResponse"
+    EPRProductTeamRead:
+      description: Read EPR ProductTeam operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EPRProductTeamResponse"
     ProductSearch:
       description: Search Product operation successful
       content:

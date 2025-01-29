@@ -10,7 +10,7 @@ from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
 from conftest import dynamodb_client_with_sleep as dynamodb_client
@@ -56,7 +56,7 @@ def _create_device_ref_data(device_ref_data, product):
 @pytest.mark.integration
 def test_no_results(version):
     product_team = _create_org()
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     with mock.patch.dict(
@@ -126,7 +126,7 @@ def test_no_results(version):
     ],
 )
 def test_index(version, device_ref_data):
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
     product_team = _create_org()
     pt_repo = ProductTeamRepository(
@@ -202,7 +202,7 @@ def test_index_no_such_product_team(version):
         "product_id": "P.123-321",
         "environment": Environment.DEV,
     }
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     with mock.patch.dict(
@@ -251,7 +251,7 @@ def test_index_no_such_product_team(version):
     ],
 )
 def test_index_no_such_product(version):
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     product_team = _create_org()
@@ -319,7 +319,7 @@ def test_index_no_such_product(version):
 )
 def test_index_multiple_returned(device_ref_data):
     version = 1
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     client = dynamodb_client()
 
     product_team = _create_org()

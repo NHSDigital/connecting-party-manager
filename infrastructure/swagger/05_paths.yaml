@@ -40,7 +40,7 @@ paths:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
         "201":
-          $ref: "#/components/responses/ProductTeamCreate"
+          $ref: "#/components/responses/CPMProductTeamCreate"
         "400":
           $ref: "#/components/responses/BadRequest"
         "422":
@@ -67,7 +67,7 @@ paths:
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
         "200":
-          $ref: "#/components/responses/ProductTeamRead"
+          $ref: "#/components/responses/CPMProductTeamRead"
         "404":
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
@@ -77,7 +77,52 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product:
+  /ProductTeamEpr:
+    post:
+      operationId: createproductteamepr
+      summary: Create a Product Team (Epr) resource (POST)
+      requestBody:
+        $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/EPRProductTeamCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createProductTeamEpr}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeamEpr/{product_team_id}:
+    get:
+      operationId: readproductteamepr
+      summary: Read a Product Team (Epr) resource (GET)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/EPRProductTeamRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProductTeamEpr}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeamEpr/{product_team_id}/Product:
     post:
       operationId: createproductendpoint
       summary: Create a Product resource (POST)
@@ -125,7 +170,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}:
+  /ProductTeamEpr/{product_team_id}/Product/{product_id}:
     get:
       operationId: readproductendpoint
       summary: Read a Product resource (GET)
@@ -167,7 +212,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/Epr:
+  /ProductTeamEpr/{product_team_id}/Product/Epr:
     post:
       operationId: createproductforeprendpoint
       summary: Create an EPR Product resource (POST)
@@ -196,7 +241,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData
   : get:
       operationId: searchDeviceReferenceData
       summary: Retrieve all Data Reference Data resources associated with a Product (GET)
@@ -245,7 +290,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
   : post:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
@@ -278,7 +323,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
   : post:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
@@ -311,7 +356,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}
   : get:
       operationId: readDeviceReferenceData
       summary: Read a Device Reference Data resource (GET)
@@ -335,7 +380,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device:
+  /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device:
     post:
       operationId: createDevice
       summary: Create a Device resource (POST)
@@ -364,7 +409,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/{device_id}
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/{device_id}
   : get:
       operationId: readDevice
       summary: Read a Device resource (GET)
@@ -388,7 +433,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/MessageHandlingSystem
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/MessageHandlingSystem
   : post:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
@@ -423,7 +468,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeam/{product_team_id}/Product/{product_id}/{environment}/Device/AccreditedSystem
+  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/AccreditedSystem
   : post:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)

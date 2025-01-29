@@ -53,7 +53,6 @@ def before_all(context: Context):
     )
 
     if context.test_mode is TestMode.INTEGRATION:
-        context.table_name = read_terraform_output("dynamodb_table_name.value")
         context.workspace_type = read_terraform_output("workspace_type.value")
         context.workspace = read_terraform_output("workspace.value")
         context.environment = read_terraform_output("environment.value")
@@ -84,6 +83,16 @@ def before_feature(context: Context, feature: Feature):
         name=feature.name,
         description=" ".join(feature.description),
     )
+    if context.test_mode is TestMode.INTEGRATION:
+        table = (
+            "dynamodb_cpm_table_name.value"
+            if "Create Product Team" in feature.name
+            or "Read Product Team" in feature.name
+            else "dynamodb_epr_table_name.value"
+        )
+        context.table_name = read_terraform_output(table)
+    else:
+        context.table_name = LOCAL_TABLE_NAME
 
 
 def before_scenario(context: Context, scenario: Scenario):

@@ -8,21 +8,21 @@ Feature: Read Device Reference Data - failure scenarios
       | Authorization | letmein |
 
   Scenario: Read a deleted Product's DeviceReferenceData
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     And I note the response field "$.id" as "device_reference_data_id"
-    And I have already made a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    And I have already made a "DELETE" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "404" with body
       | path             | value                                                                                     |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                        |
@@ -33,20 +33,20 @@ Feature: Read Device Reference Data - failure scenarios
       | Content-Length | 152              |
 
   Scenario: Read an unknown product teams DeviceReferenceData
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/F5H1R.f63ba1d2-99b3-4e7f-83b4-a98178f1e4fe/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/F5H1R.f63ba1d2-99b3-4e7f-83b4-a98178f1e4fe/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "404" with body
       | path             | value                                                                             |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                |
@@ -57,20 +57,20 @@ Feature: Read Device Reference Data - failure scenarios
       | Content-Length | 140              |
 
   Scenario: Read an unknown DeviceReferenceData
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData" with body:
       | path | value                    |
       | name | My Device Reference Data |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/not-a-device-reference-data"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/not-a-device-reference-data"
     Then I receive a status code "404" with body
       | path             | value                                                                                                                                    |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                                                                                       |

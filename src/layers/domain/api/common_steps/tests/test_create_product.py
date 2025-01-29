@@ -5,7 +5,7 @@ from domain.api.common_steps.create_product import before_steps
 from domain.core.cpm_product import CpmProduct
 from domain.core.root import Root
 from domain.repository.errors import ItemNotFound
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from domain.response.validation_errors import (
     InboundJSONDecodeError,
     InboundValidationError,

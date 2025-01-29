@@ -16,7 +16,7 @@ from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
 )
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table

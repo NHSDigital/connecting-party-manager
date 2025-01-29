@@ -4,7 +4,7 @@ import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.core.questionnaire import QuestionnaireResponse
 from domain.repository.questionnaire_repository import (
     QuestionnaireInstance,

@@ -23,7 +23,7 @@ components:
       example:
         code: "OK"
         message: "Transaction successful"
-    ProductTeamResponse:
+    CPMProductTeamResponse:
       type: object
       properties:
         id:
@@ -52,7 +52,46 @@ components:
               key_value:
                 type: string
       example:
-        id: "F5H1R"
+        id: "a9a9694d-001b-45ce-9f2a-6c9bf80ae0d0"
+        name: "Sample Product Team"
+        ods_code: "F5H1R"
+        status: "active"
+        created_on: "2024-10-15T10:00:00Z"
+        updated_on: "2024-10-15T10:00:00Z"
+        deleted_on: "null"
+        keys:
+          - key_type: "product_team_id_alias"
+            key_value: "FOOBAR"
+    EPRProductTeamResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        ods_code:
+          type: string
+        status:
+          type: string
+        created_on:
+          type: string
+        updated_on:
+          type: string
+          nullable: true
+        deleted_on:
+          type: string
+          nullable: true
+        keys:
+          type: array
+          items:
+            type: object
+            properties:
+              key_type:
+                type: string
+              key_value:
+                type: string
+      example:
+        id: "F5H1R.a9a9694d-001b-45ce-9f2a-6c9bf80ae0d0"
         name: "Sample Product Team"
         ods_code: "F5H1R"
         status: "active"

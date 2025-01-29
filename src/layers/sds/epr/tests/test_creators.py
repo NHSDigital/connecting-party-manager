@@ -3,7 +3,7 @@ from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
-from domain.core.product_team import ProductTeam
+from domain.core.product_team_epr import ProductTeam
 from domain.core.timestamp import now
 from domain.repository.questionnaire_repository import (
     QuestionnaireInstance,

@@ -4,7 +4,7 @@ from domain.core.cpm_product import CpmProduct
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.errors import ItemNotFound
-from domain.repository.product_team_repository import ProductTeamRepository
+from domain.repository.product_team_epr_repository import ProductTeamRepository
 from domain.response.validation_errors import InboundValidationError
 from event.step_chain import StepChain
 

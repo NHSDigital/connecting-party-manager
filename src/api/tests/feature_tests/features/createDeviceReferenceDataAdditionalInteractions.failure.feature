@@ -8,16 +8,16 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Authorization | letmein |
 
   Scenario: Fail to create an "AS Additional Interactions" Device Reference Data, with incomplete questionnaire response
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                       | value |
       | questionnaire_responses.spine_as_additional_interactions.0 | {}    |
     Then I receive a status code "400" with body
@@ -30,16 +30,16 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Content-Length | 163              |
 
   Scenario: Fail to create an "AS Additional Interactions" Device Reference Data, with invalid questionnaire response (bad value)
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | []    |
     Then I receive a status code "400" with body
@@ -52,16 +52,16 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Content-Length | 153              |
 
   Scenario: Fail to create an "AS Additional Interactions" Device Reference Data, with invalid questionnaire response (unknown field)
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.0.unknown_field  | 123                                                       |
@@ -75,16 +75,16 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Content-Length | 197              |
 
   Scenario: Fail to create an "AS Additional Interactions" Device Reference Data, with invalid questionnaire name
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                        | value |
       | questionnaire_responses.bad_questionnaire_name.0.some_value | 123   |
     Then I receive a status code "400" with body
@@ -97,18 +97,18 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Content-Length | 265              |
 
   Scenario: Fail to create a second "AS Additional Interactions" Device Reference Data in the same EPR Product
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     Then I receive a status code "400" with body
       | path             | value                                                                         |
       | errors.0.code    | VALIDATION_ERROR                                                              |
@@ -119,16 +119,16 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Content-Length | 134              |
 
   Scenario: Fail to create an "AS Additional Interactions" Device Reference Data in non-EPR product
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     Then I receive a status code "400" with body
       | path             | value                                                                                              |
       | errors.0.code    | VALIDATION_ERROR                                                                                   |
@@ -139,19 +139,19 @@ Feature: Create "Additional Interactions" Device Reference Data - failure scenar
       | Content-Length | 155              |
 
   Scenario: Failure to create an "AS Additional Interactions" Device Reference Data, with questionnaire responses with duplicate interaction IDs
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.1.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |

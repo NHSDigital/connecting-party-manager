@@ -67,7 +67,7 @@ def test__cpm_product_repository__product_does_not_exist_local(
 @pytest.mark.integration
 def test__query_products_by_product_team():
     product_team = _create_product_team()
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     repo = CpmProductRepository(
         table_name=table_name,
         dynamodb_client=dynamodb_client(),
@@ -93,7 +93,7 @@ def test__query_products_by_product_team():
 @pytest.mark.integration
 def test__query_products_by_product_team_a():
     product_team_a = _create_product_team()
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
     repo = CpmProductRepository(
         table_name=table_name,
         dynamodb_client=dynamodb_client(),
@@ -125,7 +125,7 @@ def test__query_products_by_product_team_a():
 @pytest.mark.integration
 def test__query_products_by_product_team_with_sk_prefix():
     product_team = _create_product_team()
-    table_name = read_terraform_output("dynamodb_table_name.value")
+    table_name = read_terraform_output("dynamodb_epr_table_name.value")
 
     product_id = ProductId.create()
     repo = CpmProductRepository(

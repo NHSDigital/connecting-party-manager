@@ -8,14 +8,14 @@ Feature: Search CPM Products - success scenarios
       | Authorization | letmein |
 
   Scenario: Successfully search CPM Products with no results
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product"
     Then I receive a status code "200" with body
       | path    | value |
       | results | []    |
@@ -25,17 +25,17 @@ Feature: Search CPM Products - success scenarios
       | Content-Length | 15               |
 
   Scenario: Successfully search one CPM Product
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value               |
       | name | My Great CpmProduct |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product"
     Then I receive a status code "200" with body
       | path                      | value                      |
       | results.0.id              | << ignore >>               |
@@ -53,23 +53,23 @@ Feature: Search CPM Products - success scenarios
       | Content-Length | 273              |
 
   Scenario Outline: Successfully search more than one CPM Product
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 1 |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 2 |
-    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 3 |
-    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product"
     Then I receive a status code "200" with body where "results" has a length of "3"
       | path                      | value                      |
       | results.0.id              | << ignore >>               |
@@ -110,27 +110,27 @@ Feature: Search CPM Products - success scenarios
       | FOOBAR                     |
 
   Scenario: Deleted Products not returned in search
-    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 1 |
     And I note the response field "$.id" as "product_id_1"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 2 |
     And I note the response field "$.id" as "product_id_2"
-    And I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
       | path | value              |
       | name | My Great Product 3 |
     And I note the response field "$.id" as "product_id_3"
-    And I have already made a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id_2) }"
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product"
+    And I have already made a "DELETE" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id_2) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product"
     Then I receive a status code "200" with body where "results" has a length of "2"
       | path                      | value                      |
       | results.0.id              | ${ note(product_id_1) }    |
