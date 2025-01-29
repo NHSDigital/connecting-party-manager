@@ -11,11 +11,27 @@ x-definitions:
       passthroughBehavior: when_no_match
       contentHandling: CONVERT_TO_TEXT
 
+tags:
+  - name: Core Creation Endpoints
+    description: Core API creation endpoints
+  - name: Core Read Endpoints
+    description: Core API read endpoints
+  - name: Core Deletion Endpoints
+    description: Core API deletion endpoints
+  - name: EPR
+    description: EPR API endpoints
+  - name: SDS
+    description: Search Results provided for the SDS FHIR API
+
 paths:
   /_status:
     get:
-      summary: Retrieve the current Status (GET)
+      summary: Retrieve the current Status of the API (GET)
+      description: >
+        Get the current status of the API
       operationId: status
+      tags:
+        - Status
       responses:
         "200":
           $ref: "#/components/responses/StatusOK"
@@ -36,6 +52,10 @@ paths:
     post:
       operationId: createproductteam
       summary: Create a Product Team resource (POST)
+      description: >
+        Create a Product Team. This is needed in order to create a Product.
+      tags:
+        - Core Creation Endpoints
       requestBody:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
@@ -60,6 +80,10 @@ paths:
     get:
       operationId: readproductteam
       summary: Read a Product Team resource (GET)
+      description: |
+        - Retrieve a Product Team using a product team ID.
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -126,6 +150,8 @@ paths:
     post:
       operationId: createproductendpoint
       summary: Create a Product resource (POST)
+      tags:
+        - Core Creation Endpoints
       description: |
         This endpoint creates a new Product resource for the specified Product Team.
         **Requirements:**
@@ -153,6 +179,10 @@ paths:
     get:
       operationId: searchCpmProduct
       summary: Retrieve all Products associated with a Product Team (GET)
+      description: |
+        - Retrieve all products for a Product Team using a product team ID.
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -174,6 +204,10 @@ paths:
     get:
       operationId: readproductendpoint
       summary: Read a Product resource (GET)
+      description: |
+        - Retrieve a product using a product team ID and product ID.
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -194,6 +228,10 @@ paths:
     delete:
       operationId: deleteproductendpoint
       summary: Delete a Product resource (DELETE)
+      description: |
+        - Delete a product using a product team ID and product ID.
+      tags:
+        - Core Deletion Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -212,10 +250,12 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeamEpr/{product_team_id}/Product/Epr:
+  /ProductTeam/{product_team_id}/Product/Epr:
     post:
       operationId: createproductforeprendpoint
       summary: Create an EPR Product resource (POST)
+      tags:
+        - EPR
       description: |
         This endpoint creates a new EPR Product resource for the specified Product Team.
         **Requirements:**
@@ -245,6 +285,10 @@ paths:
   : get:
       operationId: searchDeviceReferenceData
       summary: Retrieve all Data Reference Data resources associated with a Product (GET)
+      description: |
+        - Retrieve all Device Reference Data objects using a product team ID and product ID.
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -266,7 +310,10 @@ paths:
     post:
       operationId: createDeviceReferenceData
       summary: Create a Device Reference Data resource (POST)
-      description: This endpoint has not yet been configured. Do not use.
+      tags:
+        - Core Creation Endpoints
+      description: |
+        **This endpoint has not yet been configured. Do not use.**
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -294,12 +341,16 @@ paths:
   : post:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
+      tags:
+        - EPR
       description: |
         This endpoint creates a Device Reference Data Message Set resource for the specified Product.
         **Requirements:**
         - A valid Product Team must exist
         - A valid EPR Product must already exist under the Product Team
         - There can be no existing MHS MessageSet DRD for the EPR Product already
+        - Questionnaire response required: **spine_mhs_message_sets**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_mhs_message_sets**
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -327,12 +378,16 @@ paths:
   : post:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
+      tags:
+        - EPR
       description: |
         This endpoint creates a Device Reference Data Additional Interactions resource for the specified Product.
         **Requirements:**
         - A valid Product Team must exist
         - A valid EPR Product must already exist under the Product Team
         - There can be no existing AS AdditionalInteractions DRD for the EPR Product already
+        - Questionnaire response required: **spine_as_additional_interactions**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_as_additional_interactions**
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -360,6 +415,10 @@ paths:
   : get:
       operationId: readDeviceReferenceData
       summary: Read a Device Reference Data resource (GET)
+      description: >
+        Retrieve a Device Reference Data entity using a product team ID, product ID and Device Reference Data ID.
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -384,8 +443,10 @@ paths:
     post:
       operationId: createDevice
       summary: Create a Device resource (POST)
+      tags:
+        - Core Creation Endpoints
       description: |
-        This endpoint has not yet been configured. Do not use.
+        **This endpoint has not yet been configured. Do not use.**
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -413,6 +474,10 @@ paths:
   : get:
       operationId: readDevice
       summary: Read a Device resource (GET)
+      description: >
+        Retrieve a device using a product team ID, product ID and device ID.
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -437,6 +502,8 @@ paths:
   : post:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
+      tags:
+        - EPR
       description: |
         This endpoint creates a new Message Handling System Device resource for the specified Product.
         **Requirements:**
@@ -444,7 +511,8 @@ paths:
         - A valid Product must exist under the Product Team
         - One existing MHS Message Set Device Reference Data must be present for the Product
         - No existing MHS device for the product
-        - Must provide a spine_mhs questionnaire response
+        - Questionnaire response required: **spine_mhs**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_mhs**
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -472,6 +540,8 @@ paths:
   : post:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)
+      tags:
+        - EPR
       description: |
         This endpoint creates a new Accredited System Device resource for the specified Product.
         **Requirements:**
@@ -479,7 +549,8 @@ paths:
         - A valid Product must exist under the Product Team
         - One existing MHS Message Set Device Reference Data must be present for the Product
         - One existing AS Additional Interactions Device Reference Data must be present for the Product
-        - Must provide a spine_as questionnaire response
+        - Questionnaire response required: **spine_as**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_as**
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -507,6 +578,10 @@ paths:
     get:
       operationId: searchsdsdevice
       summary: Retrieve Device resources for SDS FHIR API (GET)
+      description: >
+        Retrieve a list of Devices to be used primarily by the SDS FHIR API.
+      tags:
+        - SDS
       parameters:
         - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsManOrg"
@@ -530,6 +605,10 @@ paths:
     get:
       operationId: searchsdsendpoint
       summary: Retrieve Endpoint resources for SDS FHIR API (GET)
+      description: >
+        Retrieve a list of Endpoints to be used primarily by the SDS FHIR API.
+      tags:
+        - SDS
       parameters:
         - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsInteration"
@@ -553,6 +632,16 @@ paths:
     get:
       operationId: readQuestionnaire
       summary: Read a Questionnaire resource (GET)
+      description: |
+        Retrieve information about the format of a questionnaire to be answered. To be used in conjunction with creating Devices and DeviceReferenceData. System generated fields are not required and will be populated by CPM. **Please note: Although examples are given it's impossible to layout exactly what format a questionnaire will take as the questionnaire itself uses json_schema to allow custom formats.**
+
+        IDs available are
+        - spine_mhs
+        - spine_as
+        - spine_mhs_message_sets
+        - spine_as_additional_interactions
+      tags:
+        - Core Read Endpoints
       parameters:
         - $ref: "#/components/parameters/QuestionnaireId"
         - $ref: "#/components/parameters/HeaderVersion"

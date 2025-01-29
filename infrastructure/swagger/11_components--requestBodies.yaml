@@ -36,9 +36,9 @@ components:
             ods_code: "F5H1R"
             keys:
               - key_type: "product_team_id_alias"
-                key_value: "BAR"
+                key_value: "FOOBAR"
     ProductCreateRequestBody:
-      description: Request body to create a Product Team
+      description: Request body to create a Product
       required: true
       content:
         application/json:
@@ -78,8 +78,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for MHS Message Set questionnaire
-                properties:
-                  spine_mhs_message_sets:
+                patternProperties:
+                  "^spine_mhs_message_sets/[0-9]+$":
                     type: array
                     description: List of questionnaires associated with the message set
                     items:
@@ -87,6 +87,9 @@ components:
                       description: Questionnaire Responses
             required:
               - questionnaire_responses
+          example:
+            questionnaire_responses:
+              { "spine_mhs_message_sets/1": [{ "question": "answer" }] }
     DeviceReferenceDataAdditionalInteractionsCreateRequestBody:
       description: Request body to create a Device Reference Data Additional Interactions object
       required: true
@@ -98,8 +101,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for Additional Interactions questionnaire
-                properties:
-                  spine_as_additional_interactions:
+                patternProperties:
+                  "^spine_as_additional_interactions/[0-9]+$":
                     type: array
                     description: List of questionnaires associated with the additional interactions
                     items:
@@ -107,6 +110,12 @@ components:
                       description: Questionnaire Responses
             required:
               - questionnaire_responses
+          example:
+            questionnaire_responses:
+              {
+                "spine_as_additional_interactions/1":
+                  [{ "question": "answer" }],
+              }
     DeviceCreateRequestBody:
       description: Request body to create a Device object
       required: true
@@ -133,8 +142,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for MHS Device
-                properties:
-                  spine_mhs:
+                patternProperties:
+                  "^spine_mhs/[0-9]+$":
                     type: array
                     description: spine_mhs questionnaire associated with the mhs device
                     items:
@@ -143,7 +152,8 @@ components:
             required:
               - questionnaire_responses
           example:
-            questionnaire_responses: { "spine_mhs": [{ "question": "answer" }] }
+            questionnaire_responses:
+              { "spine_mhs/1": [{ "question": "answer" }] }
     AccreditedSystemDeviceCreateRequestBody:
       description: Request body to create a Accredited System Device object
       required: true
@@ -155,8 +165,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for AS Device
-                properties:
-                  spine_as:
+                patternProperties:
+                  "^spine_as/[0-9]+$":
                     type: array
                     description: spine_as questionnaire associated with the as device
                     items:
@@ -165,4 +175,5 @@ components:
             required:
               - questionnaire_responses
           example:
-            questionnaire_responses: { "spine_as": [{ "question": "answer" }] }
+            questionnaire_responses:
+              { "spine_as/1": [{ "question": "answer" }] }
