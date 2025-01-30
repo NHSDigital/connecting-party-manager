@@ -78,8 +78,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for MHS Message Set questionnaire
-                patternProperties:
-                  "^spine_mhs_message_sets/[0-9]+$":
+                properties:
+                  spine_mhs_message_sets/1:
                     type: array
                     description: List of questionnaires associated with the message set
                     items:
@@ -101,8 +101,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for Additional Interactions questionnaire
-                patternProperties:
-                  "^spine_as_additional_interactions/[0-9]+$":
+                properties:
+                  spine_as_additional_interactions/1:
                     type: array
                     description: List of questionnaires associated with the additional interactions
                     items:
@@ -142,8 +142,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for MHS Device
-                patternProperties:
-                  "^spine_mhs/[0-9]+$":
+                properties:
+                  spine_mhs/1:
                     type: array
                     description: spine_mhs questionnaire associated with the mhs device
                     items:
@@ -165,8 +165,8 @@ components:
               questionnaire_responses:
                 type: object
                 description: Questionnaire Responses for AS Device
-                patternProperties:
-                  "^spine_as/[0-9]+$":
+                properties:
+                  spine_as/1:
                     type: array
                     description: spine_as questionnaire associated with the as device
                     items:

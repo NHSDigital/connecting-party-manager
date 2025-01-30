@@ -37,9 +37,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -74,9 +76,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -122,9 +126,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
       example:
         id: "123-XXX"
         name: "Sample Product Team"
@@ -218,9 +224,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -276,9 +284,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         questionnaire_responses:
           type: object
 
@@ -302,9 +312,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         keys:
           type: array
           items:
@@ -342,9 +354,11 @@ components:
         created_on:
           type: string
         updated_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         deleted_on:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         questionnaire_responses:
           type: object
       example:
