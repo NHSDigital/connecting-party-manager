@@ -1,7 +1,10 @@
 # Changelog
 
+## 2025-01-31
+- [PI-745] Create Product and Generate ID
+
 ## 2025-01-29
-- [PI-714] Update Swagger for readibility
+- [PI-714] Update Swagger for readability
 - [PI-759] Integration test timeout
 
 ## 2025-01-24
