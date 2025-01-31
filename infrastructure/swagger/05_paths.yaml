@@ -158,8 +158,6 @@ paths:
     post:
       operationId: createproductendpoint
       summary: Create a Product resource (POST)
-      tags:
-        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a new Product resource for the specified Product Team.
         **Requirements:**
@@ -256,8 +254,6 @@ paths:
     post:
       operationId: createproductendpointepr
       summary: Create an EPR Product resource (POST)
-      tags:
-        - EPR
       description: |
         This endpoint creates a new EPR Product resource for the specified Product Team.
         **Requirements:**
