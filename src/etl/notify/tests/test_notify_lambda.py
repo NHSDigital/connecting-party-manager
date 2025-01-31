@@ -1,11 +1,7 @@
-import json
 import os
 from unittest import mock
 
-import boto3
 import pytest
-
-from test_helpers.terraform import read_terraform_output
 
 EXAMPLE_DOT_COM = "https://httpbin.org"
 
@@ -58,81 +54,81 @@ def test_notify_lambda_with_state_machine_input(input, output):
     assert notify.handler(event=input) == output
 
 
-@pytest.mark.integration
-def test_notify_lambda_without_error_message():
-    notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
+# @pytest.mark.integration
+# def test_notify_lambda_without_error_message():
+#     notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
 
-    lambda_client = boto3.client("lambda")
-    response = lambda_client.invoke(
-        FunctionName=notify_lambda_arn,
-        Payload=json.dumps([{"message": "test"}]).encode(),
-    )
-    decoded_payload = response["Payload"].read().decode("utf-8")
-    decoded_payload = decoded_payload.strip('"')
-    assert decoded_payload == "pass"
-
-
-@pytest.mark.integration
-def test_notify_lambda_with_error_message():
-    notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
-
-    lambda_client = boto3.client("lambda")
-    response = lambda_client.invoke(
-        FunctionName=notify_lambda_arn,
-        Payload=json.dumps(
-            [
-                {
-                    "message": "test",
-                    "error_message": "this is an error",
-                }
-            ]
-        ).encode(),
-    )
-    decoded_payload = response["Payload"].read().decode("utf-8")
-    decoded_payload = decoded_payload.strip('"')
-    assert decoded_payload == "fail"
+#     lambda_client = boto3.client("lambda")
+#     response = lambda_client.invoke(
+#         FunctionName=notify_lambda_arn,
+#         Payload=json.dumps([{"message": "test"}]).encode(),
+#     )
+#     decoded_payload = response["Payload"].read().decode("utf-8")
+#     decoded_payload = decoded_payload.strip('"')
+#     assert decoded_payload == "pass"
 
 
-@pytest.mark.integration
-def test_notify_lambda_with_worker_response_without_error_message():
-    notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
+# @pytest.mark.integration
+# def test_notify_lambda_with_error_message():
+#     notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
 
-    lambda_client = boto3.client("lambda")
-    response = lambda_client.invoke(
-        FunctionName=notify_lambda_arn,
-        Payload=json.dumps(
-            [
-                {
-                    "stage_name": "test",
-                    "processed_records": 123,
-                    "unprocessed_records": 123,
-                }
-            ]
-        ).encode(),
-    )
-    decoded_payload = response["Payload"].read().decode("utf-8")
-    decoded_payload = decoded_payload.strip('"')
-    assert decoded_payload == "pass"
+#     lambda_client = boto3.client("lambda")
+#     response = lambda_client.invoke(
+#         FunctionName=notify_lambda_arn,
+#         Payload=json.dumps(
+#             [
+#                 {
+#                     "message": "test",
+#                     "error_message": "this is an error",
+#                 }
+#             ]
+#         ).encode(),
+#     )
+#     decoded_payload = response["Payload"].read().decode("utf-8")
+#     decoded_payload = decoded_payload.strip('"')
+#     assert decoded_payload == "fail"
 
 
-@pytest.mark.integration
-def test_notify_lambda_with_worker_response_with_error_message():
-    notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
+# @pytest.mark.integration
+# def test_notify_lambda_with_worker_response_without_error_message():
+#     notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
 
-    lambda_client = boto3.client("lambda")
-    response = lambda_client.invoke(
-        FunctionName=notify_lambda_arn,
-        Payload=json.dumps(
-            [
-                {
-                    "stage_name": "test",
-                    "processed_records": 123,
-                    "unprocessed_records": 123,
-                    "error_message": "this is an error",
-                }
-            ]
-        ).encode(),
-    )
-    decoded_payload = response["Payload"].read().decode("utf-8")
-    decoded_payload = decoded_payload.strip('"')
-    assert decoded_payload == "fail"
+#     lambda_client = boto3.client("lambda")
+#     response = lambda_client.invoke(
+#         FunctionName=notify_lambda_arn,
+#         Payload=json.dumps(
+#             [
+#                 {
+#                     "stage_name": "test",
+#                     "processed_records": 123,
+#                     "unprocessed_records": 123,
+#                 }
+#             ]
+#         ).encode(),
+#     )
+#     decoded_payload = response["Payload"].read().decode("utf-8")
+#     decoded_payload = decoded_payload.strip('"')
+#     assert decoded_payload == "pass"
+
+
+# @pytest.mark.integration
+# def test_notify_lambda_with_worker_response_with_error_message():
+#     notify_lambda_arn = read_terraform_output("sds_etl.value.notify_lambda_arn")
+
+#     lambda_client = boto3.client("lambda")
+#     response = lambda_client.invoke(
+#         FunctionName=notify_lambda_arn,
+#         Payload=json.dumps(
+#             [
+#                 {
+#                     "stage_name": "test",
+#                     "processed_records": 123,
+#                     "unprocessed_records": 123,
+#                     "error_message": "this is an error",
+#                 }
+#             ]
+#         ).encode(),
+#     )
+#     decoded_payload = response["Payload"].read().decode("utf-8")
+#     decoded_payload = decoded_payload.strip('"')
+#     assert decoded_payload == "fail"

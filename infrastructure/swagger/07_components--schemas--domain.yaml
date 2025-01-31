@@ -147,8 +147,41 @@ components:
     Questionnaire:
       type: object
       properties:
-        tbc:
+        name:
           type: string
+        version:
+          type: string
+        json_schema:
+          type: object
+          properties:
+            $schema:
+              type: string
+            type:
+              type: string
+            properties:
+              type: object
+              properties:
+                question:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    system generated:
+                      type: boolean
+      example:
+        name: "questionnaire_1"
+        version: "1"
+        json_schema:
+          $schema: "http://json-schema.org/draft-07/schema#"
+          type: "object"
+          properties:
+            question_1:
+              type: "string"
+              system generated: false
+            question_2:
+              type: "string"
+              system generated: true
+          required: question_1
 
     ProductSearchResponse:
       type: object
@@ -229,16 +262,25 @@ components:
           type: string
         name:
           type: string
+        status:
+          type: string
         product_id:
           type: string
         product_team_id:
           type: string
         ods_code:
           type: string
-        status:
-          type: string
         environment:
           type: string
+        keys:
+          type: array
+          items:
+            type: object
+            properties:
+              key_type:
+                type: string
+              key_value:
+                type: string
         created_on:
           type: string
         updated_on:
