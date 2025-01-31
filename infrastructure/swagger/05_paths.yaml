@@ -12,12 +12,14 @@ x-definitions:
       contentHandling: CONVERT_TO_TEXT
 
 tags:
-  - name: Core Creation Endpoints
-    description: Core API creation endpoints
-  - name: Core Read Endpoints
-    description: Core API read endpoints
-  - name: Core Deletion Endpoints
-    description: Core API deletion endpoints
+  - name: Core Product ID Endpoints
+    description: Create, Read and Delete Product IDs
+  - name: Core EPR Creation Endpoints
+    description: Core EPR API creation endpoints
+  - name: Core EPR Read Endpoints
+    description: Core EPR API read endpoints
+  - name: Core EPR Deletion Endpoints
+    description: Core EPR API deletion endpoints
   - name: EPR
     description: EPR API endpoints
   - name: SDS
@@ -55,7 +57,7 @@ paths:
       description: >
         Create a Product Team. This is needed in order to create a Product.
       tags:
-        - Core Creation Endpoints
+        - Core Product ID Endpoints
       requestBody:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
@@ -83,7 +85,7 @@ paths:
       description: |
         - Retrieve a Product Team using a product team ID.
       tags:
-        - Core Read Endpoints
+        - Core Product ID Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -105,6 +107,8 @@ paths:
     post:
       operationId: createproductteamepr
       summary: Create a Product Team (Epr) resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
       requestBody:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
@@ -129,6 +133,8 @@ paths:
     get:
       operationId: readproductteamepr
       summary: Read a Product Team (Epr) resource (GET)
+      tags:
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -151,7 +157,7 @@ paths:
       operationId: createproductendpoint
       summary: Create a Product resource (POST)
       tags:
-        - Core Creation Endpoints
+        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a new Product resource for the specified Product Team.
         **Requirements:**
@@ -182,7 +188,7 @@ paths:
       description: |
         - Retrieve all products for a Product Team using a product team ID.
       tags:
-        - Core Read Endpoints
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -207,7 +213,7 @@ paths:
       description: |
         - Retrieve a product using a product team ID and product ID.
       tags:
-        - Core Read Endpoints
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -231,7 +237,7 @@ paths:
       description: |
         - Delete a product using a product team ID and product ID.
       tags:
-        - Core Deletion Endpoints
+        - Core EPR Deletion Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -250,12 +256,12 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/Epr:
+  /ProductTeamEpr/{product_team_id}/Product/Epr:
     post:
       operationId: createproductforeprendpoint
       summary: Create an EPR Product resource (POST)
       tags:
-        - EPR
+        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a new EPR Product resource for the specified Product Team.
         **Requirements:**
@@ -288,7 +294,7 @@ paths:
       description: |
         - Retrieve all Device Reference Data objects using a product team ID and product ID.
       tags:
-        - Core Read Endpoints
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -311,7 +317,7 @@ paths:
       operationId: createDeviceReferenceData
       summary: Create a Device Reference Data resource (POST)
       tags:
-        - Core Creation Endpoints
+        - Core EPR Creation Endpoints
       description: |
         **This endpoint has not yet been configured. Do not use.**
       parameters:
@@ -342,7 +348,7 @@ paths:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
       tags:
-        - EPR
+        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a Device Reference Data Message Set resource for the specified Product.
         **Requirements:**
@@ -379,7 +385,7 @@ paths:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
       tags:
-        - EPR
+        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a Device Reference Data Additional Interactions resource for the specified Product.
         **Requirements:**
@@ -418,7 +424,7 @@ paths:
       description: >
         Retrieve a Device Reference Data entity using a product team ID, product ID and Device Reference Data ID.
       tags:
-        - Core Read Endpoints
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -444,7 +450,7 @@ paths:
       operationId: createDevice
       summary: Create a Device resource (POST)
       tags:
-        - Core Creation Endpoints
+        - Core EPR Creation Endpoints
       description: |
         **This endpoint has not yet been configured. Do not use.**
       parameters:
@@ -477,7 +483,7 @@ paths:
       description: >
         Retrieve a device using a product team ID, product ID and device ID.
       tags:
-        - Core Read Endpoints
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -503,7 +509,7 @@ paths:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
       tags:
-        - EPR
+        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a new Message Handling System Device resource for the specified Product.
         **Requirements:**
@@ -541,7 +547,7 @@ paths:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)
       tags:
-        - EPR
+        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a new Accredited System Device resource for the specified Product.
         **Requirements:**
@@ -641,7 +647,7 @@ paths:
         - spine_mhs_message_sets
         - spine_as_additional_interactions
       tags:
-        - Core Read Endpoints
+        - Core EPR Read Endpoints
       parameters:
         - $ref: "#/components/parameters/QuestionnaireId"
         - $ref: "#/components/parameters/HeaderVersion"
