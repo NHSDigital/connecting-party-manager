@@ -261,7 +261,7 @@ paths:
       operationId: createproductforeprendpoint
       summary: Create an EPR Product resource (POST)
       tags:
-        - Core EPR Creation Endpoints
+        - EPR
       description: |
         This endpoint creates a new EPR Product resource for the specified Product Team.
         **Requirements:**
