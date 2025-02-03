@@ -104,3 +104,23 @@ Feature: Create CPM Product - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 134              |
+
+  Scenario: Cannot create a Cpm Product with an empty name
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value | FOOBAR                |
+    Given I note the response field "$.id" as "product_team_id"
+    When I make a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
+      | path | value |
+      | name |       |
+    Then I receive a status code "400" with body
+      | path             | value                                                                            |
+      | errors.0.code    | VALIDATION_ERROR                                                                 |
+      | errors.0.message | CreateCpmProductIncomingParams.name: ensure this value has at least 1 characters |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 137              |
