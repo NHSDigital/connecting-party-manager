@@ -1,5 +1,5 @@
-Feature: Delete EPR Product - failure scenarios
-  These scenarios demonstrate failures to delete a new EPR Product
+Feature: Delete CPM Product - failure scenarios
+  These scenarios demonstrate failures to delete a new CPM Product
 
   Background:
     Given "default" request headers:
@@ -7,19 +7,19 @@ Feature: Delete EPR Product - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: EPR Product Team doesn't exist
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
+  Scenario: CPM Product Team doesn't exist
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path | value               |
       | name | My Great EprProduct |
     And I note the response field "$.id" as "product_id"
-    When I make a "DELETE" request with "default" headers to "ProductTeamEpr/123/ProductEpr/${ note(product_id) }"
+    When I make a "DELETE" request with "default" headers to "ProductTeam/123/Product/${ note(product_id) }"
     Then I receive a status code "404" with body
       | path             | value                                      |
       | errors.0.code    | RESOURCE_NOT_FOUND                         |
@@ -30,19 +30,19 @@ Feature: Delete EPR Product - failure scenarios
       | Content-Length | 101              |
 
   Scenario: Unknown Product ID
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
-    When I make a "DELETE" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/P.XXX.YYY"
+    When I make a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/P.XXX.YYY"
     Then I receive a status code "404" with body
       | path             | value                                                                         |
       | errors.0.code    | RESOURCE_NOT_FOUND                                                            |
-      | errors.0.message | Could not find EprProduct for key ('${ note(product_team_id) }', 'P.XXX.YYY') |
+      | errors.0.message | Could not find CpmProduct for key ('${ note(product_team_id) }', 'P.XXX.YYY') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 152              |
+      | Content-Length | 146              |
