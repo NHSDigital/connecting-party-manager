@@ -57,7 +57,7 @@ components:
         ods_code: "F5H1R"
         status: "active"
         created_on: "2024-10-15T10:00:00Z"
-        updated_on: "2024-10-15T10:00:00Z"
+        updated_on: "null"
         deleted_on: "null"
         keys:
           - key_type: "product_team_id_alias"
@@ -132,7 +132,7 @@ components:
           type: string
           nullable: true
       example:
-        id: "123-XXX"
+        id: "P.123-XXX"
         name: "Sample Product Team"
         product_team_id: "F5H1R.55e86121-3826-468c-a6f0-dd0f1fbc0259"
         ods_code: "F5H1R"
@@ -141,7 +141,37 @@ components:
           - key_type: "foo"
             key_value: "bar"
         created_on: "2024-10-15T10:00:00Z"
-        updated_on: "2024-10-15T10:00:00Z"
+        updated_on: "null"
+        deleted_on: "null"
+    CPMProductResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        product_team_id:
+          type: string
+        ods_code:
+          type: string
+        status:
+          type: string
+        created_on:
+          type: string
+        updated_on:
+          type: string
+          nullable: true
+        deleted_on:
+          type: string
+          nullable: true
+      example:
+        id: "P.1X3-XXX"
+        name: "Sample Product Team"
+        product_team_id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
+        ods_code: "F5H1R"
+        status: "active"
+        created_on: "2024-10-15T10:00:00Z"
+        updated_on: "null"
         deleted_on: "null"
 
     Questionnaire:

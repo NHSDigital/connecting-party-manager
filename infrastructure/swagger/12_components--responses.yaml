@@ -138,13 +138,13 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProductResponse"
+            $ref: "#/components/schemas/CPMProductResponse"
     ProductRead:
       description: Read Product operation successful
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProductResponse"
+            $ref: "#/components/schemas/CPMProductResponse"
     EprProductCreate:
       description: Create Epr Product operation successful
       content:
