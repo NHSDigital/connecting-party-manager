@@ -4,7 +4,7 @@ from typing import Literal
 from domain.core.enum import Environment
 from domain.core.product_team_key import ProductTeamKey
 from domain.repository.questionnaire_repository import QuestionnaireInstance
-from pydantic import BaseModel, Extra, Field, root_validator
+from pydantic import BaseModel, Extra, Field, root_validator, validator
 
 ALPHANUMERIC_SPACES_AND_UNDERSCORES = r"^[a-zA-Z0-9 _]*$"
 
@@ -20,6 +20,12 @@ class ProductTeamPathParams(BaseModel, extra=Extra.forbid):
 
 class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
     name: str = Field(...)
+
+    @validator("name")
+    def validate_name(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("ensure this value has at least 1 characters")
+        return v
 
 
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
@@ -42,6 +48,12 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
     ods_code: str = Field(...)
     name: str = Field(...)
     keys: list[ProductTeamKey] = Field(default_factory=list)
+
+    @validator("name")
+    def validate_name(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("ensure this value has at least 1 characters")
+        return v
 
     def __init__(self, **data):
         super().__init__(**data)

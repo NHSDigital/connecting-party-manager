@@ -1,10 +1,10 @@
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device, DeviceKeyDeletedEvent
 from domain.core.device_reference_data.v1 import (
     DeviceReferenceData,
     QuestionnaireResponseUpdatedEvent,
 )
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.root.v1 import Root
 from domain.repository.device_reference_data_repository.v1 import (
@@ -30,16 +30,16 @@ from test_helpers.dynamodb import mock_table  # noqa
 @pytest.fixture
 def product_team():
     ods_org = Root.create_ods_organisation(ods_code="AAA")
-    return ods_org.create_product_team(name="my product team")
+    return ods_org.create_product_team_epr(name="my product team")
 
 
 @pytest.fixture
 def product(product_team: ProductTeam):
-    return product_team.create_cpm_product(name="my product")
+    return product_team.create_epr_product(name="my product")
 
 
 @pytest.fixture
-def message_sets_with_two_cpa_ids(product: CpmProduct, mhs_1: NhsMhs, mhs_2: NhsMhs):
+def message_sets_with_two_cpa_ids(product: EprProduct, mhs_1: NhsMhs, mhs_2: NhsMhs):
     message_set_data = get_message_set_data(
         message_handling_systems=[mhs_1.dict(), mhs_2.dict()],
         message_set_questionnaire=QuestionnaireRepository().read(
@@ -60,7 +60,7 @@ def message_sets_with_two_cpa_ids(product: CpmProduct, mhs_1: NhsMhs, mhs_2: Nhs
 def mhs_device_with_two_cpa_ids(
     mhs_1: NhsMhs,
     message_sets_with_two_cpa_ids: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
 ):
     mhs_device_data = get_mhs_device_data(
         mhs=mhs_1.dict(),
@@ -81,7 +81,7 @@ def mhs_device_with_two_cpa_ids(
 
 
 @pytest.fixture
-def message_sets_with_one_cpa_id(product: CpmProduct, mhs_1: NhsMhs):
+def message_sets_with_one_cpa_id(product: EprProduct, mhs_1: NhsMhs):
     message_set_data = get_message_set_data(
         message_handling_systems=[mhs_1.dict()],
         message_set_questionnaire=QuestionnaireRepository().read(
@@ -102,7 +102,7 @@ def message_sets_with_one_cpa_id(product: CpmProduct, mhs_1: NhsMhs):
 def mhs_device_with_one_cpa_id(
     mhs_1: NhsMhs,
     message_sets_with_one_cpa_id: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
 ):
     mhs_device_data = get_mhs_device_data(
         mhs=mhs_1.dict(),

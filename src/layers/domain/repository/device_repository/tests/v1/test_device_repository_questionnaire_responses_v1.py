@@ -63,8 +63,8 @@ def device(
     health_response = health_questionnaire.validate({"weight": 123, "height": 345})
 
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Team")
+    product = product_team.create_epr_product(name="Product")
     device = product.create_device(name="Device-1", environment=Environment.DEV)
     device.add_questionnaire_response(questionnaire_response=shoe_response_1)
     device.add_questionnaire_response(questionnaire_response=shoe_response_2)

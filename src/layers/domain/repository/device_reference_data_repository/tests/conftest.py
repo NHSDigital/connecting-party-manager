@@ -20,8 +20,8 @@ def repository(request) -> Generator[DeviceReferenceDataRepository, None, None]:
 @pytest.fixture
 def device_reference_data():
     org = Root.create_ods_organisation(ods_code="ABC")
-    product_team = org.create_product_team(name="product-team-name")
-    product = product_team.create_cpm_product(name="product")
+    product_team = org.create_product_team_epr(name="product-team-name")
+    product = product_team.create_epr_product(name="product")
     environment = Environment.DEV
     return product.create_device_reference_data(
         name="device-reference-data", environment=environment

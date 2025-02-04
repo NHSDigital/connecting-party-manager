@@ -22,24 +22,27 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     """
 
     import api.createCpmProduct.index
-    import api.createCpmProductForEpr.index
     import api.createDevice.index
     import api.createDeviceAccreditedSystem.index
     import api.createDeviceMessageHandlingSystem.index
     import api.createDeviceReferenceData.index
     import api.createDeviceReferenceDataASActions.index
     import api.createDeviceReferenceDataMessageSet.index
+    import api.createEprProduct.index
     import api.createProductTeam.index
     import api.createProductTeamEpr.index
-    import api.deleteCpmProduct.index
+    import api.deleteEprProduct.index
     import api.readCpmProduct.index
     import api.readDevice.index
     import api.readDeviceReferenceData.index
+
+    # import api.searchCpmProduct.index
+    import api.readEprProduct.index
     import api.readProductTeam.index
     import api.readProductTeamEpr.index
     import api.readQuestionnaire.index
-    import api.searchCpmProduct.index
     import api.searchDeviceReferenceData.index
+    import api.searchEprProduct.index
     import api.searchSdsDevice.index
     import api.searchSdsEndpoint.index
     import api.status.index
@@ -48,23 +51,25 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
         "POST": {
             "ProductTeam": api.createProductTeam.index,
             "ProductTeamEpr": api.createProductTeamEpr.index,
-            "ProductTeamEpr/{product_team_id}/Product": api.createCpmProduct.index,
-            "ProductTeamEpr/{product_team_id}/Product/Epr": api.createCpmProductForEpr.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData": api.createDeviceReferenceData.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions": api.createDeviceReferenceDataASActions.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet": api.createDeviceReferenceDataMessageSet.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device": api.createDevice.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/MessageHandlingSystem": api.createDeviceMessageHandlingSystem.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/AccreditedSystem": api.createDeviceAccreditedSystem.index,
+            "ProductTeam/{product_team_id}/Product": api.createCpmProduct.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr": api.createEprProduct.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData": api.createDeviceReferenceData.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions": api.createDeviceReferenceDataASActions.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet": api.createDeviceReferenceDataMessageSet.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device": api.createDevice.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/MessageHandlingSystem": api.createDeviceMessageHandlingSystem.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/AccreditedSystem": api.createDeviceAccreditedSystem.index,
         },
         "GET": {
             "ProductTeam/{product_team_id}": api.readProductTeam.index,
+            "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
             "ProductTeamEpr/{product_team_id}": api.readProductTeamEpr.index,
-            "ProductTeamEpr/{product_team_id}/Product": api.searchCpmProduct.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData": api.searchDeviceReferenceData.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}": api.readDeviceReferenceData.index,
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/{device_id}": api.readDevice.index,
+            # "ProductTeamEpr/{product_team_id}/Product": api.searchCpmProduct.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr": api.searchEprProduct.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}": api.readEprProduct.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData": api.searchDeviceReferenceData.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}": api.readDeviceReferenceData.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/{device_id}": api.readDevice.index,
             "Questionnaire/{questionnaire_id}": api.readQuestionnaire.index,
             "searchSdsDevice?nhs_id_code={nhs_id_code}": api.searchSdsDevice.index,
             "searchSdsDevice?nhs_as_svc_ia={nhs_as_svc_ia}": api.searchSdsDevice.index,
@@ -74,7 +79,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "_status": api.status.index,
         },
         "DELETE": {
-            "ProductTeamEpr/{product_team_id}/Product/{product_id}": api.deleteCpmProduct.index,
+            "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}": api.deleteEprProduct.index,
         },
     }
 

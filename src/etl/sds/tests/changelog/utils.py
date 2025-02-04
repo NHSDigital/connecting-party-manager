@@ -3,12 +3,12 @@ from pathlib import Path
 from typing import Any, Generator, Literal, Protocol
 
 from domain.core.enum import Environment
-from domain.repository.cpm_product_repository.v1 import CpmProduct, CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceData,
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import Device, DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProduct, EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import (
     ProductTeam,
     ProductTeamRepository,
@@ -102,9 +102,9 @@ def convert_list_likes(obj):
 
 def as_domain_object(
     obj: dict,
-) -> ProductTeam | CpmProduct | Device | DeviceReferenceData:
+) -> ProductTeam | EprProduct | Device | DeviceReferenceData:
     errors = []
-    for model in (ProductTeam, CpmProduct, Device, DeviceReferenceData):
+    for model in (ProductTeam, EprProduct, Device, DeviceReferenceData):
         try:
             instance = model(**obj)
             if instance.state().keys() == obj.keys():
@@ -117,9 +117,9 @@ def as_domain_object(
 
 def read_all(
     table_name: str, db_client: "DynamoDBClient"
-) -> Generator[ProductTeam | CpmProduct | Device | DeviceReferenceData, None, None]:
+) -> Generator[ProductTeam | EprProduct | Device | DeviceReferenceData, None, None]:
     product_team_repo = ProductTeamRepository(table_name, db_client)
-    product_repo = CpmProductRepository(table_name, db_client)
+    product_repo = EprProductRepository(table_name, db_client)
     device_repo = DeviceRepository(table_name, db_client)
     drd_repo = DeviceReferenceDataRepository(table_name, db_client)
 

@@ -1,14 +1,14 @@
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.questionnaire.v1 import QuestionnaireResponse
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
     QuestionnaireRepository,
@@ -50,7 +50,7 @@ def product(product_team):
 
 
 @pytest.fixture
-def additional_interactions(product: CpmProduct):
+def additional_interactions(product: EprProduct):
     return create_additional_interactions(
         product=product,
         party_key=product.keys[0].key_value,
@@ -59,7 +59,7 @@ def additional_interactions(product: CpmProduct):
 
 
 @pytest.fixture
-def message_sets(product: CpmProduct):
+def message_sets(product: EprProduct):
     return create_message_sets(
         product=product,
         party_key=product.keys[0].key_value,
@@ -89,7 +89,7 @@ def mhs_device_data():
 
 @pytest.fixture
 def mhs_device(
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     mhs_device_data: QuestionnaireResponse,
 ):
@@ -125,7 +125,7 @@ def as_device_data():
 
 @pytest.fixture
 def as_device(
-    product: CpmProduct,
+    product: EprProduct,
     as_device_data: QuestionnaireResponse,
     additional_interactions: DeviceReferenceData,
     message_sets: DeviceReferenceData,
@@ -154,7 +154,7 @@ def product_team_repository(db_client):
 
 @pytest.fixture
 def product_repository(db_client):
-    yield CpmProductRepository(table_name="foo", dynamodb_client=db_client)
+    yield EprProductRepository(table_name="foo", dynamodb_client=db_client)
 
 
 @pytest.fixture
@@ -193,8 +193,8 @@ def test_read_or_create_epr_product_team_default(
 
 def test_read_or_create_epr_product(
     product_team: ProductTeam,
-    product: CpmProduct,
-    product_repository: CpmProductRepository,
+    product: EprProduct,
+    product_repository: EprProductRepository,
 ):
     product_repository.write(product)
     _product = read_or_create_epr_product(
@@ -208,8 +208,8 @@ def test_read_or_create_epr_product(
 
 def test_read_or_create_epr_product_default(
     product_team: ProductTeam,
-    product: CpmProduct,
-    product_repository: CpmProductRepository,
+    product: EprProduct,
+    product_repository: EprProductRepository,
 ):
     _product = read_or_create_epr_product(
         product_team=product_team,
@@ -228,7 +228,7 @@ def test_read_or_create_epr_product_default(
 
 def test_read_additional_interactions_if_exists(
     additional_interactions: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
     device_reference_data_repository: DeviceReferenceDataRepository,
 ):
     device_reference_data_repository.write(additional_interactions)
@@ -241,7 +241,7 @@ def test_read_additional_interactions_if_exists(
 
 
 def test_read_additional_interactions_if_exists_default(
-    product: CpmProduct,
+    product: EprProduct,
     device_reference_data_repository: DeviceReferenceDataRepository,
 ):
     _additional_interactions = read_additional_interactions_if_exists(
@@ -254,7 +254,7 @@ def test_read_additional_interactions_if_exists_default(
 
 def test_read_or_create_empty_message_sets(
     message_sets: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
     device_reference_data_repository: DeviceReferenceDataRepository,
 ):
     device_reference_data_repository.write(message_sets)
@@ -268,7 +268,7 @@ def test_read_or_create_empty_message_sets(
 
 def test_read_or_create_empty_message_sets_default(
     message_sets: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
     device_reference_data_repository: DeviceReferenceDataRepository,
 ):
     _message_sets = read_or_create_empty_message_sets(
@@ -287,7 +287,7 @@ def test_read_or_create_empty_message_sets_default(
 
 def test_read_or_update_mhs_device(
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     device_repository: DeviceRepository,
     message_sets: DeviceReferenceData,
     mhs_device: Device,
@@ -310,7 +310,7 @@ def test_read_or_update_mhs_device(
 
 def test_create_or_update_mhs_device_default(
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     device_repository: DeviceRepository,
     message_sets: DeviceReferenceData,
     mhs_device: Device,

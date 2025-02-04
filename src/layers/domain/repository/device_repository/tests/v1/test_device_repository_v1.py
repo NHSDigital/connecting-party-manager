@@ -20,8 +20,8 @@ DEVICE_KEY = "P.WWW-XXX"
 @pytest.fixture
 def device() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Product Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Product Team")
+    product = product_team.create_epr_product(name="Product")
     environment = Environment.DEV
     device = product.create_device(name="Device-1", environment=environment)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
@@ -31,8 +31,8 @@ def device() -> Device:
 @pytest.fixture
 def device_with_tag() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Product Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Product Team")
+    product = product_team.create_epr_product(name="Product")
     environment = Environment.DEV
     device = product.create_device(name="Device-1", environment=environment)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
@@ -45,8 +45,8 @@ def device_with_tag() -> Device:
 @pytest.fixture
 def another_device_with_same_key() -> Device:
     org = Root.create_ods_organisation(ods_code="AB123")
-    product_team = org.create_product_team(name="Product Team")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="Product Team")
+    product = product_team.create_epr_product(name="Product")
     environment = Environment.DEV
     device = product.create_device(name="Device-2", environment=environment)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
@@ -204,8 +204,8 @@ def test__device_repository__can_delete_second_device_with_same_key(
     repository: DeviceRepository,
 ):
     org = Root.create_ods_organisation(ods_code="AAA")
-    product_team = org.create_product_team(name="MyTeam")
-    product = product_team.create_cpm_product(name="Product")
+    product_team = org.create_product_team_epr(name="MyTeam")
+    product = product_team.create_epr_product(name="Product")
     device = product.create_device(name="OriginalDevice", environment=Environment.DEV)
     device.add_key(key_value=DEVICE_KEY, key_type=DeviceKeyType.PRODUCT_ID)
     repository.write(device)

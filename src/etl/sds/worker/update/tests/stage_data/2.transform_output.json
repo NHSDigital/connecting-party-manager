@@ -8,11 +8,16 @@
       "created_on": "2024-12-10T11:05:46.696830+00:00",
       "updated_on": null,
       "deleted_on": null,
-      "keys": [{ "key_type": "epr_id", "key_value": "EPR-LSP04" }]
+      "keys": [
+        {
+          "key_type": "epr_id",
+          "key_value": "EPR-LSP04"
+        }
+      ]
     }
   },
   {
-    "cpm_product_created_event": {
+    "epr_product_created_event": {
       "id": "P.JRH-EVC",
       "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
       "name": "My AAA Product",
@@ -24,8 +29,11 @@
     }
   },
   {
-    "cpm_product_key_added_event": {
-      "new_key": { "key_type": "party_key", "key_value": "AAA-111111" },
+    "epr_product_key_added_event": {
+      "new_key": {
+        "key_type": "party_key",
+        "key_value": "AAA-111111"
+      },
       "id": "P.JRH-EVC",
       "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
       "name": "My AAA Product",
@@ -34,7 +42,12 @@
       "created_on": "2024-12-10T11:05:46.698233+00:00",
       "updated_on": "2024-12-10T11:05:46.698475+00:00",
       "deleted_on": null,
-      "keys": [{ "key_type": "party_key", "key_value": "AAA-111111" }]
+      "keys": [
+        {
+          "key_type": "party_key",
+          "key_value": "AAA-111111"
+        }
+      ]
     }
   },
   {
@@ -134,7 +147,10 @@
   },
   {
     "device_key_added_event": {
-      "new_key": { "key_type": "cpa_id", "key_value": "00000000000a" },
+      "new_key": {
+        "key_type": "cpa_id",
+        "key_value": "00000000000a"
+      },
       "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
       "name": "AAA-111111 - Message Handling System",
       "product_team_id": "LSP04.d2440e42-ce71-47ea-b1e1-d7f3a2bf42aa",
@@ -145,7 +161,12 @@
       "created_on": "2024-12-10T11:05:46.705095+00:00",
       "updated_on": "2024-12-10T11:05:46.705545+00:00",
       "deleted_on": null,
-      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
+      "keys": [
+        {
+          "key_type": "cpa_id",
+          "key_value": "00000000000a"
+        }
+      ],
       "tags": [],
       "questionnaire_responses": {
         "spine_mhs/1": [
@@ -178,7 +199,12 @@
   {
     "device_reference_data_id_added_event": {
       "id": "71ccbaf5-29f7-404b-87b7-7b0a0d02639d",
-      "keys": [{ "key_type": "cpa_id", "key_value": "00000000000a" }],
+      "keys": [
+        {
+          "key_type": "cpa_id",
+          "key_value": "00000000000a"
+        }
+      ],
       "tags": [],
       "device_reference_data": {
         "3b66cdef-a172-4cb2-8cea-cec6e2e78f47": ["*"]

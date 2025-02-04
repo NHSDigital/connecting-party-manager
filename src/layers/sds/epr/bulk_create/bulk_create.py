@@ -1,7 +1,7 @@
 from typing import Literal
 
 from domain.core.aggregate_root import AggregateRoot
-from domain.core.product_team.v1 import ProductTeam
+from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
 from sds.domain.nhs_mhs import NhsMhs
 from sds.epr.constants import SdsFieldName

@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from botocore.exceptions import ClientError
 from domain.core.device.v1 import DeviceTag
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
@@ -15,6 +14,7 @@ from domain.repository.device_repository.v1 import (
     DeviceRepository,
     compress_device_fields,
 )
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.keys.v1 import KEY_SEPARATOR, TableKey
 from domain.repository.marshall import marshall
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
@@ -143,7 +143,7 @@ class BulkRepository:
         self.product_team_repository = ProductTeamRepository(
             table_name=None, dynamodb_client=None
         )
-        self.product_repository = CpmProductRepository(
+        self.product_repository = EprProductRepository(
             table_name=None, dynamodb_client=None
         )
         self.device_repository = DeviceRepository(table_name=None, dynamodb_client=None)
@@ -195,7 +195,7 @@ class BulkRepository:
         ]
         return [create_root_transaction, *create_keys_transactions]
 
-    def handle_CpmProduct(self, item: dict):
+    def handle_EprProduct(self, item: dict):
         parent_key_parts = (item["product_team_id"],)
         create_root_transaction = create_index_batch(
             id=item["id"],

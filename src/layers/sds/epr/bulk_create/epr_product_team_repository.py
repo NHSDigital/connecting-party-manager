@@ -1,7 +1,7 @@
 from collections.abc import Generator
 from typing import TYPE_CHECKING
 
-from domain.core.product_team.v1 import ProductTeam
+from domain.core.product_team_epr.v1 import ProductTeam
 from domain.repository.device_reference_data_repository.v1 import QueryType
 from domain.repository.keys.v1 import TableKey
 from domain.repository.marshall import marshall, unmarshall

@@ -15,6 +15,9 @@ def _read_core_test_data(file_name: str) -> dict | list:
 CPM_PRODUCT_TEAM_ID = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-id.json"
 )
+CPM_PRODUCT_TEAM_NO_NAME = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-no-name.json"
+)
 CPM_PRODUCT_TEAM_NO_ID = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-team-example-no-id.json"
 )
@@ -32,6 +35,9 @@ CPM_PRODUCT_TEAM_EXTRA_PARAMS = _read_core_test_data(
 )
 CPM_PRODUCT = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-example.json"
+)
+CPM_PRODUCT_NO_NAME = _read_core_test_data(
+    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-example-no-name.json"
 )
 CPM_PRODUCT_EXTRA_PARAMS = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-example-extra.json"

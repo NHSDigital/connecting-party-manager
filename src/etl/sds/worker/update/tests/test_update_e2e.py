@@ -2,16 +2,16 @@ from collections import defaultdict
 from pathlib import Path
 
 from botocore.config import Config
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team_epr.v1 import ProductTeam
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 
 # Configure the boto3 retry settings
@@ -35,7 +35,7 @@ def aggregate_database(table_name, dynamodb_client):
     product_team_repo = ProductTeamRepository(
         table_name=table_name, dynamodb_client=dynamodb_client
     )
-    product_repo = CpmProductRepository(
+    product_repo = EprProductRepository(
         table_name=table_name, dynamodb_client=dynamodb_client
     )
     device_repo = DeviceRepository(
@@ -53,7 +53,7 @@ def aggregate_database(table_name, dynamodb_client):
 
         for product in product_repo.search(product_team_id=product_team.id):
             (product_key,) = product.keys
-            _product_data = _product_team_data[CpmProduct][product_key.key_value]
+            _product_data = _product_team_data[EprProduct][product_key.key_value]
 
             _product_data[Device] = sorted(
                 device.name

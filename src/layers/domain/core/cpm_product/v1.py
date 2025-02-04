@@ -1,15 +1,10 @@
 from datetime import datetime
 
 from attr import dataclass
-from domain.core import event
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.cpm_system_id import ProductId
-from domain.core.device import UPDATED_ON, Device, DeviceCreatedEvent, event
-from domain.core.device_reference_data import (
-    DeviceReferenceData,
-    DeviceReferenceDataCreatedEvent,
-)
-from domain.core.enum import Environment, Status
+from domain.core.device import UPDATED_ON, event
+from domain.core.enum import Status
 from domain.core.error import DuplicateError
 from domain.core.event import Event, EventDeserializer
 from domain.core.product_key import ProductKey
@@ -71,40 +66,6 @@ class CpmProduct(AggregateRoot):
     updated_on: datetime = Field(default=None)
     deleted_on: datetime = Field(default=None)
     keys: list[ProductKey] = Field(default_factory=list)
-
-    def create_device(
-        self,
-        name: str,
-        environment: Environment,
-        status: Status = Status.ACTIVE,
-    ) -> Device:
-        device = Device(
-            name=name,
-            product_team_id=self.product_team_id,
-            product_id=self.id,
-            ods_code=self.ods_code,
-            status=status,
-            environment=environment,
-        )
-        device_created_event = DeviceCreatedEvent(**device.dict())
-        device.add_event(device_created_event)
-        return device
-
-    def create_device_reference_data(
-        self, name: str, environment: Environment
-    ) -> DeviceReferenceData:
-        device_reference_data = DeviceReferenceData(
-            name=name,
-            product_id=self.id,
-            product_team_id=self.product_team_id,
-            ods_code=self.ods_code,
-            environment=environment,
-        )
-        event = DeviceReferenceDataCreatedEvent(
-            **device_reference_data.dict(exclude={"questionnaire_responses"})
-        )
-        device_reference_data.add_event(event)
-        return device_reference_data
 
     @event
     def add_key(self, key_type: str, key_value: str) -> CpmProductKeyAddedEvent:

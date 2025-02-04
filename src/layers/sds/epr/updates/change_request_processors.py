@@ -1,19 +1,19 @@
 from collections.abc import Callable
 
 from domain.api.sds.query import SearchSDSDeviceQueryParams
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_key.v1 import DeviceKey, DeviceKeyType
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.error import ImmutableFieldError
 from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.questionnaire.v1 import Questionnaire, QuestionnaireResponse
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository.v1 import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from sds.epr.constants import (
     CPM_ACCREDITED_SYSTEM_IMMUTABLE_FIELDS,
@@ -59,14 +59,14 @@ from sds.epr.utils import (
 def process_request_to_add_mhs(
     mhs: dict,
     product_team_repository: ProductTeamRepository,
-    product_repository: CpmProductRepository,
+    product_repository: EprProductRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
     device_repository: DeviceRepository,
     mhs_device_questionnaire: Questionnaire,
     mhs_device_field_mapping: dict,
     message_set_questionnaire: Questionnaire,
     message_set_field_mapping: dict,
-) -> list[ProductTeam, CpmProduct, DeviceReferenceData, DeviceReferenceData, Device]:
+) -> list[ProductTeam, EprProduct, DeviceReferenceData, DeviceReferenceData, Device]:
     cpa_id = mhs["nhs_mhs_cpa_id"]
     product_name = mhs["nhs_product_name"] or cpa_id
     party_key = mhs["nhs_mhs_party_key"]
@@ -138,13 +138,13 @@ def process_request_to_add_mhs(
 def process_request_to_add_as(
     accredited_system: dict,
     product_team_repository: ProductTeamRepository,
-    product_repository: CpmProductRepository,
+    product_repository: EprProductRepository,
     device_reference_data_repository: DeviceReferenceDataRepository,
     device_repository: DeviceRepository,
     accredited_system_questionnaire: Questionnaire,
     accredited_system_field_mapping: dict,
     additional_interactions_questionnaire: Questionnaire,
-) -> list[ProductTeam, CpmProduct, DeviceReferenceData, Device]:
+) -> list[ProductTeam, EprProduct, DeviceReferenceData, Device]:
     asid = accredited_system["unique_identifier"]
     product_name = accredited_system["nhs_product_name"] or asid
     party_key = accredited_system["nhs_mhs_party_key"]

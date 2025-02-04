@@ -13,11 +13,11 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                      |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers |
     Then I receive a status code "400" with body
@@ -35,11 +35,11 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                                               | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN                            | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN                            | READ_PRACTITIONER_ROLE_R4_V001 |
@@ -59,11 +59,11 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                           | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN        | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN        | READ_PRACTITIONER_ROLE_R4_V001 |
@@ -83,11 +83,11 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                        | value |
       | questionnaire_responses.bad_questionnaire_name.0.some_value | 123   |
     Then I receive a status code "400" with body
@@ -105,13 +105,13 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
     Then I receive a status code "400" with body
       | path             | value                                                                                                                             |
       | errors.0.code    | VALIDATION_ERROR                                                                                                                  |
@@ -121,38 +121,18 @@ Feature: Create "Message Set" Device Reference Data - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 186              |
 
-  Scenario: Fail to create an "MHS Message Set" Device Reference Data in non-EPR product
-    Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
-      | path     | value                 |
-      | name     | My Great Product Team |
-      | ods_code | F5H1R                 |
-    And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product" with body:
-      | path | value            |
-      | name | My Great Product |
-    And I note the response field "$.id" as "product_id"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet"
-    Then I receive a status code "400" with body
-      | path             | value                                                                                  |
-      | errors.0.code    | VALIDATION_ERROR                                                                       |
-      | errors.0.message | Not an EPR Product: Cannot create MHS Device for product without exactly one Party Key |
-    And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 143              |
-
   Scenario: Fail to create an "MHS Message Set" Device Reference Data, with questionnaire responses with duplicate interaction IDs
     Given I have already made a "POST" request with "default" headers to "ProductTeamEpr" with body:
       | path     | value                 |
       | name     | My Great Product Team |
       | ods_code | F5H1R                 |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/MhsMessageSet" with body:
       | path                                                    | value                          |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS SN | urn:nhs:names:services:ers     |
       | questionnaire_responses.spine_mhs_message_sets.0.MHS IN | READ_PRACTITIONER_ROLE_R4_V001 |

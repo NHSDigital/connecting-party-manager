@@ -54,8 +54,8 @@ def test__parse_params_from_url_fail(path_template: str, path: str):
 
 def test__parse_params_from_url_post_product():
     path_params, _, result = _parse_params_from_url(
-        path_template="ProductTeamEpr/{product_team_id}/Product",
-        path="ProductTeamEpr/123/Product",
+        path_template="ProductTeamEpr/{product_team_id}/ProductEpr",
+        path="ProductTeamEpr/123/ProductEpr",
     )
     assert result is True
     assert path_params == {"product_team_id": "123"}
@@ -121,7 +121,7 @@ def test_parse_path_create_cpm_product():
 
     assert parse_api_path(
         method="POST",
-        path="ProductTeamEpr/123/Product",
+        path="ProductTeam/123/Product",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123"}, {}, api.createCpmProduct.index)
 
@@ -134,22 +134,60 @@ def test_parse_path_read_cpm_product():
 
     assert parse_api_path(
         method="GET",
-        path="ProductTeamEpr/123/Product/456",
+        path="ProductTeam/123/Product/456",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readCpmProduct.index)
 
 
-def test_parse_path_search_product():
+# def test_parse_path_search_cpm_product():
+#     with api_lambda_environment_variables():
+#         import api.searchCpmProduct.index
+#
+#         endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+#
+#     assert parse_api_path(
+#         method="GET",
+#         path="ProductTeam/123/Product",
+#         endpoint_lambda_mapping=endpoint_lambda_mapping,
+#     ) == ({"product_team_id": "123"}, {}, api.searchCpmProduct.index)
+#
+def test_parse_path_create_epr_product():
     with api_lambda_environment_variables():
-        import api.searchCpmProduct.index
+        import api.createEprProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="POST",
+        path="ProductTeamEpr/123/ProductEpr",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({"product_team_id": "123"}, {}, api.createEprProduct.index)
+
+
+def test_parse_path_read_epr_product():
+    with api_lambda_environment_variables():
+        import api.readEprProduct.index
 
         endpoint_lambda_mapping = get_endpoint_lambda_mapping()
 
     assert parse_api_path(
         method="GET",
-        path="ProductTeamEpr/123/Product",
+        path="ProductTeamEpr/123/ProductEpr/456",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({"product_team_id": "123"}, {}, api.searchCpmProduct.index)
+    ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readEprProduct.index)
+
+
+def test_parse_path_search_epr_product():
+    with api_lambda_environment_variables():
+        import api.searchEprProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="ProductTeamEpr/123/ProductEpr",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({"product_team_id": "123"}, {}, api.searchEprProduct.index)
 
 
 def test_parse_path_create_device():
@@ -160,7 +198,7 @@ def test_parse_path_create_device():
 
     assert parse_api_path(
         method="POST",
-        path="ProductTeamEpr/123/Product/456/dev/Device",
+        path="ProductTeamEpr/123/ProductEpr/456/dev/Device",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {"product_team_id": "123", "product_id": "456", "environment": "dev"},
@@ -177,7 +215,7 @@ def test_parse_path_read_device():
 
     assert parse_api_path(
         method="GET",
-        path="ProductTeamEpr/123/Product/456/dev/Device/789",
+        path="ProductTeamEpr/123/ProductEpr/456/dev/Device/789",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {
@@ -199,7 +237,7 @@ def test_parse_path_create_device_reference_data():
 
     assert parse_api_path(
         method="POST",
-        path="ProductTeamEpr/123/Product/456/dev/DeviceReferenceData",
+        path="ProductTeamEpr/123/ProductEpr/456/dev/DeviceReferenceData",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {"product_team_id": "123", "product_id": "456", "environment": "dev"},
@@ -216,7 +254,7 @@ def test_parse_path_read_device_reference_data():
 
     assert parse_api_path(
         method="GET",
-        path="ProductTeamEpr/123/Product/456/dev/DeviceReferenceData/789",
+        path="ProductTeamEpr/123/ProductEpr/456/dev/DeviceReferenceData/789",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {
@@ -238,7 +276,7 @@ def test_parse_path_search_device_reference_data():
 
     assert parse_api_path(
         method="GET",
-        path="ProductTeamEpr/123/Product/456/dev/DeviceReferenceData",
+        path="ProductTeamEpr/123/ProductEpr/456/dev/DeviceReferenceData",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {"product_team_id": "123", "product_id": "456", "environment": "dev"},
@@ -255,7 +293,7 @@ def test_parse_path_create_mhs_device():
 
     assert parse_api_path(
         method="POST",
-        path="ProductTeamEpr/123/Product/456/dev/Device/MessageHandlingSystem",  # pragma: allowlist secret
+        path="ProductTeamEpr/123/ProductEpr/456/dev/Device/MessageHandlingSystem",  # pragma: allowlist secret
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {"product_team_id": "123", "product_id": "456", "environment": "dev"},
@@ -272,7 +310,7 @@ def test_parse_path_create_as_device():
 
     assert parse_api_path(
         method="POST",
-        path="ProductTeamEpr/123/Product/456/dev/Device/AccreditedSystem",  # pragma: allowlist secret
+        path="ProductTeamEpr/123/ProductEpr/456/dev/Device/AccreditedSystem",  # pragma: allowlist secret
         endpoint_lambda_mapping=endpoint_lambda_mapping,
     ) == (
         {"product_team_id": "123", "product_id": "456", "environment": "dev"},

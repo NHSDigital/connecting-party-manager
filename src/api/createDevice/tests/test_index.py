@@ -7,13 +7,13 @@ from typing import Any, Generator
 from unittest import mock
 
 import pytest
-from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
 from domain.core.device import Device
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.root import Root
-from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.device_repository import DeviceRepository
+from domain.repository.epr_product_repository import EprProductRepository
 from domain.repository.product_team_epr_repository import ProductTeamRepository
 from event.json import json_loads
 
@@ -31,9 +31,9 @@ VERSION = 1
 
 
 @contextmanager
-def mock_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
+def mock_product() -> Generator[tuple[ModuleType, EprProduct], Any, None]:
     org = Root.create_ods_organisation(ods_code=ODS_CODE)
-    product_team = org.create_product_team(name=PRODUCT_TEAM_NAME)
+    product_team = org.create_product_team_epr(name=PRODUCT_TEAM_NAME)
 
     with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
@@ -45,10 +45,10 @@ def mock_product() -> Generator[tuple[ModuleType, CpmProduct], Any, None]:
         )
         product_team_repo.write(entity=product_team)
 
-        product = product_team.create_cpm_product(
+        product = product_team.create_epr_product(
             name=PRODUCT_NAME, product_id=PRODUCT_ID
         )
-        product_repo = CpmProductRepository(
+        product_repo = EprProductRepository(
             table_name=TABLE_NAME, dynamodb_client=client
         )
         product_repo.write(entity=product)

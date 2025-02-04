@@ -121,7 +121,7 @@ module "lambdas" {
     }
   }
   environment_variables = {
-    DYNAMODB_TABLE = contains(["createProductTeam", "readProductTeam"], each.key) ? module.cpmtable.dynamodb_table_name : module.eprtable.dynamodb_table_name
+    DYNAMODB_TABLE = contains(["createProductTeam", "readProductTeam", "createCpmProduct", "readCpmProduct", "searchCpmProduct", "deleteCpmProduct"], each.key) ? module.cpmtable.dynamodb_table_name : module.eprtable.dynamodb_table_name
   }
   attach_policy_statements = length((fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json"))) > 0
   policy_statements = {

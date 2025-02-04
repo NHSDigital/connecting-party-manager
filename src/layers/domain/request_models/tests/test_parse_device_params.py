@@ -11,7 +11,7 @@ def test_device():
     assert product.name == CPM_DEVICE["name"]
 
 
-def test_validate_cpm_product_raises_no_extra_fields():
+def test_validate_epr_product_raises_no_extra_fields():
     with pytest.raises(ValidationError) as exc:
         CreateDeviceIncomingParams(**CPM_DEVICE_EXTRA_PARAMS)
 

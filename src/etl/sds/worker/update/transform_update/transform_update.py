@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 
 import boto3
 from domain.core.event import ExportedEventTypeDef
-from domain.repository.cpm_product_repository.v1 import CpmProductRepository
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
 )
 from domain.repository.device_repository import DeviceRepository
+from domain.repository.epr_product_repository.v1 import EprProductRepository
 from domain.repository.product_team_epr_repository.v1 import ProductTeamRepository
 from domain.repository.questionnaire_repository.v1.questionnaire_repository import (
     QuestionnaireRepository,
@@ -48,7 +48,7 @@ REPO_KWARGS = dict(table_name=ENVIRONMENT.TABLE_NAME, dynamodb_client=DB_CLIENT)
 REPOSITORIES = dict(
     etl_device_repository=EtlDeviceRepository(**REPO_KWARGS),
     product_team_repository=ProductTeamRepository(**REPO_KWARGS),
-    product_repository=CpmProductRepository(**REPO_KWARGS),
+    product_repository=EprProductRepository(**REPO_KWARGS),
     device_repository=DeviceRepository(**REPO_KWARGS),
     device_reference_data_repository=DeviceReferenceDataRepository(**REPO_KWARGS),
 )

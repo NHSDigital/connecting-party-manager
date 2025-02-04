@@ -21,7 +21,7 @@ TABLE_NAME = "hiya"
 
 def _create_org():
     org = Root.create_ods_organisation(ods_code="ABC")
-    product_team = org.create_product_team(
+    product_team = org.create_product_team_epr(
         id=consistent_uuid(1), name="product-team-name-a"
     )
     return product_team

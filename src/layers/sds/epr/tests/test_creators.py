@@ -1,8 +1,8 @@
 import pytest
-from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.product_team_epr import ProductTeam
 from domain.core.timestamp import now
 from domain.repository.questionnaire_repository import (
@@ -229,7 +229,7 @@ def test_create_epr_product_team_exceptional_ods_code(ods_code: str, today_strin
 
 
 def test_create_epr_product(
-    product_team: ProductTeam, product: CpmProduct, today_string: str
+    product_team: ProductTeam, product: EprProduct, today_string: str
 ):
     _product = product.state()
     _product.pop("id")
@@ -252,7 +252,7 @@ def test_create_epr_product(
 
 def test_create_message_sets(
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     today_string: str,
 ):
@@ -306,7 +306,7 @@ def test_create_message_sets(
 
 def test_create_mhs_device(
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     mhs_device: Device,
     today_string: str,
@@ -364,7 +364,7 @@ def test_create_mhs_device(
 
 def test_create_additional_interactions(
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     additional_interactions: DeviceReferenceData,
     today_string: str,
 ):
@@ -421,7 +421,7 @@ def test_create_additional_interactions(
 
 def test_create_as_device(
     product_team: ProductTeam,
-    product: CpmProduct,
+    product: EprProduct,
     message_sets: DeviceReferenceData,
     additional_interactions: DeviceReferenceData,
     as_device: Device,

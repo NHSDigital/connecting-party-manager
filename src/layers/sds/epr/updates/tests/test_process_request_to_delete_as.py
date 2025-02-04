@@ -1,11 +1,11 @@
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import (
     DeviceReferenceData,
     QuestionnaireResponseUpdatedEvent,
 )
 from domain.core.enum import Environment
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.product_team.v1 import ProductTeam
 from domain.core.root.v1 import Root
 from domain.repository.device_reference_data_repository.v1 import (
@@ -35,12 +35,12 @@ from test_helpers.dynamodb import mock_table
 @pytest.fixture
 def product_team():
     ods_org = Root.create_ods_organisation(ods_code="AAA")
-    return ods_org.create_product_team(name="my product team")
+    return ods_org.create_product_team_epr(name="my product team")
 
 
 @pytest.fixture
 def product(product_team: ProductTeam):
-    return product_team.create_cpm_product(name="my product")
+    return product_team.create_epr_product(name="my product")
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def additional_interactions_data(
 def as_device_1(
     accredited_system_1: NhsAccreditedSystem,
     additional_interactions: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
 ):
     as_device_data = get_accredited_system_device_data(
         accredited_system=accredited_system_1.dict(),
@@ -85,7 +85,7 @@ def as_device_1(
 def as_device_2(
     accredited_system_2: NhsAccreditedSystem,
     additional_interactions: DeviceReferenceData,
-    product: CpmProduct,
+    product: EprProduct,
 ):
     as_device_data = get_accredited_system_device_data(
         accredited_system=accredited_system_2.dict(),
@@ -108,7 +108,7 @@ def as_device_2(
 
 
 @pytest.fixture
-def additional_interactions(product: CpmProduct, additional_interactions_data):
+def additional_interactions(product: EprProduct, additional_interactions_data):
     return create_additional_interactions(
         product=product,
         party_key="123",

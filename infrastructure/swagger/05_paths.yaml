@@ -20,9 +20,7 @@ tags:
     description: Core EPR API read endpoints
   - name: Core EPR Deletion Endpoints
     description: Core EPR API deletion endpoints
-  - name: EPR
-    description: EPR API endpoints
-  - name: SDS
+  - name: SDS Search Endpoints
     description: Search Results provided for the SDS FHIR API
 
 paths:
@@ -107,6 +105,8 @@ paths:
     post:
       operationId: createproductteamepr
       summary: Create a Product Team (Epr) resource (POST)
+      description: |
+        - Create an EPR Product Team using a product team ID.
       tags:
         - Core EPR Creation Endpoints
       requestBody:
@@ -133,6 +133,8 @@ paths:
     get:
       operationId: readproductteamepr
       summary: Read a Product Team (Epr) resource (GET)
+      description: |
+        - Read an EPR Product Team using a product team ID.
       tags:
         - Core EPR Read Endpoints
       parameters:
@@ -152,16 +154,16 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeamEpr/{product_team_id}/Product:
+  /ProductTeam/{product_team_id}/Product:
     post:
       operationId: createproductendpoint
       summary: Create a Product resource (POST)
-      tags:
-        - Core EPR Creation Endpoints
       description: |
         This endpoint creates a new Product resource for the specified Product Team.
         **Requirements:**
         - A valid Product Team must exist
+      tags:
+        - Core Product ID Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -182,38 +184,34 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    get:
-      operationId: searchCpmProduct
-      summary: Retrieve all Products associated with a Product Team (GET)
-      description: |
-        - Retrieve all products for a Product Team using a product team ID.
-      tags:
-        - Core EPR Read Endpoints
-      parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
-        - $ref: "#/components/parameters/HeaderVersion"
-        - $ref: "#/components/parameters/HeaderRequestId"
-        - $ref: "#/components/parameters/HeaderCorrelationId"
-      responses:
-        "200":
-          $ref: "#/components/responses/ProductSearch"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_searchCpmProduct}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
+    # get:
+    #   operationId: searchCpmProduct
+    #   summary: Retrieve all Products associated with a Product Team (GET)
+    #   parameters:
+    #     - $ref: "#/components/parameters/ProductTeamId"
+    #     - $ref: "#/components/parameters/HeaderVersion"
+    #     - $ref: "#/components/parameters/HeaderRequestId"
+    #     - $ref: "#/components/parameters/HeaderCorrelationId"
+    #   responses:
+    #     "200":
+    #       $ref: "#/components/responses/ProductSearch"
+    #     "404":
+    #       $ref: "#/components/responses/NotFound"
+    #   x-amazon-apigateway-integration:
+    #     <<: *ApiGatewayIntegration
+    #     uri: ${method_searchCpmProduct}
+    #   security:
+    #     - ${authoriser_name}: []
+    #     - app-level0: []
 
-  /ProductTeamEpr/{product_team_id}/Product/{product_id}:
+  /ProductTeam/{product_team_id}/Product/{product_id}:
     get:
       operationId: readproductendpoint
       summary: Read a Product resource (GET)
       description: |
         - Retrieve a product using a product team ID and product ID.
       tags:
-        - Core EPR Read Endpoints
+        - Core Product ID Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -231,41 +229,37 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    delete:
-      operationId: deleteproductendpoint
-      summary: Delete a Product resource (DELETE)
-      description: |
-        - Delete a product using a product team ID and product ID.
-      tags:
-        - Core EPR Deletion Endpoints
-      parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
-        - $ref: "#/components/parameters/ProductId"
-        - $ref: "#/components/parameters/HeaderVersion"
-        - $ref: "#/components/parameters/HeaderRequestId"
-        - $ref: "#/components/parameters/HeaderCorrelationId"
-      responses:
-        "204":
-          description: Delete Product operation successful
-        "404":
-          $ref: "#/components/responses/NotFound"
-      x-amazon-apigateway-integration:
-        <<: *ApiGatewayIntegration
-        uri: ${method_deleteCpmProduct}
-      security:
-        - ${authoriser_name}: []
-        - app-level0: []
+    # delete:
+    #   operationId: deleteproductendpoint
+    #   summary: Delete a Product resource (DELETE)
+    #   parameters:
+    #     - $ref: "#/components/parameters/ProductTeamId"
+    #     - $ref: "#/components/parameters/ProductId"
+    #     - $ref: "#/components/parameters/HeaderVersion"
+    #     - $ref: "#/components/parameters/HeaderRequestId"
+    #     - $ref: "#/components/parameters/HeaderCorrelationId"
+    #   responses:
+    #     "204":
+    #       description: Delete Product operation successful
+    #     "404":
+    #       $ref: "#/components/responses/NotFound"
+    #   x-amazon-apigateway-integration:
+    #     <<: *ApiGatewayIntegration
+    #     uri: ${method_deleteCpmProduct}
+    #   security:
+    #     - ${authoriser_name}: []
+    #     - app-level0: []
 
-  /ProductTeamEpr/{product_team_id}/Product/Epr:
+  /ProductTeamEpr/{product_team_id}/ProductEpr:
     post:
-      operationId: createproductforeprendpoint
+      operationId: createproductendpointepr
       summary: Create an EPR Product resource (POST)
-      tags:
-        - EPR
       description: |
         This endpoint creates a new EPR Product resource for the specified Product Team.
         **Requirements:**
         - A valid Product Team must exist
+      tags:
+        - Core EPR Creation Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -282,12 +276,85 @@ paths:
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
-        uri: ${method_createCpmProductForEpr}
+        uri: ${method_createEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    get:
+      operationId: searchEprProduct
+      summary: Retrieve all EPR Products associated with a Product Team (GET)
+      description: |
+        - Retrieve all EPR products for an EPR Product Team using a product team ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchEprProduct}
       security:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData
+  /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}:
+    get:
+      operationId: readproductendpointepr
+      summary: Read an EPR Product resource (GET)
+      description: |
+        - Retrieve an EPR product using an EPR product team ID and product ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    delete:
+      operationId: deleteeprproductendpoint
+      summary: Delete an EPR Product resource (DELETE)
+      description: |
+        - Delete an EPR product using an EPR product team ID and product ID.
+      tags:
+        - Core EPR Deletion Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "204":
+          description: Delete Product operation successful
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_deleteEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData
   : get:
       operationId: searchDeviceReferenceData
       summary: Retrieve all Data Reference Data resources associated with a Product (GET)
@@ -343,7 +410,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
   : post:
       operationId: createDeviceReferenceDataMessageSet
       summary: Create a Device Reference Data Message Set resource (POST)
@@ -380,7 +447,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
   : post:
       operationId: createDeviceReferenceDataAdditionalInteractions
       summary: Create a Device Reference Data Additional Interactions resource (POST)
@@ -417,7 +484,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}
   : get:
       operationId: readDeviceReferenceData
       summary: Read a Device Reference Data resource (GET)
@@ -445,8 +512,8 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device:
-    post:
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device
+  : post:
       operationId: createDevice
       summary: Create a Device resource (POST)
       tags:
@@ -476,7 +543,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/{device_id}
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/{device_id}
   : get:
       operationId: readDevice
       summary: Read a Device resource (GET)
@@ -504,7 +571,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/MessageHandlingSystem
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/MessageHandlingSystem
   : post:
       operationId: createDeviceMessageHandlingSystem
       summary: Create a Message Handling System Device resource (POST)
@@ -542,7 +609,7 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  ? /ProductTeamEpr/{product_team_id}/Product/{product_id}/{environment}/Device/AccreditedSystem
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/AccreditedSystem
   : post:
       operationId: createDeviceAccreditedSystem
       summary: Create a Accredited System Device resource (POST)
@@ -587,7 +654,7 @@ paths:
       description: >
         Retrieve a list of Devices to be used primarily by the SDS FHIR API.
       tags:
-        - SDS
+        - SDS Search Endpoints
       parameters:
         - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsManOrg"
@@ -614,7 +681,7 @@ paths:
       description: >
         Retrieve a list of Endpoints to be used primarily by the SDS FHIR API.
       tags:
-        - SDS
+        - SDS Search Endpoints
       parameters:
         - $ref: "#/components/parameters/NhsIdCode"
         - $ref: "#/components/parameters/NhsMhsInteration"

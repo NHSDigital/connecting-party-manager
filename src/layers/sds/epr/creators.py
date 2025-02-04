@@ -1,8 +1,8 @@
-from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_key import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.product_key import ProductKeyType
 from domain.core.product_team_epr import ProductTeam
 from domain.core.product_team_key import ProductTeamKey, ProductTeamKeyType
@@ -36,14 +36,14 @@ def create_epr_product_team(ods_code: str) -> ProductTeam:
 
 def create_epr_product(
     product_team: ProductTeam, product_name: str, party_key: str
-) -> CpmProduct:
-    product = product_team.create_cpm_product(name=product_name)
+) -> EprProduct:
+    product = product_team.create_epr_product(name=product_name)
     product.add_key(key_type=ProductKeyType.PARTY_KEY, key_value=party_key)
     return product
 
 
 def create_message_sets(
-    product: CpmProduct,
+    product: EprProduct,
     party_key: str,
     message_set_data: list[QuestionnaireResponse],
 ) -> DeviceReferenceData:
@@ -57,7 +57,7 @@ def create_message_sets(
 
 
 def create_mhs_device(
-    product: CpmProduct,
+    product: EprProduct,
     party_key: str,
     mhs_device_data: QuestionnaireResponse,
     cpa_ids: list[str],
@@ -78,7 +78,7 @@ def create_mhs_device(
 
 
 def create_additional_interactions(
-    product: CpmProduct,
+    product: EprProduct,
     party_key: str,
     additional_interactions_data: list[QuestionnaireResponse],
 ) -> DeviceReferenceData:
@@ -92,7 +92,7 @@ def create_additional_interactions(
 
 
 def create_as_device(
-    product: CpmProduct,
+    product: EprProduct,
     party_key: str,
     asid: str,
     as_device_data: QuestionnaireResponse,

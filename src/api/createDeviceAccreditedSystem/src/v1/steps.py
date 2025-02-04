@@ -10,7 +10,6 @@ from domain.api.common_steps.sub_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import AsidId
 from domain.core.device import (
     Device,
@@ -20,6 +19,7 @@ from domain.core.device import (
 from domain.core.device_key.v1 import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.error import (
     AccreditedSystemFatalError,
     ConfigurationError,
@@ -125,7 +125,7 @@ def create_asid(data, cache) -> AsidId:
 
 
 def create_as_device(data, cache) -> Device:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     asid: AsidId = data[create_asid]
     payload: CreateAsDeviceIncomingParams = data[parse_as_device_payload]
     party_key: str = data[get_party_key]
@@ -193,7 +193,7 @@ def set_http_status(data, cache) -> tuple[HTTPStatus, dict]:
 
 
 def get_party_key(data, cache) -> str:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     party_keys = (
         key.key_value
         for key in product.keys

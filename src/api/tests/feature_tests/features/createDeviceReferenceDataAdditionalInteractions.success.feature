@@ -15,12 +15,12 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions"
     Then I receive a status code "201" with body
       | path                    | value                                     |
       | id                      | << ignore >>                              |
@@ -39,7 +39,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | Content-Type   | application/json |
       | Content-Length | 375              |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
       | path                    | value                                     |
       | id                      | ${ note(device_reference_data_id) }       |
@@ -73,12 +73,12 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
     And I note the response field "$.id" as "product_team_id"
-    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/Epr" with body:
+    And I have already made a "POST" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr" with body:
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I note the response field "$.keys.0.key_value" as "party_key"
-    When I make a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/Product/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
+    When I make a "POST" request with "default" headers to "ProductTeamEpr/<product_team_id>/ProductEpr/<product_id>/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions" with body:
       | path                                                                      | value                                                     |
       | questionnaire_responses.spine_as_additional_interactions.0.Interaction ID | urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001 |
       | questionnaire_responses.spine_as_additional_interactions.1.Interaction ID | urn:nhs:names:services:ebs:PRSC_IN080000UK07              |
@@ -109,7 +109,7 @@ Feature: Create "Additional Interactions" Device Reference Data - success scenar
       | Content-Type   | application/json |
       | Content-Length | 980              |
     And I note the response field "$.id" as "device_reference_data_id"
-    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/Product/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
+    When I make a "GET" request with "default" headers to "ProductTeamEpr/${ note(product_team_id) }/ProductEpr/${ note(product_id) }/dev/DeviceReferenceData/${ note(device_reference_data_id) }"
     Then I receive a status code "200" with body
       | path                                                                               | value                                                     |
       | id                                                                                 | ${ note(device_reference_data_id) }                       |

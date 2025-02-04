@@ -11,7 +11,6 @@ from domain.api.common_steps.sub_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product import CpmProduct
 from domain.core.device import (
     Device,
     DeviceKeyAddedEvent,
@@ -22,6 +21,7 @@ from domain.core.device import (
 from domain.core.device_key import DeviceKeyType
 from domain.core.device_reference_data import DeviceReferenceData
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.error import ConfigurationError
 from domain.core.product_team_epr import ProductTeam
 from domain.core.questionnaire import Questionnaire, QuestionnaireResponse
@@ -48,7 +48,7 @@ def parse_mhs_device_payload(data, cache) -> CreateMhsDeviceIncomingParams:
 
 def check_for_existing_mhs(data, cache):
     product_team: ProductTeam = data[read_product_team]
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     environment: Environment = data[read_environment]
     party_key: str = data[get_party_key]
 
@@ -127,7 +127,7 @@ def validate_spine_mhs_questionnaire_response(data, cache) -> QuestionnaireRespo
 
 
 def create_mhs_device(data, cache) -> Device:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     party_key: str = data[get_party_key]
     payload: CreateMhsDeviceIncomingParams = data[parse_mhs_device_payload]
     environment: Environment = data[read_environment]

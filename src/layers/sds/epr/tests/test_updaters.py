@@ -1,8 +1,8 @@
 import json
 
 import pytest
-from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product.v1 import EprProduct
 from domain.core.questionnaire.v1 import (
     Questionnaire,
     QuestionnaireResponseValidationError,
@@ -43,7 +43,7 @@ def product(product_team):
 
 
 @pytest.fixture
-def message_sets(product: CpmProduct):
+def message_sets(product: EprProduct):
     questionnaire = QuestionnaireRepository().read(
         QuestionnaireInstance.SPINE_MHS_MESSAGE_SETS
     )
@@ -68,7 +68,7 @@ def message_sets(product: CpmProduct):
 
 
 @pytest.fixture
-def additional_interactions(product: CpmProduct):
+def additional_interactions(product: EprProduct):
     questionnaire = QuestionnaireRepository().read(
         QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
     )

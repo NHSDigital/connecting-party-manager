@@ -17,7 +17,7 @@
     }
   },
   {
-    "CpmProduct": {
+    "EprProduct": {
       "id": "P.VNT-MLW",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "name": "My AAA Product",
@@ -448,7 +448,7 @@
     }
   },
   {
-    "CpmProduct": {
+    "EprProduct": {
       "id": "P.LU6-Y7D",
       "product_team_id": "LSP04.ec12b569-ea31-4c28-9559-17d533c78441",
       "name": "My BBB Product",

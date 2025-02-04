@@ -1,9 +1,9 @@
 from unittest import mock
 
 import pytest
-from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product import EprProduct
 from domain.core.product_team_epr import ProductTeam
 from domain.core.questionnaire import QuestionnaireResponse
 from domain.repository.questionnaire_repository import (
@@ -368,7 +368,7 @@ def test_create_complete_epr_product(
     )
 
     assert isinstance(product_team, ProductTeam)
-    assert isinstance(product, CpmProduct)
+    assert isinstance(product, EprProduct)
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(mhs_device, Device)

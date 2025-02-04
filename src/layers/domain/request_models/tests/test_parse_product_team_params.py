@@ -8,6 +8,7 @@ from test_helpers.sample_data import (
     CPM_PRODUCT_TEAM_NO_ID,
     CPM_PRODUCT_TEAM_NO_ID_DUPED_KEYS,
     CPM_PRODUCT_TEAM_NO_ID_KEYS_NOT_ALLOWED,
+    CPM_PRODUCT_TEAM_NO_NAME,
 )
 
 
@@ -22,6 +23,13 @@ def test_product_team():
 def test_product_team_with_id_raises_error():
     with pytest.raises(ValidationError) as exc:
         CreateProductTeamIncomingParams(**CPM_PRODUCT_TEAM_ID)
+
+    assert exc.value.model is CreateProductTeamIncomingParams
+
+
+def test_product_team_with_blank_name_raises_error():
+    with pytest.raises(ValidationError) as exc:
+        CreateProductTeamIncomingParams(**CPM_PRODUCT_TEAM_NO_NAME)
 
     assert exc.value.model is CreateProductTeamIncomingParams
 

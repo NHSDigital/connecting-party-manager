@@ -1,7 +1,7 @@
 from random import shuffle
 
 import pytest
-from domain.core.product_team.v1 import ProductTeam
+from domain.core.product_team_epr.v1 import ProductTeam
 from domain.core.product_team_key.v1 import ProductTeamKey, ProductTeamKeyType
 from sds.epr.bulk_create.bulk_repository import BulkRepository
 from sds.epr.bulk_create.epr_product_team_repository import EprProductTeamRepository

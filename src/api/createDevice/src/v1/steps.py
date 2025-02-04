@@ -7,8 +7,8 @@ from domain.api.common_steps.sub_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product import CpmProduct
 from domain.core.device import Device
+from domain.core.epr_product import EprProduct
 from domain.repository.device_repository import DeviceRepository
 from domain.request_models import CreateDeviceIncomingParams
 from domain.response.validation_errors import mark_validation_errors_as_inbound
@@ -21,13 +21,13 @@ def parse_device_payload(data, cache) -> CreateDeviceIncomingParams:
 
 
 def create_device(data, cache) -> Device:
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     payload: CreateDeviceIncomingParams = data[parse_device_payload]
     environment = data[read_environment]
     return product.create_device(environment=environment, **payload.dict())
 
 
-def write_device(data: dict[str, CpmProduct], cache) -> CpmProduct:
+def write_device(data: dict[str, EprProduct], cache) -> EprProduct:
     device: Device = data[create_device]
     repo = DeviceRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]

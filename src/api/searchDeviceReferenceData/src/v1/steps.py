@@ -6,8 +6,8 @@ from domain.api.common_steps.sub_product import (
     read_product,
     read_product_team,
 )
-from domain.core.cpm_product import CpmProduct
 from domain.core.enum import Environment
+from domain.core.epr_product import EprProduct
 from domain.core.product_team_epr import ProductTeam
 from domain.repository.device_reference_data_repository import (
     DeviceReferenceDataRepository,
@@ -17,7 +17,7 @@ from domain.response.response_models import SearchResponse
 
 def query_device_ref_data(data, cache) -> list[dict]:
     product_team: ProductTeam = data[read_product_team]
-    product: CpmProduct = data[read_product]
+    product: EprProduct = data[read_product]
     environment: Environment = data[read_environment]
     drd_repo = DeviceReferenceDataRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
