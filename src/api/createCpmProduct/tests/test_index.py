@@ -7,7 +7,7 @@ from domain.core.root import Root
 from domain.repository.product_team_repository import ProductTeamRepository
 from event.json import json_loads
 
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.response_assertions import _response_assertions
 
 from .data import product_payload, product_team_payload
@@ -22,7 +22,7 @@ def _mock_test(version, params):
         name=product_team_payload["name"], keys=product_team_payload["keys"]
     )
 
-    with mock_table(table_name=TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(table_name=TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -113,7 +113,7 @@ def test_incoming_errors(params, error, status_code, version):
     ],
 )
 def test_index_no_such_product_team(version):
-    with mock_table(TABLE_NAME), mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME), mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,

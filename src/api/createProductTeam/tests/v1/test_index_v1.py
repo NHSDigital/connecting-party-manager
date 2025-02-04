@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 from event.json import json_loads
 
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.response_assertions import _response_assertions
 from test_helpers.sample_data import (
     CPM_PRODUCT_TEAM_NO_ID,
@@ -22,7 +22,7 @@ TABLE_NAME = "hiya"
     ],
 )
 def test_index(version):
-    with mock_table(table_name=TABLE_NAME), mock.patch.dict(
+    with mock_table_cpm(table_name=TABLE_NAME), mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -72,7 +72,7 @@ def test_index(version):
     ],
 )
 def test_index_bad_payload(version):
-    with mock_table(table_name=TABLE_NAME), mock.patch.dict(
+    with mock_table_cpm(table_name=TABLE_NAME), mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -120,7 +120,7 @@ def test_index_bad_payload(version):
     ],
 )
 def test_index(version):
-    with mock_table(table_name=TABLE_NAME), mock.patch.dict(
+    with mock_table_cpm(table_name=TABLE_NAME), mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,

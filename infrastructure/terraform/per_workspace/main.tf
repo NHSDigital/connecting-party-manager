@@ -69,15 +69,23 @@ module "cpmtable" {
   attributes = [
     { name = "pk", type = "S" },
     { name = "sk", type = "S" },
-    { name = "pk_read", type = "S" },
-    { name = "sk_read", type = "S" },
+    { name = "pk_read_1", type = "S" },
+    { name = "sk_read_1", type = "S" },
+    { name = "pk_read_2", type = "S" },
+    { name = "sk_read_2", type = "S" },
   ]
 
   global_secondary_indexes = [
     {
-      name            = "idx_gsi_read"
-      hash_key        = "pk_read"
-      range_key       = "sk_read"
+      name            = "idx_gsi_read_1"
+      hash_key        = "pk_read_1"
+      range_key       = "sk_read_1"
+      projection_type = "ALL"
+    },
+    {
+      name            = "idx_gsi_read_2"
+      hash_key        = "pk_read_2"
+      range_key       = "sk_read_2"
       projection_type = "ALL"
     }
   ]
