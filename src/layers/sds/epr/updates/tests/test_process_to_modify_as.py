@@ -1,7 +1,9 @@
 import pytest
+from domain.core.cpm_product.v1 import CpmProduct
 from domain.core.device.v1 import Device
 from domain.core.device_reference_data.v1 import DeviceReferenceData
 from domain.core.error import ImmutableFieldError
+from domain.core.product_team.v1 import ProductTeam
 from domain.questionnaire_instances.constants import QuestionnaireInstance
 from domain.repository.device_reference_data_repository.v1 import (
     DeviceReferenceDataRepository,
@@ -11,8 +13,8 @@ from domain.repository.questionnaire_repository.v1.questionnaire_repository impo
     QuestionnaireRepository,
 )
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
-from sds.domain.nhs_mhs import NhsMhs
 from sds.epr.bulk_create.tests.conftest import accredited_system_1  # noqa
+from sds.epr.bulk_create.tests.conftest import accredited_system_2  # noqa
 from sds.epr.creators import (
     create_additional_interactions,
     create_as_device,
@@ -29,10 +31,12 @@ from sds.epr.updaters import UnexpectedModification
 from sds.epr.updates.change_request_processors import (
     process_request_to_add_to_as,
     process_request_to_delete_from_as,
+    process_request_to_replace_in_as,
 )
 
 from test_helpers.dynamodb import mock_table
 
+TABLE_NAME = "foo"
 ASID_TO_MODIFY = "123"
 ADDITIONAL_INTERACTIONS_FIELD_TO_ADD_TO = "nhs_as_svc_ia"
 DEVICE_FIELD_TO_ADD_TO = "description"
@@ -41,20 +45,33 @@ DEVICE_FIELD_TO_DELETE = "nhs_as_category_bag"
 
 
 @pytest.fixture
-def accredited_system(accredited_system_1: NhsMhs):
+def accredited_system(accredited_system_1: NhsAccreditedSystem):
     """Alias to fixture from sds.epr.bulk_create.tests.conftest"""
     return accredited_system_1.dict()
 
 
 @pytest.fixture
-def product_team(accredited_system_1: NhsMhs):
+def accredited_system_duplicate(accredited_system):
+    accredited_system_duplicate = accredited_system
+    accredited_system_duplicate["unique_identifier"] = "000003"
+    return accredited_system_duplicate
+
+
+@pytest.fixture
+def another_accredited_system(accredited_system_2: NhsAccreditedSystem):
+    """Alias to fixture from sds.epr.bulk_create.tests.conftest"""
+    return accredited_system_2.dict()
+
+
+@pytest.fixture
+def product_team(accredited_system_1: NhsAccreditedSystem) -> ProductTeam:
     return create_epr_product_team(
         ods_code=accredited_system_1.nhs_mhs_manufacturer_org
     )
 
 
 @pytest.fixture
-def product(accredited_system_1: NhsMhs, product_team):
+def product(accredited_system_1: NhsAccreditedSystem, product_team) -> CpmProduct:
     return create_epr_product(
         product_team=product_team,
         product_name=accredited_system_1.nhs_product_name,
@@ -63,7 +80,7 @@ def product(accredited_system_1: NhsMhs, product_team):
 
 
 @pytest.fixture
-def empty_message_sets(accredited_system_1: NhsMhs, product):
+def empty_message_sets(accredited_system_1: NhsAccreditedSystem, product):
     return create_message_sets(
         product=product,
         party_key=accredited_system_1.nhs_mhs_party_key,
@@ -89,7 +106,7 @@ def additional_interactions(accredited_system_1: NhsAccreditedSystem, product):
 @pytest.fixture
 def accredited_system_device(
     accredited_system: dict,
-    accredited_system_1: NhsMhs,
+    accredited_system_1: NhsAccreditedSystem,
     product,
     additional_interactions: DeviceReferenceData,
     empty_message_sets: DeviceReferenceData,
@@ -109,6 +126,66 @@ def accredited_system_device(
         product=product,
         party_key=accredited_system_1.nhs_mhs_party_key,
         asid=accredited_system_1.unique_identifier,
+        as_device_data=accredited_system_device_data,
+        message_sets_id=empty_message_sets.id,
+        additional_interactions_id=additional_interactions.id,
+        as_tags=as_tags,
+    )
+
+
+@pytest.fixture
+def accredited_system_device_duplicate(
+    accredited_system_duplicate: dict,
+    accredited_system_1: NhsAccreditedSystem,
+    product,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+):
+    accredited_system_device_data = get_accredited_system_device_data(
+        accredited_system=accredited_system_duplicate,
+        accredited_system_questionnaire=QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_AS
+        ),
+        accredited_system_field_mapping=QuestionnaireRepository().read_field_mapping(
+            QuestionnaireInstance.SPINE_AS
+        ),
+    )
+    as_tags = get_accredited_system_tags(accredited_system_duplicate)
+
+    return create_as_device(
+        product=product,
+        party_key=accredited_system_1.nhs_mhs_party_key,
+        asid=accredited_system_duplicate["unique_identifier"],
+        as_device_data=accredited_system_device_data,
+        message_sets_id=empty_message_sets.id,
+        additional_interactions_id=additional_interactions.id,
+        as_tags=as_tags,
+    )
+
+
+@pytest.fixture
+def another_accredited_system_device(
+    another_accredited_system: dict,
+    accredited_system_2: NhsAccreditedSystem,
+    product,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+):
+    accredited_system_device_data = get_accredited_system_device_data(
+        accredited_system=another_accredited_system,
+        accredited_system_questionnaire=QuestionnaireRepository().read(
+            QuestionnaireInstance.SPINE_AS
+        ),
+        accredited_system_field_mapping=QuestionnaireRepository().read_field_mapping(
+            QuestionnaireInstance.SPINE_AS
+        ),
+    )
+    as_tags = get_accredited_system_tags(another_accredited_system)
+
+    return create_as_device(
+        product=product,
+        party_key=accredited_system_2.nhs_mhs_party_key,
+        asid=another_accredited_system["unique_identifier"],
         as_device_data=accredited_system_device_data,
         message_sets_id=empty_message_sets.id,
         additional_interactions_id=additional_interactions.id,
@@ -173,6 +250,10 @@ def test_process_request_to_modify_as__immutable_fields(field_name, common_kwarg
         process_request_to_delete_from_as(
             field_name=field_name, device=None, new_values=None, **common_kwargs
         )
+    with pytest.raises(ImmutableFieldError):
+        process_request_to_replace_in_as(
+            field_name=field_name, device=None, new_values=None, **common_kwargs
+        )
 
 
 def additional_interactions_correctly_updated(
@@ -187,14 +268,14 @@ def additional_interactions_correctly_updated(
         == initial_additional_interactions["created_on"]
     )
 
-    # There should be one extra additional interactions response
+    # There should be a new additional interactions response for each new value added
     initial_responses = initial_additional_interactions["questionnaire_responses"][
         f"{QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS}/1"
     ]
     final_responses = final_additional_interactions["questionnaire_responses"][
         f"{QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS}/1"
     ]
-    assert len(final_responses) == len(initial_responses) + 1
+    assert len(final_responses) == len(initial_responses) + len(new_values)
 
     initial_responses_data = [
         additional_interactions["data"] for additional_interactions in initial_responses
@@ -305,16 +386,18 @@ def test_process_request_to_add_to_as__additional_interactions_add_to_field(
     field_to_modify = ADDITIONAL_INTERACTIONS_FIELD_TO_ADD_TO
     _field_to_modify = additional_interactions_field_mapping[field_to_modify]
 
-    new_value = "another-interaction-id"
+    new_value = ["another-interaction-id"]
 
-    _device, _additional_interactions = process_request_to_add_to_as(
-        device=accredited_system_device,
-        field_name=field_to_modify,
-        new_values=[new_value],
-        **common_kwargs,
+    _additional_interactions, _updated_existing_as_device = (
+        process_request_to_add_to_as(
+            device=accredited_system_device,
+            field_name=field_to_modify,
+            new_values=new_value,
+            **common_kwargs,
+        )
     )
 
-    final_device = _device.state()
+    final_device = _updated_existing_as_device.state()
     final_additional_interactions = _additional_interactions.state()
 
     # Check additional interactions was modified
@@ -322,14 +405,176 @@ def test_process_request_to_add_to_as__additional_interactions_add_to_field(
         initial_additional_interactions=initial_additional_interactions,
         final_additional_interactions=final_additional_interactions,
         field_name=_field_to_modify,
-        new_values=[new_value],
+        new_values=new_value,
     )
-    # Tags added for new interaction id
-    assert len(final_device["tags"]) == len(initial_device["tags"]) + 2
     assert (
         final_additional_interactions["updated_on"]
         > initial_additional_interactions["updated_on"]
     )
+    # Device tags added for new interaction id
+    assert len(final_device["tags"]) == len(initial_device["tags"]) + 2 * len(new_value)
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_add_to_as__additional_interactions_add_to_field_adds_tags_to_existing_devices(
+    accredited_system_device: Device,
+    accredited_system_device_duplicate: Device,
+    device_repository: DeviceRepository,
+    empty_message_sets: DeviceReferenceData,
+    additional_interactions: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs: dict,
+):
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+    device_repository.write(accredited_system_device)
+    device_repository.write(accredited_system_device_duplicate)
+
+    additional_interactions_field_mapping = (
+        QuestionnaireRepository().read_field_mapping(
+            QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
+        )
+    )
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = ADDITIONAL_INTERACTIONS_FIELD_TO_ADD_TO
+    _field_to_modify = additional_interactions_field_mapping[field_to_modify]
+
+    new_value = ["another-interaction-id"]
+
+    (
+        _additional_interactions,
+        _updated_existing_as_device_1,
+        _updated_existing_as_device_2,
+    ) = process_request_to_add_to_as(
+        device=accredited_system_device,
+        field_name=field_to_modify,
+        new_values=new_value,
+        **common_kwargs,
+    )
+
+    final_device = _updated_existing_as_device_1.state()
+    final_additional_interactions = _additional_interactions.state()
+
+    # Check additional interactions was modified
+    assert additional_interactions_correctly_updated(
+        initial_additional_interactions=initial_additional_interactions,
+        final_additional_interactions=final_additional_interactions,
+        field_name=_field_to_modify,
+        new_values=new_value,
+    )
+    assert (
+        final_additional_interactions["updated_on"]
+        > initial_additional_interactions["updated_on"]
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+    # Assert device tags added
+    assert len(_updated_existing_as_device_1.state()["tags"]) == len(
+        initial_device["tags"]
+    ) + 2 * len(new_value)
+    assert len(_updated_existing_as_device_2.state()["tags"]) == len(
+        initial_device["tags"]
+    ) + 2 * len(new_value)
+
+
+def test_process_request_to_add_to_as__additional_interactions_add_multiple_to_field(
+    accredited_system_device: Device,
+    device_repository: DeviceRepository,
+    empty_message_sets: DeviceReferenceData,
+    additional_interactions: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_repository.write(accredited_system_device)
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+
+    additional_interactions_field_mapping = (
+        QuestionnaireRepository().read_field_mapping(
+            QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS
+        )
+    )
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = ADDITIONAL_INTERACTIONS_FIELD_TO_ADD_TO
+    _field_to_modify = additional_interactions_field_mapping[field_to_modify]
+
+    new_values = ["another-interaction-id", "another-interaction-id-2"]
+
+    _additional_interactions, _updated_existing_as_device = (
+        process_request_to_add_to_as(
+            device=accredited_system_device,
+            field_name=field_to_modify,
+            new_values=new_values,
+            **common_kwargs,
+        )
+    )
+
+    final_device = _updated_existing_as_device.state()
+    final_additional_interactions = _additional_interactions.state()
+
+    # Check additional interactions was modified
+    assert additional_interactions_correctly_updated(
+        initial_additional_interactions=initial_additional_interactions,
+        final_additional_interactions=final_additional_interactions,
+        field_name=_field_to_modify,
+        new_values=new_values,
+    )
+    assert (
+        final_additional_interactions["updated_on"]
+        > initial_additional_interactions["updated_on"]
+    )
+    # Device tags added for new interaction ids
+    assert len(final_device["tags"]) == len(initial_device["tags"]) + 2 * len(
+        new_values
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_add_to_as__additional_interactions_add_value_already_exists(
+    accredited_system_device: Device,
+    device_repository: DeviceRepository,
+    empty_message_sets: DeviceReferenceData,
+    additional_interactions: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_repository.write(accredited_system_device)
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = ADDITIONAL_INTERACTIONS_FIELD_TO_ADD_TO
+
+    new_value = ["interaction-id-1"]
+
+    _additional_interactions = process_request_to_add_to_as(
+        device=accredited_system_device,
+        field_name=field_to_modify,
+        new_values=new_value,
+        **common_kwargs,
+    )  # as device not updated, not returned...
+
+    # final_device = _device.state()
+    final_additional_interactions = _additional_interactions[
+        0
+    ].state()  # only one value in the list
+
+    # Check additional interactions was not modified
+    assert (
+        final_additional_interactions["updated_on"]
+        == initial_additional_interactions["updated_on"]
+    )
+    # No new device tags added
+    # assert len(final_device["tags"]) == len(initial_device["tags"])
+    # assert final_device["updated_on"] == initial_device["updated_on"]
 
 
 def test_process_request_to_add_to_as__device_add_to_empty_non_list_field_with_single_value_replaces_value(
@@ -543,3 +788,195 @@ def test_process_request_to_delete_from_as__device_required_field_raises_error(
             new_values=None,
             **common_kwargs,
         )
+
+
+def test_process_request_to_replace_in_as__device_replace_in_empty_non_list_field_with_single_value_replaces_value(
+    accredited_system_device: Device,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+
+    accredited_system_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_AS
+    )
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = DEVICE_FIELD_TO_ADD_TO
+    _field_to_modify = accredited_system_field_mapping[field_to_modify]
+    new_value = "Description"
+
+    _device, _additional_interactions = process_request_to_replace_in_as(
+        device=accredited_system_device,
+        field_name=field_to_modify,
+        new_values=[new_value],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_additional_interactions = _additional_interactions.state()
+
+    # Check only device was modified
+    assert initial_additional_interactions == final_additional_interactions
+    assert as_device_correctly_updated(
+        initial_device=initial_device,
+        final_device=final_device,
+        field_name=_field_to_modify,
+        new_values=(new_value),
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_replace_in_as__device_replace_in_existing_non_list_field_with_single_value_replaces_value(
+    accredited_system_device: Device,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+
+    accredited_system_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_AS
+    )
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = "nhs_requestor_urp"
+    _field_to_modify = accredited_system_field_mapping[field_to_modify]
+    new_value = "another-urp"
+
+    _device, _additional_interactions = process_request_to_replace_in_as(
+        device=accredited_system_device,
+        field_name=field_to_modify,
+        new_values=[new_value],
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_additional_interactions = _additional_interactions.state()
+
+    # Check only device was modified
+    assert initial_additional_interactions == final_additional_interactions
+    assert as_device_correctly_updated(
+        initial_device=initial_device,
+        final_device=final_device,
+        field_name=_field_to_modify,
+        new_values=(new_value),
+        value_was_replaced=True,
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_replace_in_as__device_replace_in_list_field(
+    accredited_system_device: Device,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+
+    accredited_system_field_mapping = QuestionnaireRepository().read_field_mapping(
+        QuestionnaireInstance.SPINE_AS
+    )
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = DEVICE_LIST_FIELD_TO_ADD_TO
+    _field_to_modify = accredited_system_field_mapping[field_to_modify]
+    new_values = ["123", "345", "567"]
+
+    _device, _additional_interactions = process_request_to_replace_in_as(
+        device=accredited_system_device,
+        field_name=field_to_modify,
+        new_values=new_values,
+        **common_kwargs,
+    )
+
+    final_device = _device.state()
+    final_additional_interactions = _additional_interactions.state()
+
+    # Check only device was modified
+    assert initial_additional_interactions == final_additional_interactions
+    assert as_device_correctly_updated(
+        initial_device=initial_device,
+        final_device=final_device,
+        field_name=_field_to_modify,
+        new_values=new_values,
+        value_was_replaced=True,
+    )
+    assert final_device["updated_on"] > initial_device["updated_on"]
+
+
+def test_process_request_to_add_to_replace_in_as__device_replace_in_empty_non_list_field_with_multiple_values_raises_error(
+    accredited_system_device: Device,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+    with pytest.raises(UnexpectedModification):
+        process_request_to_replace_in_as(
+            device=accredited_system_device,
+            field_name=DEVICE_FIELD_TO_ADD_TO,
+            new_values=["next-week", "today"],
+            **common_kwargs,
+        )
+
+
+def test_process_request_to_replace_in_as__additional_interactions_replace_in_list_field(
+    accredited_system_device: Device,
+    device_repository: DeviceRepository,
+    additional_interactions: DeviceReferenceData,
+    empty_message_sets: DeviceReferenceData,
+    device_reference_data_repository: DeviceReferenceDataRepository,
+    common_kwargs,
+):
+    device_repository.write(accredited_system_device)
+    device_reference_data_repository.write(empty_message_sets)
+    device_reference_data_repository.write(additional_interactions)
+
+    initial_device = accredited_system_device.state()
+    initial_additional_interactions = additional_interactions.state()
+
+    field_to_modify = ADDITIONAL_INTERACTIONS_FIELD_TO_ADD_TO
+
+    new_values = ["interaction-id-3", "interaction-id-4"]
+
+    _additional_interactions, _updated_existing_as_device = (
+        process_request_to_replace_in_as(
+            device=accredited_system_device,
+            field_name=field_to_modify,
+            new_values=new_values,
+            **common_kwargs,
+        )
+    )
+
+    final_device = _updated_existing_as_device.state()
+    final_additional_interactions = _additional_interactions.state()
+
+    # Check additional interactions was modified
+    assert len(
+        final_additional_interactions["questionnaire_responses"][
+            f"{QuestionnaireInstance.SPINE_AS_ADDITIONAL_INTERACTIONS}/1"
+        ]
+    ) == len(new_values)
+    assert (
+        final_additional_interactions["updated_on"]
+        > initial_additional_interactions["updated_on"]
+    )
+    # Debice tags updated to reflect new interactions only
+    assert len(final_device["tags"]) == 2 * len(new_values)
+    assert final_device["updated_on"] > initial_device["updated_on"]

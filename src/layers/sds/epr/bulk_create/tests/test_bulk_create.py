@@ -133,7 +133,7 @@ def as_device_data():
             "questionnaire_name": "spine_as",
             "questionnaire_version": "1",
             "data": {
-                "ASID": "123456",
+                "ASID": "000001",
                 "Approver URP": "approver-123",
                 "Date Approved": "today",
                 "Requestor URP": "requester-123",
@@ -153,14 +153,14 @@ def as_device_data():
             "questionnaire_name": "spine_as",
             "questionnaire_version": "1",
             "data": {
-                "ASID": "456789",
+                "ASID": "000002",
                 "Approver URP": "approver-456",
                 "Date Approved": "today",
                 "Requestor URP": "requester-456",
                 "Date Requested": "a week ago",
-                "ODS Code": "BBB",
+                "ODS Code": "AAA",
                 "MHS Manufacturer Organisation": "AAA",
-                "MHS Party Key": "AAA-456789",
+                "MHS Party Key": "AAA-123456",
                 "Product Key": "key-123",
                 "Client ODS Codes": ["ABC", "JKL", "LMN"],
                 "Product Name": None,
@@ -196,22 +196,40 @@ def as_tags():
         ],
         [
             {
-                "nhs_id_code": "BBB",
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-1",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-1",
+                "nhs_mhs_party_key": "AAA-123456",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-2",
+            },
+            {
+                "nhs_id_code": "AAA",
+                "nhs_as_svc_ia": "interaction-id-2",
+                "nhs_mhs_party_key": "AAA-123456",
+            },
+            {
+                "nhs_id_code": "AAA",
                 "nhs_as_svc_ia": "interaction-id-3",
             },
             {
-                "nhs_id_code": "BBB",
+                "nhs_id_code": "AAA",
                 "nhs_as_svc_ia": "interaction-id-3",
-                "nhs_mhs_party_key": "AAA-456789",
+                "nhs_mhs_party_key": "AAA-123456",
             },
             {
-                "nhs_id_code": "BBB",
+                "nhs_id_code": "AAA",
                 "nhs_as_svc_ia": "interaction-id-4",
             },
             {
-                "nhs_id_code": "BBB",
+                "nhs_id_code": "AAA",
                 "nhs_as_svc_ia": "interaction-id-4",
-                "nhs_mhs_party_key": "AAA-456789",
+                "nhs_mhs_party_key": "AAA-123456",
             },
         ],
     ]

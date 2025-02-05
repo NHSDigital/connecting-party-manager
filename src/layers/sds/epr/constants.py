@@ -78,3 +78,9 @@ class EprNameTemplate(StrEnum):
     MESSAGE_SETS = f"{{party_key}} - {MESSAGE_SETS_SUFFIX}"
     MHS_DEVICE = f"{{party_key}} - {MHS_DEVICE_SUFFIX}"
     AS_DEVICE = f"{{party_key}}/{{asid}} - {AS_DEVICE_SUFFIX}"
+
+
+class ModificationType(StrEnum):
+    ADD = "Add"
+    REPLACE = "Replace"
+    DELETE = "Delete"

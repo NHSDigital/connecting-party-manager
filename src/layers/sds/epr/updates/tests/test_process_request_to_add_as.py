@@ -37,7 +37,9 @@ from domain.repository.questionnaire_repository.v1.questionnaires import (
 from domain.repository.repository.v1 import Repository
 from sds.domain.nhs_accredited_system import NhsAccreditedSystem
 from sds.domain.nhs_mhs import NhsMhs
-from sds.epr.bulk_create.tests.conftest import accredited_system_1, mhs_1  # noqa
+from sds.epr.bulk_create.tests.conftest import accredited_system_1  # noqa
+from sds.epr.bulk_create.tests.conftest import accredited_system_2  # noqa
+from sds.epr.bulk_create.tests.conftest import mhs_1  # noqa
 from sds.epr.creators import (
     create_additional_interactions,
     create_as_device,
@@ -94,7 +96,7 @@ def mhs(mhs_1: NhsMhs):
 
 
 @pytest.fixture
-def accredited_system(accredited_system_1: NhsMhs):
+def accredited_system(accredited_system_1: NhsAccreditedSystem):
     """Alias to fixture from sds.epr.bulk_create.tests.conftest"""
     return accredited_system_1.dict()
 
@@ -126,10 +128,9 @@ def as_tags():
 
 
 @pytest.fixture
-def another_accredited_system(accredited_system):
-    accredited_system["nhs_as_svc_ia"] = ["another-interaction-id"]
-    accredited_system["unique_identifier"] = "456789"
-    return accredited_system
+def another_accredited_system(accredited_system_2: NhsAccreditedSystem):
+    """Alias to fixture from sds.epr.bulk_create.tests.conftest"""
+    return accredited_system_2.dict()
 
 
 @pytest.fixture
@@ -150,14 +151,14 @@ def as_tags_2():
 
 
 @pytest.fixture
-def initial_product_team(accredited_system_1: NhsMhs):
+def initial_product_team(accredited_system_1: NhsAccreditedSystem):
     return create_epr_product_team(
         ods_code=accredited_system_1.nhs_mhs_manufacturer_org
     )
 
 
 @pytest.fixture
-def initial_product(accredited_system_1: NhsMhs, initial_product_team):
+def initial_product(accredited_system_1: NhsAccreditedSystem, initial_product_team):
     return create_epr_product(
         product_team=initial_product_team,
         product_name=accredited_system_1.nhs_product_name,
@@ -166,7 +167,7 @@ def initial_product(accredited_system_1: NhsMhs, initial_product_team):
 
 
 @pytest.fixture
-def empty_message_sets(accredited_system_1: NhsMhs, initial_product):
+def empty_message_sets(accredited_system_1: NhsAccreditedSystem, initial_product):
     return create_message_sets(
         product=initial_product,
         party_key=accredited_system_1.nhs_mhs_party_key,
@@ -175,7 +176,9 @@ def empty_message_sets(accredited_system_1: NhsMhs, initial_product):
 
 
 @pytest.fixture
-def non_empty_message_sets(mhs: dict, accredited_system_1: NhsMhs, initial_product):
+def non_empty_message_sets(
+    mhs: dict, accredited_system_1: NhsAccreditedSystem, initial_product
+):
     mhs["nhs_mhs_svc_ia"] = "interaction-id-1"
     message_set_data = get_message_set_data(
         message_handling_systems=[mhs],
@@ -213,7 +216,7 @@ def initial_additional_interactions(
 @pytest.fixture
 def initial_accredited_system_device(
     accredited_system: dict,
-    accredited_system_1: NhsMhs,
+    accredited_system_1: NhsAccreditedSystem,
     initial_product,
     initial_additional_interactions: DeviceReferenceData,
     empty_message_sets: DeviceReferenceData,
@@ -243,7 +246,7 @@ def initial_accredited_system_device(
 @pytest.fixture
 def another_accredited_system_device(
     another_accredited_system: dict,
-    accredited_system_1: NhsMhs,
+    accredited_system_2: NhsAccreditedSystem,
     initial_product,
     initial_additional_interactions: DeviceReferenceData,
     empty_message_sets: DeviceReferenceData,
@@ -261,7 +264,7 @@ def another_accredited_system_device(
 
     return create_as_device(
         product=initial_product,
-        party_key=accredited_system_1.nhs_mhs_party_key,
+        party_key=accredited_system_2.nhs_mhs_party_key,
         asid=another_accredited_system["unique_identifier"],
         as_device_data=accredited_system_device_data,
         message_sets_id=empty_message_sets.id,
@@ -740,6 +743,7 @@ def test_process_request_to_add_as_device_exists(
         message_sets,
         additional_interactions,
         accredited_system_device,
+        updated_existing_as_device,
     ) = process_request_to_add_as(
         accredited_system=another_accredited_system,
         **input_questionnaires,
@@ -750,14 +754,16 @@ def test_process_request_to_add_as_device_exists(
     assert isinstance(message_sets, DeviceReferenceData)
     assert isinstance(additional_interactions, DeviceReferenceData)
     assert isinstance(accredited_system_device, Device)
+    assert isinstance(updated_existing_as_device, Device)
 
     assert product_team.events == []
     assert product.events == []
     assert message_sets.events == []
 
-    (accredited_system_device_ref_data_questionnaire_updated_event_1,) = (
-        additional_interactions.events
-    )
+    (
+        accredited_system_device_ref_data_questionnaire_updated_event_1,
+        accredited_system_device_ref_data_questionnaire_updated_event_2,
+    ) = additional_interactions.events
     (
         device_created_event,
         device_key_added_event,
@@ -769,6 +775,10 @@ def test_process_request_to_add_as_device_exists(
 
     assert isinstance(
         accredited_system_device_ref_data_questionnaire_updated_event_1,
+        DrdQuestionnaireUpdatedEvent,
+    )
+    assert isinstance(
+        accredited_system_device_ref_data_questionnaire_updated_event_2,
         DrdQuestionnaireUpdatedEvent,
     )
     assert isinstance(device_created_event, DeviceCreatedEvent)
@@ -795,3 +805,7 @@ def test_process_request_to_add_as_device_exists(
     assert len(initial_accredited_system_device.keys) == 1
     assert len(accredited_system_device.keys) == 1
     assert equivalent(accredited_system_device, expected_additional_device)
+    assert (
+        len(updated_existing_as_device.tags)
+        == len(initial_accredited_system_device.tags) + 2 * 2
+    )  # (2 new interactions added to the original 2. 2 tags per interaction = 8 in total)

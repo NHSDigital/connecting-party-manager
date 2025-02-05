@@ -1,12 +1,15 @@
 import pytest
 from etl_utils.io import pkl_load_lz4
 from mypy_boto3_s3 import S3Client
-from sds.epr.updates.tests.test_process_request_to_add_mhs import equivalent
 
 from conftest import dynamodb_client_with_sleep as get_dynamodb_client
 from test_helpers.terraform import read_terraform_output
 
-from .conftest import ETL_BUCKET, parametrize_over_scenarios
+from .conftest import (
+    ETL_BUCKET,
+    equivalent_with_unordered_lists,
+    parametrize_over_scenarios,
+)
 from .utils import Handler, Scenario, as_domain_object, convert_list_likes, read_all
 
 
@@ -90,7 +93,7 @@ def test_transform_and_load(
         failed_assertions = []
         for expected_obj in expected_objs_with_matching_type:
             try:
-                assert equivalent(created_obj, expected_obj)
+                assert equivalent_with_unordered_lists(created_obj, expected_obj)
             except AssertionError as error:
                 failed_assertions.append(
                     f"{type(expected_obj)}:{expected_obj.id}: {error}"

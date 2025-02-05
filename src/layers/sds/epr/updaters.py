@@ -60,10 +60,11 @@ def update_new_additional_interactions(
     additional_interactions: DeviceReferenceData,
     message_sets: DeviceReferenceData,
     additional_interactions_questionnaire: Questionnaire,
-) -> DeviceReferenceData:
+) -> tuple[DeviceReferenceData, set[str]]:
     """
     Updates the AdditionalInteractions DRD with new interactions that don't already exist
     and are not already in MessageSets DRD
+    Returns the new interactions added, to be used to add tags to existing AS devices
     """
     mhs_interaction_ids = get_interaction_ids(message_sets)
     accredited_system_interaction_ids = get_interaction_ids(additional_interactions)
@@ -80,7 +81,7 @@ def update_new_additional_interactions(
     for interaction in additional_interactions_data:
         additional_interactions.add_questionnaire_response(interaction)
 
-    return additional_interactions
+    return additional_interactions, new_additional_interactions
 
 
 def ldif_add_to_field_in_questionnaire(
@@ -164,7 +165,7 @@ def ldif_remove_field_from_questionnaire(
     new_values: list[str],  # noqa
     current_data: dict[str, list[str] | str],
     questionnaire: Questionnaire,
-):
+) -> QuestionnaireResponse:
     required_fields = set(
         questionnaire.json_schema.get(JSON_SCHEMA_REQUIRED_KEYWORD, ())
     )
