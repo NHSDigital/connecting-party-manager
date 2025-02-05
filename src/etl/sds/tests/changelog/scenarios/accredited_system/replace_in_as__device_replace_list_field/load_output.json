@@ -32,7 +32,7 @@
   },
   {
     "id": "fe15bd58-6897-4566-9a87-aab781fd96b5",
-    "name": "C3O9X-806782/000000000002 - Accredited System",
+    "name": "C3O9X-806782/000000000001 - Accredited System",
     "status": "active",
     "product_id": "P.9AN-PJG",
     "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
@@ -44,7 +44,7 @@
     "keys": [
       {
         "key_type": "accredited_system_id",
-        "key_value": "000000000002"
+        "key_value": "000000000001"
       }
     ],
     "tags": [
@@ -56,15 +56,6 @@
         "nhs_id_code": "C3O9X",
         "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14",
         "nhs_mhs_party_key": "C3O9X-806782"
-      },
-      {
-        "nhs_id_code": "C3O9X",
-        "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK15"
-      },
-      {
-        "nhs_id_code": "C3O9X",
-        "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK15",
-        "nhs_mhs_party_key": "C3O9X-806782"
       }
     ],
     "questionnaire_responses": {
@@ -74,28 +65,41 @@
           "questionnaire_name": "spine_as",
           "questionnaire_version": "1",
           "data": {
-            "ASID": "000000000002",
-            "Approver URP": "uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs",
-            "Client ODS Codes": ["C3O9X"],
-            "Date Approved": "20091016133823",
-            "Date Requested": "20091016133757",
-            "MHS Manufacturer Organisation": "C3O9X",
+            "Client ODS Codes": ["BBB", "AAA"],
             "MHS Party Key": "C3O9X-806782",
+            "ASID": "000000000001",
             "ODS Code": "C3O9X",
+            "Temp UID": "10312",
             "Product Key": "6216",
             "Product Name": "TPP SystmOne",
             "Product Version": null,
+            "Date Requested": "20091016133757",
+            "Date Approved": "20091016133823",
+            "Approver URP": "uniqueIdentifier=102583034545,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs",
             "Requestor URP": "uniqueIdentifier=203171972540,uniqueIdentifier=352307522545,uid=432776896545,ou=People,o=nhs",
-            "Temp UID": "10312"
+            "MHS Manufacturer Organisation": "C3O9X"
           },
           "created_on": "2024-12-11T11:18:53.456536+00:00"
         }
       ]
     },
     "device_reference_data": {
-      "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*.Interaction ID"],
-      "68cd98db-5d8d-45dc-ba9a-09e892535d12": ["*.Interaction ID"]
+      "390fc252-02a2-494e-b6fb-16717eec7168": ["*.Interaction ID"],
+      "68cd98db-5d8d-45dc-ba9a-09e892535d83": ["*.Interaction ID"]
     }
+  },
+  {
+    "id": "390fc252-02a2-494e-b6fb-16717eec7168",
+    "name": "C3O9X-806782 - MHS Message Sets",
+    "status": "active",
+    "product_id": "P.9AN-PJG",
+    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
+    "ods_code": "C3O9X",
+    "environment": "prod",
+    "questionnaire_responses": {},
+    "created_on": "2024-12-11T11:18:53.452472+00:00",
+    "updated_on": null,
+    "deleted_on": null
   },
   {
     "id": "68cd98db-5d8d-45dc-ba9a-09e892535d83",
@@ -115,33 +119,11 @@
             "Interaction ID": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
           },
           "created_on": "2024-12-11T11:18:53.409854+00:00"
-        },
-        {
-          "id": "2071f8ac-a020-4bf3-b413-c205004bfb08",
-          "questionnaire_name": "spine_as_additional_interactions",
-          "questionnaire_version": "1",
-          "data": {
-            "Interaction ID": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK15"
-          },
-          "created_on": "2024-12-11T11:18:53.409854+00:00"
         }
       ]
     },
     "created_on": "2024-12-11T11:18:53.452472+00:00",
     "updated_on": "2024-12-11T11:18:53.452853+00:00",
-    "deleted_on": null
-  },
-  {
-    "id": "68cd98db-5d8d-45dc-ba9a-09e892535d12",
-    "name": "C3O9X-806782 - MHS Message Sets",
-    "status": "active",
-    "product_id": "P.9AN-PJG",
-    "product_team_id": "C3O9X.fe49c1d5-d9bc-4c2e-8e8d-54d8e2e88250",
-    "ods_code": "C3O9X",
-    "environment": "prod",
-    "questionnaire_responses": {},
-    "created_on": "2024-12-11T11:18:53.452472+00:00",
-    "updated_on": null,
     "deleted_on": null
   }
 ]

@@ -56,6 +56,15 @@
         "nhs_id_code": "C3O9X",
         "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14",
         "nhs_mhs_party_key": "C3O9X-806782"
+      },
+      {
+        "nhs_id_code": "C3O9X",
+        "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK15"
+      },
+      {
+        "nhs_id_code": "C3O9X",
+        "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK15",
+        "nhs_mhs_party_key": "C3O9X-806782"
       }
     ],
     "questionnaire_responses": {
@@ -106,6 +115,15 @@
       }
     ],
     "tags": [
+      {
+        "nhs_id_code": "C3O9X",
+        "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14"
+      },
+      {
+        "nhs_id_code": "C3O9X",
+        "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK14",
+        "nhs_mhs_party_key": "C3O9X-806782"
+      },
       {
         "nhs_id_code": "C3O9X",
         "nhs_as_svc_ia": "urn:nhs:names:services:pdsquery:QUQI_IN010000UK15"
