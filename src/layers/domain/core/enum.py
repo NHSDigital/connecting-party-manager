@@ -12,3 +12,9 @@ class Environment(StrEnum):
     REF = auto()
     INT = auto()
     PROD = auto()
+
+
+class EntityType(StrEnum):
+    PRODUCT_TEAM = auto()
+    PRODUCT_TEAM_ALIAS = auto()
+    PRODUCT = auto()
