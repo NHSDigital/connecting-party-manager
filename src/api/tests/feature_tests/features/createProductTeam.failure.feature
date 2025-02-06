@@ -121,3 +121,19 @@ Feature: Create Product Team - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 138              |
+
+  Scenario: Cannot create a ProductTeam with empty product team id alias
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                 |
+      | name             | My Great Product Team |
+      | ods_code         | F5H1R                 |
+      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_value |                       |
+    Then I receive a status code "400" with body
+      | path             | value            |
+      | errors.0.code    | VALIDATION_ERROR |
+      | errors.0.message | << ignore >>     |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 209              |
