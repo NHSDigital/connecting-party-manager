@@ -223,6 +223,9 @@ MODIFY_ACCREDITED_SYSTEM_DELETE_CAT_BAG = create_modify_ldif(
 MODIFY_ACCREDITED_SYSTEM_REPLACE_INTERACTIONS_FIELD = create_modify_ldif(
     "replace/nhs_as_svc_ia.ldif", device_type="accredited_system"
 )
+MODIFY_ACCREDITED_SYSTEM_REPLACE_ADDITIONAL_INTERACTIONS_FIELD = create_modify_ldif(
+    "replace/nhs_as_svc_ia.Another.ldif", device_type="accredited_system"
+)
 MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_LIST_FIELD = create_modify_ldif(
     "replace/nhs_as_client.ldif", device_type="accredited_system"
 )
