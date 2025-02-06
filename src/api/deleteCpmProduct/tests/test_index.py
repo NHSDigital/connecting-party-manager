@@ -70,7 +70,11 @@ def test_index():
         )
 
         # Validate that the response indicates that a resource was deleted
-        assert response["statusCode"] == 204
+        assert response["statusCode"] == 200
+        assert (
+            response["body"]
+            == '{"code": "200", "message": "P.AAA-AAA has been deleted."}'
+        )
 
         # Retrieve the created resource
         repo = CpmProductRepository(

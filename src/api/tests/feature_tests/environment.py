@@ -75,7 +75,6 @@ def before_all(context: Context):
 
     if context.test_mode is TestMode.LOCAL:
         use_fixture(mock_environment, context=context, table_name=context.table_name)
-        # use_fixture(mock_dynamodb, context=context, table_name=context.table_name)
         use_fixture(mock_requests, context=context)
 
 

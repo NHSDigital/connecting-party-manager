@@ -20,11 +20,14 @@ Feature: Delete CPM Product - success scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     When I make a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }"
-    Then I receive a status code "204"
+    Then I receive a status code "200" with body
+      | path    | value                                   |
+      | code    | 200                                     |
+      | message | ${ note(product_id) } has been deleted. |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 0                |
+      | Content-Length | 57               |
 
     Examples:
       | product_team_id            |
