@@ -150,6 +150,7 @@ ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
 ADD_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_AS_MHS = read_ldif(
     "add/accredited_system.SameProductAsMhs.ldif"
 )
+ADD_ACCREDITED_SYSTEM_WITH_ACF = read_ldif("add/accredited_system_with_acf.ldif")
 ADD_MESSAGE_HANDLING_SYSTEM = read_ldif("add/message_handling_system.ldif")
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM = read_ldif(
     "add/message_handling_system.AnotherWithDifferentUniqueIdentifier.ldif"
@@ -231,4 +232,10 @@ MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_LIST_FIELD = create_modify_ldif(
 )
 MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_FIELD = create_modify_ldif(
     "replace/nhs_approver_urp.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_LIST_FIELD_WITH_EMPTY = create_modify_ldif(
+    "replace/nhs_as_acf.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_NON_LIST_FIELD_WITH_EMPTY = create_modify_ldif(
+    "replace/nhs_temp_uid.ldif", device_type="accredited_system"
 )
