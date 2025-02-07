@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-02-07
+- [PI-746] Deactivate a Product
+- [PI-765] Feature test for create ProductTeam endpoint request containing an empty key_value
+
 ## 2025-02-05
 - [PI-691] Changelog ETL - modify / replace in an AS
 - [PI-726] Update AS tags - Adding an AS
