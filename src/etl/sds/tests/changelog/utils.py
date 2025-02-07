@@ -150,12 +150,10 @@ ADD_ANOTHER_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_TEAM = read_ldif(
 ADD_ACCREDITED_SYSTEM_IN_SAME_PRODUCT_AS_MHS = read_ldif(
     "add/accredited_system.SameProductAsMhs.ldif"
 )
+ADD_ACCREDITED_SYSTEM_WITH_ACF = read_ldif("add/accredited_system_with_acf.ldif")
 ADD_MESSAGE_HANDLING_SYSTEM = read_ldif("add/message_handling_system.ldif")
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM = read_ldif(
     "add/message_handling_system.AnotherWithDifferentUniqueIdentifier.ldif"
-)
-ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_WITH_SAME_UNIQUE_IDENTIFIER = read_ldif(
-    "add/message_handling_system.AnotherWithSameUniqueIdentifier.ldif"
 )
 ADD_ANOTHER_MESSAGE_HANDLING_SYSTEM_IN_SAME_PRODUCT = read_ldif(
     "add/message_handling_system.SameProduct.ldif"
@@ -174,28 +172,12 @@ DELETE_UNKNOWN_ENTITY = read_ldif("delete/unknown_entity.ldif")
 
 # Modifies
 MODIFY_UNKNOWN_ENTITY = read_ldif("modify/unknown_entity.ldif")
+
 MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_DEVICE_FIELD = create_modify_ldif(
     "add/nhs_product_version.ldif", device_type="message_handling_system"
 )
 MODIFY_MESSAGE_HANDLING_SYSTEM_ADD_TO_MESSAGE_SETS_FIELD = create_modify_ldif(
     "add/nhs_mhs_retries.ldif", device_type="message_handling_system"
-)
-MODIFY_ACCREDITED_SYSTEM_ADD_TO_DEVICE_FIELD_LIST = create_modify_ldif(
-    "add/nhs_as_client.ldif", device_type="accredited_system"
-)
-MODIFY_ACCREDITED_SYSTEM_ADD_TO_DEVICE_FIELD_NOT_LIST = create_modify_ldif(
-    "add/description.ldif", device_type="accredited_system"
-)
-MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD = create_modify_ldif(
-    "add/nhs_as_svc_ia.ldif", device_type="accredited_system"
-)
-MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD_ALREADY_EXISTS = (
-    create_modify_ldif(
-        "add/nhs_as_svc_ia.Another.ldif", device_type="accredited_system"
-    )
-)
-MODIFY_ACCREDITED_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
-    "delete/description.ldif", device_type="accredited_system"
 )
 MODIFY_MESSAGE_HANDLING_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
     "delete/nhs_product_name.ldif", device_type="message_handling_system"
@@ -210,6 +192,47 @@ MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_DEVICE_FIELD = create_modify_ldif(
 MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_MESSAGE_SETS_FIELD = create_modify_ldif(
     "replace/nhs_ep_interaction_type.ldif", device_type="message_handling_system"
 )
-MODIFY_MESSAGE_HANDLING_SYSTEM_REPLACE_MESSAGE_SETS_FIELD_INTERACTION_ID = (
-    create_modify_ldif("replace/service_ia.ldif", device_type="message_handling_system")
+
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_DEVICE_FIELD_LIST = create_modify_ldif(
+    "add/nhs_as_client.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_CAT_BAG = create_modify_ldif(
+    "add/nhs_as_category_bag.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_DEVICE_FIELD_NOT_LIST = create_modify_ldif(
+    "add/description.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD = create_modify_ldif(
+    "add/nhs_as_svc_ia.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD_MULTIPLE = (
+    create_modify_ldif(
+        "add/nhs_as_svc_ia.Multiple.ldif", device_type="accredited_system"
+    )
+)
+MODIFY_ACCREDITED_SYSTEM_ADD_TO_ADDITIONAL_INTERACTIONS_FIELD_ALREADY_EXISTS = (
+    create_modify_ldif(
+        "add/nhs_as_svc_ia.Duplicate.ldif", device_type="accredited_system"
+    )
+)
+MODIFY_ACCREDITED_SYSTEM_DELETE_DEVICE_FIELD = create_modify_ldif(
+    "delete/description.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_DELETE_CAT_BAG = create_modify_ldif(
+    "delete/nhs_as_category_bag.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_INTERACTIONS_FIELD = create_modify_ldif(
+    "replace/nhs_as_svc_ia.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_ADDITIONAL_INTERACTIONS_FIELD = create_modify_ldif(
+    "replace/nhs_as_svc_ia.Another.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_LIST_FIELD = create_modify_ldif(
+    "replace/nhs_as_client.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_FIELD = create_modify_ldif(
+    "replace/nhs_approver_urp.ldif", device_type="accredited_system"
+)
+MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_LIST_FIELD_WITH_EMPTY = create_modify_ldif(
+    "replace/nhs_as_acf.ldif", device_type="accredited_system"
 )

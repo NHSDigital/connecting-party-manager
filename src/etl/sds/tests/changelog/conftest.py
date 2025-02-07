@@ -9,6 +9,10 @@ from unittest import mock
 
 import boto3
 import pytest
+from domain.core.device.v1 import Device
+from domain.core.device_reference_data.v1 import DeviceReferenceData
+from domain.core.epr_product.v1 import EprProduct
+from domain.core.product_team_epr.v1 import ProductTeam
 from etl_utils.io import pkl_dumps_lz4
 from etl_utils.worker.model import WorkerEnvironment
 from moto import mock_aws
@@ -34,9 +38,10 @@ def dynamodb_client() -> Generator[DynamoDBClient, None, None]:
 
 @pytest.fixture
 def s3_client() -> Generator[S3Client, None, None]:
-    with mock.patch.dict(
-        os.environ, {"AWS_DEFAULT_REGION": "us-east-1"}, clear=True
-    ), mock_aws():
+    with (
+        mock.patch.dict(os.environ, {"AWS_DEFAULT_REGION": "us-east-1"}, clear=True),
+        mock_aws(),
+    ):
         client = boto3.client("s3")
         yield client
 
@@ -130,3 +135,70 @@ def load_handler(scenario: Scenario):
 
     yield load_update.handler
     os.environ = original_environ
+
+
+def make_hashable(data):
+    """
+    Recursively convert lists and other unhashable types in a dictionary to hashable equivalents.
+    """
+    if isinstance(data, list):
+        return tuple(sorted(make_hashable(item) for item in data))
+    elif isinstance(data, dict):
+        return frozenset((key, make_hashable(value)) for key, value in data.items())
+    return data
+
+
+def equivalent_questionnaire_responses[
+    item_type: Device | DeviceReferenceData
+](new_item: item_type, old_item: item_type) -> bool:
+    # Check if the keys (questionnaire IDs) match
+    questionnaires = old_item.questionnaire_responses.keys()
+    assert new_item.questionnaire_responses.keys() == questionnaires
+
+    # Compare the questionnaire responses for each questionnaire ID
+    for q in questionnaires:
+        new_questionnaire_responses = new_item.questionnaire_responses[q]
+        old_questionnaire_responses = old_item.questionnaire_responses[q]
+
+        assert len(new_questionnaire_responses) == len(old_questionnaire_responses)
+
+        # Compare the responses as unordered collections
+        new_data_set = {make_hashable(qr.data) for qr in new_questionnaire_responses}
+        old_data_set = {make_hashable(qr.data) for qr in old_questionnaire_responses}
+
+        assert new_data_set == old_data_set
+
+    return True
+
+
+def equivalent_with_unordered_lists[
+    item_type: ProductTeam | EprProduct | Device | DeviceReferenceData
+](new_item: item_type, old_item: item_type) -> bool:
+    assert new_item.id != old_item.id
+    assert new_item.name == old_item.name
+    assert new_item.created_on > old_item.created_on
+    if old_item.updated_on:
+        assert new_item.updated_on is not None
+        assert new_item.updated_on > old_item.updated_on
+
+    # Check `keys` field for non-DeviceReferenceData items
+    if not isinstance(old_item, DeviceReferenceData):
+        assert new_item.keys == old_item.keys
+
+    # Handle `questionnaire_responses` equivalence for Devices and DeviceReferenceData
+    if isinstance(old_item, (Device, DeviceReferenceData)):
+        assert equivalent_questionnaire_responses(new_item=new_item, old_item=old_item)
+
+    # Handle additional fields specific to Device
+    if isinstance(old_item, Device):
+        assert set(new_item.tags) == set(old_item.tags)
+
+        # Compare device_reference_data.values() field as unordered collections
+        new_data = list(new_item.device_reference_data.values())
+        old_data = list(old_item.device_reference_data.values())
+        # Make elements hashable before comparing as sets
+        new_data_hashable = {make_hashable(item) for item in new_data}
+        old_data_hashable = {make_hashable(item) for item in old_data}
+        assert new_data_hashable == old_data_hashable
+
+    return True

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-02-05
+- [PI-691] Changelog ETL - modify / replace in an AS
+- [PI-726] Update AS tags - Adding an AS
+
 ## 2025-01-31
 - [PI-745] Create Product and Generate ID
 
