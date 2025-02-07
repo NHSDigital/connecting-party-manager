@@ -236,6 +236,3 @@ MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_FIELD = create_modify_ldif(
 MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_LIST_FIELD_WITH_EMPTY = create_modify_ldif(
     "replace/nhs_as_acf.ldif", device_type="accredited_system"
 )
-MODIFY_ACCREDITED_SYSTEM_REPLACE_DEVICE_NON_LIST_FIELD_WITH_EMPTY = create_modify_ldif(
-    "replace/nhs_temp_uid.ldif", device_type="accredited_system"
-)
