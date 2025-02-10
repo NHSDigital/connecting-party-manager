@@ -109,6 +109,7 @@ const EnvironmentConfigStep: React.FC<EnvironmentConfigStepProps> = ({
       </label>
       <input
         type="text"
+        placeholder="eg. internal-dev, internal-qa, ref, int"
         id="environment"
         className="nhs-input"
         value={environmentConfig.environment}
@@ -352,7 +353,7 @@ const ProductCreationFlow: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://internal-dev.api.service.nhs.uk/connecting-party-manager/ProductTeam",
+        `https://${environmentConfig.environment}.api.service.nhs.uk/connecting-party-manager/ProductTeam`,
         {
           method: "POST",
           headers: {
@@ -391,7 +392,7 @@ const ProductCreationFlow: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://internal-${environmentConfig.environment}.api.service.nhs.uk/connecting-party-manager/ProductTeam/${productTeamResponse?.id}/Product`,
+        `https://${environmentConfig.environment}.api.service.nhs.uk/connecting-party-manager/ProductTeam/${productTeamResponse?.id}/Product`,
         {
           method: "POST",
           headers: {
