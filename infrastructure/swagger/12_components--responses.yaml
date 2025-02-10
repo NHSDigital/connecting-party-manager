@@ -145,6 +145,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductResponse"
+    ProductDelete:
+      description: Delete Product operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CPMProductDeleteResponse"
     EprProductCreate:
       description: Create Epr Product operation successful
       content:

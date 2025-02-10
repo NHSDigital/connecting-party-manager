@@ -73,7 +73,7 @@ def test_index():
         assert response["statusCode"] == 200
         assert (
             response["body"]
-            == '{"code": "200", "message": "P.AAA-AAA has been deleted."}'
+            == '{"code": "RESOURCE_DELETED", "message": "P.AAA-AAA has been deleted."}'
         )
 
         # Retrieve the created resource

@@ -22,12 +22,12 @@ Feature: Delete CPM Product - success scenarios
     When I make a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>/Product/${ note(product_id) }"
     Then I receive a status code "200" with body
       | path    | value                                   |
-      | code    | 200                                     |
+      | code    | RESOURCE_DELETED                        |
       | message | ${ note(product_id) } has been deleted. |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 57               |
+      | Content-Length | 70               |
 
     Examples:
       | product_team_id            |

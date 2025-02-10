@@ -16,7 +16,10 @@ def delete_product(data, cache) -> CpmProduct:
 
 def set_http_status(data, cache) -> tuple[int, None]:
     product: CpmProduct = data[read_product]
-    return HTTPStatus.OK, {"code": "200", "message": f"{product.id} has been deleted."}
+    return HTTPStatus.OK, {
+        "code": "RESOURCE_DELETED",
+        "message": f"{product.id} has been deleted.",
+    }
 
 
 steps = [

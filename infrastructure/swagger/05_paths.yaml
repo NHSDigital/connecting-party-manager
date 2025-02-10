@@ -232,6 +232,10 @@ paths:
     delete:
       operationId: deleteproductendpoint
       summary: Delete a Product resource (DELETE)
+      description: |
+        - Delete a product using a product team ID and product ID.
+      tags:
+        - Core Product ID Endpointsurce (DELETE)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
@@ -239,8 +243,8 @@ paths:
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
-        "204":
-          description: Delete Product operation successful
+        "200":
+          $ref: "#/components/responses/ProductDelete"
         "404":
           $ref: "#/components/responses/NotFound"
       x-amazon-apigateway-integration:
