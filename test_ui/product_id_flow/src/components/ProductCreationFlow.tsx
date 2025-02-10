@@ -401,7 +401,7 @@ const ProductCreationFlow: React.FC = () => {
             Authorization: "letmein",
           },
           body: JSON.stringify({
-            name: teamFormData.name,
+            name: productFormData.name,
           }),
         }
       );
