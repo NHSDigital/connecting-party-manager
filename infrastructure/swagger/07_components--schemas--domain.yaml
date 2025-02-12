@@ -183,7 +183,16 @@ components:
         created_on: "2024-10-15T10:00:00Z"
         updated_on: "null"
         deleted_on: "null"
-
+    CPMProductDeleteResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      example:
+        code: "RESOURCE_DELETED"
+        message: "P.XYZ-123 has been deleted."
     Questionnaire:
       type: object
       properties:

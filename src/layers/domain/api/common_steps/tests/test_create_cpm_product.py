@@ -13,7 +13,7 @@ from domain.response.validation_errors import (
 from event.step_chain import StepChain
 
 from conftest import dynamodb_client_with_sleep as dynamodb_client
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.sample_data import CPM_PRODUCT_TEAM_NO_ID
 
 TABLE_NAME = "my-table"
@@ -51,7 +51,7 @@ def test_create_product_steps_bad_input(
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
-    with mock_table(table_name=TABLE_NAME):
+    with mock_table_cpm(table_name=TABLE_NAME):
         step_chain.run(init=event, cache=mocked_cache)
 
     assert isinstance(step_chain.result, expected_exception)
@@ -72,7 +72,7 @@ def test_create_product_steps_good_input():
     step_chain = StepChain(step_chain=before_steps)
 
     mocked_cache = {"DYNAMODB_CLIENT": dynamodb_client(), "DYNAMODB_TABLE": TABLE_NAME}
-    with mock_table(table_name=TABLE_NAME):
+    with mock_table_cpm(table_name=TABLE_NAME):
         product_team_repo = ProductTeamRepository(
             table_name=mocked_cache["DYNAMODB_TABLE"],
             dynamodb_client=mocked_cache["DYNAMODB_CLIENT"],

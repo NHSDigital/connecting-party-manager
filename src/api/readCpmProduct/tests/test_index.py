@@ -8,7 +8,7 @@ from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.product_team_repository import ProductTeamRepository
 from event.json import json_loads
 
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.response_assertions import _response_assertions
 
 TABLE_NAME = "hiya"
@@ -32,7 +32,7 @@ def test_index(version):
         name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
     )
 
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -102,7 +102,7 @@ def test_index_no_such_cpm_product(version):
     product_team = org.create_product_team(
         name=PRODUCT_TEAM_NAME, keys=PRODUCT_TEAM_KEYS
     )
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
@@ -159,7 +159,7 @@ def test_index_no_such_cpm_product(version):
     ],
 )
 def test_index_no_such_product_team(version):
-    with mock_table(TABLE_NAME) as client, mock.patch.dict(
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
         os.environ,
         {
             "DYNAMODB_TABLE": TABLE_NAME,
