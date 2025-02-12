@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-02-12
+- [PI-762] UI Demo POC
+
 ## 2025-02-07
 - [PI-746] Deactivate a Product
 - [PI-765] Feature test for create ProductTeam endpoint request containing an empty key_value
