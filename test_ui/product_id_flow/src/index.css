@@ -1,0 +1,87 @@
+@import url("https://fonts.googleapis.com/css2?family=Frutiger&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Frutiger, Arial, sans-serif;
+  }
+  body {
+    @apply bg-white m-0 min-h-screen flex flex-col;
+  }
+}
+
+/* NHS Custom Styles */
+@layer components {
+  .nhs-header {
+    @apply bg-nhs-blue text-white py-4;
+  }
+
+  .nhs-header > div {
+    @apply max-w-7xl mx-auto px-8;
+  }
+
+  .nhs-main {
+    @apply max-w-7xl mx-auto px-8 py-12 flex flex-col items-center;
+  }
+
+  .nhs-title {
+    @apply text-nhs-blue text-3xl font-bold mb-8 self-center;
+  }
+
+  .nhs-form-group {
+    @apply mb-6 w-[500px];
+  }
+
+  .nhs-label {
+    @apply block text-nhs-black text-base font-normal mb-2;
+  }
+
+  .nhs-input {
+    @apply w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-nhs-blue bg-white;
+  }
+
+  .nhs-button {
+    @apply px-6 py-2 rounded font-medium text-base transition-colors duration-200;
+  }
+
+  /* Default state - greyed out */
+  .nhs-button-primary {
+    @apply bg-gray-200 text-gray-500;
+  }
+
+  /* Enabled state - NHS blue with hover */
+  .nhs-button-primary[data-emphasis="true"] {
+    @apply bg-nhs-blue text-white hover:bg-nhs-bright-blue cursor-pointer;
+  }
+
+  /* Disabled state - grey */
+  .nhs-button-primary[disabled] {
+    @apply bg-gray-200 text-gray-500 cursor-not-allowed hover:bg-gray-200;
+  }
+
+  .nhs-button-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+  }
+
+  .nhs-success-banner {
+    @apply bg-green-50 border-l-4 border-nhs-green p-4 mb-6 flex items-center text-green-800 w-[500px];
+  }
+
+  .nhs-response-data {
+    @apply mt-8 w-[500px];
+  }
+
+  .nhs-response-data pre {
+    @apply bg-gray-50 p-4 rounded text-sm overflow-x-auto;
+  }
+
+  .nhs-footer {
+    @apply bg-nhs-dark-grey text-white py-4 mt-auto;
+  }
+
+  .nhs-footer > div {
+    @apply max-w-7xl mx-auto px-8;
+  }
+}

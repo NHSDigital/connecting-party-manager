@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NHS Product Team Creation</title>
+    <style>
+      .banner {
+        background-color: #007bff;
+        padding: 20px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .scroll-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .scroll-text {
+        color: white;
+        font-size: 24px;
+        font-family: Arial, sans-serif;
+        white-space: nowrap;
+        position: absolute;
+        animation: scroll-right 10s linear infinite;
+      }
+
+      @keyframes scroll-right {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100vw);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      <div class="scroll-container">
+        <div class="scroll-text">CPM Demo Environment</div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
