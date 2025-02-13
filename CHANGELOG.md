@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-02-13
+- [PI-767] Table design change
+
 ## 2025-02-12
 - [PI-762] UI Demo POC
 
