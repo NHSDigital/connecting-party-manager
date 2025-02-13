@@ -122,6 +122,7 @@ function _get_layer_list() {
 }
 
 function _get_third_party_layer_list() {
+    echo "pwd is $(pwd)"
     local layers=$(find "$(pwd)/src/layers/third_party/" -type f -name *.zip -exec basename {} .zip \; | jq -R -s -c 'split("\n")[:-1]')
     echo $layers
 }
