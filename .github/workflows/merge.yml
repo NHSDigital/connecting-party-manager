@@ -70,6 +70,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v2.0.0
         with:
+          webhook-type: webhook-trigger
           payload: |
             {
               "tag": "${{ needs.make-tag.outputs.tag}}",
