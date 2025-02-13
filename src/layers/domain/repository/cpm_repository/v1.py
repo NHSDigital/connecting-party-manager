@@ -3,6 +3,7 @@ from itertools import batched, chain
 from typing import TYPE_CHECKING, Generator, Iterable
 
 from domain.core.aggregate_root import AggregateRoot
+from domain.core.enum import EntityType
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys import KEY_SEPARATOR, TableKey
 from domain.repository.marshall import marshall, unmarshall
@@ -106,6 +107,7 @@ class Repository[ModelType: AggregateRoot]:
         parent_key_parts: tuple[str],
         data: dict,
         root: bool,
+        row_type: str,
         table_key: TableKey = None,
         parent_table_keys: tuple[TableKey] = None,
     ) -> TransactItem:
@@ -119,30 +121,37 @@ class Repository[ModelType: AggregateRoot]:
                 f"Expected provide {len(parent_table_keys)} parent key parts, got {len(parent_key_parts)}"
             )
 
-        write_key = table_key.key(id)
-        read_key = KEY_SEPARATOR.join(
+        sort_key = table_key.key(id)
+        partition_key = KEY_SEPARATOR.join(
             table_key.key(_id)
             for table_key, _id in zip(parent_table_keys, parent_key_parts)
         )
 
+        item_data = {
+            "pk": partition_key,
+            "sk": sort_key,
+            "pk_read_1": sort_key,
+            "sk_read_1": sort_key,
+            "root": root,
+            "row_type": row_type,
+            **data,
+        }
+
+        if row_type != EntityType.PRODUCT_TEAM_ALIAS:
+            item_data["pk_read_2"] = TableKey.ORG_CODE.key(data["ods_code"])
+            item_data["sk_read_2"] = sort_key
+
         return TransactItem(
             Put=TransactionStatement(
                 TableName=self.table_name,
-                Item=marshall(
-                    pk=write_key,
-                    sk=write_key,
-                    pk_read_1=read_key,
-                    sk_read_1=write_key,
-                    root=root,
-                    **data,
-                ),
+                Item=marshall(**item_data),
                 ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
             )
         )
 
-    def update_indexes(self, id: str, keys: list[str], data: dict):
+    def update_indexes(self, pk: str, id: str, keys: list[str], data: dict):
         primary_keys = [
-            marshall(pk=pk, sk=pk) for pk in map(self.table_key.key, [id, *keys])
+            marshall(pk=pk, sk=sk) for sk in map(self.table_key.key, [id, *keys])
         ]
         return update_transactions(
             table_name=self.table_name, primary_keys=primary_keys, data=data
@@ -161,21 +170,18 @@ class Repository[ModelType: AggregateRoot]:
     def _query(
         self, parent_ids: tuple[str], id: str = None, status: str = "all"
     ) -> list[dict]:
-        pk_read_1 = KEY_SEPARATOR.join(
+        pk = KEY_SEPARATOR.join(
             table_key.key(_id)
             for table_key, _id in zip(self.parent_table_keys, parent_ids)
         )
-        sk_read_1 = self.table_key.key(id or "")
+        sk = self.table_key.key(id or "")
 
         sk_query_type = QueryType.BEGINS_WITH if id is None else QueryType.EQUALS
-        sk_condition = sk_query_type.format("sk_read_1", ":sk_read_1")
+        sk_condition = sk_query_type.format("sk", ":sk")
         args = {
             "TableName": self.table_name,
-            "IndexName": "idx_gsi_read_1",
-            "KeyConditionExpression": f"pk_read_1 = :pk_read_1 AND {sk_condition}",
-            "ExpressionAttributeValues": marshall(
-                **{":pk_read_1": pk_read_1, ":sk_read_1": sk_read_1}
-            ),
+            "KeyConditionExpression": f"pk = :pk AND {sk_condition}",
+            "ExpressionAttributeValues": marshall(**{":pk": pk, ":sk": sk}),
         }
         if status != "all":
             args["FilterExpression"] = "#status = :status"
@@ -199,5 +205,7 @@ class Repository[ModelType: AggregateRoot]:
         try:
             (item,) = items
         except ValueError:
+            if id in parent_ids:
+                raise ItemNotFound(id, item_type=self.model)
             raise ItemNotFound(*filter(bool, parent_ids), id, item_type=self.model)
         return self.model(**item)

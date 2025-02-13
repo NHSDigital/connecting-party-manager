@@ -23,7 +23,7 @@ TABLE_NAME = "hiya"
 )
 def test_index(version):
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
-    product_team = org.create_product_team_epr(
+    product_team = org.create_product_team(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 
@@ -135,7 +135,7 @@ def test_index_no_such_product_team(version, product_id):
 )
 def test_index_by_alias(version):
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
-    product_team = org.create_product_team_epr(
+    product_team = org.create_product_team(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 

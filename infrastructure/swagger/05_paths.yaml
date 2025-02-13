@@ -315,7 +315,7 @@ paths:
       description: |
         - Delete a product using a product team ID and product ID.
       tags:
-        - Core Product ID Endpointsurce (DELETE)
+        - Core Product ID Endpoints
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"

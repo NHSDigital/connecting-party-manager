@@ -13,7 +13,7 @@ from test_helpers.response_assertions import _response_assertions
 
 TABLE_NAME = "hiya"
 ODS_CODE = "F5H1R"
-PRODUCT_TEAM_ID = "F5H1R.641be376-3954-4339-822c-54071c9ff1a0"
+PRODUCT_TEAM_ID = "641be376-3954-4339-822c-54071c9ff1a0"
 PRODUCT_TEAM_NAME = "product-team-name"
 PRODUCT_ID = "P.XXX-YYY"
 PRODUCT_NAME = "cpm-product-name"
@@ -64,7 +64,6 @@ def test_index(version):
                 },
             }
         )
-
     response_body = json_loads(result["body"])
 
     # Assertions for fields that must exactly match
