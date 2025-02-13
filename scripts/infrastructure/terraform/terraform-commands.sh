@@ -50,7 +50,7 @@ function _terraform() {
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
 
-        third_party_layers ${layers}
+        layers ${layers}
         third_party_layers ${third_party_layers}
     "
   fi
@@ -141,8 +141,6 @@ function _terraform_apply() {
   local workspace=$1
   local plan_file=$2
   local args=${@:3}
-
-  echo $workspace
 
   terraform init || return 1
   terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
