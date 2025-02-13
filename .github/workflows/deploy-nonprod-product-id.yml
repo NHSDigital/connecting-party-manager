@@ -1,22 +1,24 @@
 name: "Deploy: Product Id - Nonprod"
 
-on:
-  workflow_dispatch:
-    inputs:
-      account:
-        description: Account to deploy
-        required: true
-        default: dev
-        type: choice
-        options:
-          - dev
-          - qa
-          - int
-          - ref
-      sandbox:
-        description: Do you want to deploy the sandbox version?
-        type: boolean
-        default: false
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       account:
+#         description: Account to deploy
+#         required: true
+#         default: dev
+#         type: choice
+#         options:
+#           - dev
+#           - qa
+#           - int
+#           - ref
+#       sandbox:
+#         description: Do you want to deploy the sandbox version?
+#         type: boolean
+#         default: false
+
+on: pull_request
 
 jobs:
   check-for-ref-sandbox:
