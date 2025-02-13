@@ -50,6 +50,7 @@ function _terraform() {
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
 
+        third_party_layers ${layers}
         third_party_layers ${third_party_layers}
     "
   fi
