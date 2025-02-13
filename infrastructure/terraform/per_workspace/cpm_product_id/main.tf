@@ -32,7 +32,7 @@ data "aws_secretsmanager_secret" "cpm_apigee_api_key" {
 }
 
 module "eprtable" {
-  source                      = "./modules/api_storage"
+  source                      = "../modules/api_storage"
   name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--epr-table"
   environment                 = var.environment
   deletion_protection_enabled = var.deletion_protection_enabled
@@ -58,7 +58,7 @@ module "eprtable" {
 }
 
 module "cpmtable" {
-  source                      = "./modules/api_storage"
+  source                      = "../modules/api_storage"
   name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--cpm-table"
   environment                 = var.environment
   deletion_protection_enabled = var.deletion_protection_enabled
@@ -93,25 +93,25 @@ module "cpmtable" {
 
 module "layers" {
   for_each       = toset(var.layers)
-  source         = "./modules/api_worker/api_layer"
+  source         = "../modules/api_worker/api_layer"
   name           = each.key
   python_version = var.python_version
   layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
-  source_path    = "${path.module}/../../../src/layers/${each.key}/dist/${each.key}.zip"
+  source_path    = "${path.module}/../../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
 module "third_party_layers" {
   for_each       = toset(var.third_party_layers)
-  source         = "./modules/api_worker/api_layer"
+  source         = "../modules/api_worker/api_layer"
   name           = each.key
   python_version = var.python_version
   layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
-  source_path    = "${path.module}/../../../src/layers/third_party/dist/${each.key}.zip"
+  source_path    = "${path.module}/../../../../src/layers/third_party/dist/${each.key}.zip"
 }
 
 module "lambdas" {
   for_each       = setsubtract(var.lambdas, ["authoriser"])
-  source         = "./modules/api_worker/api_lambda"
+  source         = "../modules/api_worker/api_lambda"
   python_version = var.python_version
   name           = each.key
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(replace(replace(replace(each.key, "_", "-"), "DeviceReferenceData", "DeviceRefData"), "MessageHandlingSystem", "MHS"), "MessageSet", "MsgSet")}"
@@ -121,7 +121,7 @@ module "lambdas" {
     compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
     [element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn]
   )
-  source_path = "${path.module}/../../../src/api/${each.key}/dist/${each.key}.zip"
+  source_path = "${path.module}/../../../../src/api/${each.key}/dist/${each.key}.zip"
   allowed_triggers = {
     "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}" = {
       service    = "apigateway"
@@ -131,11 +131,11 @@ module "lambdas" {
   environment_variables = {
     DYNAMODB_TABLE = contains(["createProductTeam", "readProductTeam", "createCpmProduct", "readCpmProduct", "searchCpmProduct", "deleteCpmProduct"], each.key) ? module.cpmtable.dynamodb_table_name : module.eprtable.dynamodb_table_name
   }
-  attach_policy_statements = length((fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json"))) > 0
+  attach_policy_statements = length((fileset("${path.module}/../../../../src/api/${each.key}/policies", "*.json"))) > 0
   policy_statements = {
-    for file in fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json") : replace(file, ".json", "") => {
+    for file in fileset("${path.module}/../../../../src/api/${each.key}/policies", "*.json") : replace(file, ".json", "") => {
       effect    = "Allow"
-      actions   = jsondecode(file("${path.module}/../../../src/api/${each.key}/policies/${file}"))
+      actions   = jsondecode(file("${path.module}/../../../../src/api/${each.key}/policies/${file}"))
       resources = local.permission_resource_map[replace(file, ".json", "")]
     }
   }
@@ -144,10 +144,10 @@ module "lambdas" {
 
 module "authoriser" {
   name           = "authoriser"
-  source         = "./modules/api_worker/api_lambda"
+  source         = "../modules/api_worker/api_lambda"
   python_version = var.python_version
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser"
-  source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
+  source_path    = "${path.module}/../../../../src/api/authoriser/dist/authoriser.zip"
   environment_variables = {
     ENVIRONMENT = var.environment
   }
@@ -185,13 +185,13 @@ module "authoriser" {
 }
 
 module "domain" {
-  source = "./modules/domain"
+  source = "../modules/domain"
   domain = local.domain
   zone   = local.zone
 }
 
 module "api_entrypoint" {
-  source              = "./modules/api_entrypoint"
+  source              = "../modules/api_entrypoint"
   assume_account      = var.assume_account
   project             = local.project
   name                = "${local.project}--${replace(terraform.workspace, "_", "-")}--api-entrypoint"
@@ -207,7 +207,7 @@ data "aws_s3_bucket" "truststore_bucket" {
 
 
 module "sds_etl" {
-  source                           = "./modules/etl/sds"
+  source                           = "../modules/etl/sds"
   workspace_prefix                 = "${local.project}--${replace(terraform.workspace, "_", "-")}"
   assume_account                   = var.assume_account
   python_version                   = var.python_version

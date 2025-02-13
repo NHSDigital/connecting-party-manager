@@ -1,5 +1,5 @@
-name: "Deploy: Workspace - Production"
-run-name: Deploying to prod workspace - prod
+name: "Deploy: EPR Workspace - Production"
+run-name: Deploying EPR to prod workspace - prod
 
 on:
   workflow_dispatch:
@@ -10,5 +10,5 @@ jobs:
     with:
       account: prod
       workspace: prod
-      scope: per_workspace
+      scope: per_workspace/cpm_epr
     secrets: inherit # pragma: allowlist secret

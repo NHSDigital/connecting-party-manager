@@ -1,0 +1,41 @@
+name: "Deploy: EPR Workspace - Nonprod"
+
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        description: Account to deploy
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - qa
+          - int
+          - ref
+      sandbox:
+        description: Do you want to deploy the sandbox version?
+        type: boolean
+        default: false
+
+jobs:
+  check-for-ref-sandbox:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject if ref sandbox
+        run: |
+          if [[ "${{ inputs.account }}" == "ref" && "${{ inputs.sandbox }}" == "true" ]]; then
+            echo "Error: Sandbox deployment is not allowed for the 'ref' account."
+            exit 1
+          fi
+
+  deploy:
+    needs: [check-for-ref-sandbox]
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      account: ${{ inputs.account }}
+      workspace: ${{ inputs.account }}${{ inputs.sandbox == true && '-sandbox' || '' }}
+      scope: "per_workspace/cpm_epr"
+    secrets: inherit # pragma: allowlist secret
+
+run-name: "Deploying to nonprod epr workspace - ${{ inputs.account }} sandbox:${{ inputs.sandbox }}"

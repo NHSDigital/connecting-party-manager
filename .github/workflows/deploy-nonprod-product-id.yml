@@ -1,4 +1,4 @@
-name: "Deploy: Workspace - Nonprod"
+name: "Deploy: Product Id - Nonprod"
 
 on:
   workflow_dispatch:
@@ -35,7 +35,7 @@ jobs:
     with:
       account: ${{ inputs.account }}
       workspace: ${{ inputs.account }}${{ inputs.sandbox == true && '-sandbox' || '' }}
-      scope: "per_workspace"
+      scope: "per_workspace/cpm_product_id"
     secrets: inherit # pragma: allowlist secret
 
-run-name: "Deploying to nonprod workspace - ${{ inputs.account }} sandbox:${{ inputs.sandbox }}"
+run-name: "Deploying to nonprod product id workspace - ${{ inputs.account }} sandbox:${{ inputs.sandbox }}"

@@ -2,7 +2,7 @@
 
 AWS_ACCOUNT =
 TERRAFORM_WORKSPACE =
-TERRAFORM_SCOPE = per_workspace
+TERRAFORM_SCOPE = per_workspace/cpm_product_id
 TERRAFORM_ARGS =
 
 PREFIX =
@@ -11,7 +11,7 @@ VERSION =
 WORKSPACE_OUTPUT_JSON = $(CURDIR)/infrastructure/terraform/per_workspace/output.json
 TERRAFORM_PLAN_TIMESTAMP = $(TIMESTAMP_DIR)/tfplan.timestamp
 BUILD_TIMESTAMP = $(TIMESTAMP_DIR)/.build.timestamp
-TERRAFORM_FILES = $(shell find infrastructure/terraform/per_workspace -type f -name "*.tf*") $(shell find infrastructure/terraform -type f -name "*.asl.json")
+TERRAFORM_FILES = $(shell find infrastructure/terraform/per_workspace/cpm_product_id -type f -name "*.tf*") $(shell find infrastructure/terraform -type f -name "*.asl.json")
 
 terraform--clean:
 	[[ -f $(TERRAFORM_PLAN_TIMESTAMP) ]] && rm $(TERRAFORM_PLAN_TIMESTAMP) || :

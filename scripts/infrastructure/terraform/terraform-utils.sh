@@ -128,6 +128,7 @@ function _get_third_party_layer_list() {
 
 function _get_lambda_list() {
     local dir=$(pwd)
+
     local lambdas=$(find "$(pwd)/src/api" -maxdepth 1 -mindepth 1 -type d ! -name '*tests*' -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
     echo $lambdas
 }

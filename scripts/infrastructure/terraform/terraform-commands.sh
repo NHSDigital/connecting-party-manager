@@ -110,7 +110,8 @@ function _terraform_plan() {
   terraform workspace select default
   terraform init || return 1
   terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1
-  if [[ "${scope}" = "per_workspace" ]]; then
+
+if [[ "${scope}" =~ ^per_workspace/.*$ ]]; then
     terraform plan $args \
       -out="$plan_file" \
       -var-file="$var_file" \
@@ -137,6 +138,8 @@ function _terraform_apply() {
   local workspace=$1
   local plan_file=$2
   local args=${@:3}
+
+  echo $workspace
 
   terraform init || return 1
   terraform workspace select "$workspace" || terraform workspace new "$workspace" || return 1

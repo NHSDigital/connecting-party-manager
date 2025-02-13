@@ -1,0 +1,14 @@
+name: "Deploy: Product ID Workspace - Production"
+run-name: Deploying Product ID to prod workspace - prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      account: prod
+      workspace: prod
+      scope: per_workspace/cpm_product_id
+    secrets: inherit # pragma: allowlist secret
