@@ -49,6 +49,8 @@ function _terraform() {
         workspace_expiration ${workspace_expiration}
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
+
+        third_party_layers ${third_party_layers}
     "
   fi
 
