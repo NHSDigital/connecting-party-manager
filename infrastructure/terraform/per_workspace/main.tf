@@ -31,6 +31,33 @@ data "aws_secretsmanager_secret" "cpm_apigee_api_key" {
   name = "${var.environment}-apigee-cpm-apikey"
 }
 
+module "auroradb" {
+  source      = "./modules/epr_storage"
+  name        = "${local.project}-${replace(terraform.workspace, "_", "-")}-epr-rds"
+  environment = var.environment
+}
+
+
+# module "rdseprtable" {
+#   source = "terraform-aws-modules/rds/aws"
+#
+#   identifier = "epr_rds"
+#
+#   engine                   = "postgres"
+#   engine_version           = "14"
+#   engine_lifecycle_support = "open-source-rds-extended-support-disabled"
+#   family                   = "postgres14"
+#   major_engine_version     = "14"
+#   instance_class           = "db.t4g.micro"
+#
+#   allocated_storage     = 20
+#   max_allocated_storage = 100
+#
+#   db_name  = "eprPostgresql"
+#   username = "eprPostgresql"
+#   port     = 5432
+# }
+
 module "eprtable" {
   source                      = "./modules/api_storage"
   name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--epr-table"
@@ -110,7 +137,7 @@ module "third_party_layers" {
 }
 
 module "lambdas" {
-  for_each       = setsubtract(var.lambdas, ["authoriser"])
+  for_each       = setsubtract(var.lambdas, ["authoriser", "createBook"])
   source         = "./modules/api_worker/api_lambda"
   python_version = var.python_version
   name           = each.key
@@ -131,11 +158,45 @@ module "lambdas" {
   environment_variables = {
     DYNAMODB_TABLE = contains(["createProductTeam", "readProductTeam", "createCpmProduct", "readCpmProduct", "searchCpmProduct", "deleteCpmProduct"], each.key) ? module.cpmtable.dynamodb_table_name : module.eprtable.dynamodb_table_name
   }
+
   attach_policy_statements = length((fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json"))) > 0
   policy_statements = {
     for file in fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json") : replace(file, ".json", "") => {
       effect    = "Allow"
       actions   = jsondecode(file("${path.module}/../../../src/api/${each.key}/policies/${file}"))
+      resources = local.permission_resource_map[replace(file, ".json", "")]
+    }
+  }
+  memory_size = var.lambda_memory_size
+}
+
+module "eprlambda" {
+  source         = "./modules/api_worker/api_lambda_epr"
+  python_version = var.python_version
+  name           = "createBook"
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--createbook"
+
+  //Compact will remove all nulls from the list and create a new one - this is because TF throws an error if there is a null item in the list.
+  layers = concat(
+    compact([for instance in module.layers : contains(var.api_lambda_layers, instance.name) ? instance.layer_arn : null]),
+    [element([for instance in module.third_party_layers : instance if instance.name == "third_party_core"], 0).layer_arn]
+  )
+  source_path = "${path.module}/../../../src/api/createBook/dist/createBook.zip"
+  allowed_triggers = {
+    "AllowExecutionFromAPIGateway-${replace(terraform.workspace, "_", "-")}--${replace("createBook", "_", "-")}" = {
+      service    = "apigateway"
+      source_arn = "${module.api_entrypoint.execution_arn}/*/*/*"
+    }
+  }
+  vpc             = true
+  subnets         = [module.auroradb.vpc_subnets]
+  security_groups = [module.auroradb.security_groups]
+
+  attach_policy_statements = length((fileset("${path.module}/../../../src/api/createBook/policies", "*.json"))) > 0
+  policy_statements = {
+    for file in fileset("${path.module}/../../../src/api/createBook/policies", "*.json") : replace(file, ".json", "") => {
+      effect    = "Allow"
+      actions   = jsondecode(file("${path.module}/../../../src/api/createBook/policies/${file}"))
       resources = local.permission_resource_map[replace(file, ".json", "")]
     }
   }

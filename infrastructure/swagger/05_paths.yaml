@@ -48,6 +48,32 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
+  /Book:
+    post:
+      operationId: createbook
+      summary: Create a Book resource (POST)
+      description: >
+        Create a Book.
+      requestBody:
+        $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/CPMProductTeamCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createBook}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
   /ProductTeam:
     post:
       operationId: createproductteam

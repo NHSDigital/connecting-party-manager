@@ -28,6 +28,8 @@ orjson = "^3.9.15"
 attrs = "^24.2.0"
 locust = "^2.29.1"
 jsonschema = "^4.23.0"
+sqlalchemy = "^2.0.38"
+psycopg2-binary = "^2.9.10"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.0.0"

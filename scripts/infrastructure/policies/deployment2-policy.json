@@ -110,7 +110,8 @@
       ],
       "Resource": [
         "arn:aws:iam::${ACCOUNT_ID}:policy/*",
-        "arn:aws:iam::${ACCOUNT_ID}:role/*"
+        "arn:aws:iam::${ACCOUNT_ID}:role/*",
+        "*"
       ]
     },
     {
@@ -227,18 +228,18 @@
       "Resource": ["arn:aws:es:*:${ACCOUNT_ID}:domain/*"]
     },
     {
-      "Sid": "OpenSearchPLPermissions",
+      "Sid": "Ec2Permissions",
       "Effect": "Allow",
       "Action": [
-        "osis:CreatePipeline",
-        "osis:TagResource",
-        "osis:GetPipeline",
-        "osis:ListTagsForResource",
-        "osis:DeletePipeline",
-        "osis:UpdatePipeline",
-        "osis:StopPipeline"
+        "ec2:CreateInternetGateway",
+        "ec2:CreateVpnGateway",
+        "ec2:DescribeSecurityGroupRules",
+        "logs:AssociateKmsKey",
+        "logs:TagLogGroup",
+        "rds:CreateDBSubnetGroup",
+        "rds:AddTagsToResource"
       ],
-      "Resource": ["arn:aws:osis:*:${ACCOUNT_ID}:pipeline/*"]
+      "Resource": ["*"]
     },
     {
       "Sid": "GlobalPermissions",

@@ -4,8 +4,10 @@ locals {
   current_time   = timestamp()
   workspace_type = var.workspace_type
   permission_resource_map = {
-    kms      = ["*"]
-    dynamodb = ["${module.eprtable.dynamodb_table_arn}", "${module.eprtable.dynamodb_table_arn}/*", "${module.cpmtable.dynamodb_table_arn}", "${module.cpmtable.dynamodb_table_arn}/*"]
+    kms            = ["*"]
+    dynamodb       = ["${module.eprtable.dynamodb_table_arn}", "${module.eprtable.dynamodb_table_arn}/*", "${module.cpmtable.dynamodb_table_arn}", "${module.cpmtable.dynamodb_table_arn}/*"]
+    secretsmanager = ["*"]
+    ec2            = ["*"]
   }
   # e.g. api.cpm.dev.national.nhs.uk
   zone = var.domain
