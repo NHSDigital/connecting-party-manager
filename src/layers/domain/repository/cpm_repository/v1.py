@@ -193,10 +193,10 @@ class Repository[ModelType: AggregateRoot]:
             raise TooManyResults(f"Too many results for query ({(*parent_ids, id)})")
         return list(map(unmarshall, result["Items"]))
 
-    def _search(self, parent_ids: tuple[str]) -> list[ModelType]:
+    def _search(self, parent_ids: tuple[str], status: str = "all") -> list[ModelType]:
         return [
             self.model(**item)
-            for item in self._query(parent_ids=parent_ids)
+            for item in self._query(parent_ids=parent_ids, status=status)
             if item.get("root") is True
         ]
 

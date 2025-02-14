@@ -17,17 +17,20 @@ def parse_path_params(data, cache) -> ProductTeamPathParams:
 
 def read_products(data, cache) -> ProductTeamPathParams:
     path_params: ProductTeamPathParams = data[parse_path_params]
-    product_repo: CpmProductRepository = CpmProductRepository()
-
-
-def read_products(data, cache) -> ProductTeamPathParams:
-    path_params: ProductTeamPathParams = data[parse_path_params]
 
     product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    cpm_products = product_repo.search(product_team_id=product_team.id)
-    return cpm_products
+    cpm_products = product_repo.search(product_team_id=path_params.product_team_id)
+    if not cpm_products:
+        product_ids = []
+        for product in cpm_products:
+            product_ids.append(product.id)
+        return HTTPStatus.CONFLICT, {
+            "code": "CONFLICT",
+            "message": f"Product Team cannot be deleted as it still has associated Product Ids {product_ids}",
+        }
+    return path_params
 
 
 def read_product_team(data, cache) -> ProductTeam:
