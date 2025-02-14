@@ -30,6 +30,16 @@ components:
             errors:
               - code: "RESOURCE_NOT_FOUND"
                 message: "Could not find <ENTITY> for key ('<ID>')"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            errors:
+              - code: "CONFLICT"
+                message: "Product Team cannot be deleted as it still has associated Product Ids ['P.123-XYZ', 'P.456-ABC']"
     BadRequest:
       description: Bad request (multiple error types)
       content:
@@ -126,6 +136,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamResponse"
+    CpmProductTeamDelete:
+      description: Delete Product Team operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CPMProductTeamDeleteResponse"
     EPRProductTeamRead:
       description: Read EPR ProductTeam operation successful
       content:
