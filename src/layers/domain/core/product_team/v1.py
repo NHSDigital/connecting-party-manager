@@ -4,6 +4,7 @@ from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.cpm_product import CpmProduct, CpmProductCreatedEvent
 from domain.core.cpm_system_id import ProductTeamId
+from domain.core.device import event
 from domain.core.enum import Status
 from domain.core.event import Event, EventDeserializer
 from domain.core.product_team_key import ProductTeamKey
@@ -21,6 +22,18 @@ class ProductTeamCreatedEvent(Event):
     created_on: str
     updated_on: str = None
     deleted_on: str = None
+    keys: list[ProductTeamKey] = Field(default_factory=list)
+
+
+@dataclass(kw_only=True, slots=True)
+class ProductTeamDeletedEvent(Event):
+    id: str
+    name: str
+    ods_code: str
+    status: Status
+    created_on: str
+    updated_on: str
+    deleted_on: str
     keys: list[ProductTeamKey] = Field(default_factory=list)
 
 
@@ -58,6 +71,16 @@ class ProductTeam(AggregateRoot):
         product.add_event(product_created_event)
         return product
 
+    @event
+    def delete(self):
+        deleted_on = now()
+        product_team_data = self._update(
+            data=dict(
+                status=Status.INACTIVE, updated_on=deleted_on, deleted_on=deleted_on
+            )
+        )
+        return ProductTeamDeletedEvent(**product_team_data)
+
 
 class ProductTeamEventDeserializer(EventDeserializer):
-    event_types = (ProductTeamCreatedEvent,)
+    event_types = (ProductTeamCreatedEvent, ProductTeamDeletedEvent)

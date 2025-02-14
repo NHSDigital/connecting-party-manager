@@ -217,6 +217,16 @@ def _request(base_url: str, headers: dict, path: str, method: str):
                 "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
             ],
         ],
+        [
+            "/ProductTeam/123/Product/abc",
+            "DELETE",
+            404,
+        ],
+        [
+            "/ProductTeam/123",
+            "DELETE",
+            404,
+        ],
     ],
 )
 def test_smoke_tests(request_details):

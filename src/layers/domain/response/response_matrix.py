@@ -4,6 +4,7 @@ from api_utils.versioning.errors import VersionException
 from domain.core.error import (
     AccreditedSystemFatalError,
     ConfigurationError,
+    ConflictError,
     DuplicateInteractionIdError,
     InvalidSpineAsResponse,
     InvalidSpineMhsResponse,
@@ -28,6 +29,7 @@ HTTP_STATUS_TO_CPM_CODING = {
     # Success matrix here
     HTTPStatus.OK: CpmCoding.OK,
     HTTPStatus.CREATED: CpmCoding.RESOURCE_CREATED,
+    HTTPStatus.CONFLICT: CpmCoding.CONFLICT,
 }
 
 SPINE_CODING_TO_HTTP_STATUS = {
@@ -39,6 +41,8 @@ SPINE_CODING_TO_HTTP_STATUS = {
     SpineCoding.ACCESS_DENIED: HTTPStatus.FORBIDDEN,
     # 404
     SpineCoding.RESOURCE_NOT_FOUND: HTTPStatus.NOT_FOUND,
+    # 409
+    SpineCoding.CONFLICT: HTTPStatus.CONFLICT,
     # 422
     SpineCoding.UNPROCESSABLE_ENTITY: HTTPStatus.UNPROCESSABLE_ENTITY,
     # 500
@@ -65,6 +69,7 @@ EXCEPTIONS_TO_SPINE_CODING = {
     StatusNotOk: SpineCoding.SERVICE_UNAVAILABLE,
     AccreditedSystemFatalError: SpineCoding.VALIDATION_ERROR,
     DuplicateInteractionIdError: SpineCoding.VALIDATION_ERROR,
+    ConflictError: SpineCoding.CONFLICT,
 }
 
 SUCCESS_STATUSES = {*HTTP_STATUS_TO_CPM_CODING.keys(), HTTPStatus.NO_CONTENT}
