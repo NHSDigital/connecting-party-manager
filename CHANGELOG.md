@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-02-17
+- [PI-785] Generated Product Ids for PDM
+
 ## 2025-02-13
 - [PI-767] Table design change
 
