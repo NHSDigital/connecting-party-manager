@@ -43,7 +43,7 @@ const ProductDelete: React.FC = () => {
       const response = await fetch(
         `https://${environmentConfig.environment}.api.service.nhs.uk/ProductTeam/${productTeamId}/Product/${productId}`,
         {
-          method: "GET",
+          method: "DELETE",
           headers: {
             Authorization: "letmein",
             apikey: environmentConfig.apiKey,
