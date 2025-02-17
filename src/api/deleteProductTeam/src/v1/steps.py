@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+from domain.core.error import ConflictError
 from domain.core.product_team import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.product_team_repository import ProductTeamRepository
@@ -22,14 +23,34 @@ def read_products(data, cache) -> ProductTeamPathParams:
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
     cpm_products = product_repo.search(product_team_id=path_params.product_team_id)
-    if not cpm_products:
-        product_ids = []
-        for product in cpm_products:
-            product_ids.append(product.id)
-        return HTTPStatus.CONFLICT, {
-            "code": "CONFLICT",
-            "message": f"Product Team cannot be deleted as it still has associated Product Ids {product_ids}",
-        }
+
+    try:
+        if not cpm_products:
+            pass
+    except ValueError:
+        product_ids = [str(product.id) for product in cpm_products]
+        raise ConflictError(
+            message=f"Product Team cannot be deleted as it still has associated Product Ids {product_ids}"
+        )
+    # if cpm_products:
+    #     product_ids = [str(product.id) for product in cpm_products]
+    #     raise ConflictError(
+    #         message=f"Product Team cannot be deleted as it still has associated Product Ids {product_ids}"
+    #     )
+
+    return path_params
+    # cpm_products = product_repo.search(product_team_id=path_params.product_team_id)
+    # if cpm_products:
+    #     product_ids = []
+    #     for product in cpm_products:
+    #         product_ids.append(str(product.id))
+    #     raise ConflictError(
+    #         message=f"Product Team cannot be deleted as it still has associated Product Ids {product_ids}"
+    #     )
+    # return HTTPStatus.CONFLICT, {
+    #     "code": "CONFLICT",
+    #     "message": f"Product Team cannot be deleted as it still has associated Product Ids {product_ids}",
+    # }
     return path_params
 
 
@@ -51,7 +72,7 @@ def delete_product_team(data, cache) -> ProductTeamRepository:
 
 
 def set_http_status(data, cache) -> tuple[int, None]:
-    product_team: ProductTeamRepository = data[delete_product_team]
+    product_team: ProductTeam = data[read_product_team]
     return HTTPStatus.OK, {
         "code": "RESOURCE_DELETED",
         "message": f"{product_team.id} has been deleted.",

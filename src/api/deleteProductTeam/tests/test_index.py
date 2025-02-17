@@ -5,7 +5,6 @@ from unittest import mock
 import pytest
 from domain.core.root import Root
 from domain.repository.product_team_repository import ProductTeamRepository
-from event.json import json_loads
 
 from test_helpers.dynamodb import mock_table_cpm
 from test_helpers.response_assertions import _response_assertions
@@ -23,7 +22,7 @@ TABLE_NAME = "hiya"
 )
 def test_index(version):
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
-    product_team = org.create_product_team_epr(
+    product_team = org.create_product_team(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 
@@ -35,7 +34,7 @@ def test_index(version):
         },
         clear=True,
     ):
-        from api.readProductTeam.index import cache, handler
+        from api.deleteProductTeam.index import cache, handler
 
         cache["DYNAMODB_CLIENT"] = client
 
@@ -50,17 +49,10 @@ def test_index(version):
                 "pathParameters": {"product_team_id": product_team.id},
             }
         )
-    result_body = json_loads(result["body"])
     expected_result = json.dumps(
         {
-            "id": result_body["id"],
-            "name": "FOOBAR Product Team",
-            "ods_code": "F5H1R",
-            "status": "active",
-            "created_on": result_body["created_on"],
-            "updated_on": None,
-            "deleted_on": None,
-            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+            "code": "RESOURCE_DELETED",
+            "message": f"{product_team.id} has been deleted.",
         }
     )
 
@@ -80,7 +72,7 @@ def test_index(version):
 
 @pytest.mark.parametrize(
     "version, product_id",
-    [("1", "123"), ("1", f"F5H1R.{consistent_uuid(1)}")],
+    [("1", "123"), ("1", f"{consistent_uuid(1)}")],
 )
 def test_index_no_such_product_team(version, product_id):
     with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
@@ -91,7 +83,7 @@ def test_index_no_such_product_team(version, product_id):
         },
         clear=True,
     ):
-        from api.readProductTeam.index import cache, handler
+        from api.deleteProductTeam.index import cache, handler
 
         cache["DYNAMODB_CLIENT"] = client
 
@@ -135,7 +127,7 @@ def test_index_no_such_product_team(version, product_id):
 )
 def test_index_by_alias(version):
     org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
-    product_team = org.create_product_team_epr(
+    product_team = org.create_product_team(
         name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
     )
 
@@ -147,7 +139,7 @@ def test_index_by_alias(version):
         },
         clear=True,
     ):
-        from api.readProductTeam.index import cache, handler
+        from api.deleteProductTeam.index import cache, handler
 
         cache["DYNAMODB_CLIENT"] = client
 
@@ -162,17 +154,10 @@ def test_index_by_alias(version):
                 "pathParameters": {"product_team_id": "BAR"},
             }
         )
-    result_body = json_loads(result["body"])
     expected_result = json.dumps(
         {
-            "id": result_body["id"],
-            "name": "FOOBAR Product Team",
-            "ods_code": "F5H1R",
-            "status": "active",
-            "created_on": result_body["created_on"],
-            "updated_on": None,
-            "deleted_on": None,
-            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+            "code": "RESOURCE_DELETED",
+            "message": f"{product_team.id} has been deleted.",
         }
     )
 

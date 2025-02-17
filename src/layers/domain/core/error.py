@@ -6,6 +6,13 @@ class NotFoundError(Exception):
     pass
 
 
+class ConflictError(Exception):
+    def __init__(self, message="Conflict occurred"):
+        self.message = message
+        self.status_code = 409
+        super().__init__(message)
+
+
 class InvalidKeyPattern(ValueError):
     pass
 
