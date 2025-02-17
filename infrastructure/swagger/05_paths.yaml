@@ -264,25 +264,38 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    # get:
-    #   operationId: searchCpmProduct
-    #   summary: Retrieve all Products associated with a Product Team (GET)
-    #   parameters:
-    #     - $ref: "#/components/parameters/ProductTeamId"
-    #     - $ref: "#/components/parameters/HeaderVersion"
-    #     - $ref: "#/components/parameters/HeaderRequestId"
-    #     - $ref: "#/components/parameters/HeaderCorrelationId"
-    #   responses:
-    #     "200":
-    #       $ref: "#/components/responses/ProductSearch"
-    #     "404":
-    #       $ref: "#/components/responses/NotFound"
-    #   x-amazon-apigateway-integration:
-    #     <<: *ApiGatewayIntegration
-    #     uri: ${method_searchCpmProduct}
-    #   security:
-    #     - ${authoriser_name}: []
-    #     - app-level0: []
+
+  /Product:
+    get:
+      operationId: searchProduct
+      summary: Retrieve all Products associated with a Product Team or Organisation (GET)
+      parameters:
+        - name: product_team_id
+          in: query
+          required: false
+          description: The ID of the product team to filter results by.
+          schema:
+            type: string
+        - name: organisation_code
+          in: query
+          required: false
+          description: The organisation code to filter results by.
+          schema:
+            type: string
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
 
   /ProductTeam/{product_team_id}/Product/{product_id}:
     get:

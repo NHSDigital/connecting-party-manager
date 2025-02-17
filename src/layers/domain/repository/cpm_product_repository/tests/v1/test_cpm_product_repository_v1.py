@@ -164,11 +164,11 @@ def test__query_products_by_product_team_with_sk_prefix():
 
 def test__cpm_product_repository_search():
     product_id = "P.XXX-YYY"
-
     product_team = _create_product_team()
     cpm_product = product_team.create_cpm_product(
         name="cpm-product-name", product_id=product_id
     )
+    organisation_code = CPM_PRODUCT_TEAM_NO_ID["ods_code"]
 
     with mock_table_cpm("my_table") as client:
         repo = CpmProductRepository(
@@ -177,6 +177,15 @@ def test__cpm_product_repository_search():
         )
 
         repo.write(cpm_product)
-        result = repo.search(product_team_id=product_team.id)
 
-    assert result == [cpm_product]
+        # Test search by product team (search_by_product_team)
+        result_by_product_team = repo.search_by_product_team(
+            product_team_id=product_team.id
+        )
+        assert result_by_product_team == [cpm_product]
+
+        # Test search by organisation (search_by_organisation)
+        result_by_organisation = repo.search_by_organisation(
+            organisation_code=organisation_code
+        )
+        assert result_by_organisation == [cpm_product]
