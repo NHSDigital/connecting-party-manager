@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import ProductCreationFlow from "./components/ProductCreationFlow";
 import ProductSearch from "./components/ProductSearchFlow";
+import ProductDelete from "./components/ProductDeleteFlow";
 
 function App() {
-  const [currentFlow, setCurrentFlow] = useState<"creation" | "search" | null>(
-    null
-  );
+  const [currentFlow, setCurrentFlow] = useState<
+    "creation" | "search" | "delete" | null
+  >(null);
 
   const renderFlow = () => {
     switch (currentFlow) {
@@ -13,6 +14,8 @@ function App() {
         return <ProductCreationFlow />;
       case "search":
         return <ProductSearch />;
+      case "delete":
+        return <ProductDelete />;
       default:
         return (
           <div className="min-h-screen flex flex-col items-center justify-center">
@@ -31,6 +34,12 @@ function App() {
                 onClick={() => setCurrentFlow("search")}
               >
                 Product Search Flow
+              </button>
+              <button
+                className="nhs-button nhs-button-primary"
+                onClick={() => setCurrentFlow("delete")}
+              >
+                Product Delete Flow
               </button>
             </div>
           </div>
