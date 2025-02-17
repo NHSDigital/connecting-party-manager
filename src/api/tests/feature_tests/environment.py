@@ -88,6 +88,8 @@ def before_feature(context: Context, feature: Feature):
         "Create Product Team - failure scenarios",
         "Read Product Team - success scenarios",
         "Read Product Team - failure scenarios",
+        "Delete Product Team - success scenarios",
+        "Delete Product Team - failure scenarios",
         "Create CPM Product - success scenarios",
         "Create CPM Product - failure scenarios",
         "Read CPM Product - success scenarios",

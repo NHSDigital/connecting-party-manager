@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Generator, Iterable
 
 from domain.core.aggregate_root import AggregateRoot
 from domain.core.enum import EntityType
+from domain.core.product_team_key.v1 import ProductTeamKeyType
 from domain.repository.errors import ItemNotFound
 from domain.repository.keys import KEY_SEPARATOR, TableKey
 from domain.repository.marshall import marshall, unmarshall
@@ -150,9 +151,20 @@ class Repository[ModelType: AggregateRoot]:
         )
 
     def update_indexes(self, pk: str, id: str, keys: list[str], data: dict):
-        primary_keys = [
-            marshall(pk=pk, sk=sk) for sk in map(self.table_key.key, [id, *keys])
-        ]
+        if self.table_key != TableKey.PRODUCT_TEAM:
+            primary_keys = [
+                marshall(pk=pk, sk=sk) for sk in map(self.table_key.key, [id, *keys])
+            ]
+        else:
+            primary_keys = [marshall(pk=pk, sk=pk)]
+            for key in keys:
+                if key["key_type"] == ProductTeamKeyType.PRODUCT_TEAM_ID_ALIAS:
+                    primary_keys.append(
+                        marshall(
+                            pk=TableKey.PRODUCT_TEAM.key(key["key_value"]),
+                            sk=TableKey.PRODUCT_TEAM.key(key["key_value"]),
+                        )
+                    )
         return update_transactions(
             table_name=self.table_name, primary_keys=primary_keys, data=data
         )
@@ -193,10 +205,10 @@ class Repository[ModelType: AggregateRoot]:
             raise TooManyResults(f"Too many results for query ({(*parent_ids, id)})")
         return list(map(unmarshall, result["Items"]))
 
-    def _search(self, parent_ids: tuple[str]) -> list[ModelType]:
+    def _search(self, parent_ids: tuple[str], status: str = "all") -> list[ModelType]:
         return [
             self.model(**item)
-            for item in self._query(parent_ids=parent_ids)
+            for item in self._query(parent_ids=parent_ids, status=status)
             if item.get("root") is True
         ]
 
