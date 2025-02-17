@@ -26,6 +26,7 @@ class TableKeyAction:
 
 class TableKey(TableKeyAction, StrEnum):
     PRODUCT_TEAM = "PT"
+    PRODUCT_TEAM_ALIAS = "PTA"
     CPM_SYSTEM_ID = "CSI"
     CPM_PRODUCT = "P"
     CPM_PRODUCT_STATUS = "PS"
@@ -34,6 +35,7 @@ class TableKey(TableKeyAction, StrEnum):
     DEVICE_TAG = "DT"
     DEVICE_STATUS = "DS"
     ENVIRONMENT = "E"
+    ORG_CODE = "ORG"
 
 
 def group_by_key(

@@ -72,6 +72,8 @@ class MyRepository(Repository[MyModel]):
                     sk=MyTableKey.FOO.key(event.field),
                     pk_read_1=MyTableKey.FOO.key(event.field),
                     sk_read_1=MyTableKey.FOO.key(event.field),
+                    pk_read_2=MyTableKey.FOO.key(event.field),
+                    sk_read_2=MyTableKey.FOO.key(event.field),
                     **asdict(event)
                 ),
                 ConditionExpression=ConditionExpression.MUST_NOT_EXIST,
@@ -87,6 +89,8 @@ class MyRepository(Repository[MyModel]):
                     sk=MyTableKey.BAR.key(event.field),
                     pk_read_1=MyTableKey.BAR.key(event.field),
                     sk_read_1=MyTableKey.BAR.key(event.field),
+                    pk_read_2=MyTableKey.BAR.key(event.field),
+                    sk_read_2=MyTableKey.BAR.key(event.field),
                     **asdict(event)
                 ),
             )
