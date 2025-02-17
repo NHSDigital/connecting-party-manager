@@ -36,14 +36,13 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.readCpmProduct.index
     import api.readDevice.index
     import api.readDeviceReferenceData.index
-
-    # import api.searchCpmProduct.index
     import api.readEprProduct.index
     import api.readProductTeam.index
     import api.readProductTeamEpr.index
     import api.readQuestionnaire.index
     import api.searchDeviceReferenceData.index
     import api.searchEprProduct.index
+    import api.searchProduct.index  # Ensure this import is included for searchProduct
     import api.searchSdsDevice.index
     import api.searchSdsEndpoint.index
     import api.status.index
@@ -65,7 +64,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
             "ProductTeam/{product_team_id}": api.readProductTeam.index,
             "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
             "ProductTeamEpr/{product_team_id}": api.readProductTeamEpr.index,
-            # "ProductTeamEpr/{product_team_id}/Product": api.searchCpmProduct.index,
+            "Product": api.searchProduct.index,
             "ProductTeamEpr/{product_team_id}/ProductEpr": api.searchEprProduct.index,
             "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}": api.readEprProduct.index,
             "ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData": api.searchDeviceReferenceData.index,
