@@ -1,0 +1,46 @@
+---
+components:
+  parameters:
+    ProductTeamId:
+      name: product_team_id
+      in: path
+      required: true
+      description: product team identifier
+      schema:
+        type: string
+    ProductId:
+      name: product_id
+      in: path
+      required: true
+      description: product identifier
+      schema:
+        type: string
+    DeviceReferenceDataId:
+      name: device_reference_data_id
+      in: path
+      required: true
+      description: Device Ref Data identifier
+      schema:
+        type: string
+    DeviceId:
+      name: device_id
+      in: path
+      required: true
+      description: Device identifier
+      schema:
+        type: string
+    QuestionnaireId:
+      name: questionnaire_id
+      in: path
+      required: true
+      description: Questionnaire identifier
+      schema:
+        type: string
+    Environment:
+      name: environment
+      in: path
+      required: true
+      description: Environment identifier
+      schema:
+        type: string
+        enum: [dev, qa, ref, int, prod]

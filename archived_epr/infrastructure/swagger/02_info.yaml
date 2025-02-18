@@ -1,0 +1,124 @@
+---
+info:
+  version: 1.0.0
+  title: Connecting Party Manager
+  contact:
+    name: NHS Digital API Management
+    url: "https://digital.nhs.uk/developer/help-and-support"
+    email: api.management@nhs.net
+  license:
+    name: MIT
+    url: https://github.com/NHSDigital/connecting-party-manager/blob/main/LICENCE.md
+  description: |
+    ## Overview
+
+    API to configure internal systems to allow a Connecting Party to connect. A source of information about Connecting Parties (systems that connect to NHSE) that helps provide system identity attributes that ensure NHSE services know what systems they are connecting to and the legal entities they are sharing data with. This service is driven by APIs that enable self-service for activities such as certificate management and environment access. It also is a store of end-to-end onboarding/integration data and a catalogue of endpoints.
+
+    ## Who can use this API
+
+    This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development. You must demonstrate you have a valid use case as part of digital onboarding. Connecting Parties must have an appointed Clinical Safety Officer and undertake a Clinical Safety Assessment.
+
+    ## API status and roadmap
+
+    This API is in [development](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
+
+    To see our roadmap, or to suggest, comment or vote on features for this API, see our interactive [product backlog](https://nhs-digital-api-management.featureupvote.com/).
+
+    If you have any other queries, [contact us](https://digital.nhs.uk/developer/help-and-support).
+
+    ## Service level
+
+    This API is a platinum service, meaning it is operational and supported 24 hours a day, 365 days a year.
+
+    For more details, see [service levels](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#service-levels).
+
+    ## Technology
+
+    This API is [RESTful](https://digital.nhs.uk/developer/guides-and-documentation/our-api-technologies#basic-rest).
+
+    ## Network access
+
+    This API is available on the internet and, indirectly, on the [Health and Social Care Network (HSCN)](https://digital.nhs.uk/services/health-and-social-care-network).
+
+    For more details see [Network access for APIs](https://digital.nhs.uk/developer/guides-and-documentation/network-access-for-apis).
+
+    ## Security and authorisation
+
+    This API uses the following access modes:
+
+    * [Application-restricted RESTful API - signed JWT authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication)
+
+    ## Errors
+
+    We use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:
+
+    * 200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action
+    * 400 to 499 if it failed because of a client error by your application
+    * 500 to 599 if it failed because of an error on our server
+
+    Errors specific to each API are shown in the Endpoints section, under Response. See our [reference guide](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#http-status-codes) for more on errors.
+
+    ## Open source
+
+    You might find the following open source resources useful:
+
+    | Resource                       | Description                                | Links                                                                    |
+    |--------------------------------|--------------------------------------------|--------------------------------------------------------------------------|
+    | Connecting Party Manager       | Source code for the core API and sandbox   | [GitHub repo](https://github.com/NHSDigital/connecting-party-manager)    |
+    | Connecting Party Manager - CI  | Source code for the Github Actions runners | [GitHub repo](https://github.com/NHSDigital/connecting-party-manager-CI) |
+
+    We currently don't have any open source client libraries or sample code for this API. If you think this would be useful, you can [upvote the suggestion on our Interactive Product Backlog](https://nhs-digital-api-management.featureupvote.com/suggestions/107439/client-libraries-and-reference-implementations).
+
+    ## Environments and testing
+
+    | Environment       | Base URL                                                                    |
+    | ----------------- | --------------------------------------------------------------------------- |
+    | Sandbox           | `https://sandbox.api.service.nhs.uk/connecting-party-manager/`      |
+    | Integration       | `https://int.api.service.nhs.uk/connecting-party-manager/` |
+    | Production        | `https://api.service.nhs.uk/connecting-party-manager/`     |
+
+    ### Sandbox and Integration environments
+
+    Our [sandbox environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#sandbox-testing):
+
+    * is for early developer testing,
+    * is open access, so does not allow you to test authorisation,
+    * includes ready-to-use test data - for details [contact us](https://digital.nhs.uk/developer/help-and-support),
+    * underpins our `Try this API` feature; see the documentation for each endpoint for more details.
+
+    Our [integration test environment](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing):
+
+    * is for formal integration testing,
+    * includes authorisation,
+    * includes ready-to-use test data - for details [contact us](https://digital.nhs.uk/developer/help-and-support).
+
+    For more details see [integration testing with our RESTful APIs](https://digital.nhs.uk/developer/guides-and-documentation/testing#integration-testing-with-our-restful-apis).
+
+    ## Onboarding
+
+    You need to get your software approved by us before it can go live with this API. We call this onboarding. The onboarding process can sometimes be quite long, so it’s worth planning well ahead.
+
+    As part of this process, you need to demonstrate that you can manage risks and that your software conforms technically with the requirements for this API.
+
+    Information on this page might impact the design of your software. For details, see [Onboarding support information](https://digital.nhs.uk/developer/api-catalogue/national-record-locator-consumer-fhir/onboarding-support-information).
+
+    To understand how our online digital onboarding process works, see [digital onboarding](https://digital.nhs.uk/developer/guides-and-documentation/digital-onboarding#using-the-digital-onboarding-portal).
+
+    <div class="nhsd-m-emphasis-box nhsd-m-emphasis-box--emphasis nhsd-!t-margin-bottom-6" aria-label="Highlighted Information">
+        <div class="nhsd-a-box nhsd-a-box--border-blue">
+            <div class="nhsd-m-emphasis-box__image-box">
+                <figure class="nhsd-a-image">
+                    <picture class="nhsd-a-image__picture">
+                        <img src="http://digital.nhs.uk/binaries/content/gallery/icons/play-circle.svg?colour=231f20" alt="" style="object-fit:fill">
+                    </picture>
+                </figure>
+            </div>
+            <div class="nhsd-m-emphasis-box__content-box">
+                <div data-uipath="website.contentblock.emphasis.content" class="nhsd-t-word-break"><p class="nhsd-t-body">To get started, sign in or create a <a href="http://onboarding.prod.api.platform.nhs.uk/">developer account</a>, then select 'product onboarding'.</p></div>
+            </div>
+        </div>
+    </div>
+
+    ## Change log
+
+    For details of how this API has changed over time, see the [change log](https://github.com/NHSDigital/connecting-party-manager/blob/main/CHANGELOG.md).

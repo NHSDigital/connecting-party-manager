@@ -1,0 +1,31 @@
+---
+components:
+  parameters:
+    HeaderVersion:
+      in: header
+      name: version
+      required: true
+      schema:
+        $ref: "#/components/schemas/HeaderVersion"
+    HeaderRequestId:
+      in: header
+      name: x-request-id
+      required: true
+      schema:
+        $ref: "#/components/schemas/HeaderRequestId"
+    HeaderCorrelationId:
+      in: header
+      name: x-correlation-id
+      required: true
+      schema:
+        $ref: "#/components/schemas/HeaderCorrelationId"
+    HeaderAuthorization:
+      in: header
+      name: authorization
+      schema:
+        $ref: "#/components/schemas/HeaderAuthorization"
+    HeaderApikey:
+      in: header
+      name: apikey
+      schema:
+        $ref: "#/components/schemas/HeaderApikey"

@@ -69,6 +69,40 @@ components:
                     message: "Duplicate 'Interaction ID' provided: value '<INTERACTION ID>' occurs <N> times in the questionnaire response."
                   - code: "VALIDATION_ERROR"
                     message: "SubCpmProductPathParams.environment: value is not a valid enumeration member; permitted: 'dev', 'qa', 'ref', 'int', 'prod'"
+    SdsSearchDeviceBadRequest:
+      description: searchSDSDevice Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            MissingValue:
+              value:
+                errors:
+                  - code: "MISSING_VALUE"
+                    message: "SearchSDSDeviceQueryParams.nhs_as_client: field required"
+            ValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchSDSDeviceQueryParams.foo: extra fields not permitted"
+    SdsSearchEndpointBadRequest:
+      description: searchSDSEndpoint Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            ValidationErrorExtraFields:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchSDSEndpointQueryParams.foo: extra fields not permitted"
+            ValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
     UnprocessableContent:
       description: Unprocessable Content
       content:
@@ -90,6 +124,12 @@ components:
           schema:
             type: string
           example: "*"
+    EPRProductTeamCreate:
+      description: Create EPR ProductTeam operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EPRProductTeamResponse"
     CPMProductTeamRead:
       description: Read ProductTeam operation successful
       content:
@@ -102,6 +142,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamDeleteResponse"
+    EPRProductTeamRead:
+      description: Read EPR ProductTeam operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EPRProductTeamResponse"
+    ProductSearch:
+      description: Search Product operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductSearchResponse"
     ProductCreate:
       description: Create Product operation successful
       content:
@@ -125,3 +177,69 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductDeleteResponse"
+    EprProductCreate:
+      description: Create Epr Product operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductResponse"
+    DeviceRefDataCreate:
+      description: Create Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceReferenceDataResponse"
+    DeviceRefDataRead:
+      description: Read Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceReferenceDataResponse"
+    DeviceRefDataSearch:
+      description: Search Device Reference Data operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceRefDataSearchResponse"
+    DeviceCreate:
+      description: Create Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceResponse"
+    DeviceRead:
+      description: Read Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceResponse"
+    AsDeviceCreate:
+      description: Create Accredited System Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AsDeviceResponse"
+    MhsDeviceCreate:
+      description: Create Message Handling System Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MhsDeviceResponse"
+    SdsDeviceSearch:
+      description: Search Device operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceSearchResponse"
+    SdsEndpointSearch:
+      description: Search Endpoint operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceSearchResponse"
+    QuestionnaireRead:
+      description: Read Questionnaire operation successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Questionnaire"
