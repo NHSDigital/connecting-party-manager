@@ -41,99 +41,13 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             ],
         ],
         [
-            "/ProductTeamEpr",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateProductTeamIncomingParams.ods_code: field required",
-                "CreateProductTeamIncomingParams.name: field required",
-                "CreateProductTeamIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr",
+            "/ProductTeam/123/Product",
             "POST",
             400,
             ["MISSING_VALUE", "VALIDATION_ERROR"],
             [
                 "CreateCpmProductIncomingParams.name: field required",
                 "CreateCpmProductIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateCpmProductIncomingParams.name: field required",
-                "CreateCpmProductIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc",
-            "DELETE",
-            404,
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/DeviceReferenceData",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateDeviceReferenceDataIncomingParams.name: field required",
-                "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/DeviceReferenceData/AccreditedSystemsAdditionalInteractions",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateDeviceReferenceDataIncomingParams.name: field required",
-                "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/DeviceReferenceData/MhsMessageSet",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateDeviceReferenceDataIncomingParams.name: field required",
-                "CreateDeviceReferenceDataIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/Device",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateDeviceIncomingParams.name: field required",
-                "CreateDeviceIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/Device/MessageHandlingSystem",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateMhsDeviceIncomingParams.questionnaire_responses: field required",
-                "CreateMhsDeviceIncomingParams.foo: extra fields not permitted",
-            ],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/Device/AccreditedSystem",
-            "POST",
-            400,
-            ["MISSING_VALUE", "VALIDATION_ERROR"],
-            [
-                "CreateAsDeviceIncomingParams.questionnaire_responses: field required",
-                "CreateAsDeviceIncomingParams.foo: extra fields not permitted",
             ],
         ],
         [
@@ -149,73 +63,6 @@ def _request(base_url: str, headers: dict, path: str, method: str):
             404,
             ["RESOURCE_NOT_FOUND"],
             ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/ProductTeamEpr/123",
-            "GET",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/ProductTeamEpr/123/Product",
-            "GET",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc",
-            "GET",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/DeviceReferenceData",
-            "GET",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/DeviceReferenceData/xyz",
-            "GET",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/ProductTeamEpr/123/ProductEpr/abc/dev/Device/xyz",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find ProductTeam for key ('123')"],
-        ],
-        [
-            "/Questionnaire/987",
-            "GET",
-            404,
-            ["RESOURCE_NOT_FOUND"],
-            ["Could not find Questionnaire for key ('987')"],
-        ],
-        [
-            "/searchSdsDevice",
-            "GET",
-            400,
-            ["MISSING_VALUE"],
-            [
-                "SearchSDSDeviceQueryParams.nhs_as_client: field required",
-                "SearchSDSDeviceQueryParams.nhs_as_svc_ia: field required",
-            ],
-        ],
-        [
-            "/searchSdsEndpoint",
-            "GET",
-            400,
-            ["VALIDATION_ERROR"],
-            [
-                "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
-            ],
         ],
         [
             "/ProductTeam/123/Product/abc",
