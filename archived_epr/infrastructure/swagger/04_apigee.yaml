@@ -1,0 +1,19 @@
+---
+x-nhsd-apim:
+  temporary: ${ terraform_output("workspace_type.value") != "PERSISTENT" }
+  access:
+    - title: Application Restricted
+      grants:
+        app-level0: []
+  target: # Only one target (omit for NO backend)
+    type: external
+    healthcheck: /_status
+    url: ${ terraform_output("certificate_domain_name.value") }
+    security:
+      type: apikey
+      header: apikey
+      secret: cpm-1 # NB: this is the *name* of the secret, not the value
+  ratelimiting:
+    proxy:
+      timeunit: "minute"
+      limit: 6000

@@ -1,0 +1,16 @@
+---
+components:
+  securitySchemes:
+    ${authoriser_name}:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        type: request
+        authorizerUri: ${lambda_invoke_arn}
+        authorizerCredentials: ${authoriser_iam_role}
+        identitySource: ""
+        authorizerResultTtlInSeconds: 0
+    app-level0:
+      $ref: https://proxygen.prod.api.platform.nhs.uk/components/securitySchemes/app-level0
