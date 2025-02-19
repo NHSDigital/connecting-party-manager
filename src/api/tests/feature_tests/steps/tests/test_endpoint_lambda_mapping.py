@@ -100,6 +100,19 @@ def test_parse_path_read_product_team():
     ) == ({"product_team_id": "123"}, {}, api.readProductTeam.index)
 
 
+def test_parse_path_delete_product_team():
+    with api_lambda_environment_variables():
+        import api.deleteProductTeam.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="DELETE",
+        path="ProductTeam/123",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({"product_team_id": "123"}, {}, api.deleteProductTeam.index)
+
+
 def test_parse_path_read_product_team_epr():
     with api_lambda_environment_variables():
         import api.readProductTeamEpr.index

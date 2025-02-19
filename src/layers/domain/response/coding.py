@@ -36,11 +36,14 @@ class SpineCoding(StrEnum):
     SERVICE_ERROR = auto()
     SERVICE_UNAVAILABLE = auto()
     RESOURCE_NOT_FOUND = auto()
+    CONFLICT = auto()
 
 
 class CpmCoding(Enum):
     OK = Coding(code="OK", display="Transaction successful")
     RESOURCE_CREATED = Coding(code="RESOURCE_CREATED", display="Resource created")
+    RESOURCE_DELETED = Coding(code="RESOURCE_DELETED", display="Resource deleted")
+    CONFLICT = Coding(code="CONFLICT", display="Conflict")
 
     @property
     def value(self):
