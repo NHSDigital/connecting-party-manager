@@ -34,7 +34,7 @@ test--%--rerun: ## Rerun failed integration or unit (pytest) tests
 	$(MAKE) test--$* _INTERNAL_FLAGS="--last-failed --last-failed-no-failures none" _CACHE_CLEAR=$(_CACHE_CLEAR)
 
 test--feature--integration: aws--login $(PROXYGEN_PRODUCT_TIMESTAMP) ## Run integration feature (gherkin) tests
-	$(MAKE) _behave _INTERNAL_FLAGS="--define='test_mode=integration' $(_INTERNAL_FLAGS)" AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
+	$(MAKE) _behave _INTERNAL_FLAGS="--define='test_mode=integration' --exclude='archived_epr/' $(_INTERNAL_FLAGS)" AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
 
 test--feature--local: _behave  ## Run local feature (gherkin) tests
 
