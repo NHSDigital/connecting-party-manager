@@ -37,7 +37,7 @@ Feature: Delete Product Team - failure scenarios
       | path | value               |
       | name | My Great EprProduct |
     And I note the response field "$.id" as "product_id"
-    When I make a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }"
+    When I make a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>"
     Then I receive a status code "409" with body
       | path             | value                                                                                           |
       | errors.0.code    | CONFLICT                                                                                        |
@@ -46,3 +46,8 @@ Feature: Delete Product Team - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 132              |
+
+    Examples:
+      | product_team_id            |
+      | ${ note(product_team_id) } |
+      | FOOBAR                     |
