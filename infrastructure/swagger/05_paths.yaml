@@ -52,6 +52,8 @@ paths:
     options:
       operationId: createproductteamcors
       summary: Create a Product Team resource (OPTIONS)
+      tags:
+        - Core Product ID Endpoints
       responses:
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -199,6 +201,8 @@ paths:
       summary: Create a Product resource (OPTIONS)
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
+      tags:
+        - Core Product ID Endpoints
       responses:
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -291,6 +295,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
+      tags:
+        - Core Product ID Endpoints
       responses:
         "400":
           $ref: "#/components/responses/BadRequest"
