@@ -25,7 +25,7 @@ Feature: Delete Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 101              |
 
-  Scenario: CPM Product Team has associated products
+  Scenario Outline: CPM Product Team has associated products
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
