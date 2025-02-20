@@ -1,8 +1,8 @@
 from domain.core.cpm_system_id import CpmSystemId
 
+from .cpm_repository import Repository
 from .keys import TableKey
 from .marshall import marshall, marshall_value, unmarshall
-from .repository import Repository
 
 
 class CpmSystemIdRepository[T](Repository[T]):

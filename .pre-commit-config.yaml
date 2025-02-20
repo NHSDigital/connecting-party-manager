@@ -4,7 +4,7 @@ repos:
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        exclude: ".pre-commit-config.yaml|infrastructure/localstack/provider.tf|src/etl/sds/tests/changelog|src/etl/sds/worker/bulk/transform_bulk/tests|src/etl/sds/worker/bulk/tests/stage_data|src/api/tests/smoke_tests/test_smoke.py|archived_epr/src_old/api/tests/smoke_tests/test_smoke.py"
+        exclude: ".pre-commit-config.yaml|infrastructure/localstack/provider.tf|archived_epr/src_old/etl/sds/tests/changelog|archived_epr/src_old/etl/sds/worker/bulk/transform_bulk/tests|archived_epr/src_old/etl/sds/worker/bulk/tests/stage_data|src/api/tests/smoke_tests/test_smoke.py|archived_epr/src_old/api/tests/smoke_tests/test_smoke.py"
 
   - repo: https://github.com/prettier/pre-commit
     rev: 57f39166b5a5a504d6808b87ab98d41ebf095b46
