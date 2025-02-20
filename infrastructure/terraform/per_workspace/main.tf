@@ -200,26 +200,3 @@ module "api_entrypoint" {
   domain              = module.domain.domain_cert
   depends_on          = [module.domain]
 }
-
-data "aws_s3_bucket" "truststore_bucket" {
-  bucket = "${local.project}--${replace(var.environment, "_", "-")}--truststore"
-}
-
-
-module "sds_etl" {
-  source                           = "./modules/etl/sds"
-  workspace_prefix                 = "${local.project}--${replace(terraform.workspace, "_", "-")}"
-  assume_account                   = var.assume_account
-  python_version                   = var.python_version
-  event_layer_arn                  = element([for instance in module.layers : instance if instance.name == "event"], 0).layer_arn
-  third_party_core_layer_arn       = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds"], 0).layer_arn
-  third_party_sds_update_layer_arn = element([for instance in module.third_party_layers : instance if instance.name == "third_party_sds_update"], 0).layer_arn
-  domain_layer_arn                 = element([for instance in module.layers : instance if instance.name == "domain"], 0).layer_arn
-  sds_layer_arn                    = element([for instance in module.layers : instance if instance.name == "sds"], 0).layer_arn
-  table_name                       = module.eprtable.dynamodb_table_name
-  table_arn                        = module.eprtable.dynamodb_table_arn
-  is_persistent                    = var.workspace_type == "PERSISTENT"
-  truststore_bucket                = data.aws_s3_bucket.truststore_bucket
-  etl_snapshot_bucket              = local.etl_snapshot_bucket
-  environment                      = var.environment
-}
