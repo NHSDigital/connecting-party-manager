@@ -1,0 +1,179 @@
+---
+components:
+  requestBodies:
+    ProductTeamCreateRequestBody:
+      description: Request body to create a Product Team
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the product team
+              ods_code:
+                type: string
+                description: ODS code associated with the product team
+              keys:
+                type: array
+                description: List of keys associated with the product team
+                items:
+                  type: object
+                  properties:
+                    key_type:
+                      type: string
+                      description: The type of the key (e.g., product_team_id_alias)
+                    key_value:
+                      type: string
+                      description: The value of the key
+            required:
+              - name
+              - ods_code
+              - keys
+          example:
+            name: "Sample Product Team"
+            ods_code: "F5H1R"
+            keys:
+              - key_type: "product_team_id_alias"
+                key_value: "FOOBAR"
+    ProductCreateRequestBody:
+      description: Request body to create a Product
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the product
+            required:
+              - name
+          example:
+            name: "Sample Product"
+    DeviceReferenceDataCreateRequestBody:
+      description: Request body to create a Device Reference Data object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the DeviceReferenceData
+            required:
+              - name
+          example:
+            name: "Sample Device Reference Data"
+    DeviceReferenceDataMessageSetCreateRequestBody:
+      description: Request body to create a Device Reference Data Message Set object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for MHS Message Set questionnaire
+                properties:
+                  spine_mhs_message_sets/1:
+                    type: array
+                    description: List of questionnaires associated with the message set
+                    items:
+                      type: object
+                      description: Questionnaire Responses
+            required:
+              - questionnaire_responses
+          example:
+            questionnaire_responses:
+              { "spine_mhs_message_sets/1": [{ "question": "answer" }] }
+    DeviceReferenceDataAdditionalInteractionsCreateRequestBody:
+      description: Request body to create a Device Reference Data Additional Interactions object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for Additional Interactions questionnaire
+                properties:
+                  spine_as_additional_interactions/1:
+                    type: array
+                    description: List of questionnaires associated with the additional interactions
+                    items:
+                      type: object
+                      description: Questionnaire Responses
+            required:
+              - questionnaire_responses
+          example:
+            questionnaire_responses:
+              {
+                "spine_as_additional_interactions/1":
+                  [{ "question": "answer" }],
+              }
+    DeviceCreateRequestBody:
+      description: Request body to create a Device object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the Device
+            required:
+              - name
+          example:
+            name: "Sample Device"
+    MessageHandlingSystemDeviceCreateRequestBody:
+      description: Request body to create a Message Handling System Device object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for MHS Device
+                properties:
+                  spine_mhs/1:
+                    type: array
+                    description: spine_mhs questionnaire associated with the mhs device
+                    items:
+                      type: object
+                      description: spine_mhs questionnaire response
+            required:
+              - questionnaire_responses
+          example:
+            questionnaire_responses:
+              { "spine_mhs/1": [{ "question": "answer" }] }
+    AccreditedSystemDeviceCreateRequestBody:
+      description: Request body to create a Accredited System Device object
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire_responses:
+                type: object
+                description: Questionnaire Responses for AS Device
+                properties:
+                  spine_as/1:
+                    type: array
+                    description: spine_as questionnaire associated with the as device
+                    items:
+                      type: object
+                      description: spine_as questionnaire response
+            required:
+              - questionnaire_responses
+          example:
+            questionnaire_responses:
+              { "spine_as/1": [{ "question": "answer" }] }

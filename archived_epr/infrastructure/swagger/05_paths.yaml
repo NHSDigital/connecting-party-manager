@@ -1,0 +1,842 @@
+---
+x-definitions:
+  ApiGatewayIntegration:
+    type: object
+    x-amazon-apigateway-integration: &ApiGatewayIntegration
+      type: aws_proxy
+      httpMethod: POST
+      responses:
+        default:
+          statusCode: "200"
+      passthroughBehavior: when_no_match
+      contentHandling: CONVERT_TO_TEXT
+
+tags:
+  - name: Core Product ID Endpoints
+    description: Create, Read and Delete Product IDs
+  - name: Core EPR Creation Endpoints
+    description: Core EPR API creation endpoints
+  - name: Core EPR Read Endpoints
+    description: Core EPR API read endpoints
+  - name: Core EPR Deletion Endpoints
+    description: Core EPR API deletion endpoints
+  - name: SDS Search Endpoints
+    description: Search Results provided for the SDS FHIR API
+
+paths:
+  /_status:
+    get:
+      summary: Retrieve the current Status of the API (GET)
+      description: >
+        Get the current status of the API
+      operationId: status
+      tags:
+        - Status
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusOK"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_status}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeam:
+    options:
+      operationId: createproductteamcors
+      summary: Create a Product Team resource (OPTIONS)
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: "never"
+        type: "mock"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    post:
+      operationId: createproductteam
+      summary: Create a Product Team resource (POST)
+      description: >
+        Create a Product Team. This is needed in order to create a Product.
+      tags:
+        - Core Product ID Endpoints
+      requestBody:
+        $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/CPMProductTeamCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createProductTeam}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeam/{product_team_id}:
+    get:
+      operationId: readproductteam
+      summary: Read a Product Team resource (GET)
+      description: |
+        - Retrieve a Product Team using a product team ID.
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/CPMProductTeamRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProductTeam}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    delete:
+      operationId: deleteproductteam
+      summary: Delete a Product Team resource (DELETE)
+      description: |
+        - Delete a product Team using a product team ID.
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/CpmProductTeamDelete"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_deleteProductTeam}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeamEpr:
+    post:
+      operationId: createproductteamepr
+      summary: Create a Product Team (Epr) resource (POST)
+      description: |
+        - Create an EPR Product Team using a product team ID.
+      tags:
+        - Core EPR Creation Endpoints
+      requestBody:
+        $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/EPRProductTeamCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+      parameters:
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createProductTeamEpr}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeamEpr/{product_team_id}:
+    get:
+      operationId: readproductteamepr
+      summary: Read a Product Team (Epr) resource (GET)
+      description: |
+        - Read an EPR Product Team using a product team ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/EPRProductTeamRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readProductTeamEpr}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeam/{product_team_id}/Product:
+    options:
+      operationId: createproductcors
+      summary: Create a Product resource (OPTIONS)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: "never"
+        type: "mock"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    post:
+      operationId: createproductendpoint
+      summary: Create a Product resource (POST)
+      description: |
+        This endpoint creates a new Product resource for the specified Product Team.
+        **Requirements:**
+        - A valid Product Team must exist
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/ProductCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/ProductCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    # get:
+    #   operationId: searchCpmProduct
+    #   summary: Retrieve all Products associated with a Product Team (GET)
+    #   parameters:
+    #     - $ref: "#/components/parameters/ProductTeamId"
+    #     - $ref: "#/components/parameters/HeaderVersion"
+    #     - $ref: "#/components/parameters/HeaderRequestId"
+    #     - $ref: "#/components/parameters/HeaderCorrelationId"
+    #   responses:
+    #     "200":
+    #       $ref: "#/components/responses/ProductSearch"
+    #     "404":
+    #       $ref: "#/components/responses/NotFound"
+    #   x-amazon-apigateway-integration:
+    #     <<: *ApiGatewayIntegration
+    #     uri: ${method_searchCpmProduct}
+    #   security:
+    #     - ${authoriser_name}: []
+    #     - app-level0: []
+
+  /ProductTeam/{product_team_id}/Product/{product_id}:
+    get:
+      operationId: readproductendpoint
+      summary: Read a Product resource (GET)
+      description: |
+        - Retrieve a product using a product team ID and product ID.
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    delete:
+      operationId: deleteproductendpoint
+      summary: Delete a Product resource (DELETE)
+      description: |
+        - Delete a product using a product team ID and product ID.
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductDelete"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_deleteCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeamEpr/{product_team_id}/ProductEpr:
+    post:
+      operationId: createproductendpointepr
+      summary: Create an EPR Product resource (POST)
+      description: |
+        This endpoint creates a new EPR Product resource for the specified Product Team.
+        **Requirements:**
+        - A valid Product Team must exist
+      tags:
+        - Core EPR Creation Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/ProductCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/EprProductCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    get:
+      operationId: searchEprProduct
+      summary: Retrieve all EPR Products associated with a Product Team (GET)
+      description: |
+        - Retrieve all EPR products for an EPR Product Team using a product team ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}:
+    get:
+      operationId: readproductendpointepr
+      summary: Read an EPR Product resource (GET)
+      description: |
+        - Retrieve an EPR product using an EPR product team ID and product ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    delete:
+      operationId: deleteeprproductendpoint
+      summary: Delete an EPR Product resource (DELETE)
+      description: |
+        - Delete an EPR product using an EPR product team ID and product ID.
+      tags:
+        - Core EPR Deletion Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "204":
+          description: Delete Product operation successful
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_deleteEprProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData
+  : get:
+      operationId: searchDeviceReferenceData
+      summary: Retrieve all Data Reference Data resources associated with a Product (GET)
+      description: |
+        - Retrieve all Device Reference Data objects using a product team ID and product ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeviceRefDataSearch"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchDeviceReferenceData}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    post:
+      operationId: createDeviceReferenceData
+      summary: Create a Device Reference Data resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
+      description: |
+        **This endpoint has not yet been configured. Do not use.**
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceReferenceDataCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/DeviceRefDataCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceReferenceData}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/MhsMessageSet
+  : post:
+      operationId: createDeviceReferenceDataMessageSet
+      summary: Create a Device Reference Data Message Set resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
+      description: |
+        This endpoint creates a Device Reference Data Message Set resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid EPR Product must already exist under the Product Team
+        - There can be no existing MHS MessageSet DRD for the EPR Product already
+        - Questionnaire response required: **spine_mhs_message_sets**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_mhs_message_sets**
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceReferenceDataMessageSetCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/DeviceRefDataCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceReferenceDataMessageSet}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/AccreditedSystemsAdditionalInteractions
+  : post:
+      operationId: createDeviceReferenceDataAdditionalInteractions
+      summary: Create a Device Reference Data Additional Interactions resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
+      description: |
+        This endpoint creates a Device Reference Data Additional Interactions resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid EPR Product must already exist under the Product Team
+        - There can be no existing AS AdditionalInteractions DRD for the EPR Product already
+        - Questionnaire response required: **spine_as_additional_interactions**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_as_additional_interactions**
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceReferenceDataAdditionalInteractionsCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/DeviceRefDataCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceReferenceDataASActions}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/DeviceReferenceData/{device_reference_data_id}
+  : get:
+      operationId: readDeviceReferenceData
+      summary: Read a Device Reference Data resource (GET)
+      description: >
+        Retrieve a Device Reference Data entity using a product team ID, product ID and Device Reference Data ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/DeviceReferenceDataId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeviceRefDataRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readDeviceReferenceData}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device
+  : post:
+      operationId: createDevice
+      summary: Create a Device resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
+      description: |
+        **This endpoint has not yet been configured. Do not use.**
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/DeviceCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/{device_id}
+  : get:
+      operationId: readDevice
+      summary: Read a Device resource (GET)
+      description: >
+        Retrieve a device using a product team ID, product ID and device ID.
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/DeviceId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeviceRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/MessageHandlingSystem
+  : post:
+      operationId: createDeviceMessageHandlingSystem
+      summary: Create a Message Handling System Device resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
+      description: |
+        This endpoint creates a new Message Handling System Device resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid Product must exist under the Product Team
+        - One existing MHS Message Set Device Reference Data must be present for the Product
+        - No existing MHS device for the product
+        - Questionnaire response required: **spine_mhs**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_mhs**
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/MessageHandlingSystemDeviceCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/MhsDeviceCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceMessageHandlingSystem}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  ? /ProductTeamEpr/{product_team_id}/ProductEpr/{product_id}/{environment}/Device/AccreditedSystem
+  : post:
+      operationId: createDeviceAccreditedSystem
+      summary: Create a Accredited System Device resource (POST)
+      tags:
+        - Core EPR Creation Endpoints
+      description: |
+        This endpoint creates a new Accredited System Device resource for the specified Product.
+        **Requirements:**
+        - A valid Product Team must exist
+        - A valid Product must exist under the Product Team
+        - One existing MHS Message Set Device Reference Data must be present for the Product
+        - One existing AS Additional Interactions Device Reference Data must be present for the Product
+        - Questionnaire response required: **spine_as**
+        - Refer to the questionnaire endpoint for details on this questionnaire response. **/questionnaire/spine_as**
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+        - $ref: "#/components/parameters/Environment"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      requestBody:
+        $ref: "#/components/requestBodies/AccreditedSystemDeviceCreateRequestBody"
+      responses:
+        "201":
+          $ref: "#/components/responses/AsDeviceCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_createDeviceAccreditedSystem}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /searchSdsDevice:
+    get:
+      operationId: searchsdsdevice
+      summary: Retrieve Device resources for SDS FHIR API (GET)
+      description: >
+        Retrieve a list of Devices to be used primarily by the SDS FHIR API.
+      tags:
+        - SDS Search Endpoints
+      parameters:
+        - $ref: "#/components/parameters/NhsIdCode"
+        - $ref: "#/components/parameters/NhsMhsManOrg"
+        - $ref: "#/components/parameters/NhsMhsPartyKey"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/SdsDeviceSearch"
+        "400":
+          $ref: "#/components/responses/SdsSearchDeviceBadRequest"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchSdsDevice}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /searchSdsEndpoint:
+    get:
+      operationId: searchsdsendpoint
+      summary: Retrieve Endpoint resources for SDS FHIR API (GET)
+      description: >
+        Retrieve a list of Endpoints to be used primarily by the SDS FHIR API.
+      tags:
+        - SDS Search Endpoints
+      parameters:
+        - $ref: "#/components/parameters/NhsIdCode"
+        - $ref: "#/components/parameters/NhsMhsInteration"
+        - $ref: "#/components/parameters/NhsMhsPartyKey"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/SdsEndpointSearch"
+        "400":
+          $ref: "#/components/responses/SdsSearchEndpointBadRequest"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchSdsEndpoint}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /Questionnaire/{questionnaire_id}:
+    get:
+      operationId: readQuestionnaire
+      summary: Read a Questionnaire resource (GET)
+      description: |
+        Retrieve information about the format of a questionnaire to be answered. To be used in conjunction with creating Devices and DeviceReferenceData. System generated fields are not required and will be populated by CPM. **Please note: Although examples are given it's impossible to layout exactly what format a questionnaire will take as the questionnaire itself uses json_schema to allow custom formats.**
+
+        IDs available are
+        - spine_mhs
+        - spine_as
+        - spine_mhs_message_sets
+        - spine_as_additional_interactions
+      tags:
+        - Core EPR Read Endpoints
+      parameters:
+        - $ref: "#/components/parameters/QuestionnaireId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/QuestionnaireRead"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_readQuestionnaire}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
