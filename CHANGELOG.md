@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-02-19-a
+- [PI-753] Delete Product Teams
+- [PI-791] Remove EPR feature tests
+
 ## 2025-02-17
 - [PI-785] Generated Product Ids for PDM
 

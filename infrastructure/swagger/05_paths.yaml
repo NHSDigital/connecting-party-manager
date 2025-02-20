@@ -139,6 +139,31 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
+    delete:
+      operationId: deleteproductteam
+      summary: Delete a Product Team resource (DELETE)
+      description: |
+        - Delete a product Team using a product team ID.
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/CpmProductTeamDelete"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_deleteProductTeam}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
 
   /ProductTeamEpr:
     post:
