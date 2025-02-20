@@ -67,7 +67,7 @@ const ProductSearch: React.FC = () => {
       const response = await fetch(
         `https://${
           environmentConfig.environment
-        }.api.service.nhs.uk/connecting-party-manager/searchProduct?${queryParams.toString()}`,
+        }.api.service.nhs.uk/connecting-party-manager/Product?${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
@@ -78,20 +78,11 @@ const ProductSearch: React.FC = () => {
           },
         }
       );
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(
-          `HTTP error! status: ${response.status}, body: ${errorBody}`
-        );
-      }
-
       const responseData: ProductSearchResponse = await response.json();
 
       setSearchResults(responseData);
     } catch (err) {
-      setError("Failed to fetch search results. Please try again.");
-      console.error(err);
+      setError(`Failed to fetch search results. Please try again. ${err}`);
     } finally {
       setLoading(false);
     }
@@ -211,14 +202,34 @@ const ProductSearch: React.FC = () => {
                         <ul className="ml-4">
                           {team.products.map((product) => (
                             <li key={product.id} className="mb-2">
-                              <p className="font-bold">{product.name}</p>
-                              <p>Product ID: {product.id}</p>
+                              <p className="font-bold">
+                                Product ID: {product.id}
+                              </p>
+                              <p>Name: {product.name}</p>
                               <p>ODS Code: {product.ods_code}</p>
                               <p>Status: {product.status}</p>
+                              <p>Product Team Id: {product.product_team_id}</p>
                               <p>
                                 Created On:{" "}
                                 {new Date(product.created_on).toLocaleString()}
                               </p>
+                              <p>
+                                Updated On:{" "}
+                                {product.updated_on
+                                  ? new Date(
+                                      product.updated_on
+                                    ).toLocaleString()
+                                  : "null"}
+                              </p>
+                              <p>
+                                Deleted On:{" "}
+                                {product.deleted_on
+                                  ? new Date(
+                                      product.deleted_on
+                                    ).toLocaleString()
+                                  : "null"}
+                              </p>
+                              <p>Keys: {product.keys}</p>
                             </li>
                           ))}
                         </ul>
