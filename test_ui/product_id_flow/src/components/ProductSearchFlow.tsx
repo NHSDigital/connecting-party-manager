@@ -59,96 +59,36 @@ const ProductSearch: React.FC = () => {
     setError(null);
 
     try {
-      // const queryParams = new URLSearchParams();
-      // if (organisationCode) queryParams.append("organisation_code", organisationCode);
-      // if (productTeamId) queryParams.append("product_team_id", productTeamId);
+      const queryParams = new URLSearchParams();
+      if (organisationCode)
+        queryParams.append("organisation_code", organisationCode);
+      if (productTeamId) queryParams.append("product_team_id", productTeamId);
 
-      // const response = await fetch(
-      //   `https://${environmentConfig.environment}.api.service.nhs.uk/searchProduct?${queryParams.toString()}`,
-      //   {
-      //       method: "GET",
-      //       headers: {
-      //           Authorization: "letmein",
-      //           apikey: environmentConfig.apiKey,
-      //           version: "1",
-      //           "Content-Type": "application/json",
-      //       },
-      //   }
-      // );
-
-      // if (!response.ok) {
-      //   const errorBody = await response.text();
-      //   throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
-      // }
-
-      // const responseData: ProductSearchResponse = await response.json();
-
-      const mockResponse: ProductSearchResponse = {
-        results: [
-          {
-            org_code: "YEA",
-            product_teams: [
-              {
-                product_team_id: "1234",
-                products: [
-                  {
-                    id: "P.123.ABC",
-                    product_team_id: "1234",
-                    name: "My Great Product 1",
-                    ods_code: "YEA",
-                    status: "active",
-                    created_on: "2025-01-29T10:18:49.098128+00:00",
-                    updated_on: null,
-                    deleted_on: null,
-                    keys: [],
-                  },
-                  {
-                    id: "P.456.DEF",
-                    product_team_id: "1234",
-                    name: "My Great Product 2",
-                    ods_code: "YEA",
-                    status: "active",
-                    created_on: "2025-01-29T10:18:49.098128+00:00",
-                    updated_on: null,
-                    deleted_on: null,
-                    keys: [],
-                  },
-                ],
-              },
-              {
-                product_team_id: "5678",
-                products: [
-                  {
-                    id: "P.xyz.123",
-                    product_team_id: "5678",
-                    name: "My Great Product 3",
-                    ods_code: "YEA",
-                    status: "active",
-                    created_on: "2025-01-29T10:18:49.098128+00:00",
-                    updated_on: null,
-                    deleted_on: null,
-                    keys: [],
-                  },
-                  {
-                    id: "P.abc.456",
-                    product_team_id: "5678",
-                    name: "My Great Product 4",
-                    ods_code: "YEA",
-                    status: "active",
-                    created_on: "2025-01-29T10:18:49.098128+00:00",
-                    updated_on: null,
-                    deleted_on: null,
-                    keys: [],
-                  },
-                ],
-              },
-            ],
+      const response = await fetch(
+        `https://${
+          environmentConfig.environment
+        }.api.service.nhs.uk/connecting-party-manager/searchProduct?${queryParams.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "letmein",
+            apikey: environmentConfig.apiKey,
+            version: "1",
+            "Content-Type": "application/json",
           },
-        ],
-      };
+        }
+      );
 
-      // setSearchResults(responseData);
-      setSearchResults(mockResponse);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status}, body: ${errorBody}`
+        );
+      }
+
+      const responseData: ProductSearchResponse = await response.json();
+
+      setSearchResults(responseData);
     } catch (err) {
       setError("Failed to fetch search results. Please try again.");
       console.error(err);
