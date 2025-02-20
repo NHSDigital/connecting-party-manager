@@ -37,6 +37,8 @@ Feature: Delete Product Team - success scenarios
       | ods_code         | F5H1R                 |
       | keys.0.key_type  | product_team_id_alias |
       | keys.0.key_value | FOOBAR                |
+      | keys.1.key_type  | product_team_id_alias |
+      | keys.1.key_value | GARPLY                |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>"
     When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>"
@@ -45,10 +47,11 @@ Feature: Delete Product Team - success scenarios
       | errors.0.code    | RESOURCE_NOT_FOUND                                       |
       | errors.0.message | Could not find ProductTeam for key ('<product_team_id>') |
     And the response headers contain:
-      | name           | value            |
-      | Content-Type   | application/json |
-      | Content-Length | 134              |
+      | name         | value            |
+      | Content-Type | application/json |
 
     Examples:
       | product_team_id            |
       | ${ note(product_team_id) } |
+      | FOOBAR                     |
+      | GARPLY                     |
