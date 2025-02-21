@@ -4,6 +4,10 @@
 - [PI-754] Search Product
 - Dependabot: datamodel-code-generator
 
+## 2025-02-21-a
+- [PI-792] Remove EPR & SDS lambdas
+- [PI-816] Deploy PROD API Spec
+
 ## 2025-02-20
 - [PI-790] Remove EPR from swagger
 
