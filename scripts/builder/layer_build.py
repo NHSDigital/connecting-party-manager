@@ -47,13 +47,14 @@ def create_zip_package(
 
 
 def build(file):
-    layer_base_dir = get_base_dir(file)
-    package_name = layer_base_dir.name
+    if "archived_epr" not in file:
+        layer_base_dir = get_base_dir(file)
+        package_name = layer_base_dir.name
 
-    with create_zip_package(
-        package_name=package_name, base_dir=layer_base_dir
-    ) as build_dir:
-        copy_source_code(source_dir=layer_base_dir, build_dir=build_dir)
+        with create_zip_package(
+            package_name=package_name, base_dir=layer_base_dir
+        ) as build_dir:
+            copy_source_code(source_dir=layer_base_dir, build_dir=build_dir)
 
 
 @contextmanager

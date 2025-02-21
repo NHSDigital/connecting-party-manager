@@ -98,21 +98,22 @@ def build_third_party(
     group: str,
     dependencies: dict[str, str],
 ):
-    base_dir = get_base_dir(file)
-    package_zipper = create_zip_package(
-        package_name=f"third_party_{group}", base_dir=base_dir, third_party=True
-    )
-    docker_file = get_dockerfile_path(base_dir=base_dir, group=group)
+    if "archived_epr" not in file:
+        base_dir = get_base_dir(file)
+        package_zipper = create_zip_package(
+            package_name=f"third_party_{group}", base_dir=base_dir, third_party=True
+        )
+        docker_file = get_dockerfile_path(base_dir=base_dir, group=group)
 
-    with TemporaryDirectory() as root_dir, package_zipper as build_dir:
-        root_dir = Path(root_dir).resolve()
-        venv_dir = root_dir / VENV
-        with create_temp_path(path=venv_dir, is_dir=True):
-            create_requirements(
-                root_dir=root_dir,
-                pyproject_toml_path=pyproject_toml_path,
-                group=group,
-                dependencies=dependencies,
-            )
-            docker_run(docker_file=docker_file, root_dir=root_dir, group=group)
-            copy_source_code(source_dir=venv_dir, build_dir=build_dir)
+        with TemporaryDirectory() as root_dir, package_zipper as build_dir:
+            root_dir = Path(root_dir).resolve()
+            venv_dir = root_dir / VENV
+            with create_temp_path(path=venv_dir, is_dir=True):
+                create_requirements(
+                    root_dir=root_dir,
+                    pyproject_toml_path=pyproject_toml_path,
+                    group=group,
+                    dependencies=dependencies,
+                )
+                docker_run(docker_file=docker_file, root_dir=root_dir, group=group)
+                copy_source_code(source_dir=venv_dir, build_dir=build_dir)
