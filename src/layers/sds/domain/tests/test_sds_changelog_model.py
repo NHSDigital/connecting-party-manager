@@ -1,16 +1,13 @@
 from io import StringIO
 
-import pytest
 from etl_utils.ldif.ldif import parse_ldif
 from etl_utils.ldif.model import DistinguishedName
 from sds.domain.changelog import ChangelogRecord
 from sds.domain.parse import parse_sds_record
 
-from etl.sds.tests.constants import EtlTestDataPath
-
 
 # all files listed here get downloaded to the paths listed in 'test_data_paths'
-@pytest.mark.s3(EtlTestDataPath.CHANGELOG)
+# @pytest.mark.s3(EtlTestDataPath.CHANGELOG) Uncomment this when archived
 def test_changelog_model_against_changelog_data(test_data_paths):
     (ldif_path,) = test_data_paths
 
@@ -43,7 +40,7 @@ def test_changelog_model_against_changelog_data(test_data_paths):
 
 
 # all files listed here get downloaded to the paths listed in 'test_data_paths'
-@pytest.mark.s3(EtlTestDataPath.CHANGELOG)
+# @pytest.mark.s3(EtlTestDataPath.CHANGELOG) Uncomment this when archived
 def test_changelog_changes_are_valid_ldif(test_data_paths):
     (ldif_path,) = test_data_paths
 
