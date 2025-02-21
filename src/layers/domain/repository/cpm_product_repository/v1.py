@@ -24,8 +24,27 @@ class CpmProductRepository(Repository[CpmProduct]):
     def read(self, product_team_id: str, id: str, status: str = "active"):
         return super()._read(parent_ids=(product_team_id,), id=id, status=status)
 
-    def search(self, product_team_id: str, status: str = "active"):
-        return super()._search(parent_ids=(product_team_id,), status=status)
+    def search_by_product_team(
+        self, product_team_id: str, status: str
+    ) -> list[CpmProduct]:
+        """Search for products under a given Product Team."""
+        return super()._search(
+            parent_ids=(TableKey.PRODUCT_TEAM.key(product_team_id),),
+            sk_prefix="P#",
+            status=status,
+        )
+
+    def search_by_organisation(
+        self, organisation_code: str, status: str
+    ) -> list[CpmProduct]:
+        """Search for products under a given Organisation using idx_gsi_read_2."""
+        self.parent_table_keys = (TableKey.ORG_CODE,)
+        return super()._search(
+            parent_ids=(TableKey.ORG_CODE.key(organisation_code),),
+            sk_prefix="P#",
+            gsi="idx_gsi_read_2",
+            status=status,
+        )
 
     def handle_CpmProductCreatedEvent(self, event: CpmProductCreatedEvent):
         return self.create_index(

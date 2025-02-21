@@ -1,6 +1,7 @@
 import pytest
 from domain.core.cpm_product import CpmProduct
 from domain.core.cpm_system_id import ProductId
+from domain.core.enum import Status
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
@@ -82,7 +83,9 @@ def test__query_products_by_product_team():
         name="cpm-product-name-2", product_id=product_id.id
     )
     repo.write(cpm_product_2)
-    result = repo.search(product_team_id=product_team.id)
+    result = repo.search_by_product_team(
+        product_team_id=product_team.id, status=Status.ACTIVE
+    )
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
     assert isinstance(result[1], CpmProduct)
@@ -114,7 +117,9 @@ def test__query_products_by_product_team_a():
         name="cpm-product-name-3", product_id=product_id.id
     )
     repo.write(cpm_product_3)
-    result = repo.search(product_team_id=product_team_a.id)
+    result = repo.search_by_product_team(
+        product_team_id=product_team_a.id, status=Status.ACTIVE
+    )
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
     assert isinstance(result[1], CpmProduct)
@@ -154,7 +159,9 @@ def test__query_products_by_product_team_with_sk_prefix():
     client = dynamodb_client()
     client.put_item(**args)
 
-    result = repo.search(product_team_id=product_team.id)
+    result = repo.search_by_product_team(
+        product_team_id=product_team.id, status=Status.ACTIVE
+    )
     assert len(result) == 2
     assert isinstance(result[0], CpmProduct)
     assert isinstance(result[1], CpmProduct)
@@ -164,11 +171,11 @@ def test__query_products_by_product_team_with_sk_prefix():
 
 def test__cpm_product_repository_search():
     product_id = "P.XXX-YYY"
-
     product_team = _create_product_team()
     cpm_product = product_team.create_cpm_product(
         name="cpm-product-name", product_id=product_id
     )
+    organisation_code = CPM_PRODUCT_TEAM_NO_ID["ods_code"]
 
     with mock_table_cpm("my_table") as client:
         repo = CpmProductRepository(
@@ -177,6 +184,15 @@ def test__cpm_product_repository_search():
         )
 
         repo.write(cpm_product)
-        result = repo.search(product_team_id=product_team.id)
 
-    assert result == [cpm_product]
+        # Test search by product team (search_by_product_team)
+        result_by_product_team = repo.search_by_product_team(
+            product_team_id=product_team.id, status=Status.ACTIVE
+        )
+        assert result_by_product_team == [cpm_product]
+
+        # Test search by organisation (search_by_organisation)
+        result_by_organisation = repo.search_by_organisation(
+            organisation_code=organisation_code, status=Status.ACTIVE
+        )
+        assert result_by_organisation == [cpm_product]
