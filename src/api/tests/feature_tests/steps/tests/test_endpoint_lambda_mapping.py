@@ -134,6 +134,19 @@ def test_parse_path_delete_cpm_product():
     )
 
 
+def test_parse_path_search_cpm_product():
+    with api_lambda_environment_variables():
+        import api.searchProduct.index
+
+        endpoint_lambda_mapping = get_endpoint_lambda_mapping()
+
+    assert parse_api_path(
+        method="GET",
+        path="Product",
+        endpoint_lambda_mapping=endpoint_lambda_mapping,
+    ) == ({}, {}, api.searchProduct.index)
+
+
 def test_parse_path_error():
     with pytest.raises(EndpointConfigurationError):
         parse_api_path(method="GET", path="ProductTeam/123", endpoint_lambda_mapping={})

@@ -96,6 +96,8 @@ def before_feature(context: Context, feature: Feature):
         "Read CPM Product - failure scenarios",
         "Delete CPM Product - success scenarios",
         "Delete CPM Product - failure scenarios",
+        "Search Products - success scenarios",
+        "Search Products - failures scenarios",
     ]
     if context.test_mode is TestMode.INTEGRATION:
         table = (

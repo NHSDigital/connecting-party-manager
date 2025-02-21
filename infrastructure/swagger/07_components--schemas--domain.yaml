@@ -124,3 +124,78 @@ components:
       example:
         code: "RESOURCE_DELETED"
         message: "P.XYZ-123 has been deleted."
+    ProductSearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              org_code:
+                type: string
+              product_teams:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product_team_id:
+                      type: string
+                    products:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          product_team_id:
+                            type: string
+                          ods_code:
+                            type: string
+                          status:
+                            type: string
+                          keys:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key_type:
+                                  type: string
+                                key_value:
+                                  type: string
+                          created_on:
+                            type: string
+                          updated_on:
+                            type: string
+                            nullable: true
+                          deleted_on:
+                            type: string
+                            nullable: true
+      example:
+        results:
+          - org_code: "xyzzy"
+            product_teams:
+              - product_team_id: "1234"
+                products:
+                  - id: "P.123"
+                    product_team_id: "1234"
+                    name: "My Great Product 1"
+                    ods_code: "F5H1R"
+                    status: "active"
+                    created_on: "2024-10-15T10:00:00Z"
+                    updated_on: "null"
+                    deleted_on: "null"
+                    keys: []
+              - product_team_id: "5678"
+                products:
+                  - id: "P.xyz"
+                    product_team_id: "5678"
+                    name: "My Great Product 3"
+                    ods_code: "F5H1R"
+                    status: "active"
+                    created_on: "2024-10-15T10:00:00Z"
+                    updated_on: "null"
+                    deleted_on: "null"
+                    keys: []

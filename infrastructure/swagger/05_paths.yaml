@@ -14,7 +14,8 @@ x-definitions:
 tags:
   - name: Core Product ID Endpoints
     description: Create, Read and Delete Product IDs
-
+  - name: Options
+    description: These exist for CORS
 paths:
   /_status:
     get:
@@ -44,6 +45,8 @@ paths:
     options:
       operationId: createproductteamcors
       summary: Create a Product Team resource (OPTIONS)
+      tags:
+        - Options
       responses:
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -161,6 +164,8 @@ paths:
     options:
       operationId: createproductcors
       summary: Create a Product resource (OPTIONS)
+      tags:
+        - Options
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
       responses:
@@ -228,25 +233,69 @@ paths:
       security:
         - ${authoriser_name}: []
         - app-level0: []
-    # get:
-    #   operationId: searchCpmProduct
-    #   summary: Retrieve all Products associated with a Product Team (GET)
-    #   parameters:
-    #     - $ref: "#/components/parameters/ProductTeamId"
-    #     - $ref: "#/components/parameters/HeaderVersion"
-    #     - $ref: "#/components/parameters/HeaderRequestId"
-    #     - $ref: "#/components/parameters/HeaderCorrelationId"
-    #   responses:
-    #     "200":
-    #       $ref: "#/components/responses/ProductSearch"
-    #     "404":
-    #       $ref: "#/components/responses/NotFound"
-    #   x-amazon-apigateway-integration:
-    #     <<: *ApiGatewayIntegration
-    #     uri: ${method_searchCpmProduct}
-    #   security:
-    #     - ${authoriser_name}: []
-    #     - app-level0: []
+
+  /Product:
+    options:
+      operationId: searchproductcors
+      summary: Search Products (OPTIONS)
+      tags:
+        - Options
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: "never"
+        type: "mock"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+    get:
+      operationId: searchProduct
+      summary: Retrieve all Products associated with a Product Team or Organisation (GET)
+      tags:
+        - Core Product ID Endpoints
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamIdQuery"
+        - $ref: "#/components/parameters/OrganisationCodeQuery"
+        - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderRequestId"
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProductSearch"
+        "400":
+          $ref: "#/components/responses/SearchProductBadRequest"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        uri: ${method_searchProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
 
   /ProductTeam/{product_team_id}/Product/{product_id}:
     get:
