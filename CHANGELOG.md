@@ -2,6 +2,7 @@
 
 ## 2025-02-21
 - [PI-754] Search Product
+- Dependabot: datamodel-code-generator
 
 ## 2025-02-20
 - [PI-790] Remove EPR from swagger
