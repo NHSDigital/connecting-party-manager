@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+from domain.core.enum import Status
 from domain.core.error import ConflictError
 from domain.core.product_team import ProductTeam
 from domain.repository.cpm_product_repository import CpmProductRepository
@@ -29,7 +30,9 @@ def read_products(data, cache):
     product_repo = CpmProductRepository(
         table_name=cache["DYNAMODB_TABLE"], dynamodb_client=cache["DYNAMODB_CLIENT"]
     )
-    cpm_products = product_repo.search(product_team_id=product_team.id)
+    cpm_products = product_repo.search_by_product_team(
+        product_team_id=product_team.id, status=Status.ACTIVE
+    )
 
     if cpm_products:
         product_ids = [str(product.id) for product in cpm_products]

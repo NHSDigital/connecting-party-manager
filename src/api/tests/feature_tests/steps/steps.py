@@ -184,14 +184,15 @@ def then_response(context: Context, status_code: str, list_to_check: str, count:
         response_body = context.response.json()
     except JSONDecodeError:
         response_body = context.response.text
-    assert len(response_body[list_to_check]) == int(count)
     if list_to_check == "results":
+        assert len(response_body["results"]) == int(count)
         expected_body[list_to_check] = sorted(
             expected_body[list_to_check], key=lambda x: x["name"]
         )
         response_body[list_to_check] = sorted(
             response_body[list_to_check], key=lambda x: x["name"]
         )
+
     assert_many(
         assertions=(
             assert_equal,
@@ -212,16 +213,46 @@ def then_response(context: Context, status_code: str, list_to_check: str, count:
 
 
 @then(
-    'I receive a status code "{status_code}" with a "{entity_type}" search body response that contains'
+    'I receive a status code "{status_code}" with body where ProductTeams has a length of "{product_team_count}" with "{product_count}" Products each'
 )
-def then_response(context: Context, status_code: str, entity_type: str):
+def then_response(
+    context: Context, status_code: str, product_team_count: str, product_count: str
+):
     expected_body = parse_table(table=context.table, context=context)
-    expected_body = sorted(expected_body, key=lambda x: x[sort_keys[entity_type]])
     try:
         response_body = context.response.json()
     except JSONDecodeError:
         response_body = context.response.text
-    response_body = sorted(response_body, key=lambda x: x[sort_keys[entity_type]])
+
+    len_product_teams = len(response_body["results"][0]["product_teams"])
+    assert len_product_teams == int(product_team_count)
+
+    len_products = 0
+    for i in range(len_product_teams):
+        len_products += len(response_body["results"][0]["product_teams"][i]["products"])
+    assert len_products == int(product_count)
+
+    # Sort product teams by "product_team_id"
+    expected_body["results"][0]["product_teams"] = sorted(
+        expected_body["results"][0]["product_teams"],
+        key=lambda team: team["product_team_id"],
+    )
+    response_body["results"][0]["product_teams"] = sorted(
+        response_body["results"][0]["product_teams"],
+        key=lambda team: team["product_team_id"],
+    )
+
+    # Sort products inside each product team by "id"
+    for i, _ in enumerate(expected_body["results"][0]["product_teams"]):
+        expected_body["results"][0]["product_teams"][i]["products"] = sorted(
+            expected_body["results"][0]["product_teams"][i]["products"],
+            key=lambda product: product["id"],
+        )
+        response_body["results"][0]["product_teams"][i]["products"] = sorted(
+            response_body["results"][0]["product_teams"][i]["products"],
+            key=lambda product: product["id"],
+        )
+
     assert_many(
         assertions=(
             assert_equal,

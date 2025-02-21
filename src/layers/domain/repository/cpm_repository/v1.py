@@ -180,21 +180,41 @@ class Repository[ModelType: AggregateRoot]:
         )
 
     def _query(
-        self, parent_ids: tuple[str], id: str = None, status: str = "all"
+        self,
+        parent_ids: tuple[str],
+        id: str = None,
+        status: str = "all",
+        gsi: str = None,
+        sk_prefix: str = None,
     ) -> list[dict]:
+        """
+        Perform a query on the table with optional GSI and sk_prefix.
+        """
+        # Ensure parent_ids are prefixed only once
         pk = KEY_SEPARATOR.join(
-            table_key.key(_id)
+            _id if _id.startswith(table_key.key("")) else table_key.key(_id)
             for table_key, _id in zip(self.parent_table_keys, parent_ids)
         )
+        pk_attribute_name = "pk_read_2" if gsi == "idx_gsi_read_2" else "pk"
+
+        # Ensure sk_prefix is correctly applied
         sk = self.table_key.key(id or "")
+        if sk_prefix and not sk.startswith(sk_prefix):  # Avoid double prefixing
+            sk = sk_prefix + sk
+        sk_attribute_name = "sk_read_2" if gsi == "idx_gsi_read_2" else "sk"
 
         sk_query_type = QueryType.BEGINS_WITH if id is None else QueryType.EQUALS
-        sk_condition = sk_query_type.format("sk", ":sk")
+        sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
+
         args = {
             "TableName": self.table_name,
-            "KeyConditionExpression": f"pk = :pk AND {sk_condition}",
+            "KeyConditionExpression": f"{pk_attribute_name} = :pk AND {sk_condition}",
             "ExpressionAttributeValues": marshall(**{":pk": pk, ":sk": sk}),
         }
+
+        if gsi:
+            args["IndexName"] = gsi
+
         if status != "all":
             args["FilterExpression"] = "#status = :status"
             args["ExpressionAttributeValues"][":status"] = {"S": status}
@@ -205,12 +225,27 @@ class Repository[ModelType: AggregateRoot]:
             raise TooManyResults(f"Too many results for query ({(*parent_ids, id)})")
         return list(map(unmarshall, result["Items"]))
 
-    def _search(self, parent_ids: tuple[str], status: str = "all") -> list[ModelType]:
-        return [
-            self.model(**item)
-            for item in self._query(parent_ids=parent_ids, status=status)
-            if item.get("root") is True
-        ]
+    def _search(
+        self,
+        parent_ids: tuple[str],
+        gsi: str = None,
+        sk_prefix: str = None,
+        status: str = "all",
+    ) -> list[ModelType]:
+        """
+        Perform a search query with optional GSI and sk_prefix.
+        """
+        query_params = {
+            "parent_ids": parent_ids,
+            "sk_prefix": sk_prefix,
+            "status": status,
+        }
+
+        # If a GSI is provided, include it in the query parameters
+        if gsi:
+            query_params["gsi"] = gsi
+
+        return [self.model(**item) for item in self._query(**query_params)]
 
     def _read(self, parent_ids: tuple[str], id: str, status: str = "all") -> ModelType:
         items = self._query(parent_ids=parent_ids or (id,), id=id, status=status)
