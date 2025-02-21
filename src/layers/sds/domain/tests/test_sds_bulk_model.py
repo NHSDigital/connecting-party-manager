@@ -17,7 +17,7 @@ BULK_SKIPS = [245315]
 BULK_FILTER_SKIPS = [64320]
 
 
-@pytest.mark.s3(EtlTestDataPath.MINI_LDIF)
+# @pytest.mark.s3(EtlTestDataPath.MINI_LDIF) Uncomment this when archived
 def test_bulk_data_is_valid_sds_mini(test_data_paths):
     (ldif_path,) = test_data_paths
 
@@ -41,7 +41,7 @@ def test_bulk_data_is_valid_sds_mini(test_data_paths):
 
 
 @memory_intensive
-@pytest.mark.s3(EtlTestDataPath.FULL_LDIF)
+# @pytest.mark.s3(EtlTestDataPath.FULL_LDIF) Uncomment this when archived
 def test_bulk_data_is_valid_sds_full(test_data_paths):
     (ldif_path,) = test_data_paths
 

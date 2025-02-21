@@ -222,7 +222,7 @@ jobs:
     runs-on: [self-hosted, ci]
     strategy:
       matrix:
-        test-type: [integration, s3]
+        test-type: [integration]
     steps:
       - uses: actions/checkout@v4
         with:
