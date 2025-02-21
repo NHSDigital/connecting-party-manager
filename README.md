@@ -29,7 +29,7 @@
 
 ### Prerequisites
 
-We use `asdf` to fetch the required versions of prerequisite libraries instead of your system's default version. To get it up and running go to https://asdf-vm.com/guide/getting-started.html. You can check it installed properly by using the command `asdf --version`.
+We use `asdf` to fetch the required versions of prerequisite libraries instead of your system's default version. To get it up and running go to <https://asdf-vm.com/guide/getting-started.html>. You can check it installed properly by using the command `asdf --version`.
 
 However, you will also need to install the `docker engine` separately
 
@@ -469,3 +469,11 @@ To run the SBOM commands there are some make commands that currently handle this
 
 `make generate--sbom`
 `make validate--sbom`
+
+## Extras
+
+### Archive
+
+The project originally was designed to have a concept of an EPRv2. This did not work out but we have kept the remains of the EPR work in an archive folder located in the `root/archived_epr`. The EPR code was supposed to fit into the structure of our existing CPM model but it became apparent as requirements came through that this would not be possible. You will find in this folder `swagger/OAS spec`, `lambdas`, `ETL` and `tests`.
+
+This has been left in for future reference. The code would need to be transferred back into the root of the project, changing `src_old` back to `src` and merging into the existing `src` directory.

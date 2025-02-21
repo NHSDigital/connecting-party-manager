@@ -9,10 +9,12 @@ SRC_DIR = "src"
 DIST_DIR = "dist"
 BUILD_DIR = "build"
 SCRIPT_DIR = "make"
+ARCHIVE_DIR = "archived_epr"
 UNNECESSARY_DIRS = [
     DIST_DIR,
     BUILD_DIR,
     SCRIPT_DIR,
+    ARCHIVE_DIR,
     "setup.py",
     "__pycache__",
     "*.dist-info",
