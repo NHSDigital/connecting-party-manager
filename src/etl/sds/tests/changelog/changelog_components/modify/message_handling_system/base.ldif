@@ -1,6 +1,0 @@
-dn: uniqueIdentifier=00000a84594b2ef34279,ou=Services,o=nhs
-changeType: modify
-<<TEMPLATE>>
-objectClass: modify
-objectClass: top
-uniqueIdentifier: 00000a84594b2ef34279

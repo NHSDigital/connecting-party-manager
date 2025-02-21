@@ -1,13 +1,13 @@
 import pytest
-from domain.core.epr_product import EprProduct
+from domain.core.cpm_product import CpmProduct
 from domain.core.error import NotFoundError
-from domain.repository.epr_product_repository import EprProductRepository
+from domain.repository.cpm_product_repository import CpmProductRepository
 from domain.repository.errors import ItemNotFound
 
 
 @pytest.mark.integration
 def test__epr_product_repository_delete(
-    product: EprProduct, repository: EprProductRepository
+    product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)  # Create product in DB
 
@@ -24,7 +24,7 @@ def test__epr_product_repository_delete(
 
 @pytest.mark.integration
 def test__epr_product_repository_cannot_delete_if_does_not_exist(
-    product: EprProduct, repository: EprProductRepository
+    product: CpmProduct, repository: CpmProductRepository
 ):
     product.clear_events()
     product.delete()
@@ -33,7 +33,7 @@ def test__epr_product_repository_cannot_delete_if_does_not_exist(
 
 
 def test__epr_product_repository_delete_local(
-    product: EprProduct, repository: EprProductRepository
+    product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)  # Create product in DB
     product_from_db = repository.read(
@@ -48,7 +48,7 @@ def test__epr_product_repository_delete_local(
 
 
 def test__epr_product_repository_cannot_delete_if_does_not_exist_local(
-    product: EprProduct, repository: EprProductRepository
+    product: CpmProduct, repository: CpmProductRepository
 ):
     product.clear_events()
     product.delete()

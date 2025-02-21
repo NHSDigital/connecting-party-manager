@@ -3,7 +3,6 @@ import time
 from pathlib import Path
 
 import boto3
-from etl_utils.constants import ETL_STATE_LOCK
 from event.aws.client import dynamodb_client
 from event.logging.logger import setup_logger
 from nhs_context_logging.fixtures import (  # noqa: F401
@@ -146,17 +145,6 @@ def clear_dynamodb_table_(request: FixtureRequest):
         table_name_epr = read_terraform_output("dynamodb_epr_table_name.value")
         clear_dynamodb_table(client=client, table_name=table_name_cpm)
         clear_dynamodb_table(client=client, table_name=table_name_epr)
-        yield
-    else:
-        yield
-
-
-@fixture(autouse=True)
-def clear_etl_state_lock_(request: FixtureRequest):
-    if is_integration(request):
-        s3_client = boto3.client("s3")
-        bucket_name = read_terraform_output("sds_etl.value.bucket")
-        s3_client.delete_object(Bucket=bucket_name, Key=ETL_STATE_LOCK)
         yield
     else:
         yield
