@@ -1,5 +1,0 @@
-dn: uniqueIdentifier=000000000001,ou=Services,o=nhs
-objectClass: delete
-objectClass: top
-changeType: delete
-uniqueIdentifier: 000000000001

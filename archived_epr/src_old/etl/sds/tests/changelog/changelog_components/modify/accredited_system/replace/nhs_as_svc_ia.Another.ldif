@@ -1,4 +1,0 @@
-replace: nhsAsSvcIA
-nhsAsSvcIA: urn:nhs:names:services:ers:READ_PRACTITIONER_ROLE_R4_V001
-nhsAsSvcIA: urn:nhs:names:services:pds:MCCI_IN010000UK13
-nhsAsSvcIA: urn:nhs:names:services:pds:PRPA_IN160000UK30
