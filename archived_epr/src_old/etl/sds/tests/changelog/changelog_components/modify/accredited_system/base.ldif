@@ -1,6 +1,0 @@
-dn: uniqueIdentifier=000000000001,ou=Services,o=nhs
-changeType: modify
-<<TEMPLATE>>
-objectClass: modify
-objectClass: top
-uniqueIdentifier: 000000000001
