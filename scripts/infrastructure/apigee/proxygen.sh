@@ -192,12 +192,8 @@ function publish_swagger(){
 
     if [[ ${_aws_environment} == "prod" ]]; then
         _flags=""
-    #elif [[ ${_aws_environment} == "int" ]]; then
     else
         _flags="--uat"
-    # else
-    #     echo "ERROR: only environments to deploy to are 'prod' and 'int'"
-    #     exit 1;
     fi
 
         echo "

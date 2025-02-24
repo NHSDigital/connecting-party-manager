@@ -21,7 +21,6 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
         query_parameters = {'value': something}
     """
 
-    import api.createCpmProduct.index
     import api.createDevice.index
     import api.createDeviceAccreditedSystem.index
     import api.createDeviceMessageHandlingSystem.index
@@ -29,24 +28,26 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
     import api.createDeviceReferenceDataASActions.index
     import api.createDeviceReferenceDataMessageSet.index
     import api.createEprProduct.index
-    import api.createProductTeam.index
     import api.createProductTeamEpr.index
-    import api.deleteCpmProduct.index
     import api.deleteEprProduct.index
-    import api.deleteProductTeam.index
-    import api.readCpmProduct.index
     import api.readDevice.index
     import api.readDeviceReferenceData.index
 
     # import api.searchCpmProduct.index
     import api.readEprProduct.index
-    import api.readProductTeam.index
     import api.readProductTeamEpr.index
     import api.readQuestionnaire.index
     import api.searchDeviceReferenceData.index
     import api.searchEprProduct.index
     import api.searchSdsDevice.index
     import api.searchSdsEndpoint.index
+
+    import api.createCpmProduct.index
+    import api.createProductTeam.index
+    import api.deleteCpmProduct.index
+    import api.deleteProductTeam.index
+    import api.readCpmProduct.index
+    import api.readProductTeam.index
     import api.status.index
 
     return {

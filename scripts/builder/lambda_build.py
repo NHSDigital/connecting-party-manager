@@ -34,10 +34,11 @@ def create_zip_package(
 
 
 def build(file):
-    lambda_base_dir = get_base_dir(file)
-    package_name = lambda_base_dir.name
+    if "archived_epr" not in file:
+        lambda_base_dir = get_base_dir(file)
+        package_name = lambda_base_dir.name
 
-    with create_zip_package(
-        package_name=package_name, base_dir=lambda_base_dir
-    ) as build_dir:
-        copy_source_code(source_dir=lambda_base_dir, build_dir=build_dir)
+        with create_zip_package(
+            package_name=package_name, base_dir=lambda_base_dir
+        ) as build_dir:
+            copy_source_code(source_dir=lambda_base_dir, build_dir=build_dir)
