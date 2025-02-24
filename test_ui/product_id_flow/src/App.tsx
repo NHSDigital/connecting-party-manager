@@ -2,10 +2,11 @@ import { useState } from "react";
 import ProductCreationFlow from "./components/ProductCreationFlow";
 import ProductSearch from "./components/ProductSearchFlow";
 import ProductDelete from "./components/ProductDeleteFlow";
+import ProductTeamDelete from "./components/ProductDeleteTeamFlow";
 
 function App() {
   const [currentFlow, setCurrentFlow] = useState<
-    "creation" | "search" | "delete" | null
+    "creation" | "search" | "delete" | "deleteTeam" | null
   >(null);
 
   const renderFlow = () => {
@@ -16,6 +17,8 @@ function App() {
         return <ProductSearch />;
       case "delete":
         return <ProductDelete />;
+      case "deleteTeam":
+        return <ProductTeamDelete />;
       default:
         return (
           <div className="min-h-screen flex flex-col items-center justify-center">
@@ -40,6 +43,12 @@ function App() {
                 onClick={() => setCurrentFlow("delete")}
               >
                 Product Delete Flow
+              </button>
+              <button
+                className="nhs-button nhs-button-primary"
+                onClick={() => setCurrentFlow("deleteTeam")}
+              >
+                Product Team Delete Flow
               </button>
             </div>
           </div>
