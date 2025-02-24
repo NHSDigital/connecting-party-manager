@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-02-24
+- [PI-794] Remove EPR S3 tests
+- [PI-788] Create Product Search and Delete Flows for test UI
+
 ## 2025-02-21
 - [PI-754] Search Product
 - Dependabot: datamodel-code-generator
