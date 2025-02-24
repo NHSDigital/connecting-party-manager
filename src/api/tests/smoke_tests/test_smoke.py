@@ -83,6 +83,25 @@ def _request(base_url: str, headers: dict, path: str, method: str):
                 "SearchProductQueryParams.__root__: Please provide exactly one valid query parameter: ('product_team_id', 'organisation_code')."
             ],
         ],
+        [
+            "/ProductTeam/123/Product/abc",
+            "DELETE",
+            404,
+        ],
+        [
+            "/ProductTeam/123",
+            "DELETE",
+            404,
+        ],
+        [
+            "/Product",
+            "GET",
+            400,
+            ["VALIDATION_ERROR"],
+            [
+                "SearchProductQueryParams.__root__: Please provide exactly one valid query parameter: ('product_team_id', 'organisation_code')."
+            ],
+        ],
     ],
 )
 def test_smoke_tests(request_details):

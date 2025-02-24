@@ -15,3 +15,17 @@ components:
       description: The organisation code to filter results by.
       schema:
         type: string
+    ProductTeamIdQuery:
+      name: product_team_id
+      in: query
+      required: false
+      description: The ID of the product team to filter results by.
+      schema:
+        type: string
+    OrganisationCodeQuery:
+      name: organisation_code
+      in: query
+      required: false
+      description: The organisation code to filter results by.
+      schema:
+        type: string
