@@ -10,10 +10,6 @@ from domain.core.error import (
     InvalidSpineMhsResponse,
     NotEprProductError,
 )
-from domain.core.questionnaire import (
-    QuestionnaireResponseMissingValue,
-    QuestionnaireResponseValidationError,
-)
 from domain.ods import InvalidOdsCodeError
 from domain.repository.errors import AlreadyExistsError, ItemNotFound
 from event.status.steps import StatusNotOk
@@ -56,11 +52,9 @@ EXCEPTIONS_TO_SPINE_CODING = {
     InboundValidationError: SpineCoding.VALIDATION_ERROR,
     InboundMissingValue: SpineCoding.MISSING_VALUE,
     InboundJSONDecodeError: SpineCoding.VALIDATION_ERROR,
-    QuestionnaireResponseValidationError: SpineCoding.VALIDATION_ERROR,
     NotEprProductError: SpineCoding.VALIDATION_ERROR,
     InvalidSpineMhsResponse: SpineCoding.VALIDATION_ERROR,
     InvalidSpineAsResponse: SpineCoding.VALIDATION_ERROR,
-    QuestionnaireResponseMissingValue: SpineCoding.MISSING_VALUE,
     InvalidOdsCodeError: SpineCoding.UNPROCESSABLE_ENTITY,
     ConfigurationError: SpineCoding.VALIDATION_ERROR,
     VersionException: SpineCoding.ACCESS_DENIED,

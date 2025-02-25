@@ -1,9 +1,8 @@
 from datetime import datetime
 
 from attr import dataclass
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.cpm_system_id import ProductId
-from domain.core.device import UPDATED_ON, event
 from domain.core.enum import Status
 from domain.core.error import DuplicateError
 from domain.core.event import Event, EventDeserializer

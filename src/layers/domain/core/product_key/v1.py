@@ -1,7 +1,7 @@
 import re
 from enum import StrEnum, auto
 
-from domain.core.device_key import DeviceKey
+from domain.core.product_team_key import ProductTeamKey
 from domain.core.validation import SdsId
 
 
@@ -14,7 +14,7 @@ class ProductKeyType(StrEnum):
         return SdsId.PartyKey.ID_PATTERN
 
 
-class ProductKey(DeviceKey):
+class ProductKey(ProductTeamKey):
     """A Product Key is a secondary way of indexing / retrieving Products"""
 
     key_type: ProductKeyType
