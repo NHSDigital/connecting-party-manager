@@ -1,9 +1,6 @@
 from collections.abc import Generator
 
 from domain.core.device import Device
-from domain.repository.device_reference_data_repository import (
-    DeviceReferenceDataRepository,
-)
 from domain.repository.device_repository import DeviceRepository
 
 from conftest import dynamodb_client_with_sleep as dynamodb_client
@@ -14,7 +11,7 @@ TABLE_NAME = "my_table"
 
 
 def repository_fixture[
-    T: DeviceRepository | DeviceReferenceDataRepository
+    T: DeviceRepository
 ](is_integration_test: bool, repository_class: type[T]) -> Generator[T, None, None]:
     if is_integration_test:
         table_name = read_terraform_output("dynamodb_epr_table_name.value")
@@ -35,7 +32,7 @@ def devices_exactly_equal(device_a: Device, device_b: Device) -> bool:
 
 
 def repository_fixture_cpm[
-    T: DeviceRepository | DeviceReferenceDataRepository
+    T
 ](is_integration_test: bool, repository_class: type[T]) -> Generator[T, None, None]:
     if is_integration_test:
         table_name = read_terraform_output("dynamodb_cpm_table_name.value")
