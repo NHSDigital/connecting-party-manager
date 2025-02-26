@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-02-26
+- [PI-793] Remove EPR ETL
+- [PI-795] Remove EPR repository layers
+- [PI-834] Remove EPR domain logic
+- Dependabot: Update black
+- Dependabot: Update attrs
+
 ## 2025-02-24
 - [PI-794] Remove EPR S3 tests
 - [PI-788] Create Product Search and Delete Flows for test UI
