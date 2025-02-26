@@ -14,7 +14,7 @@ from test_helpers.terraform import read_terraform_output
 )
 @pytest.mark.integration
 def test_party_key_generation(start, expected):
-    table_name = read_terraform_output("dynamodb_epr_table_name.value")
+    table_name = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client()
     # Insert a dummy entry with an initial 'latest' value
     client.put_item(
@@ -50,7 +50,7 @@ def test_party_key_generation(start, expected):
 )
 @pytest.mark.integration
 def test_asid_key_generation(start, expected):
-    TABLE_NAME = read_terraform_output("dynamodb_epr_table_name.value")
+    TABLE_NAME = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client()
     # Insert a dummy entry with an initial 'latest' value
     client.put_item(
@@ -76,7 +76,7 @@ def test_asid_key_generation(start, expected):
 
 @pytest.mark.integration
 def test_asid_key_generation_seeded():
-    table_name = read_terraform_output("dynamodb_epr_table_name.value")
+    table_name = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client()
     repository = CpmSystemIdRepository[AsidId](
         table_name=table_name, dynamodb_client=client, model=AsidId
@@ -92,7 +92,7 @@ def test_asid_key_generation_seeded():
 
 @pytest.mark.integration
 def test_asid_generation_increment():
-    TABLE_NAME = read_terraform_output("dynamodb_epr_table_name.value")
+    TABLE_NAME = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client()
     start_value = 200000000000
 
@@ -139,7 +139,7 @@ def test_asid_generation_increment():
 
 @pytest.mark.integration
 def test_party_key_generation_seeded():
-    table_name = read_terraform_output("dynamodb_epr_table_name.value")
+    table_name = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client()
     repository = CpmSystemIdRepository[PartyKeyId](
         table_name=table_name, dynamodb_client=client, model=PartyKeyId
@@ -159,7 +159,7 @@ def test_party_key_generation_seeded():
 
 @pytest.mark.integration
 def test_party_key_generation_increment():
-    TABLE_NAME = read_terraform_output("dynamodb_epr_table_name.value")
+    TABLE_NAME = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client()
     start_party_key = "AAA-100000"
 
