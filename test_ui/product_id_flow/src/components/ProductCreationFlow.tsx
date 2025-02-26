@@ -5,6 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 interface TeamFormData {
   ods_code: string;
   name: string;
+  aliases: string[];
 }
 
 interface ProductFormData {
@@ -163,90 +164,147 @@ const ProductTeamStep: React.FC<ProductTeamStepProps> = ({
   setCurrentStep,
   isCreateTeamEnabled,
   isNextEnabled,
-}) => (
-  <div>
-    <div className="nhs-form-group">
-      <label className="nhs-label" htmlFor="ods_code">
-        ODS Code
-      </label>
-      {productTeamResponse ? (
-        <p className="bg-gray-50 p-2 rounded">{productTeamResponse.ods_code}</p>
-      ) : (
-        <input
-          type="text"
-          id="ods_code"
-          className="nhs-input"
-          value={teamFormData.ods_code}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setTeamFormData({
-              ...teamFormData,
-              ods_code: e.target.value,
-            })
-          }
+}) => {
+  const handleAliasChange = (index: number, value: string) => {
+    const newAliases = [...teamFormData.aliases];
+    newAliases[index] = value;
+    setTeamFormData({ ...teamFormData, aliases: newAliases });
+  };
+
+  const handleAddAlias = () => {
+    setTeamFormData({
+      ...teamFormData,
+      aliases: [...teamFormData.aliases, ""],
+    });
+  };
+
+  const handleRemoveAlias = (index: number) => {
+    const newAliases = teamFormData.aliases.filter((_, i) => i !== index);
+    setTeamFormData({ ...teamFormData, aliases: newAliases });
+  };
+
+  return (
+    <div>
+      <div className="nhs-form-group">
+        <label className="nhs-label" htmlFor="ods_code">
+          ODS Code
+        </label>
+        {productTeamResponse ? (
+          <p className="bg-gray-50 p-2 rounded">
+            {productTeamResponse.ods_code}
+          </p>
+        ) : (
+          <input
+            type="text"
+            id="ods_code"
+            className="nhs-input"
+            value={teamFormData.ods_code}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setTeamFormData({
+                ...teamFormData,
+                ods_code: e.target.value,
+              })
+            }
+            disabled={loading}
+          />
+        )}
+      </div>
+
+      <div className="nhs-form-group">
+        <label className="nhs-label" htmlFor="team_name">
+          Team Name
+        </label>
+        {productTeamResponse ? (
+          <p className="bg-gray-50 p-2 rounded">{productTeamResponse.name}</p>
+        ) : (
+          <input
+            type="text"
+            id="team_name"
+            className="nhs-input"
+            value={teamFormData.name}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setTeamFormData({ ...teamFormData, name: e.target.value })
+            }
+            disabled={loading}
+          />
+        )}
+      </div>
+
+      <div className="nhs-form-group">
+        <label className="nhs-label">Product Team Aliases</label>
+        {teamFormData.aliases.map((alias, index) => (
+          <div key={index} className="flex items-center mb-2">
+            <input
+              type="text"
+              className="nhs-input mr-2"
+              value={alias}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleAliasChange(index, e.target.value)
+              }
+              disabled={loading}
+            />
+            <button
+              type="button"
+              className="nhs-button nhs-button-secondary"
+              onClick={() => handleRemoveAlias(index)}
+              disabled={loading}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="nhs-button nhs-button-secondary"
+          onClick={handleAddAlias}
           disabled={loading}
-        />
+        >
+          Add Alias
+        </button>
+      </div>
+
+      {productTeamResponse && (
+        <div className="nhs-success-banner">
+          <CheckCircle2 className="h-5 w-5 mr-2" />
+          <p>Product Team created successfully</p>
+        </div>
+      )}
+
+      <div className="flex justify-between mt-6">
+        <button
+          type="button"
+          onClick={handleCreateProductTeam}
+          disabled={
+            !isCreateTeamEnabled || loading || productTeamResponse !== null
+          }
+          data-emphasis={
+            isCreateTeamEnabled && !loading && !productTeamResponse
+          }
+          className="nhs-button nhs-button-primary"
+        >
+          {loading ? "Creating..." : "Create Product Team"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCurrentStep(2)}
+          disabled={!isNextEnabled}
+          data-emphasis={isNextEnabled}
+          className="nhs-button nhs-button-primary"
+        >
+          Next
+        </button>
+      </div>
+
+      {productTeamResponse && (
+        <div className="nhs-response-data">
+          <h3 className="text-lg font-bold mb-2">Response Data</h3>
+          <pre>{JSON.stringify(productTeamResponse, null, 2)}</pre>
+        </div>
       )}
     </div>
-
-    <div className="nhs-form-group">
-      <label className="nhs-label" htmlFor="team_name">
-        Team Name
-      </label>
-      {productTeamResponse ? (
-        <p className="bg-gray-50 p-2 rounded">{productTeamResponse.name}</p>
-      ) : (
-        <input
-          type="text"
-          id="team_name"
-          className="nhs-input"
-          value={teamFormData.name}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setTeamFormData({ ...teamFormData, name: e.target.value })
-          }
-          disabled={loading}
-        />
-      )}
-    </div>
-
-    {productTeamResponse && (
-      <div className="nhs-success-banner">
-        <CheckCircle2 className="h-5 w-5 mr-2" />
-        <p>Product Team created successfully</p>
-      </div>
-    )}
-
-    <div className="flex justify-between mt-6">
-      <button
-        type="button"
-        onClick={handleCreateProductTeam}
-        disabled={
-          !isCreateTeamEnabled || loading || productTeamResponse !== null
-        }
-        data-emphasis={isCreateTeamEnabled && !loading && !productTeamResponse}
-        className="nhs-button nhs-button-primary"
-      >
-        {loading ? "Creating..." : "Create Product Team"}
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setCurrentStep(2)}
-        disabled={!isNextEnabled}
-        data-emphasis={isNextEnabled}
-        className="nhs-button nhs-button-primary"
-      >
-        Next
-      </button>
-    </div>
-
-    {productTeamResponse && (
-      <div className="nhs-response-data">
-        <h3 className="text-lg font-bold mb-2">Response Data</h3>
-        <pre>{JSON.stringify(productTeamResponse, null, 2)}</pre>
-      </div>
-    )}
-  </div>
-);
+  );
+};
 
 const ProductStep: React.FC<ProductStepProps> = ({
   productFormData,
@@ -316,6 +374,7 @@ const ProductCreationFlow: React.FC = () => {
   const [teamFormData, setTeamFormData] = useState<TeamFormData>({
     ods_code: "",
     name: "",
+    aliases: [],
   });
   const [environmentConfig, setEnvironmentConfig] = useState<EnvironmentConfig>(
     {
@@ -365,6 +424,10 @@ const ProductCreationFlow: React.FC = () => {
           body: JSON.stringify({
             ods_code: teamFormData.ods_code,
             name: teamFormData.name,
+            keys: teamFormData.aliases.map((alias) => ({
+              key_type: "product_team_id_alias",
+              key_value: alias,
+            })),
           }),
         }
       );

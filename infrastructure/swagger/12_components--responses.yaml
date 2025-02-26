@@ -86,8 +86,18 @@ components:
       headers:
         Access-Control-Allow-Origin:
           schema:
-            type: string
-          example: "*"
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            ValidationErrorExtraFields:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchSDSEndpointQueryParams.foo: extra fields not permitted"
+            ValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
     UnprocessableContent:
       description: Unprocessable Content
       content:

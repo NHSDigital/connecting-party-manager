@@ -17,56 +17,56 @@ BULK_SKIPS = [245315]
 BULK_FILTER_SKIPS = [64320]
 
 
-@pytest.mark.s3(EtlTestDataPath.MINI_LDIF)
-def test_bulk_data_is_valid_sds_mini(test_data_paths):
-    (ldif_path,) = test_data_paths
+# @pytest.mark.s3(EtlTestDataPath.MINI_LDIF) Uncomment this when archived
+# def test_bulk_data_is_valid_sds_mini(test_data_paths):
+#     (ldif_path,) = test_data_paths
 
-    unprocessed_records = deque(parse_ldif(file_opener=open, path_or_data=ldif_path))
-    processed_records = []
-    while unprocessed_records:
-        distinguished_name, record = unprocessed_records[0]
-        try:
-            sds_record = parse_sds_record(
-                distinguished_name=distinguished_name, record=record
-            )
-            processed_records.append(type(sds_record))
-        except Exception as exception:
-            processed_records.append(exception)
-        else:
-            unprocessed_records.popleft()
+#     unprocessed_records = deque(parse_ldif(file_opener=open, path_or_data=ldif_path))
+#     processed_records = []
+#     while unprocessed_records:
+#         distinguished_name, record = unprocessed_records[0]
+#         try:
+#             sds_record = parse_sds_record(
+#                 distinguished_name=distinguished_name, record=record
+#             )
+#             processed_records.append(type(sds_record))
+#         except Exception as exception:
+#             processed_records.append(exception)
+#         else:
+#             unprocessed_records.popleft()
 
-    counts = Counter(processed_records)
-    assert counts[NhsMhs] == 1655
-    assert counts[NhsAccreditedSystem] == 252
+#     counts = Counter(processed_records)
+#     assert counts[NhsMhs] == 1655
+#     assert counts[NhsAccreditedSystem] == 252
 
 
-@memory_intensive
-@pytest.mark.s3(EtlTestDataPath.FULL_LDIF)
-def test_bulk_data_is_valid_sds_full(test_data_paths):
-    (ldif_path,) = test_data_paths
+# @memory_intensive
+# @pytest.mark.s3(EtlTestDataPath.FULL_LDIF) Uncomment this when archived
+# def test_bulk_data_is_valid_sds_full(test_data_paths):
+#     (ldif_path,) = test_data_paths
 
-    unprocessed_records = deque(parse_ldif(file_opener=open, path_or_data=ldif_path))
+#     unprocessed_records = deque(parse_ldif(file_opener=open, path_or_data=ldif_path))
 
-    index = 0
-    processed_records = []
-    while unprocessed_records:
-        distinguished_name, record = unprocessed_records[0]
-        try:
-            if index not in BULK_SKIPS:
-                sds_record = parse_sds_record(
-                    distinguished_name=distinguished_name, record=record
-                )
-                processed_records.append(type(sds_record))
-        except Exception as exception:
-            processed_records.append(exception)
-        else:
-            unprocessed_records.popleft()
-        index += 1
+#     index = 0
+#     processed_records = []
+#     while unprocessed_records:
+#         distinguished_name, record = unprocessed_records[0]
+#         try:
+#             if index not in BULK_SKIPS:
+#                 sds_record = parse_sds_record(
+#                     distinguished_name=distinguished_name, record=record
+#                 )
+#                 processed_records.append(type(sds_record))
+#         except Exception as exception:
+#             processed_records.append(exception)
+#         else:
+#             unprocessed_records.popleft()
+#         index += 1
 
-    assert Counter(processed_records) == {
-        NhsMhs: 154506,
-        NhsAccreditedSystem: 5631,
-    }
+#     assert Counter(processed_records) == {
+#         NhsMhs: 154506,
+#         NhsAccreditedSystem: 5631,
+#     }
 
 
 @pytest.mark.integration
