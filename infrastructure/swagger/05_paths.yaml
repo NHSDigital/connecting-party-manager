@@ -16,14 +16,6 @@ tags:
     description: Create, Read and Delete Product IDs
   - name: Options
     description: These exist for CORS
-  - name: Core EPR Creation Endpoints
-    description: Core EPR API creation endpoints
-  - name: Core EPR Read Endpoints
-    description: Core EPR API read endpoints
-  - name: Core EPR Deletion Endpoints
-    description: Core EPR API deletion endpoints
-  - name: SDS Search Endpoints
-    description: Search Results provided for the SDS FHIR API
 
 paths:
   /_status:
