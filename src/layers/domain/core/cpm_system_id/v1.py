@@ -10,6 +10,7 @@ from uuid import uuid4
 from domain.core.base import BaseModel
 from domain.core.error import InvalidKeyPattern
 from domain.core.product_key import ProductKeyType
+from domain.core.product_team_key import validate_key
 from event.json import json_load
 from pydantic import validator
 
@@ -31,16 +32,6 @@ PRODUCT_TEAM_EPR_ID_PATTERN = re.compile(
 PRODUCT_TEAM_ID_PATTERN = re.compile(
     r"^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
-
-
-def validate_key(key_value: str, key_type: ProductKeyType):
-    if key_type and key_type.pattern.match(key_value) is None:
-        raise InvalidKeyPattern(
-            f"Key '{key_value}' does not match the expected "
-            f"pattern '{key_type.pattern.pattern}' associated with "
-            f"key type '{key_type}'"
-        )
-    return key_value
 
 
 @cache
