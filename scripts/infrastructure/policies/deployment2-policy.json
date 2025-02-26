@@ -168,24 +168,8 @@
       "Resource": [
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*",
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*",
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-etl-notify-slack-webhook-url-*"
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*"
       ]
-    },
-    {
-      "Sid": "SQSPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "sqs:createqueue",
-        "sqs:tagqueue",
-        "sqs:setqueueattributes",
-        "sqs:getqueueattributes",
-        "sqs:listqueuetags",
-        "sqs:deletequeue",
-        "sqs:PurgeQueue",
-        "sqs:GetQueueUrl"
-      ],
-      "Resource": ["arn:aws:sqs:eu-west-2:${ACCOUNT_ID}:*-sqs*"]
     },
     {
       "Sid": "EventSourceMappingPermissions",
@@ -209,48 +193,14 @@
       ]
     },
     {
-      "Sid": "OpenSearchPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "es:AddTags",
-        "es:ListTags",
-        "es:CreateDomain",
-        "es:DescribeDomain",
-        "es:DescribeElasticsearchDomain",
-        "es:DescribeDomainConfig",
-        "es:DescribeElasticsearchDomainConfig",
-        "es:DeleteElasticsearchDomain",
-        "es:DeleteDomain",
-        "es:UpdateElasticsearchDomainConfig",
-        "es:UpdateDomainConfig"
-      ],
-      "Resource": ["arn:aws:es:*:${ACCOUNT_ID}:domain/*"]
-    },
-    {
-      "Sid": "OpenSearchPLPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "osis:CreatePipeline",
-        "osis:TagResource",
-        "osis:GetPipeline",
-        "osis:ListTagsForResource",
-        "osis:DeletePipeline",
-        "osis:UpdatePipeline",
-        "osis:StopPipeline"
-      ],
-      "Resource": ["arn:aws:osis:*:${ACCOUNT_ID}:pipeline/*"]
-    },
-    {
       "Sid": "GlobalPermissions",
       "Effect": "Allow",
       "Action": [
-        "s3:ListAllMyBuckets",
         "secretsmanager:ListSecrets",
         "lambda:ListFunctions",
         "ssm:DescribeParameters",
         "dynamodb:ListTables",
         "firehose:ListDeliveryStreams",
-        "sqs:listqueues",
         "states:ListStateMachines",
         "events:ListRules",
         "acm:ListCertificates",
