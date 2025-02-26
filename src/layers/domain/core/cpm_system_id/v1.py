@@ -8,14 +8,8 @@ from pathlib import Path
 from uuid import uuid4
 
 from domain.core.base import BaseModel
-from domain.core.error import InvalidKeyPattern
-from domain.core.product_key import ProductKeyType
-from domain.core.product_team_key import validate_key
 from event.json import json_load
 from pydantic import validator
-
-FIRST_ASID = 200000099999
-FIRST_PARTY_KEY = 849999
 
 PRODUCT_ID_PART_LENGTH = 3
 PRODUCT_ID_NUMBER_OF_PARTS: int = 2
@@ -26,9 +20,6 @@ PRODUCT_ID_PATTERN = re.compile(
 
 PATH_TO_CPM_SYSTEM_IDS = Path(__file__).parent
 PRODUCT_IDS_GENERATED_FILE = f"{PATH_TO_CPM_SYSTEM_IDS}/generated_ids/product_ids.json"
-PRODUCT_TEAM_EPR_ID_PATTERN = re.compile(
-    r"^[a-zA-Z0-9]+\.([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
-)
 PRODUCT_TEAM_ID_PATTERN = re.compile(
     r"^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$"
 )
@@ -72,54 +63,6 @@ class CpmSystemId(BaseModel, ABC):
         return self.id
 
 
-class AsidId(CpmSystemId):
-
-    @classmethod
-    def create(cls, current_number: int):
-        current_number = current_number or FIRST_ASID
-        latest_number = current_number + 1
-        return cls(__root__=f"{latest_number:012d}")
-
-    @classmethod
-    def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
-        """Validate that the ASID has the correct format."""
-        return (
-            cpm_system_id.isdigit()
-            and len(cpm_system_id) == 12
-            and cpm_system_id.startswith("2")
-        )
-
-    @property
-    def latest_number(self):
-        if self.id:
-            return int(self.id)
-
-
-class PartyKeyId(CpmSystemId):
-
-    @classmethod
-    def create(cls, current_number: int, ods_code: str):
-        current_number = current_number or FIRST_PARTY_KEY
-        latest_number = current_number + 1
-        return cls(
-            __root__=f"{ods_code}-{latest_number:06d}",
-        )
-
-    @classmethod
-    def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
-        """Validate that the party key has the correct format."""
-        try:
-            validate_key(key_value=cpm_system_id, key_type=ProductKeyType.PARTY_KEY)
-        except InvalidKeyPattern:
-            return False
-        return True
-
-    @property
-    def latest_number(self):
-        if self.id:
-            return int(self.id.split("-")[1])
-
-
 class ProductId(CpmSystemId):
     @classmethod
     def create(cls):
@@ -145,14 +88,10 @@ class ProductId(CpmSystemId):
 
 class ProductTeamId(CpmSystemId):
     @classmethod
-    def create(cls, ods_code: str = None):
-        if ods_code:
-            return cls(__root__=f"{ods_code}.{uuid4()}")
+    def create(cls):
         return cls(__root__=str(uuid4()))
 
     @classmethod
     def validate_cpm_system_id(cls, cpm_system_id: str) -> bool:
         """Validate that the product_team key has the correct format."""
-        if "." in cpm_system_id:
-            return PRODUCT_TEAM_EPR_ID_PATTERN.match(cpm_system_id) is not None
         return PRODUCT_TEAM_ID_PATTERN.match(cpm_system_id) is not None

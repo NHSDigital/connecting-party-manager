@@ -22,18 +22,5 @@ class CpmId:
     class ProductTeamIdAlias:
         ID_PATTERN = re.compile(rf"^[ -~]+$")
 
-    class EprId:
-        ID_PATTERN = re.compile(rf"^EPR-{_ODS_CODE_REGEX}$")
-
-
-class SdsId:
-    class AccreditedSystem:
-        ID_PATTERN = re.compile(rf"^[a-zA-Z-0-9]+$")
-
-    class PartyKey:
-        PARTY_KEY_REGEX = rf"^{_ODS_CODE_REGEX}-[0-9]{{5,9}}$"
-        ID_PATTERN = re.compile(PARTY_KEY_REGEX)
-
-    class CpaId:
-        CPA_ID_REGEX = rf"^[a-zA-Z0-9\-\:\_]+$"
-        ID_PATTERN = re.compile(CPA_ID_REGEX)
+    class General:
+        ID_PATTERN = re.compile(rf"^[a-zA-Z0-9]+$")

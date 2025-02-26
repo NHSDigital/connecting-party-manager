@@ -9,20 +9,20 @@ from test_helpers.sample_data import (
 )
 
 
-def test_epr_product():
+def test_cpm_product():
     product = CreateCpmProductIncomingParams(**CPM_PRODUCT)
     assert isinstance(product, CreateCpmProductIncomingParams)
     assert product.name == CPM_PRODUCT["name"]
 
 
-def test_validate_epr_product_raises_no_extra_fields():
+def test_validate_cpm_product_raises_no_extra_fields():
     with pytest.raises(ValidationError) as exc:
         CreateCpmProductIncomingParams(**CPM_PRODUCT_EXTRA_PARAMS)
 
     assert exc.value.model is CreateCpmProductIncomingParams
 
 
-def test_validate_epr_product_raises_no_name():
+def test_validate_cpm_product_raises_no_name():
     with pytest.raises(ValidationError) as exc:
         CreateCpmProductIncomingParams(**CPM_PRODUCT_NO_NAME)
 
