@@ -3,7 +3,7 @@ from collections.abc import Generator
 import pytest
 from domain.core.root import Root
 from domain.repository.cpm_product_repository import CpmProductRepository
-from domain.repository.device_repository.tests.utils import repository_fixture_cpm
+from domain.repository.cpm_product_repository.tests.utils import repository_fixture_cpm
 
 
 @pytest.fixture

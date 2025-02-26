@@ -6,18 +6,18 @@ POSTMAN_COLLECTION = $(CURDIR)/src/api/tests/feature_tests/postman-collection.js
 TOOL_VERSIONS_COPY = $(TIMESTAMP_DIR)/tool-versions.copy
 POETRY_LOCK = $(CURDIR)/poetry.lock
 INIT_TIMESTAMP = $(CURDIR)/.timestamp/init.timestamp
-SRC_FILES = $(shell find src/api src/etl src/layers src/test_helpers -type f -name "*.py" -not -path "*/feature_tests/*" -not -path "*/test_*" -not -path "*/fhir/r4/strict_models.py" -not -path "*/fhir/r4/models.py" -not -path "*/archived_epr/*")
+SRC_FILES = $(shell find src/api src/layers src/test_helpers -type f -name "*.py" -not -path "*/feature_tests/*" -not -path "*/test_*" -not -path "*/fhir/r4/strict_models.py" -not -path "*/fhir/r4/models.py" -not -path "*/archived_epr/*")
 THIRD_PARTY_DIST = $(CURDIR)/src/layers/third_party/dist
 SWAGGER_DIST = $(CURDIR)/infrastructure/swagger/dist
 SWAGGER_PUBLIC = $(SWAGGER_DIST)/public/swagger.yaml
 SWAGGER_AWS = $(SWAGGER_DIST)/aws/swagger.yaml
 
 BUILD_DEPENDENCIES = $(INIT_TIMESTAMP) \
-					 $(SRC_FILES) \
-				     $(TOOL_VERSIONS_COPY) \
-					 $(POETRY_LOCK) \
-					 $(SWAGGER_PUBLIC) \
-					 $(SWAGGER_AWS)
+										 $(SRC_FILES) \
+										 $(TOOL_VERSIONS_COPY) \
+										 $(POETRY_LOCK) \
+										 $(SWAGGER_PUBLIC) \
+										 $(SWAGGER_AWS)
 
 
 clean: poetry--clean swagger--clean terraform--clean ## Complete clear-out of the project installation and artifacts
