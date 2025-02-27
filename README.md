@@ -203,7 +203,6 @@ There are four types of `pytest` in this project:
 - Unit: these _do not have_ any `@pytest.mark` markers;
 - Integration: these have `@pytest.mark.integration` markers;
 - Smoke: these have `@pytest.mark.smoke` markers;
-- Matrix: these have `@pytest.mark.matrix` markers;
 
 In order to run these you can do one of::
 
@@ -211,7 +210,6 @@ In order to run these you can do one of::
 make test--unit
 make test--integration   # Will attempt to log you into AWS first
 make test--smoke         # Will attempt to log you into AWS first
-make test--sds--matrix
 ```
 
 If you would like to rerun all failed tests, you can append `--rerun` to the test command, e.g.:
@@ -230,7 +228,6 @@ Otherwise, feel free to run `pytest` from your `poetry` shell for more fine-grai
 
 The VSCode settings for "Run and Debug" are also set up to run these tests if your prefer.
 
-`make test--sds--matrix` is used for testing responses match in SDS FHIR between CPM and LDAP. You must provide `SDS_PROD_APIKEY` and `SDS_DEV_APIKEY`. There are 3 optional variables `USE_CPM_PROD`, defaults to `FALSE`, `COMPARISON_ENV`, defaults to `local` and `TEST_COUNT`, defaults to `10` and is the number of requests to make.
 Add `PYTEST_FLAGS='-sv'`.
 
 ### End-to-End feature tests
@@ -296,25 +293,17 @@ TBC
 
 #### Write-integrity (primary keys)
 
-The Partition Key (`pk`) that we use for all objects\* in the database is a unique combination of prefix (aligned with the object type, e.g. `D#` for `Device`) and identifier (generally a UUID). The Sort Key (`sk`) that we use is always exactly equal to the Partition Key. This is opposed to having fully denormalised objects so that attributes are nested under their own `sk`. The reason for doing this is to limit multiple read operations for a given object, and also save I/O in our ETL process by reducing the number of database transactions required per object.
+The Partition Key (`pk`) that we use for all objects\* in the database is a unique combination of prefix (aligned with the object type, e.g. `PT#` for `ProductTeam`) and identifier (generally a UUID). The Sort Key (`sk`) that we use is the id of the entity itself.
 
-Objects can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object,
+Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object,
 a copy is made in the database with the index being that key, rather
 than the object's identifier. Such copies are referred to as non-root
 objects, whereas the "original" (indexed by identifier) is referred to
 as the root object.
 
-\* In the case of `Device` tags, which sit outside of the standard database model, `pk` is equal to a query string and `sk` is equal to `pk` of the object that is referred to. A tag-indexed `Device` is otherwise a copy of the root `Device`.
-
 #### Read/search interface
 
-We have implemented a Global Secondary Index (GSI) for attributes named `pk_read` and `sk_read`. The pattern that is place is as follows:
-
-- `pk_read`: A concatenation of parent `pk` values (joined with `#`, e.g. `PT#<product_team_id>#P<product_id>`)
-- `sk_read`: Equal to the `pk` of the object itself.
-
-We refer to this as an "ownership" model, as it allows for reads to be
-executed in a way that mirrors the API read operations (GET `grandparent/parent/child`), whilst also giving us the ability to return all objects owned by the object indicated in the `pk_read` - which is a common operation for us.
+We have implemented 2 Global Secondary Indexes (GSI) for attributes named `pk_read_1`, `sk_read_1`, `pk_read_2` and `sk_read_2`. The pattern that is place is as follows:
 
 A `read` and `search` is available on all `Repository` patterns (almost) for free (the base `_read` and `_search` require a shallow wrapper, but most of the work is done for you).
 

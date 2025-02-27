@@ -34,8 +34,8 @@ Feature: Delete Product Team - failure scenarios
       | keys.0.key_value | FOOBAR                |
     Given I note the response field "$.id" as "product_team_id"
     Given I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
-      | path | value            |
-      | name | My Great Product |
+      | path | value               |
+      | name | My Great CpmProduct |
     And I note the response field "$.id" as "product_id"
     When I make a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>"
     Then I receive a status code "409" with body

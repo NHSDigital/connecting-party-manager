@@ -40,6 +40,3 @@ test--feature--local: _behave  ## Run local feature (gherkin) tests
 
 test--feature--%--auto-retry:  ## Autoretry of failed feature (gherkin) tests
 	$(MAKE) test--feature--$* _INTERNAL_FLAGS="--define='auto_retry=true'"
-
-test--sds--matrix: ## Run end-to-end smoke tests that check data matches betweeen cpm and ldap
-	SDS_PROD_APIKEY=$(SDS_PROD_APIKEY) SDS_DEV_APIKEY=$(SDS_DEV_APIKEY) USE_CPM_PROD=$(USE_CPM_PROD) TEST_COUNT=$(TEST_COUNT) COMPARISON_ENV=$(COMPARISON_ENV) RUN_SPEEDTEST=$(RUN_SPEEDTEST) poetry run python -m pytest $(PYTEST_FLAGS) -m 'matrix' --ignore=src/layers --ignore=src/etl --ignore=archived_epr $(_CACHE_CLEAR)
