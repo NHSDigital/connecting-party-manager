@@ -293,9 +293,17 @@ TBC
 
 #### Write-integrity (primary keys)
 
-The Partition Key (`pk`) that we use for all objects\* in the database is a unique combination of prefix (aligned with the object type, e.g. `PT#` for `ProductTeam`) and identifier (generally a UUID). The Sort Key (`sk`) that we use is the id of the entity itself.
+The Partition Key (`pk`) that we use for all objects\* in the database is a unique combination of prefix (aligned with the object type, e.g. `PT#` for `ProductTeam`) and identifier (generally a UUID). The Sort Key (`sk`) that we use is the id of the entity itself. We inject 2 columns into the row of each entity during writing and do not display on the domain classes themselves. These are `row_type` and `root`
 
-Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object,
+The table is structured as below. (For purposes of clarity extra "entity specific" attributes have been left out.)
+
+|    PK     |     SK      |      row_type      |    Id     |      name      |            created_on            | updated_on | deleted_on | status |  pk_read_1  |  sk_read_1  | pk_read_2 |  sk_read_2  | root  |
+| :-------: | :---------: | :----------------: | :-------: | :------------: | :------------------------------: | :--------: | :--------: | :----: | :---------: | :---------: | :-------: | :---------: | :---: |
+| PT#12345  |  PT#12345   |    product_team    |   12345   | A Product Team | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active |  PT#12345   |  PT#12345   | ORG#AB123 |  PT#12345   | true  |
+| PT#12345  | P#P.123-XYZ |      product       | P.123-XYZ |   A product    | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active | P#P.123-XYZ | P#P.123-XYZ | ORG#AB123 | P#P.123-XYZ | true  |
+| PT#FOOBAR |  PT#FOOBAR  | product_team_alias |   12345   | A Product Team | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active |  PT#FOOBAR  |  PT#FOOBAR  |   NULL    |    NULL     | false |
+
+Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object, that is of type product_team_alias_id,
 a copy is made in the database with the index being that key, rather
 than the object's identifier. Such copies are referred to as non-root
 objects, whereas the "original" (indexed by identifier) is referred to
@@ -305,7 +313,7 @@ as the root object.
 
 We have implemented 2 Global Secondary Indexes (GSI) for attributes named `pk_read_1`, `sk_read_1`, `pk_read_2` and `sk_read_2`. The pattern that is place is as follows:
 
-A `read` and `search` is available on all `Repository` patterns (almost) for free (the base `_read` and `_search` require a shallow wrapper, but most of the work is done for you).
+A `read` and `search` is available on all `Repository` patterns (almost) for free (the base `_read` and `_search` require a shallow wrapper).
 
 ### Response models
 
