@@ -1,10 +1,9 @@
 from datetime import datetime
 
 from attr import dataclass
-from domain.core.aggregate_root import AggregateRoot
+from domain.core.aggregate_root import AggregateRoot, event
 from domain.core.cpm_product import CpmProduct, CpmProductCreatedEvent
 from domain.core.cpm_system_id import ProductTeamId
-from domain.core.device import event
 from domain.core.enum import Status
 from domain.core.event import Event, EventDeserializer
 from domain.core.product_team_key import ProductTeamKey

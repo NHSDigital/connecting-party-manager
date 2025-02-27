@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2025.02.24"
+version = "2025.02.26"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -10,8 +10,6 @@ packages = [
   { include = "domain", from = "src/layers" },
   { include = "event", from = "src/layers" },
   { include = "api_utils", from = "src/layers" },
-  { include = "etl_utils", from = "src/layers" },
-  { include = "sds", from = "src/layers" },
   { include = "builder", from = "scripts" },
 ]
 
@@ -25,13 +23,13 @@ email-validator = "^2.1.0.post1"
 smart-open = "^7.0.1"
 urllib3 = "<3"
 orjson = "^3.9.15"
-attrs = "^24.2.0"
+attrs = "^25.1.0"
 locust = "^2.29.1"
 jsonschema = "^4.23.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.0.0"
-black = "^24.1.1"
+black = "^25.1.0"
 flake8 = "^7.0.0"
 behave = "^1.2.6"
 pytest = "^8.2.0"
@@ -65,15 +63,15 @@ optional = true
 [tool.poetry.group.local.dependencies]
 ipython = "^8.17.2"
 
-[tool.poetry.group.sds_update]
-optional = true
-
-[tool.poetry.group.sds_update.dependencies]
-python-ldap = "^3.4.4"
-lz4 = "^4.3.3"
-
-[tool.poetry.group.sds.dependencies]
-lz4 = "^4.3.3"
+# [tool.poetry.group.sds_update]
+# optional = true
+#
+# [tool.poetry.group.sds_update.dependencies]
+# python-ldap = "^3.4.4"
+# lz4 = "^4.3.3"
+#
+# [tool.poetry.group.sds.dependencies]
+# lz4 = "^4.3.3"
 
 [tool.poetry.group.ci.dependencies]
 pygithub = "^2.3.0"

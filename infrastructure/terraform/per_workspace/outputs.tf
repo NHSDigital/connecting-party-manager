@@ -22,14 +22,6 @@ output "invoke_url" {
   value = module.api_entrypoint.invoke_url
 }
 
-output "sds_etl" {
-  value = module.sds_etl
-}
-
-output "manual_trigger_arn" {
-  value = module.sds_etl.manual_trigger_arn
-}
-
 output "test_data_bucket" {
   value = "${local.project}--${replace(var.account_name, "_", "-")}--test-data"
 }

@@ -8,9 +8,9 @@ from pathlib import Path
 from uuid import uuid4
 
 from domain.core.base import BaseModel
-from domain.core.device_key import validate_key
 from domain.core.error import InvalidKeyPattern
 from domain.core.product_key import ProductKeyType
+from domain.core.product_team_key import validate_key
 from event.json import json_load
 from pydantic import validator
 
