@@ -88,7 +88,7 @@ module "lambdas" {
   source         = "./modules/api_worker/api_lambda"
   python_version = var.python_version
   name           = each.key
-  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(replace(replace(replace(each.key, "_", "-"), "DeviceReferenceData", "DeviceRefData"), "MessageHandlingSystem", "MHS"), "MessageSet", "MsgSet")}"
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
 
   //Compact will remove all nulls from the list and create a new one - this is because TF throws an error if there is a null item in the list.
   layers = concat(

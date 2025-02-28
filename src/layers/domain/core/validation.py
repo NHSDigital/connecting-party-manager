@@ -1,14 +1,11 @@
 import re
 
-DEVICE_KEY_SEPARATOR = ":"
-
 _ODS_CODE_REGEX = r"[a-zA-Z0-9]{1,9}"
 UUID_REGEX = (
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
 ODS_CODE_REGEX = rf"^({_ODS_CODE_REGEX})$"
 ENTITY_NAME_REGEX = r"^\S+( \S+)*$"
-DEVICE_NAME_REGEX = r"^[ -~]+$"  # any sequence of ascii
 CPM_PRODUCT_NAME_REGEX = r"^[ -~]+$"  # any sequence of ascii
 
 
