@@ -469,7 +469,7 @@ def test_index_org_code_multiple_product_teams():
     ],
 )
 def test_index_invalid_query_params(query_params, expected_status, expected_error):
-    table_name = read_terraform_output("dynamodb_epr_table_name.value")
+    table_name = read_terraform_output("dynamodb_cpm_table_name.value")
     client = dynamodb_client_with_sleep()
 
     with mock.patch.dict(

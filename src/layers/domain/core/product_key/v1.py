@@ -2,16 +2,15 @@ import re
 from enum import StrEnum, auto
 
 from domain.core.product_team_key import ProductTeamKey
-from domain.core.validation import SdsId
+from domain.core.validation import CpmId
 
 
 class ProductKeyType(StrEnum):
-    PARTY_KEY = auto()
+    GENERAL = auto()
 
     @property
     def pattern(self) -> re.Pattern:
-        # To the developer: if adding more patterns then please refer to DeviceKeyType.pattern for guidance
-        return SdsId.PartyKey.ID_PATTERN
+        return CpmId.General.ID_PATTERN
 
 
 class ProductKey(ProductTeamKey):

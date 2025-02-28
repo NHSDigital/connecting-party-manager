@@ -2,14 +2,7 @@ import os
 from pathlib import Path
 
 import pytest
-from domain.core.cpm_system_id import (
-    PRODUCT_TEAM_EPR_ID_PATTERN,
-    PRODUCT_TEAM_ID_PATTERN,
-    AsidId,
-    PartyKeyId,
-    ProductId,
-    ProductTeamId,
-)
+from domain.core.cpm_system_id import PRODUCT_TEAM_ID_PATTERN, ProductId, ProductTeamId
 from event.json import json_load
 
 PATH_TO_CPM_SYSTEM_IDS = Path(__file__).parent.parent
@@ -30,90 +23,10 @@ def test_cpm_product_team_id_generator():
     assert PRODUCT_TEAM_ID_PATTERN.match(generator.id)
 
 
-def test_epr_product_team_id_generator():
-    generator = ProductTeamId.create(ods_code="ABC")
-    assert PRODUCT_TEAM_EPR_ID_PATTERN.match(generator.id)
-
-
 def test_cpm_product_tema_id_validate_id_valid():
     valid_key = "3150ac97-45d0-40f6-904f-c6422c46e711"
     is_valid = ProductTeamId.validate(valid_key)
     assert is_valid
-
-
-def test_epr_product_tema_id_validate_id_valid():
-    valid_key = "ABC.3150ac97-45d0-40f6-904f-c6422c46e711"
-    is_valid = ProductTeamId.validate(valid_key)
-    assert is_valid
-
-
-def test_party_key_generator_format_key():
-    generator = PartyKeyId.create(current_number=123456, ods_code="ABC")
-    expected_key = "ABC-123457"  # Expecting the number to be formatted with 6 digits
-    assert generator.id == expected_key
-
-
-def test_party_key_generator_validate_key_valid():
-    valid_key = "ABC-123457"
-    is_valid = PartyKeyId.validate_cpm_system_id(valid_key)
-    assert is_valid
-
-
-@pytest.mark.parametrize(
-    "invalid_key",
-    [
-        "ABC000124",  # Missing hyphen
-        "ABC-1234",  # Number part too short
-        "ABC-123456789101112",  # Number part too long
-        "ABC-0001A4",  # Number part contains a non-digit character
-        "",  # Empty string
-    ],
-)
-def test_party_key_generator_validate_key_invalid_format(invalid_key):
-    is_valid = PartyKeyId.validate_cpm_system_id(invalid_key)
-    assert not is_valid
-
-
-def test_party_key_generator_increment_number():
-    # Test that the number is incremented correctly
-    generator = PartyKeyId.create(current_number=123456, ods_code="XYZ")
-    expected_key = "XYZ-123457"  # Expecting increment from 123456 to 123457
-    assert generator.id == expected_key
-
-
-def test_asid_generator_validate_key_valid():
-    valid_key = "223456789014"
-    is_valid = AsidId.validate_cpm_system_id(valid_key)
-    assert is_valid
-
-
-@pytest.mark.parametrize(
-    "invalid_key",
-    [
-        "1234567890123",
-        "12345678901",
-        "1234567890",
-        "123456789",
-        "12345678",
-        "1234567",
-        "123456",
-        "12345",
-        "1234",
-        "123",
-        "12",
-        "1",
-        "",  # Empty string
-    ],
-)
-def test_asid_generator_validate_key_invalid_format(invalid_key):
-    is_valid = AsidId.validate_cpm_system_id(invalid_key)
-    assert not is_valid
-
-
-def test_asid_generator_increment_number():
-    # Test that the number is incremented correctly
-    generator = AsidId.create(current_number=223456789012)
-    assert generator.id == "223456789013"
 
 
 @pytest.mark.repeat(50)

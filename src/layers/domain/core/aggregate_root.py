@@ -76,8 +76,8 @@ class AggregateRoot(BaseModel):
         for example:
 
             [
-                {"device_created_event": {"id": "123", ...}},
-                {"device_key_added_event": {"key_type": "asid", ...}},
+                {"product_created_event": {"id": "123", ...}},
+                {"product_key_added_event": {"key_type": "asid", ...}},
                 ...
             ]
 

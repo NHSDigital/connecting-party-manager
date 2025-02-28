@@ -29,12 +29,6 @@ class TableKey(TableKeyAction, StrEnum):
     PRODUCT_TEAM_ALIAS = "PTA"
     CPM_SYSTEM_ID = "CSI"
     CPM_PRODUCT = "P"
-    CPM_PRODUCT_STATUS = "PS"
-    DEVICE_REFERENCE_DATA = "DRD"
-    DEVICE = "D"
-    DEVICE_TAG = "DT"
-    DEVICE_STATUS = "DS"
-    ENVIRONMENT = "E"
     ORG_CODE = "ORG"
 
 

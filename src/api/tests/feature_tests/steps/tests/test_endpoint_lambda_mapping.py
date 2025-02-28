@@ -27,13 +27,14 @@ def api_lambda_environment_variables():
 
 
 def test__template_to_regex():
-    result = _template_to_regex("Device/{id1}/{id2}?field={id3}")
-    assert result == r"^Device/(?P<id1>[^\/]+)/(?P<id2>[^\/]+)?field=(?P<id3>[^\/]+)$"
+    result = _template_to_regex("Product/{id1}/{id2}?field={id3}")
+    assert result == r"^Product/(?P<id1>[^\/]+)/(?P<id2>[^\/]+)?field=(?P<id3>[^\/]+)$"
 
 
 def test__parse_params_from_url():
     path_params, query_params, result = _parse_params_from_url(
-        path_template="Device/{id1}/{id2}?field={id3}", path="Device/123/foo?field=hiya"
+        path_template="Product/{id1}/{id2}?field={id3}",
+        path="Product/123/foo?field=hiya",
     )
     assert result is True
     assert path_params == {"id1": "123", "id2": "foo"}
@@ -43,8 +44,8 @@ def test__parse_params_from_url():
 @pytest.mark.parametrize(
     ["path_template", "path"],
     [
-        ("Device/{id1}/{id2}", "Device/123/foo/bar"),
-        ("Device/{id1}/{id2}?field={id3}", "Device/123/foo/bar"),
+        ("Product/{id1}/{id2}", "Product/123/foo/bar"),
+        ("Product/{id1}/{id2}?field={id3}", "Product/123/foo/bar"),
     ],
 )
 def test__parse_params_from_url_fail(path_template: str, path: str):

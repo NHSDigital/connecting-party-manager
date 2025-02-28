@@ -6,7 +6,7 @@ from unittest import mock
 import pytest
 from event.status.steps import StatusNotOk, _status_check
 
-from test_helpers.dynamodb import mock_table
+from test_helpers.dynamodb import mock_table_cpm as mock_table
 from test_helpers.response_assertions import _response_assertions
 
 TABLE_NAME = "hiya"

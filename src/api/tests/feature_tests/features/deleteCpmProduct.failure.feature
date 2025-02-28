@@ -17,7 +17,7 @@ Feature: Delete CPM Product - failure scenarios
     Given I note the response field "$.id" as "product_team_id"
     Given I have already made a "POST" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product" with body:
       | path | value               |
-      | name | My Great EprProduct |
+      | name | My Great CpmProduct |
     And I note the response field "$.id" as "product_id"
     When I make a "DELETE" request with "default" headers to "ProductTeam/123/Product/${ note(product_id) }"
     Then I receive a status code "404" with body

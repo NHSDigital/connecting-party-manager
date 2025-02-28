@@ -37,13 +37,13 @@ Feature: Create Product Team - failure scenarios
       | keys.0.key_type  | invalid_alias         |
       | keys.0.key_value | FOOBAR                |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                                  |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                                       |
-      | errors.0.message | CreateProductTeamIncomingParams.keys.0.key_type: value is not a valid enumeration member; permitted: 'product_team_id_alias', 'epr_id' |
+      | path             | value                                                                                                                        |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                             |
+      | errors.0.message | CreateProductTeamIncomingParams.keys.0.key_type: value is not a valid enumeration member; permitted: 'product_team_id_alias' |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 191              |
+      | Content-Length | 181              |
 
   Scenario: Cannot create a ProductTeam with an that is missing fields
     When I make a "POST" request with "default" headers to "ProductTeam" with body:

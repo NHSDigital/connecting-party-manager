@@ -6,7 +6,7 @@ from domain.repository.errors import ItemNotFound
 
 
 @pytest.mark.integration
-def test__epr_product_repository_delete(
+def test__cpm_product_repository_delete(
     product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)  # Create product in DB
@@ -23,7 +23,7 @@ def test__epr_product_repository_delete(
 
 
 @pytest.mark.integration
-def test__epr_product_repository_cannot_delete_if_does_not_exist(
+def test__cpm_product_repository_cannot_delete_if_does_not_exist(
     product: CpmProduct, repository: CpmProductRepository
 ):
     product.clear_events()
@@ -32,7 +32,7 @@ def test__epr_product_repository_cannot_delete_if_does_not_exist(
         repository.write(product)
 
 
-def test__epr_product_repository_delete_local(
+def test__cpm_product_repository_delete_local(
     product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)  # Create product in DB
@@ -47,7 +47,7 @@ def test__epr_product_repository_delete_local(
         repository.read(product_team_id=product.product_team_id, id=product.id)
 
 
-def test__epr_product_repository_cannot_delete_if_does_not_exist_local(
+def test__cpm_product_repository_cannot_delete_if_does_not_exist_local(
     product: CpmProduct, repository: CpmProductRepository
 ):
     product.clear_events()

@@ -9,7 +9,6 @@ FIXED_UUID = uuid4()
 @pytest.mark.parametrize(
     ("table_key", "args", "expected"),
     [
-        (TableKey.DEVICE, (FIXED_UUID, "foo", 1), f"D#{FIXED_UUID}#foo#1"),
         (TableKey.PRODUCT_TEAM, ("foo",), "PT#foo"),
     ],
 )
@@ -20,12 +19,12 @@ def test_TableKeys_key(table_key: TableKey, args, expected):
 @pytest.mark.parametrize(
     ("table_key", "expected"),
     [
-        (TableKey.DEVICE, [{"key": "D#foo"}, {"key": "D#bar"}]),
+        (TableKey.CPM_PRODUCT, [{"key": "P#foo"}, {"key": "P#bar"}]),
         (TableKey.PRODUCT_TEAM, [{"key": "PT#foo"}]),
     ],
 )
 def test_TableKeys_filter(table_key: TableKey, expected):
-    iterable = [{"key": "D#foo"}, {"key": "PT#foo"}, {"key": "D#bar"}]
+    iterable = [{"key": "P#foo"}, {"key": "PT#foo"}, {"key": "P#bar"}]
     assert list(table_key.filter(iterable=iterable, key="key")) == expected
 
 
@@ -33,7 +32,7 @@ def test_TableKeys_filter(table_key: TableKey, expected):
     ("table_key", "expected"),
     [
         (
-            TableKey.DEVICE,
+            TableKey.CPM_PRODUCT,
             [("foo", {"other_data": "FOO"}), ("bar", {"other_data": "BAR"})],
         ),
         (
@@ -44,20 +43,18 @@ def test_TableKeys_filter(table_key: TableKey, expected):
 )
 def test_TableKeys_filter_and_group(table_key: TableKey, expected):
     iterable = [
-        {"pk_read": "D#foo", "other_data": "FOO"},
-        {"pk_read": "PT#baz", "other_data": "BAZ"},
-        {"pk_read": "D#bar", "other_data": "BAR"},
+        {"pk": "P#foo", "other_data": "FOO"},
+        {"pk": "PT#baz", "other_data": "BAZ"},
+        {"pk": "P#bar", "other_data": "BAR"},
     ]
-    assert (
-        list(table_key.filter_and_group(iterable=iterable, key="pk_read")) == expected
-    )
+    assert list(table_key.filter_and_group(iterable=iterable, key="pk")) == expected
 
 
 def test_group_by_key():
     iterable = [
-        {"pk_read": "D#foo", "other_data": "FOO"},
+        {"pk_read": "P#foo", "other_data": "FOO"},
         {"pk_read": "PT#baz", "other_data": "BAZ"},
-        {"pk_read": "D#bar", "other_data": "BAR"},
+        {"pk_read": "P#bar", "other_data": "BAR"},
     ]
     assert list(group_by_key(iterable=iterable, key="pk_read")) == [
         ("foo", {"other_data": "FOO"}),
