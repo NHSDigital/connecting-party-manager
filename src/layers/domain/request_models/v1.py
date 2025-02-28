@@ -28,6 +28,15 @@ class CreateCpmProductIncomingParams(BaseModel, extra=Extra.forbid):
         return v
 
 
+class CpmProductReadPathParams(BaseModel, extra=Extra.forbid):
+    product_id: str = Field(...)
+
+    @root_validator(pre=True)
+    def ignore_env(cls, values):
+        values.pop("environment", None)
+        return values
+
+
 class CpmProductPathParams(BaseModel, extra=Extra.forbid):
     product_id: str = Field(...)
     product_team_id: str = Field(...)
