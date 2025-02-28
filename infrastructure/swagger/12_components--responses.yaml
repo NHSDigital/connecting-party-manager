@@ -30,6 +30,11 @@ components:
             errors:
               - code: "RESOURCE_NOT_FOUND"
                 message: "Could not find <ENTITY> for key ('<ID>')"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     Conflict:
       description: Conflict
       content:
@@ -40,6 +45,11 @@ components:
             errors:
               - code: "CONFLICT"
                 message: "Product Team cannot be deleted as it still has associated Product Ids ['P.123-XYZ', 'P.456-ABC']"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     BadRequest:
       description: Bad request (multiple error types)
       content:
@@ -59,16 +69,6 @@ components:
                 errors:
                   - code: "VALIDATION_ERROR"
                     message: "Item already exists"
-                  - code: "VALIDATION_ERROR"
-                    message: "Expected only one response for the '<QUESTIONNAIRE _NAME>' questionnaire"
-                  - code: "VALIDATION_ERROR"
-                    message: "Require a 'spine_mhs' questionnaire response to create a MHS Device"
-                  - code: "VALIDATION_ERROR"
-                    message: "Not an EPR Product: Cannot create MHS device for product without exactly one Party Key"
-                  - code: "VALIDATION_ERROR"
-                    message: "Duplicate 'Interaction ID' provided: value '<INTERACTION ID>' occurs <N> times in the questionnaire response."
-                  - code: "VALIDATION_ERROR"
-                    message: "SubCpmProductPathParams.environment: value is not a valid enumeration member; permitted: 'dev', 'qa', 'ref', 'int', 'prod'"
     SearchProductBadRequest:
       description: searchProduct Bad request
       content:
@@ -83,21 +83,6 @@ components:
                     message: "SearchProductQueryParams.__root__: Please provide exactly one valid query parameter: {'product_team_id', 'organisation_code'}."
                   - code: "VALIDATION_ERROR"
                     message: "SearchSDSDeviceQueryParams.foo: extra fields not permitted"
-      headers:
-        Access-Control-Allow-Origin:
-          schema:
-            $ref: "#/components/schemas/ErrorResponse"
-          examples:
-            ValidationErrorExtraFields:
-              value:
-                errors:
-                  - code: "VALIDATION_ERROR"
-                    message: "SearchSDSEndpointQueryParams.foo: extra fields not permitted"
-            ValidationError:
-              value:
-                errors:
-                  - code: "VALIDATION_ERROR"
-                    message: "SearchSDSEndpointQueryParams.__root__: At least 2 query parameters should be provided of type, nhs_id_code, nhs_mhs_svc_ia and nhs_mhs_party_key"
     UnprocessableContent:
       description: Unprocessable Content
       content:
@@ -131,6 +116,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamDeleteResponse"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     ProductCreate:
       description: Create Product operation successful
       content:
