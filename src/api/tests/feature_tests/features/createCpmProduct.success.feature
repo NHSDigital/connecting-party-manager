@@ -34,7 +34,7 @@ Feature: Create CPM Product - success scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 249              |
-    When I make a "GET" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/${ note(product_id) }"
+    When I make a "GET" request with "default" headers to "Product/${ note(product_id) }"
     Then I receive a status code "200" with body
       | path            | value                      |
       | id              | ${ note(product_id) }      |

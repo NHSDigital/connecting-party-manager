@@ -47,15 +47,15 @@ Feature: Delete CPM Product - success scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     And I have already made a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }/Product/<product_id>"
-    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>"
+    When I make a "GET" request with "default" headers to "Product/<product_id>"
     Then I receive a status code "404" with body
-      | path             | value                                                                            |
-      | errors.0.code    | RESOURCE_NOT_FOUND                                                               |
-      | errors.0.message | Could not find CpmProduct for key ('${ note(product_team_id) }', '<product_id>') |
+      | path             | value                                              |
+      | errors.0.code    | RESOURCE_NOT_FOUND                                 |
+      | errors.0.message | Could not find CpmProduct for key ('<product_id>') |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 146              |
+      | Content-Length | 106              |
 
     Examples:
       | product_team_id            | product_id            |

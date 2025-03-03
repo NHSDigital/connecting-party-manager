@@ -21,8 +21,13 @@ class CpmProductRepository(Repository[CpmProduct]):
             table_key=TableKey.CPM_PRODUCT,
         )
 
-    def read(self, product_team_id: str, id: str, status: str = "active"):
-        return super()._read(parent_ids=(product_team_id,), id=id, status=status)
+    def read(self, product_team_id: str = None, id: str = None, status: str = "active"):
+        if product_team_id:
+            return super()._read(parent_ids=(product_team_id,), id=id, status=status)
+        else:
+            return super()._read(
+                parent_ids=(id,), id=id, status=status, gsi="idx_gsi_read_1"
+            )
 
     def search_by_product_team(
         self, product_team_id: str, status: str

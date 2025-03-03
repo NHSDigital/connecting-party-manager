@@ -25,7 +25,6 @@ TABLE_NAME = "my-table"
         (
             {
                 "pathParameters": {
-                    "product_team_id": "does-not-exist",
                     "product_id": "does-not-exist",
                 },
             },
@@ -69,7 +68,6 @@ def test_read_product_steps_good_input():
         step_chain.run(
             init={
                 "pathParameters": {
-                    "product_team_id": str(product_team.id),
                     "product_id": str(product.id),
                 },
             },

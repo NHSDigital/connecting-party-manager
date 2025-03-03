@@ -19,7 +19,7 @@ Feature: Read CPM Product - success scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>/Product/<product_id>"
+    When I make a "GET" request with "default" headers to "Product/<product_id>"
     Then I receive a status code "200" with body
       | path            | value                      |
       | id              | <product_id>               |

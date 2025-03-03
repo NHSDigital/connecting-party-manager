@@ -37,7 +37,7 @@ def get_endpoint_lambda_mapping() -> ENDPOINT_LAMBDA_MAPPING:
         },
         "GET": {
             "ProductTeam/{product_team_id}": api.readProductTeam.index,
-            "ProductTeam/{product_team_id}/Product/{product_id}": api.readCpmProduct.index,
+            "Product/{product_id}": api.readCpmProduct.index,
             "Product?product_team_id={product_team_id}": api.searchProduct.index,
             "Product?organisation_code={organisation_code}": api.searchProduct.index,
             "Product?foo={foo}": api.searchProduct.index,

@@ -23,6 +23,10 @@ if TYPE_CHECKING:
 
 BATCH_SIZE = 100
 
+pk_gsi_mapping = {"idx_gsi_read_1": "pk_read_1", "idx_gsi_read_2": "pk_read_2"}
+
+sk_gsi_mapping = {"idx_gsi_read_1": "sk_read_1", "idx_gsi_read_2": "sk_read_2"}
+
 
 class TooManyResults(Exception):
     pass
@@ -190,21 +194,33 @@ class Repository[ModelType: AggregateRoot]:
         """
         Perform a query on the table with optional GSI and sk_prefix.
         """
-        # Ensure parent_ids are prefixed only once
-        pk = KEY_SEPARATOR.join(
-            _id if _id.startswith(table_key.key("")) else table_key.key(_id)
-            for table_key, _id in zip(self.parent_table_keys, parent_ids)
-        )
-        pk_attribute_name = "pk_read_2" if gsi == "idx_gsi_read_2" else "pk"
 
-        # Ensure sk_prefix is correctly applied
-        sk = self.table_key.key(id or "")
-        if sk_prefix and not sk.startswith(sk_prefix):  # Avoid double prefixing
-            sk = sk_prefix + sk
-        sk_attribute_name = "sk_read_2" if gsi == "idx_gsi_read_2" else "sk"
+        if gsi == "idx_gsi_read_1":
+            pk = TableKey.CPM_PRODUCT.key(id)
+            pk_attribute_name = pk_gsi_mapping.get(gsi, "pk_read_1")
+            sk = pk
+            sk_attribute_name = sk_gsi_mapping.get(gsi, "sk_read_1")
+            sk_query_type = QueryType.EQUALS
+            sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
+        else:
+            for table_key, _id in zip(self.parent_table_keys, parent_ids):
+                # Ensure parent_ids are prefixed only once
+                pk = KEY_SEPARATOR.join(
+                    _id if _id.startswith(table_key.key("")) else table_key.key(_id)
+                    for table_key, _id in zip(self.parent_table_keys, parent_ids)
+                )
+                pk_attribute_name = pk_gsi_mapping.get(gsi, "pk")
 
-        sk_query_type = QueryType.BEGINS_WITH if id is None else QueryType.EQUALS
-        sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
+                # Ensure sk_prefix is correctly applied
+                sk = self.table_key.key(id or "")
+                if sk_prefix and not sk.startswith(sk_prefix):  # Avoid double prefixing
+                    sk = sk_prefix + sk
+                sk_attribute_name = sk_gsi_mapping.get(gsi, "sk")
+
+                sk_query_type = (
+                    QueryType.BEGINS_WITH if id is None else QueryType.EQUALS
+                )
+                sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
 
         args = {
             "TableName": self.table_name,
@@ -247,8 +263,12 @@ class Repository[ModelType: AggregateRoot]:
 
         return [self.model(**item) for item in self._query(**query_params)]
 
-    def _read(self, parent_ids: tuple[str], id: str, status: str = "all") -> ModelType:
-        items = self._query(parent_ids=parent_ids or (id,), id=id, status=status)
+    def _read(
+        self, parent_ids: tuple[str], id: str, status: str = "all", gsi: str = None
+    ) -> ModelType:
+        items = self._query(
+            parent_ids=parent_ids or (id,), id=id, status=status, gsi=gsi
+        )
         try:
             (item,) = items
         except ValueError:
