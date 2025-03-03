@@ -203,24 +203,21 @@ class Repository[ModelType: AggregateRoot]:
             sk_query_type = QueryType.EQUALS
             sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
         else:
-            for table_key, _id in zip(self.parent_table_keys, parent_ids):
-                # Ensure parent_ids are prefixed only once
-                pk = KEY_SEPARATOR.join(
-                    _id if _id.startswith(table_key.key("")) else table_key.key(_id)
-                    for table_key, _id in zip(self.parent_table_keys, parent_ids)
-                )
-                pk_attribute_name = pk_gsi_mapping.get(gsi, "pk")
+            # Ensure parent_ids are prefixed only once
+            pk = KEY_SEPARATOR.join(
+                _id if _id.startswith(table_key.key("")) else table_key.key(_id)
+                for table_key, _id in zip(self.parent_table_keys, parent_ids)
+            )
+            pk_attribute_name = pk_gsi_mapping.get(gsi, "pk")
 
-                # Ensure sk_prefix is correctly applied
-                sk = self.table_key.key(id or "")
-                if sk_prefix and not sk.startswith(sk_prefix):  # Avoid double prefixing
-                    sk = sk_prefix + sk
-                sk_attribute_name = sk_gsi_mapping.get(gsi, "sk")
+            # Ensure sk_prefix is correctly applied
+            sk = self.table_key.key(id or "")
+            if sk_prefix and not sk.startswith(sk_prefix):  # Avoid double prefixing
+                sk = sk_prefix + sk
+            sk_attribute_name = sk_gsi_mapping.get(gsi, "sk")
 
-                sk_query_type = (
-                    QueryType.BEGINS_WITH if id is None else QueryType.EQUALS
-                )
-                sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
+            sk_query_type = QueryType.BEGINS_WITH if id is None else QueryType.EQUALS
+            sk_condition = sk_query_type.format(sk_attribute_name, ":sk")
 
         args = {
             "TableName": self.table_name,
