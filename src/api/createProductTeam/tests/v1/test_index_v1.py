@@ -124,7 +124,7 @@ def test_index_bad_payload(version):
         "1",
     ],
 )
-def test_index(version):
+def test_index_duplicated_keys(version):
     with mock_table_cpm(table_name=TABLE_NAME), mock.patch.dict(
         os.environ,
         {
@@ -141,26 +141,18 @@ def test_index(version):
                 "body": json.dumps(CPM_PRODUCT_TEAM_NO_ID_DUPED_KEYS),
             }
         )
-    result_body = json_loads(result["body"])
     expected_body = json.dumps(
         {
-            "id": result_body["id"],
-            "name": "FOOBAR Product Team",
-            "ods_code": "F5H1R",
-            "status": "active",
-            "created_on": result_body["created_on"],
-            "updated_on": None,
-            "deleted_on": None,
-            "keys": [
+            "errors": [
                 {
-                    "key_type": "product_team_id",
-                    "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                    "code": "VALIDATION_ERROR",
+                    "message": "CreateProductTeamIncomingParams.keys: Ensure that product_team_id only exists once within keys.",
                 }
-            ],
+            ]
         }
     )
     expected = {
-        "statusCode": 201,
+        "statusCode": 400,
         "body": expected_body,
         "headers": {
             "Content-Length": str(len(expected_body)),

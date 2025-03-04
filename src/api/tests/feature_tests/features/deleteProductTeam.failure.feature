@@ -59,8 +59,6 @@ Feature: Delete Product Team - failure scenarios
       | ods_code         | F5H1R                                |
       | keys.0.key_type  | product_team_id                      |
       | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
-      | keys.1.key_type  | product_team_id                      |
-      | keys.1.key_value | 7bac2c22-7fc8-452f-ab2e-08a91aa35ec6 |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>"
     Then I receive a status code "404" with body

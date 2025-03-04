@@ -49,9 +49,7 @@ def test_validate_product_team_raises_no_extra_keys():
 
 
 def test_product_team_duped_keys():
-    product_team = CreateProductTeamIncomingParams(**CPM_PRODUCT_TEAM_NO_ID_DUPED_KEYS)
-    assert isinstance(product_team, CreateProductTeamIncomingParams)
-    assert len(product_team.keys) == 1
-    assert product_team.keys[0] == CPM_PRODUCT_TEAM_NO_ID["keys"][0]
-    assert product_team.ods_code == CPM_PRODUCT_TEAM_NO_ID["ods_code"]
-    assert product_team.name == CPM_PRODUCT_TEAM_NO_ID["name"]
+    with pytest.raises(ValidationError) as exc:
+        CreateProductTeamIncomingParams(**CPM_PRODUCT_TEAM_NO_ID_DUPED_KEYS)
+
+    assert exc.value.model is CreateProductTeamIncomingParams

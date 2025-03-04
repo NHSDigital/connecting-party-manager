@@ -1,3 +1,5 @@
+from typing import List
+
 from domain.core.enum import Environment
 from domain.core.product_team_key import ProductTeamKey
 from pydantic import BaseModel, Extra, Field, root_validator, validator
@@ -64,12 +66,22 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
             raise ValueError("ensure this value has at least 1 characters")
         return v
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        # Deduplicate the list of keys
-        self.keys = list(
-            {frozenset(key.dict().items()): key for key in self.keys}.values()
-        )
+    @validator("keys")
+    def validate_keys(cls, v: List[ProductTeamKey]) -> List[ProductTeamKey]:
+        id_count = sum(1 for item in v if item.key_type == "product_team_id")
+        if id_count > 1:
+            raise ValueError(
+                "Ensure that product_team_id only exists once within keys."
+            )
+        return v
+
+    #
+    # def __init__(self, **data):
+    #     super().__init__(**data)
+    #     # Deduplicate the list of keys
+    #     self.keys = list(
+    #         {frozenset(key.dict().items()): key for key in self.keys}.values()
+    #     )
 
 
 class SearchProductQueryParams(BaseModel, extra=Extra.forbid):

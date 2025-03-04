@@ -45,7 +45,7 @@ Feature: Create Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 175              |
 
-  Scenario: Cannot create a ProductTeam with an that is missing fields
+  Scenario: Cannot create a ProductTeam that is missing fields
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                                |
       | name             | My Great Product Team                |
@@ -137,3 +137,23 @@ Feature: Create Product Team - failure scenarios
       | name           | value            |
       | Content-Type   | application/json |
       | Content-Length | 272              |
+
+  Scenario: Successfully create a ProductTeam with duplicated product_team_id keys
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | ods_code         | F5H1R                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
+      | keys.1.key_type  | product_team_id                      |
+      | keys.1.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
+      | keys.2.key_type  | product_team_id                      |
+      | keys.2.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
+    Then I receive a status code "400" with body
+      | path             | value                                                                                           |
+      | errors.0.code    | VALIDATION_ERROR                                                                                |
+      | errors.0.message | CreateProductTeamIncomingParams.keys: Ensure that product_team_id only exists once within keys. |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 152              |

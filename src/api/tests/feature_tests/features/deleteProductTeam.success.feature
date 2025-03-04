@@ -37,8 +37,6 @@ Feature: Delete Product Team - success scenarios
       | ods_code         | F5H1R                                |
       | keys.0.key_type  | product_team_id                      |
       | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
-      | keys.1.key_type  | product_team_id                      |
-      | keys.1.key_value | 43252144-9bce-460c-8fa2-b0ab8cd74e72 |
     And I note the response field "$.id" as "product_team_id"
     And I have already made a "DELETE" request with "default" headers to "ProductTeam/<product_team_id>"
     When I make a "GET" request with "default" headers to "ProductTeam/<product_team_id>"
@@ -54,4 +52,3 @@ Feature: Delete Product Team - success scenarios
       | product_team_id                      |
       | ${ note(product_team_id) }           |
       | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
-      | 43252144-9bce-460c-8fa2-b0ab8cd74e72 |
