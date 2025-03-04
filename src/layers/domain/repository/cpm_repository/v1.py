@@ -196,7 +196,7 @@ class Repository[ModelType: AggregateRoot]:
         """
 
         if gsi == "idx_gsi_read_1":
-            pk = TableKey.CPM_PRODUCT.key(id)
+            pk = self.table_key.key(id)
             pk_attribute_name = pk_gsi_mapping.get(gsi, "pk_read_1")
             sk = pk
             sk_attribute_name = sk_gsi_mapping.get(gsi, "sk_read_1")
