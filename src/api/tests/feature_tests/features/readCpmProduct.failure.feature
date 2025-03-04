@@ -9,11 +9,11 @@ Feature: Read CPM Product - failure scenarios
 
   Scenario: Unknown Product ID
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | F5H1R                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | ods_code         | F5H1R                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 8babe222-5c78-42c6-8aa6-a3c69943030a |
     Given I note the response field "$.id" as "product_team_id"
     When I make a "GET" request with "default" headers to "Product/P.XXX.YYY"
     Then I receive a status code "404" with body

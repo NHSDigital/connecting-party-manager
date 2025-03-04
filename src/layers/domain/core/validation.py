@@ -16,8 +16,10 @@ class CpmId:
             rf"^P\.[{PRODUCT_ID_CHARS}]{{3}}-[{PRODUCT_ID_CHARS}]{{3}}$"
         )
 
-    class ProductTeamIdAlias:
-        ID_PATTERN = re.compile(rf"^[ -~]+$")
+    class ProductTeamId:
+        ID_PATTERN = re.compile(
+            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        )
 
     class General:
         ID_PATTERN = re.compile(rf"^[a-zA-Z0-9]+$")

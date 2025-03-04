@@ -19,7 +19,7 @@ class SearchProductResponse(SearchResponse[dict]):
 
         for product in product_dicts:
             org_code = product["ods_code"]
-            team_id = product["product_team_id"]
+            team_id = product["cpm_product_team_id"]
 
             if org_code not in organisations:
                 organisations[org_code] = {"org_code": org_code, "product_teams": {}}

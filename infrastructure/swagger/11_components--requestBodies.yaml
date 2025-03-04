@@ -23,7 +23,7 @@ components:
                   properties:
                     key_type:
                       type: string
-                      description: The type of the key (e.g., product_team_id_alias)
+                      description: The type of the key (e.g., product_team_id)
                     key_value:
                       type: string
                       description: The value of the key
@@ -35,8 +35,8 @@ components:
             name: "Sample Product Team"
             ods_code: "F5H1R"
             keys:
-              - key_type: "product_team_id_alias"
-                key_value: "FOOBAR"
+              - key_type: "product_team_id"
+                key_value: "0a78ee8f-5bcf-4db1-9341-ef1d67248715"
     ProductCreateRequestBody:
       description: Request body to create a Product
       required: true

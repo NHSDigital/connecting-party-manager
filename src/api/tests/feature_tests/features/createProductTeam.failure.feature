@@ -7,19 +7,19 @@ Feature: Create Product Team - failure scenarios
       | version       | 1       |
       | Authorization | letmein |
 
-  Scenario: Cannot create a ProductTeam with a product_team_id_alias that already exists
+  Scenario: Cannot create a ProductTeam with a product_team_id key that already exists
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | F5H1R                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | ods_code         | F5H1R                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | F5H1R                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | ods_code         | F5H1R                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
     Then I receive a status code "400" with body
       | path             | value               |
       | errors.0.code    | VALIDATION_ERROR    |
@@ -37,20 +37,20 @@ Feature: Create Product Team - failure scenarios
       | keys.0.key_type  | invalid_alias         |
       | keys.0.key_value | FOOBAR                |
     Then I receive a status code "400" with body
-      | path             | value                                                                                                                        |
-      | errors.0.code    | VALIDATION_ERROR                                                                                                             |
-      | errors.0.message | CreateProductTeamIncomingParams.keys.0.key_type: value is not a valid enumeration member; permitted: 'product_team_id_alias' |
+      | path             | value                                                                                                                  |
+      | errors.0.code    | VALIDATION_ERROR                                                                                                       |
+      | errors.0.message | CreateProductTeamIncomingParams.keys.0.key_type: value is not a valid enumeration member; permitted: 'product_team_id' |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 181              |
+      | Content-Length | 175              |
 
   Scenario: Cannot create a ProductTeam with an that is missing fields
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
     Then I receive a status code "400" with body
       | path             | value                                                    |
       | errors.0.code    | MISSING_VALUE                                            |
@@ -62,11 +62,11 @@ Feature: Create Product Team - failure scenarios
 
   Scenario: Cannot create a ProductTeam with a syntactically invalid ODS Code
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | invalid_ods_code      |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | ods_code         | invalid_ods_code                     |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
     Then I receive a status code "422" with body
       | path             | value                                                                                                                 |
       | errors.0.code    | UNPROCESSABLE_ENTITY                                                                                                  |
@@ -78,11 +78,11 @@ Feature: Create Product Team - failure scenarios
 
   Scenario: Cannot create a ProductTeam with an ODS code that is syntatically correct but doesnt exist
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             | My Great Product Team |
-      | ods_code         | F5H11                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             | My Great Product Team                |
+      | ods_code         | F5H11                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
     Then I receive a status code "422" with body
       | path             | value                                                                                                      |
       | errors.0.code    | UNPROCESSABLE_ENTITY                                                                                       |
@@ -108,11 +108,11 @@ Feature: Create Product Team - failure scenarios
 
   Scenario: Cannot create a ProductTeam with an empty name
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
-      | path             | value                 |
-      | name             |                       |
-      | ods_code         | F5H11                 |
-      | keys.0.key_type  | product_team_id_alias |
-      | keys.0.key_value | FOOBAR                |
+      | path             | value                                |
+      | name             |                                      |
+      | ods_code         | F5H11                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
     Then I receive a status code "400" with body
       | path             | value                                                                             |
       | errors.0.code    | VALIDATION_ERROR                                                                  |
@@ -122,12 +122,12 @@ Feature: Create Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 138              |
 
-  Scenario: Cannot create a ProductTeam with empty product team id alias
+  Scenario: Cannot create a ProductTeam with empty product team id key
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
       | name             | My Great Product Team |
       | ods_code         | F5H1R                 |
-      | keys.0.key_type  | product_team_id_alias |
+      | keys.0.key_type  | product_team_id       |
       | keys.0.key_value |                       |
     Then I receive a status code "400" with body
       | path             | value            |
@@ -136,4 +136,4 @@ Feature: Create Product Team - failure scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 209              |
+      | Content-Length | 272              |

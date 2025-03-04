@@ -162,7 +162,7 @@ class Repository[ModelType: AggregateRoot]:
         else:
             primary_keys = [marshall(pk=pk, sk=pk)]
             for key in keys:
-                if key["key_type"] == ProductTeamKeyType.PRODUCT_TEAM_ID_ALIAS:
+                if key["key_type"] == ProductTeamKeyType.PRODUCT_TEAM_ID:
                     primary_keys.append(
                         marshall(
                             pk=TableKey.PRODUCT_TEAM.key(key["key_value"]),
