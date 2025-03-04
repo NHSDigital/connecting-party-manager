@@ -75,14 +75,6 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
             )
         return v
 
-    #
-    # def __init__(self, **data):
-    #     super().__init__(**data)
-    #     # Deduplicate the list of keys
-    #     self.keys = list(
-    #         {frozenset(key.dict().items()): key for key in self.keys}.values()
-    #     )
-
 
 class SearchProductQueryParams(BaseModel, extra=Extra.forbid):
     product_team_id: str = None
