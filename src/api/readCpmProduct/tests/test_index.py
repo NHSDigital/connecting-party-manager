@@ -17,7 +17,9 @@ PRODUCT_TEAM_ID = "641be376-3954-4339-822c-54071c9ff1a0"
 PRODUCT_TEAM_NAME = "product-team-name"
 PRODUCT_ID = "P.XXX-YYY"
 PRODUCT_NAME = "cpm-product-name"
-PRODUCT_TEAM_KEYS = [{"key_type": "product_team_id_alias", "key_value": "BAR"}]
+PRODUCT_TEAM_KEYS = [
+    {"key_type": "product_team_id", "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b"}
+]
 
 
 @pytest.mark.parametrize(
@@ -67,14 +69,14 @@ def test_index(version):
 
     # Assertions for fields that must exactly match
     assert response_body["id"] == PRODUCT_ID
-    assert response_body["product_team_id"] == product_team.id
+    assert response_body["cpm_product_team_id"] == product_team.id
     assert response_body["name"] == PRODUCT_NAME
     assert response_body["ods_code"] == ODS_CODE
     assert response_body["updated_on"] is None
     assert response_body["deleted_on"] is None
 
     # Assertions for fields that only need to be included
-    assert "product_team_id" in response_body
+    assert "cpm_product_team_id" in response_body
     assert "created_on" in response_body
 
     expected_headers = {

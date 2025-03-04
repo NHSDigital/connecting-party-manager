@@ -75,5 +75,5 @@ def test_read_product_steps_good_input():
         )
 
     assert isinstance(step_chain.result, CpmProduct)
-    assert step_chain.result.product_team_id == product_team.id
+    assert step_chain.result.cpm_product_team_id == product_team.id
     assert step_chain.result.ods_code == ods_code

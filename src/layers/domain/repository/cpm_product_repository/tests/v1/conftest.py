@@ -19,6 +19,11 @@ def product():
     org = Root.create_ods_organisation(ods_code="ABC")
     product_team = org.create_product_team(
         name="product-team-name",
-        keys=[{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+        keys=[
+            {
+                "key_type": "product_team_id",
+                "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+            }
+        ],
     )
     return product_team.create_cpm_product(name="cpm-product-name")

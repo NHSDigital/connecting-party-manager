@@ -101,7 +101,7 @@ def test_index():
     assert deleted_product == {
         "name": PRODUCT_NAME,
         "ods_code": ODS_CODE,
-        "product_team_id": product_team.id,
+        "cpm_product_team_id": product_team.id,
         "status": Status.INACTIVE,
         "keys": [],
     }

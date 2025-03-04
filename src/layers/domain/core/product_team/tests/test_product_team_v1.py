@@ -13,7 +13,7 @@ from pydantic import ValidationError
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
                 }
             ],
@@ -34,7 +34,7 @@ def test__create_product_team_bad_name(keys: list, name: str):
         [
             [
                 {
-                    "key_type": "product_team_id",
+                    "key_type": "product_team_id_alias",
                     "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
                 }
             ],
@@ -55,7 +55,7 @@ def test__create_product_team_bad_key_type(keys: list, name: str):
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
                 }
             ],
@@ -65,7 +65,7 @@ def test__create_product_team_bad_key_type(keys: list, name: str):
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
                 }
             ],
@@ -75,16 +75,11 @@ def test__create_product_team_bad_key_type(keys: list, name: str):
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "f9518c12-6c83-4544-97db-d9dd1d64da97",
                 }
             ],
             "Third",
-            "AB123",
-        ],
-        [
-            [{"key_type": "product_team_id_alias", "key_value": "foobar"}],
-            "Fourth",
             "AB123",
         ],
     ],
@@ -110,7 +105,7 @@ def test__create_product_team(
             None,
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
                 }
             ],
@@ -121,7 +116,7 @@ def test__create_product_team(
             None,
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
                 }
             ],
@@ -132,17 +127,11 @@ def test__create_product_team(
             None,
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "f9518c12-6c83-4544-97db-d9dd1d64da97",
                 }
             ],
             "Third",
-            "AB123",
-        ],
-        [
-            None,
-            [{"key_type": "product_team_id_alias", "key_value": "foobar"}],
-            "Fourth",
             "AB123",
         ],
     ],
@@ -168,7 +157,7 @@ def test__create_product_team_provided_id_equals_none_is_ignored(
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
                 }
             ],
@@ -177,7 +166,7 @@ def test__create_product_team_provided_id_equals_none_is_ignored(
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
                 }
             ],
@@ -186,13 +175,12 @@ def test__create_product_team_provided_id_equals_none_is_ignored(
         [
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "f9518c12-6c83-4544-97db-d9dd1d64da97",
                 }
             ],
             "Third",
         ],
-        [[{"key_type": "product_team_id_alias", "key_value": "foobar"}], "Fourth"],
     ],
 )
 def test__create_product_team_from_org_no_id(
@@ -227,7 +215,7 @@ def test__create_product_team_from_org_no_id(
             None,
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "ae28e872-843d-4e2e-9f0b-b5d3c42d441f",
                 }
             ],
@@ -237,7 +225,7 @@ def test__create_product_team_from_org_no_id(
             "FOOBAR",
             [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
                 }
             ],
@@ -262,7 +250,7 @@ def test__create_product_team_from_org_id_raises_error(
         {
             "keys": [
                 {
-                    "key_type": "product_team_id_alias",
+                    "key_type": "product_team_id",
                     "key_value": "edf90c3a-f865-4dd9-9ab9-400e6ebc02e0",
                 }
             ],

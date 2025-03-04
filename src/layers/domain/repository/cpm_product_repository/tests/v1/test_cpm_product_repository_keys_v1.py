@@ -14,6 +14,6 @@ def test__product_repository__add_key(
     product.add_key(**party_key.dict())
     repository.write(product)
     product_by_id = repository.read(
-        product_team_id=product.product_team_id, id=product.id
+        product_team_id=product.cpm_product_team_id, id=product.id
     )
     assert product_by_id.keys == [party_key]

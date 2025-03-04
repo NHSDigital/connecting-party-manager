@@ -48,7 +48,12 @@ def test_index(version):
             "created_on": result_body["created_on"],
             "updated_on": None,
             "deleted_on": None,
-            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+            "keys": [
+                {
+                    "key_type": "product_team_id",
+                    "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                }
+            ],
         }
     )
     expected = {
@@ -146,7 +151,12 @@ def test_index(version):
             "created_on": result_body["created_on"],
             "updated_on": None,
             "deleted_on": None,
-            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+            "keys": [
+                {
+                    "key_type": "product_team_id",
+                    "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                }
+            ],
         }
     )
     expected = {
