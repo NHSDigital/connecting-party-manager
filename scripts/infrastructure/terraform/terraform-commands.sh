@@ -32,6 +32,7 @@ function _terraform() {
   current_date=$(_get_current_date) || return 1
   layers=$(_get_layer_list) || return 1
   third_party_layers=$(_get_third_party_layer_list) || return 1
+  echo $third_party_layers
   lambdas=$(_get_lambda_list) || return 1
   login_account=$(_get_account_full_name) || return 1
   local plan_file="./tfplan"
@@ -158,9 +159,9 @@ function _terraform_destroy() {
     -var "assume_account=${aws_account_id}" \
     -var "assume_role=${terraform_role_name}" \
     -var "workspace_type=${workspace_type}" \
-    -var "lambdas=${lambdas}" \
-    -var "layers=${layers}" \
-    -var "third_party_layers=${third_party_layers}" ||
+    # -var "lambdas=${lambdas}" \
+    # -var "layers=${layers}" \
+    # -var "third_party_layers=${third_party_layers}" ||
     return 1
 
   if [ "$workspace" != "default" ]; then
