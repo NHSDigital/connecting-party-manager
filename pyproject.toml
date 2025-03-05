@@ -61,7 +61,7 @@ click = "^8.1.7"
 optional = true
 
 [tool.poetry.group.local.dependencies]
-ipython = "^8.17.2"
+ipython = "^9.0.1"
 
 # [tool.poetry.group.sds_update]
 # optional = true
