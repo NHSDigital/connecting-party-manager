@@ -1,0 +1,14 @@
+{
+  "keys": [
+    {
+      "key_type": "product_team_id_alias",
+      "key_value": "BAR"
+    },
+    {
+      "key_type": "product_team_alias",
+      "key_value": "FOO"
+    }
+  ],
+  "ods_code": "F5H1R",
+  "name": "FOOBAR Product Team"
+}

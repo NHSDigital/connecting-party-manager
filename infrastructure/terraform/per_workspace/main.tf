@@ -31,32 +31,6 @@ data "aws_secretsmanager_secret" "cpm_apigee_api_key" {
   name = "${var.environment}-apigee-cpm-apikey"
 }
 
-module "eprtable" {
-  source                      = "./modules/api_storage"
-  name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--epr-table"
-  environment                 = var.environment
-  deletion_protection_enabled = var.deletion_protection_enabled
-  kms_deletion_window_in_days = 7
-  range_key                   = "sk"
-  hash_key                    = "pk"
-
-  attributes = [
-    { name = "pk", type = "S" },
-    { name = "sk", type = "S" },
-    { name = "pk_read", type = "S" },
-    { name = "sk_read", type = "S" },
-  ]
-
-  global_secondary_indexes = [
-    {
-      name            = "idx_gsi_read"
-      hash_key        = "pk_read"
-      range_key       = "sk_read"
-      projection_type = "ALL"
-    }
-  ]
-}
-
 module "cpmtable" {
   source                      = "./modules/api_storage"
   name                        = "${local.project}--${replace(terraform.workspace, "_", "-")}--cpm-table"
@@ -114,7 +88,7 @@ module "lambdas" {
   source         = "./modules/api_worker/api_lambda"
   python_version = var.python_version
   name           = each.key
-  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(replace(replace(replace(each.key, "_", "-"), "DeviceReferenceData", "DeviceRefData"), "MessageHandlingSystem", "MHS"), "MessageSet", "MsgSet")}"
+  lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
 
   //Compact will remove all nulls from the list and create a new one - this is because TF throws an error if there is a null item in the list.
   layers = concat(
@@ -129,7 +103,7 @@ module "lambdas" {
     }
   }
   environment_variables = {
-    DYNAMODB_TABLE = contains(["createProductTeam", "readProductTeam", "deleteProductTeam", "createCpmProduct", "readCpmProduct", "searchProduct", "deleteCpmProduct"], each.key) ? module.cpmtable.dynamodb_table_name : module.eprtable.dynamodb_table_name
+    DYNAMODB_TABLE = module.cpmtable.dynamodb_table_name
   }
   attach_policy_statements = length((fileset("${path.module}/../../../src/api/${each.key}/policies", "*.json"))) > 0
   policy_statements = {

@@ -10,7 +10,6 @@ from event.aws.client import dynamodb_client
 from api.tests.feature_tests.feature_test_helpers import TestMode
 from api.tests.feature_tests.steps.context import Context
 from api.tests.feature_tests.steps.fixtures import (
-    mock_dynamodb,
     mock_dynamodb_cpm,
     mock_environment,
     mock_requests,
@@ -100,20 +99,11 @@ def before_feature(context: Context, feature: Feature):
         "Search Products - failures scenarios",
     ]
     if context.test_mode is TestMode.INTEGRATION:
-        table = (
-            "dynamodb_cpm_table_name.value"
-            if feature.name in cpm_scenarios
-            else "dynamodb_epr_table_name.value"
-        )
+        table = "dynamodb_cpm_table_name.value"
         context.table_name = read_terraform_output(table)
     else:
         context.table_name = LOCAL_TABLE_NAME
-        if feature.name in cpm_scenarios:
-            use_fixture(
-                mock_dynamodb_cpm, context=context, table_name=context.table_name
-            )
-        else:
-            use_fixture(mock_dynamodb, context=context, table_name=context.table_name)
+        use_fixture(mock_dynamodb_cpm, context=context, table_name=context.table_name)
 
 
 def before_scenario(context: Context, scenario: Scenario):

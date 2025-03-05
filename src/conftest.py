@@ -142,9 +142,7 @@ def clear_dynamodb_table_(request: FixtureRequest):
     if is_integration(request):
         client = dynamodb_client()
         table_name_cpm = read_terraform_output("dynamodb_cpm_table_name.value")
-        table_name_epr = read_terraform_output("dynamodb_epr_table_name.value")
         clear_dynamodb_table(client=client, table_name=table_name_cpm)
-        clear_dynamodb_table(client=client, table_name=table_name_epr)
         yield
     else:
         yield

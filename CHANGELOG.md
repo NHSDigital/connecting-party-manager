@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-03-03
+- [PI-789] Remove EPR Final
+
 ## 2025-02-26
 - [PI-793] Remove EPR ETL
 - [PI-795] Remove EPR repository layers

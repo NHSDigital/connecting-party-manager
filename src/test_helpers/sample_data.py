@@ -42,15 +42,3 @@ CPM_PRODUCT_NO_NAME = _read_core_test_data(
 CPM_PRODUCT_EXTRA_PARAMS = _read_core_test_data(
     f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-product-example-extra.json"
 )
-CPM_DEVICE = _read_core_test_data(
-    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-example.json"
-)
-CPM_DEVICE_EXTRA_PARAMS = _read_core_test_data(
-    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-example-extra.json"
-)
-CPM_DEVICE_REFERENCE_DATA = _read_core_test_data(
-    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-reference-data-example.json"
-)
-CPM_DEVICE_REFERENCE_DATA_EXTRA_PARAMS = _read_core_test_data(
-    f"{PATH_TO_CORE_CPM_TEST_DATA}/cpm-device-reference-data-example-extra.json"
-)

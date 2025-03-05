@@ -41,7 +41,6 @@ variable "api_lambda_layers" {
     "domain",
     "event",
     "api_utils",
-    "sds"
   ]
 }
 
