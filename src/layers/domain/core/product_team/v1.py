@@ -61,8 +61,13 @@ class ProductTeam(AggregateRoot):
 
     def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:
         extra_kwargs = {"id": product_id} if product_id is not None else {}
+        product_team_id = next(
+            (key.key_value for key in self.keys if key.key_type == "product_team_id"),
+            None,
+        )
         product = CpmProduct(
             cpm_product_team_id=self.id,
+            product_team_id=product_team_id,
             name=name,
             ods_code=self.ods_code,
             **extra_kwargs

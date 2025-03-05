@@ -62,6 +62,7 @@ def test_index(version):
         {
             "id": product["id"],
             "cpm_product_team_id": product["cpm_product_team_id"],
+            "product_team_id": product_team_payload["keys"][0]["key_value"],
             "name": "Foobar product",
             "ods_code": "F5H1R",
             "status": "active",
