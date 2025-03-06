@@ -135,7 +135,8 @@ def test_search_by_product_team_id():
                     "org_code": ODS_CODE,
                     "product_teams": [
                         {
-                            "product_team_id": product_team.id,
+                            "product_team_id": None,
+                            "cpm_product_team_id": product_team.id,
                             "products": [cpm_product.state()],
                         },
                     ],
@@ -209,7 +210,8 @@ def test_search_by_product_team_alias():
                     "org_code": ODS_CODE,
                     "product_teams": [
                         {
-                            "product_team_id": product_team.id,
+                            "product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                            "cpm_product_team_id": product_team.id,
                             "products": [cpm_product.state()],
                         },
                     ],
@@ -284,7 +286,8 @@ def test_index_org_code():
                     "org_code": ODS_CODE,
                     "product_teams": [
                         {
-                            "product_team_id": product_team.id,
+                            "product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                            "cpm_product_team_id": product_team.id,
                             "products": [cpm_product.state()],
                         },
                     ],
@@ -419,11 +422,13 @@ def test_index_org_code_multiple_product_teams():
                 "org_code": ODS_CODE,
                 "product_teams": [
                     {
-                        "product_team_id": product_team_1.id,
+                        "product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                        "cpm_product_team_id": product_team_1.id,
                         "products": [cpm_product_1.state()],
                     },
                     {
-                        "product_team_id": product_team_2.id,
+                        "product_team_id": None,
+                        "cpm_product_team_id": product_team_2.id,
                         "products": [cpm_product_2.state()],
                     },
                 ],
@@ -434,9 +439,8 @@ def test_index_org_code_multiple_product_teams():
     # Ensure expected product teams are sorted
     expected_product_teams = sorted(
         expected_response["results"][0]["product_teams"],
-        key=lambda team: team["product_team_id"],
+        key=lambda team: team["cpm_product_team_id"],
     )
-
     # Sort the products within each product team in the expected response
     for team in expected_product_teams:
         team["products"] = sorted(team["products"], key=lambda product: product["id"])
