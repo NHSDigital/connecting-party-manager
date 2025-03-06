@@ -81,8 +81,6 @@ components:
           type: string
         name:
           type: string
-        cpm_product_team_id:
-          type: string
         product_team_id:
           type: string
         cpm_product_team_id:
