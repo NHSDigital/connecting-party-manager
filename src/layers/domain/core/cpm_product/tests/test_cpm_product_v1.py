@@ -10,7 +10,7 @@ def cpm_product():
     product = CpmProduct(
         name="Foo",
         ods_code="ABC123",
-        product_team_id="ABC123.18934119-5780-4d28-b9be-0e6dff3908ba",
+        cpm_product_team_id="18934119-5780-4d28-b9be-0e6dff3908ba",
     )
     return product
 
@@ -20,7 +20,7 @@ def test_cpm_product_created(cpm_product: CpmProduct):
     assert isinstance(cpm_product.id, ProductId)
     assert isinstance(cpm_product.name, str)
     assert isinstance(cpm_product.ods_code, str)
-    assert isinstance(cpm_product.product_team_id, str)
+    assert isinstance(cpm_product.cpm_product_team_id, str)
     assert isinstance(cpm_product.created_on, datetime)
 
 
@@ -39,5 +39,5 @@ def test_invalid_product_id(invalid_product_id):
             id=invalid_product_id,
             name="Foo",
             ods_code="ABC123",
-            product_team_id="ABC123.18934119-5780-4d28-b9be-0e6dff3908ba",
+            cpm_product_team_id="18934119-5780-4d28-b9be-0e6dff3908ba",
         )

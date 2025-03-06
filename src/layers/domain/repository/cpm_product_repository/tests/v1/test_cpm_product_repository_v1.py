@@ -25,7 +25,7 @@ def _create_product_team(name: str = "FOOBAR Product Team", ods_code: str = "F5H
 @pytest.mark.integration
 def test__cpm_product_repository(product: CpmProduct, repository: CpmProductRepository):
     repository.write(product)
-    result = repository.read(product_team_id=product.product_team_id, id=product.id)
+    result = repository.read(product_team_id=product.cpm_product_team_id, id=product.id)
     assert result == product
 
 
@@ -52,7 +52,7 @@ def test__cpm_product_repository_local(
     product: CpmProduct, repository: CpmProductRepository
 ):
     repository.write(product)
-    result = repository.read(product_team_id=product.product_team_id, id=product.id)
+    result = repository.read(product_team_id=product.cpm_product_team_id, id=product.id)
     assert result == product
 
 

@@ -113,9 +113,9 @@ def test_parse_path_read_cpm_product():
 
     assert parse_api_path(
         method="GET",
-        path="ProductTeam/123/Product/456",
+        path="Product/456",
         endpoint_lambda_mapping=endpoint_lambda_mapping,
-    ) == ({"product_team_id": "123", "product_id": "456"}, {}, api.readCpmProduct.index)
+    ) == ({"product_id": "456"}, {}, api.readCpmProduct.index)
 
 
 def test_parse_path_delete_cpm_product():

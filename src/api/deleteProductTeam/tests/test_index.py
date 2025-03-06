@@ -152,7 +152,9 @@ def test_index_by_alias(version):
         result = handler(
             event={
                 "headers": {"version": version},
-                "pathParameters": {"product_team_id": "BAR"},
+                "pathParameters": {
+                    "product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b"
+                },
             }
         )
     expected_result = json.dumps(

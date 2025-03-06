@@ -25,7 +25,6 @@ TABLE_NAME = "my-table"
         (
             {
                 "pathParameters": {
-                    "product_team_id": "does-not-exist",
                     "product_id": "does-not-exist",
                 },
             },
@@ -69,7 +68,6 @@ def test_read_product_steps_good_input():
         step_chain.run(
             init={
                 "pathParameters": {
-                    "product_team_id": str(product_team.id),
                     "product_id": str(product.id),
                 },
             },
@@ -77,5 +75,5 @@ def test_read_product_steps_good_input():
         )
 
     assert isinstance(step_chain.result, CpmProduct)
-    assert step_chain.result.product_team_id == product_team.id
+    assert step_chain.result.cpm_product_team_id == product_team.id
     assert step_chain.result.ods_code == ods_code

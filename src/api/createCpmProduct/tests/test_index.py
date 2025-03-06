@@ -61,7 +61,7 @@ def test_index(version):
     expected_body = json.dumps(
         {
             "id": product["id"],
-            "product_team_id": product["product_team_id"],
+            "cpm_product_team_id": product["cpm_product_team_id"],
             "name": "Foobar product",
             "ods_code": "F5H1R",
             "status": "active",
@@ -127,7 +127,9 @@ def test_index_no_such_product_team(version):
             event={
                 "headers": {"version": version},
                 "body": json.dumps(product_payload),
-                "pathParameters": {"product_team_id": "FOOBAR"},
+                "pathParameters": {
+                    "product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b"
+                },
             }
         )
     expected_result = json.dumps(
@@ -135,7 +137,7 @@ def test_index_no_such_product_team(version):
             "errors": [
                 {
                     "code": "RESOURCE_NOT_FOUND",
-                    "message": "Could not find ProductTeam for key ('FOOBAR')",
+                    "message": "Could not find ProductTeam for key ('808a36db-a52a-4130-b71e-d9cbcbaed15b')",
                 }
             ],
         }

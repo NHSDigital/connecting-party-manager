@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-03-05
+- [PI-833] Read product by productID
+- [PI-832] product_team_id as a key in product_team
+
 ## 2025-03-03
 - [PI-789] Remove EPR Final
 

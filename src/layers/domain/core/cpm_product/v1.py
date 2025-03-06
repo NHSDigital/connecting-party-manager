@@ -15,7 +15,7 @@ from pydantic import Field
 @dataclass(kw_only=True, slots=True)
 class CpmProductCreatedEvent(Event):
     id: str
-    product_team_id: str
+    cpm_product_team_id: str
     name: str
     ods_code: str
     status: Status
@@ -28,7 +28,7 @@ class CpmProductCreatedEvent(Event):
 class CpmProductKeyAddedEvent(Event):
     new_key: dict
     id: str
-    product_team_id: str
+    cpm_product_team_id: str
     name: str
     ods_code: str
     status: Status
@@ -41,7 +41,7 @@ class CpmProductKeyAddedEvent(Event):
 @dataclass(kw_only=True, slots=True)
 class CpmProductDeletedEvent(Event):
     id: str
-    product_team_id: str
+    cpm_product_team_id: str
     name: str
     ods_code: str
     status: Status
@@ -57,7 +57,7 @@ class CpmProduct(AggregateRoot):
     """
 
     id: ProductId = Field(default_factory=ProductId.create)
-    product_team_id: str = Field(...)
+    cpm_product_team_id: str = Field(...)
     name: str = Field(regex=CPM_PRODUCT_NAME_REGEX, min_length=1)
     ods_code: str
     status: Status = Status.ACTIVE

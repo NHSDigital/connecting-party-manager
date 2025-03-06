@@ -17,7 +17,9 @@ PRODUCT_TEAM_ID = "641be376-3954-4339-822c-54071c9ff1a0"
 PRODUCT_TEAM_NAME = "product-team-name"
 PRODUCT_ID = "P.XXX-YYY"
 PRODUCT_NAME = "cpm-product-name"
-PRODUCT_TEAM_KEYS = [{"key_type": "product_team_id_alias", "key_value": "BAR"}]
+PRODUCT_TEAM_KEYS = [
+    {"key_type": "product_team_id", "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b"}
+]
 
 
 @pytest.mark.parametrize(
@@ -60,7 +62,6 @@ def test_index(version):
                 "headers": {"version": version},
                 "pathParameters": {
                     "product_id": str(cpm_product.id.id),
-                    "product_team_id": str(product_team.id),
                 },
             }
         )
@@ -68,14 +69,14 @@ def test_index(version):
 
     # Assertions for fields that must exactly match
     assert response_body["id"] == PRODUCT_ID
-    assert response_body["product_team_id"] == product_team.id
+    assert response_body["cpm_product_team_id"] == product_team.id
     assert response_body["name"] == PRODUCT_NAME
     assert response_body["ods_code"] == ODS_CODE
     assert response_body["updated_on"] is None
     assert response_body["deleted_on"] is None
 
     # Assertions for fields that only need to be included
-    assert "product_team_id" in response_body
+    assert "cpm_product_team_id" in response_body
     assert "created_on" in response_body
 
     expected_headers = {
@@ -121,7 +122,6 @@ def test_index_no_such_cpm_product(version):
                 "headers": {"version": version},
                 "pathParameters": {
                     "product_id": PRODUCT_ID,
-                    "product_team_id": str(product_team.id),
                 },
             }
         )
@@ -131,59 +131,7 @@ def test_index_no_such_cpm_product(version):
             "errors": [
                 {
                     "code": "RESOURCE_NOT_FOUND",
-                    "message": f"Could not find CpmProduct for key ('{product_team.id}', '{PRODUCT_ID}')",
-                }
-            ],
-        }
-    )
-
-    expected = {
-        "statusCode": 404,
-        "body": expected_result,
-        "headers": {
-            "Content-Length": str(len(expected_result)),
-            "Content-Type": "application/json",
-            "Version": version,
-        },
-    }
-    _response_assertions(
-        result=result, expected=expected, check_body=True, check_content_length=True
-    )
-
-
-@pytest.mark.parametrize(
-    "version",
-    [
-        "1",
-    ],
-)
-def test_index_no_such_product_team(version):
-    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
-        os.environ,
-        {
-            "DYNAMODB_TABLE": TABLE_NAME,
-            "AWS_DEFAULT_REGION": "eu-west-2",
-        },
-        clear=True,
-    ):
-        from api.readCpmProduct.index import handler
-
-        result = handler(
-            event={
-                "headers": {"version": version},
-                "pathParameters": {
-                    "product_id": str(PRODUCT_ID),
-                    "product_team_id": str(PRODUCT_TEAM_ID),
-                },
-            }
-        )
-
-    expected_result = json.dumps(
-        {
-            "errors": [
-                {
-                    "code": "RESOURCE_NOT_FOUND",
-                    "message": f"Could not find ProductTeam for key ('{PRODUCT_TEAM_ID}')",
+                    "message": f"Could not find CpmProduct for key ('{PRODUCT_ID}')",
                 }
             ],
         }

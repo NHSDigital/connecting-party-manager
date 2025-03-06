@@ -62,7 +62,10 @@ class ProductTeam(AggregateRoot):
     def create_cpm_product(self, name: str, product_id: str = None) -> CpmProduct:
         extra_kwargs = {"id": product_id} if product_id is not None else {}
         product = CpmProduct(
-            product_team_id=self.id, name=name, ods_code=self.ods_code, **extra_kwargs
+            cpm_product_team_id=self.id,
+            name=name,
+            ods_code=self.ods_code,
+            **extra_kwargs
         )
         data = product.state()
         del data["keys"]

@@ -60,7 +60,12 @@ def test_index(version):
             "created_on": result_body["created_on"],
             "updated_on": None,
             "deleted_on": None,
-            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+            "keys": [
+                {
+                    "key_type": "product_team_id",
+                    "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                }
+            ],
         }
     )
 
@@ -159,7 +164,9 @@ def test_index_by_alias(version):
         result = handler(
             event={
                 "headers": {"version": version},
-                "pathParameters": {"product_team_id": "BAR"},
+                "pathParameters": {
+                    "product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b"
+                },
             }
         )
     result_body = json_loads(result["body"])
@@ -172,7 +179,12 @@ def test_index_by_alias(version):
             "created_on": result_body["created_on"],
             "updated_on": None,
             "deleted_on": None,
-            "keys": [{"key_type": "product_team_id_alias", "key_value": "BAR"}],
+            "keys": [
+                {
+                    "key_type": "product_team_id",
+                    "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b",
+                }
+            ],
         }
     )
 

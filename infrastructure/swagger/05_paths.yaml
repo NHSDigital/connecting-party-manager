@@ -50,7 +50,7 @@ paths:
         - Options
       responses:
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductTeamBadRequest"
         "200":
           description: "200 response"
           headers:
@@ -95,7 +95,7 @@ paths:
         "201":
           $ref: "#/components/responses/CPMProductTeamCreate"
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductTeamBadRequest"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
       parameters:
@@ -298,15 +298,14 @@ paths:
         - ${authoriser_name}: []
         - app-level0: []
 
-  /ProductTeam/{product_team_id}/Product/{product_id}:
+  /Product/{product_id}:
     options:
-      operationId: productactions
-      summary: Product actions (OPTIONS)
+      operationId: productreadactions
+      summary: Product Read actions (OPTIONS)
       parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
       tags:
-        - Core Product ID Endpoints
+        - Options
       responses:
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -331,7 +330,7 @@ paths:
           default:
             statusCode: "200"
             responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
         requestTemplates:
@@ -345,11 +344,10 @@ paths:
       operationId: readproductendpoint
       summary: Read a Product resource (GET)
       description: |
-        - Retrieve a product using a product team ID and product ID.
+        - Retrieve a product using a product ID.
       tags:
         - Core Product ID Endpoints
       parameters:
-        - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
@@ -362,6 +360,50 @@ paths:
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readCpmProduct}
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
+
+  /ProductTeam/{product_team_id}/Product/{product_id}:
+    options:
+      operationId: productactions
+      summary: Product actions (OPTIONS)
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/ProductId"
+      tags:
+        - Options
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,DELETE'"
+              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: "never"
+        type: "mock"
       security:
         - ${authoriser_name}: []
         - app-level0: []

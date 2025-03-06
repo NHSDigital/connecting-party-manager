@@ -17,7 +17,9 @@ VERSION = "1"
 ODS_CODE = "F5H1R"
 PRODUCT_TEAM_NAME = "product-team-name"
 PRODUCT_TEAM_ID = "sample_product_team_id"
-PRODUCT_TEAM_KEYS = [{"key_type": "product_team_id_alias", "key_value": "FOOBAR"}]
+PRODUCT_TEAM_KEYS = [
+    {"key_type": "product_team_id", "key_value": "808a36db-a52a-4130-b71e-d9cbcbaed15b"}
+]
 PRODUCT_NAME = "product-name"
 PRODUCT_ID = "P.AAA-367"
 
@@ -191,7 +193,7 @@ def test_search_by_product_team_alias():
         )
         product_repo.write(cpm_product)
 
-        params = {"product_team_id": "FOOBAR"}
+        params = {"product_team_id": "808a36db-a52a-4130-b71e-d9cbcbaed15b"}
         result = handler(
             event={
                 "headers": {"version": VERSION},

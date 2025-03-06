@@ -21,8 +21,13 @@ class CpmProductRepository(Repository[CpmProduct]):
             table_key=TableKey.CPM_PRODUCT,
         )
 
-    def read(self, product_team_id: str, id: str, status: str = "active"):
-        return super()._read(parent_ids=(product_team_id,), id=id, status=status)
+    def read(self, product_team_id: str = None, id: str = None, status: str = "active"):
+        if product_team_id:
+            return super()._read(parent_ids=(product_team_id,), id=id, status=status)
+        else:
+            return super()._read(
+                parent_ids=(id,), id=id, status=status, gsi="idx_gsi_read_1"
+            )
 
     def search_by_product_team(
         self, product_team_id: str, status: str
@@ -49,7 +54,7 @@ class CpmProductRepository(Repository[CpmProduct]):
     def handle_CpmProductCreatedEvent(self, event: CpmProductCreatedEvent):
         return self.create_index(
             id=event.id,
-            parent_key_parts=(event.product_team_id,),
+            parent_key_parts=(event.cpm_product_team_id,),
             data=asdict(event),
             root=True,
             row_type=EntityType.PRODUCT,
@@ -62,7 +67,7 @@ class CpmProductRepository(Repository[CpmProduct]):
         product_keys = {ProductKey(**key) for key in event.keys}
         product_keys_before_update = product_keys - {new_key}
         update_transactions = self.update_indexes(
-            pk=TableKey.PRODUCT_TEAM.key(event.product_team_id),
+            pk=TableKey.PRODUCT_TEAM.key(event.cpm_product_team_id),
             id=event.id,
             keys=product_keys_before_update,
             data={"keys": event.keys, "updated_on": event.updated_on},
@@ -71,7 +76,7 @@ class CpmProductRepository(Repository[CpmProduct]):
 
     def handle_CpmProductDeletedEvent(self, event: CpmProductDeletedEvent):
         return self.update_indexes(
-            pk=TableKey.PRODUCT_TEAM.key(event.product_team_id),
+            pk=TableKey.PRODUCT_TEAM.key(event.cpm_product_team_id),
             id=event.id,
             keys=event.keys,
             data=asdict(event),
