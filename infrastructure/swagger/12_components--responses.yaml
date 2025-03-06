@@ -72,7 +72,7 @@ components:
                   - code: "VALIDATION_ERROR"
                     message: "SearchProductQueryParams.__root__: Please provide exactly one valid query parameter: {'product_team_id', 'organisation_code'}."
     CreateProductTeamBadRequest:
-      description: searchProductTeam Bad request
+      description: createProductTeam Bad request
       content:
         application/json:
           schema:
@@ -93,6 +93,11 @@ components:
                 errors:
                   - code: "VALIDATION_ERROR"
                     message: "CreateProductTeamIncomingParams.keys: Ensure that product_team_id only exists once within keys."
+            ItemExistsValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "Item already exists"
             MissingValue:
               value:
                 errors:
