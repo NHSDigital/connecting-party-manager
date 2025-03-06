@@ -85,6 +85,8 @@ components:
           type: string
         product_team_id:
           type: string
+        cpm_product_team_id:
+          type: string
         ods_code:
           type: string
         status:
