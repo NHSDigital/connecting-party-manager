@@ -372,7 +372,7 @@ paths:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
       tags:
-        - Core Product ID Endpoints
+        - Options
       responses:
         "400":
           $ref: "#/components/responses/BadRequest"
