@@ -144,6 +144,8 @@ components:
                 items:
                   type: object
                   properties:
+                    cpm_product_team_id:
+                      type: string
                     product_team_id:
                       type: string
                     products:
@@ -182,7 +184,8 @@ components:
         results:
           - org_code: "xyzzy"
             product_teams:
-              - product_team_id: "1234"
+              - product_team_id: "55e86121-3826-468c-a6f0-dd0f1fbc0259"
+              - cpm_product_team_id: "a9a9694d-001b-45ce-9f2a-6c9bf80ae0d0"
                 products:
                   - id: "P.123"
                     product_team_id: "1234"
@@ -193,7 +196,8 @@ components:
                     updated_on: "null"
                     deleted_on: "null"
                     keys: []
-              - product_team_id: "5678"
+              - product_team_id: "24ac1857-f718-4905-813f-52da930c3ea1"
+              - cpm_product_team_id: "152705aa-0342-487f-a654-64bba814a847"
                 products:
                   - id: "P.xyz"
                     product_team_id: "5678"
