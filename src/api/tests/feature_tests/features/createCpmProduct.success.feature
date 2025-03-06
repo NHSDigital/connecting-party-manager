@@ -20,36 +20,38 @@ Feature: Create CPM Product - success scenarios
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
     Then I receive a status code "201" with body
-      | path                | value                      |
-      | id                  | ${ note(product_id) }      |
-      | name                | My Great Product           |
-      | cpm_product_team_id | ${ note(product_team_id) } |
-      | ods_code            | F5H1R                      |
-      | status              | active                     |
-      | keys                | []                         |
-      | created_on          | << ignore >>               |
-      | updated_on          | << ignore >>               |
-      | deleted_on          | << ignore >>               |
+      | path                | value                                |
+      | id                  | ${ note(product_id) }                |
+      | name                | My Great Product                     |
+      | product_team_id     | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
+      | cpm_product_team_id | ${ note(product_team_id) }           |
+      | ods_code            | F5H1R                                |
+      | status              | active                               |
+      | keys                | []                                   |
+      | created_on          | << ignore >>                         |
+      | updated_on          | << ignore >>                         |
+      | deleted_on          | << ignore >>                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 253              |
+      | Content-Length | 312              |
     When I make a "GET" request with "default" headers to "Product/${ note(product_id) }"
     Then I receive a status code "200" with body
-      | path                | value                      |
-      | id                  | ${ note(product_id) }      |
-      | name                | My Great Product           |
-      | cpm_product_team_id | ${ note(product_team_id) } |
-      | ods_code            | F5H1R                      |
-      | status              | active                     |
-      | keys                | []                         |
-      | created_on          | << ignore >>               |
-      | updated_on          | << ignore >>               |
-      | deleted_on          | << ignore >>               |
+      | path                | value                                |
+      | id                  | ${ note(product_id) }                |
+      | name                | My Great Product                     |
+      | product_team_id     | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
+      | cpm_product_team_id | ${ note(product_team_id) }           |
+      | ods_code            | F5H1R                                |
+      | status              | active                               |
+      | keys                | []                                   |
+      | created_on          | << ignore >>                         |
+      | updated_on          | << ignore >>                         |
+      | deleted_on          | << ignore >>                         |
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 253              |
+      | Content-Length | 312              |
 
     Examples:
       | product_team_id                      |
