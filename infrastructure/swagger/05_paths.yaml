@@ -50,7 +50,7 @@ paths:
         - Options
       responses:
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductTeamBadRequest"
         "200":
           description: "200 response"
           headers:
@@ -95,7 +95,7 @@ paths:
         "201":
           $ref: "#/components/responses/CPMProductTeamCreate"
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductTeamBadRequest"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
       parameters:

@@ -71,6 +71,33 @@ components:
                 errors:
                   - code: "VALIDATION_ERROR"
                     message: "SearchProductQueryParams.__root__: Please provide exactly one valid query parameter: {'product_team_id', 'organisation_code'}."
+    CreateProductTeamBadRequest:
+      description: searchProductTeam Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            NotPermittedValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "CreateProductTeamIncomingParams.keys.0.key_type: value is not a valid enumeration member; permitted: 'product_team_id'"
+            FormatValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "CreateProductTeamIncomingParams.keys.0.key_value: Key '' does not match the expected pattern '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' associated with key type 'product_team_id'"
+            DuplicateKeyValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "CreateProductTeamIncomingParams.keys: Ensure that product_team_id only exists once within keys."
+            MissingValue:
+              value:
+                errors:
+                  - code: "MISSING_VALUE"
+                    message: "CreateProductTeamIncomingParams.ods_code: field required"
       headers:
         Access-Control-Allow-Origin:
           schema:
