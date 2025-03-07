@@ -22,6 +22,7 @@ function _terraform() {
   account=$(_get_account_name "$AWS_ACCOUNT") || return 1
   workspace=$(_get_workspace_name "$account" "$lowercase_string") || return 1
   aws_account_id=$(_get_aws_account_id "$account" "$PROFILE_PREFIX" "$VERSION") || return 1
+  external_id=$(_get_external_id "$account")
 
   var_file=$(_get_workspace_vars_file "$account") || return 1
   scope=$(_get_terraform_scope "$TERRAFORM_SCOPE") || return 1
@@ -116,6 +117,7 @@ function _terraform_plan() {
       -var-file="$var_file" \
       -var "assume_account=${aws_account_id}" \
       -var "assume_role=${terraform_role_name}" \
+      -var "external_id=${external_id}" \
       -var "updated_date=${current_date}" \
       -var "expiration_date=${expiration_date}" \
       -var "lambdas=${lambdas}" \
@@ -128,6 +130,7 @@ function _terraform_plan() {
       -var-file="$var_file" \
       -var "assume_account=${aws_account_id}" \
       -var "assume_role=${terraform_role_name}" \
+      -var "external_id=${external_id}" \
       -var "updated_date=${current_date}" \
       -var "expiration_date=${expiration_date}" || return 1
   fi
@@ -157,6 +160,7 @@ function _terraform_destroy() {
     -var-file="$var_file" \
     -var "assume_account=${aws_account_id}" \
     -var "assume_role=${terraform_role_name}" \
+    -var "external_id=${external_id}" \
     -var "workspace_type=${workspace_type}" \
     -var "lambdas=${lambdas}" \
     -var "layers=${layers}" \
