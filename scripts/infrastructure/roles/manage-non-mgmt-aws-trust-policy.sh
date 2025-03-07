@@ -41,7 +41,7 @@ tf_assume_role_policy=$(_substitute_environment_variables ./scripts/infrastructu
 aws iam update-assume-role-policy --role-name NHSDeploymentRole --policy-document "${tf_assume_role_policy}"
 aws iam update-assume-role-policy --role-name NHSSmokeTestRole --policy-document "${tf_assume_role_policy}"
 
-if [ "$ENV" != "PROD" ]; then
+if [ "$ENV" != "prod" ]; then
   aws iam update-assume-role-policy --role-name NHSDevelopmentRole --policy-document "${tf_assume_role_policy}"
   aws iam update-assume-role-policy --role-name NHSTestCIRole --policy-document "${tf_assume_role_policy}"
 fi
