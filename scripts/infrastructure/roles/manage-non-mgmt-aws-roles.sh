@@ -32,11 +32,11 @@ else
   fi
 fi
 MGMT_ID_PARAMETER_STORE="nhse-cpm--${ENV}--mgmt-account-id-v1.0.0"
-
+EXTERNAL_ID_PARAMETER_STORE="${ENV}-external-id"
 if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" &> /dev/null; then
   # Secret exists, retrieve its value
   MGMT_ACCOUNT_ID=$(aws secretsmanager get-secret-value --secret-id "$MGMT_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" --query 'SecretString' --output text)
-
+  EXTERNAL_ID=$(aws secretsmanager get-secret-value --secret-id "$EXTERNAL_ID_PARAMETER_STORE" --region "$AWS_REGION_NAME" --query 'SecretString' --output text)
   #
   # Create the NHSDeploymentRole that will be used for deployment and CI/CD in All Deployment environments
   #

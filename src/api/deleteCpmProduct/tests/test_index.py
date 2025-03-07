@@ -102,6 +102,7 @@ def test_index():
         "name": PRODUCT_NAME,
         "ods_code": ODS_CODE,
         "cpm_product_team_id": product_team.id,
+        "product_team_id": CPM_PRODUCT_TEAM_NO_ID["keys"][0]["key_value"],
         "status": Status.INACTIVE,
         "keys": [],
     }
