@@ -61,3 +61,7 @@ resource "aws_secretsmanager_secret" "etl_notify_slack_webhook_url" {
 resource "aws_secretsmanager_secret" "apigee-sds-app-key" {
   name = "${terraform.workspace}-apigee-sds-app-key"
 }
+
+resource "aws_secretsmanager_secret" "external-id" {
+  name = "${terraform.workspace}-external-id"
+}
