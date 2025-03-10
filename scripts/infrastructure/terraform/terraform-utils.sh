@@ -78,6 +78,21 @@ function _get_aws_account_id() {
       --output text
 }
 
+function _get_external_id() {
+  local env=$1
+
+  if [[ -z "$env" ]]; then
+    env="dev"
+  fi
+
+  external_id_name="nhse-cpm--mgmt--${env}-external-id"
+
+  aws secretsmanager get-secret-value \
+    --secret-id "$external_id_name" \
+    --query SecretString \
+    --output text
+}
+
 function _get_workspace_vars_file() {
     local dir=$(pwd)
     local account=$1

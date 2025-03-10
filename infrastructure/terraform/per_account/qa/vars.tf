@@ -8,6 +8,8 @@ variable "assume_account" {
 
 variable "assume_role" {}
 
+variable "external_id" {}
+
 variable "environment" {}
 
 variable "expiration_date" {

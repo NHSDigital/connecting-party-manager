@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-03-07
+- [PI-383] External ID
+- [PI-838] product_team includes product_team_id
+
 ## 2025-03-05
 - [PI-833] Read product by productID
 - [PI-832] product_team_id as a key in product_team
