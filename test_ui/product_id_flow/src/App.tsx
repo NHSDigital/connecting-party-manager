@@ -3,22 +3,30 @@ import ProductCreationFlow from "./components/ProductCreationFlow";
 import ProductSearch from "./components/ProductSearchFlow";
 import ProductDelete from "./components/ProductDeleteFlow";
 import ProductTeamDelete from "./components/ProductDeleteTeamFlow";
+import ProductRead from "./components/ProductReadFlow";
 
 function App() {
   const [currentFlow, setCurrentFlow] = useState<
-    "creation" | "search" | "delete" | "deleteTeam" | null
+    | "creation"
+    | "searchProducts"
+    | "deleteProduct"
+    | "deleteTeam"
+    | "readProduct"
+    | null
   >(null);
 
   const renderFlow = () => {
     switch (currentFlow) {
       case "creation":
         return <ProductCreationFlow />;
-      case "search":
+      case "searchProducts":
         return <ProductSearch />;
-      case "delete":
+      case "deleteProduct":
         return <ProductDelete />;
       case "deleteTeam":
         return <ProductTeamDelete />;
+      case "readProduct":
+        return <ProductRead />;
       default:
         return (
           <div className="min-h-screen flex flex-col items-center justify-center">
@@ -34,13 +42,13 @@ function App() {
               </button>
               <button
                 className="nhs-button nhs-button-primary"
-                onClick={() => setCurrentFlow("search")}
+                onClick={() => setCurrentFlow("searchProducts")}
               >
                 Product Search Flow
               </button>
               <button
                 className="nhs-button nhs-button-primary"
-                onClick={() => setCurrentFlow("delete")}
+                onClick={() => setCurrentFlow("deleteProduct")}
               >
                 Product Delete Flow
               </button>
@@ -49,6 +57,12 @@ function App() {
                 onClick={() => setCurrentFlow("deleteTeam")}
               >
                 Product Team Delete Flow
+              </button>
+              <button
+                className="nhs-button nhs-button-primary"
+                onClick={() => setCurrentFlow("readProduct")}
+              >
+                Product Read Flow
               </button>
             </div>
           </div>
