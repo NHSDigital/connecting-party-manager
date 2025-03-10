@@ -36,11 +36,12 @@ Feature: Search Products - success scenarios
       | path | value            |
       | name | My Great Product |
     And I note the response field "$.id" as "product_id"
-    When I make a "GET" request with "default" headers to "Product?product_team_id=${ note(product_team_id) }"
+    When I make a "GET" request with "default" headers to "Product?product_team_id=<product_team_id>"
     Then I receive a status code "200" with body
       | path                                                     | value                                |
       | results.0.org_code                                       | F5H1R                                |
-      | results.0.product_teams.0.product_team_id                | ${ note(product_team_id) }           |
+      | results.0.product_teams.0.product_team_id                | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
+      | results.0.product_teams.0.cpm_product_team_id            | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.id                  | ${ note(product_id) }                |
       | results.0.product_teams.0.products.0.cpm_product_team_id | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.product_team_id     | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
@@ -54,7 +55,7 @@ Feature: Search Products - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 444              |
+      | Content-Length | 507              |
 
     Examples:
       | product_team_id                      |
@@ -77,7 +78,8 @@ Feature: Search Products - success scenarios
     Then I receive a status code "200" with body
       | path                                                     | value                                |
       | results.0.org_code                                       | F5H1R                                |
-      | results.0.product_teams.0.product_team_id                | ${ note(product_team_id) }           |
+      | results.0.product_teams.0.product_team_id                | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
+      | results.0.product_teams.0.cpm_product_team_id            | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.id                  | ${ note(product_id) }                |
       | results.0.product_teams.0.products.0.cpm_product_team_id | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.product_team_id     | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
@@ -91,7 +93,7 @@ Feature: Search Products - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 444              |
+      | Content-Length | 507              |
 
   Scenario Outline: Successfully search more than one Product with product team id or alias
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -117,7 +119,8 @@ Feature: Search Products - success scenarios
     Then I receive a status code "200" with body where ProductTeams has a length of "1" with "3" Products each
       | path                                                     | value                                |
       | results.0.org_code                                       | F5H1R                                |
-      | results.0.product_teams.0.product_team_id                | ${ note(product_team_id) }           |
+      | results.0.product_teams.0.product_team_id                | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
+      | results.0.product_teams.0.cpm_product_team_id            | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.id                  | ${ note(product_id_1) }              |
       | results.0.product_teams.0.products.0.cpm_product_team_id | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.product_team_id     | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
@@ -151,7 +154,7 @@ Feature: Search Products - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 1078             |
+      | Content-Length | 1141             |
 
     Examples:
       | product_team_id                      |
@@ -181,7 +184,8 @@ Feature: Search Products - success scenarios
     Then I receive a status code "200" with body where ProductTeams has a length of "2" with "2" Products each
       | path                                                     | value                        |
       | results.0.org_code                                       | F5H1R                        |
-      | results.0.product_teams.0.product_team_id                | ${ note(product_team_id_1) } |
+      | results.0.product_teams.0.product_team_id                | null                         |
+      | results.0.product_teams.0.cpm_product_team_id            | ${ note(product_team_id_1) } |
       | results.0.product_teams.0.products.0.id                  | ${ note(product_id_1) }      |
       | results.0.product_teams.0.products.0.cpm_product_team_id | ${ note(product_team_id_1) } |
       | results.0.product_teams.0.products.0.product_team_id     | null                         |
@@ -192,7 +196,8 @@ Feature: Search Products - success scenarios
       | results.0.product_teams.0.products.0.updated_on          | null                         |
       | results.0.product_teams.0.products.0.deleted_on          | null                         |
       | results.0.product_teams.0.products.0.keys                | []                           |
-      | results.0.product_teams.1.product_team_id                | ${ note(product_team_id_2) } |
+      | results.0.product_teams.1.product_team_id                | null                         |
+      | results.0.product_teams.1.cpm_product_team_id            | ${ note(product_team_id_2) } |
       | results.0.product_teams.1.products.0.id                  | ${ note(product_id_2) }      |
       | results.0.product_teams.1.products.0.cpm_product_team_id | ${ note(product_team_id_2) } |
       | results.0.product_teams.1.products.0.product_team_id     | null                         |
@@ -206,7 +211,7 @@ Feature: Search Products - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 769              |
+      | Content-Length | 827              |
 
   Scenario: Deleted Products not returned in search
     Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
@@ -233,7 +238,8 @@ Feature: Search Products - success scenarios
     Then I receive a status code "200" with body where ProductTeams has a length of "1" with "2" Products each
       | path                                                     | value                                |
       | results.0.org_code                                       | F5H1R                                |
-      | results.0.product_teams.0.product_team_id                | ${ note(product_team_id) }           |
+      | results.0.product_teams.0.product_team_id                | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
+      | results.0.product_teams.0.cpm_product_team_id            | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.id                  | ${ note(product_id_1) }              |
       | results.0.product_teams.0.products.0.cpm_product_team_id | ${ note(product_team_id) }           |
       | results.0.product_teams.0.products.0.product_team_id     | 808a36db-a52a-4130-b71e-d9cbcbaed15b |
@@ -257,4 +263,4 @@ Feature: Search Products - success scenarios
     And the response headers contain:
       | name           | value            |
       | Content-Type   | application/json |
-      | Content-Length | 762              |
+      | Content-Length | 825              |

@@ -100,6 +100,9 @@ function attach_product(){
     _product_name="connecting-party-manager--$_apigee_environment--$API_NAME--app-level0"
     _secret_name="$_aws_environment--apigee-app-client-info"
     _apigee_stage=$(get_apigee_stage ${_workspace_name})
+    external_id_secret_name="nhse-cpm--mgmt--${_aws_environment}-external-id"
+    external_id=$(aws secretsmanager get-secret-value --secret-id $external_id_secret_name --query SecretString --output text)
+
 
 
     echo "
@@ -118,7 +121,7 @@ function attach_product(){
     session_name="attach-product-session"
     duration_seconds=900
 
-    assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
+    assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --external-id "$external_id" --duration-seconds "$duration_seconds")
     # Check if the assume-role command was successful
     if [ $? -eq 0 ]; then
 
@@ -183,6 +186,8 @@ function detach_product(){
     _product_name="connecting-party-manager--$_apigee_environment--$API_NAME--app-level0"
     _secret_name="$_aws_environment--apigee-app-client-info"
     _apigee_stage=$(get_apigee_stage ${_workspace_name})
+    external_id_secret_name="nhse-cpm--mgmt--${_aws_environment}-external-id"
+    external_id=$(aws secretsmanager get-secret-value --secret-id $external_id_secret_name --query SecretString --output text)
 
 
     echo "
@@ -201,7 +206,7 @@ function detach_product(){
     session_name="attach-product-session"
     duration_seconds=900
 
-    assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
+    assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --external-id "$external_id" --duration-seconds "$duration_seconds")
     # Check if the assume-role command was successful
     if [ $? -eq 0 ]; then
 

@@ -27,7 +27,10 @@ function _destroy_corrupted_workspace() {
     role_arn="arn:aws:iam::${dev_acct}:role/${TERRAFORM_ROLE_NAME}"
     session_name="resource-search-session"
     duration_seconds=900
-    assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --duration-seconds "$duration_seconds")
+    external_id_secret_name="nhse-cpm--mgmt--${ENV}-external-id"
+    external_id=$(aws secretsmanager get-secret-value --secret-id $external_id_secret_name --query SecretString --output text)
+
+    assume_role_output=$(aws sts assume-role --role-arn "$role_arn" --role-session-name "$session_name" --external-id "$external_id" --duration-seconds "$duration_seconds")
 
     # Check if the assume-role command was successful
     if [ $? -eq 0 ]; then
