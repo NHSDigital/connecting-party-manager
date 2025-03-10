@@ -30,6 +30,16 @@ components:
             errors:
               - code: "RESOURCE_NOT_FOUND"
                 message: "Could not find <ENTITY> for key ('<ID>')"
+    ProductTeamNotFound:
+      description: Product Team has not been found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            errors:
+              - code: "RESOURCE_NOT_FOUND"
+                message: "Could not find ProductTeam for key ('f9518c12-6c83-4544-97db-d9dd1d64da97')"
     Conflict:
       description: Conflict
       content:
@@ -103,6 +113,33 @@ components:
                 errors:
                   - code: "MISSING_VALUE"
                     message: "CreateProductTeamIncomingParams.ods_code: field required"
+    CreateProductBadRequest:
+      description: createProduct Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            MissingValue:
+              value:
+                errors:
+                  - code: "MISSING_VALUE"
+                    message: "CreateCpmProductIncomingParams.name: field required"
+            ExtraFieldsValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "CreateCpmProductIncomingParams.extra_name: extra fields not permitted"
+            EmptyValueValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "CreateCpmProductIncomingParams.name: ensure this value has at least 1 characters"
+            InvalidJSONValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "Invalid JSON body was provided: line 1 column 20 (char 19)"
       headers:
         Access-Control-Allow-Origin:
           schema:
