@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-03-10
+- [PI-387] Add Product Team Id to search results
+- [PI-843] Ad Read Product to test UI
+
 ## 2025-03-07
 - [PI-383] External ID
 - [PI-838] product_team includes product_team_id
