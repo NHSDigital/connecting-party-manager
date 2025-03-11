@@ -29,7 +29,8 @@ JSON
 
 
 resource "aws_secretsmanager_secret" "source-account-id-for-backup" {
-  name = "${terraform.workspace}-source-account-id-for-backup"
+  name        = "${terraform.workspace}-source-account-id"
+  description = "ID of the account we want to backup"
 }
 
 
