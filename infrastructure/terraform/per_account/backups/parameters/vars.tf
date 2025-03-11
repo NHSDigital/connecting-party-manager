@@ -27,3 +27,5 @@ variable "workspace_type" {
   type    = string
   default = "PERSISTENT"
 }
+
+variable "external_id" {}

@@ -31,3 +31,8 @@ JSON
 resource "aws_secretsmanager_secret" "source-account-id-for-backup" {
   name = "${terraform.workspace}-source-account-id-for-backup"
 }
+
+
+resource "aws_secretsmanager_secret" "external-id" {
+  name = "${terraform.workspace}-external-id"
+}
