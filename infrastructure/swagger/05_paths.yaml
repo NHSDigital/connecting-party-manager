@@ -29,8 +29,6 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/StatusOK"
-        "404":
-          $ref: "#/components/responses/NotFound"
       parameters:
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
@@ -424,7 +422,7 @@ paths:
         "200":
           $ref: "#/components/responses/ProductDelete"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductDeleteNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_deleteCpmProduct}
