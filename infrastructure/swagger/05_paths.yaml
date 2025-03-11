@@ -29,6 +29,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/StatusOK"
+        "404":
+          description: _status not found
       parameters:
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
