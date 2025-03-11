@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-03-10
+- [PI-387] Add Product Team Id to search results
+- [PI-843] Add Read Product to test UI
+- [PI-764] Refine Swagger
+
 ## 2025-03-07
 - [PI-383] External ID
 - [PI-838] product_team includes product_team_id

@@ -19,18 +19,20 @@ class SearchProductResponse(SearchResponse[dict]):
 
         for product in product_dicts:
             org_code = product["ods_code"]
-            team_id = product["cpm_product_team_id"]
+            product_team_id = product["product_team_id"]
+            cpm_team_id = product["cpm_product_team_id"]
 
             if org_code not in organisations:
                 organisations[org_code] = {"org_code": org_code, "product_teams": {}}
 
-            if team_id not in organisations[org_code]["product_teams"]:
-                organisations[org_code]["product_teams"][team_id] = {
-                    "product_team_id": team_id,
+            if cpm_team_id not in organisations[org_code]["product_teams"]:
+                organisations[org_code]["product_teams"][cpm_team_id] = {
+                    "product_team_id": product_team_id,
+                    "cpm_product_team_id": cpm_team_id,
                     "products": [],
                 }
 
-            organisations[org_code]["product_teams"][team_id]["products"].append(
+            organisations[org_code]["product_teams"][cpm_team_id]["products"].append(
                 product
             )
 
@@ -41,7 +43,7 @@ class SearchProductResponse(SearchResponse[dict]):
                     "org_code": org["org_code"],
                     "product_teams": sorted(
                         list(org["product_teams"].values()),
-                        key=lambda team: team["product_team_id"],
+                        key=lambda team: team["cpm_product_team_id"],
                     ),
                 }
                 for org in organisations.values()

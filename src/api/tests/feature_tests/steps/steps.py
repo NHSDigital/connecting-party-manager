@@ -235,11 +235,11 @@ def then_response(
     # Sort product teams by "product_team_id"
     expected_body["results"][0]["product_teams"] = sorted(
         expected_body["results"][0]["product_teams"],
-        key=lambda team: team["product_team_id"],
+        key=lambda team: team["cpm_product_team_id"],
     )
     response_body["results"][0]["product_teams"] = sorted(
         response_body["results"][0]["product_teams"],
-        key=lambda team: team["product_team_id"],
+        key=lambda team: team["cpm_product_team_id"],
     )
 
     # Sort products inside each product team by "id"

@@ -30,7 +30,7 @@ paths:
         "200":
           $ref: "#/components/responses/StatusOK"
         "404":
-          $ref: "#/components/responses/NotFound"
+          description: _status not found
       parameters:
         - $ref: "#/components/parameters/HeaderVersion"
         - $ref: "#/components/parameters/HeaderRequestId"
@@ -128,7 +128,7 @@ paths:
         "200":
           $ref: "#/components/responses/CPMProductTeamRead"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductTeamNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readProductTeam}
@@ -151,7 +151,7 @@ paths:
         "200":
           $ref: "#/components/responses/CpmProductTeamDelete"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductTeamNotFound"
         "409":
           $ref: "#/components/responses/Conflict"
       x-amazon-apigateway-integration:
@@ -225,9 +225,9 @@ paths:
         "201":
           $ref: "#/components/responses/ProductCreate"
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductBadRequest"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductTeamNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_createCpmProduct}
@@ -356,7 +356,7 @@ paths:
         "200":
           $ref: "#/components/responses/ProductRead"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readCpmProduct}
@@ -424,7 +424,7 @@ paths:
         "200":
           $ref: "#/components/responses/ProductDelete"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductDeleteNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_deleteCpmProduct}
