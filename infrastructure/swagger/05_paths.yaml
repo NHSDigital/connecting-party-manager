@@ -171,7 +171,7 @@ paths:
         - $ref: "#/components/parameters/ProductTeamId"
       responses:
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductBadRequest"
         "200":
           description: "200 response"
           headers:
@@ -243,7 +243,7 @@ paths:
         - Options
       responses:
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/SearchProductBadRequest"
         "200":
           description: "200 response"
           headers:
@@ -307,8 +307,6 @@ paths:
       tags:
         - Options
       responses:
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "200":
           description: "200 response"
           headers:
@@ -374,8 +372,6 @@ paths:
       tags:
         - Options
       responses:
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "200":
           description: "200 response"
           headers:

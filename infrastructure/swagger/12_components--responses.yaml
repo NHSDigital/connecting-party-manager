@@ -67,25 +67,6 @@ components:
             errors:
               - code: "CONFLICT"
                 message: "Product Team cannot be deleted as it still has associated Product Ids ['P.1X3-XYZ', 'P.4Y6-ABC']"
-    BadRequest:
-      description: Bad request (multiple error types)
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorResponse"
-          examples:
-            MissingValue:
-              value:
-                errors:
-                  - code: "MISSING_VALUE"
-                    message: "<MISSING_FIELD>: field required"
-                  - code: "MISSING_VALUE"
-                    message: "Failed to validate data against '<QUESTIONNAIRE>': '<MISSING_FIELD>' is a required property"
-            ValidationError:
-              value:
-                errors:
-                  - code: "VALIDATION_ERROR"
-                    message: "Item already exists"
     SearchProductBadRequest:
       description: searchProduct Bad request
       content:
@@ -93,11 +74,16 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
           examples:
-            ValidationError:
+            MissingParamValidationError:
               value:
                 errors:
                   - code: "VALIDATION_ERROR"
                     message: "SearchProductQueryParams.__root__: Please provide exactly one valid query parameter: {'product_team_id', 'organisation_code'}."
+            UnknownParamValidationError:
+              value:
+                errors:
+                  - code: "VALIDATION_ERROR"
+                    message: "SearchProductQueryParams.foo: extra fields not permitted"
     CreateProductTeamBadRequest:
       description: createProductTeam Bad request
       content:
