@@ -40,6 +40,16 @@ components:
             errors:
               - code: "RESOURCE_NOT_FOUND"
                 message: "Could not find ProductTeam for key ('f9518c12-6c83-4544-97db-d9dd1d64da97')"
+    ProductNotFound:
+      description: Product has not been found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            errors:
+              - code: "RESOURCE_NOT_FOUND"
+                message: "Could not find CpmProduct for key ('P.XXX-YYY')"
     Conflict:
       description: Conflict
       content:

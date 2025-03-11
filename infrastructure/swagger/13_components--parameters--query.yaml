@@ -5,7 +5,7 @@ components:
       name: product_team_id
       in: query
       required: false
-      description: The ID of the product team to filter results by.
+      description: Product Team identifier to filter results by. Either the "internally" generated id (cpm_product_team_id) or the provided team id (product_team_id)
       schema:
         type: string
     OrganisationCodeQuery:

@@ -356,7 +356,7 @@ paths:
         "200":
           $ref: "#/components/responses/ProductRead"
         "404":
-          $ref: "#/components/responses/NotFound"
+          $ref: "#/components/responses/ProductNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
         uri: ${method_readCpmProduct}
