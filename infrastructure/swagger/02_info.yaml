@@ -12,23 +12,32 @@ info:
   description: |
     ## Overview
 
-    API to configure internal systems to allow a Connecting Party to connect. A source of information about Connecting Parties (systems that connect to NHSE) that helps provide system identity attributes that ensure NHSE services know what systems they are connecting to and the legal entities they are sharing data with. This service is driven by APIs that enable self-service for activities such as certificate management and environment access. It also is a store of end-to-end onboarding/integration data and a catalogue of endpoints.
+    Use this API to access the Connecting Party Manager (CPM) service - an internal service for the creation and management of product IDs.
+
+    This API only has a single access mode, application-restricted - signed JWT authentication, through which you may:
+
+    * Create a product team
+    * Create a product
+    * Retrieve details about a product team
+    * Retrieve details about a product
+    * Retrieve a list of all products associated wit a team or all products associated with an organisation, grouped by product team
+    * Delete a product team
+    * Delete a product
 
     ## Who can use this API
 
-    This API can only be used where there is a legal basis to do so. Make sure you have a valid use case before you go too far with your development. You must demonstrate you have a valid use case as part of digital onboarding. Connecting Parties must have an appointed Clinical Safety Officer and undertake a Clinical Safety Assessment.
+    Currently this API is for [internal use only](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
 
     ## API status and roadmap
 
-    This API is in [development](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#statuses).
+    This API is in development, meaning:
 
-    To see our roadmap, or to suggest, comment or vote on features for this API, see our interactive [product backlog](https://nhs-digital-api-management.featureupvote.com/).
-
-    If you have any other queries, [contact us](https://digital.nhs.uk/developer/help-and-support).
+    * it is available for testing in the integration environment
+    * we expect to make breaking changes based on developer feedback
 
     ## Service level
 
-    This API is a platinum service, meaning it is operational and supported 24 hours a day, 365 days a year.
+    This API is a bronze service, meaning it is operational and supported only during business hours (8 am to 6 pm), Monday to Friday excluding bank holidays.
 
     For more details, see [service levels](https://digital.nhs.uk/developer/guides-and-documentation/reference-guide#service-levels).
 
@@ -96,28 +105,7 @@ info:
 
     ## Onboarding
 
-    You need to get your software approved by us before it can go live with this API. We call this onboarding. The onboarding process can sometimes be quite long, so it’s worth planning well ahead.
-
-    As part of this process, you need to demonstrate that you can manage risks and that your software conforms technically with the requirements for this API.
-
-    Information on this page might impact the design of your software. For details, see [Onboarding support information](https://digital.nhs.uk/developer/api-catalogue/national-record-locator-consumer-fhir/onboarding-support-information).
-
-    To understand how our online digital onboarding process works, see [digital onboarding](https://digital.nhs.uk/developer/guides-and-documentation/digital-onboarding#using-the-digital-onboarding-portal).
-
-    <div class="nhsd-m-emphasis-box nhsd-m-emphasis-box--emphasis nhsd-!t-margin-bottom-6" aria-label="Highlighted Information">
-        <div class="nhsd-a-box nhsd-a-box--border-blue">
-            <div class="nhsd-m-emphasis-box__image-box">
-                <figure class="nhsd-a-image">
-                    <picture class="nhsd-a-image__picture">
-                        <img src="http://digital.nhs.uk/binaries/content/gallery/icons/play-circle.svg?colour=231f20" alt="" style="object-fit:fill">
-                    </picture>
-                </figure>
-            </div>
-            <div class="nhsd-m-emphasis-box__content-box">
-                <div data-uipath="website.contentblock.emphasis.content" class="nhsd-t-word-break"><p class="nhsd-t-body">To get started, sign in or create a <a href="http://onboarding.prod.api.platform.nhs.uk/">developer account</a>, then select 'product onboarding'.</p></div>
-            </div>
-        </div>
-    </div>
+    This API is not yet available for onboarding.
 
     ## Change log
 
