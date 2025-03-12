@@ -171,7 +171,7 @@ paths:
         - $ref: "#/components/parameters/ProductTeamId"
       responses:
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/CreateProductBadRequest"
         "200":
           description: "200 response"
           headers:
@@ -243,7 +243,7 @@ paths:
         - Options
       responses:
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "#/components/responses/SearchProductBadRequest"
         "200":
           description: "200 response"
           headers:
@@ -307,8 +307,6 @@ paths:
       tags:
         - Options
       responses:
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "200":
           description: "200 response"
           headers:
@@ -325,6 +323,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Empty"
+        "400":
+          description: "400 response"
       x-amazon-apigateway-integration:
         responses:
           default:
@@ -374,8 +374,6 @@ paths:
       tags:
         - Options
       responses:
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "200":
           description: "200 response"
           headers:
@@ -392,6 +390,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Empty"
+        "404":
+          description: "404 response"
       x-amazon-apigateway-integration:
         responses:
           default:
