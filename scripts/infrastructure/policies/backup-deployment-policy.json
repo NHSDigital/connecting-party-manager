@@ -44,7 +44,9 @@
         "iam:GetPolicy",
         "iam:GetPolicyVersion",
         "iam:ListPolicyVersions",
-        "iam:DeletePolicy"
+        "iam:DeletePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion"
       ],
       "Resource": ["arn:aws:iam::${ACCOUNT_ID}:policy/*"]
     },
@@ -57,6 +59,36 @@
         "iam:DetachRolePolicy"
       ],
       "Resource": ["arn:aws:iam::${ACCOUNT_ID}:role/*"]
+    },
+    {
+      "Sid": "ParameterPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:eu-west-2:${ACCOUNT_ID}:secret:backups-source-account-id-*",
+        "arn:aws:secretsmanager:eu-west-2:${ACCOUNT_ID}:secret:backups-external-id-*"
+      ]
+    },
+    {
+      "Sid": "KMSPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "kms:TagResource",
+        "kms:EnableKeyRotation",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:ListResourceTags",
+        "kms:ScheduleKeyDeletion",
+        "kms:CreateKey"
+      ],
+      "Resource": ["arn:aws:kms:eu-west-2:${ACCOUNT_ID}:key/*"]
     }
   ]
 }

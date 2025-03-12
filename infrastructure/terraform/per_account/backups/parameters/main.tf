@@ -33,7 +33,6 @@ resource "aws_secretsmanager_secret" "source-account-id-for-backup" {
   description = "ID of the account we want to backup"
 }
 
-
 resource "aws_secretsmanager_secret" "external-id" {
   name = "${terraform.workspace}-external-id"
 }
