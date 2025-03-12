@@ -19,8 +19,8 @@
    3. [Response models](#response-models)
    4. [Request models](#request-models)
 4. [Workflow](#workflow)
-5. [Swagger](#swagger)
-6. [ETL](#etl)
+5. [Deployment](#deployment)
+6. [Swagger](#swagger)
 7. [Administration](#administration)
 
 ---
@@ -360,6 +360,34 @@ This command will also:
 - Update the version in `pyproject.toml` with the release branch version.
 - Update the VERSION file with the release branch version number.
 
+## Deployment
+
+### Create a Release branch
+
+When requested by QA
+
+- Create a release branch using the make command described in the previous section
+- Create a new changelog file with the correct date in the changelog directory. (Follow the patterns used in previous files.)
+- merge the required branches through the command line into the release branch. i.e. `git merge origin/feature/PI-123-A_branch_for_qa`
+- commit and push the release branch to github and create a PR.
+- Use the workflow on the #platforms-connecting-party-manager Slack channel to notify of the new release branch.
+
+### After QA has approved the changes
+
+QA should approve the release branch PR and notify developers on the #platforms-connecting-party-manager slack channel of a request to merge the release branch.
+
+- Merge the release branch within the github UI. This will merge the release and close any feature branches that are associated with it.
+- Reply to the QA notification on slack that its has been merged and to rebase. Make sure this reply also appears on the main feed. `Merged, rebase rebase :alert:` is usually enough.
+- Now we need to deploy to all environments.
+- In the github UI, navigate to the actions tab Select `Deploy: Workspace - Nonprod` and select the dropdown `Run workflow`
+- Select the `Tag` to deploy (This is the release branch that has just been merged.)
+- Select the Account to deploy to as well as if it should be the sandbox or not.
+- You must do this for all the environments.
+- Now navigate to the `Deploy: Workspace - Production` on the left
+- Run workflow. Select the Tag to deploy and Run.
+- In production you will need to approve the deployment once the terraform plan has run. All other environments will deploy until finish without any user interaction.
+- Once all environments are deployed successfully you can move any Jira tickets to "Done"
+
 ## Swagger
 
 This is all done by `make build`. For more details on how to update the Swagger, please see [the swagger README](infrastructure/swagger/README.md).
@@ -379,52 +407,6 @@ If you find yourself with a locked terraform state, do:
 
 ```
 make terraform--unlock TERRAFORM_ARGS=<lock_id>
-```
-
-## ETL
-
-### Debugging the state after changelog errors
-
-In order to get the latest head state of the ETL, do either (for your developer workspace)
-
-```
-make etl--head-state--developer
-```
-
-or for a persistent workspace (`dev`, `prod`, etc):
-
-```
-make etl--head-state--persistent-workspace WORKSPACE=<workspace_name>
-```
-
-For the developer operation, the script will automatically activate via SSO, however for the persistent-workspace
-operation you will need to export credentials by navigating yourself to the SSO login page and exporting the
-credentials for the workspace into your terminal.
-
-### Clearing the state (don't take this lightly, intended for first time bulk upload only)
-
-Before running the bulk trigger, you need to clear the initial ETL state, do:
-
-```
-make etl--clear-state
-```
-
-Before running the changelog trigger you additionally need to specify a changelog number (ideally close to the true latest changelog number, otherwise the logs will be pretty heavy!)
-
-```
-make etl--clear-state SET_CHANGELOG_NUMBER=540210
-```
-
-You can additionally set the workspace name if you want to clear the state for a given (e.g. persistent) workspace name:
-
-```
-make etl--clear-state WORKSPACE=dev
-```
-
-and
-
-```
-make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210
 ```
 
 ## Administration
