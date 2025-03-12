@@ -33,7 +33,6 @@ function _terraform() {
   current_date=$(_get_current_date) || return 1
   layers=$(_get_layer_list) || return 1
   third_party_layers=$(_get_third_party_layer_list) || return 1
-  echo $third_party_layers
   lambdas=$(_get_lambda_list) || return 1
   login_account=$(_get_account_full_name) || return 1
   local plan_file="./tfplan"
@@ -51,7 +50,7 @@ function _terraform() {
         workspace_expiration ${workspace_expiration}
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
-    "
+            "
   fi
 
   if [[ "${login_account}" != "NHS Digital Spine Core CPM MGMT" ]]; then

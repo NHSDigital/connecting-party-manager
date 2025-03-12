@@ -33,5 +33,3 @@ module "billing_alarms" {
   limit       = var.budget_limit
   environment = terraform.workspace
 }
-
-# make a secret for source account id
