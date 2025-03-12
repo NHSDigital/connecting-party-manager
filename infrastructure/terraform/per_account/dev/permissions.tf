@@ -23,6 +23,7 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:DeleteFramework",
           "backup:DescribeFramework",
           "backup:ListFrameworks",
+          "backup:UpdateFramework",
           "backup:CreateBackupVault",
           "backup:DeleteBackupVault",
           "backup:DescribeBackupVault",
