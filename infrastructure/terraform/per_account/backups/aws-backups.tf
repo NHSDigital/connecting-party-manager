@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 data "aws_secretsmanager_secret" "source_account_id" {
   name = "backups-source-account-id"
 }
@@ -8,9 +6,6 @@ data "aws_secretsmanager_secret_version" "source_account_id" {
   secret_id = data.aws_secretsmanager_secret.source_account_id.id
 }
 
-output "account_id" {
-  value = data.aws_caller_identity.current.account_id
-}
 
 # We need a key for the backup vaults. This key will be used to encrypt the backups themselves.
 # We need one per vault (on the assumption that each vault will be in a different account).
@@ -24,7 +19,7 @@ module "destination" {
   source = "../../modules/aws-backup-destination"
 
   source_account_name     = "test" # please note that the assigned value would be the prefix in aws_backup_vault.vault.name - change to dev/prod
-  account_id              = data.aws_caller_identity.current.account_id
+  account_id              = var.assume_account
   source_account_id       = data.aws_secretsmanager_secret_version.source_account_id.secret_string
   kms_key                 = aws_kms_key.destination_backup_key.arn
   enable_vault_protection = false
