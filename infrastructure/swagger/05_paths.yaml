@@ -122,6 +122,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
@@ -145,6 +147,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
@@ -284,6 +288,8 @@ paths:
         - $ref: "#/components/parameters/ProductTeamIdQuery"
         - $ref: "#/components/parameters/OrganisationCodeQuery"
         - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
@@ -350,6 +356,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProductId"
         - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:
@@ -418,6 +426,8 @@ paths:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
         - $ref: "#/components/parameters/HeaderVersion"
+        - $ref: "#/components/parameters/HeaderAuthorization"
+        - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
       responses:

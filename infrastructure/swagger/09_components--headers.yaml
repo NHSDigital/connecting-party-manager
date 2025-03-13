@@ -22,10 +22,12 @@ components:
     HeaderAuthorization:
       in: header
       name: authorization
+      required: true
       schema:
         $ref: "#/components/schemas/HeaderAuthorization"
     HeaderApikey:
       in: header
       name: apikey
+      required: true
       schema:
         $ref: "#/components/schemas/HeaderApikey"
