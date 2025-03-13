@@ -4,6 +4,11 @@
 
 ## Table of Contents
 
+1. [TLDR](#tldr)
+   1. [Requirements](#requirements)
+   2. [Building a local environment](#building-a-local-environment)
+   3. [Testing](#testing)
+   4. [Destroying a local environment](#destroying-a-local-environment)
 1. [Setup](#setup)
    1. [Prerequisites](#prerequisites)
    2. [Useful tools](#useful-tools)
@@ -11,26 +16,68 @@
    4. [Proxygen](#proxygen)
    5. [Temporary Proxies](#temporary-proxies)
    6. [AWS SSO Setup](#aws-sso-setup)
-   7. [Other helpful commands](#other-helpful-commands)
-2. [Tests](#tests)
+   7. [Build a local workspace on AWS (DEV)](#build-a-local-workspace-on-aws-dev)
+   8. [Build a local workspace on AWS (QA)](#build-a-local-workspace-on-aws-qa)
+   9. [Destroy a local workspace on AWS](#destroy-a-local-workspace-on-aws)
+   10. [Automated workspace destroys](#automated-workspace-destroys)
+   11. [Destroy Expired Workspaces](#destroy-expired-workspaces)
+   12. [Destroy Redundant Workspaces](#destroy-redundant-workspaces)
+   13. [Destroy Corrupted Workspaces](#destroy-corrupted-workspaces)
+   14. [Updating Roles](#updating-roles)
+   15. [Other helpful commands](#other-helpful-commands)
+1. [Tests](#tests)
    1. [pytest tests](#pytest-tests)
    2. [End-to-End feature tests](#end-to-end-feature-tests)
-   3. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
-3. [Data modelling](#data-modelling)
+   3. [Local](#local)
+   4. [Integration](#integration)
+   5. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
+1. [Data modelling](#data-modelling)
    1. [Domain models](#domain-models)
    2. [Database models](#database-models)
    3. [Response models](#response-models)
    4. [Request models](#request-models)
-4. [Workflow](#workflow)
-5. [Deployment](#deployment)
-6. [Swagger](#swagger)
-7. [Administration](#administration)
+1. [Workflow](#workflow)
+1. [Deployment](#deployment)
+1. [Swagger](#swagger)
+1. [Setting Lamba permissions](#setting-lambda-permissions)
+1. [Terraform](#terraform)
+1. [Administration](#administration)
+1. [SBOM](#sbom)
+1. [Extras](#extras)
+   1. [Archive](#archive)
 
 ---
 
-## TL;DR
+## TLDR
 
-If you don't want to read this entire README that a lot of love and care has gone into and you just want to get up and running then this is the section for you.
+If you want to get up and running as quickly as possible then read this section. However it is advisable to read the full README when possible.
+
+### Requirements
+
+- Ensure you have `AWS SSO` setup. For more information please read the [AWS SSO Setup](#aws-sso-setup) section.
+- Ensure you have `asdf` installed and the `docker engine` running. For more information please read the [Setup](#setup) section.
+
+### Building a local environment
+
+- Inside the connecting party manager root directory, run...
+- `make terraform--apply`
+- For more information please read the [Build a local workspace on AWS (DEV)](#build-a-local-workspace-on-aws-dev) section.
+
+### Testing
+
+- Inside the connecting party manager root directory, run any of the following commands...
+- `make test--unit`
+- `make test--integration`
+- `make test--feature--local`
+- `make test--feature--integration`
+- `make test--smoke`
+
+### Destroying a local environment
+
+- Provided you haven't changed the workspace name, then.
+- Inside the connecting party manager root directory, run...
+- `make terraform--destroy`
+- For more information please read the [Destroy a local workspace on AWS](#destroy-a-local-workspace-on-aws) section.
 
 ## Setup
 
@@ -38,7 +85,7 @@ If you don't want to read this entire README that a lot of love and care has gon
 
 We use `asdf` to fetch the required versions of prerequisite libraries instead of your system's default version. To get it up and running go to <https://asdf-vm.com/guide/getting-started.html>. You can check it installed properly by using the command `asdf --version`.
 
-However, you will also need to install the `docker engine` separately
+You will also need to install the `docker engine` separately
 
 Additionally you will need `wget` (doing `which wget` will return blank if not installed). Please Google "how to install wget on my operating system", if you don't already have this installed.
 
@@ -48,9 +95,9 @@ Otherwise `asdf` should do the work for you.
 
 ### Useful tools
 
-`VScode` is useful and we have a workspace file setup to allow easy integration
+`VScode` is a useful IDE and we have a workspace file setup to allow easy integration
 
-`Postman` &/or `Newman` Feature tests create a postman.collection which can be used for manual testing.
+`Postman` &/or `Newman`. Feature tests create a postman.collection which can be used for manual testing.
 
 ### Project build
 
@@ -68,7 +115,7 @@ We use [Proxygen](https://github.com/NHSDigital/proxygen-cli) to deploy our prox
 
 - `make apigee--deploy`
 
-This when run locally will need you to have done a local `terraform--plan` and `terraform--apply` (as it will read some details from the output files)
+When you run this locally you will need to have done a local `terraform--plan` and `terraform--apply` (as it will read some details from the output files)
 
 Caveats
 
@@ -124,7 +171,7 @@ This is the preferred method of switching between profiles, as it will cause the
 
 You can build a working copy of the CPM service in your own workspace within the `dev` environment. To do this follow these steps. (You must have SSO setup on your system and have MGMT admin access)
 
-You must pass a `TERRAFORM_WORKSPACE` variable to each command in the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`. This variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
+Your workspace will build with an 8 digit hash of your system username by default. Therefore you do not need to provide a workspace name, however, if you would like to give your workspace a specific name then you must pass a `TERRAFORM_WORKSPACE` variable to each command. It is recommended that you use the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`, but it will accept any name, however this variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
 
 ```shell
 make terraform--init TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
@@ -205,13 +252,13 @@ Run `make` to get a list of helpful commands.
 
 ### `pytest` tests
 
-There are four types of `pytest` in this project:
+There are three types of `pytest` in this project:
 
 - Unit: these _do not have_ any `@pytest.mark` markers;
 - Integration: these have `@pytest.mark.integration` markers;
 - Smoke: these have `@pytest.mark.smoke` markers;
 
-In order to run these you can do one of::
+In order to run these you can do one of:
 
 ```shell
 make test--unit
@@ -310,7 +357,7 @@ The table is structured as below. (For purposes of clarity extra "entity specifi
 | PT#12345  | P#P.123-XYZ |      product       | P.123-XYZ |   A product    | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active | P#P.123-XYZ | P#P.123-XYZ | ORG#AB123 | P#P.123-XYZ | true  |
 | PT#FOOBAR |  PT#FOOBAR  | product_team_alias |   12345   | A Product Team | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active |  PT#FOOBAR  |  PT#FOOBAR  |   NULL    |    NULL     | false |
 
-Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object, that is of type product_team_alias_id,
+Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For a key in an domain object, that is of type product_team_id,
 a copy is made in the database with the index being that key, rather
 than the object's identifier. Such copies are referred to as non-root
 objects, whereas the "original" (indexed by identifier) is referred to
@@ -440,7 +487,9 @@ We also have a confluence page
 
 `https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Swagger+Docs`
 
-In time we will also have our spec uploaded to bloomreach via proxygen
+The Spec is also available on the NHS API Catalogue.
+
+`https://digital.nhs.uk/developer/api-catalogue/connecting-party-manager/content`
 
 ## SBOM (Service Bill of Materials)
 
