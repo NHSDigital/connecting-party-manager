@@ -6,9 +6,12 @@
 
 1. [Setup](#setup)
    1. [Prerequisites](#prerequisites)
-   2. [Project build](#project-build)
-   3. [AWS SSO Setup](#aws-sso-setup)
-   4. [Other helpful commands](#other-helpful-commands)
+   2. [Useful tools](#useful-tools)
+   3. [Project build](#project-build)
+   4. [Proxygen](#proxygen)
+   5. [Temporary Proxies](#temporary-proxies)
+   6. [AWS SSO Setup](#aws-sso-setup)
+   7. [Other helpful commands](#other-helpful-commands)
 2. [Tests](#tests)
    1. [pytest tests](#pytest-tests)
    2. [End-to-End feature tests](#end-to-end-feature-tests)
@@ -24,6 +27,10 @@
 7. [Administration](#administration)
 
 ---
+
+## TL;DR
+
+If you don't want to read this entire README that a lot of love and care has gone into and you just want to get up and running then this is the section for you.
 
 ## Setup
 
