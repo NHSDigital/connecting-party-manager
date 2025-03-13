@@ -82,7 +82,7 @@ module "source" {
   bootstrap_kms_key_arn        = aws_kms_key.backup_notifications.arn
   project_name                 = local.project
   reports_bucket               = aws_s3_bucket.backup_reports.bucket
-  terraform_role_arn           = var.assume_role
+  terraform_role_arn           = join(",", var.assume_role)
 
   backup_plan_config = {
     "compliance_resource_types" : [
