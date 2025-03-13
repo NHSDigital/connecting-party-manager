@@ -14,17 +14,17 @@
    2. [Useful tools](#useful-tools)
    3. [Project build](#project-build)
    4. [Proxygen](#proxygen)
-   5. [Temporary Proxies](#temporary-proxies)
-   6. [AWS SSO Setup](#aws-sso-setup)
-   7. [Build a local workspace on AWS (DEV)](#build-a-local-workspace-on-aws-dev)
-   8. [Build a local workspace on AWS (QA)](#build-a-local-workspace-on-aws-qa)
-   9. [Destroy a local workspace on AWS](#destroy-a-local-workspace-on-aws)
-   10. [Automated workspace destroys](#automated-workspace-destroys)
-   11. [Destroy Expired Workspaces](#destroy-expired-workspaces)
-   12. [Destroy Redundant Workspaces](#destroy-redundant-workspaces)
-   13. [Destroy Corrupted Workspaces](#destroy-corrupted-workspaces)
-   14. [Updating Roles](#updating-roles)
-   15. [Other helpful commands](#other-helpful-commands)
+      1. [Temporary Proxies](#temporary-proxies)
+   5. [AWS SSO Setup](#aws-sso-setup)
+   6. [Build a local workspace on AWS (DEV)](#build-a-local-workspace-on-aws-dev)
+   7. [Build a local workspace on AWS (QA)](#build-a-local-workspace-on-aws-qa)
+   8. [Destroy a local workspace on AWS](#destroy-a-local-workspace-on-aws)
+   9. [Automated workspace destroys](#automated-workspace-destroys)
+   10. [Destroy Expired Workspaces](#destroy-expired-workspaces)
+   11. [Destroy Redundant Workspaces](#destroy-redundant-workspaces)
+   12. [Destroy Corrupted Workspaces](#destroy-corrupted-workspaces)
+   13. [Updating Roles](#updating-roles)
+   14. [Other helpful commands](#other-helpful-commands)
 1. [Tests](#tests)
    1. [pytest tests](#pytest-tests)
    2. [End-to-End feature tests](#end-to-end-feature-tests)
@@ -341,7 +341,39 @@ Modelling in Connecting Party Manager is split into four partially-decoupled com
 
 ### Domain models
 
-TBC
+We have two Domain models, ProductTeam and Product.
+
+```
+class ProductTeam()
+    id: str
+    name: str
+    ods_code: str
+    status: enum(ACTIVE, INACTIVE)
+    created_on: datetime
+    updated_on: datetime
+    deleted_on: datetime
+    keys: list[{
+      key_type: str,
+      key_value: uuid
+    }]
+```
+
+```
+class CpmProduct(AggregateRoot):
+    id: str
+    cpm_product_team_id: str
+    product_team_id: str
+    name: str
+    ods_code: str
+    status: enum(ACTIVE, INACTIVE)
+    created_on: datetime
+    updated_on: datetime
+    deleted_on: datetime
+    keys: list[{
+      key_type: str,
+      key_value: str
+    }]
+```
 
 ### Database models
 
@@ -371,11 +403,11 @@ A `read` and `search` is available on all `Repository` patterns (almost) for fre
 
 ### Response models
 
-TBC
+For all response models please refer to the Swagger/OAS spec
 
 ### Request models
 
-TBC
+For all request models please refer to the Swagger/OAS spec
 
 ## Workflow
 
