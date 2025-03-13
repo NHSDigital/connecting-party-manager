@@ -67,48 +67,6 @@ if ! _validate_current_account "Backups"; then
         --region "${AWS_REGION_NAME}" \
         || exit 1
     fi
-
-    # add source account permissions for immuatable backup
-    if _validate_current_account "DEV"; then
-      policy_name="NHSSourceAccountBackupPermissionssPolicy"
-      tf_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/source-account-backup-permissions-policy.json)
-      aws iam get-policy --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" &> /dev/null
-      if [ $? != 0 ]; then
-        aws iam create-policy \
-          --policy-name "${policy_name}" \
-          --policy-document "${tf_policy}" \
-          --region "${AWS_REGION_NAME}" \
-          || exit 1
-      fi
-
-      # We update the version because this updates all roles and we don't have to detach and delete.
-      versions=$(aws iam list-policy-versions --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" --region "${AWS_REGION_NAME}")
-      num_versions=$(echo "$versions" | jq -r '.Versions | length')
-      # There has got to be at least 2 versions.
-      if [ "$num_versions" -ge 2 ]; then
-        # Extract the oldest version using jq
-        oldest_version=$(echo "$versions" | jq -r '.Versions | sort_by(.CreateDate) | .[0].VersionId')
-
-        aws iam delete-policy-version \
-          --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
-          --version-id "${oldest_version}" \
-          || exit 1
-      fi
-
-        aws iam create-policy-version \
-          --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
-          --policy-document "${tf_policy}" \
-          --set-as-default \
-          --region "${AWS_REGION_NAME}" \
-          || exit 1
-      if [[ ! $attached_policies == *"\"PolicyName\": \"${policy_name}\""* ]]; then
-        aws iam attach-role-policy \
-          --role-name "${role_name}" \
-          --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${policy_name}" \
-          --region "${AWS_REGION_NAME}" \
-          || exit 1
-      fi
-    fi
   done
 fi
 

@@ -9,7 +9,6 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:ListBackupPlans",
           "backup:CreateBackupPlan",
           "backup:DeleteBackupPlan",
-          "backup:DescribeBackupPlan",
           "backup:UpdateBackupPlan",
           "backup:GetBackupPlan",
           "backup:CreateReportPlan",
@@ -53,7 +52,6 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
         Action = [
           "kms:ListKeys",
           "kms:DescribeKey",
-          "kms:DeleteKey",
           "kms:CreateKey",
           "kms:ListAliases",
           "kms:CreateAlias",
