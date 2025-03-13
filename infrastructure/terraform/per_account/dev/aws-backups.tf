@@ -102,15 +102,4 @@ module "source" {
     ],
     "selection_tag" : "NHSE-Enable-Backup"
   }
-  # # Note here that we need to explicitly disable DynamoDB backups in the source account.
-  # # The default config in the module enables backups for all resource types.
-  # backup_plan_config_dynamodb = {
-  #   "compliance_resource_types" : [
-  #     "DynamoDB"
-  #   ],
-  #   "rules" : [
-  #   ],
-  #   "enable" : false,
-  #   "selection_tag" : "NHSE-Enable-Backup"
-  # }
 }

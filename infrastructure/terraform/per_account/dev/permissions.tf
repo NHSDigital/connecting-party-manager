@@ -36,7 +36,11 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:DeleteRestoreTestingPlan",
           "backup:GetRestoreTestingPlan",
           "backup:ListRestoreTestingPlans",
-          "backup:UpdateRestoreTestingPlan"
+          "backup:UpdateRestoreTestingPlan",
+          "backup:CreateRestoreTestingSelection",
+          "backup:DescribeRestoreTestingSelection",
+          "backup:UpdateRestoreTestingSelection",
+          "backup:DeleteRestoreTestingSelection",
         ],
         Resource = "*"
       },
@@ -57,6 +61,24 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "kms:CreateAlias",
           "kms:DeleteAlias",
           "kms:TagResource"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Resource = [
+          "arn:aws:secretsmanager:*:${var.assume_account}:secret:destination_vault_arn-*",
+          "arn:aws:secretsmanager:*:${var.assume_account}:secret:destination_account_id-*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "backup:*",
+          "cloudformation:*"
         ],
         Resource = "*"
       }
