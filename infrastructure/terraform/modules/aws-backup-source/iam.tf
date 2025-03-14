@@ -26,40 +26,31 @@ resource "aws_iam_role_policy_attachment" "restore" {
   role       = aws_iam_role.backup.name
 }
 
-resource "aws_iam_role_policy_attachment" "s3_restore" {
-  policy_arn = "arn:aws:iam::aws:policy/AWSBackupServiceRolePolicyForS3Restore"
-  role       = aws_iam_role.backup.name
-}
 
-resource "aws_iam_role_policy_attachment" "s3_backup" {
-  policy_arn = "arn:aws:iam::aws:policy/AWSBackupServiceRolePolicyForS3Backup"
-  role       = aws_iam_role.backup.name
-}
-
-resource "aws_iam_role_policy_attachment" "backup_full_access" {
-  policy_arn = "arn:aws:iam::aws:policy/AWSBackupFullAccess"
-  role       = aws_iam_role.backup.name
-}
+# resource "aws_iam_role_policy_attachment" "backup_full_access" {
+#   policy_arn = "arn:aws:iam::aws:policy/AWSBackupFullAccess"
+#   role       = aws_iam_role.backup.name
+# }
 
 
-resource "aws_iam_policy" "restore_testing_selection_permissions" {
-  name = "${local.resource_name_prefix}-source-account-backup-permissions"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "backup:*",
-          "cloudformation:*"
-        ],
-        Resource = "*"
-      },
-    ]
-  })
-}
+# resource "aws_iam_policy" "restore_testing_selection_permissions" {
+#   name = "${local.resource_name_prefix}-source-account-backup-permissions"
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "backup:*",
+#           "cloudformation:*"
+#         ],
+#         Resource = "*"
+#       },
+#     ]
+#   })
+# }
 
-resource "aws_iam_role_policy_attachment" "source_account_backup_permissions" {
-  policy_arn = aws_iam_policy.restore_testing_selection_permissions.arn
-  role       = aws_iam_role.backup.name
-}
+# resource "aws_iam_role_policy_attachment" "source_account_backup_permissions" {
+#   policy_arn = aws_iam_policy.restore_testing_selection_permissions.arn
+#   role       = aws_iam_role.backup.name
+# }
