@@ -71,6 +71,15 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "arn:aws:secretsmanager:*:${var.assume_account}:secret:destination_account_id-*"
         ]
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "iam:UpdateAssumeRolePolicy"
+        ],
+        Resource = [
+          "arn:aws:iam::${ACCOUNT_ID}:role/*"
+        ]
+      },
     ]
   })
 }
