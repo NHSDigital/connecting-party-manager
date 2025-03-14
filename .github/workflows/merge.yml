@@ -11,8 +11,10 @@ permissions:
   actions: write
 
 env:
-  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.sha }} | cut -c 1-7)
+  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.sha }} | cut -c 1-6)
   MERGE_CACHE_SUFFIX: merge
+  ACCOUNT: dev
+  SCOPE: per_workspace
 
 jobs:
   get-branch-from-workflow-file:
@@ -47,7 +49,7 @@ jobs:
 
   build-main:
     runs-on: [self-hosted, ci]
-    needs: [get-branch-from-workflow-file]
+    needs: get-branch-from-workflow-file
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,14 +61,26 @@ jobs:
           restore-from-cache: "false"
           cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
 
-  terraform-main-build:
+  terraform--init:
+    needs: [get-branch-from-workflow-file, build-main, create-workspace-name]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/terraform/
+        with:
+          command: init
+          account: ${{ env.ACCOUNT }}
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+          scope: ${{ env.SCOPE }}
+          restore-from-cache: "true"
+          save-to-cache: "true"
+          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
+
+  terraform--plan:
     needs:
-      [
-        create-workspace-name,
-        get-branch-from-workflow-file,
-        build-main,
-        parse-secrets,
-      ]
+      [get-branch-from-workflow-file, terraform--init, create-workspace-name]
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v4
@@ -75,16 +89,33 @@ jobs:
       - uses: ./.github/actions/terraform/
         with:
           command: plan
+          account: ${{ env.ACCOUNT }}
           workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+          scope: ${{ env.SCOPE }}
+          restore-from-cache: "true"
+          save-to-cache: "true"
+          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
+
+  terraform--apply:
+    needs:
+      [get-branch-from-workflow-file, terraform--plan, create-workspace-name]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/terraform/
         with:
           command: apply
-          save-to-cache: "true"
-          restore-from-cache: "false"
+          account: ${{ env.ACCOUNT }}
           workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+          scope: ${{ env.SCOPE }}
+          restore-from-cache: "true"
+          save-to-cache: "true"
+          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
 
   apigee--deploy:
-    needs: [build-main, terraform-main-build, get-branch-from-workflow-file]
+    needs: [build-main, terraform--apply, get-branch-from-workflow-file]
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v4
