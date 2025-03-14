@@ -12,6 +12,7 @@ permissions:
 
 env:
   BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.sha }} | cut -c 1-7)
+  MERGE_CACHE_SUFFIX: merge
 
 jobs:
   get-branch-from-workflow-file:
@@ -46,7 +47,7 @@ jobs:
 
   build-main:
     runs-on: [self-hosted, ci]
-    needs: [parse-secrets, get-branch-from-workflow-file]
+    needs: [get-branch-from-workflow-file]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,6 +57,7 @@ jobs:
           command: build
           save-to-cache: "true"
           restore-from-cache: "false"
+          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
 
   terraform-main-build:
     needs:
@@ -191,62 +193,63 @@ jobs:
           command: destroy
           workspace: ${{ needs.create-workspace-name.outputs.workspace }}
 
-  make-tag:
-    runs-on: [self-hosted, ci]
-    permissions: write-all
-    name: Create a tag from main
-    steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v4
-      - name: Create 'env.tag' from the latest release
-        run: |
-          TAG=$(make changelog--get-latest-release)
-          echo "tag=${TAG}" >> $GITHUB_ENV
+  # make-tag:
+  #   runs-on: [self-hosted, ci]
+  #   needs: [terraform-main-destroy]
+  #   permissions: write-all
+  #   name: Create a tag from main
+  #   steps:
+  #     - name: Checkout the repo
+  #       uses: actions/checkout@v4
+  #     - name: Create 'env.tag' from the latest release
+  #       run: |
+  #         TAG=$(make changelog--get-latest-release)
+  #         echo "tag=${TAG}" >> $GITHUB_ENV
 
-      - name: Create tag named from 'env.tag'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ env.tag }}',
-              sha: context.sha
-            })
-    outputs:
-      tag: ${{ env.tag }}
+  #     - name: Create tag named from 'env.tag'
+  #       uses: actions/github-script@v7
+  #       with:
+  #         script: |
+  #           github.rest.git.createRef({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             ref: 'refs/tags/${{ env.tag }}',
+  #             sha: context.sha
+  #           })
+  #   outputs:
+  #     tag: ${{ env.tag }}
 
-  set-success:
-    name: Set Success
-    needs: [make-tag, get-branch-from-workflow-file]
-    runs-on: [self-hosted, ci]
-    steps:
-      - name: Set success env var
-        run: echo "success"
-    outputs:
-      success: "succeeded"
+  # set-success:
+  #   name: Set Success
+  #   needs: [make-tag, get-branch-from-workflow-file]
+  #   runs-on: [self-hosted, ci]
+  #   steps:
+  #     - name: Set success env var
+  #       run: echo "success"
+  #   outputs:
+  #     success: "succeeded"
 
-  message-slack:
-    name: Notify slack of merge to main
-    needs: [make-tag, get-branch-from-workflow-file, set-success]
-    runs-on: [self-hosted, ci]
-    steps:
-      - name: Catch failed steps
-        id: catch-failed-step
-        uses: ./.github/actions/catch-failed-step
-      - name: Send merge result to slack
-        id: slack
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook-type: webhook-trigger
-          payload: |
-            {
-              "tag": "${{ needs.make-tag.outputs.tag}}",
-              "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}",
-              "caller": "${{ github.triggering_actor }}",
-              "result":  "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
-              "result_detail": "${{ needs.set-success.outputs.success && 'None' || steps.catch-failed-step.outputs.failed-step-name }}",
-              "action_url": "${{ format('{0}/{1}/actions/runs/{2}/attempts/{3}', github.server_url, github.repository, github.run_id, github.run_attempt) }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.MAIN_MERGE_SLACK_HOOK_URL }}
+  # message-slack:
+  #   name: Notify slack of merge to main
+  #   needs: [make-tag, get-branch-from-workflow-file, set-success]
+  #   runs-on: [self-hosted, ci]
+  #   steps:
+  #     - name: Catch failed steps
+  #       id: catch-failed-step
+  #       uses: ./.github/actions/catch-failed-step
+  #     - name: Send merge result to slack
+  #       id: slack
+  #       uses: slackapi/slack-github-action@v2.0.0
+  #       with:
+  #         webhook-type: webhook-trigger
+  #         payload: |
+  #           {
+  #             "tag": "${{ needs.make-tag.outputs.tag}}",
+  #             "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}",
+  #             "caller": "${{ github.triggering_actor }}",
+  #             "result":  "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
+  #             "result_detail": "${{ needs.set-success.outputs.success && 'None' || steps.catch-failed-step.outputs.failed-step-name }}",
+  #             "action_url": "${{ format('{0}/{1}/actions/runs/{2}/attempts/{3}', github.server_url, github.repository, github.run_id, github.run_attempt) }}"
+  #           }
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.MAIN_MERGE_SLACK_HOOK_URL }}
