@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["backup.amazonaws.com"]
+      identifiers = ["backup.amazonaws.com", "cloudformation.amazonaws.com"]
     }
 
     actions = ["sts:AssumeRole"]
