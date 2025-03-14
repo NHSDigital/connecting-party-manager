@@ -122,6 +122,21 @@ Feature: Create Product Team - failure scenarios
       | Content-Type   | application/json |
       | Content-Length | 138              |
 
+  Scenario: Cannot create a ProductTeam with a missing name
+    When I make a "POST" request with "default" headers to "ProductTeam" with body:
+      | path             | value                                |
+      | ods_code         | F5H11                                |
+      | keys.0.key_type  | product_team_id                      |
+      | keys.0.key_value | 0a78ee8f-5bcf-4db1-9341-ef1d67248715 |
+    Then I receive a status code "400" with body
+      | path             | value                                                |
+      | errors.0.code    | MISSING_VALUE                                        |
+      | errors.0.message | CreateProductTeamIncomingParams.name: field required |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 106              |
+
   Scenario: Cannot create a ProductTeam with empty product team id key
     When I make a "POST" request with "default" headers to "ProductTeam" with body:
       | path             | value                 |
