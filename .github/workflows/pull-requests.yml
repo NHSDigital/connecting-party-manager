@@ -9,10 +9,10 @@ permissions:
 
 env:
   BASE_CACHE_SUFFIX: base
-  BASE_BRANCH_NAME: ${{ github.event.pull_request.base.ref }}
-  BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+  BASE_BRANCH_NAME: main
+  BRANCH_NAME: feature/PI-855-add_sonar_code_coverage
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
-  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
+  BRANCH_GITHUB_SHA_SHORT: $(echo a8317c44b73b7be455bf22ccf16eaf4c80fae205 | cut -c 1-7)
   TF_CLI_ARGS: -no-color
 
 jobs:
@@ -274,6 +274,43 @@ jobs:
         with:
           command: test--smoke
           requires-aws: true
+
+  test--coverage:
+    needs:
+      [
+        build-head,
+        workflow--codebase-checks,
+        test--unit,
+        test--feature--local,
+        terraform-head-build,
+        test--feature--integration,
+        test--integration,
+        apigee--deploy,
+        apigee--attach-product,
+        test--smoke,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: test--coverage
+          requires-aws: true
+
+  sonarqube:
+    needs: [test--coverage]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
 
   apigee--detach-product:
     needs:
