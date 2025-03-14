@@ -101,8 +101,18 @@ module "source" {
       "DynamoDB"
     ],
     "rules" : [
+      {
+        "copy_action" : {
+          "delete_after" : 4
+        },
+        "lifecycle" : {
+          "delete_after" : 2
+        },
+        "name" : "daily_kept_for_2_days",
+        "schedule" : "cron(0 0 * * ? *)"
+      }
     ],
-    "enable" : false,
+    "enable" : true,
     "selection_tag" : "NHSE-Enable-Backup"
   }
 }

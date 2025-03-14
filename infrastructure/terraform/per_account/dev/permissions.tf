@@ -9,6 +9,7 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:ListBackupPlans",
           "backup:CreateBackupPlan",
           "backup:DeleteBackupPlan",
+          "backup:GetBackupPlan",
           "backup:UpdateBackupPlan",
           "backup:GetBackupPlan",
           "backup:CreateReportPlan",
@@ -22,7 +23,6 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:DeleteFramework",
           "backup:DescribeFramework",
           "backup:ListFrameworks",
-          "backup:UpdateFramework",
           "backup:CreateBackupVault",
           "backup:DeleteBackupVault",
           "backup:DescribeBackupVault",
@@ -36,11 +36,7 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:DeleteRestoreTestingPlan",
           "backup:GetRestoreTestingPlan",
           "backup:ListRestoreTestingPlans",
-          "backup:UpdateRestoreTestingPlan",
-          "backup:CreateRestoreTestingSelection",
-          "backup:DescribeRestoreTestingSelection",
-          "backup:UpdateRestoreTestingSelection",
-          "backup:DeleteRestoreTestingSelection",
+          "backup:UpdateRestoreTestingPlan"
         ],
         Resource = "*"
       },
@@ -56,6 +52,7 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
         Action = [
           "kms:ListKeys",
           "kms:DescribeKey",
+          "kms:DisableKey",
           "kms:CreateKey",
           "kms:ListAliases",
           "kms:CreateAlias",
@@ -74,14 +71,6 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "arn:aws:secretsmanager:*:${var.assume_account}:secret:destination_account_id-*"
         ]
       },
-      {
-        Effect = "Allow",
-        Action = [
-          "backup:*",
-          "cloudformation:*"
-        ],
-        Resource = "*"
-      }
     ]
   })
 }
