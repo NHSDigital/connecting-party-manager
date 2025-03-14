@@ -77,7 +77,8 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "iam:UpdateAssumeRolePolicy"
         ],
         Resource = [
-          "arn:aws:iam::${var.assume_account}:role/*"
+          "arn:aws:iam::${var.assume_account}:role/*",
+          "arn:aws:iam::${var.assume_account}:policy/*"
         ]
       },
     ]
