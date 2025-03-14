@@ -1,7 +1,12 @@
 # Changelog
 
+## 2025-03-12
+- [PI-841] Remove VPC cpm-sds-etl-hscn-vpc
+- [PI-851] Swagger spec refinement - Part Deux
+- [PI-854] Fix sonarcloud runs
+
 ## 2025-03-10
-- [PI-387] Add Product Team Id to search results
+- [PI-837] Add Product Team Id to search results
 - [PI-843] Add Read Product to test UI
 - [PI-764] Refine Swagger
 

@@ -88,7 +88,11 @@ function generate_public_swagger() {
     yq 'del(.security)' |
     yq 'del(.paths./_status)' |
     yq 'del(.. | select(has("StatusOK")).StatusOK)' |
-    yq 'del(.components.securitySchemes."${authoriser_name}")' \
+    yq 'del(.components.securitySchemes."${authoriser_name}")' |
+    yq 'del(.components.responses.CorsOK)' |
+    yq 'del(.components.schemas.Empty)' |
+    yq 'del(.tags[] | select(.name == "Options"))' |
+    yq 'del(.paths.*.options)' \
       >${PUBLIC_SWAGGER_FILE}
   echo "Generated ${PUBLIC_SWAGGER_FILE}"
   validate_yaml ${PUBLIC_SWAGGER_FILE}
