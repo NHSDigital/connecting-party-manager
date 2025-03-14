@@ -36,6 +36,11 @@ resource "aws_iam_role_policy_attachment" "s3_backup" {
   role       = aws_iam_role.backup.name
 }
 
+resource "aws_iam_role_policy_attachment" "backup_full_access" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSBackupFullAccess"
+  role       = aws_iam_role.backup.name
+}
+
 
 resource "aws_iam_policy" "restore_testing_selection_permissions" {
   name = "${local.resource_name_prefix}-source-account-backup-permissions"
@@ -49,7 +54,7 @@ resource "aws_iam_policy" "restore_testing_selection_permissions" {
           "cloudformation:*"
         ],
         Resource = "*"
-      }
+      },
     ]
   })
 }

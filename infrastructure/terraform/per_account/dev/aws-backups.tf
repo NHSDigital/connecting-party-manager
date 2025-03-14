@@ -102,4 +102,24 @@ module "source" {
     ],
     "selection_tag" : "NHSE-Enable-Backup"
   }
+
+  backup_plan_config_dynamodb = {
+    "enable" : true,
+    "compliance_resource_types" : [
+      "DynamoDB"
+    ],
+    "rules" : [
+      {
+        "copy_action" : {
+          "delete_after" : 4
+        },
+        "lifecycle" : {
+          "delete_after" : 2
+        },
+        "name" : "daily_kept_for_2_days",
+        "schedule" : "cron(0 0 * * ? *)"
+      }
+    ],
+    "selection_tag" : "NHSE-Enable-Backup"
+  }
 }
