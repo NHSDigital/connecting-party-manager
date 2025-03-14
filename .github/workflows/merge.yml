@@ -3,12 +3,15 @@ name: "Workflow: Merge to Main"
 on:
   push:
     branches:
-      - main
+      - feature/PI-855-add_sonar_code_coverage
 
 permissions:
   id-token: write
   contents: read
   actions: write
+
+env:
+  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.sha }} | cut -c 1-7)
 
 jobs:
   get-branch-from-workflow-file:
@@ -22,6 +25,171 @@ jobs:
           branch_name=${workflow_ref#*refs/heads/}
           branch_name=${branch_name#*refs/tags/}
           echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
+
+  parse-secrets:
+    runs-on: [self-hosted, ci]
+    steps:
+      - id: parse-secrets
+        run: |
+          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
+
+  create-workspace-name:
+    runs-on: [self-hosted, ci]
+    needs: [get-branch-from-workflow-file]
+    outputs:
+      workspace: ${{ steps.create_workspace_name.outputs.workspace }}
+    steps:
+      - id: create_workspace_name
+        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdld
+        run: |
+          echo "workspace=main-$(echo ${{ needs.get-branch-from-workflow-file.outputs.branch_name }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p' | tr '[:upper:]' '[:lower:]')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
+
+  build-main:
+    runs-on: [self-hosted, ci]
+    needs: [parse-secrets, get-branch-from-workflow-file]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
+
+  terraform-main-build:
+    needs:
+      [
+        create-workspace-name,
+        get-branch-from-workflow-file,
+        build-main,
+        parse-secrets,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/terraform/
+        with:
+          command: plan
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+      - uses: ./.github/actions/terraform/
+        with:
+          command: apply
+          save-to-cache: "true"
+          restore-from-cache: "false"
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
+
+  apigee--deploy:
+    needs: [build-main, terraform-main-build, get-branch-from-workflow-file]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--deploy DEV_BUILD="true"
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
+  apigee--attach-product:
+    needs: [build-main, apigee--deploy, get-branch-from-workflow-file]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - run: |
+          poetry add pytest-nhsd-apim==3.4.3
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--attach-product DEV_BUILD="true"
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
+  test--coverage-sonar:
+    needs:
+      [
+        build-main,
+        apigee--deploy,
+        apigee--attach-product,
+        get-branch-from-workflow-file,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: test--coverage
+          requires-aws: true
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
+  apigee--detach-product:
+    needs:
+      [
+        build-main,
+        apigee--attach-product,
+        test--coverage-sonar,
+        get-branch-from-workflow-file,
+      ]
+    runs-on: [self-hosted, ci]
+    if: ${{ needs.apigee--attach-product.result == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - run: |
+          poetry add pytest-nhsd-apim==3.4.3
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--detach-product DEV_BUILD="true"
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
+  delete--proxy:
+    needs:
+      [apigee--deploy, apigee--detach-product, get-branch-from-workflow-file]
+    runs-on: [self-hosted, ci]
+    if: ${{ needs.apigee--deploy.result == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/make/
+        with:
+          command: apigee--delete DEV_BUILD="true"
+          save-to-cache: "false"
+          restore-from-cache: "true"
+          requires-aws: true
+
+  terraform-main-destroy:
+    needs:
+      [
+        create-workspace-name,
+        get-branch-from-workflow-file,
+        build-main,
+        delete--proxy,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+      - uses: ./.github/actions/terraform/
+        with:
+          command: destroy
+          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
 
   make-tag:
     runs-on: [self-hosted, ci]

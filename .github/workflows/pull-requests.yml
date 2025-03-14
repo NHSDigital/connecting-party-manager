@@ -12,7 +12,7 @@ env:
   BASE_BRANCH_NAME: main
   BRANCH_NAME: feature/PI-855-add_sonar_code_coverage
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
-  BRANCH_GITHUB_SHA_SHORT: $(echo a8317c44b73b7be455bf22ccf16eaf4c80fae205 | cut -c 1-7)
+  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
   TF_CLI_ARGS: -no-color
 
 jobs:
