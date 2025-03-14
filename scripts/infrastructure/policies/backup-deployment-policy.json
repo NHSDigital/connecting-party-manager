@@ -1,0 +1,94 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ResourceGroupPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:GetGroupConfiguration",
+        "resource-groups:GetTags",
+        "resource-groups:Tag",
+        "resource-groups:CreateGroup",
+        "resource-groups:DeleteGroup"
+      ],
+      "Resource": ["arn:aws:resource-groups:*:${ACCOUNT_ID}:group/*"]
+    },
+    {
+      "Sid": "GlobalPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:DescribeParameters",
+        "ssm:ListTagsForResource",
+        "ssm:GetParameters",
+        "ssm:PutParameter",
+        "ssm:AddTagsToResource",
+        "ssm:DeleteParameter"
+      ],
+      "Resource": ["arn:aws:ssm:eu-west-2:${ACCOUNT_ID}:*"]
+    },
+    {
+      "Sid": "BudgetPermissions",
+      "Effect": "Allow",
+      "Action": ["budgets:ViewBudget", "budgets:ModifyBudget"],
+      "Resource": ["arn:aws:budgets::${ACCOUNT_ID}:budget/*"]
+    },
+    {
+      "Sid": "IamPolicyPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreatePolicy",
+        "iam:TagPolicy",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicyVersions",
+        "iam:DeletePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion"
+      ],
+      "Resource": ["arn:aws:iam::${ACCOUNT_ID}:policy/*"]
+    },
+    {
+      "Sid": "IamRolePermissions",
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:ListAttachedRolePolicies",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": ["arn:aws:iam::${ACCOUNT_ID}:role/*"]
+    },
+    {
+      "Sid": "ParameterPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:eu-west-2:${ACCOUNT_ID}:secret:backups-source-account-id-*",
+        "arn:aws:secretsmanager:eu-west-2:${ACCOUNT_ID}:secret:backups-external-id-*"
+      ]
+    },
+    {
+      "Sid": "KMSPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "kms:TagResource",
+        "kms:EnableKeyRotation",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:ListResourceTags",
+        "kms:ScheduleKeyDeletion",
+        "kms:CreateKey"
+      ],
+      "Resource": ["arn:aws:kms:eu-west-2:${ACCOUNT_ID}:key/*"]
+    }
+  ]
+}

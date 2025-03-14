@@ -50,7 +50,7 @@ function _terraform() {
         workspace_expiration ${workspace_expiration}
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
-    "
+            "
   fi
 
   if [[ "${login_account}" != "NHS Digital Spine Core CPM MGMT" ]]; then
@@ -162,9 +162,9 @@ function _terraform_destroy() {
     -var "assume_role=${terraform_role_name}" \
     -var "external_id=${external_id}" \
     -var "workspace_type=${workspace_type}" \
-    -var "lambdas=${lambdas}" \
-    -var "layers=${layers}" \
-    -var "third_party_layers=${third_party_layers}" ||
+    # -var "lambdas=${lambdas}" \
+    # -var "layers=${layers}" \
+    # -var "third_party_layers=${third_party_layers}" ||
     return 1
 
   if [ "$workspace" != "default" ]; then

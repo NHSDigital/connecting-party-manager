@@ -70,3 +70,11 @@ resource "aws_secretsmanager_secret" "apigee-sds-app-key" {
 resource "aws_secretsmanager_secret" "external-id" {
   name = "${terraform.workspace}-external-id"
 }
+
+resource "aws_secretsmanager_secret" "destination_vault_arn" {
+  name = "destination_vault_arn"
+}
+
+resource "aws_secretsmanager_secret" "destination_account_id" {
+  name = "destination_account_id"
+}

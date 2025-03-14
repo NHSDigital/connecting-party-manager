@@ -1,4 +1,4 @@
-name: "Deploy: Parameters - Nonprod"
+name: "Deploy: Parameters - Backups"
 
 on:
   workflow_dispatch:
@@ -6,18 +6,11 @@ on:
       account:
         description: Account to deploy
         required: true
-        default: dev
-        type: choice
-        options:
-          - dev
-          - qa
-          - int
-          - ref
-          - backups
+        default: backups
 
 jobs:
   deploy:
-    uses: ./.github/workflows/_deploy.yml
+    uses: ./.github/workflows/_deploy_backups.yml
     with:
       account: ${{ inputs.account }}
       workspace: ${{ inputs.account }}

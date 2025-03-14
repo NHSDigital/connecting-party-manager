@@ -16,7 +16,8 @@ module "dynamodb_table" {
   point_in_time_recovery_enabled = true
 
   tags = {
-    Name = var.name
+    Name                 = var.name
+    "NHSE-Enable-Backup" = "True" # will this work? Only needed for 1 environment? only tag in one account
   }
 
 }

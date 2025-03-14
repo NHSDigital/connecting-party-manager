@@ -29,6 +29,8 @@ else
     ENV="int"
   elif _validate_current_account "REF"; then
     ENV="ref"
+  elif _validate_current_account "Backups"; then
+    ENV="backups"
   fi
 fi
 MGMT_ID_PARAMETER_STORE="nhse-cpm--${ENV}--mgmt-account-id-v1.0.0"
@@ -54,6 +56,7 @@ if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --r
   #
   # Create the NHSSmokeTestRole that will be used for smoke tests in All Deployment environments
   #
+  if ! _validate_current_account "Backups"; then
     aws iam get-role --role-name "NHSSmokeTestRole" &> /dev/null
     if [ $? != 0 ]; then
       tf_assume_role_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/role-trust-policy.json)
@@ -68,7 +71,7 @@ if aws secretsmanager describe-secret --secret-id "$MGMT_ID_PARAMETER_STORE" --r
   #
   # Create the NHSDevelopmentRole that will be used for deployment from local environments
   #
-  if ! _validate_current_account "PROD"; then
+  if [ ! $(_validate_current_account "PROD") ] && [ ! $(_validate_current_account "Backups") ]; then
     aws iam get-role --role-name "NHSDevelopmentRole" &> /dev/null
     if [ $? != 0 ]; then
       tf_assume_role_policy=$(_substitute_environment_variables ./scripts/infrastructure/policies/role-trust-policy.json)
