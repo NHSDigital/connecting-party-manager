@@ -86,3 +86,4 @@ cpm.cdx.json
 test_failure.json
 test_success_*.json
 pyrightconfig.json
+sonarcloud-coverage.xml

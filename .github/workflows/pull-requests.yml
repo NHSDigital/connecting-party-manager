@@ -275,7 +275,7 @@ jobs:
           command: test--smoke
           requires-aws: true
 
-  test--coverage:
+  test--coverage-sonar:
     needs:
       [
         build-head,
@@ -298,14 +298,6 @@ jobs:
         with:
           command: test--coverage
           requires-aws: true
-
-  sonarqube:
-    needs: [test--coverage]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
