@@ -23,7 +23,6 @@ inputs:
   paths-to-cache:
     description: "[Optional] paths to cache?"
     required: false
-    default: ""
 runs:
   using: "composite"
   steps:
