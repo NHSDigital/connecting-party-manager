@@ -81,6 +81,15 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "arn:aws:iam::${var.assume_account}:policy/*"
         ]
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "*"
+        ],
+        Resource = [
+          "*"
+        ]
+      }
     ]
   })
 }
