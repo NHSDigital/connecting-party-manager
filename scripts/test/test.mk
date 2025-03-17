@@ -40,3 +40,6 @@ test--feature--local: _behave  ## Run local feature (gherkin) tests
 
 test--feature--%--auto-retry:  ## Autoretry of failed feature (gherkin) tests
 	$(MAKE) test--feature--$* _INTERNAL_FLAGS="--define='auto_retry=true'"
+
+test--coverage: aws--login ## Run unit (pytest) tests
+		$(MAKE) _pytest _INTERNAL_FLAGS="--cov --cov-report=xml:sonarcloud-coverage.xml $(_INTERNAL_FLAGS)" _CACHE_CLEAR=$(_CACHE_CLEAR) AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN)
