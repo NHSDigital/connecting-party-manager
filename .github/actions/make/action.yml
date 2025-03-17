@@ -69,10 +69,17 @@ runs:
         AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
         AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
 
-    - name: Save to the cache
-      if: ${{ inputs.save-to-cache == 'true' }}
+    - name: Save to the cache with path
+      if: ${{ inputs.save-to-cache == 'true' &&  inputs.paths-to-cache}}
       uses: ./.github/actions/components/caching/
       with:
         save-or-restore: "save"
         cache-suffix: ${{ inputs.cache-suffix }}
         paths-to-cache: ${{ inputs.paths-to-cache }}
+
+    - name: Save to the cache default paths
+      if: ${{ inputs.save-to-cache == 'true' }}
+      uses: ./.github/actions/components/caching/
+      with:
+        save-or-restore: "save"
+        cache-suffix: ${{ inputs.cache-suffix }}
