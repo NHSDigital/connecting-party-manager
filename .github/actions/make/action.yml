@@ -20,6 +20,10 @@ inputs:
     description: "[Optional] save to cache?"
     required: false
     default: "false"
+  paths-to-cache:
+    description: "[Optional] paths to cache?"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -72,3 +76,4 @@ runs:
       with:
         save-or-restore: "save"
         cache-suffix: ${{ inputs.cache-suffix }}
+        paths-to-cache: ${{ inputs.paths-to-cache }}

@@ -298,6 +298,10 @@ jobs:
         with:
           command: test--coverage
           requires-aws: true
+          save-to-cache: "true"
+          restore-from-cache: "false"
+          cache-suffix: "coverage"
+          paths-to-cache: "sonarcloud-coverage.xml"
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:

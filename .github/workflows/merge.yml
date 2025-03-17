@@ -10,12 +10,6 @@ permissions:
   contents: read
   actions: write
 
-env:
-  BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.sha }} | cut -c 1-6)
-  MERGE_CACHE_SUFFIX: merge
-  ACCOUNT: dev
-  SCOPE: per_workspace
-
 jobs:
   get-branch-from-workflow-file:
     runs-on: [self-hosted, ci]
@@ -29,258 +23,82 @@ jobs:
           branch_name=${branch_name#*refs/tags/}
           echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 
-  parse-secrets:
-    runs-on: [self-hosted, ci]
-    steps:
-      - id: parse-secrets
-        run: |
-          echo "::add-mask::${{ secrets.CI_ROLE_NAME }}"
-
-  create-workspace-name:
-    runs-on: [self-hosted, ci]
-    needs: [get-branch-from-workflow-file]
-    outputs:
-      workspace: ${{ steps.create_workspace_name.outputs.workspace }}
-    steps:
-      - id: create_workspace_name
-        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdld
-        run: |
-          echo "workspace=main-$(echo ${{ needs.get-branch-from-workflow-file.outputs.branch_name }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p' | tr '[:upper:]' '[:lower:]')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
-
-  build-main:
-    runs-on: [self-hosted, ci]
-    needs: get-branch-from-workflow-file
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
-        with:
-          command: build
-          save-to-cache: "true"
-          restore-from-cache: "false"
-          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
-
-  terraform--init:
-    needs: [get-branch-from-workflow-file, build-main, create-workspace-name]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/terraform/
-        with:
-          command: init
-          account: ${{ env.ACCOUNT }}
-          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
-          scope: ${{ env.SCOPE }}
-          restore-from-cache: "true"
-          save-to-cache: "true"
-          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
-
-  terraform--plan:
-    needs:
-      [get-branch-from-workflow-file, terraform--init, create-workspace-name]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/terraform/
-        with:
-          command: plan
-          account: ${{ env.ACCOUNT }}
-          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
-          scope: ${{ env.SCOPE }}
-          restore-from-cache: "true"
-          save-to-cache: "true"
-          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
-
-  terraform--apply:
-    needs:
-      [get-branch-from-workflow-file, terraform--plan, create-workspace-name]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/terraform/
-        with:
-          command: apply
-          account: ${{ env.ACCOUNT }}
-          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
-          scope: ${{ env.SCOPE }}
-          restore-from-cache: "true"
-          save-to-cache: "true"
-          cache-suffix: ${{ env.MERGE_CACHE_SUFFIX }}
-
-  apigee--deploy:
-    needs: [build-main, terraform--apply, get-branch-from-workflow-file]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
-        with:
-          command: apigee--deploy DEV_BUILD="true"
-          save-to-cache: "false"
-          restore-from-cache: "true"
-          requires-aws: true
-
-  apigee--attach-product:
-    needs: [build-main, apigee--deploy, get-branch-from-workflow-file]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - run: |
-          poetry add pytest-nhsd-apim==3.4.3
-      - uses: ./.github/actions/make/
-        with:
-          command: apigee--attach-product DEV_BUILD="true"
-          save-to-cache: "false"
-          restore-from-cache: "true"
-          requires-aws: true
-
   test--coverage-sonar:
-    needs:
-      [
-        build-main,
-        apigee--deploy,
-        apigee--attach-product,
-        get-branch-from-workflow-file,
-      ]
     runs-on: [self-hosted, ci]
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
+          ref: main
       - uses: ./.github/actions/make/
         with:
           command: test--coverage
           requires-aws: true
+          save-to-cache: "true"
+          restore-from-cache: "false"
+          cache-suffix: "coverage"
+          paths-to-cache: "sonarcloud-coverage.xml"
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
 
-  apigee--detach-product:
-    needs:
-      [
-        build-main,
-        apigee--attach-product,
-        test--coverage-sonar,
-        get-branch-from-workflow-file,
-      ]
+  make-tag:
     runs-on: [self-hosted, ci]
-    if: ${{ needs.apigee--attach-product.result == 'success' }}
+    permissions: write-all
+    name: Create a tag from main
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - run: |
-          poetry add pytest-nhsd-apim==3.4.3
-      - uses: ./.github/actions/make/
-        with:
-          command: apigee--detach-product DEV_BUILD="true"
-          save-to-cache: "false"
-          restore-from-cache: "true"
-          requires-aws: true
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+      - name: Create 'env.tag' from the latest release
+        run: |
+          TAG=$(make changelog--get-latest-release)
+          echo "tag=${TAG}" >> $GITHUB_ENV
 
-  delete--proxy:
-    needs:
-      [apigee--deploy, apigee--detach-product, get-branch-from-workflow-file]
-    runs-on: [self-hosted, ci]
-    if: ${{ needs.apigee--deploy.result == 'success' }}
-    steps:
-      - uses: actions/checkout@v4
+      - name: Create tag named from 'env.tag'
+        uses: actions/github-script@v7
         with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
-        with:
-          command: apigee--delete DEV_BUILD="true"
-          save-to-cache: "false"
-          restore-from-cache: "true"
-          requires-aws: true
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ env.tag }}',
+              sha: context.sha
+            })
+    outputs:
+      tag: ${{ env.tag }}
 
-  terraform-main-destroy:
-    needs:
-      [
-        create-workspace-name,
-        get-branch-from-workflow-file,
-        build-main,
-        delete--proxy,
-      ]
+  set-success:
+    name: Set Success
+    needs: [make-tag, get-branch-from-workflow-file]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - name: Set success env var
+        run: echo "success"
+    outputs:
+      success: "succeeded"
+
+  message-slack:
+    name: Notify slack of merge to main
+    needs: [make-tag, get-branch-from-workflow-file, set-success]
+    runs-on: [self-hosted, ci]
+    steps:
+      - name: Catch failed steps
+        id: catch-failed-step
+        uses: ./.github/actions/catch-failed-step
+      - name: Send merge result to slack
+        id: slack
+        uses: slackapi/slack-github-action@v2.0.0
         with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/terraform/
-        with:
-          command: destroy
-          workspace: ${{ needs.create-workspace-name.outputs.workspace }}
-
-  # make-tag:
-  #   runs-on: [self-hosted, ci]
-  #   needs: [terraform-main-destroy]
-  #   permissions: write-all
-  #   name: Create a tag from main
-  #   steps:
-  #     - name: Checkout the repo
-  #       uses: actions/checkout@v4
-  #     - name: Create 'env.tag' from the latest release
-  #       run: |
-  #         TAG=$(make changelog--get-latest-release)
-  #         echo "tag=${TAG}" >> $GITHUB_ENV
-
-  #     - name: Create tag named from 'env.tag'
-  #       uses: actions/github-script@v7
-  #       with:
-  #         script: |
-  #           github.rest.git.createRef({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             ref: 'refs/tags/${{ env.tag }}',
-  #             sha: context.sha
-  #           })
-  #   outputs:
-  #     tag: ${{ env.tag }}
-
-  # set-success:
-  #   name: Set Success
-  #   needs: [make-tag, get-branch-from-workflow-file]
-  #   runs-on: [self-hosted, ci]
-  #   steps:
-  #     - name: Set success env var
-  #       run: echo "success"
-  #   outputs:
-  #     success: "succeeded"
-
-  # message-slack:
-  #   name: Notify slack of merge to main
-  #   needs: [make-tag, get-branch-from-workflow-file, set-success]
-  #   runs-on: [self-hosted, ci]
-  #   steps:
-  #     - name: Catch failed steps
-  #       id: catch-failed-step
-  #       uses: ./.github/actions/catch-failed-step
-  #     - name: Send merge result to slack
-  #       id: slack
-  #       uses: slackapi/slack-github-action@v2.0.0
-  #       with:
-  #         webhook-type: webhook-trigger
-  #         payload: |
-  #           {
-  #             "tag": "${{ needs.make-tag.outputs.tag}}",
-  #             "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}",
-  #             "caller": "${{ github.triggering_actor }}",
-  #             "result":  "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
-  #             "result_detail": "${{ needs.set-success.outputs.success && 'None' || steps.catch-failed-step.outputs.failed-step-name }}",
-  #             "action_url": "${{ format('{0}/{1}/actions/runs/{2}/attempts/{3}', github.server_url, github.repository, github.run_id, github.run_attempt) }}"
-  #           }
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.MAIN_MERGE_SLACK_HOOK_URL }}
+          webhook-type: webhook-trigger
+          payload: |
+            {
+              "tag": "${{ needs.make-tag.outputs.tag}}",
+              "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}",
+              "caller": "${{ github.triggering_actor }}",
+              "result":  "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
+              "result_detail": "${{ needs.set-success.outputs.success && 'None' || steps.catch-failed-step.outputs.failed-step-name }}",
+              "action_url": "${{ format('{0}/{1}/actions/runs/{2}/attempts/{3}', github.server_url, github.repository, github.run_id, github.run_attempt) }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.MAIN_MERGE_SLACK_HOOK_URL }}
