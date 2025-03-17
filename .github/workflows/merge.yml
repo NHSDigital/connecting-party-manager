@@ -3,7 +3,7 @@ name: "Workflow: Merge to Main"
 on:
   push:
     branches:
-      - feature/PI-855-add_sonar_code_coverage
+      - main
 
 permissions:
   id-token: write
