@@ -4,26 +4,80 @@
 
 ## Table of Contents
 
+1. [TLDR](#tldr)
+   1. [Requirements](#requirements)
+   2. [Building a local environment](#building-a-local-environment)
+   3. [Testing](#testing)
+   4. [Destroying a local environment](#destroying-a-local-environment)
 1. [Setup](#setup)
    1. [Prerequisites](#prerequisites)
-   2. [Project build](#project-build)
-   3. [AWS SSO Setup](#aws-sso-setup)
-   4. [Other helpful commands](#other-helpful-commands)
-2. [Tests](#tests)
+   2. [Useful tools](#useful-tools)
+   3. [Project build](#project-build)
+   4. [Proxygen](#proxygen)
+      1. [Temporary Proxies](#temporary-proxies)
+   5. [AWS SSO Setup](#aws-sso-setup)
+   6. [Build a local workspace on AWS (DEV)](#build-a-local-workspace-on-aws-dev)
+   7. [Build a local workspace on AWS (QA)](#build-a-local-workspace-on-aws-qa)
+   8. [Destroy a local workspace on AWS](#destroy-a-local-workspace-on-aws)
+   9. [Automated workspace destroys](#automated-workspace-destroys)
+   10. [Destroy Expired Workspaces](#destroy-expired-workspaces)
+   11. [Destroy Redundant Workspaces](#destroy-redundant-workspaces)
+   12. [Destroy Corrupted Workspaces](#destroy-corrupted-workspaces)
+   13. [Updating Roles](#updating-roles)
+   14. [Other helpful commands](#other-helpful-commands)
+1. [Tests](#tests)
    1. [pytest tests](#pytest-tests)
    2. [End-to-End feature tests](#end-to-end-feature-tests)
-   3. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
-3. [Data modelling](#data-modelling)
+   3. [Local](#local)
+   4. [Integration](#integration)
+   5. [Generate the Feature Test Postman collection](#generate-the-feature-test-postman-collection)
+1. [Data modelling](#data-modelling)
    1. [Domain models](#domain-models)
    2. [Database models](#database-models)
    3. [Response models](#response-models)
    4. [Request models](#request-models)
-4. [Workflow](#workflow)
-5. [Swagger](#swagger)
-6. [ETL](#etl)
-7. [Administration](#administration)
+1. [Workflow](#workflow)
+1. [Deployment](#deployment)
+1. [Swagger](#swagger)
+1. [Setting Lamba permissions](#setting-lambda-permissions)
+1. [Terraform](#terraform)
+1. [Administration](#administration)
+1. [SBOM](#sbom)
+1. [Extras](#extras)
+   1. [Archive](#archive)
 
 ---
+
+## TLDR
+
+If you want to get up and running as quickly as possible then read this section. However it is advisable to read the full README when possible.
+
+### Requirements
+
+- Ensure you have `AWS SSO` setup. For more information please read the [AWS SSO Setup](#aws-sso-setup) section.
+- Ensure you have `asdf` installed and the `docker engine` running. For more information please read the [Setup](#setup) section.
+
+### Building a local environment
+
+- Inside the connecting party manager root directory, run...
+- `make terraform--apply`
+- For more information please read the [Build a local workspace on AWS (DEV)](#build-a-local-workspace-on-aws-dev) section.
+
+### Testing
+
+- Inside the connecting party manager root directory, run any of the following commands...
+- `make test--unit`
+- `make test--integration`
+- `make test--feature--local`
+- `make test--feature--integration`
+- `make test--smoke`
+
+### Destroying a local environment
+
+- Provided you haven't changed the workspace name, then.
+- Inside the connecting party manager root directory, run...
+- `make terraform--destroy`
+- For more information please read the [Destroy a local workspace on AWS](#destroy-a-local-workspace-on-aws) section.
 
 ## Setup
 
@@ -31,7 +85,7 @@
 
 We use `asdf` to fetch the required versions of prerequisite libraries instead of your system's default version. To get it up and running go to <https://asdf-vm.com/guide/getting-started.html>. You can check it installed properly by using the command `asdf --version`.
 
-However, you will also need to install the `docker engine` separately
+You will also need to install the `docker engine` separately
 
 Additionally you will need `wget` (doing `which wget` will return blank if not installed). Please Google "how to install wget on my operating system", if you don't already have this installed.
 
@@ -41,9 +95,9 @@ Otherwise `asdf` should do the work for you.
 
 ### Useful tools
 
-`VScode` is useful and we have a workspace file setup to allow easy integration
+`VScode` is a useful IDE and we have a workspace file setup to allow easy integration
 
-`Postman` &/or `Newman` Feature tests create a postman.collection which can be used for manual testing.
+`Postman` &/or `Newman`. Feature tests create a postman.collection which can be used for manual testing.
 
 ### Project build
 
@@ -61,7 +115,7 @@ We use [Proxygen](https://github.com/NHSDigital/proxygen-cli) to deploy our prox
 
 - `make apigee--deploy`
 
-This when run locally will need you to have done a local `terraform--plan` and `terraform--apply` (as it will read some details from the output files)
+When you run this locally you will need to have done a local `terraform--plan` and `terraform--apply` (as it will read some details from the output files)
 
 Caveats
 
@@ -117,7 +171,7 @@ This is the preferred method of switching between profiles, as it will cause the
 
 You can build a working copy of the CPM service in your own workspace within the `dev` environment. To do this follow these steps. (You must have SSO setup on your system and have MGMT admin access)
 
-You must pass a `TERRAFORM_WORKSPACE` variable to each command in the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`. This variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
+Your workspace will build with an 8 digit hash of your system username by default. Therefore you do not need to provide a workspace name, however, if you would like to give your workspace a specific name then you must pass a `TERRAFORM_WORKSPACE` variable to each command. It is recommended that you use the format `YOUR_SHORTCODE_AND_JIRA_NUMBER`, but it will accept any name, however this variable must not contain spaces, but can contain underscores and hyphens. `e.g. jobl3-PI-100`
 
 ```shell
 make terraform--init TERRAFORM_WORKSPACE="<YOUR_SHORTCODE_AND_JIRA_NUMBER>" # Will attempt to login to AWS first using SSO
@@ -198,13 +252,13 @@ Run `make` to get a list of helpful commands.
 
 ### `pytest` tests
 
-There are four types of `pytest` in this project:
+There are three types of `pytest` in this project:
 
 - Unit: these _do not have_ any `@pytest.mark` markers;
 - Integration: these have `@pytest.mark.integration` markers;
 - Smoke: these have `@pytest.mark.smoke` markers;
 
-In order to run these you can do one of::
+In order to run these you can do one of:
 
 ```shell
 make test--unit
@@ -287,7 +341,39 @@ Modelling in Connecting Party Manager is split into four partially-decoupled com
 
 ### Domain models
 
-TBC
+We have two Domain models, ProductTeam and Product.
+
+```
+class ProductTeam()
+    id: str
+    name: str
+    ods_code: str
+    status: enum(ACTIVE, INACTIVE)
+    created_on: datetime
+    updated_on: datetime
+    deleted_on: datetime
+    keys: list[{
+      key_type: str,
+      key_value: uuid
+    }]
+```
+
+```
+class CpmProduct(AggregateRoot):
+    id: str
+    cpm_product_team_id: str
+    product_team_id: str
+    name: str
+    ods_code: str
+    status: enum(ACTIVE, INACTIVE)
+    created_on: datetime
+    updated_on: datetime
+    deleted_on: datetime
+    keys: list[{
+      key_type: str,
+      key_value: str
+    }]
+```
 
 ### Database models
 
@@ -303,7 +389,7 @@ The table is structured as below. (For purposes of clarity extra "entity specifi
 | PT#12345  | P#P.123-XYZ |      product       | P.123-XYZ |   A product    | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active | P#P.123-XYZ | P#P.123-XYZ | ORG#AB123 | P#P.123-XYZ | true  |
 | PT#FOOBAR |  PT#FOOBAR  | product_team_alias |   12345   | A Product Team | 2025-01-30T14:30:18.191643+00:00 |    null    |    null    | active |  PT#FOOBAR  |  PT#FOOBAR  |   NULL    |    NULL     | false |
 
-Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For every key in an domain object, that is of type product_team_alias_id,
+Product Teams can additionally be indexed by any keys (see [Domain models](#domain-models)) that they have. For a key in an domain object, that is of type product_team_id,
 a copy is made in the database with the index being that key, rather
 than the object's identifier. Such copies are referred to as non-root
 objects, whereas the "original" (indexed by identifier) is referred to
@@ -317,11 +403,11 @@ A `read` and `search` is available on all `Repository` patterns (almost) for fre
 
 ### Response models
 
-TBC
+For all response models please refer to the Swagger/OAS spec
 
 ### Request models
 
-TBC
+For all request models please refer to the Swagger/OAS spec
 
 ## Workflow
 
@@ -360,6 +446,34 @@ This command will also:
 - Update the version in `pyproject.toml` with the release branch version.
 - Update the VERSION file with the release branch version number.
 
+## Deployment
+
+### Create a Release branch
+
+When requested by QA
+
+- Create a release branch using the make command described in the previous section
+- Create a new changelog file with the correct date in the changelog directory. (Follow the patterns used in previous files.)
+- merge the required branches through the command line into the release branch. i.e. `git merge origin/feature/PI-123-A_branch_for_qa`
+- commit and push the release branch to github and create a PR.
+- Use the workflow on the #platforms-connecting-party-manager Slack channel to notify of the new release branch.
+
+### After QA has approved the changes
+
+QA should approve the release branch PR and notify developers on the #platforms-connecting-party-manager slack channel of a request to merge the release branch.
+
+- Merge the release branch within the github UI. This will merge the release and close any feature branches that are associated with it.
+- Reply to the QA notification on slack that its has been merged and to rebase. Make sure this reply also appears on the main feed. `Merged, rebase rebase :alert:` is usually enough.
+- Now we need to deploy to all environments.
+- In the github UI, navigate to the actions tab Select `Deploy: Workspace - Nonprod` and select the dropdown `Run workflow`
+- Select the `Tag` to deploy (This is the release branch that has just been merged.)
+- Select the Account to deploy to as well as if it should be the sandbox or not.
+- You must do this for all the environments.
+- Now navigate to the `Deploy: Workspace - Production` on the left
+- Run workflow. Select the Tag to deploy and Run.
+- In production you will need to approve the deployment once the terraform plan has run. All other environments will deploy until finish without any user interaction.
+- Once all environments are deployed successfully you can move any Jira tickets to "Done"
+
 ## Swagger
 
 This is all done by `make build`. For more details on how to update the Swagger, please see [the swagger README](infrastructure/swagger/README.md).
@@ -379,52 +493,6 @@ If you find yourself with a locked terraform state, do:
 
 ```
 make terraform--unlock TERRAFORM_ARGS=<lock_id>
-```
-
-## ETL
-
-### Debugging the state after changelog errors
-
-In order to get the latest head state of the ETL, do either (for your developer workspace)
-
-```
-make etl--head-state--developer
-```
-
-or for a persistent workspace (`dev`, `prod`, etc):
-
-```
-make etl--head-state--persistent-workspace WORKSPACE=<workspace_name>
-```
-
-For the developer operation, the script will automatically activate via SSO, however for the persistent-workspace
-operation you will need to export credentials by navigating yourself to the SSO login page and exporting the
-credentials for the workspace into your terminal.
-
-### Clearing the state (don't take this lightly, intended for first time bulk upload only)
-
-Before running the bulk trigger, you need to clear the initial ETL state, do:
-
-```
-make etl--clear-state
-```
-
-Before running the changelog trigger you additionally need to specify a changelog number (ideally close to the true latest changelog number, otherwise the logs will be pretty heavy!)
-
-```
-make etl--clear-state SET_CHANGELOG_NUMBER=540210
-```
-
-You can additionally set the workspace name if you want to clear the state for a given (e.g. persistent) workspace name:
-
-```
-make etl--clear-state WORKSPACE=dev
-```
-
-and
-
-```
-make etl--clear-state WORKSPACE=dev SET_CHANGELOG_NUMBER=540210
 ```
 
 ## Administration
@@ -451,7 +519,9 @@ We also have a confluence page
 
 `https://nhsd-confluence.digital.nhs.uk/display/SPINE/CPM+Swagger+Docs`
 
-In time we will also have our spec uploaded to bloomreach via proxygen
+The Spec is also available on the NHS API Catalogue.
+
+`https://digital.nhs.uk/developer/api-catalogue/connecting-party-manager/content`
 
 ## SBOM (Service Bill of Materials)
 

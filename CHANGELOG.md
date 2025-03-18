@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-03-18
+- [PI-761] Product Team name cannot be blank
+- [PI-850] Readme Review
+- [PI-855] Code coverage
+
 ## 2025-03-12
 - [PI-841] Remove VPC cpm-sds-etl-hscn-vpc
 - [PI-851] Swagger spec refinement - Part Deux

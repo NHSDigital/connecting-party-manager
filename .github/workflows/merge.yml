@@ -23,6 +23,25 @@ jobs:
           branch_name=${branch_name#*refs/tags/}
           echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 
+  test--coverage-sonar:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Restore coverage from the cache
+        uses: ./.github/actions/components/caching/
+        with:
+          save-or-restore: "restore"
+          cache-suffix: "coverage"
+          paths-to-cache: "sonarcloud-coverage.xml"
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
   make-tag:
     runs-on: [self-hosted, ci]
     permissions: write-all
