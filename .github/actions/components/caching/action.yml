@@ -51,39 +51,23 @@ runs:
         save-to-cache: "false"
         restore-from-cache: "false"
 
-    - if: ${{ inputs.save-or-restore == 'restore' && inputs.restore-coverage == 'true' }}
+    - if: ${{ inputs.save-or-restore == 'restore'}}
       id: restore-cache
       uses: actions/cache/restore@v3
       with:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ inputs.coverage-branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
-
-    - if: ${{ inputs.save-or-restore == 'restore' && inputs.restore-coverage != 'true' }}
-      id: restore-cache
-      uses: actions/cache/restore@v3
-      with:
-        path: ${{ inputs.paths-to-cache }}
-        key: "dummy"
-        restore-keys: |
-          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
+          ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
 
     # # For debugging, uncomment the following:
     # - id: tree
     #   shell: bash
     #   run: tree -D -I '__pycache__|.git|.venv|.hypothesis|.pytest_cache'
 
-    - if: ${{ inputs.save-or-restore == 'save' && inputs.cache-coverage == 'true'}}
+    - if: ${{ inputs.save-or-restore == 'save' }}
       id: save-cache
       uses: actions/cache/save@v3
       with:
         path: ${{ inputs.paths-to-cache }}
-        key: ${{ inputs.coverage-branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
-
-    - if: ${{ inputs.save-or-restore == 'save' && inputs.cache-coverage != 'true'}}
-      id: save-cache
-      uses: actions/cache/save@v3
-      with:
-        path: ${{ inputs.paths-to-cache }}
-        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
+        key: ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
