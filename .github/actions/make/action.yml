@@ -48,6 +48,7 @@ runs:
       with:
         save-or-restore: "restore"
         cache-suffix: ${{ inputs.cache-suffix }}
+        restore-coverage: ${{ inputs.restore-coverage }}
 
     - name: Restore coverage from the cache
       if: ${{ inputs.restore-from-cache == 'true' &&  inputs.restore-coverage == 'true'}}
@@ -95,6 +96,7 @@ runs:
         save-or-restore: "save"
         cache-suffix: ${{ inputs.coverage-cache-suffix }}
         paths-to-cache: ${{ inputs.paths-to-cache }}
+        cache-coverage: ${{ inputs.cache-coverage }}
 
     - name: Save to the cache default paths
       if: ${{ inputs.save-to-cache == 'true'  &&  inputs.cache-coverage != 'true'}}

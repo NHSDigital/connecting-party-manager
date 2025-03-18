@@ -25,6 +25,12 @@ inputs:
       src
       infrastructure
       !**/.terraform/modules/**/*
+  cache-coverage:
+    description: "Saving cache coverage"
+    required: false
+  restore-coverage:
+    description: "Restoring cache coverage"
+    required: false
 
 runs:
   using: "composite"
@@ -33,7 +39,7 @@ runs:
       shell: bash
       run: echo "date=$(date +'%Y-%m-%d-%M:%S')" >> $GITHUB_OUTPUT
 
-    - if: ${{ inputs.save-or-restore == 'restore' }}
+    - if: ${{ inputs.save-or-restore == 'restore'}}
       id: timestamp--reset
       uses: ./.github/actions/make/
       with:
@@ -41,7 +47,16 @@ runs:
         save-to-cache: "false"
         restore-from-cache: "false"
 
-    - if: ${{ inputs.save-or-restore == 'restore' }}
+    - if: ${{ inputs.save-or-restore == 'restore' && inputs.restore-coverage == 'true' }}
+      id: restore-cache
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ inputs.paths-to-cache }}
+        key: "dummy"
+        restore-keys: |
+          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
+
+    - if: ${{ inputs.save-or-restore == 'restore' && inputs.restore-coverage != 'true' }}
       id: restore-cache
       uses: actions/cache/restore@v3
       with:
