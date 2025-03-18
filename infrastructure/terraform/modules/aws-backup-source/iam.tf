@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["backup.amazonaws.com", "cloudformation.amazonaws.com"]
+      identifiers = ["backup.amazonaws.com"]
     }
 
     actions = ["sts:AssumeRole"]
@@ -26,30 +26,6 @@ resource "aws_iam_role_policy_attachment" "restore" {
   role       = aws_iam_role.backup.name
 }
 
-
-# resource "aws_iam_role_policy_attachment" "backup_full_access" {
-#   policy_arn = "arn:aws:iam::aws:policy/AWSBackupFullAccess"
-#   role       = aws_iam_role.backup.name
-# }
-
-
-resource "aws_iam_policy" "restore_testing_selection_permissions" {
-  name = "${local.resource_name_prefix}-source-account-backup-permissions"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "*"
-        ],
-        Resource = "*"
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "source_account_backup_permissions" {
-  policy_arn = aws_iam_policy.restore_testing_selection_permissions.arn
-  role       = aws_iam_role.backup.name
+output "backup_role_arn" {
+  value = aws_iam_role.backup.arn
 }

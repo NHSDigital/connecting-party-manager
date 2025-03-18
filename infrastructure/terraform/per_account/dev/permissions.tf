@@ -36,7 +36,9 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "backup:DeleteRestoreTestingPlan",
           "backup:GetRestoreTestingPlan",
           "backup:ListRestoreTestingPlans",
-          "backup:UpdateRestoreTestingPlan"
+          "backup:UpdateRestoreTestingPlan",
+          "backup:CreateRestoreTestingSelection",
+          "backup:GetRestoreTestingSelection"
         ],
         Resource = "*"
       },
@@ -81,15 +83,6 @@ resource "aws_iam_policy" "source_account_backup_permissions" {
           "arn:aws:iam::${var.assume_account}:policy/*"
         ]
       },
-      {
-        Effect = "Allow",
-        Action = [
-          "*"
-        ],
-        Resource = [
-          "*"
-        ]
-      }
     ]
   })
 }

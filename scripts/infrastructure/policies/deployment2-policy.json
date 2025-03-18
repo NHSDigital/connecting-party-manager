@@ -264,6 +264,8 @@
         "SNS:ListTagsForResource",
         "budgets:ModifyBudget",
         "budgets:ViewBudget",
+        "budgets:ListTagsForResource",
+        "budgets:TagResource",
         "SNS:DeleteTopic",
         "SNS:CreateTopic",
         "SNS:TagResource",

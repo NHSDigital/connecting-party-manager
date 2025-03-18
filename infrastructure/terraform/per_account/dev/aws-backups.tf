@@ -37,6 +37,26 @@ resource "aws_s3_bucket_acl" "backup_reports" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_policy" "backup_reports_policy" {
+  bucket = aws_s3_bucket.backup_reports.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = module.source.backup_role_arn
+        },
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ],
+        Resource = "${aws_s3_bucket.backup_reports.arn}/*"
+      }
+    ]
+  })
+}
+
 # We need a key for the SNS topic that will be used for notifications from AWS Backup. This key
 # will be used to encrypt the messages sent to the topic before they are sent to the subscribers,
 # but isn't needed by the recipients of the messages.
