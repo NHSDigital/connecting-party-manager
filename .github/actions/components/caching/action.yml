@@ -54,7 +54,7 @@ runs:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
+          ${{ inputs.branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
     - if: ${{ inputs.save-or-restore == 'restore' && inputs.restore-coverage != 'true' }}
       id: restore-cache
@@ -70,7 +70,14 @@ runs:
     #   shell: bash
     #   run: tree -D -I '__pycache__|.git|.venv|.hypothesis|.pytest_cache'
 
-    - if: ${{ inputs.save-or-restore == 'save' }}
+    - if: ${{ inputs.save-or-restore == 'save' && inputs.cache-coverage == 'true'}}
+      id: save-cache
+      uses: actions/cache/save@v3
+      with:
+        path: ${{ inputs.paths-to-cache }}
+        key: ${{ inputs.branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
+
+    - if: ${{ inputs.save-or-restore == 'save' && inputs.cache-coverage != 'true'}}
       id: save-cache
       uses: actions/cache/save@v3
       with:
