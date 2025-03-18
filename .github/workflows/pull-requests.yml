@@ -275,6 +275,40 @@ jobs:
           command: test--smoke
           requires-aws: true
 
+  test--coverage-sonar:
+    needs:
+      [
+        build-head,
+        workflow--codebase-checks,
+        test--unit,
+        test--feature--local,
+        terraform-head-build,
+        test--feature--integration,
+        test--integration,
+        apigee--deploy,
+        apigee--attach-product,
+        test--smoke,
+      ]
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+      - uses: ./.github/actions/make/
+        with:
+          command: test--coverage
+          requires-aws: true
+          save-to-cache: "true"
+          cache-coverage: "true"
+          coverage-cache-suffix: "coverage"
+          coverage-branch-name: ${{ env.BRANCH_NAME }}
+          paths-to-cache: "sonarcloud-coverage.xml"
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
   apigee--detach-product:
     needs:
       [

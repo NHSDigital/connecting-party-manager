@@ -12,6 +12,10 @@ inputs:
     description: "[Optional] Cache suffix (e.g. 'base')"
     required: false
     default: ""
+  coverage-branch-name:
+    description: "[Optional] Branch name for coverage cache"
+    required: false
+    default: ""
   coverage-cache-suffix:
     description: "[Optional] Coverage cache suffix (e.g. 'coverage')"
     required: false
@@ -55,6 +59,7 @@ runs:
       uses: ./.github/actions/components/caching/
       with:
         save-or-restore: "restore"
+        coverage-branch-name: ${{ inputs.coverage-branch-name }}
         cache-suffix: ${{ inputs.coverage-cache-suffix }}
 
     - name: Configure AWS Credentials
@@ -95,6 +100,7 @@ runs:
       with:
         save-or-restore: "save"
         cache-suffix: ${{ inputs.coverage-cache-suffix }}
+        coverage-branch-name: ${{ inputs.coverage-branch-name }}
         paths-to-cache: ${{ inputs.paths-to-cache }}
         cache-coverage: ${{ inputs.cache-coverage }}
 

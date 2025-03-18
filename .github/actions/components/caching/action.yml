@@ -8,6 +8,10 @@ inputs:
     description: "[Optional] Cache prefix (e.g. 'base')"
     required: false
     default: ""
+  coverage-branch-name:
+    description: "[Optional] Coverage name for cache"
+    required: false
+    default: ""
   paths-to-cache:
     description: |
       [Optional] Path to the items to be saved/restored.
@@ -54,7 +58,7 @@ runs:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ inputs.branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
+          ${{ inputs.coverage-branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
     - if: ${{ inputs.save-or-restore == 'restore' && inputs.restore-coverage != 'true' }}
       id: restore-cache
@@ -75,7 +79,7 @@ runs:
       uses: actions/cache/save@v3
       with:
         path: ${{ inputs.paths-to-cache }}
-        key: ${{ inputs.branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
+        key: ${{ inputs.coverage-branch-name }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
 
     - if: ${{ inputs.save-or-restore == 'save' && inputs.cache-coverage != 'true'}}
       id: save-cache
