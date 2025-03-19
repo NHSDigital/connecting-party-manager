@@ -9,8 +9,8 @@ permissions:
 
 env:
   BASE_CACHE_SUFFIX: base
-  BASE_BRANCH_NAME: main
-  BRANCH_NAME: feature/PI-855-add_sonar_code_coverage
+  BASE_BRANCH_NAME: ${{ github.event.pull_request.base.ref }}
+  BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
   BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
   TF_CLI_ARGS: -no-color
