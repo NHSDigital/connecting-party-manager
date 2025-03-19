@@ -1,9 +1,7 @@
-name: "Workflow: Merge to Main ggg"
+name: "Workflow: Merge to Main"
 
 on:
-  push:
-    branches:
-      - feature/PI-857-test-merge
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -25,6 +23,7 @@ jobs:
 
   test--coverage-sonar:
     runs-on: [self-hosted, ci]
+    needs: [get-branch-from-workflow-file]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +34,7 @@ jobs:
           save-or-restore: "restore"
           cache-suffix: "coverage"
           paths-to-cache: "sonarcloud-coverage.xml"
+          coverage-branch-name: feature/PI-857-sonar_merge_commit
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
