@@ -58,7 +58,7 @@ runs:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
+          ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
     # # For debugging, uncomment the following:
     # - id: tree
