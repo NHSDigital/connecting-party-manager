@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-03-19
+- [PI-858] Fix PR action
+
 ## 2025-03-18
 - [PI-761] Product Team name cannot be blank
 - [PI-850] Readme Review
