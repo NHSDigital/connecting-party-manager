@@ -61,9 +61,7 @@ const ProductTeamDelete: React.FC = () => {
       const responseData = await response.json();
       setProductTeamDeleteResponse(responseData);
     } catch (err) {
-      setError(
-        `Failed to Delete. Please try again. ${productTeamDeleteResponse}`
-      );
+      setError(`Failed to Delete. Please try again. ${err}`);
       console.error(err);
     } finally {
       setLoading(false);
