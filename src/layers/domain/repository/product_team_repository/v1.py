@@ -56,7 +56,7 @@ class ProductTeamRepository(Repository[ProductTeam]):
         product_team_key_delete_transactions = [
             self.delete_index(id=key.key_value) for key in keys
         ]
-        timestamp = int(datetime.now().timestamp() * 1000)  # Convert seconds to minutes
+        timestamp = int(datetime.now().timestamp() * 1000)
         product_team_key_create_transactions = [
             self.create_index(
                 id=f"{key.key_value}-{timestamp}",

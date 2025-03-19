@@ -241,3 +241,102 @@ def test_index_existing_products(version):
     _response_assertions(
         result=result, expected=expected, check_body=True, check_content_length=True
     )
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+    ],
+)
+def test_index_create_multiple_times(version):
+    org = Root.create_ods_organisation(ods_code=CPM_PRODUCT_TEAM_NO_ID["ods_code"])
+    product_team = org.create_product_team(
+        name=CPM_PRODUCT_TEAM_NO_ID["name"], keys=CPM_PRODUCT_TEAM_NO_ID["keys"]
+    )
+
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.deleteProductTeam.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
+
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": {"product_team_id": product_team.id},
+            }
+        )
+    expected_result = json.dumps(
+        {
+            "code": "RESOURCE_DELETED",
+            "message": f"{product_team.id} has been deleted.",
+        }
+    )
+
+    expected = {
+        "statusCode": 200,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
+
+    with mock_table_cpm(TABLE_NAME) as client, mock.patch.dict(
+        os.environ,
+        {
+            "DYNAMODB_TABLE": TABLE_NAME,
+            "AWS_DEFAULT_REGION": "eu-west-2",
+        },
+        clear=True,
+    ):
+        from api.deleteProductTeam.index import cache, handler
+
+        cache["DYNAMODB_CLIENT"] = client
+
+        product_team_repo = ProductTeamRepository(
+            table_name=TABLE_NAME, dynamodb_client=client
+        )
+        product_team_repo.write(entity=product_team)
+
+        result = handler(
+            event={
+                "headers": {"version": version},
+                "pathParameters": {"product_team_id": product_team.id},
+            }
+        )
+    expected_result = json.dumps(
+        {
+            "code": "RESOURCE_DELETED",
+            "message": f"{product_team.id} has been deleted.",
+        }
+    )
+
+    expected = {
+        "statusCode": 200,
+        "body": expected_result,
+        "headers": {
+            "Content-Length": str(len(expected_result)),
+            "Content-Type": "application/json",
+            "Version": version,
+        },
+    }
+    _response_assertions(
+        result=result, expected=expected, check_body=True, check_content_length=True
+    )
