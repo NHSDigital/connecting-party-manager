@@ -1,7 +1,6 @@
 name: "Workflow: Pull Request"
 
-on:
-  workflow_dispatch:
+on: pull_request
 
 permissions:
   id-token: write
