@@ -1,7 +1,8 @@
-resource "aws_backup_framework" "main" {
+resource "aws_backup_framework" "dynamodb" {
+  count = var.backup_plan_config_dynamodb.enable ? 1 : 0
   # must be underscores instead of dashes
-  name        = replace("${local.resource_name_prefix}-framework", "-", "_")
-  description = "${var.project_name} Backup Framework"
+  name        = replace("${local.resource_name_prefix}-dynamodb-framework", "-", "_")
+  description = "${var.project_name} DynamoDB Backup Framework"
 
   # Evaluates if recovery points are encrypted.
   control {
@@ -71,47 +72,6 @@ resource "aws_backup_framework" "main" {
       value = "1"
     }
   }
-
-  # Evaluates if resources are protected by a backup plan.
-  control {
-    name = "BACKUP_RESOURCES_PROTECTED_BY_BACKUP_PLAN"
-
-    scope {
-      compliance_resource_types = var.backup_plan_config.compliance_resource_types
-      tags = {
-        (var.backup_plan_config.selection_tag) = "True"
-      }
-    }
-  }
-
-  # Evaluates if resources have at least one recovery point created within the past 1 day.
-  control {
-    name = "BACKUP_LAST_RECOVERY_POINT_CREATED"
-
-    input_parameter {
-      name  = "recoveryPointAgeUnit"
-      value = "days"
-    }
-
-    input_parameter {
-      name  = "recoveryPointAgeValue"
-      value = "1"
-    }
-
-    scope {
-      compliance_resource_types = var.backup_plan_config.compliance_resource_types
-      tags = {
-        (var.backup_plan_config.selection_tag) = "True"
-      }
-    }
-  }
-}
-
-resource "aws_backup_framework" "dynamodb" {
-  count = var.backup_plan_config_dynamodb.enable ? 1 : 0
-  # must be underscores instead of dashes
-  name        = replace("${local.resource_name_prefix}-dynamodb-framework", "-", "_")
-  description = "${var.project_name} DynamoDB Backup Framework"
 
   # Evaluates if resources are protected by a backup plan.
   control {

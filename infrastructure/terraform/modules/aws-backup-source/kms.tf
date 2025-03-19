@@ -11,8 +11,6 @@ resource "aws_kms_alias" "backup_key" {
 }
 
 data "aws_iam_policy_document" "backup_key_policy" {
-  #checkov:skip=CKV_AWS_109:See (CERSS-25168) for more info
-  #checkov:skip=CKV_AWS_111:See (CERSS-25169) for more info
   statement {
     sid = "AllowBackupUseOfKey"
     principals {

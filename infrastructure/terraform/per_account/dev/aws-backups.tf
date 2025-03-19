@@ -45,13 +45,15 @@ resource "aws_s3_bucket_policy" "backup_reports_policy" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = module.source.backup_role_arn
+          AWS = "arn:aws:iam::${var.assume_account}:role/aws-service-role/reports.backup.amazonaws.com/AWSServiceRoleForBackupReports"
         },
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl"
-        ],
-        Resource = "${aws_s3_bucket.backup_reports.arn}/*"
+        Action   = "s3:PutObject",
+        Resource = "${aws_s3_bucket.backup_reports.arn}/*",
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
       }
     ]
   })
@@ -103,18 +105,6 @@ module "source" {
   project_name                 = local.project
   reports_bucket               = aws_s3_bucket.backup_reports.bucket
   terraform_role_arn           = "arn:aws:iam::${var.assume_account}:role/${var.assume_role}"
-
-
-  # disable all backups for now - just deploy the vault
-  backup_plan_config = {
-    "compliance_resource_types" : [
-      "S3"
-    ],
-    "rules" : [
-    ],
-    "enable" : false,
-    "selection_tag" : "NHSE-Enable-Backup"
-  }
 
   backup_plan_config_dynamodb = {
     "compliance_resource_types" : [

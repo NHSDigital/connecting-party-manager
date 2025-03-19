@@ -13,6 +13,7 @@ variable "notifications_target_email_address" {
   type        = string
   default     = ""
 }
+# needs adding
 
 variable "bootstrap_kms_key_arn" {
   description = "The ARN of the bootstrap KMS key used for encryption at rest of the SNS topic."
@@ -69,74 +70,6 @@ variable "backup_copy_vault_account_id" {
   description = "The account id of the destination backup vault for allowing restores back into the source account."
   type        = string
   default     = ""
-}
-
-variable "backup_plan_config" {
-  description = "Configuration for backup plans"
-  type = object({
-    selection_tag             = string
-    compliance_resource_types = list(string)
-    rules = list(object({
-      name                     = string
-      schedule                 = string
-      enable_continuous_backup = optional(bool)
-      lifecycle = object({
-        delete_after       = optional(number)
-        cold_storage_after = optional(number)
-      })
-      copy_action = optional(object({
-        delete_after = optional(number)
-      }))
-    }))
-  })
-  default = {
-    selection_tag             = "BackupLocal"
-    compliance_resource_types = ["S3"]
-    rules = [
-      {
-        name     = "daily_kept_5_weeks"
-        schedule = "cron(0 0 * * ? *)"
-        lifecycle = {
-          delete_after = 35
-        }
-        copy_action = {
-          delete_after = 365
-        }
-      },
-      {
-        name     = "weekly_kept_3_months"
-        schedule = "cron(0 1 ? * SUN *)"
-        lifecycle = {
-          delete_after = 90
-        }
-        copy_action = {
-          delete_after = 365
-        }
-      },
-      {
-        name     = "monthly_kept_7_years"
-        schedule = "cron(0 2 1  * ? *)"
-        lifecycle = {
-          cold_storage_after = 30
-          delete_after       = 2555
-        }
-        copy_action = {
-          delete_after = 365
-        }
-      },
-      {
-        name                     = "point_in_time_recovery"
-        schedule                 = "cron(0 5 * * ? *)"
-        enable_continuous_backup = true
-        lifecycle = {
-          delete_after = 35
-        }
-        copy_action = {
-          delete_after = 365
-        }
-      }
-    ]
-  }
 }
 
 variable "backup_plan_config_dynamodb" {
