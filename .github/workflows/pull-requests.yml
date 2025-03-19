@@ -61,7 +61,7 @@ jobs:
       workspace: ${{ steps.create_workspace_name.outputs.workspace }}
     steps:
       - id: create_workspace_name
-        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdld
+        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdl
         run: |
           if [[ ${{ env.BRANCH_NAME }} == *"release/"* ]]; then
             echo "workspace=rel-$(echo ${{ env.BRANCH_NAME }} | sed 's/release\///')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
