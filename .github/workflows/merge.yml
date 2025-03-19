@@ -34,6 +34,7 @@ jobs:
           save-or-restore: "restore"
           cache-suffix: "coverage"
           paths-to-cache: "sonarcloud-coverage.xml"
+          cache-coverage: true
           coverage-branch-name: feature/PI-857-sonar_merge_commit
 
       - name: SonarQube Scan
