@@ -21,7 +21,7 @@ components:
       headers:
         <<: *ResponseHeaders
     ProductTeamNotFound:
-      description: Product Team has not been found
+      description: Product team has not been found
       content:
         application/json:
           schema:
@@ -68,7 +68,7 @@ components:
               - code: "CONFLICT"
                 message: "Product Team cannot be deleted as it still has associated Product Ids ['P.1X3-XYZ', 'P.4Y6-ABC']"
     SearchProductBadRequest:
-      description: searchProduct Bad request
+      description: searchProduct bad request
       content:
         application/json:
           schema:
@@ -85,7 +85,7 @@ components:
                   - code: "VALIDATION_ERROR"
                     message: "SearchProductQueryParams.foo: extra fields not permitted"
     CreateProductTeamBadRequest:
-      description: createProductTeam Bad request
+      description: createProductTeam bad request
       content:
         application/json:
           schema:
@@ -117,7 +117,7 @@ components:
                   - code: "MISSING_VALUE"
                     message: "CreateProductTeamIncomingParams.ods_code: field required"
     CreateProductBadRequest:
-      description: createProduct Bad request
+      description: createProduct bad request
       content:
         application/json:
           schema:
@@ -158,7 +158,7 @@ components:
               - code: "UNPROCESSABLE_ENTITY"
                 message: "Invalid ODS Code: could not resolve 'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/invalid_ods_code'"
     CPMProductTeamCreate:
-      description: Create ProductTeam operation successful
+      description: Create product team operation successful
       content:
         application/json:
           schema:
@@ -169,19 +169,19 @@ components:
             type: string
           example: "*"
     CPMProductTeamRead:
-      description: Read ProductTeam operation successful
+      description: Read product team operation successful
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamResponse"
     CpmProductTeamDelete:
-      description: Delete Product Team operation successful
+      description: Delete product team operation successful
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamDeleteResponse"
     ProductCreate:
-      description: Create Product operation successful
+      description: Create product operation successful
       content:
         application/json:
           schema:
@@ -192,19 +192,19 @@ components:
             type: string
           example: "*"
     ProductRead:
-      description: Read Product operation successful
+      description: Read product operation successful
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductResponse"
     ProductDelete:
-      description: Delete Product operation successful
+      description: Delete product operation successful
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductDeleteResponse"
     ProductSearch:
-      description: Search Product operation successful
+      description: Search product operation successful
       content:
         application/json:
           schema:

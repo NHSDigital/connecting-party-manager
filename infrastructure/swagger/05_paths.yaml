@@ -86,7 +86,7 @@ paths:
       operationId: createproductteam
       summary: Create a product team
       description: >
-        Create a Product Team. This is needed in order to create a Product.
+        Create a product team. This is needed in order to create a product.
       tags:
         - Core product operations
       requestBody:
@@ -116,7 +116,7 @@ paths:
       operationId: readproductteam
       summary: Get a product team
       description: |
-        - Retrieve a Product Team using a product team ID.
+        - Get the details of a product team based on it's product team ID.
       tags:
         - Core product operations
       parameters:
@@ -141,7 +141,7 @@ paths:
       operationId: deleteproductteam
       summary: Delete a product team
       description: |
-        - Delete a product Team using a product team ID.
+        - Delete a product team based on it's product team ID.
       tags:
         - Core product operations
       parameters:
@@ -211,9 +211,7 @@ paths:
       operationId: createproductendpoint
       summary: Create a product
       description: |
-        This endpoint creates a new Product resource for the specified Product Team.
-        **Requirements:**
-        - A valid Product Team must exist
+        Create or register a new product for a given product team.
       tags:
         - Core product operations
       parameters:
@@ -281,7 +279,7 @@ paths:
         - app-level0: []
     get:
       operationId: searchProduct
-      summary: Get all products for a product team or organisation
+      summary: Get all products for a product team or an organisation
       tags:
         - Core product operations
       parameters:
@@ -350,7 +348,7 @@ paths:
       operationId: readproductendpoint
       summary: Get a product
       description: |
-        - Retrieve a product using a product ID.
+        - Get a product using a product ID.
       tags:
         - Core product operations
       parameters:

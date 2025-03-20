@@ -2,7 +2,6 @@
 components:
   requestBodies:
     ProductTeamCreateRequestBody:
-      description: Request body to create a Product Team
       required: true
       content:
         application/json:
@@ -38,7 +37,6 @@ components:
               - key_type: "product_team_id"
                 key_value: "0a78ee8f-5bcf-4db1-9341-ef1d67248715"
     ProductCreateRequestBody:
-      description: Request body to create a Product
       required: true
       content:
         application/json:
