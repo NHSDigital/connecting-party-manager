@@ -8,8 +8,7 @@
       "Resource": [
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*",
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*",
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-sds-app-key-*"
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*"
       ]
     }
   ]
