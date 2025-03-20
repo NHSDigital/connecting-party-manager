@@ -12,7 +12,7 @@ x-definitions:
       contentHandling: CONVERT_TO_TEXT
 
 tags:
-  - name: Core Product ID Endpoints
+  - name: Core product operations
     description: Create, Read and Delete Product IDs
   - name: Options
     description: These exist for CORS
@@ -45,7 +45,7 @@ paths:
   /ProductTeam:
     options:
       operationId: createproductteamcors
-      summary: Create a Product Team resource (OPTIONS)
+      summary: Create a product team (OPTIONS)
       tags:
         - Options
       responses:
@@ -84,11 +84,11 @@ paths:
         - app-level0: []
     post:
       operationId: createproductteam
-      summary: Create a Product Team resource (POST)
+      summary: Create a product team
       description: >
         Create a Product Team. This is needed in order to create a Product.
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       requestBody:
         $ref: "#/components/requestBodies/ProductTeamCreateRequestBody"
       responses:
@@ -114,11 +114,11 @@ paths:
   /ProductTeam/{product_team_id}:
     get:
       operationId: readproductteam
-      summary: Read a Product Team resource (GET)
+      summary: Get a product team
       description: |
         - Retrieve a Product Team using a product team ID.
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -139,11 +139,11 @@ paths:
         - app-level0: []
     delete:
       operationId: deleteproductteam
-      summary: Delete a Product Team resource (DELETE)
+      summary: Delete a product team
       description: |
         - Delete a product Team using a product team ID.
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -168,7 +168,7 @@ paths:
   /ProductTeam/{product_team_id}/Product:
     options:
       operationId: createproductcors
-      summary: Create a Product resource (OPTIONS)
+      summary: Create a product (OPTIONS)
       tags:
         - Options
       parameters:
@@ -209,13 +209,13 @@ paths:
         - app-level0: []
     post:
       operationId: createproductendpoint
-      summary: Create a Product resource (POST)
+      summary: Create a product
       description: |
         This endpoint creates a new Product resource for the specified Product Team.
         **Requirements:**
         - A valid Product Team must exist
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -281,9 +281,9 @@ paths:
         - app-level0: []
     get:
       operationId: searchProduct
-      summary: Retrieve all Products associated with a Product Team or Organisation (GET)
+      summary: Get all products for a product team or organisation
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       parameters:
         - $ref: "#/components/parameters/ProductTeamIdQuery"
         - $ref: "#/components/parameters/OrganisationCodeQuery"
@@ -348,11 +348,11 @@ paths:
         - app-level0: []
     get:
       operationId: readproductendpoint
-      summary: Read a Product resource (GET)
+      summary: Get a product
       description: |
         - Retrieve a product using a product ID.
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       parameters:
         - $ref: "#/components/parameters/ProductId"
         - $ref: "#/components/parameters/HeaderVersion"
@@ -417,11 +417,11 @@ paths:
         - app-level0: []
     delete:
       operationId: deleteproductendpoint
-      summary: Delete a Product resource (DELETE)
+      summary: Delete a product
       description: |
         - Delete a product using a product team ID and product ID.
       tags:
-        - Core Product ID Endpoints
+        - Core product operations
       parameters:
         - $ref: "#/components/parameters/ProductTeamId"
         - $ref: "#/components/parameters/ProductId"
