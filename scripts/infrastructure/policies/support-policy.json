@@ -252,6 +252,30 @@
         "apigateway:POST"
       ],
       "Resource": ["arn:aws:apigateway:*::/*"]
+    },
+    {
+      "Sid": "CertificateSupportPermissions",
+      "Effect": "Allow",
+      "Action": ["acm:ListTagsForCertificate", "acm:DescribeCertificate"],
+      "Resource": ["arn:aws:acm:*:{$ACCOUNT_ID}:certificate*"]
+    },
+    {
+      "Sid": "BillingSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostForcast",
+        "ce:GetAnomalies",
+        "ce:GetTags",
+        "budgets:ViewBudget"
+      ],
+      "Resource": [
+        "arn:aws:ce:*:{$ACCOUNT_ID}:GetCostAndUsage",
+        "arn:aws:ce:*:{$ACCOUNT_ID}:GetCostForecast",
+        "arn:aws:ce:*:{$ACCOUNT_ID}:GetTags",
+        "arn:aws:ce:*:{$ACCOUNT_ID}:anomalymonitor/*",
+        "arn:aws:budgets::{$ACCOUNT_ID}:budget/*"
+      ]
     }
   ]
 }
