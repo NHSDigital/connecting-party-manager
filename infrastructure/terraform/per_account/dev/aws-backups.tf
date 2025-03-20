@@ -113,13 +113,13 @@ module "source" {
     "rules" : [
       {
         "copy_action" : {
-          "delete_after" : 4
+          "delete_after" : 31
         },
         "lifecycle" : {
-          "delete_after" : 2
+          "delete_after" : 4
         },
         "name" : "daily_kept_for_2_days",
-        "schedule" : "cron(0 0 * * ? *)"
+        "schedule" : "cron(0 20 * * ? *)"
       }
     ],
     "enable" : true,

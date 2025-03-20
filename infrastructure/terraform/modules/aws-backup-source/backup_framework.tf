@@ -1,5 +1,4 @@
 resource "aws_backup_framework" "dynamodb" {
-  count = var.backup_plan_config_dynamodb.enable ? 1 : 0
   # must be underscores instead of dashes
   name        = replace("${local.resource_name_prefix}-dynamodb-framework", "-", "_")
   description = "${var.project_name} DynamoDB Backup Framework"

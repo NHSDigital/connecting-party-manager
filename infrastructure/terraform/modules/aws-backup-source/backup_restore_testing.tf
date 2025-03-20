@@ -13,7 +13,6 @@ resource "aws_backup_restore_testing_plan" "backup_restore_testing_plan" {
 
 
 resource "aws_backup_restore_testing_selection" "backup_restore_testing_selection_dynamodb" {
-  count                     = var.backup_plan_config_dynamodb.enable ? 1 : 0
   name                      = "backup_restore_testing_selection_dynamodb"
   restore_testing_plan_name = aws_backup_restore_testing_plan.backup_restore_testing_plan.name
   protected_resource_type   = "DynamoDB"
