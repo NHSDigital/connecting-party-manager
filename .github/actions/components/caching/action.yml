@@ -8,6 +8,10 @@ inputs:
     description: "[Optional] Cache prefix (e.g. 'base')"
     required: false
     default: ""
+  coverage-branch-name:
+    description: "[Optional] Coverage name for cache"
+    required: false
+    default: ""
   paths-to-cache:
     description: |
       [Optional] Path to the items to be saved/restored.
@@ -25,6 +29,12 @@ inputs:
       src
       infrastructure
       !**/.terraform/modules/**/*
+  cache-coverage:
+    description: "Saving cache coverage"
+    required: false
+  restore-coverage:
+    description: "Restoring cache coverage"
+    required: false
 
 runs:
   using: "composite"
@@ -33,7 +43,7 @@ runs:
       shell: bash
       run: echo "date=$(date +'%Y-%m-%d-%M:%S')" >> $GITHUB_OUTPUT
 
-    - if: ${{ inputs.save-or-restore == 'restore' }}
+    - if: ${{ inputs.save-or-restore == 'restore'}}
       id: timestamp--reset
       uses: ./.github/actions/make/
       with:
@@ -41,14 +51,14 @@ runs:
         save-to-cache: "false"
         restore-from-cache: "false"
 
-    - if: ${{ inputs.save-or-restore == 'restore' }}
+    - if: ${{ inputs.save-or-restore == 'restore'}}
       id: restore-cache
       uses: actions/cache/restore@v3
       with:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
+          ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
     # # For debugging, uncomment the following:
     # - id: tree
@@ -60,4 +70,4 @@ runs:
       uses: actions/cache/save@v3
       with:
         path: ${{ inputs.paths-to-cache }}
-        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
+        key: ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
