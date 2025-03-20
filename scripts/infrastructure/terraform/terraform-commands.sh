@@ -50,7 +50,7 @@ function _terraform() {
         workspace_expiration ${workspace_expiration}
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
-    "
+            "
   fi
 
   if [[ "${login_account}" != "NHS Digital Spine Core CPM MGMT" ]]; then

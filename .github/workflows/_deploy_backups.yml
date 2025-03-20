@@ -121,60 +121,6 @@ jobs:
           save-to-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}
 
-  apigee--deploy:
-    needs: [get-branch-from-workflow-file, terraform--apply]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - uses: ./.github/actions/make/
-        if: ${{ env.SCOPE == 'per_workspace'}}
-        with:
-          command: apigee--deploy PERSISTENT_ENVIRONMENT_BUILD="true"
-          requires-aws: true
-          restore-from-cache: "true"
-          cache-suffix: ${{ env.CACHE_NAME }}
-      - name: Archive swagger
-        uses: actions/upload-artifact@v4
-        with:
-          name: swagger
-          path: |
-            infrastructure/swagger/dist/public/swagger.yaml
-            infrastructure/swagger/dist/aws/swagger.yaml
-            infrastructure/swagger/dist/apigee/swagger.yaml
-        if: ${{ always() }}
-
-  swagger--publish:
-    needs: [get-branch-from-workflow-file, apigee--deploy]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - if: ${{ env.SCOPE == 'per_workspace' && (env.ACCOUNT == 'int' || env.ACCOUNT == 'prod') }}
-        uses: ./.github/actions/make/
-        with:
-          command: swagger--publish
-          requires-aws: true
-          restore-from-cache: "true"
-          cache-suffix: ${{ env.CACHE_NAME }}
-
-  test--smoke:
-    needs: [get-branch-from-workflow-file, apigee--deploy]
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - if: ${{ env.ACCOUNT != 'mgmt' && env.ACCOUNT != 'backups' }}
-        uses: ./.github/actions/make/
-        with:
-          command: test--smoke WORKSPACE="${{ env.WORKSPACE }}" ACCOUNT="${{ env.ACCOUNT }}"
-          requires-aws: true
-          restore-from-cache: "true"
-          cache-suffix: ${{ env.CACHE_NAME }}
-
   set-success:
     name: Set Success
     needs: [test--smoke, apigee--deploy]
