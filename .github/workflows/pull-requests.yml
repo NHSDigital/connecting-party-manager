@@ -13,6 +13,7 @@ env:
   BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   CI_ROLE_NAME: ${{ secrets.CI_ROLE_NAME }}
   BRANCH_GITHUB_SHA_SHORT: $(echo ${{ github.event.pull_request.head.sha }} | cut -c 1-7)
+  COVERAGE_ARTIFACT_BRANCH_NAME: $(echo ${{ github.event.pull_request.head.ref }} | cut -c 9-)
   TF_CLI_ARGS: -no-color
 
 jobs:
@@ -61,7 +62,7 @@ jobs:
       workspace: ${{ steps.create_workspace_name.outputs.workspace }}
     steps:
       - id: create_workspace_name
-        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdld
+        # will create a workspace in the format ci-PI-70-b25lkjd or for release branches rel-2023-10-30-lskjdl
         run: |
           if [[ ${{ env.BRANCH_NAME }} == *"release/"* ]]; then
             echo "workspace=rel-$(echo ${{ env.BRANCH_NAME }} | sed 's/release\///')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
@@ -275,6 +276,16 @@ jobs:
           command: test--smoke
           requires-aws: true
 
+  create-coverage-name:
+    runs-on: [self-hosted, ci]
+    needs: [workflow--check--branch-name]
+    outputs:
+      coverage-name: ${{ steps.create_coverage_name.outputs.coverage-name }}
+    steps:
+      - id: create_coverage_name
+        run: |
+          echo "coverage-name=${{ env.COVERAGE_ARTIFACT_BRANCH_NAME }}" >> $GITHUB_OUTPUT
+
   test--coverage-sonar:
     needs:
       [
@@ -288,6 +299,7 @@ jobs:
         apigee--deploy,
         apigee--attach-product,
         test--smoke,
+        create-coverage-name,
       ]
     runs-on: [self-hosted, ci]
     steps:
@@ -299,9 +311,12 @@ jobs:
           command: test--coverage
           requires-aws: true
           save-to-cache: "true"
-          cache-coverage: "true"
-          coverage-cache-suffix: "coverage"
           paths-to-cache: "sonarcloud-coverage.xml"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ needs.create-coverage-name.outputs.coverage-name }}-coverage"
+          path: "sonarcloud-coverage.xml"
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
