@@ -8,10 +8,6 @@ inputs:
     description: "[Optional] Cache prefix (e.g. 'base')"
     required: false
     default: ""
-  coverage-branch-name:
-    description: "[Optional] Coverage name for cache"
-    required: false
-    default: ""
   paths-to-cache:
     description: |
       [Optional] Path to the items to be saved/restored.
@@ -29,12 +25,6 @@ inputs:
       src
       infrastructure
       !**/.terraform/modules/**/*
-  cache-coverage:
-    description: "Saving cache coverage"
-    required: false
-  restore-coverage:
-    description: "Restoring cache coverage"
-    required: false
 
 runs:
   using: "composite"
@@ -58,7 +48,7 @@ runs:
         path: ${{ inputs.paths-to-cache }}
         key: "dummy"
         restore-keys: |
-          ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
+          ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-
 
     # # For debugging, uncomment the following:
     # - id: tree
@@ -70,4 +60,4 @@ runs:
       uses: actions/cache/save@v3
       with:
         path: ${{ inputs.paths-to-cache }}
-        key: ${{ inputs.cache-coverage == 'true' && inputs.coverage-branch-name || env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
+        key: ${{ env.GITHUB_SHA_SHORT }}-${{ inputs.cache-suffix == '' && 'head' || inputs.cache-suffix }}-${{ steps.set-date.outputs.date }}
