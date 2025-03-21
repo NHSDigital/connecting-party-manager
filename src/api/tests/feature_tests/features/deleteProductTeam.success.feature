@@ -128,3 +128,19 @@ Feature: Delete Product Team - success scenarios
     And the response headers contain:
       | name         | value            |
       | Content-Type | application/json |
+
+  Scenario: Successfully delete a CPM Product Team without a key
+    Given I have already made a "POST" request with "default" headers to "ProductTeam" with body:
+      | path     | value                 |
+      | name     | My Great Product Team |
+      | ods_code | F5H1R                 |
+    And I note the response field "$.id" as "product_team_id"
+    When I make a "DELETE" request with "default" headers to "ProductTeam/${ note(product_team_id) }"
+    Then I receive a status code "200" with body
+      | path    | value                                        |
+      | code    | RESOURCE_DELETED                             |
+      | message | ${ note(product_team_id) } has been deleted. |
+    And the response headers contain:
+      | name           | value            |
+      | Content-Type   | application/json |
+      | Content-Length | 97               |

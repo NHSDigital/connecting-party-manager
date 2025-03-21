@@ -68,7 +68,7 @@ components:
               - code: "CONFLICT"
                 message: "Product Team cannot be deleted as it still has associated Product Ids ['P.1X3-XYZ', 'P.4Y6-ABC']"
     SearchProductBadRequest:
-      description: searchProduct bad request
+      description: Search product bad request
       content:
         application/json:
           schema:
@@ -85,7 +85,7 @@ components:
                   - code: "VALIDATION_ERROR"
                     message: "SearchProductQueryParams.foo: extra fields not permitted"
     CreateProductTeamBadRequest:
-      description: createProductTeam bad request
+      description: Create product team bad request
       content:
         application/json:
           schema:
@@ -117,7 +117,7 @@ components:
                   - code: "MISSING_VALUE"
                     message: "CreateProductTeamIncomingParams.ods_code: field required"
     CreateProductBadRequest:
-      description: createProduct bad request
+      description: Create product bad request
       content:
         application/json:
           schema:
@@ -148,7 +148,7 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     UnprocessableContent:
-      description: Unprocessable Content
+      description: Unprocessable content
       content:
         application/json:
           schema:
@@ -169,7 +169,7 @@ components:
             type: string
           example: "*"
     CPMProductTeamRead:
-      description: Read product team operation successful
+      description: Get product team operation successful
       content:
         application/json:
           schema:
@@ -192,7 +192,7 @@ components:
             type: string
           example: "*"
     ProductRead:
-      description: Read product operation successful
+      description: Get product operation successful
       content:
         application/json:
           schema:
