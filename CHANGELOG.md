@@ -2,6 +2,7 @@
 
 ## 2025-03-20
 - [PI-815] Allow a Product Team to be recreated
+- [PI-859] Swagger refinement
 
 ## 2025-03-19
 - [PI-858] Fix PR action
