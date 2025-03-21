@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from attr import asdict
 from domain.core.enum import EntityType
 from domain.core.product_team import (
@@ -50,9 +52,29 @@ class ProductTeamRepository(Repository[ProductTeam]):
         return [create_root_transaction] + create_key_transactions
 
     def handle_ProductTeamDeletedEvent(self, event: ProductTeamDeletedEvent):
-        return self.update_indexes(
+        keys = {ProductTeamKey(**key) for key in event.keys}
+        product_team_key_delete_transactions = [
+            self.delete_index(id=key.key_value) for key in keys
+        ]
+        timestamp = int(datetime.now().timestamp() * 1000)
+        product_team_key_create_transactions = [
+            self.create_index(
+                id=f"{key.key_value}-{timestamp}",
+                parent_key_parts=(f"{key.key_value}-{timestamp}",),
+                data=asdict(event),
+                root=False,
+                row_type=EntityType.PRODUCT_TEAM_ALIAS,
+            )
+            for key in keys
+        ]
+        product_team_update = self.update_indexes(
             pk=TableKey.PRODUCT_TEAM.key(event.id),
             id=event.id,
             keys=event.keys,
             data=asdict(event),
+        )
+        return (
+            product_team_update
+            + product_team_key_create_transactions
+            + product_team_key_delete_transactions
         )

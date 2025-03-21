@@ -5,13 +5,13 @@ components:
       name: product_team_id
       in: path
       required: true
-      description: Product Team identifier. Either the "internally" generated id (cpm_product_team_id) or the provided team id (product_team_id)
+      description: Product team identifier. Either the "internally" generated id (cpm_product_team_id) or the provided team id (product_team_id)
       schema:
         type: string
     ProductId:
       name: product_id
       in: path
       required: true
-      description: The Product identifier generated at time of creation.
+      description: The product identifier generated at time of creation.
       schema:
         type: string
