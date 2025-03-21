@@ -12,17 +12,18 @@ info:
   description: |
     ## Overview
 
-    Use this API to access the Connecting Party Manager (CPM) service - an internal service for the creation and management of product IDs.
+    Use this API to access the Connecting Party Manager (CPM) service - an internal service for registering and managing details of IT systems and applications that connect to our APIs – sometimes known as ‘connecting parties’ and referred to herein as ‘products’.
 
-    This API only has a single access mode, application-restricted - signed JWT authentication, through which you may:
+    Each product is owned by a ‘product team’. Product teams are associated with software development or healthcare organisations, identified by an ODS code.
 
-    * Create a product team
-    * Create a product
-    * Retrieve details about a product team
-    * Retrieve details about a product
-    * Retrieve a list of all products associated wit a team or all products associated with an organisation, grouped by product team
-    * Delete a product team
-    * Delete a product
+    You can:
+    * create (register) a product team
+    * get product team details
+    * delete a product team
+    * create (register) a product
+    * get details of a single product
+    * get details of all products for a given product team or organisation
+    * delete a product
 
     ## Who can use this API
 
@@ -53,7 +54,9 @@ info:
 
     ## Security and authorisation
 
-    This API uses the following access modes:
+    This API is application-restricted, meaning we authenticate the calling application but not the end user.
+
+    To use this API, use the following security pattern:
 
     * [Application-restricted RESTful API - signed JWT authentication](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication)
 
