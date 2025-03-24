@@ -311,7 +311,6 @@ jobs:
           command: test--coverage
           requires-aws: true
           save-to-cache: "true"
-          paths-to-cache: "sonarcloud-coverage.xml"
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
