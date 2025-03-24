@@ -41,7 +41,7 @@ runs:
         save-to-cache: "false"
         restore-from-cache: "false"
 
-    - if: ${{ inputs.save-or-restore == 'restore' }}
+    - if: ${{ inputs.save-or-restore == 'restore '}}
       id: restore-cache
       uses: actions/cache/restore@v3
       with:
