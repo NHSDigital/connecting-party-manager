@@ -1,13 +1,17 @@
 ---
 x-definitions:
+  OptionResponseParameters:
+    type: object
+    option-response-parameters: &OptionResponseParameters
+      OptionResponseParameters:
+        method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE'"
+        method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
+        method.response.header.Access-Control-Allow-Origin: "'*'"
   ApiGatewayIntegration:
     type: object
     x-amazon-apigateway-integration: &ApiGatewayIntegration
       type: aws_proxy
       httpMethod: POST
-      responses:
-        default:
-          statusCode: "200"
       passthroughBehavior: when_no_match
       contentHandling: CONVERT_TO_TEXT
 
@@ -37,6 +41,9 @@ paths:
         - $ref: "#/components/parameters/HeaderCorrelationId"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_status}
       security:
         - ${authoriser_name}: []
@@ -68,15 +75,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Empty"
       x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
         responses:
           default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
-              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        requestTemplates:
-          application/json: '{"statusCode": 200}'
+            statusCode: 200
+            <<: *OptionResponseParameters
+          "400":
+            statusCode: "400"
+            <<: *OptionResponseParameters
         passthroughBehavior: "never"
         type: "mock"
       security:
@@ -106,12 +112,57 @@ paths:
         - $ref: "#/components/parameters/HeaderCorrelationId"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_createProductTeam}
       security:
         - ${authoriser_name}: []
         - app-level0: []
 
   /ProductTeam/{product_team_id}:
+    options:
+      operationId: productteamcors
+      summary: Product Team (OPTIONS)
+      tags:
+        - Options
+      parameters:
+        - $ref: "#/components/parameters/ProductTeamId"
+        - $ref: "#/components/parameters/CorsOrigin"
+      responses:
+        "400":
+          $ref: "#/components/responses/CreateProductTeamBadRequest"
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
+            <<: *OptionResponseParameters
+          "409":
+            $ref: "#/components/responses/Conflict"
+            statusCode: 409
+            <<: *OptionResponseParameters
+        passthroughBehavior: "never"
+        type: "mock"
+      security:
+        - ${authoriser_name}: []
+        - app-level0: []
     get:
       operationId: readproductteam
       summary: Get a product team
@@ -133,6 +184,9 @@ paths:
           $ref: "#/components/responses/ProductTeamNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_readProductTeam}
       security:
         - ${authoriser_name}: []
@@ -151,6 +205,7 @@ paths:
         - $ref: "#/components/parameters/HeaderApikey"
         - $ref: "#/components/parameters/HeaderRequestId"
         - $ref: "#/components/parameters/HeaderCorrelationId"
+        - $ref: "#/components/parameters/CorsOrigin"
       responses:
         "200":
           $ref: "#/components/responses/CpmProductTeamDelete"
@@ -160,6 +215,9 @@ paths:
           $ref: "#/components/responses/Conflict"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_deleteProductTeam}
       security:
         - ${authoriser_name}: []
@@ -193,15 +251,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/Empty"
       x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
         responses:
           default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
-              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        requestTemplates:
-          application/json: '{"statusCode": 200}'
+            statusCode: 200
+            <<: *OptionResponseParameters
         passthroughBehavior: "never"
         type: "mock"
       security:
@@ -232,6 +286,9 @@ paths:
           $ref: "#/components/responses/ProductTeamNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_createCpmProduct}
       security:
         - ${authoriser_name}: []
@@ -263,15 +320,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/Empty"
       x-amazon-apigateway-integration:
+        <<: *ApiGatewayIntegration
         responses:
           default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'apikey,authorization,content-type,version'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        requestTemplates:
-          application/json: '{"statusCode": 200}'
+            statusCode: 200
+            <<: *OptionResponseParameters
         passthroughBehavior: "never"
         type: "mock"
       security:
@@ -297,6 +350,9 @@ paths:
           $ref: "#/components/responses/SearchProductBadRequest"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_searchProduct}
       security:
         - ${authoriser_name}: []
@@ -365,6 +421,9 @@ paths:
           $ref: "#/components/responses/ProductNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_readCpmProduct}
       security:
         - ${authoriser_name}: []
@@ -435,6 +494,9 @@ paths:
           $ref: "#/components/responses/ProductDeleteNotFound"
       x-amazon-apigateway-integration:
         <<: *ApiGatewayIntegration
+        responses:
+          default:
+            statusCode: 200
         uri: ${method_deleteCpmProduct}
       security:
         - ${authoriser_name}: []
