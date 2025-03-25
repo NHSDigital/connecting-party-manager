@@ -1,0 +1,270 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "TagPermissions",
+      "Effect": "Allow",
+      "Action": ["tag:TagResources", "tag:GetResources"],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "ParameterPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:PutResourcePolicy",
+        "secretsmanager:DeleteResourcePolicy",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:UntagResource"
+      ],
+      "Resource": ["arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*"]
+    },
+    {
+      "Sid": "DynamoDBPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:CreateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:DescribeContinuousBackups",
+        "dynamodb:DescribeTable",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:ListTagsOfResource",
+        "dynamodb:UpdateContinuousBackups",
+        "dynamodb:UpdateTimeToLive",
+        "dynamodb:UpdateTable",
+        "dynamodb:TagResource",
+        "dynamodb:UntagResource"
+      ],
+      "Resource": ["arn:aws:dynamodb:*:${ACCOUNT_ID}:table/*"]
+    },
+    {
+      "Sid": "LambdaPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:AddPermission",
+        "lambda:CreateFunction",
+        "lambda:DeleteLayerVersion",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:GetFunction",
+        "lambda:GetLayerVersion",
+        "lambda:GetPolicy",
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:ListFunctions",
+        "lambda:ListVersionsByFunction",
+        "lambda:InvokeFunction",
+        "lambda:DeleteFunction",
+        "lambda:PublishVersion",
+        "lambda:PublishLayerVersion",
+        "lambda:RemovePermission",
+        "lambda:TagResource",
+        "lambda:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:lambda:*:${ACCOUNT_ID}:function:*",
+        "arn:aws:lambda:*:${ACCOUNT_ID}:layer:*"
+      ]
+    },
+    {
+      "Sid": "APIGatewayPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:DELETE",
+        "apigateway:GET",
+        "apigateway:PATCH",
+        "apigateway:PUT",
+        "apigateway:POST"
+      ],
+      "Resource": ["arn:aws:apigateway:*::/*"]
+    },
+    {
+      "Sid": "CloudFormationPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:DescribeStacks",
+        "cloudformation:ListStacks",
+        "cloudformation:ListStackResources"
+      ],
+      "Resource": ["arn:aws:cloudformation:*:${ACCOUNT_ID}:stack/*/*"]
+    },
+    {
+      "Sid": "StepFunctionPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "states:DescribeStateMachine",
+        "states:ListStateMachineVersions",
+        "states:ListTagsForResource",
+        "states:CreateStateMachine",
+        "states:UpdateStateMachine",
+        "states:DeleteStateMachine",
+        "states:TagResource"
+      ],
+      "Resource": ["arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*"]
+    },
+    {
+      "Sid": "Route53Permissions",
+      "Effect": "Allow",
+      "Action": [
+        "route53:CreateHostedZone",
+        "route53:GetChange",
+        "route53:GetHostedZone",
+        "route53:ListTagsForResource",
+        "route53:DeleteHostedZone",
+        "route53:ChangeTagsForResource",
+        "route53:ListHostedZones",
+        "route53:ChangeResourceRecordSets",
+        "route53:ListResourceRecordSets",
+        "route53:AssociateVPCWithHostedZone"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "AcmPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "acm:RequestCertificate",
+        "acm:AddTagsToCertificate",
+        "acm:DescribeCertificate",
+        "acm:ListTagsForCertificate",
+        "acm:DeleteCertificate"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "EventsPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "events:TagResource",
+        "events:PutRule",
+        "events:DescribeRule",
+        "events:ListTagsForResource",
+        "events:DeleteRule",
+        "events:PutTargets",
+        "events:ListTargetsByRule",
+        "events:RemoveTargets",
+        "events:DisableRule"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "VpcPermissionsPlan",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeVpcEndpointServices",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateVpcEndpoint",
+        "ec2:DescribeVpcEndpoints",
+        "ec2:DescribePrefixLists",
+        "ec2:DescribeRouteTables",
+        "ec2:DeleteNetworkInterface",
+        "ec2:DisassociateRouteTable"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateVpc", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc/*"]
+    },
+    {
+      "Sid": "VpcPermissionsApply2",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeVpcAttribute",
+        "ec2:ModifyVpcAttribute",
+        "ec2:CreateSubnet",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateRouteTable",
+        "ec2:DeleteVpc"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc/vpc-*"]
+    },
+    {
+      "Sid": "VpcEndpointPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateVpcEndpoint",
+        "ec2:CreateTags",
+        "ec2:DeleteVpcEndpoints"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc-endpoint/*"]
+    },
+    {
+      "Sid": "VpcEndpointPermissions2",
+      "Effect": "Allow",
+      "Action": ["ec2:ModifyVpcEndpoint"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:vpc-endpoint/vpce-*"]
+    },
+    {
+      "Sid": "SubnetPermissions",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateSubnet", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:subnet/*"]
+    },
+    {
+      "Sid": "SubnetPermissions2",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DeleteSubnet",
+        "ec2:AssociateRouteTable",
+        "ec2:ModifyVpcEndpoint"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:subnet/subnet-*"]
+    },
+    {
+      "Sid": "SecurityGroupPermissions",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateSecurityGroup", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/*"]
+    },
+    {
+      "Sid": "SecurityGroupPermissions2",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DeleteSecurityGroup",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:ModifyVpcEndpoint",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:security-group/sg-*"]
+    },
+    {
+      "Sid": "SecretsPermissions",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": [
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-sds-hscn-endpoint-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-host-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-changelog-user-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-ldap-changelog-password-*",
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-client-info-*"
+      ]
+    },
+    {
+      "Sid": "RouteTablePermissions",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateRouteTable", "ec2:CreateTags"],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:route-table/*"]
+    },
+    {
+      "Sid": "RouteTablePermissions2",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DeleteRouteTable",
+        "ec2:ModifyVpcEndpoint",
+        "ec2:AssociateRouteTable"
+      ],
+      "Resource": ["arn:aws:ec2:eu-west-2:${ACCOUNT_ID}:route-table/rtb-*"]
+    }
+  ]
+}
