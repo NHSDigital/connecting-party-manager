@@ -116,7 +116,7 @@ paths:
       operationId: readproductteam
       summary: Get a product team
       description: |
-        - Get the details of a product team based on it's product team ID.
+        Get the details of a product team based on it's product team ID.
       tags:
         - Core product operations
       parameters:
@@ -141,7 +141,7 @@ paths:
       operationId: deleteproductteam
       summary: Delete a product team
       description: |
-        - Delete a product team based on it's product team ID.
+        Delete a product team based on it's product team ID.
       tags:
         - Core product operations
       parameters:
@@ -348,7 +348,7 @@ paths:
       operationId: readproductendpoint
       summary: Get a product
       description: |
-        - Get a product using a product ID.
+        Get a product using a product ID.
       tags:
         - Core product operations
       parameters:
@@ -417,7 +417,7 @@ paths:
       operationId: deleteproductendpoint
       summary: Delete a product
       description: |
-        - Delete a product using a product team ID and product ID.
+        Delete a product using a product team ID and product ID.
       tags:
         - Core product operations
       parameters:

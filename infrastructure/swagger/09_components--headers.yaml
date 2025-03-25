@@ -10,13 +10,11 @@ components:
     HeaderRequestId:
       in: header
       name: x-request-id
-      required: true
       schema:
         $ref: "#/components/schemas/HeaderRequestId"
     HeaderCorrelationId:
       in: header
       name: x-correlation-id
-      required: true
       schema:
         $ref: "#/components/schemas/HeaderCorrelationId"
     HeaderAuthorization:
