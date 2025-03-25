@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-03-25
+- [PI-857] Sonar Merge Commit
+- [PI-865] Swagger refinement 2
+
 ## 2025-03-20
 - [PI-815] Allow a Product Team to be recreated
 - [PI-859] Swagger refinement
