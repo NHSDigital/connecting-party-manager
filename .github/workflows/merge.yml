@@ -11,37 +11,6 @@ permissions:
   actions: write
 
 jobs:
-  get-branch-from-workflow-file:
-    runs-on: [self-hosted, ci]
-    outputs:
-      branch_name: ${{ steps.get_branch.outputs.branch_name }}
-    steps:
-      - id: get_branch
-        run: |
-          workflow_ref=${{ github.workflow_ref }}
-          branch_name=${workflow_ref#*refs/heads/}
-          branch_name=${branch_name#*refs/tags/}
-          echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
-
-  test--coverage-sonar:
-    runs-on: [self-hosted, ci]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - name: Restore coverage from the cache
-        uses: ./.github/actions/components/caching/
-        with:
-          save-or-restore: "restore"
-          cache-suffix: "coverage"
-          paths-to-cache: "sonarcloud-coverage.xml"
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-
   make-tag:
     runs-on: [self-hosted, ci]
     permissions: write-all
@@ -67,9 +36,40 @@ jobs:
     outputs:
       tag: ${{ env.tag }}
 
+  create-coverage-name:
+    runs-on: [self-hosted, ci]
+    needs: [make-tag]
+    outputs:
+      coverage-name: ${{ steps.create_coverage_name.outputs.coverage-name }}
+    steps:
+      - id: create_coverage_name
+        run: |
+          coverage_artifact_branch_name=$(echo ${{ needs.make-tag.outputs.tag }} | cut -c 9-)
+          echo "coverage-name=${coverage_artifact_branch_name}" >> $GITHUB_OUTPUT
+
+  test--coverage-sonar:
+    runs-on: [self-hosted, ci]
+    needs: [create-coverage-name, make-tag]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v9
+        with:
+          name: "${{ needs.create-coverage-name.outputs.coverage-name }}-coverage"
+          branch: "${{ needs.make-tag.outputs.tag }}"
+          workflow: pull-requests.yml
+          workflow_conclusion: success
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
   set-success:
     name: Set Success
-    needs: [make-tag, get-branch-from-workflow-file]
+    needs: [make-tag]
     runs-on: [self-hosted, ci]
     steps:
       - name: Set success env var
@@ -79,7 +79,7 @@ jobs:
 
   message-slack:
     name: Notify slack of merge to main
-    needs: [make-tag, get-branch-from-workflow-file, set-success]
+    needs: [make-tag, set-success]
     runs-on: [self-hosted, ci]
     steps:
       - name: Catch failed steps
@@ -93,7 +93,7 @@ jobs:
           payload: |
             {
               "tag": "${{ needs.make-tag.outputs.tag}}",
-              "branch": "${{ needs.get-branch-from-workflow-file.outputs.branch_name }}",
+              "branch": "main",
               "caller": "${{ github.triggering_actor }}",
               "result":  "${{ needs.set-success.outputs.success && needs.set-success.outputs.success || 'failed' }}",
               "result_detail": "${{ needs.set-success.outputs.success && 'None' || steps.catch-failed-step.outputs.failed-step-name }}",
