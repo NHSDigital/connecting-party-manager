@@ -15,8 +15,13 @@ module "dynamodb_table" {
 
   point_in_time_recovery_enabled = true
 
-  tags = {
-    Name = var.name
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.environment == "dev" ? {
+      "NHSE-Enable-Backup" = "True"
+    } : {}
+  )
 
 }

@@ -29,6 +29,8 @@ else
     ENV="int"
   elif _validate_current_account "REF"; then
     ENV="ref"
+  elif _validate_current_account "Backups"; then
+    ENV="backups"
   fi
 fi
 EXTERNAL_ID_PARAMETER_STORE="${ENV}-external-id"
