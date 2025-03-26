@@ -18,7 +18,7 @@ resource "aws_kms_key" "destination_backup_key" {
 module "destination" {
   source = "../modules/aws-backup-destination"
 
-  source_account_name     = "test" # please note that the assigned value would be the prefix in aws_backup_vault.vault.name - change to dev/prod
+  source_account_name     = "dev" # please note that the assigned value would be the prefix in aws_backup_vault.vault.name - change to dev/prod BACKUPS_LOGIC
   account_id              = var.assume_account
   source_account_id       = data.aws_secretsmanager_secret_version.source_account_id.secret_string
   kms_key                 = aws_kms_key.destination_backup_key.arn
