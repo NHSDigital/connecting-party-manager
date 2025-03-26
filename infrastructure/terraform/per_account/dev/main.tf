@@ -95,3 +95,23 @@ resource "aws_s3_bucket_logging" "truststore_to_access_logs" {
 resource "aws_route53_zone" "dev-ns" {
   name = "api.cpm.dev.national.nhs.uk"
 }
+
+# BACKUPS_LOGIC
+module "layers" {
+  for_each       = toset(var.layers)
+  source         = "../../modules/api_worker/api_layer"
+  name           = each.key
+  python_version = var.python_version
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
+  source_path    = "${path.module}/../../../../src/layers/${each.key}/dist/${each.key}.zip"
+}
+
+# BACKUPS_LOGIC
+module "third_party_layers" {
+  for_each       = toset(var.third_party_layers)
+  source         = "../../modules/api_worker/api_layer"
+  name           = each.key
+  python_version = var.python_version
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
+  source_path    = "${path.module}/../../../../src/layers/third_party/dist/${each.key}.zip"
+}

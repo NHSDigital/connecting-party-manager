@@ -162,7 +162,7 @@
       "Resource": ["arn:aws:s3:::*--etl/*"]
     },
     {
-      "Sid": "ApigeeSecretsIntegrationPermissions",
+      "Sid": "SecretsIntegrationPermissions",
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
       "Resource": [
@@ -264,6 +264,8 @@
         "SNS:ListTagsForResource",
         "budgets:ModifyBudget",
         "budgets:ViewBudget",
+        "budgets:ListTagsForResource",
+        "budgets:TagResource",
         "SNS:DeleteTopic",
         "SNS:CreateTopic",
         "SNS:TagResource",
