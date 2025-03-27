@@ -1,5 +1,6 @@
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
+from typing import Optional
 
 from behave.model import Table
 from behave.runner import Context as BehaveContext
@@ -17,19 +18,19 @@ from api.tests.feature_tests.steps.postman import (
 @dataclass
 class Context(BehaveContext):
     base_url: str
-    headers: dict[str, dict[str, str]] = None
-    response: Response = None
-    table: Table = None
-    test_mode: TestMode = None
-    table_name: str = None
-    session: AbstractContextManager = None
-    dynamodb_client: DynamoDBClient = None
-    workspace: str = None
-    environment: str = None
-    workspace_type: str = None
-    api_key: str = None
-    notes: dict[str, str] = None
-    postman_endpoint: str = None
+    headers: Optional[dict[str, dict[str, str]]]
+    response: Optional[Response]
+    table: Optional[Table]
+    test_mode: Optional[TestMode]
+    table_name: Optional[str]
+    session: Optional[AbstractContextManager]
+    dynamodb_client: Optional[DynamoDBClient]
+    workspace: Optional[str]
+    environment: Optional[str]
+    workspace_type: Optional[str]
+    api_key: Optional[str]
+    notes: Optional[dict[str, str]]
+    postman_endpoint: Optional[str]
 
     postman_collection: PostmanCollection = None
     postman_feature: PostmanItem = None

@@ -1,6 +1,6 @@
 from types import ModuleType
 
-from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.constants import VersioningStepArgs
 from api_utils.versioning.steps import (
     get_largest_possible_version,
     get_steps_for_requested_version,
@@ -27,8 +27,8 @@ def execute_step_chain(
     )
     version_chain.run(
         init={
-            VERSIONING_STEP_ARGS.EVENT: event,
-            VERSIONING_STEP_ARGS.VERSIONED_STEPS: versioned_steps,
+            VersioningStepArgs.EVENT: event,
+            VersioningStepArgs.VERSIONED_STEPS: versioned_steps,
         }
     )
 

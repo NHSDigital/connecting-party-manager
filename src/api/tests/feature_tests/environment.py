@@ -82,22 +82,6 @@ def before_feature(context: Context, feature: Feature):
         name=feature.name,
         description=" ".join(feature.description),
     )
-    cpm_scenarios = [
-        "Create Product Team - success scenarios",
-        "Create Product Team - failure scenarios",
-        "Read Product Team - success scenarios",
-        "Read Product Team - failure scenarios",
-        "Delete Product Team - success scenarios",
-        "Delete Product Team - failure scenarios",
-        "Create CPM Product - success scenarios",
-        "Create CPM Product - failure scenarios",
-        "Read CPM Product - success scenarios",
-        "Read CPM Product - failure scenarios",
-        "Delete CPM Product - success scenarios",
-        "Delete CPM Product - failure scenarios",
-        "Search Products - success scenarios",
-        "Search Products - failures scenarios",
-    ]
     if context.test_mode is TestMode.INTEGRATION:
         table = "dynamodb_cpm_table_name.value"
         context.table_name = read_terraform_output(table)

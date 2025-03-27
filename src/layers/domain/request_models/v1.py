@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from domain.core.enum import Environment
 from domain.core.product_team_key import ProductTeamKey
@@ -77,8 +77,8 @@ class CreateProductTeamIncomingParams(BaseModel, extra=Extra.forbid):
 
 
 class SearchProductQueryParams(BaseModel, extra=Extra.forbid):
-    product_team_id: str = None
-    organisation_code: str = None
+    product_team_id: Optional[str]
+    organisation_code: Optional[str]
 
     @root_validator
     def check_filters(cls, values: dict):
