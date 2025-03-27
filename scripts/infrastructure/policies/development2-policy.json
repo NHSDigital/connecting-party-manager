@@ -209,38 +209,6 @@
       ]
     },
     {
-      "Sid": "OpenSearchPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "es:AddTags",
-        "es:ListTags",
-        "es:CreateDomain",
-        "es:DescribeDomain",
-        "es:DescribeElasticsearchDomain",
-        "es:DescribeDomainConfig",
-        "es:DescribeElasticsearchDomainConfig",
-        "es:DeleteElasticsearchDomain",
-        "es:DeleteDomain",
-        "es:UpdateElasticsearchDomainConfig",
-        "es:UpdateDomainConfig"
-      ],
-      "Resource": ["arn:aws:es:*:${ACCOUNT_ID}:domain/*"]
-    },
-    {
-      "Sid": "OpenSearchPLPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "osis:CreatePipeline",
-        "osis:TagResource",
-        "osis:GetPipeline",
-        "osis:ListTagsForResource",
-        "osis:DeletePipeline",
-        "osis:UpdatePipeline",
-        "osis:StopPipeline"
-      ],
-      "Resource": ["arn:aws:osis:*:${ACCOUNT_ID}:pipeline/*"]
-    },
-    {
       "Sid": "GlobalPermissions",
       "Effect": "Allow",
       "Action": [
