@@ -22,4 +22,4 @@ class CpmId:
         )
 
     class General:
-        ID_PATTERN = re.compile(rf"^[a-zA-Z0-9]+$")
+        ID_PATTERN = re.compile(r"^[a-zA-Z0-9]+$")

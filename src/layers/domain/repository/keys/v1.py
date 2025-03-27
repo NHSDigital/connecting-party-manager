@@ -50,5 +50,5 @@ def strip_key_prefix(key: str):
     return tail
 
 
-def remove_keys(pk=None, sk=None, pk_read=None, sk_read=None, **values):
+def remove_keys(**values):
     return values
