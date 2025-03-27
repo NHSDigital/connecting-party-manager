@@ -46,8 +46,6 @@ def retry_on_ssl_error(sleep_time: int = 3, max_retries=5):
                 raise
             time.sleep(sleep_time)
             retries += 1
-        finally:
-            break
 
 
 def make_request(

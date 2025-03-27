@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.constants import VersioningStepArgs
 from api_utils.versioning.errors import VersionException
 from api_utils.versioning.models import Event
 from api_utils.versioning.steps import (
@@ -53,9 +53,7 @@ def test_largest_possible_version(requested_version: str, expected_version: str)
         data=step_data(
             kwargs={
                 get_requested_version: requested_version,
-                StepChain.INIT: {
-                    VERSIONING_STEP_ARGS.VERSIONED_STEPS: handler_versions
-                },
+                StepChain.INIT: {VersioningStepArgs.VERSIONED_STEPS: handler_versions},
             }
         )
     )
@@ -72,7 +70,7 @@ def test_largest_possible_version_error(requested_version: str):
                 kwargs={
                     get_requested_version: requested_version,
                     StepChain.INIT: {
-                        VERSIONING_STEP_ARGS.VERSIONED_STEPS: handler_versions
+                        VersioningStepArgs.VERSIONED_STEPS: handler_versions
                     },
                 }
             )

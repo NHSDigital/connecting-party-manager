@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from attr import dataclass
 from domain.core.aggregate_root import AggregateRoot, event
@@ -19,8 +20,8 @@ class ProductTeamCreatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: str = None
-    deleted_on: str = None
+    updated_on: Optional[str]
+    deleted_on: Optional[str]
     keys: list[ProductTeamKey] = Field(default_factory=list)
 
 
@@ -43,7 +44,7 @@ class ProductTeam(AggregateRoot):
     ProductTeams, meaning that `ods_code` is not unique amongst ProductTeams.
     """
 
-    id: str = None
+    id: Optional[str]
     name: str = Field(regex=ENTITY_NAME_REGEX)
     ods_code: str
     status: Status = Status.ACTIVE
