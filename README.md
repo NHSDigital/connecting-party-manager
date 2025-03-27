@@ -544,3 +544,13 @@ To run the SBOM commands there are some make commands that currently handle this
 The project originally was designed to have a concept of an EPRv2. This did not work out but we have kept the remains of the EPR work in an archive folder located in the `root/archived_epr`. The EPR code was supposed to fit into the structure of our existing CPM model but it became apparent as requirements came through that this would not be possible. You will find in this folder `swagger/OAS spec`, `lambdas`, `ETL` and `tests`.
 
 This has been left in for future reference. The code would need to be transferred back into the root of the project, changing `src_old` back to `src` and merging into the existing `src` directory.
+
+### Secrets
+
+There are some secrets that we have left within CPM that were needed in order to make connections to LDAP and HSCN - if we were to delete them then the specific details we had obtained as CPM would be lost.
+We have left them in the code for potential future use, if you want to delete them and start afresh that is also fine - below are the secrets, they exist in each environment:
+
+"sds-hscn-endpoint"
+"ldap-host"
+"ldap-changelog-user"
+"ldap-changelog-password"

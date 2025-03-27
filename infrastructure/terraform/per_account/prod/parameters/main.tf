@@ -55,14 +55,6 @@ resource "aws_secretsmanager_secret" "ldap-changelog-password" {
   name = "${terraform.workspace}-ldap-changelog-password"
 }
 
-resource "aws_secretsmanager_secret" "etl_notify_slack_webhook_url" {
-  name = "${terraform.workspace}--etl-notify-slack-webhook-url"
-}
-
-resource "aws_secretsmanager_secret" "apigee-sds-app-key" {
-  name = "${terraform.workspace}-apigee-sds-app-key"
-}
-
 resource "aws_secretsmanager_secret" "external-id" {
   name = "${terraform.workspace}-external-id"
 }
