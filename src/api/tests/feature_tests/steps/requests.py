@@ -33,22 +33,6 @@ def _parse_url(base_url: str, endpoint: str) -> str:
     return url
 
 
-# @contextmanager
-# def retry_on_ssl_error(sleep_time: int = 3, max_retries=5):
-#     retries = 0
-#     while True:
-#         try:
-#             yield
-#         except SSLError:
-#             if retries == max_retries:
-#                 raise
-#             time.sleep(sleep_time)
-#             retries += 1
-#         finally:
-#             print("ficl ypu")
-#             pass
-
-
 def make_request(
     base_url: str,
     http_method: str,
@@ -60,11 +44,6 @@ def make_request(
     url = _parse_url(base_url=base_url, endpoint=endpoint)
     json = body if type(body) is dict else None
     data = None if type(body) is dict else body
-
-    # with retry_on_ssl_error():
-    #     response = request(
-    #         method=http_method, url=url, headers=headers, json=json, data=data
-    #     )
 
     response = request(
         method=http_method, url=url, headers=headers, json=json, data=data
