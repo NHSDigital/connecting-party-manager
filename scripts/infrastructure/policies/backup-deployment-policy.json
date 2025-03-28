@@ -32,7 +32,12 @@
     {
       "Sid": "BudgetPermissions",
       "Effect": "Allow",
-      "Action": ["budgets:ViewBudget", "budgets:ModifyBudget"],
+      "Action": [
+        "budgets:ViewBudget",
+        "budgets:ModifyBudget",
+        "budgets:ListTagsForResource",
+        "budgets:TagResource"
+      ],
       "Resource": ["arn:aws:budgets::${ACCOUNT_ID}:budget/*"]
     },
     {
