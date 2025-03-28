@@ -1,5 +1,6 @@
-import requests
 from event.environment import BaseEnvironment
+
+from notify.operations import send_notification
 
 
 class NotifyEnvironment(BaseEnvironment):
@@ -10,12 +11,7 @@ class NotifyEnvironment(BaseEnvironment):
 ENVIRONMENT = NotifyEnvironment.build()
 
 
-def send_notification(slack_webhook_url, **data):
-    response = requests.post(url=slack_webhook_url, json=data)
-    return response.text
-
-
-def lambda_handler(event, context):
+def lambda_handler(event, context=None):
     data = event["Records"]
     subject_for_slack = data[0]["Sns"]["Subject"]
     message_for_slack = data[0]["Sns"]["Message"]
