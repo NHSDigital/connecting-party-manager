@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-03-26
+- [PI-407] Immutable Backups
+
 ## 2025-03-25
 - [PI-857] Sonar Merge Commit
 - [PI-865] Swagger refinement 2

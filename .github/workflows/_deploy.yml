@@ -47,6 +47,7 @@ jobs:
           branch_name=${branch_name#*refs/tags/}
           echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 
+  # BACKUPS_LOGIC (Source account needs layers building)
   build:
     runs-on: [self-hosted, ci]
     needs: get-branch-from-workflow-file
@@ -61,7 +62,14 @@ jobs:
           save-to-cache: "true"
           restore-from-cache: "false"
           cache-suffix: ${{ env.CACHE_NAME }}
-      - if: ${{ env.SCOPE != 'per_workspace'}}
+      - if: ${{ env.SCOPE != 'per_workspace' && inputs.account == 'dev'}}
+        uses: ./.github/actions/make/
+        with:
+          command: build
+          save-to-cache: "true"
+          restore-from-cache: "false"
+          cache-suffix: ${{ env.CACHE_NAME }}
+      - if: ${{ env.SCOPE != 'per_workspace' && inputs.account != 'dev'}}
         uses: ./.github/actions/make/
         with:
           command: poetry--update
@@ -167,7 +175,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
-      - if: ${{ env.ACCOUNT != 'mgmt'}}
+      - if: ${{ env.ACCOUNT != 'mgmt' && env.ACCOUNT != 'backups' }}
         uses: ./.github/actions/make/
         with:
           command: test--smoke WORKSPACE="${{ env.WORKSPACE }}" ACCOUNT="${{ env.ACCOUNT }}"
