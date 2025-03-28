@@ -67,7 +67,7 @@ module "cpmtable" {
 
 module "layers" {
   for_each       = toset(var.layers)
-  source         = "./modules/api_worker/api_layer"
+  source         = "../modules/api_worker/api_layer"
   name           = each.key
   python_version = var.python_version
   layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
@@ -76,7 +76,7 @@ module "layers" {
 
 module "third_party_layers" {
   for_each       = toset(var.third_party_layers)
-  source         = "./modules/api_worker/api_layer"
+  source         = "../modules/api_worker/api_layer"
   name           = each.key
   python_version = var.python_version
   layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
@@ -85,7 +85,7 @@ module "third_party_layers" {
 
 module "lambdas" {
   for_each       = setsubtract(var.lambdas, ["authoriser"])
-  source         = "./modules/api_worker/api_lambda"
+  source         = "../modules/api_worker/api_lambda"
   python_version = var.python_version
   name           = each.key
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
@@ -118,7 +118,7 @@ module "lambdas" {
 
 module "authoriser" {
   name           = "authoriser"
-  source         = "./modules/api_worker/api_lambda"
+  source         = "../modules/api_worker/api_lambda"
   python_version = var.python_version
   lambda_name    = "${local.project}--${replace(terraform.workspace, "_", "-")}--authoriser"
   source_path    = "${path.module}/../../../src/api/authoriser/dist/authoriser.zip"
