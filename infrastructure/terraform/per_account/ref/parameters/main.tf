@@ -39,6 +39,10 @@ resource "aws_secretsmanager_secret" "apigee-app-key" {
   name = "${terraform.workspace}-apigee-app-key"
 }
 
+resource "aws_secretsmanager_secret" "etl_notify_slack_webhook_url" {
+  name = "${terraform.workspace}--etl-notify-slack-webhook-url"
+}
+
 resource "aws_secretsmanager_secret" "sds-hscn-endpoint" {
   name = "${terraform.workspace}-sds-hscn-endpoint"
 }
