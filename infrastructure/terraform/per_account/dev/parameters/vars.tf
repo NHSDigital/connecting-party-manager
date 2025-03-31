@@ -29,3 +29,13 @@ variable "workspace_type" {
   type    = string
   default = "PERSISTENT"
 }
+
+# BACKUPS_LOGIC
+variable "layers" {
+  type = list(string)
+}
+
+# BACKUPS_LOGIC
+variable "third_party_layers" {
+  type = list(string)
+}

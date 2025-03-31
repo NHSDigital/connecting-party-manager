@@ -50,7 +50,7 @@ function _terraform() {
         workspace_expiration ${workspace_expiration}
         expiration_date      ${expiration_date}
         role                 ${terraform_role_name}
-    "
+            "
   fi
 
   if [[ "${login_account}" != "NHS Digital Spine Core CPM MGMT" ]]; then
@@ -125,14 +125,27 @@ function _terraform_plan() {
       -var "layers=${layers}" \
       -var "third_party_layers=${third_party_layers}" || return 1
   else
-    terraform plan $args \
-      -out="$plan_file" \
-      -var-file="$var_file" \
-      -var "assume_account=${aws_account_id}" \
-      -var "assume_role=${terraform_role_name}" \
-      -var "external_id=${external_id}" \
-      -var "updated_date=${current_date}" \
-      -var "expiration_date=${expiration_date}" || return 1
+    if [[ "${account}" = "dev" ]]; then # BACKUPS_LOGIC
+      terraform plan $args \
+        -out="$plan_file" \
+        -var-file="$var_file" \
+        -var "assume_account=${aws_account_id}" \
+        -var "assume_role=${terraform_role_name}" \
+        -var "external_id=${external_id}" \
+        -var "updated_date=${current_date}" \
+        -var "expiration_date=${expiration_date}" \
+        -var "layers=${layers}" \
+        -var "third_party_layers=${third_party_layers}" || return 1
+    else
+      terraform plan $args \
+        -out="$plan_file" \
+        -var-file="$var_file" \
+        -var "assume_account=${aws_account_id}" \
+        -var "assume_role=${terraform_role_name}" \
+        -var "external_id=${external_id}" \
+        -var "updated_date=${current_date}" \
+        -var "expiration_date=${expiration_date}" || return 1
+    fi
   fi
 }
 

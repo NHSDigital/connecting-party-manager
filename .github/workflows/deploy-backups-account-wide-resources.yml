@@ -1,0 +1,19 @@
+name: "Deploy: Account Wide - Backups"
+
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        description: Account to deploy
+        required: true
+        default: backups
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy_backups.yml
+    with:
+      account: ${{ inputs.account }}
+      workspace: ${{ inputs.account }}
+      scope: "per_account/${{ inputs.account }}"
+    secrets: inherit # pragma: allowlist secret
+
+run-name: Deploying account wide to nonprod workspace - ${{ inputs.account }}
