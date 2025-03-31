@@ -63,10 +63,6 @@ resource "aws_secretsmanager_secret" "apigee-app-client-info" {
   name = "${terraform.workspace}--apigee-app-client-info"
 }
 
-resource "aws_secretsmanager_secret" "apigee-sds-app-key" {
-  name = "${terraform.workspace}-apigee-sds-app-key"
-}
-
 resource "aws_secretsmanager_secret" "external-id" {
   name = "${terraform.workspace}-external-id"
 }
