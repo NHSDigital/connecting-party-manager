@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-04-01
+- [PI-848] Add info box to swaager explaining prodID usage in non-prod envs
+
 ## 2025-03-31
 - [PI-835] Clean up deployment policies
 - [PI-861] Remove SDS secret access
