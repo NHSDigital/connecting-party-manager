@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -23,7 +23,7 @@ class AwsLambdaResponse(BaseModel):
     statusCode: HTTPStatus
     body: str = Field(min_length=0, default="")
     version: None | str = Field(exclude=True)
-    headers: AwsLambdaResponseHeaders = None
+    headers: Optional[AwsLambdaResponseHeaders]
 
     @validator("headers", always=True)
     def generate_response_headers(cls, headers, values):

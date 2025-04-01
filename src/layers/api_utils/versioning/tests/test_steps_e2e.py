@@ -1,7 +1,7 @@
 from types import FunctionType
 
 import pytest
-from api_utils.versioning.constants import VERSIONING_STEP_ARGS
+from api_utils.versioning.constants import VersioningStepArgs
 from api_utils.versioning.models import Event, VersionHeader
 from api_utils.versioning.steps import versioning_steps
 from domain.logging.step_decorators import logging_step_decorators
@@ -48,8 +48,8 @@ def test_versioning_steps(requested_version: str, expected_steps: list[FunctionT
     )
     step_chain.run(
         init={
-            VERSIONING_STEP_ARGS.EVENT: _event.dict(),
-            VERSIONING_STEP_ARGS.VERSIONED_STEPS: versioned_steps,
+            VersioningStepArgs.EVENT: _event.dict(),
+            VersioningStepArgs.VERSIONED_STEPS: versioned_steps,
         }
     )
     assert step_chain.result is expected_steps

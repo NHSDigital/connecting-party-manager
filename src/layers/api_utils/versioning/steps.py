@@ -4,20 +4,20 @@ from types import FunctionType
 from domain.response.validation_errors import mark_validation_errors_as_inbound
 from event.step_chain import StepChain
 
-from .constants import VERSIONING_STEP_ARGS
+from .constants import VersioningStepArgs
 from .errors import VersionException
 from .models import Event
 
 
 @mark_validation_errors_as_inbound
 def get_requested_version(data, cache=None):
-    event = Event(**data[StepChain.INIT][VERSIONING_STEP_ARGS.EVENT])
+    event = Event(**data[StepChain.INIT][VersioningStepArgs.EVENT])
     return event.headers.version
 
 
 def get_largest_possible_version(data, cache=None) -> str:
     requested_version = data[get_requested_version]
-    possible_versions = data[StepChain.INIT][VERSIONING_STEP_ARGS.VERSIONED_STEPS]
+    possible_versions = data[StepChain.INIT][VersioningStepArgs.VERSIONED_STEPS]
     integer_versions = map(int, possible_versions)
     possible_versions = [
         version
@@ -31,7 +31,7 @@ def get_largest_possible_version(data, cache=None) -> str:
 
 
 def get_steps_for_requested_version(data, cache=None):
-    steps_by_version = data[StepChain.INIT][VERSIONING_STEP_ARGS.VERSIONED_STEPS]
+    steps_by_version = data[StepChain.INIT][VersioningStepArgs.VERSIONED_STEPS]
     largest_possible_version = data[get_largest_possible_version]
     return steps_by_version[largest_possible_version]
 

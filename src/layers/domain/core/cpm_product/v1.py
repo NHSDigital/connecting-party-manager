@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Optional
 
-from attr import dataclass
+from attr import dataclass, field
 from domain.core.aggregate_root import UPDATED_ON, AggregateRoot, event
 from domain.core.cpm_system_id import ProductId
 from domain.core.enum import Status
@@ -21,8 +22,8 @@ class CpmProductCreatedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: str = None
-    deleted_on: str = None
+    updated_on: Optional[str]
+    deleted_on: Optional[str]
 
 
 @dataclass(kw_only=True, slots=True)
@@ -35,8 +36,8 @@ class CpmProductKeyAddedEvent(Event):
     ods_code: str
     status: Status
     created_on: str
-    updated_on: str = None
-    deleted_on: str = None
+    updated_on: Optional[str] = field(default=None)
+    deleted_on: Optional[str] = field(default=None)
     keys: list[dict]
 
 
