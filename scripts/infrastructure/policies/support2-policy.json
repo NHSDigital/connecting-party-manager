@@ -1,0 +1,28 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CertificateSupportPermissions",
+      "Effect": "Allow",
+      "Action": ["acm:ListTagsForCertificate", "acm:DescribeCertificate"],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "BudgetSupportPermissions",
+      "Effect": "Allow",
+      "Action": ["budgets:ViewBudget"],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "BillingSupportPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostForecast",
+        "ce:GetAnomalies",
+        "ce:GetTags"
+      ],
+      "Resource": ["*"]
+    }
+  ]
+}
