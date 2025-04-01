@@ -15,6 +15,9 @@ manage--mgmt-development-policies: aws--login ## Create or update IAM Policies
 manage--non-mgmt-support-policies: aws--login ## Create or update IAM Policies
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/roles/manage-non-mgmt-aws-support-policies.sh
 
+manage--mgmt-support-policies: aws--login ## Create or update IAM Policies
+	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/roles/manage-mgmt-aws-support-policies.sh
+
 manage--non-mgmt-test-policies: aws--login ## Create or update IAM Policies
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) AWS_SESSION_TOKEN=$(AWS_SESSION_TOKEN) bash $(PATH_TO_INFRASTRUCTURE)/roles/manage-non-mgmt-aws-support-integration-policies.sh
 
