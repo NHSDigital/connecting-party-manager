@@ -2,6 +2,7 @@
 
 ## 2025-04-01
 - [PI-848] Add info box to swaager explaining prodID usage in non-prod envs
+- [PI-870] Sonarcloud fixes
 
 ## 2025-03-31
 - [PI-835] Clean up deployment policies
