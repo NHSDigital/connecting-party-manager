@@ -24,43 +24,6 @@
       "Resource": ["*"]
     },
     {
-      "Sid": "S3IntegrationPermissions",
-      "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:PutObject"],
-      "Resource": ["arn:aws:s3:::*/*"]
-    },
-    {
-      "Sid": "S3IntegrationPermissionsBucket",
-      "Effect": "Allow",
-      "Action": ["s3:ListBucket"],
-      "Resource": ["arn:aws:s3:::*"]
-    },
-    {
-      "Sid": "S3IntegrationDeletePermissions",
-      "Effect": "Allow",
-      "Action": ["s3:DeleteObject"],
-      "Resource": ["arn:aws:s3:::*--sds--etl/*"]
-    },
-    {
-      "Sid": "StepFunctionIntegrationPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "states:StartExecution",
-        "states:DescribeExecution",
-        "states:ListExecutions"
-      ],
-      "Resource": [
-        "arn:aws:states:*:${ACCOUNT_ID}:stateMachine:*",
-        "arn:aws:states:*:${ACCOUNT_ID}:execution:*"
-      ]
-    },
-    {
-      "Sid": "LambdaIntegrationPermissions",
-      "Effect": "Allow",
-      "Action": ["lambda:InvokeFunction"],
-      "Resource": ["arn:aws:lambda:*:${ACCOUNT_ID}:function:nhse-cpm--notify"]
-    },
-    {
       "Sid": "ApigeeSecretsIntegrationPermissions",
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],

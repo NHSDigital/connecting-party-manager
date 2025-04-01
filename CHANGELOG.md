@@ -1,5 +1,11 @@
 # Changelog
 
+## 2025-03-31
+- [PI-835] Clean up deployment policies
+- [PI-861] Remove SDS secret access
+- [PI-862] Update Support policy
+- [PI-863] Update Developer Role permissions
+
 ## 2025-03-26
 - [PI-407] Immutable Backups
 
