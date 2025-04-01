@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from functools import cache
 from pathlib import Path
+from typing import Optional
 from uuid import uuid4
 
 from domain.core.base import BaseModel
@@ -34,7 +35,7 @@ def _load_existing_ids():
 
 
 class CpmSystemId(BaseModel, ABC):
-    __root__: str = None
+    __root__: Optional[str]
 
     @classmethod
     @abstractmethod
