@@ -29,17 +29,14 @@ variable "budget_limit" {
   type    = string
 }
 
-# BACKUPS_LOGIC
 variable "python_version" {
   default = "python3.12"
 }
 
-# BACKUPS_LOGIC
 variable "layers" {
   type = list(string)
 }
 
-# BACKUPS_LOGIC
 variable "third_party_layers" {
   type = list(string)
 }

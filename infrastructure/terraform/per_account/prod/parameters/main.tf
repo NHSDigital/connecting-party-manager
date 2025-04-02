@@ -39,10 +39,6 @@ resource "aws_secretsmanager_secret" "apigee-app-key" {
   name = "${terraform.workspace}-apigee-app-key"
 }
 
-resource "aws_secretsmanager_secret" "etl_notify_slack_webhook_url" {
-  name = "${terraform.workspace}--etl-notify-slack-webhook-url"
-}
-
 resource "aws_secretsmanager_secret" "sds-hscn-endpoint" {
   name = "${terraform.workspace}-sds-hscn-endpoint"
 }
@@ -59,6 +55,18 @@ resource "aws_secretsmanager_secret" "ldap-changelog-password" {
   name = "${terraform.workspace}-ldap-changelog-password"
 }
 
+resource "aws_secretsmanager_secret" "notify_slack_webhook_url" {
+  name = "${terraform.workspace}-notify-slack-webhook-url"
+}
+
 resource "aws_secretsmanager_secret" "external-id" {
   name = "${terraform.workspace}-external-id"
+}
+
+resource "aws_secretsmanager_secret" "destination_vault_arn" {
+  name = "destination_vault_arn"
+}
+
+resource "aws_secretsmanager_secret" "destination_account_id" {
+  name = "destination_account_id"
 }

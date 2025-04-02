@@ -159,7 +159,7 @@
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-credentials-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-cpm-apikey-*",
         "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-apigee-app-key-*",
-        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-etl-notify-slack-webhook-url-*"
+        "arn:aws:secretsmanager:*:${ACCOUNT_ID}:secret:*-notify-slack-webhook-url-*"
       ]
     },
     {
