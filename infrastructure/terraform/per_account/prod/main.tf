@@ -96,69 +96,20 @@ resource "aws_route53_zone" "prod-ns" {
   name = "api.cpm.national.nhs.uk"
 }
 
-module "snapshot_bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.2"
-  bucket  = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
-  versioning = {
-    enabled = true
-  }
-  tags = {
-    Name = "${local.project}--${replace(terraform.workspace, "_", "-")}--snapshot"
-  }
+module "layers" {
+  for_each       = toset(var.layers)
+  source         = "../../modules/api_worker/api_layer"
+  name           = each.key
+  python_version = var.python_version
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
+  source_path    = "${path.module}/../../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
-resource "aws_s3_bucket_policy" "snapshot_bucket_policy" {
-  bucket = module.snapshot_bucket.s3_bucket_id
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "AWSAccessLogDeliveryWrite",
-        Effect = "Allow",
-        Principal = {
-          Service = "logging.s3.amazonaws.com"
-        },
-        Action   = "s3:PutObject",
-        Resource = "${module.snapshot_bucket.s3_bucket_arn}/*"
-      },
-      {
-        Sid    = "AWSAccessLogDeliveryAclCheck",
-        Effect = "Allow",
-        Principal = {
-          Service = "logging.s3.amazonaws.com"
-        },
-        Action   = "s3:GetBucketAcl",
-        Resource = "${module.snapshot_bucket.s3_bucket_arn}"
-      },
-      {
-        Sid       = "denyInsecureTransport",
-        Effect    = "Deny",
-        Principal = "*",
-        Action    = "s3:*",
-        Resource = [
-          "${module.snapshot_bucket.s3_bucket_arn}",
-          "${module.snapshot_bucket.s3_bucket_arn}/*"
-        ],
-        Condition = {
-          Bool = {
-            "aws:SecureTransport" = "false"
-          }
-        }
-      },
-      {
-        Sid    = "AllowDynamoDBExport",
-        Effect = "Allow",
-        Principal = {
-          Service = "dynamodb.amazonaws.com"
-        },
-        Action = [
-          "s3:PutObject",
-          "s3:AbortMultipartUpload",
-          "s3:ListMultipartUploadParts"
-        ],
-        Resource = "${module.snapshot_bucket.s3_bucket_arn}/*"
-      }
-    ]
-  })
+module "third_party_layers" {
+  for_each       = toset(var.third_party_layers)
+  source         = "../../modules/api_worker/api_layer"
+  name           = each.key
+  python_version = var.python_version
+  layer_name     = "${local.project}--${replace(terraform.workspace, "_", "-")}--${replace(each.key, "_", "-")}"
+  source_path    = "${path.module}/../../../../src/layers/third_party/dist/${each.key}.zip"
 }

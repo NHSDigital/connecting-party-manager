@@ -28,3 +28,15 @@ variable "budget_limit" {
   default = "1300"
   type    = string
 }
+
+variable "python_version" {
+  default = "python3.12"
+}
+
+variable "layers" {
+  type = list(string)
+}
+
+variable "third_party_layers" {
+  type = list(string)
+}
