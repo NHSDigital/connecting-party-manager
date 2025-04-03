@@ -96,7 +96,6 @@ resource "aws_route53_zone" "dev-ns" {
   name = "api.cpm.dev.national.nhs.uk"
 }
 
-# BACKUPS_LOGIC
 module "layers" {
   for_each       = toset(var.layers)
   source         = "../../modules/api_worker/api_layer"
@@ -106,7 +105,6 @@ module "layers" {
   source_path    = "${path.module}/../../../../src/layers/${each.key}/dist/${each.key}.zip"
 }
 
-# BACKUPS_LOGIC
 module "third_party_layers" {
   for_each       = toset(var.third_party_layers)
   source         = "../../modules/api_worker/api_layer"

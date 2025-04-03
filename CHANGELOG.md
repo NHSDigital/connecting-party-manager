@@ -1,5 +1,9 @@
 # Changelog
 
+## 2025-04-02
+- [PI-872] Enable backups in PROD
+- [PI-873] Update support policy to have 2 policies
+
 ## 2025-04-01
 - [PI-848] Add info box to swaager explaining prodID usage in non-prod envs
 - [PI-870] Sonarcloud fixes

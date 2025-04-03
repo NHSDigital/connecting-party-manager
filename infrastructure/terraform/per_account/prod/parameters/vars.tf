@@ -29,3 +29,11 @@ variable "workspace_type" {
   type    = string
   default = "PERSISTENT"
 }
+
+variable "layers" {
+  type = list(string)
+}
+
+variable "third_party_layers" {
+  type = list(string)
+}

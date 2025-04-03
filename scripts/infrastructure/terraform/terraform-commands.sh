@@ -125,7 +125,7 @@ function _terraform_plan() {
       -var "layers=${layers}" \
       -var "third_party_layers=${third_party_layers}" || return 1
   else
-    if [[ "${account}" = "dev" ]]; then # BACKUPS_LOGIC
+    if [[ "${account}" = "prod" || "${account}" = "dev" ]]; then # Immutable backups requires layers, but is only enabled in prod
       terraform plan $args \
         -out="$plan_file" \
         -var-file="$var_file" \

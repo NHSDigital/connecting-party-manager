@@ -1,5 +1,5 @@
 data "aws_secretsmanager_secret" "slack_webhook_url" {
-  name = "${var.environment}--etl-notify-slack-webhook-url"
+  name = "${var.environment}-notify-slack-webhook-url"
 }
 
 data "aws_secretsmanager_secret_version" "slack_webhook_url" {

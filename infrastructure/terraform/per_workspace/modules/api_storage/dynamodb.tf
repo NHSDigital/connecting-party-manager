@@ -19,7 +19,7 @@ module "dynamodb_table" {
     {
       Name = var.name
     },
-    var.environment == "dev" ? {
+    var.environment == "prod" ? {
       "NHSE-Enable-Backup" = "True"
     } : {}
   )
