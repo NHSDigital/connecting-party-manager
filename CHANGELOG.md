@@ -3,6 +3,9 @@
 ## 2025-04-04
 - [PI-876] Add Backups permission policy to PROD
 
+## 2025-04-04-a
+- [PI-877] Fix deployment policy permission rename
+
 ## 2025-04-02
 - [PI-872] Enable backups in PROD
 - [PI-873] Update support policy to have 2 policies
