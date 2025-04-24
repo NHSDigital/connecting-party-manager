@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-04-24
+- Dependabot: Update datamodel-code-generator
+
 ## 2025-04-23
 - [PI-879] Update Billing alarm recipients
 - [PI-880] Allow dependabot PRs to pass branch name check
