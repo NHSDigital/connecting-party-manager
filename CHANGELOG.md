@@ -2,6 +2,7 @@
 
 ## 2025-04-23
 - [PI-879] Update Billing alarm recipients
+- [PI-880] Allow dependabot PRs to pass branch name check
 
 ## 2025-04-04
 - [PI-876] Add Backups permission policy to PROD
