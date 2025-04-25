@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2025-04-24
+- [PI-880] Allow dependabot PRs to pass branch name check
 - Dependabot: Update datamodel-code-generator
 
 ## 2025-04-23
