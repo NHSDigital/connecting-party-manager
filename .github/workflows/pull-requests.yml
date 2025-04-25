@@ -66,6 +66,8 @@ jobs:
         run: |
           if [[ ${{ env.BRANCH_NAME }} == *"release/"* ]]; then
             echo "workspace=rel-$(echo ${{ env.BRANCH_NAME }} | sed 's/release\///')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
+          elif [[ ${{ env.BRANCH_NAME }} == *"dependabot/"* ]]; then
+            echo "workspace=ci-$(echo ${{ env.BRANCH_NAME }} | sed -n 's|.*pip/||p' | awk -F- '{ for (i=1;i<=NF;i++) printf substr($i,1,1); print "" }')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
           else
             echo "workspace=ci-$(echo ${{ env.BRANCH_NAME }} | sed -n 's/.*\/\([^-]*\)-\([^-]*\).*/\1-\2/p' | tr '[:upper:]' '[:lower:]')-${{ env.BRANCH_GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
           fi
