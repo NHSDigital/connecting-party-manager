@@ -50,7 +50,7 @@
 
 ## TLDR
 
-If you want to get up and running as quickly as possible then read this section. However it is advisable to read the full README when possible.
+If you want test to get up and running as quickly as possible then read this section. However it is advisable to read the full README when possible.
 
 ### Requirements
 
