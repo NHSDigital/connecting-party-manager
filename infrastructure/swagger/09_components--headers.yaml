@@ -29,3 +29,8 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/HeaderApikey"
+    CorsOrigin:
+      in: header
+      name: Access-Control-Allow-Origin
+      schema:
+        $ref: "#/components/schemas/CorsOrigin"

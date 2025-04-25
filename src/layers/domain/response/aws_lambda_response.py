@@ -11,6 +11,9 @@ class AwsLambdaResponseHeaders(BaseModel):
     content_length: str = Field(alias="Content-Length", regex=r"^[0-9][0-9]*$")
     version: str = Field(alias="Version", regex=r"^(null)|([1-9][0-9]*)$")
     host: str = Field(default=None, alias="Host")
+    access_control_allow_origin: str = Field(
+        default=None, alias="access-control-allow-origin"
+    )
 
     class Config:
         allow_population_by_field_name = True
@@ -35,6 +38,7 @@ class AwsLambdaResponse(BaseModel):
             content_length=len(body),
             version="null" if version is None else version,
             host="foo.co.uk",
+            access_control_allow_origin="https://digital.nhs.uk",
         )
         return headers
 
