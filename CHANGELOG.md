@@ -2,7 +2,6 @@
 
 ## 2025-05-02
 - Dependabot: Update aws-lambda-powertools
-- Dependabot: Update pydantic
 
 ## 2025-04-24
 - [PI-880] Allow dependabot PRs to pass branch name check
