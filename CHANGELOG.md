@@ -5,6 +5,9 @@
 - Dependabot: datamodel-code-generator
 - Dependabot: action-download-artifact
 
+## 2025-07-18-a
+- Dependabot: pydantic
+
 ## 2025-04-24
 - [PI-880] Allow dependabot PRs to pass branch name check
 - Dependabot: Update datamodel-code-generator
