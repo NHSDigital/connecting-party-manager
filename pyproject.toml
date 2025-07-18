@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2025.07.18"
+version = "2025.07.18.a"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -15,7 +15,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "3.12.3"
-pydantic = "1.10.21"
+pydantic = "1.10.22"
 nhs-context-logging = "^0.6.8"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
