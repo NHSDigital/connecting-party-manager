@@ -55,7 +55,7 @@ jobs:
         with:
           ref: main
       - name: Download artifact
-        uses: dawidd6/action-download-artifact@v9
+        uses: dawidd6/action-download-artifact@v11
         with:
           name: "${{ needs.create-coverage-name.outputs.coverage-name }}-coverage"
           branch: "${{ needs.make-tag.outputs.tag }}"
@@ -87,7 +87,7 @@ jobs:
         uses: ./.github/actions/catch-failed-step
       - name: Send merge result to slack
         id: slack
-        uses: slackapi/slack-github-action@v2.0.0
+        uses: slackapi/slack-github-action@v2.1.1
         with:
           webhook-type: webhook-trigger
           payload: |
