@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-07-21
+- Create new tag
+
 ## 2025-07-18
 - Dependabot: slackapi
 - Dependabot: datamodel-code-generator
