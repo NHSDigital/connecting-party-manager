@@ -20,7 +20,7 @@ jobs:
   workflow--check--branch-name:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -30,7 +30,7 @@ jobs:
   workflow--check--rebased-on-main:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: ./.github/actions/make/
@@ -40,7 +40,7 @@ jobs:
   workflow--check--release-branch-name:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
       - uses: ./.github/actions/make/
@@ -76,7 +76,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [parse-secrets]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -89,7 +89,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [workflow--check--branch-name]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -103,7 +103,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [build-head]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -117,7 +117,7 @@ jobs:
       matrix:
         test-type: [unit, slow]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/pytest-with-rerun/
@@ -128,7 +128,7 @@ jobs:
     needs: [build-head]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -139,7 +139,7 @@ jobs:
     needs: [create-workspace-name, build-base, parse-secrets]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BASE_BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
@@ -168,7 +168,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/terraform/
@@ -186,7 +186,7 @@ jobs:
     needs: [build-head, terraform-head-build]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -200,7 +200,7 @@ jobs:
     needs: [build-head, apigee--deploy]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - run: |
@@ -227,7 +227,7 @@ jobs:
       matrix:
         test-type: [integration]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/pytest-with-rerun/
@@ -247,7 +247,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -270,7 +270,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -305,7 +305,7 @@ jobs:
       ]
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -335,7 +335,7 @@ jobs:
     runs-on: [self-hosted, ci]
     if: ${{ needs.apigee--attach-product.result == 'success' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - run: |
@@ -352,7 +352,7 @@ jobs:
     runs-on: [self-hosted, ci]
     if: ${{ needs.apigee--deploy.result == 'success' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
       - uses: ./.github/actions/make/
@@ -366,7 +366,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [build-head]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.BRANCH_NAME }}
           fetch-depth: 0
