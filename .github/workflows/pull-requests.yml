@@ -314,7 +314,7 @@ jobs:
           requires-aws: true
           save-to-cache: "true"
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: "${{ needs.create-coverage-name.outputs.coverage-name }}-coverage"
           path: "sonarcloud-coverage.xml"
