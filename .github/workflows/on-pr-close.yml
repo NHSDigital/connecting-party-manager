@@ -28,13 +28,13 @@ jobs:
     steps:
       - name: Checkout Branch
         id: checkout-build-branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         continue-on-error: true
         with:
           ref: ${{ env.BRANCH_NAME }}
       - name: Fallback to main
         if: steps.checkout-build-branch.outcome == 'failure'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
       - uses: ./.github/actions/make/
@@ -49,13 +49,13 @@ jobs:
     steps:
       - name: Checkout Branch for destroy
         id: checkout-destroy-branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         continue-on-error: true
         with:
           ref: ${{ env.BRANCH_NAME }}
       - name: Fallback to main for destroy
         if: steps.checkout-destroy-branch.outcome == 'failure'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
           fetch-depth: 0
