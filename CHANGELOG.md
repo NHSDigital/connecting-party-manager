@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-12-11
+- Dependabot: datamodel-code-generator
+
 ## 2025-07-21
 - Create new tag
 
