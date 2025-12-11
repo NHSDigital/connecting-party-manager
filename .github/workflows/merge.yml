@@ -17,7 +17,7 @@ jobs:
     name: Create a tag from main
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Create 'env.tag' from the latest release
         run: |
           TAG=$(make changelog--get-latest-release)
@@ -51,7 +51,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [create-coverage-name, make-tag]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: main
       - name: Download artifact
