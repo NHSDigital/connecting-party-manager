@@ -144,7 +144,7 @@ jobs:
           restore-from-cache: "true"
           cache-suffix: ${{ env.CACHE_NAME }}
       - name: Archive swagger
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: swagger
           path: |
