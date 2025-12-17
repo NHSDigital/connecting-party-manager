@@ -4,5 +4,5 @@ python 3.12.3
 terraform 1.5.7
 jq 1.7
 yq 4.34.2
-nodejs 20.9.0
+nodejs 20.19.0
 java zulu-jre-17.42.19

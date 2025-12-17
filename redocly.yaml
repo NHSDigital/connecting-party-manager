@@ -1,2 +1,5 @@
 extends:
   - recommended-strict
+rules:
+  no-invalid-schema-examples:
+    severity: warn
