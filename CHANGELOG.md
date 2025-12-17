@@ -5,6 +5,7 @@
 - [PI-889] Pytest update
 - [PI-889] Dependabot - Github actions update
 - [PI-889] Dependabot - Sonarqube update
+- [PI-889] Dependabot - upload artifact update
 
 ## 2025-07-21
 - Create new tag
