@@ -2,6 +2,7 @@
 
 ## 2025-12-17
 - [PI-889] redocly hotfix
+- [PI-889] nodejs update
 - [PI-889] Dependabot pytest update
 
 ## 2025-07-21
