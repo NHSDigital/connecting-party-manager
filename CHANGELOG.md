@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025-12-17
+- [PI-889] Dependabot updates
+
 ## 2025-07-21
 - Create new tag
 
