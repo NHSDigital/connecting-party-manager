@@ -16,7 +16,7 @@ components:
               message:
                 type: string
     StatusOK:
-      type: string
+      type: object
       properties:
         code:
           type: string

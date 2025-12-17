@@ -28,15 +28,15 @@ $(_CLEANED_SWAGGER_FILE): $(SWAGGER_DEPENDENCIES)
 
 $(SWAGGER_AWS): $(SWAGGER_DEPENDENCIES) $(_CLEANED_SWAGGER_FILE)
 	@env bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh generate_aws_swagger
-	npx --yes @redocly/cli lint $(SWAGGER_AWS) --skip-rule operation-4xx-response --skip-rule spec-components-invalid-map-name
+	npx --yes @redocly/cli@1.17.0 lint $(SWAGGER_AWS) --skip-rule operation-4xx-response --skip-rule spec-components-invalid-map-name
 
 $(SWAGGER_PUBLIC): $(SWAGGER_DEPENDENCIES) $(_CLEANED_SWAGGER_FILE)
 	@env bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh generate_public_swagger
-	npx --yes @redocly/cli lint $(SWAGGER_PUBLIC) --skip-rule security-defined
+	npx --yes @redocly/cli@1.17.0 lint $(SWAGGER_PUBLIC) --skip-rule security-defined
 
 $(SWAGGER_APIGEE): $(SWAGGER_DEPENDENCIES) $(_CLEANED_SWAGGER_FILE) $(WORKSPACE_OUTPUT_JSON)
 	@env bash $(PATH_TO_INFRASTRUCTURE)/swagger/merge.sh generate_apigee_swagger
-	npx --yes @redocly/cli lint $(SWAGGER_APIGEE) --skip-rule security-defined
+	npx --yes @redocly/cli@1.17.0 lint $(SWAGGER_APIGEE) --skip-rule security-defined
 
 $(SWAGGER_PUBLISH_TIMESTAMP): aws--login $(SWAGGER_PUBLIC) $(WORKSPACE_OUTPUT_JSON)
 	[[ -f $(SWAGGER_PUBLISH_TIMESTAMP) ]] && rm $(SWAGGER_PUBLISH_TIMESTAMP) || :
