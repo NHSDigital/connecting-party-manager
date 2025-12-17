@@ -41,7 +41,7 @@ jobs:
     runs-on: [self-hosted, ci]
     needs: [get-branch-from-workflow-file]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - uses: ./.github/actions/make/
@@ -55,7 +55,7 @@ jobs:
     needs: [build-base]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ needs.get-branch-from-workflow-file.outputs.branch_name }}
       - name: Destroy workspace
