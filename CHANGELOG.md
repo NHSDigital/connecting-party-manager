@@ -2,8 +2,7 @@
 
 ## 2025-12-17
 - [PI-889] redocly hotfix
-- [PI-889] nodejs update
-- [PI-889] Dependabot pytest update
+- [PI-889] Pytest update
 
 ## 2025-07-21
 - Create new tag
