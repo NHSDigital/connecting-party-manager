@@ -5,6 +5,7 @@
 - Dependabot - Datamodel code generator update
 - Dependabot - Pytest-cov update
 - Dependabot - github-script update
+- Dependabot - aws lambda powertools update
 
 ## 2025-12-17
 - [PI-889] redocly hotfix
