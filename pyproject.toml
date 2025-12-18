@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "connecting-party-manager"
-version = "2025.12.17"
+version = "2025.12.18"
 description = "Repository for the Connecting Party Manager API and related services"
 authors = ["NHS England"]
 license = "LICENSE.md"
@@ -15,7 +15,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "3.12.3"
-pydantic = "1.10.22"
+pydantic = "1.10.25"
 nhs-context-logging = "^0.6.8"
 requests = "^2.31.0"
 aws-lambda-powertools = "^2.26.0"
@@ -40,7 +40,7 @@ hypothesis = "^6.87.3"
 aws-lambda-powertools = { extras = ["aws-sdk"], version = "^2.26.0" }
 parse = "^1.19.1"
 pytest-mock = "^3.12.0"
-datamodel-code-generator = "^0.43.1"
+datamodel-code-generator = "^0.44.0"
 pyyaml = "^6.0.1"
 proxygen-cli = "^2.1.14"
 moto = "^5.0.1"
