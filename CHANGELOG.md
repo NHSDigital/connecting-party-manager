@@ -3,10 +3,10 @@
 ## 2025-12-17
 - [PI-889] redocly hotfix
 - [PI-889] Pytest update
-- [PI-889] Dependabot - Github actions update
-- [PI-889] Dependabot - Sonarqube update
-- [PI-889] Dependabot - upload artifact update
-- [PI-889] Dependabot - Datamodel code generator update
+- Dependabot - Github actions update
+- Dependabot - Sonarqube update
+- Dependabot - upload artifact update
+- Dependabot - Datamodel code generator update
 
 ## 2025-07-21
 - Create new tag
