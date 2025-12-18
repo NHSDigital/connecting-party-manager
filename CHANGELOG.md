@@ -3,7 +3,6 @@
 ## 2025-12-18
 - Dependabot - Pydantic
 - Dependabot - Datamodel code generator update
-- Dependabot - Pytest
 
 ## 2025-12-17
 - [PI-889] redocly hotfix
