@@ -29,14 +29,14 @@ from api.tests.feature_tests.steps.table import (
 sort_keys = {"product": "name"}
 
 
-@given('"{header_name}" request headers')
+@given('"{header_name}" request headers:')
 def given_request_headers(context: Context, header_name: str):
     table_headers = parse_table(table=context.table, context=context)
     context.headers[header_name] = dict(**table_headers, apikey=context.api_key)
 
 
 @given(
-    'I have already made a "{http_method}" request with "{header_name}" headers to "{endpoint}" with body'
+    'I have already made a "{http_method}" request with "{header_name}" headers to "{endpoint}" with body:'
 )
 def given_made_request(
     context: Context, http_method: str, header_name: str, endpoint: str
@@ -93,7 +93,7 @@ def given_made_request(
 
 
 @when(
-    'I make a "{http_method}" request with "{header_name}" headers to "{endpoint}" with body'
+    'I make a "{http_method}" request with "{header_name}" headers to "{endpoint}" with body:'
 )
 def when_make_request(
     context: Context, http_method: str, header_name: str, endpoint: str
@@ -293,7 +293,7 @@ def then_response(context: Context, status_code: str):
     )
 
 
-@then("the response headers contain")
+@then("the response headers contain:")
 def then_response(context: Context):
     expected_response_headers = parse_table(table=context.table, context=context)
     assert_is_subset(
