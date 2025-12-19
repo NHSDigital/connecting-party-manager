@@ -22,3 +22,7 @@ components:
     HeaderApikey:
       type: string
       example: GEDT124JF9OP
+
+    CorsOrigin:
+      type: string
+      example: "*"

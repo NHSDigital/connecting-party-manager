@@ -180,6 +180,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CPMProductTeamDeleteResponse"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          example: "*"
     ProductCreate:
       description: Create product operation successful
       content:
