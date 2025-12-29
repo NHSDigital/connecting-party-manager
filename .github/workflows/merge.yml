@@ -55,7 +55,7 @@ jobs:
         with:
           ref: main
       - name: Download artifact
-        uses: dawidd6/action-download-artifact@v11
+        uses: dawidd6/action-download-artifact@v12
         with:
           name: "${{ needs.create-coverage-name.outputs.coverage-name }}-coverage"
           branch: "${{ needs.make-tag.outputs.tag }}"
